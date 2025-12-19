@@ -21,7 +21,6 @@ import {
   Quote,
   Menu,
   X,
-  UserCircle,
   Crown,
   BookMarked,
   Download,
