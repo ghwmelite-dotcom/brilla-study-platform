@@ -105,7 +105,7 @@ function StatItem({ stat, index, inView }: { stat: typeof stats[0]; index: numbe
       <div className="text-4xl md:text-5xl font-bold text-white mb-2">
         {count}{stat.suffix}
       </div>
-      <div className="text-white/60">{stat.label}</div>
+      <div className="text-white/80">{stat.label}</div>
     </div>
   );
 }
@@ -393,7 +393,7 @@ export function LandingPage() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-xl md:text-2xl text-white/70 max-w-3xl mx-auto mb-10">
+          <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-10">
             Join over 50,000 students preparing smarter with AI-powered practice,
             past papers, and competition simulations.
           </p>
@@ -425,7 +425,7 @@ export function LandingPage() {
           </div>
 
           {/* Trust Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-8 text-white/60">
+          <div className="flex flex-wrap items-center justify-center gap-8 text-white/90">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-green-400" />
               <span>Free to Start</span>
@@ -478,13 +478,13 @@ export function LandingPage() {
             'text-center mb-16',
             modesRef.inView ? 'animate-slide-up' : 'opacity-0'
           )}>
-            <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
+            <span className="inline-block px-4 py-1 bg-white/20 text-white rounded-full text-sm font-medium mb-4">
               Choose Your Path
             </span>
-            <h2 className="text-4xl md:text-5xl font-display font-bold text-slate-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
               One Platform, Three Exams
             </h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+            <p className="text-xl text-white/80 max-w-2xl mx-auto">
               Whether you're preparing for NSMQ, WASSCE, or BECE, we've got you covered.
             </p>
           </div>
@@ -659,7 +659,7 @@ export function LandingPage() {
           <h2 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
             Ready to Shine?
           </h2>
-          <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
+          <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
             Join the thousands of students already preparing smarter with Brilla.
             Your journey to academic excellence starts here.
           </p>
@@ -676,7 +676,7 @@ export function LandingPage() {
             </Link>
           </div>
 
-          <p className="mt-8 text-white/60 flex items-center justify-center gap-2">
+          <p className="mt-8 text-white/80 flex items-center justify-center gap-2">
             <Clock className="w-4 h-4" />
             Takes less than 2 minutes to get started
           </p>
@@ -695,7 +695,7 @@ export function LandingPage() {
                 </div>
                 <span className="font-display font-bold text-2xl">Brilla</span>
               </div>
-              <p className="text-slate-400">
+              <p className="text-slate-300">
                 Ghana's leading exam preparation platform for NSMQ, WASSCE, and BECE.
               </p>
             </div>
@@ -703,7 +703,7 @@ export function LandingPage() {
             {/* Links */}
             <div>
               <h4 className="font-semibold mb-4">Platform</h4>
-              <ul className="space-y-2 text-slate-400">
+              <ul className="space-y-2 text-slate-300">
                 <li><Link to="/topics" className="hover:text-white transition">Topics</Link></li>
                 <li><Link to="/practice" className="hover:text-white transition">Practice</Link></li>
                 <li><Link to="/past-papers" className="hover:text-white transition">Past Papers</Link></li>
@@ -713,7 +713,7 @@ export function LandingPage() {
 
             <div>
               <h4 className="font-semibold mb-4">Exams</h4>
-              <ul className="space-y-2 text-slate-400">
+              <ul className="space-y-2 text-slate-300">
                 <li><a href="#" className="hover:text-white transition">NSMQ Prep</a></li>
                 <li><a href="#" className="hover:text-white transition">WASSCE Prep</a></li>
                 <li><a href="#" className="hover:text-white transition">BECE Prep</a></li>
@@ -722,7 +722,7 @@ export function LandingPage() {
 
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-slate-400">
+              <ul className="space-y-2 text-slate-300">
                 <li><a href="#" className="hover:text-white transition">Help Center</a></li>
                 <li><a href="#" className="hover:text-white transition">Contact Us</a></li>
                 <li><a href="#" className="hover:text-white transition">Privacy Policy</a></li>
@@ -732,11 +732,11 @@ export function LandingPage() {
           </div>
 
           <div className="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-slate-500">
+            <p className="text-slate-400">
               &copy; {new Date().getFullYear()} Brilla Study Platform. Made with love in Ghana.
             </p>
             <div className="flex items-center gap-2">
-              <span className="text-slate-500">Designed for </span>
+              <span className="text-slate-400">Designed for </span>
               <span className="text-xl">🇬🇭</span>
             </div>
           </div>
