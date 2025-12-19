@@ -87,6 +87,29 @@ function FloatingElement({ children, delay = 0, className = '' }: { children: Re
   );
 }
 
+// Stat item component with its own counter hook
+function StatItem({ stat, index, inView }: { stat: typeof stats[0]; index: number; inView: boolean }) {
+  const count = useCounter(stat.value, 2000, inView);
+
+  return (
+    <div
+      className={cn(
+        'text-center',
+        inView ? 'animate-scale-in' : 'opacity-0'
+      )}
+      style={{ animationDelay: `${index * 0.1}s` }}
+    >
+      <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm mb-4">
+        <stat.icon className="w-8 h-8 text-secondary" />
+      </div>
+      <div className="text-4xl md:text-5xl font-bold text-white mb-2">
+        {count}{stat.suffix}
+      </div>
+      <div className="text-white/60">{stat.label}</div>
+    </div>
+  );
+}
+
 // Typewriter effect component
 function TypewriterText({ texts, className = '' }: { texts: string[]; className?: string }) {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
@@ -434,27 +457,12 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <div
+              <StatItem
                 key={stat.label}
-                className={cn(
-                  'text-center',
-                  statsRef.inView ? 'animate-scale-in' : 'opacity-0'
-                )}
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm mb-4">
-                  <stat.icon className="w-8 h-8 text-secondary" />
-                </div>
-                <div className="text-4xl md:text-5xl font-bold text-white mb-2">
-                  {statsRef.inView ? (
-                    <>
-                      {useCounter(stat.value, 2000, statsRef.inView)}
-                      {stat.suffix}
-                    </>
-                  ) : '0'}
-                </div>
-                <div className="text-white/60">{stat.label}</div>
-              </div>
+                stat={stat}
+                index={index}
+                inView={statsRef.inView}
+              />
             ))}
           </div>
         </div>
