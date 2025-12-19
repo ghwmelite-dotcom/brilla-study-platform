@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
-import { useBattleStore, useAuthStore } from '@/stores';
+import { useBattleStore } from '@/stores';
 import { BattleLobby, BattleArena, BattleResults } from '@/components/battle';
 import type { Battle } from '@/types';
 
@@ -10,7 +10,6 @@ type BattlePhase = 'lobby' | 'waiting' | 'battle' | 'results';
 export function BattlePage() {
   const { id: battleId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuthStore();
   const { currentBattle, fetchBattle, resetBattle, startPolling, stopPolling } = useBattleStore();
 
   const [phase, setPhase] = useState<BattlePhase>('lobby');

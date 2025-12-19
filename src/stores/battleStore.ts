@@ -115,8 +115,6 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       set({
         currentBattle: battle,
         currentQuestion,
-        challengerScore: battle.challengerScore,
-        opponentScore: battle.opponentScore,
         isLoading: false,
       });
     } catch (error) {

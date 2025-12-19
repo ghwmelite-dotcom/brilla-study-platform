@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Swords, Users, Clock, RefreshCw, Zap } from 'lucide-react';
+import { Swords, Users, RefreshCw, Zap } from 'lucide-react';
 import { useBattleStore, useAuthStore } from '@/stores';
 import type { Battle, Difficulty } from '@/types';
 

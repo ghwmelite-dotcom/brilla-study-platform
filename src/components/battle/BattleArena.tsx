@@ -25,7 +25,6 @@ export function BattleArena({ battle, onComplete }: BattleArenaProps) {
   } = useBattleStore();
 
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
-  const [voiceAnswer, setVoiceAnswer] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [lastResult, setLastResult] = useState<{
@@ -38,8 +37,7 @@ export function BattleArena({ battle, onComplete }: BattleArenaProps) {
   // Timer for each question
   const { time, start, reset: resetTimer } = useTimer({
     initialTime: currentQuestion?.timeLimit || 30,
-    countdown: true,
-    onEnd: () => {
+    onComplete: () => {
       if (!showResult && selectedAnswer === '') {
         handleSubmit('');
       }
@@ -104,7 +102,6 @@ export function BattleArena({ battle, onComplete }: BattleArenaProps) {
         setTimeout(() => {
           setShowResult(false);
           setSelectedAnswer('');
-          setVoiceAnswer('');
           setLastResult(null);
           nextQuestion();
         }, 2000);
@@ -247,7 +244,7 @@ export function BattleArena({ battle, onComplete }: BattleArenaProps) {
           /* Direct answer / voice input */
           <div className="space-y-4">
             <VoiceInput
-              onTranscript={setVoiceAnswer}
+              onTranscript={setSelectedAnswer}
               onSubmit={handleVoiceSubmit}
               disabled={showResult || isSubmitting}
               placeholder="Speak or type your answer..."

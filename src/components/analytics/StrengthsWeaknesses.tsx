@@ -1,6 +1,5 @@
 import { TrendingUp, TrendingDown, ChevronRight } from 'lucide-react';
 import type { TopicStrength } from '@/utils/analyticsUtils';
-import { getSubjectColor } from '@/utils/analyticsUtils';
 
 interface StrengthsWeaknessesProps {
   strengths: TopicStrength[];
