@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout';
 import {
   HomePage,
@@ -22,60 +22,65 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 // Login Page (placeholder)
 function LoginPage() {
-  const { isLoading, error } = useAuthStore();
+  const navigate = useNavigate();
+  const { isLoading, error, isAuthenticated } = useAuthStore();
 
-  const handleDemoLogin = async (role: 'student' | 'admin' | 'teacher' = 'student') => {
-    try {
-      const users = {
-        student: {
-          id: 'user_demo',
-          email: 'demo@stjohns.edu.gh',
-          name: 'Demo Student',
-          role: 'student' as const,
-          house: 'Blue House',
-          yearGroup: 3,
-          xpPoints: 1500,
-          level: 2,
-          streakDays: 5,
-        },
-        admin: {
-          id: 'user_admin',
-          email: 'admin@stjohns.edu.gh',
-          name: 'Admin User',
-          role: 'admin' as const,
-          house: undefined,
-          yearGroup: undefined,
-          xpPoints: 0,
-          level: 10,
-          streakDays: 0,
-        },
-        teacher: {
-          id: 'user_teacher',
-          email: 'teacher@stjohns.edu.gh',
-          name: 'Demo Teacher',
-          role: 'teacher' as const,
-          house: undefined,
-          yearGroup: undefined,
-          xpPoints: 5000,
-          level: 5,
-          streakDays: 30,
-        },
-      };
+  // Redirect if already authenticated
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
-      const selectedUser = users[role];
+  const handleDemoLogin = (role: 'student' | 'admin' | 'teacher' = 'student') => {
+    const users = {
+      student: {
+        id: 'user_demo',
+        email: 'demo@stjohns.edu.gh',
+        name: 'Demo Student',
+        role: 'student' as const,
+        house: 'Blue House',
+        yearGroup: 3,
+        xpPoints: 1500,
+        level: 2,
+        streakDays: 5,
+      },
+      admin: {
+        id: 'user_admin',
+        email: 'admin@stjohns.edu.gh',
+        name: 'Admin User',
+        role: 'admin' as const,
+        house: undefined,
+        yearGroup: undefined,
+        xpPoints: 0,
+        level: 10,
+        streakDays: 0,
+      },
+      teacher: {
+        id: 'user_teacher',
+        email: 'teacher@stjohns.edu.gh',
+        name: 'Demo Teacher',
+        role: 'teacher' as const,
+        house: undefined,
+        yearGroup: undefined,
+        xpPoints: 5000,
+        level: 5,
+        streakDays: 30,
+      },
+    };
 
-      useAuthStore.setState({
-        user: {
-          ...selectedUser,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        token: `${role}_demo_token`,
-        isAuthenticated: true,
-      });
-    } catch (err) {
-      console.error('Login failed:', err);
-    }
+    const selectedUser = users[role];
+
+    useAuthStore.setState({
+      user: {
+        ...selectedUser,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      token: `${role}_demo_token`,
+      isAuthenticated: true,
+    });
+
+    // Redirect to dashboard after login
+    navigate('/dashboard');
   };
 
   return (
@@ -160,6 +165,14 @@ function LoginPage() {
 
 // Register Page (placeholder)
 function RegisterPage() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
+
+  // Redirect if already authenticated
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   const handleDemoRegister = () => {
     useAuthStore.setState({
       user: {
@@ -178,6 +191,9 @@ function RegisterPage() {
       token: 'new_token',
       isAuthenticated: true,
     });
+
+    // Redirect to dashboard after registration
+    navigate('/dashboard');
   };
 
   return (
