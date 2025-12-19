@@ -95,51 +95,54 @@ function LoginPage() {
           </div>
         )}
 
+        {/* Demo login buttons */}
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Email</label>
-            <input
-              type="email"
-              className="w-full px-4 py-2 rounded-lg border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
-              placeholder="student@stjohns.edu.gh"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Password</label>
-            <input
-              type="password"
-              className="w-full px-4 py-2 rounded-lg border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
-              placeholder="••••••••"
-            />
-          </div>
+          {/* Admin - Primary button */}
           <button
-            onClick={() => handleDemoLogin('student')}
+            type="button"
+            onClick={() => handleDemoLogin('admin')}
             disabled={isLoading}
-            className="w-full py-2 px-4 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
+            className="w-full py-3 px-4 bg-accent text-white rounded-lg font-semibold hover:bg-accent-dark active:scale-[0.98] transition-all disabled:opacity-50 shadow-md"
           >
-            {isLoading ? 'Signing in...' : 'Sign In (Demo Student)'}
+            {isLoading ? 'Signing in...' : 'Sign In as Admin'}
           </button>
-        </div>
 
-        {/* Demo login options */}
-        <div className="mt-6 pt-6 border-t border-neutral-200">
-          <p className="text-xs text-neutral-400 text-center mb-3">Demo Accounts</p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-neutral-200"></div>
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="px-2 bg-white text-neutral-400">or continue as</span>
+            </div>
+          </div>
+
+          {/* Teacher and Student buttons */}
+          <div className="grid grid-cols-2 gap-3">
             <button
-              onClick={() => handleDemoLogin('admin')}
-              disabled={isLoading}
-              className="py-2 px-3 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-dark transition-colors disabled:opacity-50"
-            >
-              Admin Login
-            </button>
-            <button
+              type="button"
               onClick={() => handleDemoLogin('teacher')}
               disabled={isLoading}
-              className="py-2 px-3 bg-secondary text-neutral-900 rounded-lg text-sm font-medium hover:bg-secondary-dark transition-colors disabled:opacity-50"
+              className="py-3 px-4 bg-secondary text-neutral-900 rounded-lg font-medium hover:bg-secondary-dark active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
             >
-              Teacher Login
+              Teacher
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDemoLogin('student')}
+              disabled={isLoading}
+              className="py-3 px-4 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
+            >
+              Student
             </button>
           </div>
+        </div>
+
+        {/* Demo credentials info */}
+        <div className="mt-6 p-4 bg-neutral-50 rounded-lg">
+          <p className="text-xs text-neutral-500 text-center">
+            <strong>Demo Mode:</strong> Click any button above to sign in instantly.
+            <br />No password required.
+          </p>
         </div>
 
         <div className="mt-6 text-center">
