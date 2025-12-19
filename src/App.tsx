@@ -278,11 +278,46 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="topics" element={<TopicsPage />} />
-          <Route path="topics/:subjectSlug" element={<TopicsPage />} />
-          <Route path="topics/:subjectSlug/:topicSlug" element={<TopicsPage />} />
-          <Route path="practice" element={<PracticePage />} />
-          <Route path="competition" element={<CompetitionPage />} />
+          <Route
+            path="topics"
+            element={
+              <ProtectedRoute>
+                <TopicsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="topics/:subjectSlug"
+            element={
+              <ProtectedRoute>
+                <TopicsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="topics/:subjectSlug/:topicSlug"
+            element={
+              <ProtectedRoute>
+                <TopicsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="practice"
+            element={
+              <ProtectedRoute>
+                <PracticePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="competition"
+            element={
+              <ProtectedRoute>
+                <CompetitionPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="leaderboard" element={<LeaderboardPage />} />
           <Route
             path="profile"
