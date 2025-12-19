@@ -5,7 +5,6 @@ import { jwt } from 'hono/jwt';
 // Types for Cloudflare bindings
 interface Env {
   DB: D1Database;
-  CACHE: KVNamespace;
   JWT_SECRET: string;
   ENVIRONMENT: string;
   ANTHROPIC_API_KEY?: string;
