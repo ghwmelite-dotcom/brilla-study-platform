@@ -24,24 +24,53 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function LoginPage() {
   const { isLoading, error } = useAuthStore();
 
-  const handleDemoLogin = async () => {
+  const handleDemoLogin = async (role: 'student' | 'admin' | 'teacher' = 'student') => {
     try {
-      // For demo, we'll set a mock user directly
-      useAuthStore.setState({
-        user: {
+      const users = {
+        student: {
           id: 'user_demo',
           email: 'demo@stjohns.edu.gh',
           name: 'Demo Student',
-          role: 'student',
+          role: 'student' as const,
           house: 'Blue House',
           yearGroup: 3,
           xpPoints: 1500,
           level: 2,
           streakDays: 5,
+        },
+        admin: {
+          id: 'user_admin',
+          email: 'admin@stjohns.edu.gh',
+          name: 'Admin User',
+          role: 'admin' as const,
+          house: undefined,
+          yearGroup: undefined,
+          xpPoints: 0,
+          level: 10,
+          streakDays: 0,
+        },
+        teacher: {
+          id: 'user_teacher',
+          email: 'teacher@stjohns.edu.gh',
+          name: 'Demo Teacher',
+          role: 'teacher' as const,
+          house: undefined,
+          yearGroup: undefined,
+          xpPoints: 5000,
+          level: 5,
+          streakDays: 30,
+        },
+      };
+
+      const selectedUser = users[role];
+
+      useAuthStore.setState({
+        user: {
+          ...selectedUser,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
-        token: 'demo_token',
+        token: `${role}_demo_token`,
         isAuthenticated: true,
       });
     } catch (err) {
@@ -84,12 +113,33 @@ function LoginPage() {
             />
           </div>
           <button
-            onClick={handleDemoLogin}
+            onClick={() => handleDemoLogin('student')}
             disabled={isLoading}
             className="w-full py-2 px-4 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
           >
-            {isLoading ? 'Signing in...' : 'Sign In (Demo)'}
+            {isLoading ? 'Signing in...' : 'Sign In (Demo Student)'}
           </button>
+        </div>
+
+        {/* Demo login options */}
+        <div className="mt-6 pt-6 border-t border-neutral-200">
+          <p className="text-xs text-neutral-400 text-center mb-3">Demo Accounts</p>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => handleDemoLogin('admin')}
+              disabled={isLoading}
+              className="py-2 px-3 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-dark transition-colors disabled:opacity-50"
+            >
+              Admin Login
+            </button>
+            <button
+              onClick={() => handleDemoLogin('teacher')}
+              disabled={isLoading}
+              className="py-2 px-3 bg-secondary text-neutral-900 rounded-lg text-sm font-medium hover:bg-secondary-dark transition-colors disabled:opacity-50"
+            >
+              Teacher Login
+            </button>
+          </div>
         </div>
 
         <div className="mt-6 text-center">
