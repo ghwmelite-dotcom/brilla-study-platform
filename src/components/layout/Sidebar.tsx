@@ -12,40 +12,55 @@ import {
   User,
   Settings,
   HelpCircle,
-  Calculator,
-  Atom,
-  FlaskConical,
-  Dna,
+  FileText,
 } from 'lucide-react';
 import { cn } from '@/utils';
-import { useAuthStore } from '@/stores';
+import { useAuthStore, useExamStore } from '@/stores';
+import { SubjectNavigation } from '@/components/subjects';
+import { ExamModeSwitcher } from '@/components/exam';
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+// Main navigation (always visible)
 const mainNavItems = [
   { path: '/', label: 'Home', icon: Home },
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, auth: true },
   { path: '/topics', label: 'Topics', icon: BookOpen },
   { path: '/practice', label: 'Practice', icon: Brain },
-  { path: '/battle', label: '1v1 Battle', icon: Swords, auth: true },
-  { path: '/competition', label: 'Competition', icon: Trophy },
+];
+
+// Exam-specific navigation items
+const examSpecificItems = {
+  nsmq: [
+    { path: '/battle', label: '1v1 Battle', icon: Swords, auth: true },
+    { path: '/competition', label: 'Competition Sim', icon: Trophy },
+  ],
+  wassce: [
+    { path: '/past-papers', label: 'Past Papers', icon: FileText },
+    { path: '/practice/essay', label: 'Essay Practice', icon: BookOpen },
+  ],
+  bece: [
+    { path: '/past-papers', label: 'Past Papers', icon: FileText },
+  ],
+};
+
+// Common items for all modes
+const commonItems = [
   { path: '/house-cup', label: 'House Cup', icon: Shield, auth: true },
   { path: '/analytics', label: 'Analytics', icon: BarChart3, auth: true },
   { path: '/leaderboard', label: 'Leaderboard', icon: Medal },
 ];
 
-const subjects = [
-  { slug: 'mathematics', label: 'Mathematics', icon: Calculator, color: 'text-blue-500' },
-  { slug: 'physics', label: 'Physics', icon: Atom, color: 'text-purple-500' },
-  { slug: 'chemistry', label: 'Chemistry', icon: FlaskConical, color: 'text-green-500' },
-  { slug: 'biology', label: 'Biology', icon: Dna, color: 'text-amber-500' },
-];
-
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { isAuthenticated } = useAuthStore();
+  const { currentExamType } = useExamStore();
+
+  // Get exam-specific navigation items
+  const examItems = examSpecificItems[currentExamType] || [];
+  const allNavItems = [...mainNavItems, ...examItems, ...commonItems];
 
   return (
     <>
@@ -68,14 +83,19 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         )}
       >
         <nav className="p-4 space-y-6">
+          {/* Mobile Exam Switcher */}
+          <div className="lg:hidden">
+            <ExamModeSwitcher />
+          </div>
+
           {/* Main Navigation */}
           <div>
             <h3 className="px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
               Navigation
             </h3>
             <ul className="space-y-1">
-              {mainNavItems.map((item) => {
-                if (item.auth && !isAuthenticated) return null;
+              {allNavItems.map((item) => {
+                if ('auth' in item && item.auth && !isAuthenticated) return null;
 
                 return (
                   <li key={item.path}>
@@ -100,33 +120,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </ul>
           </div>
 
-          {/* Subjects */}
-          <div>
-            <h3 className="px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
-              Subjects
-            </h3>
-            <ul className="space-y-1">
-              {subjects.map((subject) => (
-                <li key={subject.slug}>
-                  <NavLink
-                    to={`/topics/${subject.slug}`}
-                    onClick={onClose}
-                    className={({ isActive }) =>
-                      cn(
-                        'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
-                        isActive
-                          ? 'bg-primary text-white'
-                          : 'text-neutral-700 hover:bg-neutral-100'
-                      )
-                    }
-                  >
-                    <subject.icon className={cn('w-5 h-5', subject.color)} />
-                    {subject.label}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Dynamic Subjects */}
+          <SubjectNavigation onItemClick={onClose} />
 
           {/* Quick Stats (if authenticated) */}
           {isAuthenticated && (
@@ -209,10 +204,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </ul>
           </div>
 
-          {/* School branding */}
+          {/* Platform branding */}
           <div className="text-center text-xs text-neutral-500 pt-4 border-t border-neutral-200">
-            <p className="font-medium">St John's Grammar School</p>
-            <p>NSMQ Training Platform</p>
+            <p className="font-medium">Brilla Study Platform</p>
+            <p>
+              {currentExamType === 'nsmq' && 'NSMQ Competition Prep'}
+              {currentExamType === 'wassce' && 'WASSCE Exam Prep'}
+              {currentExamType === 'bece' && 'BECE Exam Prep'}
+            </p>
           </div>
         </nav>
       </aside>

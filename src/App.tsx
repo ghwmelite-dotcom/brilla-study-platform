@@ -9,6 +9,7 @@ import {
   HouseCupPage,
   AnalyticsPage,
   BattlePage,
+  PastPapersPage,
 } from '@/pages';
 import { useAuthStore } from '@/stores';
 
@@ -45,6 +46,7 @@ function LoginPage() {
         xpPoints: 1500,
         level: 2,
         streakDays: 5,
+        aiGradingCredits: 0,
       },
       admin: {
         id: 'user_admin',
@@ -56,6 +58,7 @@ function LoginPage() {
         xpPoints: 0,
         level: 10,
         streakDays: 0,
+        aiGradingCredits: 100,
       },
       teacher: {
         id: 'user_teacher',
@@ -67,6 +70,7 @@ function LoginPage() {
         xpPoints: 5000,
         level: 5,
         streakDays: 30,
+        aiGradingCredits: 50,
       },
     };
 
@@ -188,6 +192,7 @@ function RegisterPage() {
         xpPoints: 0,
         level: 1,
         streakDays: 0,
+        aiGradingCredits: 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
@@ -420,6 +425,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <BattlePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="past-papers" element={<PastPapersPage />} />
+          <Route
+            path="past-papers/:paperId"
+            element={
+              <ProtectedRoute>
+                <PastPapersPage />
               </ProtectedRoute>
             }
           />

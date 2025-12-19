@@ -1,4 +1,65 @@
-// User types
+// =============================================
+// EXAM TYPE SYSTEM
+// =============================================
+
+export type ExamTypeSlug = 'nsmq' | 'wassce' | 'bece';
+
+export interface ExamType {
+  id: string;
+  name: string;
+  slug: ExamTypeSlug;
+  description?: string;
+  country: string;
+  isActive: boolean;
+  displayOrder: number;
+  icon?: string;
+  color?: string;
+}
+
+export interface SubjectCategory {
+  id: string;
+  examTypeId: string;
+  name: string;
+  slug: string;
+  description?: string;
+  isCore: boolean;
+  displayOrder: number;
+}
+
+export interface PaperType {
+  id: string;
+  examTypeId: string;
+  name: string;
+  slug: string;
+  description?: string;
+  questionFormat: 'objective' | 'essay' | 'practical' | 'mixed';
+  typicalDuration?: number; // in minutes
+  totalMarks?: number;
+  displayOrder: number;
+}
+
+// =============================================
+// SUBSCRIPTION & PREMIUM FEATURES
+// =============================================
+
+export type SubscriptionTierSlug = 'free' | 'basic' | 'premium' | 'school';
+
+export interface SubscriptionTier {
+  id: string;
+  name: string;
+  slug: SubscriptionTierSlug;
+  description?: string;
+  priceMonthly: number;
+  priceYearly: number;
+  aiGradingQuota: number; // -1 for unlimited
+  features: string[];
+  isActive: boolean;
+}
+
+// =============================================
+// USER TYPES (Extended)
+// =============================================
+
 export interface User {
   id: string;
   email: string;
@@ -10,6 +71,11 @@ export interface User {
   level: number;
   streakDays: number;
   avatarUrl?: string;
+  // Multi-exam additions
+  primaryExamTypeId?: string;
+  subscriptionTierId?: string;
+  subscriptionExpiresAt?: string;
+  aiGradingCredits: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -28,8 +94,16 @@ export interface Subject {
   icon: string;
   color: string;
   description?: string;
+  // Multi-exam additions
+  examTypeId?: string;
+  categoryId?: string;
+  waecCode?: string;
+  isActive: boolean;
+  displayOrder: number;
+  // Computed
   topicCount?: number;
   questionCount?: number;
+  category?: SubjectCategory;
 }
 
 export interface Topic {
@@ -47,7 +121,21 @@ export interface Topic {
 }
 
 // Question types
-export type QuestionType = 'multiple_choice' | 'true_false' | 'direct_answer' | 'problem' | 'riddle';
+export type QuestionType =
+  | 'multiple_choice'
+  | 'true_false'
+  | 'direct_answer'
+  | 'problem'
+  | 'riddle'
+  // Extended types for WASSCE/BECE
+  | 'essay'
+  | 'short_answer'
+  | 'structured'
+  | 'practical'
+  | 'calculation'
+  | 'diagram'
+  | 'comprehension';
+
 export type RoundType = 'round_one' | 'speed_race' | 'problem_of_day' | 'true_false' | 'riddles';
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
 
@@ -65,7 +153,155 @@ export interface Question {
   points: number;
   timeLimit: number; // in seconds
   imageUrl?: string;
+  // Multi-exam additions
+  examTypeId?: string;
+  paperTypeId?: string;
+  pastPaperId?: string;
+  marks: number;
+  questionNumber?: number;
+  section?: string;
   createdAt: string;
+}
+
+// =============================================
+// PAST PAPERS SYSTEM
+// =============================================
+
+export interface PastPaper {
+  id: string;
+  examTypeId: string;
+  subjectId: string;
+  paperTypeId: string;
+  year: number;
+  month?: string; // 'May-June', 'November-December'
+  series?: string;
+  title: string;
+  totalQuestions: number;
+  totalMarks?: number;
+  timeAllowed?: number; // in minutes
+  instructions?: string;
+  isComplete: boolean;
+  isPremium: boolean;
+  // Computed/joined
+  subject?: Subject;
+  paperType?: PaperType;
+  questions?: Question[];
+}
+
+export interface PaperAttempt {
+  id: string;
+  userId: string;
+  paperId: string;
+  status: 'in_progress' | 'completed' | 'abandoned';
+  timeAllowed?: number;
+  timeUsed?: number;
+  totalScore?: number;
+  percentageScore?: number;
+  startedAt: string;
+  submittedAt?: string;
+  // Computed/joined
+  paper?: PastPaper;
+  answers?: PaperAttemptAnswer[];
+}
+
+export interface PaperAttemptAnswer {
+  id: string;
+  attemptId: string;
+  questionId: string;
+  answerText: string;
+  isCorrect?: boolean;
+  marksEarned?: number;
+  timeTaken?: number;
+  answeredAt: string;
+}
+
+// =============================================
+// ESSAY SYSTEM
+// =============================================
+
+export interface EssayQuestion {
+  id: string;
+  questionId: string;
+  wordLimitMin?: number;
+  wordLimitMax?: number;
+  markingScheme: MarkingCriteria[];
+  modelAnswer?: string;
+  markingRubric?: MarkingRubric;
+  aiGradingEnabled: boolean;
+  // Joined
+  question?: Question;
+}
+
+export interface MarkingCriteria {
+  name: string;
+  description: string;
+  maxMarks: number;
+  guidelines?: string;
+}
+
+export interface MarkingRubric {
+  criteria: RubricCriterion[];
+  totalMarks: number;
+}
+
+export interface RubricCriterion {
+  name: string;
+  description: string;
+  maxMarks: number;
+  levels: RubricLevel[];
+}
+
+export interface RubricLevel {
+  marks: number;
+  description: string;
+}
+
+export type GradingType = 'ai' | 'manual' | 'self' | 'peer';
+export type GradingStatus = 'pending' | 'grading' | 'graded' | 'reviewed' | 'failed';
+
+export interface EssayAttempt {
+  id: string;
+  userId: string;
+  questionId: string;
+  answerText: string;
+  wordCount: number;
+  gradingType?: GradingType;
+  gradingStatus: GradingStatus;
+  aiScore?: number;
+  aiFeedback?: AIEssayFeedback;
+  manualScore?: number;
+  manualFeedback?: string;
+  finalScore?: number;
+  createdAt: string;
+  gradedAt?: string;
+  // Joined
+  question?: Question;
+  essayQuestion?: EssayQuestion;
+}
+
+export interface AIEssayFeedback {
+  overallScore: number;
+  overallFeedback: string;
+  criteriaScores: CriteriaScore[];
+  strengths: string[];
+  areasForImprovement: string[];
+  suggestions?: string[];
+  grammarErrors?: GrammarError[];
+  spellingErrors?: string[];
+}
+
+export interface CriteriaScore {
+  criterionName: string;
+  score: number;
+  maxScore: number;
+  feedback: string;
+}
+
+export interface GrammarError {
+  text: string;
+  suggestion: string;
+  position: { start: number; end: number };
+  type: 'grammar' | 'punctuation' | 'style';
 }
 
 export interface QuestionOption {

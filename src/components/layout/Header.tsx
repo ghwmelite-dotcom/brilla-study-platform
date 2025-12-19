@@ -14,6 +14,7 @@ import {
 import { useState } from 'react';
 import { useAuthStore } from '@/stores';
 import { Button } from '@/components/common';
+import { ExamModeSwitcher } from '@/components/exam';
 import { formatNumber } from '@/utils';
 
 interface HeaderProps {
@@ -65,6 +66,11 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
 
           {/* Page title (mobile) */}
           <span className="lg:hidden font-semibold text-neutral-900">{getPageTitle()}</span>
+
+          {/* Exam Mode Switcher */}
+          <div className="hidden lg:block">
+            <ExamModeSwitcher />
+          </div>
         </div>
 
         {/* Center section - Search */}

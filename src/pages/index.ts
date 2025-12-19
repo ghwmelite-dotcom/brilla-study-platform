@@ -6,3 +6,4 @@ export { CompetitionPage } from './Competition';
 export { HouseCupPage } from './HouseCup';
 export { AnalyticsPage } from './Analytics';
 export { BattlePage } from './Battle';
+export { PastPapers as PastPapersPage } from './PastPapers';
