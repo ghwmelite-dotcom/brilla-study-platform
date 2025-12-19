@@ -165,6 +165,75 @@ CREATE TABLE IF NOT EXISTS competitions (
     completed_at TEXT
 );
 
+-- Houses table (for House Cup system)
+CREATE TABLE IF NOT EXISTS houses (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    color TEXT NOT NULL,
+    icon TEXT DEFAULT 'shield',
+    description TEXT,
+    is_default INTEGER DEFAULT 0,
+    school_id TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- House points tracking
+CREATE TABLE IF NOT EXISTS house_points (
+    id TEXT PRIMARY KEY,
+    house_id TEXT NOT NULL REFERENCES houses(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    points INTEGER NOT NULL,
+    source TEXT NOT NULL CHECK (source IN ('practice', 'battle', 'competition', 'achievement', 'bonus')),
+    source_id TEXT,
+    period TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- House standings (cached rankings)
+CREATE TABLE IF NOT EXISTS house_standings (
+    id TEXT PRIMARY KEY,
+    house_id TEXT NOT NULL REFERENCES houses(id) ON DELETE CASCADE,
+    period TEXT NOT NULL CHECK (period IN ('weekly', 'monthly', 'yearly', 'all_time')),
+    period_value TEXT NOT NULL,
+    total_points INTEGER DEFAULT 0,
+    member_count INTEGER DEFAULT 0,
+    rank INTEGER,
+    updated_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(house_id, period, period_value)
+);
+
+-- Battles table (for 1v1 battles)
+CREATE TABLE IF NOT EXISTS battles (
+    id TEXT PRIMARY KEY,
+    challenger_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    opponent_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+    status TEXT DEFAULT 'waiting' CHECK (status IN ('waiting', 'active', 'completed', 'cancelled')),
+    subject_id TEXT REFERENCES subjects(id),
+    difficulty TEXT DEFAULT 'medium',
+    question_count INTEGER DEFAULT 10,
+    questions TEXT,
+    challenger_score INTEGER DEFAULT 0,
+    opponent_score INTEGER DEFAULT 0,
+    current_question INTEGER DEFAULT 0,
+    winner_id TEXT REFERENCES users(id),
+    created_at TEXT DEFAULT (datetime('now')),
+    started_at TEXT,
+    completed_at TEXT
+);
+
+-- Battle answers tracking
+CREATE TABLE IF NOT EXISTS battle_answers (
+    id TEXT PRIMARY KEY,
+    battle_id TEXT NOT NULL REFERENCES battles(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    question_index INTEGER NOT NULL,
+    answer TEXT,
+    is_correct INTEGER,
+    time_taken INTEGER,
+    points_earned INTEGER DEFAULT 0,
+    answered_at TEXT DEFAULT (datetime('now'))
+);
+
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_questions_topic ON questions(topic_id);
 CREATE INDEX IF NOT EXISTS idx_questions_subject ON questions(subject_id);
@@ -179,3 +248,12 @@ CREATE INDEX IF NOT EXISTS idx_question_attempts_question ON question_attempts(q
 CREATE INDEX IF NOT EXISTS idx_leaderboard_period ON leaderboard(period);
 CREATE INDEX IF NOT EXISTS idx_leaderboard_score ON leaderboard(score DESC);
 CREATE INDEX IF NOT EXISTS idx_riddles_subject ON riddles(subject_id);
+CREATE INDEX IF NOT EXISTS idx_houses_default ON houses(is_default);
+CREATE INDEX IF NOT EXISTS idx_house_points_house ON house_points(house_id);
+CREATE INDEX IF NOT EXISTS idx_house_points_user ON house_points(user_id);
+CREATE INDEX IF NOT EXISTS idx_house_points_period ON house_points(period);
+CREATE INDEX IF NOT EXISTS idx_house_standings_period ON house_standings(period, period_value);
+CREATE INDEX IF NOT EXISTS idx_battles_status ON battles(status);
+CREATE INDEX IF NOT EXISTS idx_battles_challenger ON battles(challenger_id);
+CREATE INDEX IF NOT EXISTS idx_battles_opponent ON battles(opponent_id);
+CREATE INDEX IF NOT EXISTS idx_battle_answers_battle ON battle_answers(battle_id);

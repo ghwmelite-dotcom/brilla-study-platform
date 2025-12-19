@@ -6,6 +6,9 @@ import {
   Brain,
   Trophy,
   Medal,
+  Shield,
+  BarChart3,
+  Swords,
   User,
   Settings,
   HelpCircle,
@@ -27,7 +30,10 @@ const mainNavItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, auth: true },
   { path: '/topics', label: 'Topics', icon: BookOpen },
   { path: '/practice', label: 'Practice', icon: Brain },
+  { path: '/battle', label: '1v1 Battle', icon: Swords, auth: true },
   { path: '/competition', label: 'Competition', icon: Trophy },
+  { path: '/house-cup', label: 'House Cup', icon: Shield, auth: true },
+  { path: '/analytics', label: 'Analytics', icon: BarChart3, auth: true },
   { path: '/leaderboard', label: 'Leaderboard', icon: Medal },
 ];
 

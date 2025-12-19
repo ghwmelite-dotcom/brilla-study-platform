@@ -6,6 +6,9 @@ import {
   TopicsPage,
   PracticePage,
   CompetitionPage,
+  HouseCupPage,
+  AnalyticsPage,
+  BattlePage,
 } from '@/pages';
 import { useAuthStore } from '@/stores';
 
@@ -388,6 +391,38 @@ function App() {
             }
           />
           <Route path="leaderboard" element={<LeaderboardPage />} />
+          <Route
+            path="house-cup"
+            element={
+              <ProtectedRoute>
+                <HouseCupPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="analytics"
+            element={
+              <ProtectedRoute>
+                <AnalyticsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="battle"
+            element={
+              <ProtectedRoute>
+                <BattlePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="battle/:id"
+            element={
+              <ProtectedRoute>
+                <BattlePage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="profile"
             element={

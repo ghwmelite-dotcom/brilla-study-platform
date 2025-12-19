@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { Footer } from './Footer';
+import { AiTutor, AiButton } from '@/components/ai';
 
 export function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -28,6 +29,10 @@ export function Layout() {
       </div>
 
       <Footer />
+
+      {/* AI Tutor - floating button and chat panel */}
+      <AiButton />
+      <AiTutor />
     </div>
   );
 }

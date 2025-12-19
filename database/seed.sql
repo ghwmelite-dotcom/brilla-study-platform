@@ -275,6 +275,13 @@ INSERT INTO achievements (id, name, description, icon, requirement_type, require
 ('ach_perfect', 'Perfectionist', 'Get a perfect round (all correct)', 'Target', 'perfect_rounds', 1, 300),
 ('ach_speed_demon', 'Speed Demon', 'Answer 10 speed questions in under 5 seconds each', 'Zap', 'speed_record', 10, 400);
 
+-- Insert default Houses
+INSERT INTO houses (id, name, color, icon, description, is_default) VALUES
+('house_blue', 'Blue House', '#3B82F6', 'shield', 'The house of wisdom and intellect', 1),
+('house_red', 'Red House', '#EF4444', 'shield', 'The house of courage and determination', 1),
+('house_green', 'Green House', '#22C55E', 'shield', 'The house of growth and harmony', 1),
+('house_yellow', 'Yellow House', '#EAB308', 'shield', 'The house of energy and optimism', 1);
+
 -- Insert sample user for testing
 INSERT INTO users (id, email, password_hash, name, role, house, year_group, xp_points, level, streak_days) VALUES
-('user_demo', 'demo@stjohns.edu.gh', '$2a$10$demopasswordhash', 'Demo Student', 'student', 'Blue House', 3, 1500, 2, 5);
+('user_demo', 'demo@stjohns.edu.gh', '$2a$10$demopasswordhash', 'Demo Student', 'student', 'house_blue', 3, 1500, 2, 5);

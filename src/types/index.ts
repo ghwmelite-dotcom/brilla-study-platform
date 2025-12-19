@@ -143,6 +143,81 @@ export interface RoundAnswer {
   timeTaken: number;
 }
 
+// House types (House Cup System)
+export interface House {
+  id: string;
+  name: string;
+  color: string;
+  icon: string;
+  description?: string;
+  isDefault: boolean;
+  schoolId?: string;
+  memberCount?: number;
+  totalPoints?: number;
+  createdAt: string;
+}
+
+export interface HousePoints {
+  id: string;
+  houseId: string;
+  userId: string;
+  points: number;
+  source: 'practice' | 'battle' | 'competition' | 'achievement' | 'bonus';
+  sourceId?: string;
+  period: string;
+  createdAt: string;
+}
+
+export interface HouseStanding {
+  id: string;
+  houseId: string;
+  houseName: string;
+  houseColor: string;
+  period: 'weekly' | 'monthly' | 'yearly' | 'all_time';
+  periodValue: string;
+  totalPoints: number;
+  memberCount: number;
+  rank: number;
+}
+
+// Battle types (1v1 Battles)
+export type BattleStatus = 'waiting' | 'active' | 'completed' | 'cancelled';
+
+export interface Battle {
+  id: string;
+  challengerId: string;
+  challengerName?: string;
+  challengerAvatar?: string;
+  opponentId?: string;
+  opponentName?: string;
+  opponentAvatar?: string;
+  status: BattleStatus;
+  subjectId?: string;
+  subjectName?: string;
+  difficulty: Difficulty;
+  questionCount: number;
+  questions?: Question[];
+  challengerScore: number;
+  opponentScore: number;
+  currentQuestion: number;
+  winnerId?: string;
+  createdAt: string;
+  startedAt?: string;
+  completedAt?: string;
+}
+
+export interface BattleAnswer {
+  id: string;
+  battleId: string;
+  userId: string;
+  questionIndex: number;
+  answer: string;
+  isCorrect: boolean;
+  timeTaken: number;
+  pointsEarned: number;
+  answeredAt: string;
+}
+
 // Achievement types
 export interface Achievement {
   id: string;
