@@ -20,7 +20,7 @@ import { cn } from '@/utils';
 
 const subjects = [
   {
-    id: 'mathematics',
+    id: 'nsmq-mathematics',
     name: 'Mathematics',
     icon: Calculator,
     color: 'bg-blue-500',
@@ -29,7 +29,7 @@ const subjects = [
     questions: 120,
   },
   {
-    id: 'physics',
+    id: 'nsmq-physics',
     name: 'Physics',
     icon: Atom,
     color: 'bg-purple-500',
@@ -38,7 +38,7 @@ const subjects = [
     questions: 100,
   },
   {
-    id: 'chemistry',
+    id: 'nsmq-chemistry',
     name: 'Chemistry',
     icon: FlaskConical,
     color: 'bg-green-500',
@@ -47,7 +47,7 @@ const subjects = [
     questions: 95,
   },
   {
-    id: 'biology',
+    id: 'nsmq-biology',
     name: 'Biology',
     icon: Dna,
     color: 'bg-amber-500',
@@ -81,7 +81,7 @@ const features = [
 ];
 
 export function HomePage() {
-  const { isAuthenticated, user } = useAuthStore();
+  const { user } = useAuthStore();
 
   return (
     <div className="space-y-12">
@@ -89,45 +89,28 @@ export function HomePage() {
       <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary-dark to-neutral-900 text-white p-8 md:p-12">
         <div className="relative z-10 max-w-2xl">
           <Badge variant="secondary" className="mb-4">
-            St John's Grammar School
+            Welcome back, {user?.name?.split(' ')[0] || 'Student'}!
           </Badge>
           <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
-            Master the NSMQ with{' '}
+            Continue your journey with{' '}
             <span className="text-secondary">Brilla</span>
           </h1>
           <p className="text-lg text-white/80 mb-6">
-            Train smarter with our comprehensive quiz platform. Practice all 5 NSMQ rounds,
-            track your progress, and compete with your peers.
+            You're on a {user?.streakDays || 0} day streak! Keep the momentum going.
+            Practice, compete, and achieve your goals.
           </p>
           <div className="flex flex-wrap gap-4">
-            {isAuthenticated ? (
-              <>
-                <Link to="/practice">
-                  <Button variant="secondary" size="lg">
-                    <Zap className="w-5 h-5 mr-2" />
-                    Start Practice
-                  </Button>
-                </Link>
-                <Link to="/dashboard">
-                  <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-primary">
-                    View Dashboard
-                  </Button>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/register">
-                  <Button variant="secondary" size="lg">
-                    Get Started Free
-                  </Button>
-                </Link>
-                <Link to="/login">
-                  <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-primary">
-                    Login
-                  </Button>
-                </Link>
-              </>
-            )}
+            <Link to="/practice">
+              <Button variant="secondary" size="lg">
+                <Zap className="w-5 h-5 mr-2" />
+                Start Practice
+              </Button>
+            </Link>
+            <Link to="/dashboard">
+              <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-primary">
+                View Dashboard
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -137,7 +120,7 @@ export function HomePage() {
       </section>
 
       {/* Quick Stats for logged in users */}
-      {isAuthenticated && user && (
+      {user && (
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="p-4 text-center">
             <Flame className="w-8 h-8 text-orange-500 mx-auto mb-2" />
@@ -272,24 +255,6 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      {!isAuthenticated && (
-        <section className="text-center py-12">
-          <h2 className="text-3xl font-display font-bold text-neutral-900 mb-4">
-            Ready to Start Training?
-          </h2>
-          <p className="text-neutral-500 mb-6 max-w-lg mx-auto">
-            Join hundreds of students preparing for the NSMQ. Track your progress,
-            compete with peers, and achieve your goals.
-          </p>
-          <Link to="/register">
-            <Button size="lg">
-              Create Free Account
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </Link>
-        </section>
-      )}
     </div>
   );
 }

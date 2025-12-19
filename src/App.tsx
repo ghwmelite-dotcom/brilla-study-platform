@@ -10,6 +10,7 @@ import {
   AnalyticsPage,
   BattlePage,
   PastPapersPage,
+  LandingPage,
 } from '@/pages';
 import { useAuthStore } from '@/stores';
 
@@ -335,18 +336,37 @@ function ProfilePage() {
   );
 }
 
+// Home route - shows landing for guests, home for authenticated users
+function HomeRoute() {
+  const { isAuthenticated } = useAuthStore();
+
+  if (!isAuthenticated) {
+    return <LandingPage />;
+  }
+
+  return (
+    <Layout>
+      <div className="max-w-7xl mx-auto px-4 py-6 lg:px-6">
+        <HomePage />
+      </div>
+    </Layout>
+  );
+}
+
 // Main App component
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Landing page for guests, home for authenticated (no nested layout) */}
+        <Route path="/" element={<HomeRoute />} />
+
         {/* Auth routes (no layout) */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
         {/* Main app routes (with layout) */}
-        <Route path="/" element={<Layout />}>
-          <Route index element={<HomePage />} />
+        <Route element={<Layout />}>
           <Route
             path="dashboard"
             element={

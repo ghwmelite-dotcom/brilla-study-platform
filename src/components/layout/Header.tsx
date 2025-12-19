@@ -41,7 +41,7 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-neutral-200">
+    <header className="sticky top-0 z-50 bg-white border-b border-neutral-200">
       <div className="flex items-center justify-between h-16 px-4 lg:px-6">
         {/* Left section */}
         <div className="flex items-center gap-4">

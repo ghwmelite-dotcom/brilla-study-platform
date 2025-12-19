@@ -5,7 +5,11 @@ import { Sidebar } from './Sidebar';
 import { Footer } from './Footer';
 import { AiTutor, AiButton } from '@/components/ai';
 
-export function Layout() {
+interface LayoutProps {
+  children?: React.ReactNode;
+}
+
+export function Layout({ children }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
@@ -22,9 +26,11 @@ export function Layout() {
         />
 
         <main className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto px-4 py-6 lg:px-6">
-            <Outlet />
-          </div>
+          {children || (
+            <div className="max-w-7xl mx-auto px-4 py-6 lg:px-6">
+              <Outlet />
+            </div>
+          )}
         </main>
       </div>
 
