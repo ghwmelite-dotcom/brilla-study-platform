@@ -1,6 +1,6 @@
 import { Trophy, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import type { CompetitionSchool } from '@/types';
-import { cn, formatNumber } from '@/utils';
+import { cn } from '@/utils';
 
 interface ScoreboardProps {
   schools: CompetitionSchool[];

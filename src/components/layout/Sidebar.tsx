@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
   Home,
   LayoutDashboard,
@@ -39,7 +39,6 @@ const subjects = [
 ];
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const location = useLocation();
   const { isAuthenticated } = useAuthStore();
 
   return (

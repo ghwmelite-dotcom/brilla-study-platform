@@ -3,9 +3,7 @@ import {
   Flame,
   Star,
   Target,
-  TrendingUp,
   Trophy,
-  Clock,
   BookOpen,
   Brain,
   ChevronRight,
@@ -14,7 +12,7 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, Button, Badge, ProgressBar, CircularProgress } from '@/components/common';
 import { useAuthStore, useProgressStore } from '@/stores';
-import { cn, formatRelativeTime } from '@/utils';
+import { cn } from '@/utils';
 
 export function DashboardPage() {
   const { user } = useAuthStore();

@@ -14,7 +14,7 @@ import {
 import { useState } from 'react';
 import { useAuthStore } from '@/stores';
 import { Button } from '@/components/common';
-import { cn, formatNumber } from '@/utils';
+import { formatNumber } from '@/utils';
 
 interface HeaderProps {
   onMenuToggle: () => void;

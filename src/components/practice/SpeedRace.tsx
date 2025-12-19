@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Zap, Trophy, Clock, Target } from 'lucide-react';
+import { Zap, Clock } from 'lucide-react';
 import type { Question } from '@/types';
 import { Card, Button, Badge, ProgressBar } from '@/components/common';
 import { MathText } from '@/components/questions';
-import { cn, formatTime } from '@/utils';
+import { cn } from '@/utils';
 import { SCORING } from '@/types';
 
 interface SpeedRaceProps {

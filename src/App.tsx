@@ -22,7 +22,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 // Login Page (placeholder)
 function LoginPage() {
-  const { login, isLoading, error } = useAuthStore();
+  const { isLoading, error } = useAuthStore();
 
   const handleDemoLogin = async () => {
     try {

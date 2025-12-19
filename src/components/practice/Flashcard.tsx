@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { RotateCcw, ChevronLeft, ChevronRight, Shuffle, Check, X } from 'lucide-react';
 import type { Topic } from '@/types';
 import { Card, Button, Badge } from '@/components/common';
-import { MathText, FormulaList } from '@/components/questions';
+import { MathText } from '@/components/questions';
 import { cn, shuffleArray } from '@/utils';
 
 interface FlashcardItem {

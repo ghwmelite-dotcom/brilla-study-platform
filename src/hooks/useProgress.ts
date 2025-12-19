@@ -77,7 +77,7 @@ export function useProgress() {
   );
 
   const getSubjectMastery = useCallback(
-    (subjectId: string, topicIds: string[]): number => {
+    (_subjectId: string, topicIds: string[]): number => {
       const relevantProgress = topicIds
         .map((id) => topicProgress[id])
         .filter(Boolean);

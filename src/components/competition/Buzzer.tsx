@@ -60,22 +60,9 @@ export function Buzzer({
         className={cn(
           'relative w-40 h-40 rounded-full transition-all duration-150',
           'focus:outline-none focus:ring-4 focus:ring-offset-4',
-          isEnabled && !buzzedSchool && !disabled && [
-            'bg-red-500 hover:bg-red-600 active:bg-red-700',
-            'shadow-[0_8px_0_0_#b91c1c,0_15px_20px_-5px_rgba(0,0,0,0.3)]',
-            'hover:shadow-[0_6px_0_0_#b91c1c,0_12px_15px_-5px_rgba(0,0,0,0.3)]',
-            'active:shadow-[0_2px_0_0_#b91c1c,0_5px_10px_-5px_rgba(0,0,0,0.3)]',
-            'active:translate-y-1.5',
-            'focus:ring-red-300',
-          ],
-          (!isEnabled || disabled) && [
-            'bg-neutral-300 cursor-not-allowed',
-            'shadow-[0_4px_0_0_#9ca3af]',
-          ],
-          buzzedSchool && [
-            'cursor-not-allowed',
-            'shadow-[0_2px_0_0_#374151]',
-          ],
+          isEnabled && !buzzedSchool && !disabled && 'bg-red-500 hover:bg-red-600 active:bg-red-700 shadow-[0_8px_0_0_#b91c1c,0_15px_20px_-5px_rgba(0,0,0,0.3)] hover:shadow-[0_6px_0_0_#b91c1c,0_12px_15px_-5px_rgba(0,0,0,0.3)] active:shadow-[0_2px_0_0_#b91c1c,0_5px_10px_-5px_rgba(0,0,0,0.3)] active:translate-y-1.5 focus:ring-red-300',
+          (!isEnabled || disabled) && 'bg-neutral-300 cursor-not-allowed shadow-[0_4px_0_0_#9ca3af]',
+          buzzedSchool && 'cursor-not-allowed shadow-[0_2px_0_0_#374151]',
           isPressed && 'translate-y-1.5'
         )}
         style={buzzedSchool ? { backgroundColor: schoolColor || '#6b7280' } : undefined}
@@ -158,10 +145,7 @@ export function MultiBuzzer({
               className={cn(
                 'w-24 h-24 rounded-full transition-all duration-150 border-4',
                 'focus:outline-none focus:ring-2 focus:ring-offset-2',
-                isEnabled && !hasBuzzed && [
-                  'hover:scale-105 active:scale-95',
-                  'shadow-lg hover:shadow-xl',
-                ],
+                isEnabled && !hasBuzzed && 'hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl',
                 !isEnabled && 'opacity-50 cursor-not-allowed',
                 hasBuzzed && 'cursor-default'
               )}

@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
-  Brain,
   Zap,
   BookOpen,
   Target,
-  Clock,
   ArrowRight,
   Calculator,
   Atom,
@@ -154,7 +152,7 @@ const difficulties = [
 ];
 
 export function PracticePage() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const initialMode = searchParams.get('mode') as PracticeMode;
 
   const [activeMode, setActiveMode] = useState<PracticeMode>(initialMode);

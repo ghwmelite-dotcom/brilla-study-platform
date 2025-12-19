@@ -13,7 +13,6 @@ import {
   Filter,
 } from 'lucide-react';
 import { Card, Button, Badge, Input, ProgressBar } from '@/components/common';
-import { FormulaList } from '@/components/questions';
 import { cn } from '@/utils';
 
 // Sample data - would come from API
@@ -118,7 +117,7 @@ const subjectsData = {
 const subjects = Object.values(subjectsData);
 
 export function TopicsPage() {
-  const { subjectSlug, topicSlug } = useParams();
+  const { subjectSlug, topicSlug: _topicSlug } = useParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
 

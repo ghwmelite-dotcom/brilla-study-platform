@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, HelpCircle, Clock } from 'lucide-react';
+import { CheckCircle, XCircle, HelpCircle } from 'lucide-react';
 import type { Question } from '@/types';
 import { Card, Button, Timer, Badge, DifficultyBadge } from '@/components/common';
-import { cn, formatTime } from '@/utils';
+import { cn } from '@/utils';
 import { MathText } from './MathText';
 
 interface QuestionCardProps {
@@ -206,7 +206,7 @@ interface MultipleChoiceOptionsProps {
 function MultipleChoiceOptions({
   options,
   selectedAnswer,
-  correctAnswer,
+  correctAnswer: _correctAnswer,
   isRevealed,
   onSelect,
 }: MultipleChoiceOptionsProps) {

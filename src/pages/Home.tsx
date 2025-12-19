@@ -7,7 +7,6 @@ import {
   Target,
   Zap,
   Medal,
-  Users,
   Calculator,
   Atom,
   FlaskConical,
