@@ -2,17 +2,89 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Primary Meta Tags -->
+    <title>Brilla Study Platform - Master NSMQ, WASSCE & BECE</title>
+    <meta name="title" content="Brilla Study Platform - Master NSMQ, WASSCE & BECE" />
+    <meta name="description" content="Ghana's #1 exam preparation platform. Join 50,000+ students mastering NSMQ, WASSCE, and BECE with AI-powered practice, past papers, and competition simulations." />
+    <meta name="keywords" content="NSMQ, WASSCE, BECE, Ghana education, exam prep, science quiz, mathematics, past papers, AI tutoring" />
+    <meta name="author" content="Brilla Study Platform" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://brilla.study/" />
+    <meta property="og:title" content="Brilla Study Platform - Master NSMQ, WASSCE & BECE" />
+    <meta property="og:description" content="Ghana's #1 exam preparation platform. Join 50,000+ students mastering exams with AI-powered practice." />
+    <meta property="og:image" content="/og-image.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://brilla.study/" />
+    <meta property="twitter:title" content="Brilla Study Platform - Master NSMQ, WASSCE & BECE" />
+    <meta property="twitter:description" content="Ghana's #1 exam preparation platform. Join 50,000+ students mastering exams with AI-powered practice." />
+    <meta property="twitter:image" content="/og-image.png" />
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1e3a8a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Brilla" />
+    <meta name="application-name" content="Brilla" />
+    <meta name="msapplication-TileColor" content="#1e3a8a" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+
+    <!-- Favicon & Icons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Brilla Study Platform - NSMQ Training for St John's Grammar School" />
-    <title>Brilla Study Platform</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <link rel="apple-touch-icon" href="/icons/icon.svg" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- KaTeX for Math -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+
+    <!-- Preload critical assets -->
+    <link rel="preload" href="/favicon.svg" as="image" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered:', registration.scope);
+
+              // Check for updates
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                if (newWorker) {
+                  newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                      // New content available, show update prompt
+                      if (confirm('New version available! Reload to update?')) {
+                        window.location.reload();
+                      }
+                    }
+                  });
+                }
+              });
+            })
+            .catch((error) => {
+              console.log('SW registration failed:', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
