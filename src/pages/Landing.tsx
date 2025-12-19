@@ -668,7 +668,7 @@ export function LandingPage() {
             <Link to="/register">
               <Button
                 size="lg"
-                className="bg-white text-primary hover:bg-neutral-100 px-10 py-6 text-lg rounded-xl font-semibold shadow-2xl hover:scale-105 transition-transform"
+                className="bg-white text-emerald-600 hover:bg-neutral-100 hover:text-emerald-700 px-10 py-6 text-lg rounded-xl font-semibold shadow-2xl hover:scale-105 transition-transform"
               >
                 Create Free Account
                 <ArrowRight className="w-5 h-5 ml-2" />
