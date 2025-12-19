@@ -231,7 +231,7 @@ export function LandingPage() {
   const ctaRef = useInView(0.3);
 
   return (
-    <div className="min-h-screen bg-white overflow-hidden">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Custom Styles */}
       <style>{`
         @keyframes float {
