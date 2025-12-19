@@ -1,0 +1,28 @@
+name = "brilla-api"
+main = "workers/api/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+ENVIRONMENT = "development"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "brilla-db"
+database_id = "your-database-id-here"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "your-kv-namespace-id-here"
+
+[dev]
+port = 8787
+local_protocol = "http"
+
+# Production environment
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+[env.production.d1_databases]
+binding = "DB"
+database_name = "brilla-db-prod"
+database_id = "your-prod-database-id-here"

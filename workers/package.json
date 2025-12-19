@@ -1,0 +1,19 @@
+{
+  "name": "brilla-api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create brilla-db",
+    "db:migrate": "wrangler d1 execute brilla-db --file=../database/schema.sql",
+    "db:seed": "wrangler d1 execute brilla-db --file=../database/seed.sql"
+  },
+  "dependencies": {
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241022.0",
+    "wrangler": "^3.82.0"
+  }
+}
