@@ -280,7 +280,7 @@ export function CommunityPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-neutral-900">{room.name}</h3>
-                      <p className="text-sm text-neutral-500">{room.members} members active</p>
+                      <p className="text-sm text-neutral-500">{room.members} {room.members === 1 ? 'member' : 'members'} active</p>
                     </div>
                     <ArrowRight className="w-5 h-5 text-neutral-400" />
                   </button>
