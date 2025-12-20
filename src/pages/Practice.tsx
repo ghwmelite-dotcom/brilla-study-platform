@@ -187,6 +187,13 @@ const examFeatures = {
       color: 'bg-teal-500',
       path: '/mock-exams',
     },
+    {
+      name: 'Virtual Lab',
+      description: 'Practice WASSCE practical experiments',
+      icon: FlaskConical,
+      color: 'bg-green-500',
+      path: '/virtual-lab',
+    },
   ],
   bece: [
     {

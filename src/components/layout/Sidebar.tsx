@@ -21,6 +21,7 @@ import {
   Users,
   MessageSquare,
   Hash,
+  FlaskConical,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { useAuthStore, useExamStore, useChatStore, useProgressStore } from '@/stores';
@@ -51,6 +52,7 @@ const examSpecificItems = {
     { path: '/past-papers', label: 'Past Papers', icon: FileText },
     { path: '/practice/essay', label: 'Essay Practice', icon: PenTool },
     { path: '/mock-exams', label: 'Mock Exams', icon: ClipboardList },
+    { path: '/virtual-lab', label: 'Virtual Lab', icon: FlaskConical },
     { path: '/catalog', label: 'Subject Catalog', icon: GraduationCap },
   ],
   bece: [

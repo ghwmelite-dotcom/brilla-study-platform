@@ -17,6 +17,7 @@ import {
   SubjectCatalogPage,
   CommunityPage,
 } from '@/pages';
+import { VirtualLabPage } from '@/components/lab';
 import { useAuthStore } from '@/stores';
 
 // Protected Route wrapper
@@ -480,6 +481,22 @@ function App() {
             }
           />
           <Route path="catalog" element={<SubjectCatalogPage />} />
+          <Route
+            path="virtual-lab"
+            element={
+              <ProtectedRoute>
+                <VirtualLabPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="virtual-lab/:experimentSlug"
+            element={
+              <ProtectedRoute>
+                <VirtualLabPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="community"
             element={

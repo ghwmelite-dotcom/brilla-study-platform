@@ -792,3 +792,9 @@ export const CHAT_RATE_LIMITS = {
   MESSAGES_PER_HOUR: 200,
   DM_PER_MINUTE: 10,
 } as const;
+
+// =============================================
+// VIRTUAL LAB TYPES
+// =============================================
+
+export * from './lab';

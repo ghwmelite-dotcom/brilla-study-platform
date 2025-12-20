@@ -8,4 +8,5 @@ export { useExamStore } from './examStore';
 export { useEssayStore } from './essayStore';
 export { useChatStore } from './chatStore';
 export { useModerationStore } from './moderationStore';
+export { useLabStore } from './labStore';
 export type { ChatMessage as AiChatMessage } from './aiTutorStore';
