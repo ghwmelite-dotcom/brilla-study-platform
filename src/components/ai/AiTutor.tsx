@@ -1,10 +1,48 @@
-import { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Sparkles, BookOpen, Lightbulb, GraduationCap } from 'lucide-react';
-import { useAiTutorStore, useAuthStore } from '@/stores';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { X, Send, Loader2, Sparkles, BookOpen, Lightbulb, GraduationCap, FileText, PenTool, Calculator } from 'lucide-react';
+import { useAiTutorStore, useAuthStore, useExamStore } from '@/stores';
 import { AiMessage } from './AiMessage';
+
+// Exam-specific configurations
+const examConfigs = {
+  nsmq: {
+    name: 'NSMQ',
+    subtitle: 'Science & Maths Quiz prep',
+    welcomeMessage: "I'm here to help you prepare for NSMQ. Ask me anything about Maths, Physics, Chemistry, or Biology!",
+    quickActions: [
+      { label: 'Explain a concept', icon: BookOpen, prompt: 'Can you explain ' },
+      { label: 'Speed problem tips', icon: Lightbulb, prompt: 'How can I solve faster: ' },
+      { label: 'Formula help', icon: GraduationCap, prompt: 'Help me understand the formula for ' },
+      { label: 'Mental math tricks', icon: Calculator, prompt: 'What are mental math tricks for ' },
+    ],
+  },
+  wassce: {
+    name: 'WASSCE',
+    subtitle: 'West African SSS exam prep',
+    welcomeMessage: "I'm here to help you excel in WASSCE. Ask me about any subject - Core Maths, English, Sciences, Business, Arts, and more!",
+    quickActions: [
+      { label: 'Explain a topic', icon: BookOpen, prompt: 'Can you explain ' },
+      { label: 'Essay writing help', icon: PenTool, prompt: 'Help me write an essay on ' },
+      { label: 'Past paper question', icon: FileText, prompt: 'How do I answer this WASSCE question: ' },
+      { label: 'Study tips', icon: Lightbulb, prompt: 'What are tips for studying ' },
+    ],
+  },
+  bece: {
+    name: 'BECE',
+    subtitle: 'Basic Education exam prep',
+    welcomeMessage: "I'm here to help you prepare for BECE. Ask me about Maths, English, Integrated Science, Social Studies, and more!",
+    quickActions: [
+      { label: 'Explain a concept', icon: BookOpen, prompt: 'Can you explain in simple terms ' },
+      { label: 'Help with homework', icon: GraduationCap, prompt: 'Can you help me understand ' },
+      { label: 'Practice questions', icon: FileText, prompt: 'Give me practice questions on ' },
+      { label: 'Study tips', icon: Lightbulb, prompt: 'How should I study for ' },
+    ],
+  },
+};
 
 export function AiTutor() {
   const { user } = useAuthStore();
+  const { currentExamType } = useExamStore();
   const {
     isOpen,
     messages,
@@ -19,6 +57,11 @@ export function AiTutor() {
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Get exam-specific config
+  const examConfig = useMemo(() => {
+    return examConfigs[currentExamType] || examConfigs.nsmq;
+  }, [currentExamType]);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -37,7 +80,8 @@ export function AiTutor() {
 
     const message = inputMessage.trim();
     setInputMessage('');
-    await sendMessage(message, user.id);
+    // Include exam context in the message
+    await sendMessage(`[${examConfig.name} Mode] ${message}`, user.id);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -46,12 +90,6 @@ export function AiTutor() {
       handleSend();
     }
   };
-
-  const quickActions = [
-    { label: 'Explain a concept', icon: BookOpen, prompt: 'Can you explain ' },
-    { label: 'Study tips', icon: Lightbulb, prompt: 'What are some tips for ' },
-    { label: 'Formula help', icon: GraduationCap, prompt: 'Help me understand the formula for ' },
-  ];
 
   const handleQuickAction = (prompt: string) => {
     setInputMessage(prompt);
@@ -78,7 +116,7 @@ export function AiTutor() {
             </div>
             <div className="text-white">
               <h3 className="font-semibold text-sm sm:text-base">Brilla AI Tutor</h3>
-              <p className="text-xs text-white/80">Your personal study assistant</p>
+              <p className="text-xs text-white/80">{examConfig.subtitle}</p>
             </div>
           </div>
           <button
@@ -98,13 +136,12 @@ export function AiTutor() {
                 Hi, I'm Brilla AI!
               </h4>
               <p className="text-sm text-neutral-500 mb-6">
-                I'm here to help you prepare for NSMQ. Ask me anything about
-                Maths, Physics, Chemistry, or Biology!
+                {examConfig.welcomeMessage}
               </p>
 
               {/* Quick actions */}
               <div className="space-y-2">
-                {quickActions.map((action, i) => (
+                {examConfig.quickActions.map((action, i) => (
                   <button
                     key={i}
                     onClick={() => handleQuickAction(action.prompt)}
