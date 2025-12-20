@@ -206,17 +206,27 @@ export function ChatInput() {
           </button>
 
           {showEmoji && (
-            <div className="absolute bottom-full left-0 mb-2 p-2 bg-white rounded-lg shadow-lg border border-neutral-200 grid grid-cols-6 gap-1">
-              {EMOJI_LIST.map((emoji) => (
-                <button
-                  key={emoji}
-                  onClick={() => insertEmoji(emoji)}
-                  className="w-8 h-8 flex items-center justify-center hover:bg-neutral-100 rounded transition-colors text-lg"
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
+            <>
+              {/* Backdrop to close picker */}
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setShowEmoji(false)}
+              />
+              {/* Emoji grid */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-3 bg-white rounded-xl shadow-xl border border-neutral-200 z-50 w-[200px] max-h-[200px] overflow-y-auto">
+                <div className="grid grid-cols-4 gap-2">
+                  {EMOJI_LIST.map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => insertEmoji(emoji)}
+                      className="w-10 h-10 flex items-center justify-center hover:bg-neutral-100 rounded-lg transition-colors text-xl active:scale-90"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
         </div>
 

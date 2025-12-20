@@ -75,16 +75,8 @@ export function CommunityPage() {
       // TODO: Replace with API call in production
       await new Promise((resolve) => setTimeout(resolve, 300));
 
-      // Demo online users
-      const demoUsers: OnlineUser[] = [
-        { id: 'user_ama', name: 'Ama Mensah', house: 'Blue House', level: 15, avatarUrl: undefined },
-        { id: 'user_kofi', name: 'Kofi Boateng', house: 'Red House', level: 12, avatarUrl: undefined },
-        { id: 'user_yaa', name: 'Yaa Asantewaa', house: 'Green House', level: 18, avatarUrl: undefined },
-        { id: 'user_kwesi', name: 'Kwesi Appiah', house: 'Yellow House', level: 10, avatarUrl: undefined },
-        { id: 'user_abena', name: 'Abena Osei', house: 'Blue House', level: 14, avatarUrl: undefined },
-        { id: 'user_kojo', name: 'Kojo Mensah', house: 'Red House', level: 9, avatarUrl: undefined },
-      ];
-      setOnlineUsers(demoUsers);
+      // Empty until real API is connected
+      setOnlineUsers([]);
     } catch (error) {
       console.error('Failed to fetch online users:', error);
     } finally {
@@ -122,31 +114,8 @@ export function CommunityPage() {
       // TODO: Replace with API call in production
       await new Promise((resolve) => setTimeout(resolve, 300));
 
-      // Demo recent discussions
-      const demoDiscussions: RecentDiscussion[] = [
-        {
-          room: 'WASSCE Physics Study Group',
-          topic: 'Can someone explain the difference between velocity and acceleration?',
-          replies: 3,
-          time: '1 hour ago',
-          author: 'Kwame Asante',
-        },
-        {
-          room: 'NSMQ Speed Drills',
-          topic: 'Just finished a 50-question speed drill! My best time yet',
-          replies: 8,
-          time: '2 hours ago',
-          author: 'Ama Mensah',
-        },
-        {
-          room: 'Chemistry Lab Partners',
-          topic: 'Tips for qualitative analysis practicals?',
-          replies: 5,
-          time: '3 hours ago',
-          author: 'Yaa Asantewaa',
-        },
-      ];
-      setRecentDiscussions(demoDiscussions);
+      // Empty until real API is connected
+      setRecentDiscussions([]);
     } catch (error) {
       console.error('Failed to fetch recent discussions:', error);
     }
