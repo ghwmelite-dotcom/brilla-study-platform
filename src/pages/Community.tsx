@@ -352,14 +352,14 @@ export function CommunityPage() {
                       <h3 className="font-medium text-neutral-900 truncate">{room.name}</h3>
                       <p className="text-sm text-neutral-500">
                         {room.memberCount} {room.memberCount === 1 ? 'member' : 'members'}
-                        {room.unreadCount > 0 && (
+                        {(room.unreadCount ?? 0) > 0 && (
                           <span className="ml-2 text-primary font-medium">
                             • {room.unreadCount} new
                           </span>
                         )}
                       </p>
                     </div>
-                    {room.unreadCount > 0 && (
+                    {(room.unreadCount ?? 0) > 0 && (
                       <span className="min-w-[24px] h-6 px-2 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
                         {room.unreadCount}
                       </span>
