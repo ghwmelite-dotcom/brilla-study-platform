@@ -86,7 +86,7 @@ interface AuthState {
   getPendingCount: () => number;
 
   // Admin actions - User Management
-  loadAllUsers: () => void;
+  loadAllUsers: () => Promise<void>;
   createUser: (data: CreateUserData) => Promise<ManagedUser>;
   updateUser: (userId: string, updates: Partial<ManagedUser>) => Promise<void>;
   deactivateUser: (userId: string) => Promise<void>;
@@ -119,53 +119,14 @@ interface RegisterData {
   adminCode?: string;
 }
 
-// Storage keys (simulating database)
+// Storage keys (simulating database for fallback/demo)
 const PENDING_USERS_KEY = 'brilla-pending-users';
 const ALL_USERS_KEY = 'brilla-all-users';
-const VERIFICATION_EMAILS_KEY = 'brilla-verification-emails';
-
-// Generate a random verification token
-const generateVerificationToken = (): string => {
-  return `verify_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-};
-
-// Get token expiry (24 hours from now)
-const getTokenExpiry = (): string => {
-  const expiry = new Date();
-  expiry.setHours(expiry.getHours() + 24);
-  return expiry.toISOString();
-};
 
 // Simple password hash (in production, use bcrypt on server)
 const hashPassword = (password: string): string => {
   // Simple hash for demo - in production, this would be server-side bcrypt
   return btoa(password + '_brilla_salt');
-};
-
-
-// Simulated email storage (for demo purposes - shows "sent" emails)
-interface SentEmail {
-  id: string;
-  to: string;
-  subject: string;
-  body: string;
-  sentAt: string;
-  type: 'verification' | 'password_reset';
-}
-
-const loadSentEmails = (): SentEmail[] => {
-  try {
-    const stored = localStorage.getItem(VERIFICATION_EMAILS_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-};
-
-const saveSentEmail = (email: SentEmail) => {
-  const emails = loadSentEmails();
-  emails.push(email);
-  localStorage.setItem(VERIFICATION_EMAILS_KEY, JSON.stringify(emails));
 };
 
 // Helper to load pending users from localStorage
@@ -468,9 +429,50 @@ export const useAuthStore = create<AuthState>()(
       },
 
       // User Management Actions
-      loadAllUsers: () => {
-        const allUsers = loadAllUsersFromStorage();
-        set({ allUsers });
+      loadAllUsers: async () => {
+        try {
+          const response = await api.get<Record<string, unknown>[]>('/admin/users');
+          if (!response.success || !response.data) {
+            console.error('Failed to load users:', response.error);
+            // Fall back to localStorage for demo mode
+            const allUsers = loadAllUsersFromStorage();
+            set({ allUsers });
+            return;
+          }
+
+          const users: ManagedUser[] = response.data.map((u: Record<string, unknown>) => ({
+            id: u.id as string,
+            email: u.email as string,
+            name: u.name as string,
+            role: u.role as 'student' | 'teacher' | 'admin',
+            status: (u.status as UserStatus) || 'approved',
+            house: u.house as string | undefined,
+            yearGroup: u.year_group as number | undefined,
+            schoolLevel: u.school_level as SchoolLevel | undefined,
+            schoolName: u.school_name as string | undefined,
+            teacherLicenseNumber: u.teacher_license_number as string | undefined,
+            subjectsTaught: u.subjectsTaught as string[] | undefined,
+            yearsExperience: u.years_experience as string | undefined,
+            qualifications: u.qualifications as string | undefined,
+            xpPoints: (u.xp_points as number) || 0,
+            level: (u.level as number) || 1,
+            streakDays: (u.streak_days as number) || 0,
+            aiGradingCredits: (u.ai_grading_credits as number) || 0,
+            isActive: (u.is_active as number) === 1,
+            emailVerified: (u.email_verified as number) === 1,
+            passwordSet: !!(u.password_hash),
+            lastLoginAt: u.last_login_at as string | undefined,
+            createdAt: u.created_at as string,
+            updatedAt: u.updated_at as string,
+          }));
+
+          set({ allUsers: users });
+        } catch (error) {
+          console.error('Failed to load users from API:', error);
+          // Fall back to localStorage for demo mode
+          const allUsers = loadAllUsersFromStorage();
+          set({ allUsers });
+        }
       },
 
       createUser: async (data: CreateUserData) => {
@@ -479,75 +481,58 @@ export const useAuthStore = create<AuthState>()(
           throw new Error('Only admins can create users');
         }
 
-        await new Promise(resolve => setTimeout(resolve, 500));
+        try {
+          const response = await api.post<Record<string, unknown>>('/admin/users', {
+            email: data.email,
+            name: data.name,
+            role: data.role,
+            schoolLevel: data.schoolLevel,
+            yearGroup: data.yearGroup,
+            schoolName: data.schoolName,
+            house: data.house,
+            teacherLicenseNumber: data.teacherLicenseNumber,
+            subjectsTaught: data.subjectsTaught,
+            yearsExperience: data.yearsExperience,
+            qualifications: data.qualifications,
+          });
 
-        const allUsers = loadAllUsersFromStorage();
+          if (!response.success || !response.data) {
+            throw new Error(response.error || 'Failed to create user');
+          }
 
-        // Check if email already exists
-        if (allUsers.some(u => u.email === data.email)) {
-          throw new Error('A user with this email already exists.');
+          const u = response.data;
+          const newUser: ManagedUser = {
+            id: u.id as string,
+            email: u.email as string,
+            name: u.name as string,
+            role: u.role as 'student' | 'teacher' | 'admin',
+            status: 'approved',
+            schoolLevel: data.schoolLevel,
+            yearGroup: data.yearGroup,
+            schoolName: data.schoolName,
+            house: data.house,
+            teacherLicenseNumber: data.teacherLicenseNumber,
+            subjectsTaught: data.subjectsTaught,
+            yearsExperience: data.yearsExperience,
+            qualifications: data.qualifications,
+            xpPoints: 0,
+            level: 1,
+            streakDays: 0,
+            aiGradingCredits: data.role === 'admin' ? 100 : data.role === 'teacher' ? 50 : 10,
+            isActive: true,
+            emailVerified: false,
+            passwordSet: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+
+          // Refresh user list
+          await get().loadAllUsers();
+
+          return newUser;
+        } catch (error) {
+          throw error instanceof Error ? error : new Error('Failed to create user');
         }
-
-        // Check pending users too
-        const pendingUsers = loadPendingUsersFromStorage();
-        if (pendingUsers.some(u => u.email === data.email)) {
-          throw new Error('A pending registration with this email already exists.');
-        }
-
-        // Generate verification token
-        const verificationToken = generateVerificationToken();
-        const verificationTokenExpiry = getTokenExpiry();
-
-        const newUser: ManagedUser = {
-          id: `user_${Date.now()}`,
-          email: data.email,
-          name: data.name,
-          role: data.role,
-          status: 'approved',
-          schoolLevel: data.schoolLevel,
-          yearGroup: data.yearGroup,
-          schoolName: data.schoolName,
-          house: data.house,
-          teacherLicenseNumber: data.teacherLicenseNumber,
-          subjectsTaught: data.subjectsTaught,
-          yearsExperience: data.yearsExperience,
-          qualifications: data.qualifications,
-          xpPoints: 0,
-          level: 1,
-          streakDays: 0,
-          aiGradingCredits: data.role === 'admin' ? 100 : data.role === 'teacher' ? 50 : 10,
-          isActive: true,
-          emailVerified: false,
-          passwordSet: false,
-          verificationToken,
-          verificationTokenExpiry,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-
-        const updatedUsers = [...allUsers, newUser];
-        saveAllUsersToStorage(updatedUsers);
-        set({ allUsers: updatedUsers });
-
-        // Send verification email (simulated)
-        const verificationUrl = `${window.location.origin}/set-password?token=${verificationToken}`;
-        saveSentEmail({
-          id: `email_${Date.now()}`,
-          to: data.email,
-          subject: 'Welcome to Brilla - Set Up Your Password',
-          body: `Hello ${data.name},\n\nYour account has been created on Brilla Study Platform.\n\nPlease click the link below to set up your password:\n${verificationUrl}\n\nThis link expires in 24 hours.\n\nBest regards,\nBrilla Team`,
-          sentAt: new Date().toISOString(),
-          type: 'verification',
-        });
-
-        // Log for demo purposes
-        console.log('📧 Verification email sent:', {
-          to: data.email,
-          verificationUrl,
-          token: verificationToken,
-        });
-
-        return newUser;
       },
 
       updateUser: async (userId: string, updates: Partial<ManagedUser>) => {
@@ -556,30 +541,29 @@ export const useAuthStore = create<AuthState>()(
           throw new Error('Only admins can update users');
         }
 
-        await new Promise(resolve => setTimeout(resolve, 300));
+        try {
+          const response = await api.put(`/admin/users/${userId}`, {
+            name: updates.name,
+            email: updates.email,
+            schoolLevel: updates.schoolLevel,
+            yearGroup: updates.yearGroup,
+            schoolName: updates.schoolName,
+            house: updates.house,
+            teacherLicenseNumber: updates.teacherLicenseNumber,
+            subjectsTaught: updates.subjectsTaught,
+            yearsExperience: updates.yearsExperience,
+            qualifications: updates.qualifications,
+          });
 
-        const allUsers = loadAllUsersFromStorage();
-        const userIndex = allUsers.findIndex(u => u.id === userId);
-
-        if (userIndex === -1) {
-          throw new Error('User not found');
-        }
-
-        // Don't allow changing email to an existing one
-        if (updates.email && updates.email !== allUsers[userIndex].email) {
-          if (allUsers.some(u => u.email === updates.email)) {
-            throw new Error('A user with this email already exists.');
+          if (!response.success) {
+            throw new Error(response.error || 'Failed to update user');
           }
+
+          // Refresh user list
+          await get().loadAllUsers();
+        } catch (error) {
+          throw error instanceof Error ? error : new Error('Failed to update user');
         }
-
-        allUsers[userIndex] = {
-          ...allUsers[userIndex],
-          ...updates,
-          updatedAt: new Date().toISOString(),
-        };
-
-        saveAllUsersToStorage(allUsers);
-        set({ allUsers });
       },
 
       deactivateUser: async (userId: string) => {
@@ -592,20 +576,18 @@ export const useAuthStore = create<AuthState>()(
           throw new Error('You cannot deactivate your own account');
         }
 
-        await new Promise(resolve => setTimeout(resolve, 300));
+        try {
+          const response = await api.post(`/admin/users/${userId}/deactivate`, {});
 
-        const allUsers = loadAllUsersFromStorage();
-        const userIndex = allUsers.findIndex(u => u.id === userId);
+          if (!response.success) {
+            throw new Error(response.error || 'Failed to deactivate user');
+          }
 
-        if (userIndex === -1) {
-          throw new Error('User not found');
+          // Refresh user list
+          await get().loadAllUsers();
+        } catch (error) {
+          throw error instanceof Error ? error : new Error('Failed to deactivate user');
         }
-
-        allUsers[userIndex].isActive = false;
-        allUsers[userIndex].updatedAt = new Date().toISOString();
-
-        saveAllUsersToStorage(allUsers);
-        set({ allUsers });
       },
 
       reactivateUser: async (userId: string) => {
@@ -614,20 +596,18 @@ export const useAuthStore = create<AuthState>()(
           throw new Error('Only admins can reactivate users');
         }
 
-        await new Promise(resolve => setTimeout(resolve, 300));
+        try {
+          const response = await api.post(`/admin/users/${userId}/reactivate`, {});
 
-        const allUsers = loadAllUsersFromStorage();
-        const userIndex = allUsers.findIndex(u => u.id === userId);
+          if (!response.success) {
+            throw new Error(response.error || 'Failed to reactivate user');
+          }
 
-        if (userIndex === -1) {
-          throw new Error('User not found');
+          // Refresh user list
+          await get().loadAllUsers();
+        } catch (error) {
+          throw error instanceof Error ? error : new Error('Failed to reactivate user');
         }
-
-        allUsers[userIndex].isActive = true;
-        allUsers[userIndex].updatedAt = new Date().toISOString();
-
-        saveAllUsersToStorage(allUsers);
-        set({ allUsers });
       },
 
       deleteUser: async (userId: string) => {
@@ -640,23 +620,23 @@ export const useAuthStore = create<AuthState>()(
           throw new Error('You cannot delete your own account');
         }
 
-        await new Promise(resolve => setTimeout(resolve, 300));
+        try {
+          const response = await api.delete(`/admin/users/${userId}`);
 
-        const allUsers = loadAllUsersFromStorage();
-        const filteredUsers = allUsers.filter(u => u.id !== userId);
+          if (!response.success) {
+            throw new Error(response.error || 'Failed to delete user');
+          }
 
-        if (filteredUsers.length === allUsers.length) {
-          throw new Error('User not found');
+          // Refresh user list
+          await get().loadAllUsers();
+        } catch (error) {
+          throw error instanceof Error ? error : new Error('Failed to delete user');
         }
-
-        saveAllUsersToStorage(filteredUsers);
-        set({ allUsers: filteredUsers });
       },
 
       getUserStats: () => {
-        const allUsers = loadAllUsersFromStorage();
-        const pendingUsers = loadPendingUsersFromStorage();
-        const pending = pendingUsers.filter(u => u.status === 'pending');
+        // Use the current allUsers from state (populated by loadAllUsers from API)
+        const { allUsers } = get();
 
         const today = new Date().toDateString();
         const activeToday = allUsers.filter(u => {
@@ -664,12 +644,15 @@ export const useAuthStore = create<AuthState>()(
           return new Date(u.lastLoginAt).toDateString() === today;
         }).length;
 
+        // Count pending from allUsers (users with status 'pending')
+        const pending = allUsers.filter(u => u.status === 'pending').length;
+
         return {
           total: allUsers.length,
           students: allUsers.filter(u => u.role === 'student' && u.isActive).length,
           teachers: allUsers.filter(u => u.role === 'teacher' && u.isActive).length,
           admins: allUsers.filter(u => u.role === 'admin' && u.isActive).length,
-          pending: pending.length,
+          pending,
           activeToday,
         };
       },
@@ -738,52 +721,18 @@ export const useAuthStore = create<AuthState>()(
           throw new Error('Only admins can resend verification emails');
         }
 
-        await new Promise(resolve => setTimeout(resolve, 500));
+        try {
+          const response = await api.post(`/admin/users/${userId}/resend-verification`, {});
 
-        const allUsers = loadAllUsersFromStorage();
-        const userIndex = allUsers.findIndex(u => u.id === userId);
+          if (!response.success) {
+            throw new Error(response.error || 'Failed to resend verification email');
+          }
 
-        if (userIndex === -1) {
-          throw new Error('User not found');
+          // Refresh user list
+          await get().loadAllUsers();
+        } catch (error) {
+          throw error instanceof Error ? error : new Error('Failed to resend verification email');
         }
-
-        const targetUser = allUsers[userIndex];
-
-        if (targetUser.passwordSet && targetUser.emailVerified) {
-          throw new Error('This user has already set their password.');
-        }
-
-        // Generate new verification token
-        const verificationToken = generateVerificationToken();
-        const verificationTokenExpiry = getTokenExpiry();
-
-        allUsers[userIndex] = {
-          ...targetUser,
-          verificationToken,
-          verificationTokenExpiry,
-          updatedAt: new Date().toISOString(),
-        };
-
-        saveAllUsersToStorage(allUsers);
-        set({ allUsers });
-
-        // Send verification email (simulated)
-        const verificationUrl = `${window.location.origin}/set-password?token=${verificationToken}`;
-        saveSentEmail({
-          id: `email_${Date.now()}`,
-          to: targetUser.email,
-          subject: 'Brilla - Password Setup Link (Resent)',
-          body: `Hello ${targetUser.name},\n\nA new password setup link has been generated for your Brilla account.\n\nPlease click the link below to set up your password:\n${verificationUrl}\n\nThis link expires in 24 hours.\n\nBest regards,\nBrilla Team`,
-          sentAt: new Date().toISOString(),
-          type: 'verification',
-        });
-
-        // Log for demo purposes
-        console.log('📧 Verification email resent:', {
-          to: targetUser.email,
-          verificationUrl,
-          token: verificationToken,
-        });
       },
     }),
     {

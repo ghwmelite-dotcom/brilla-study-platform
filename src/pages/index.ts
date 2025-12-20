@@ -13,3 +13,4 @@ export { ContentManagementPage } from './ContentManagement';
 export { MockExamsPage } from './MockExams';
 export { SubjectCatalogPage } from './SubjectCatalog';
 export { CommunityPage } from './Community';
+export { default as SettingsPage } from './Settings';

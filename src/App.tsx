@@ -16,6 +16,7 @@ import {
   MockExamsPage,
   SubjectCatalogPage,
   CommunityPage,
+  SettingsPage,
 } from '@/pages';
 import HelpCenter from '@/pages/HelpCenter';
 import AdminApprovals from '@/pages/AdminApprovals';
@@ -520,6 +521,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="settings"
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
               </ProtectedRoute>
             }
           />

@@ -2263,6 +2263,89 @@ protectedApp.post('/ai/study-plan', async (c) => {
 });
 
 // =============================================
+// USER SELF-SERVICE ENDPOINTS
+// =============================================
+
+// Middleware to verify authenticated user
+const userAuth = async (c: any, next: any) => {
+  const authHeader = c.req.header('Authorization');
+  if (!authHeader?.startsWith('Bearer ')) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  const token = authHeader.slice(7);
+  const payload = await verifyJWT(token, c.env.JWT_SECRET);
+
+  if (!payload) {
+    return c.json({ success: false, error: 'Invalid token' }, 401);
+  }
+
+  c.set('user', payload);
+  await next();
+};
+
+// Update current user's profile
+protectedApp.put('/users/me', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  const { name, schoolName, house } = await c.req.json();
+
+  try {
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        name = COALESCE(?, name),
+        school_name = COALESCE(?, school_name),
+        house = COALESCE(?, house),
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(name || null, schoolName || null, house || null, user.userId).run();
+
+    return c.json({ success: true, data: { message: 'Profile updated successfully' } });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    return c.json({ success: false, error: 'Failed to update profile' }, 500);
+  }
+});
+
+// Change password
+protectedApp.post('/users/me/change-password', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  const { currentPassword, newPassword } = await c.req.json();
+
+  try {
+    // Get current password hash
+    const dbUser = await c.env.DB.prepare(`
+      SELECT password_hash FROM users WHERE id = ?
+    `).bind(user.userId).first();
+
+    if (!dbUser || !dbUser.password_hash) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    // Verify current password
+    const isValid = await verifyPassword(currentPassword, dbUser.password_hash as string);
+    if (!isValid) {
+      return c.json({ success: false, error: 'Current password is incorrect' }, 400);
+    }
+
+    // Hash new password
+    const newHash = await hashPassword(newPassword);
+
+    // Update password
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        password_hash = ?,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(newHash, user.userId).run();
+
+    return c.json({ success: true, data: { message: 'Password changed successfully' } });
+  } catch (error) {
+    console.error('Change password error:', error);
+    return c.json({ success: false, error: 'Failed to change password' }, 500);
+  }
+});
+
+// =============================================
 // ADMIN USER MANAGEMENT ENDPOINTS
 // =============================================
 
