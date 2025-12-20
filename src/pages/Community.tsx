@@ -72,12 +72,19 @@ export function CommunityPage() {
   const fetchOnlineUsers = async () => {
     setIsLoadingOnline(true);
     try {
-      // TODO: Replace with API call
-      // const response = await fetch('/api/users/online');
-      // const data = await response.json();
-      // setOnlineUsers(data.users);
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setOnlineUsers([]);
+      // TODO: Replace with API call in production
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Demo online users
+      const demoUsers: OnlineUser[] = [
+        { id: 'user_ama', name: 'Ama Mensah', house: 'Blue House', level: 15, avatarUrl: undefined },
+        { id: 'user_kofi', name: 'Kofi Boateng', house: 'Red House', level: 12, avatarUrl: undefined },
+        { id: 'user_yaa', name: 'Yaa Asantewaa', house: 'Green House', level: 18, avatarUrl: undefined },
+        { id: 'user_kwesi', name: 'Kwesi Appiah', house: 'Yellow House', level: 10, avatarUrl: undefined },
+        { id: 'user_abena', name: 'Abena Osei', house: 'Blue House', level: 14, avatarUrl: undefined },
+        { id: 'user_kojo', name: 'Kojo Mensah', house: 'Red House', level: 9, avatarUrl: undefined },
+      ];
+      setOnlineUsers(demoUsers);
     } catch (error) {
       console.error('Failed to fetch online users:', error);
     } finally {
@@ -88,12 +95,21 @@ export function CommunityPage() {
   const fetchFeaturedRooms = async () => {
     setIsLoadingFeatured(true);
     try {
-      // TODO: Replace with API call
-      // const response = await fetch(`/api/chat/rooms/featured?examType=${currentExamType}`);
-      // const data = await response.json();
-      // setFeaturedRooms(data.rooms);
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setFeaturedRooms([]);
+      // TODO: Replace with API call in production
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Demo featured rooms based on exam type
+      const demoFeatured: FeaturedRoom[] = currentExamType === 'nsmq'
+        ? [
+            { id: 'room_nsmq_practice', name: 'NSMQ Speed Drills', members: 89, isHot: true },
+            { id: 'room_nsmq_riddles', name: 'Riddle Masters', members: 67 },
+          ]
+        : [
+            { id: 'room_wassce_physics', name: 'WASSCE Physics Study Group', members: 156, isHot: true },
+            { id: 'room_wassce_maths', name: 'WASSCE Mathematics Help', members: 234 },
+            { id: 'room_chemistry_lab', name: 'Chemistry Lab Partners', members: 67 },
+          ];
+      setFeaturedRooms(demoFeatured);
     } catch (error) {
       console.error('Failed to fetch featured rooms:', error);
     } finally {
@@ -103,12 +119,34 @@ export function CommunityPage() {
 
   const fetchRecentDiscussions = async () => {
     try {
-      // TODO: Replace with API call
-      // const response = await fetch('/api/chat/discussions/recent');
-      // const data = await response.json();
-      // setRecentDiscussions(data.discussions);
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setRecentDiscussions([]);
+      // TODO: Replace with API call in production
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Demo recent discussions
+      const demoDiscussions: RecentDiscussion[] = [
+        {
+          room: 'WASSCE Physics Study Group',
+          topic: 'Can someone explain the difference between velocity and acceleration?',
+          replies: 3,
+          time: '1 hour ago',
+          author: 'Kwame Asante',
+        },
+        {
+          room: 'NSMQ Speed Drills',
+          topic: 'Just finished a 50-question speed drill! My best time yet',
+          replies: 8,
+          time: '2 hours ago',
+          author: 'Ama Mensah',
+        },
+        {
+          room: 'Chemistry Lab Partners',
+          topic: 'Tips for qualitative analysis practicals?',
+          replies: 5,
+          time: '3 hours ago',
+          author: 'Yaa Asantewaa',
+        },
+      ];
+      setRecentDiscussions(demoDiscussions);
     } catch (error) {
       console.error('Failed to fetch recent discussions:', error);
     }

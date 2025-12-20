@@ -58,6 +58,7 @@ interface ChatState {
 
   // Typing indicators
   setTyping: (isTyping: boolean) => void;
+  simulateTyping: (userName: string, duration?: number) => void;
 
   // Utility
   markAsRead: (roomId: string) => void;
@@ -78,7 +79,7 @@ const getCurrentUser = () => {
 };
 
 // Clear old cached data on load
-const STORE_VERSION = 2;
+const STORE_VERSION = 3;
 if (typeof window !== 'undefined') {
   try {
     const stored = localStorage.getItem('brilla-chat');
@@ -93,6 +94,230 @@ if (typeof window !== 'undefined') {
     localStorage.removeItem('brilla-chat');
   }
 }
+
+// Demo rooms to show chat functionality
+const getDemoRooms = (): ChatRoom[] => {
+  const now = new Date().toISOString();
+  const hourAgo = new Date(Date.now() - 3600000).toISOString();
+  const dayAgo = new Date(Date.now() - 86400000).toISOString();
+
+  return [
+    {
+      id: 'room_wassce_physics',
+      name: 'WASSCE Physics Study Group',
+      description: 'Discuss physics concepts, formulas, and exam preparation',
+      type: 'subject',
+      subjectId: 'sub_physics',
+      examTypeId: 'exam_wassce',
+      isArchived: false,
+      maxMembers: 500,
+      createdBy: 'system',
+      createdAt: dayAgo,
+      updatedAt: hourAgo,
+      memberCount: 156,
+      unreadCount: 3,
+      myRole: 'member',
+      lastMessage: {
+        id: 'msg_demo1',
+        roomId: 'room_wassce_physics',
+        senderId: 'user_kwame',
+        content: 'Can someone explain the difference between velocity and acceleration?',
+        contentType: 'text',
+        isEdited: false,
+        isDeleted: false,
+        createdAt: hourAgo,
+        updatedAt: hourAgo,
+        sender: { id: 'user_kwame', name: 'Kwame Asante' },
+        reactions: [],
+      },
+    },
+    {
+      id: 'room_wassce_maths',
+      name: 'WASSCE Mathematics Help',
+      description: 'Get help with mathematics problems and exam prep',
+      type: 'subject',
+      subjectId: 'sub_maths',
+      examTypeId: 'exam_wassce',
+      isArchived: false,
+      maxMembers: 500,
+      createdBy: 'system',
+      createdAt: dayAgo,
+      updatedAt: now,
+      memberCount: 234,
+      unreadCount: 0,
+      myRole: 'member',
+    },
+    {
+      id: 'room_nsmq_practice',
+      name: 'NSMQ Speed Drills',
+      description: 'Practice speed rounds and riddles together',
+      type: 'public',
+      examTypeId: 'exam_nsmq',
+      isArchived: false,
+      maxMembers: 200,
+      createdBy: 'system',
+      createdAt: dayAgo,
+      updatedAt: hourAgo,
+      memberCount: 89,
+      unreadCount: 5,
+      myRole: 'member',
+      lastMessage: {
+        id: 'msg_demo2',
+        roomId: 'room_nsmq_practice',
+        senderId: 'user_ama',
+        content: 'Just finished a 50-question speed drill! My best time yet 🔥',
+        contentType: 'text',
+        isEdited: false,
+        isDeleted: false,
+        createdAt: hourAgo,
+        updatedAt: hourAgo,
+        sender: { id: 'user_ama', name: 'Ama Mensah' },
+        reactions: [{ emoji: '🔥', count: 5, userIds: [], hasReacted: false }],
+      },
+    },
+    {
+      id: 'room_chemistry_lab',
+      name: 'Chemistry Lab Partners',
+      description: 'Discuss practical experiments and lab reports',
+      type: 'subject',
+      subjectId: 'sub_chemistry',
+      examTypeId: 'exam_wassce',
+      isArchived: false,
+      maxMembers: 100,
+      createdBy: 'system',
+      createdAt: dayAgo,
+      updatedAt: dayAgo,
+      memberCount: 67,
+      unreadCount: 0,
+      myRole: 'member',
+    },
+  ];
+};
+
+// Demo messages for rooms
+const getDemoMessages = (): Record<string, ChatMessage[]> => {
+  const now = new Date();
+  const times = [
+    new Date(now.getTime() - 7200000).toISOString(), // 2 hours ago
+    new Date(now.getTime() - 3600000).toISOString(), // 1 hour ago
+    new Date(now.getTime() - 1800000).toISOString(), // 30 min ago
+    new Date(now.getTime() - 600000).toISOString(),  // 10 min ago
+    new Date(now.getTime() - 60000).toISOString(),   // 1 min ago
+  ];
+
+  return {
+    room_wassce_physics: [
+      {
+        id: 'msg_p1',
+        roomId: 'room_wassce_physics',
+        senderId: 'user_teacher',
+        content: 'Welcome everyone! Feel free to ask any physics questions here. Remember to be respectful and help each other learn.',
+        contentType: 'text',
+        isEdited: false,
+        isDeleted: false,
+        createdAt: times[0],
+        updatedAt: times[0],
+        sender: { id: 'user_teacher', name: 'Mr. Osei (Moderator)' },
+        reactions: [{ emoji: '👍', count: 12, userIds: [], hasReacted: false }],
+      },
+      {
+        id: 'msg_p2',
+        roomId: 'room_wassce_physics',
+        senderId: 'user_kofi',
+        content: 'Hello everyone! I\'m struggling with projectile motion. Any tips?',
+        contentType: 'text',
+        isEdited: false,
+        isDeleted: false,
+        createdAt: times[1],
+        updatedAt: times[1],
+        sender: { id: 'user_kofi', name: 'Kofi Boateng' },
+        reactions: [],
+      },
+      {
+        id: 'msg_p3',
+        roomId: 'room_wassce_physics',
+        senderId: 'user_ama',
+        content: 'Break it down into horizontal and vertical components! The key formulas are:\n\n• Horizontal: x = v₀cos(θ)t\n• Vertical: y = v₀sin(θ)t - ½gt²\n\nRemember, horizontal velocity stays constant (no air resistance) while vertical velocity changes due to gravity.',
+        contentType: 'text',
+        isEdited: false,
+        isDeleted: false,
+        createdAt: times[2],
+        updatedAt: times[2],
+        sender: { id: 'user_ama', name: 'Ama Mensah' },
+        reactions: [{ emoji: '❤️', count: 3, userIds: [], hasReacted: false }, { emoji: '🙏', count: 2, userIds: [], hasReacted: false }],
+      },
+      {
+        id: 'msg_p4',
+        roomId: 'room_wassce_physics',
+        senderId: 'user_kofi',
+        content: 'Thank you Ama! That makes so much more sense now.',
+        contentType: 'text',
+        isEdited: false,
+        isDeleted: false,
+        createdAt: times[3],
+        updatedAt: times[3],
+        sender: { id: 'user_kofi', name: 'Kofi Boateng' },
+        replyToId: 'msg_p3',
+        replyTo: { id: 'msg_p3', content: 'Break it down into horizontal and vertical...', senderName: 'Ama Mensah' },
+        reactions: [],
+      },
+      {
+        id: 'msg_p5',
+        roomId: 'room_wassce_physics',
+        senderId: 'user_kwame',
+        content: 'Can someone explain the difference between velocity and acceleration?',
+        contentType: 'text',
+        isEdited: false,
+        isDeleted: false,
+        createdAt: times[4],
+        updatedAt: times[4],
+        sender: { id: 'user_kwame', name: 'Kwame Asante' },
+        reactions: [],
+      },
+    ],
+    room_nsmq_practice: [
+      {
+        id: 'msg_n1',
+        roomId: 'room_nsmq_practice',
+        senderId: 'user_yaa',
+        content: 'Anyone up for a riddle practice session? I have some from past competitions!',
+        contentType: 'text',
+        isEdited: false,
+        isDeleted: false,
+        createdAt: times[0],
+        updatedAt: times[0],
+        sender: { id: 'user_yaa', name: 'Yaa Asantewaa' },
+        reactions: [{ emoji: '🙋', count: 8, userIds: [], hasReacted: false }],
+      },
+      {
+        id: 'msg_n2',
+        roomId: 'room_nsmq_practice',
+        senderId: 'user_kwesi',
+        content: 'Yes! Let\'s do it. I need practice on the speed rounds.',
+        contentType: 'text',
+        isEdited: false,
+        isDeleted: false,
+        createdAt: times[1],
+        updatedAt: times[1],
+        sender: { id: 'user_kwesi', name: 'Kwesi Appiah' },
+        reactions: [],
+      },
+      {
+        id: 'msg_n3',
+        roomId: 'room_nsmq_practice',
+        senderId: 'user_ama',
+        content: 'Just finished a 50-question speed drill! My best time yet 🔥',
+        contentType: 'text',
+        isEdited: false,
+        isDeleted: false,
+        createdAt: times[4],
+        updatedAt: times[4],
+        sender: { id: 'user_ama', name: 'Ama Mensah' },
+        reactions: [{ emoji: '🔥', count: 5, userIds: [], hasReacted: false }],
+      },
+    ],
+  };
+};
 
 export const useChatStore = create<ChatState>()(
   persist(
@@ -126,12 +351,26 @@ export const useChatStore = create<ChatState>()(
       fetchRooms: async () => {
         set({ isLoadingRooms: true });
         try {
-          // TODO: Replace with API call
+          // TODO: Replace with API call in production
           // const response = await fetch('/api/chat/rooms');
           // const data = await response.json();
           // set({ rooms: data.rooms });
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          set({ isLoadingRooms: false });
+          await new Promise((resolve) => setTimeout(resolve, 300));
+
+          // Load demo rooms if no rooms exist
+          const { rooms } = get();
+          if (rooms.length === 0) {
+            const demoRooms = getDemoRooms();
+            const demoMessages = getDemoMessages();
+            set({
+              rooms: demoRooms,
+              messagesByRoom: demoMessages,
+              isLoadingRooms: false,
+              isConnected: true,
+            });
+          } else {
+            set({ isLoadingRooms: false, isConnected: true });
+          }
         } catch (error) {
           set({
             connectionError: 'Failed to load rooms',
@@ -143,19 +382,19 @@ export const useChatStore = create<ChatState>()(
       fetchMessages: async (roomId: string) => {
         set({ isLoadingMessages: true });
         try {
-          // TODO: Replace with API call
+          // TODO: Replace with API call in production
           // const response = await fetch(`/api/chat/rooms/${roomId}/messages`);
           // const data = await response.json();
-          // set((state) => ({
-          //   messagesByRoom: { ...state.messagesByRoom, [roomId]: data.messages },
-          // }));
-          await new Promise((resolve) => setTimeout(resolve, 300));
+          await new Promise((resolve) => setTimeout(resolve, 200));
 
-          // Initialize empty messages array if room doesn't have messages
           const { messagesByRoom } = get();
+
+          // If no messages for this room, check demo messages
           if (!messagesByRoom[roomId]) {
+            const demoMessages = getDemoMessages();
+            const roomMessages = demoMessages[roomId] || [];
             set({
-              messagesByRoom: { ...messagesByRoom, [roomId]: [] },
+              messagesByRoom: { ...messagesByRoom, [roomId]: roomMessages },
             });
           }
           set({ isLoadingMessages: false });
@@ -334,6 +573,58 @@ export const useChatStore = create<ChatState>()(
               : room
           ),
         }));
+
+        // Simulate a response from demo users occasionally (30% chance)
+        if (Math.random() < 0.3 && activeRoomId.startsWith('room_')) {
+          const demoResponders = [
+            { id: 'user_ama', name: 'Ama Mensah' },
+            { id: 'user_kofi', name: 'Kofi Boateng' },
+            { id: 'user_yaa', name: 'Yaa Asantewaa' },
+            { id: 'user_kwesi', name: 'Kwesi Appiah' },
+          ];
+          const responder = demoResponders[Math.floor(Math.random() * demoResponders.length)];
+
+          // Show typing indicator after 1-2 seconds
+          setTimeout(() => {
+            get().simulateTyping(responder.name, 2500);
+          }, 1000 + Math.random() * 1000);
+
+          // Add response message after typing
+          setTimeout(() => {
+            const responses = [
+              'Great question! Let me think about that...',
+              'I agree with you! 👍',
+              'That\'s a really good point!',
+              'Has anyone tried the practice questions for this topic?',
+              'I found a helpful resource for this - will share later!',
+              'Thanks for sharing! This is really helpful 🙏',
+              'I was just thinking about the same thing!',
+              'Let\'s discuss this more in the study session!',
+            ];
+            const responseContent = responses[Math.floor(Math.random() * responses.length)];
+
+            const responseMessage: ChatMessage = {
+              id: `msg_sim_${Date.now()}`,
+              roomId: activeRoomId,
+              senderId: responder.id,
+              content: responseContent,
+              contentType: 'text',
+              isEdited: false,
+              isDeleted: false,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              sender: responder,
+              reactions: [],
+            };
+
+            set((state) => ({
+              messagesByRoom: {
+                ...state.messagesByRoom,
+                [activeRoomId]: [...(state.messagesByRoom[activeRoomId] || []), responseMessage],
+              },
+            }));
+          }, 4000 + Math.random() * 1000);
+        }
       },
 
       editMessage: async (messageId: string, newContent: string) => {
@@ -442,7 +733,27 @@ export const useChatStore = create<ChatState>()(
       },
 
       setTyping: (_isTyping: boolean) => {
-        // TODO: Send typing indicator via WebSocket
+        // TODO: Send typing indicator via WebSocket in production
+        // For demo, this would broadcast to other users
+      },
+
+      // Simulate another user typing (for demo purposes)
+      simulateTyping: (userName: string, duration: number = 3000) => {
+        const typingUser: ChatTypingUser = {
+          id: `typing_${Date.now()}`,
+          name: userName,
+        };
+
+        set((state) => ({
+          typingUsers: [...state.typingUsers, typingUser],
+        }));
+
+        // Remove typing indicator after duration
+        setTimeout(() => {
+          set((state) => ({
+            typingUsers: state.typingUsers.filter((u) => u.id !== typingUser.id),
+          }));
+        }, duration);
       },
 
       markAsRead: (roomId: string) => {
