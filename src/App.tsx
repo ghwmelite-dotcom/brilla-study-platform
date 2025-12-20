@@ -49,9 +49,9 @@ function LoginPage() {
         role: 'student' as const,
         house: 'Blue House',
         yearGroup: 3,
-        xpPoints: 1500,
-        level: 2,
-        streakDays: 5,
+        xpPoints: 0,
+        level: 1,
+        streakDays: 0,
         aiGradingCredits: 0,
       },
       admin: {
@@ -62,7 +62,7 @@ function LoginPage() {
         house: undefined,
         yearGroup: undefined,
         xpPoints: 0,
-        level: 10,
+        level: 1,
         streakDays: 0,
         aiGradingCredits: 100,
       },
@@ -73,9 +73,9 @@ function LoginPage() {
         role: 'teacher' as const,
         house: undefined,
         yearGroup: undefined,
-        xpPoints: 5000,
-        level: 5,
-        streakDays: 30,
+        xpPoints: 0,
+        level: 1,
+        streakDays: 0,
         aiGradingCredits: 50,
       },
     };
@@ -189,7 +189,7 @@ function RegisterPage() {
   const handleDemoRegister = () => {
     useAuthStore.setState({
       user: {
-        id: 'user_new',
+        id: `user_${Date.now()}`,
         email: 'new@stjohns.edu.gh',
         name: 'New Student',
         role: 'student',
@@ -202,7 +202,7 @@ function RegisterPage() {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
-      token: 'new_token',
+      token: `new_token_${Date.now()}`,
       isAuthenticated: true,
     });
 

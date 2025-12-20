@@ -23,7 +23,7 @@ import {
   Hash,
 } from 'lucide-react';
 import { cn } from '@/utils';
-import { useAuthStore, useExamStore, useChatStore } from '@/stores';
+import { useAuthStore, useExamStore, useChatStore, useProgressStore } from '@/stores';
 import { SubjectNavigation } from '@/components/subjects';
 import { ExamModeSwitcher } from '@/components/exam';
 
@@ -102,6 +102,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { isAuthenticated, user } = useAuthStore();
   const { currentExamType, initializeExamData } = useExamStore();
   const { openChat, setActiveTab, getUnreadCount } = useChatStore();
+  const { totalQuestionsAttempted, overallAccuracy } = useProgressStore();
   const isTeacherOrAdmin = user?.role === 'teacher' || user?.role === 'admin';
   const unreadCount = getUnreadCount();
 
@@ -274,21 +275,24 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           {/* Dynamic Subjects */}
           <SubjectNavigation onItemClick={onClose} />
 
-          {/* Quick Stats (if authenticated) */}
-          {isAuthenticated && (
+          {/* Quick Stats (if authenticated and has progress) */}
+          {isAuthenticated && totalQuestionsAttempted > 0 && (
             <div className="bg-gradient-to-br from-primary to-primary-dark rounded-xl p-4 text-white">
-              <h4 className="font-semibold mb-3">Today's Progress</h4>
+              <h4 className="font-semibold mb-3">Your Progress</h4>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="opacity-80">Questions</span>
-                  <span className="font-medium">12/20</span>
+                  <span className="font-medium">{totalQuestionsAttempted}</span>
                 </div>
                 <div className="w-full bg-white/20 rounded-full h-2">
-                  <div className="bg-secondary h-2 rounded-full" style={{ width: '60%' }} />
+                  <div
+                    className="bg-secondary h-2 rounded-full transition-all"
+                    style={{ width: `${Math.min(overallAccuracy, 100)}%` }}
+                  />
                 </div>
                 <div className="flex justify-between text-sm mt-2">
                   <span className="opacity-80">Accuracy</span>
-                  <span className="font-medium">85%</span>
+                  <span className="font-medium">{overallAccuracy}%</span>
                 </div>
               </div>
             </div>

@@ -2,6 +2,23 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { UserProgress, Achievement, LeaderboardEntry, LeaderboardPeriod } from '@/types';
 
+// Clear old cached data on load
+const STORE_VERSION = 2;
+if (typeof window !== 'undefined') {
+  try {
+    const stored = localStorage.getItem('brilla-progress');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Clear if no version or old version
+      if (!parsed.version || parsed.version < STORE_VERSION) {
+        localStorage.removeItem('brilla-progress');
+      }
+    }
+  } catch {
+    localStorage.removeItem('brilla-progress');
+  }
+}
+
 interface ProgressState {
   // Progress data
   topicProgress: Record<string, UserProgress>;
@@ -303,6 +320,7 @@ export const useProgressStore = create<ProgressState>()(
     }),
     {
       name: 'brilla-progress',
+      version: STORE_VERSION,
       partialize: (state) => ({
         topicProgress: state.topicProgress,
         totalQuestionsAttempted: state.totalQuestionsAttempted,

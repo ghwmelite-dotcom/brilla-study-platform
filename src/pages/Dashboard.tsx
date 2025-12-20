@@ -6,9 +6,7 @@ import {
   Trophy,
   BookOpen,
   Brain,
-  ChevronRight,
   Award,
-  Zap,
 } from 'lucide-react';
 import { Card, CardHeader, Button, Badge, ProgressBar, CircularProgress } from '@/components/common';
 import { useAuthStore, useProgressStore } from '@/stores';
@@ -40,29 +38,17 @@ export function DashboardPage() {
   const xpProgress = totalXP - xpForCurrentLevel;
   const xpPercentage = Math.min((xpProgress / 1000) * 100, 100);
 
-  // Sample data for demonstration
-  const recentActivity = [
-    { type: 'practice', topic: 'Quadratic Equations', score: 8, total: 10, time: '2 hours ago' },
-    { type: 'speed', topic: 'Speed Race', score: 45, total: 50, time: '5 hours ago' },
-    { type: 'quiz', topic: 'Thermodynamics', score: 7, total: 10, time: 'Yesterday' },
-  ];
+  // Get real data from progress store
+  const strengths = useProgressStore((state) => state.getStrengths());
+  const weaknesses = useProgressStore((state) => state.getWeaknesses());
 
-  const weakTopics = [
-    { name: 'Organic Chemistry', mastery: 35 },
-    { name: 'Modern Physics', mastery: 42 },
-    { name: 'Ecology', mastery: 48 },
-  ];
-
-  const strongTopics = [
-    { name: 'Algebra', mastery: 92 },
-    { name: 'Mechanics', mastery: 88 },
-    { name: 'Cell Biology', mastery: 85 },
-  ];
-
-  const achievements = [
-    { icon: '🔥', name: 'Week Warrior', description: '7 day streak', unlocked: true },
-    { icon: '🎯', name: 'Sharpshooter', description: '90% accuracy', unlocked: true },
-    { icon: '⚡', name: 'Speed Demon', description: 'Coming soon', unlocked: false },
+  // Define available achievements (these would come from API in production)
+  const availableAchievements = [
+    { id: 'first_question', icon: '🎯', name: 'First Steps', description: 'Answer your first question', requirement: 1 },
+    { id: 'streak_3', icon: '🔥', name: 'Getting Started', description: '3 correct in a row', requirement: 3 },
+    { id: 'streak_7', icon: '🔥', name: 'Week Warrior', description: '7 day streak', requirement: 7 },
+    { id: 'questions_50', icon: '📚', name: 'Dedicated Learner', description: 'Answer 50 questions', requirement: 50 },
+    { id: 'accuracy_90', icon: '🎯', name: 'Sharpshooter', description: 'Achieve 90% accuracy', requirement: 90 },
   ];
 
   return (
@@ -153,56 +139,85 @@ export function DashboardPage() {
           <Card className="p-6">
             <CardHeader
               title="Today's Goals"
-              subtitle="Complete these to maintain your streak"
-              action={<Badge variant="primary">3/5 complete</Badge>}
+              subtitle={totalQuestionsAttempted > 0 ? "Keep up the momentum!" : "Start your learning journey"}
             />
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+              {/* Goal 1: Answer questions */}
+              <div className={cn(
+                "flex items-center justify-between p-3 rounded-lg",
+                totalQuestionsAttempted >= 10 ? "bg-green-50" : "bg-neutral-50"
+              )}>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
-                    <span className="text-white text-sm">✓</span>
+                  <div className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center",
+                    totalQuestionsAttempted >= 10 ? "bg-green-500" : "bg-neutral-200"
+                  )}>
+                    <span className={totalQuestionsAttempted >= 10 ? "text-white text-sm" : "text-neutral-500 text-sm"}>
+                      {totalQuestionsAttempted >= 10 ? "✓" : "1"}
+                    </span>
                   </div>
                   <span className="text-neutral-700">Answer 10 questions</span>
                 </div>
-                <span className="text-sm text-green-600">10/10</span>
+                <span className={cn("text-sm", totalQuestionsAttempted >= 10 ? "text-green-600" : "text-neutral-500")}>
+                  {Math.min(totalQuestionsAttempted, 10)}/10
+                </span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+
+              {/* Goal 2: Get correct answers */}
+              <div className={cn(
+                "flex items-center justify-between p-3 rounded-lg",
+                totalCorrect >= 5 ? "bg-green-50" : "bg-neutral-50"
+              )}>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
-                    <span className="text-white text-sm">✓</span>
+                  <div className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center",
+                    totalCorrect >= 5 ? "bg-green-500" : "bg-neutral-200"
+                  )}>
+                    <span className={totalCorrect >= 5 ? "text-white text-sm" : "text-neutral-500 text-sm"}>
+                      {totalCorrect >= 5 ? "✓" : "2"}
+                    </span>
                   </div>
-                  <span className="text-neutral-700">Complete a speed round</span>
+                  <span className="text-neutral-700">Get 5 correct answers</span>
                 </div>
-                <span className="text-sm text-green-600">Done</span>
+                <span className={cn("text-sm", totalCorrect >= 5 ? "text-green-600" : "text-neutral-500")}>
+                  {Math.min(totalCorrect, 5)}/5
+                </span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+
+              {/* Goal 3: Build a streak */}
+              <div className={cn(
+                "flex items-center justify-between p-3 rounded-lg",
+                currentStreak >= 3 ? "bg-green-50" : "bg-neutral-50"
+              )}>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
-                    <span className="text-white text-sm">✓</span>
+                  <div className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center",
+                    currentStreak >= 3 ? "bg-green-500" : "bg-neutral-200"
+                  )}>
+                    <span className={currentStreak >= 3 ? "text-white text-sm" : "text-neutral-500 text-sm"}>
+                      {currentStreak >= 3 ? "✓" : "3"}
+                    </span>
                   </div>
-                  <span className="text-neutral-700">Review 5 flashcards</span>
+                  <span className="text-neutral-700">Build a 3-answer streak</span>
                 </div>
-                <span className="text-sm text-green-600">Done</span>
+                <span className={cn("text-sm", currentStreak >= 3 ? "text-green-600" : "text-neutral-500")}>
+                  {currentStreak}/3 streak
+                </span>
               </div>
+
+              {/* Goal 4: Start practicing */}
               <div className="flex items-center justify-between p-3 bg-primary-50 rounded-lg border border-primary-200">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
                     <span className="text-primary text-sm">4</span>
                   </div>
-                  <span className="text-neutral-700">Practice a weak topic</span>
+                  <span className="text-neutral-700">
+                    {totalQuestionsAttempted === 0 ? "Start your first practice session" : "Continue practicing"}
+                  </span>
                 </div>
-                <Link to="/practice?mode=drill">
+                <Link to="/practice">
                   <Button size="sm">Start</Button>
                 </Link>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-neutral-200 flex items-center justify-center">
-                    <span className="text-neutral-500 text-sm">5</span>
-                  </div>
-                  <span className="text-neutral-500">Achieve 80% accuracy today</span>
-                </div>
-                <span className="text-sm text-neutral-400">75%</span>
               </div>
             </div>
           </Card>
@@ -211,46 +226,37 @@ export function DashboardPage() {
           <Card className="p-6">
             <CardHeader
               title="Recent Activity"
-              action={
-                <Link to="/history">
-                  <Button variant="ghost" size="sm">
-                    View All
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </Link>
-              }
             />
-            <div className="space-y-3">
-              {recentActivity.map((activity, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg"
-                >
+            {totalQuestionsAttempted === 0 ? (
+              <div className="text-center py-8">
+                <BookOpen className="w-12 h-12 text-neutral-300 mx-auto mb-3" />
+                <p className="text-neutral-500 font-medium">No activity yet</p>
+                <p className="text-sm text-neutral-400 mt-1">
+                  Start practicing to see your progress here
+                </p>
+                <Link to="/practice" className="inline-block mt-4">
+                  <Button size="sm">Start Practice</Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className={cn(
-                      'p-2 rounded-lg',
-                      activity.type === 'practice' && 'bg-blue-100',
-                      activity.type === 'speed' && 'bg-yellow-100',
-                      activity.type === 'quiz' && 'bg-purple-100'
-                    )}>
-                      {activity.type === 'practice' && <BookOpen className="w-4 h-4 text-blue-500" />}
-                      {activity.type === 'speed' && <Zap className="w-4 h-4 text-yellow-500" />}
-                      {activity.type === 'quiz' && <Brain className="w-4 h-4 text-purple-500" />}
+                    <div className="p-2 rounded-lg bg-blue-100">
+                      <Brain className="w-4 h-4 text-blue-500" />
                     </div>
                     <div>
-                      <p className="font-medium text-neutral-900">{activity.topic}</p>
-                      <p className="text-xs text-neutral-500">{activity.time}</p>
+                      <p className="font-medium text-neutral-900">Practice Session</p>
+                      <p className="text-xs text-neutral-500">Questions answered</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-neutral-900">{activity.score}/{activity.total}</p>
-                    <p className="text-xs text-neutral-500">
-                      {Math.round((activity.score / activity.total) * 100)}%
-                    </p>
+                    <p className="font-bold text-neutral-900">{totalCorrect}/{totalQuestionsAttempted}</p>
+                    <p className="text-xs text-neutral-500">{overallAccuracy}% accuracy</p>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </Card>
         </div>
 
@@ -261,18 +267,18 @@ export function DashboardPage() {
             <CardHeader title="Overall Progress" />
             <div className="flex justify-center mb-4">
               <CircularProgress
-                value={overallAccuracy || 75}
+                value={overallAccuracy}
                 size={120}
                 variant="primary"
               />
             </div>
             <div className="grid grid-cols-2 gap-4 text-center">
               <div>
-                <p className="text-2xl font-bold text-neutral-900">{totalQuestionsAttempted || 156}</p>
+                <p className="text-2xl font-bold text-neutral-900">{totalQuestionsAttempted}</p>
                 <p className="text-xs text-neutral-500">Questions</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-primary">{Object.keys(topicProgress).length || 12}</p>
+                <p className="text-2xl font-bold text-primary">{Object.keys(topicProgress).length}</p>
                 <p className="text-xs text-neutral-500">Topics Covered</p>
               </div>
             </div>
@@ -282,74 +288,100 @@ export function DashboardPage() {
           <Card className="p-6">
             <CardHeader
               title="Areas to Improve"
-              action={<Badge variant="warning" size="sm">Focus</Badge>}
+              action={weaknesses.length > 0 ? <Badge variant="warning" size="sm">Focus</Badge> : undefined}
             />
-            <div className="space-y-3">
-              {weakTopics.map((topic, index) => (
-                <div key={index}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-neutral-700">{topic.name}</span>
-                    <span className="text-neutral-500">{topic.mastery}%</span>
-                  </div>
-                  <ProgressBar value={topic.mastery} variant="warning" size="sm" />
+            {weaknesses.length > 0 ? (
+              <>
+                <div className="space-y-3">
+                  {weaknesses.map((topic) => (
+                    <div key={topic.topicId}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-neutral-700 truncate">{topic.name}</span>
+                        <span className="text-neutral-500">{topic.mastery}%</span>
+                      </div>
+                      <ProgressBar value={topic.mastery} variant="warning" size="sm" />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <Link to="/practice?filter=weak" className="block mt-4">
-              <Button variant="outline" fullWidth size="sm">
-                Practice Weak Topics
-              </Button>
-            </Link>
+                <Link to="/practice?filter=weak" className="block mt-4">
+                  <Button variant="outline" fullWidth size="sm">
+                    Practice Weak Topics
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-neutral-500 text-sm">
+                  {totalQuestionsAttempted > 0
+                    ? "Great job! No weak areas identified yet."
+                    : "Start practicing to identify areas for improvement."
+                  }
+                </p>
+              </div>
+            )}
           </Card>
 
           {/* Strengths */}
           <Card className="p-6">
             <CardHeader
               title="Your Strengths"
-              action={<Badge variant="success" size="sm">Great!</Badge>}
+              action={strengths.length > 0 ? <Badge variant="success" size="sm">Great!</Badge> : undefined}
             />
-            <div className="space-y-3">
-              {strongTopics.map((topic, index) => (
-                <div key={index}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-neutral-700">{topic.name}</span>
-                    <span className="text-neutral-500">{topic.mastery}%</span>
+            {strengths.length > 0 ? (
+              <div className="space-y-3">
+                {strengths.map((topic) => (
+                  <div key={topic.topicId}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-neutral-700 truncate">{topic.name}</span>
+                      <span className="text-neutral-500">{topic.mastery}%</span>
+                    </div>
+                    <ProgressBar value={topic.mastery} variant="success" size="sm" />
                   </div>
-                  <ProgressBar value={topic.mastery} variant="success" size="sm" />
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-neutral-500 text-sm">
+                  {totalQuestionsAttempted > 0
+                    ? "Keep practicing to build your strengths!"
+                    : "Your strengths will appear here as you practice."
+                  }
+                </p>
+              </div>
+            )}
           </Card>
 
           {/* Achievements */}
           <Card className="p-6">
             <CardHeader
               title="Achievements"
-              action={
-                <Link to="/achievements">
-                  <Button variant="ghost" size="sm">
-                    All
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </Link>
-              }
             />
             <div className="space-y-3">
-              {achievements.map((achievement, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    'flex items-center gap-3 p-3 rounded-lg',
-                    achievement.unlocked ? 'bg-primary-50' : 'bg-neutral-50 opacity-50'
-                  )}
-                >
-                  <span className="text-2xl">{achievement.icon}</span>
-                  <div>
-                    <p className="font-medium text-neutral-900">{achievement.name}</p>
-                    <p className="text-xs text-neutral-500">{achievement.description}</p>
+              {availableAchievements.slice(0, 3).map((achievement) => {
+                // Determine if achievement is unlocked based on current progress
+                let isUnlocked = false;
+                if (achievement.id === 'first_question') isUnlocked = totalQuestionsAttempted >= 1;
+                if (achievement.id === 'streak_3') isUnlocked = longestStreak >= 3;
+                if (achievement.id === 'streak_7') isUnlocked = longestStreak >= 7;
+                if (achievement.id === 'questions_50') isUnlocked = totalQuestionsAttempted >= 50;
+                if (achievement.id === 'accuracy_90') isUnlocked = overallAccuracy >= 90 && totalQuestionsAttempted >= 10;
+
+                return (
+                  <div
+                    key={achievement.id}
+                    className={cn(
+                      'flex items-center gap-3 p-3 rounded-lg',
+                      isUnlocked ? 'bg-primary-50' : 'bg-neutral-50 opacity-50'
+                    )}
+                  >
+                    <span className="text-2xl">{achievement.icon}</span>
+                    <div>
+                      <p className="font-medium text-neutral-900">{achievement.name}</p>
+                      <p className="text-xs text-neutral-500">{achievement.description}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </Card>
         </div>
