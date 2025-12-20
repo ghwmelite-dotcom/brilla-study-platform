@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ExamType, ExamTypeSlug, Subject, SubjectCategory, PaperType } from '@/types';
+import {
+  examTypes as localExamTypes,
+  getSubjectsByExamType,
+  getCategoriesByExamType,
+  getPaperTypesByExamType,
+} from '@/data';
 
 interface ExamState {
   // Current exam mode
@@ -18,12 +24,13 @@ interface ExamState {
   error: string | null;
 
   // Actions
-  setExamType: (examType: ExamTypeSlug) => Promise<void>;
-  fetchExamTypes: () => Promise<void>;
-  fetchSubjects: (examType?: ExamTypeSlug, category?: string) => Promise<void>;
-  fetchCategories: (examType: ExamTypeSlug) => Promise<void>;
-  fetchPaperTypes: (examType: ExamTypeSlug) => Promise<void>;
+  setExamType: (examType: ExamTypeSlug) => void;
+  initializeExamData: () => void;
+  fetchSubjects: (examType?: ExamTypeSlug) => void;
+  fetchCategories: (examType: ExamTypeSlug) => void;
+  fetchPaperTypes: (examType: ExamTypeSlug) => void;
   getSubjectsByCategory: (categorySlug: string) => Subject[];
+  getCategorySubjects: (categoryId: string) => Subject[];
   clearError: () => void;
 }
 
@@ -31,7 +38,7 @@ export const useExamStore = create<ExamState>()(
   persist(
     (set, get) => ({
       currentExamType: 'nsmq',
-      examTypes: [],
+      examTypes: localExamTypes,
       subjects: [],
       categories: [],
       paperTypes: [],
@@ -39,102 +46,67 @@ export const useExamStore = create<ExamState>()(
       isLoadingSubjects: false,
       error: null,
 
-      setExamType: async (examType) => {
+      setExamType: (examType) => {
         set({ currentExamType: examType, isLoading: true });
 
-        // Load data for the new exam type
-        const { fetchSubjects, fetchCategories, fetchPaperTypes } = get();
+        // Load data for the new exam type using local data
+        const subjects = getSubjectsByExamType(examType);
+        const categories = getCategoriesByExamType(examType);
+        const paperTypes = getPaperTypesByExamType(examType);
 
-        try {
-          await Promise.all([
-            fetchSubjects(examType),
-            fetchCategories(examType),
-            fetchPaperTypes(examType),
-          ]);
-          set({ isLoading: false });
-        } catch {
-          set({ isLoading: false, error: 'Failed to load exam data' });
-        }
+        set({
+          subjects,
+          categories,
+          paperTypes,
+          isLoading: false,
+          isLoadingSubjects: false,
+        });
       },
 
-      fetchExamTypes: async () => {
-        set({ isLoading: true, error: null });
-        try {
-          const response = await fetch('/api/exam-types');
-          const data = await response.json();
+      initializeExamData: () => {
+        const { currentExamType } = get();
 
-          if (!response.ok) {
-            throw new Error(data.error || 'Failed to fetch exam types');
-          }
+        // Load data for current exam type
+        const subjects = getSubjectsByExamType(currentExamType);
+        const categories = getCategoriesByExamType(currentExamType);
+        const paperTypes = getPaperTypesByExamType(currentExamType);
 
-          set({ examTypes: data.data, isLoading: false });
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : 'Failed to fetch exam types',
-            isLoading: false,
-          });
-        }
+        set({
+          subjects,
+          categories,
+          paperTypes,
+          examTypes: localExamTypes,
+        });
       },
 
-      fetchSubjects: async (examType, category) => {
+      fetchSubjects: (examType) => {
         const exam = examType || get().currentExamType;
-        set({ isLoadingSubjects: true, error: null });
+        set({ isLoadingSubjects: true });
 
-        try {
-          let url = `/api/subjects?exam_type=${exam}`;
-          if (category) {
-            url += `&category=${category}`;
-          }
-
-          const response = await fetch(url);
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || 'Failed to fetch subjects');
-          }
-
-          set({ subjects: data.data, isLoadingSubjects: false });
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : 'Failed to fetch subjects',
-            isLoadingSubjects: false,
-          });
-        }
+        const subjects = getSubjectsByExamType(exam);
+        set({ subjects, isLoadingSubjects: false });
       },
 
-      fetchCategories: async (examType) => {
-        try {
-          const response = await fetch(`/api/exam-types/${examType}/categories`);
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || 'Failed to fetch categories');
-          }
-
-          set({ categories: data.data });
-        } catch (error) {
-          console.error('Failed to fetch categories:', error);
-        }
+      fetchCategories: (examType) => {
+        const categories = getCategoriesByExamType(examType);
+        set({ categories });
       },
 
-      fetchPaperTypes: async (examType) => {
-        try {
-          const response = await fetch(`/api/exam-types/${examType}/paper-types`);
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || 'Failed to fetch paper types');
-          }
-
-          set({ paperTypes: data.data });
-        } catch (error) {
-          console.error('Failed to fetch paper types:', error);
-        }
+      fetchPaperTypes: (examType) => {
+        const paperTypes = getPaperTypesByExamType(examType);
+        set({ paperTypes });
       },
 
       getSubjectsByCategory: (categorySlug) => {
+        const { subjects, categories } = get();
+        const category = categories.find((c) => c.slug === categorySlug);
+        if (!category) return [];
+        return subjects.filter((s) => s.categoryId === category.id);
+      },
+
+      getCategorySubjects: (categoryId) => {
         const { subjects } = get();
-        return subjects.filter((s) => s.category?.slug === categorySlug);
+        return subjects.filter((s) => s.categoryId === categoryId);
       },
 
       clearError: () => set({ error: null }),
@@ -147,3 +119,17 @@ export const useExamStore = create<ExamState>()(
     }
   )
 );
+
+// Initialize exam data on store creation
+// This runs after rehydration automatically
+const initializeOnLoad = () => {
+  const state = useExamStore.getState();
+  if (state.subjects.length === 0) {
+    state.initializeExamData();
+  }
+};
+
+// Call initialization after a microtask to ensure store is fully created
+if (typeof window !== 'undefined') {
+  setTimeout(initializeOnLoad, 0);
+}

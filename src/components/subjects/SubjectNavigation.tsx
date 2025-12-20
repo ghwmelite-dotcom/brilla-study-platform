@@ -20,6 +20,7 @@ function getIconComponent(iconName: string): React.ComponentType<{ className?: s
     BookOpen: Icons.BookOpen,
     Microscope: Icons.Microscope,
     Globe: Icons.Globe,
+    Globe2: Icons.Globe2,
     Languages: Icons.Languages,
     TrendingUp: Icons.TrendingUp,
     Briefcase: Icons.Briefcase,
@@ -54,6 +55,11 @@ function getIconComponent(iconName: string): React.ComponentType<{ className?: s
     Keyboard: Icons.Keyboard,
     Wheat: Icons.Wheat,
     FunctionSquare: Icons.FunctionSquare,
+    Leaf: Icons.Leaf,
+    Beaker: Icons.Beaker,
+    Users: Icons.Users,
+    Sigma: Icons.Sigma,
+    PiggyBank: Icons.PiggyBank,
   };
 
   return iconMap[iconName] || Icons.BookOpen;

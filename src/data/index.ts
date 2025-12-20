@@ -9,3 +9,15 @@ export {
   essayQuestions,
   additionalNsmqQuestions,
 } from './studyMaterials';
+
+export {
+  examTypes,
+  subjects,
+  subjectCategories,
+  paperTypes,
+  getExamTypeBySlug,
+  getSubjectsByExamType,
+  getCategoriesByExamType,
+  getPaperTypesByExamType,
+  getSubjectsByCategory,
+} from './examData';

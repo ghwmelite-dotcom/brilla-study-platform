@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   Home,
@@ -14,6 +15,10 @@ import {
   HelpCircle,
   FileText,
   Upload,
+  PenTool,
+  GraduationCap,
+  Zap,
+  ClipboardList,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { useAuthStore, useExamStore } from '@/stores';
@@ -38,13 +43,18 @@ const examSpecificItems = {
   nsmq: [
     { path: '/battle', label: '1v1 Battle', icon: Swords, auth: true },
     { path: '/competition', label: 'Competition Sim', icon: Trophy },
+    { path: '/speed-quiz', label: 'Speed Quiz', icon: Zap },
   ],
   wassce: [
     { path: '/past-papers', label: 'Past Papers', icon: FileText },
-    { path: '/practice/essay', label: 'Essay Practice', icon: BookOpen },
+    { path: '/practice/essay', label: 'Essay Practice', icon: PenTool },
+    { path: '/mock-exams', label: 'Mock Exams', icon: ClipboardList },
+    { path: '/catalog', label: 'Subject Catalog', icon: GraduationCap },
   ],
   bece: [
     { path: '/past-papers', label: 'Past Papers', icon: FileText },
+    { path: '/practice/essay', label: 'Essay Practice', icon: PenTool },
+    { path: '/mock-exams', label: 'Mock Exams', icon: ClipboardList },
   ],
 };
 
@@ -55,14 +65,44 @@ const commonItems = [
   { path: '/leaderboard', label: 'Leaderboard', icon: Medal },
 ];
 
+// Exam mode descriptions
+const examModeInfo = {
+  nsmq: {
+    title: 'NSMQ Mode',
+    description: 'Science & Maths Competition',
+    color: 'from-amber-500 to-orange-600',
+    textColor: 'text-amber-600',
+    bgColor: 'bg-amber-50',
+  },
+  wassce: {
+    title: 'WASSCE Mode',
+    description: 'Senior Secondary Exam Prep',
+    color: 'from-indigo-500 to-purple-600',
+    textColor: 'text-indigo-600',
+    bgColor: 'bg-indigo-50',
+  },
+  bece: {
+    title: 'BECE Mode',
+    description: 'Junior Secondary Exam Prep',
+    color: 'from-emerald-500 to-teal-600',
+    textColor: 'text-emerald-600',
+    bgColor: 'bg-emerald-50',
+  },
+};
+
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { isAuthenticated, user } = useAuthStore();
-  const { currentExamType } = useExamStore();
+  const { currentExamType, initializeExamData } = useExamStore();
   const isTeacherOrAdmin = user?.role === 'teacher' || user?.role === 'admin';
+
+  // Initialize exam data on mount
+  useEffect(() => {
+    initializeExamData();
+  }, [initializeExamData]);
 
   // Get exam-specific navigation items
   const examItems = examSpecificItems[currentExamType] || [];
-  const allNavItems = [...mainNavItems, ...examItems, ...commonItems];
+  const examInfo = examModeInfo[currentExamType];
 
   return (
     <>
@@ -90,13 +130,90 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <ExamModeSwitcher />
           </div>
 
+          {/* Exam Mode Indicator */}
+          <div className={cn('rounded-lg p-3', examInfo.bgColor)}>
+            <div className="flex items-center gap-2">
+              <div className={cn('w-2 h-2 rounded-full bg-gradient-to-r', examInfo.color)} />
+              <span className={cn('text-sm font-semibold', examInfo.textColor)}>
+                {examInfo.title}
+              </span>
+            </div>
+            <p className="text-xs text-neutral-600 mt-1 ml-4">{examInfo.description}</p>
+          </div>
+
           {/* Main Navigation */}
           <div>
             <h3 className="px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
-              Navigation
+              General
             </h3>
             <ul className="space-y-1">
-              {allNavItems.map((item) => {
+              {mainNavItems.map((item) => {
+                if ('auth' in item && item.auth && !isAuthenticated) return null;
+
+                return (
+                  <li key={item.path}>
+                    <NavLink
+                      to={item.path}
+                      onClick={onClose}
+                      className={({ isActive }) =>
+                        cn(
+                          'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                          isActive
+                            ? 'bg-primary text-white'
+                            : 'text-neutral-700 hover:bg-neutral-100'
+                        )
+                      }
+                    >
+                      <item.icon className="w-5 h-5" />
+                      {item.label}
+                    </NavLink>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          {/* Exam-Specific Features */}
+          {examItems.length > 0 && (
+            <div>
+              <h3 className="px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
+                {currentExamType.toUpperCase()} Features
+              </h3>
+              <ul className="space-y-1">
+                {examItems.map((item) => {
+                  if ('auth' in item && item.auth && !isAuthenticated) return null;
+
+                  return (
+                    <li key={item.path}>
+                      <NavLink
+                        to={item.path}
+                        onClick={onClose}
+                        className={({ isActive }) =>
+                          cn(
+                            'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                            isActive
+                              ? cn('bg-gradient-to-r text-white', examInfo.color)
+                              : 'text-neutral-700 hover:bg-neutral-100'
+                          )
+                        }
+                      >
+                        <item.icon className="w-5 h-5" />
+                        {item.label}
+                      </NavLink>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
+          {/* Community Features */}
+          <div>
+            <h3 className="px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
+              Community
+            </h3>
+            <ul className="space-y-1">
+              {commonItems.map((item) => {
                 if ('auth' in item && item.auth && !isAuthenticated) return null;
 
                 return (

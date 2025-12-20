@@ -30,13 +30,7 @@ const EXAM_CONFIG: Record<ExamTypeSlug, { name: string; shortName: string; icon:
 export function ExamModeSwitcher() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { currentExamType, examTypes, setExamType, fetchExamTypes, isLoading } = useExamStore();
-
-  useEffect(() => {
-    if (examTypes.length === 0) {
-      fetchExamTypes();
-    }
-  }, [examTypes.length, fetchExamTypes]);
+  const { currentExamType, setExamType, isLoading } = useExamStore();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import {
   Zap,
   BookOpen,
@@ -10,9 +10,15 @@ import {
   FlaskConical,
   Dna,
   Settings,
+  FileText,
+  PenTool,
+  Trophy,
+  ClipboardList,
+  Swords,
 } from 'lucide-react';
 import { Card, Button, Badge, Select } from '@/components/common';
 import { TopicDrill, SpeedRace, Flashcard } from '@/components/practice';
+import { useExamStore } from '@/stores';
 import { cn } from '@/utils';
 import type { Question } from '@/types';
 
@@ -113,7 +119,8 @@ const flashcards = [
 
 type PracticeMode = 'drill' | 'speed' | 'flashcard' | null;
 
-const practiceModes = [
+// Base practice modes available to all
+const basePracticeModes = [
   {
     id: 'drill',
     name: 'Topic Drill',
@@ -140,13 +147,71 @@ const practiceModes = [
   },
 ];
 
-const subjects = [
-  { value: 'all', label: 'All Subjects' },
-  { value: 'mathematics', label: 'Mathematics' },
-  { value: 'physics', label: 'Physics' },
-  { value: 'chemistry', label: 'Chemistry' },
-  { value: 'biology', label: 'Biology' },
-];
+// Exam-specific practice features (shown as links)
+const examFeatures = {
+  nsmq: [
+    {
+      name: '1v1 Battle',
+      description: 'Challenge other students in real-time quiz battles',
+      icon: Swords,
+      color: 'bg-red-500',
+      path: '/battle',
+    },
+    {
+      name: 'Competition Sim',
+      description: 'Simulate full NSMQ competition rounds',
+      icon: Trophy,
+      color: 'bg-amber-500',
+      path: '/competition',
+    },
+  ],
+  wassce: [
+    {
+      name: 'Past Papers',
+      description: 'Practice with real WASSCE past questions',
+      icon: FileText,
+      color: 'bg-indigo-500',
+      path: '/past-papers',
+    },
+    {
+      name: 'Essay Practice',
+      description: 'Write essays and get AI-powered feedback',
+      icon: PenTool,
+      color: 'bg-purple-500',
+      path: '/practice/essay',
+    },
+    {
+      name: 'Mock Exams',
+      description: 'Take full-length timed mock exams',
+      icon: ClipboardList,
+      color: 'bg-teal-500',
+      path: '/mock-exams',
+    },
+  ],
+  bece: [
+    {
+      name: 'Past Papers',
+      description: 'Practice with real BECE past questions',
+      icon: FileText,
+      color: 'bg-emerald-500',
+      path: '/past-papers',
+    },
+    {
+      name: 'Essay Practice',
+      description: 'Practice composition and letter writing',
+      icon: PenTool,
+      color: 'bg-purple-500',
+      path: '/practice/essay',
+    },
+    {
+      name: 'Mock Exams',
+      description: 'Take timed mock exams like the real BECE',
+      icon: ClipboardList,
+      color: 'bg-teal-500',
+      path: '/mock-exams',
+    },
+  ],
+};
 
 const difficulties = [
   { value: 'all', label: 'All Difficulties' },
@@ -159,12 +224,22 @@ const difficulties = [
 export function PracticePage() {
   const [searchParams] = useSearchParams();
   const initialMode = searchParams.get('mode') as PracticeMode;
+  const { currentExamType, subjects: examSubjects } = useExamStore();
 
   const [activeMode, setActiveMode] = useState<PracticeMode>(initialMode);
   const [selectedSubject, setSelectedSubject] = useState('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [questionCount, setQuestionCount] = useState(10);
   const [isSessionActive, setIsSessionActive] = useState(false);
+
+  // Get exam-specific features
+  const currentExamFeatures = examFeatures[currentExamType] || [];
+
+  // Build subject options from exam store
+  const subjectOptions = [
+    { value: 'all', label: 'All Subjects' },
+    ...examSubjects.slice(0, 6).map((s) => ({ value: s.slug, label: s.name })),
+  ];
 
   const handleStartSession = (mode: PracticeMode) => {
     setActiveMode(mode);
@@ -226,11 +301,33 @@ export function PracticePage() {
         <p className="text-neutral-500">Choose your practice style and start training</p>
       </div>
 
+      {/* Exam-Specific Features */}
+      {currentExamFeatures.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold text-neutral-900 mb-4">
+            {currentExamType.toUpperCase()} Practice Features
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {currentExamFeatures.map((feature) => (
+              <Link key={feature.path} to={feature.path}>
+                <Card hoverable className="p-6 h-full">
+                  <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center text-white mb-4', feature.color)}>
+                    <feature.icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-neutral-900 mb-2">{feature.name}</h3>
+                  <p className="text-sm text-neutral-500">{feature.description}</p>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Practice Mode Selection */}
       <section>
-        <h2 className="text-lg font-semibold text-neutral-900 mb-4">Select Practice Mode</h2>
+        <h2 className="text-lg font-semibold text-neutral-900 mb-4">Quick Practice Modes</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {practiceModes.map((mode) => (
+          {basePracticeModes.map((mode) => (
             <Card
               key={mode.id}
               hoverable
@@ -271,7 +368,7 @@ export function PracticePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <Select
               label="Subject"
-              options={subjects}
+              options={subjectOptions}
               value={selectedSubject}
               onChange={(e) => setSelectedSubject(e.target.value)}
             />
@@ -298,7 +395,7 @@ export function PracticePage() {
             <div className="text-sm text-neutral-500">
               <p>Ready to practice {questionCount} questions</p>
               {selectedSubject !== 'all' && (
-                <p>Subject: {subjects.find((s) => s.value === selectedSubject)?.label}</p>
+                <p>Subject: {subjectOptions.find((s) => s.value === selectedSubject)?.label}</p>
               )}
             </div>
             <Button
@@ -306,7 +403,7 @@ export function PracticePage() {
               onClick={() => handleStartSession(activeMode)}
               rightIcon={<ArrowRight className="w-5 h-5" />}
             >
-              Start {practiceModes.find((m) => m.id === activeMode)?.name}
+              Start {basePracticeModes.find((m) => m.id === activeMode)?.name}
             </Button>
           </div>
         </Card>
