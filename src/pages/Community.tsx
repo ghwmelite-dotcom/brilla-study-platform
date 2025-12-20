@@ -91,15 +91,26 @@ export function CommunityPage() {
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       // Featured rooms based on exam type - members will be updated from real data
-      const demoFeatured: FeaturedRoom[] = currentExamType === 'nsmq'
-        ? [
-            { id: 'room_nsmq_practice', name: 'NSMQ Speed Drills', members: 1 },
-          ]
-        : [
-            { id: 'room_wassce_physics', name: 'WASSCE Physics Study Group', members: 1 },
-            { id: 'room_wassce_maths', name: 'WASSCE Mathematics Help', members: 1 },
-            { id: 'room_chemistry_lab', name: 'Chemistry Lab Partners', members: 1 },
-          ];
+      let demoFeatured: FeaturedRoom[] = [];
+
+      if (currentExamType === 'nsmq') {
+        demoFeatured = [
+          { id: 'room_nsmq_practice', name: 'NSMQ Speed Drills', members: 1 },
+        ];
+      } else if (currentExamType === 'bece') {
+        demoFeatured = [
+          { id: 'room_bece_maths', name: 'BECE Mathematics Study Group', members: 1 },
+          { id: 'room_bece_english', name: 'BECE English Language Help', members: 1 },
+          { id: 'room_bece_science', name: 'BECE Integrated Science', members: 1 },
+        ];
+      } else {
+        // WASSCE (default)
+        demoFeatured = [
+          { id: 'room_wassce_physics', name: 'WASSCE Physics Study Group', members: 1 },
+          { id: 'room_wassce_maths', name: 'WASSCE Mathematics Help', members: 1 },
+          { id: 'room_chemistry_lab', name: 'Chemistry Lab Partners', members: 1 },
+        ];
+      }
       setFeaturedRooms(demoFeatured);
     } catch (error) {
       console.error('Failed to fetch featured rooms:', error);

@@ -78,7 +78,7 @@ const getCurrentUser = () => {
 };
 
 // Clear old cached data on load
-const STORE_VERSION = 5;
+const STORE_VERSION = 6;
 if (typeof window !== 'undefined') {
   try {
     const stored = localStorage.getItem('brilla-chat');
@@ -101,6 +101,7 @@ const getDemoRooms = (): ChatRoom[] => {
   const dayAgo = new Date(Date.now() - 86400000).toISOString();
 
   return [
+    // WASSCE Rooms
     {
       id: 'room_wassce_physics',
       name: 'WASSCE Physics Study Group',
@@ -134,6 +135,23 @@ const getDemoRooms = (): ChatRoom[] => {
       myRole: 'member',
     },
     {
+      id: 'room_chemistry_lab',
+      name: 'Chemistry Lab Partners',
+      description: 'Discuss practical experiments and lab reports',
+      type: 'subject',
+      subjectId: 'sub_chemistry',
+      examTypeId: 'exam_wassce',
+      isArchived: false,
+      maxMembers: 100,
+      createdBy: 'system',
+      createdAt: dayAgo,
+      updatedAt: dayAgo,
+      memberCount: 1,
+      unreadCount: 0,
+      myRole: 'member',
+    },
+    // NSMQ Rooms
+    {
       id: 'room_nsmq_practice',
       name: 'NSMQ Speed Drills',
       description: 'Practice speed rounds and riddles together',
@@ -148,15 +166,48 @@ const getDemoRooms = (): ChatRoom[] => {
       unreadCount: 0,
       myRole: 'member',
     },
+    // BECE Rooms
     {
-      id: 'room_chemistry_lab',
-      name: 'Chemistry Lab Partners',
-      description: 'Discuss practical experiments and lab reports',
+      id: 'room_bece_maths',
+      name: 'BECE Mathematics Study Group',
+      description: 'Get help with JHS mathematics and BECE prep',
       type: 'subject',
-      subjectId: 'sub_chemistry',
-      examTypeId: 'exam_wassce',
+      subjectId: 'sub_maths',
+      examTypeId: 'exam_bece',
       isArchived: false,
-      maxMembers: 100,
+      maxMembers: 500,
+      createdBy: 'system',
+      createdAt: dayAgo,
+      updatedAt: hourAgo,
+      memberCount: 1,
+      unreadCount: 0,
+      myRole: 'member',
+    },
+    {
+      id: 'room_bece_english',
+      name: 'BECE English Language Help',
+      description: 'Improve your English comprehension and writing skills',
+      type: 'subject',
+      subjectId: 'sub_english',
+      examTypeId: 'exam_bece',
+      isArchived: false,
+      maxMembers: 500,
+      createdBy: 'system',
+      createdAt: dayAgo,
+      updatedAt: now,
+      memberCount: 1,
+      unreadCount: 0,
+      myRole: 'member',
+    },
+    {
+      id: 'room_bece_science',
+      name: 'BECE Integrated Science',
+      description: 'Discuss science concepts and prepare for BECE practicals',
+      type: 'subject',
+      subjectId: 'sub_science',
+      examTypeId: 'exam_bece',
+      isArchived: false,
+      maxMembers: 500,
       createdBy: 'system',
       createdAt: dayAgo,
       updatedAt: dayAgo,
