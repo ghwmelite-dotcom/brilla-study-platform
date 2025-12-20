@@ -368,28 +368,47 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     </li>
                   )}
                   {isAdmin && (
-                    <li>
-                      <NavLink
-                        to="/admin/approvals"
-                        onClick={onClose}
-                        className={({ isActive }) =>
-                          cn(
-                            'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
-                            isActive
-                              ? 'bg-purple-600 text-white'
-                              : 'text-neutral-700 hover:bg-neutral-100'
-                          )
-                        }
-                      >
-                        <UserCheck className="w-5 h-5" />
-                        <span className="flex-1">User Approvals</span>
-                        {pendingCount > 0 && (
-                          <span className="min-w-[20px] h-5 px-1.5 bg-amber-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                            {pendingCount > 99 ? '99+' : pendingCount}
-                          </span>
-                        )}
-                      </NavLink>
-                    </li>
+                    <>
+                      <li>
+                        <NavLink
+                          to="/admin/users"
+                          onClick={onClose}
+                          className={({ isActive }) =>
+                            cn(
+                              'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                              isActive
+                                ? 'bg-indigo-600 text-white'
+                                : 'text-neutral-700 hover:bg-neutral-100'
+                            )
+                          }
+                        >
+                          <Users className="w-5 h-5" />
+                          User Management
+                        </NavLink>
+                      </li>
+                      <li>
+                        <NavLink
+                          to="/admin/approvals"
+                          onClick={onClose}
+                          className={({ isActive }) =>
+                            cn(
+                              'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                              isActive
+                                ? 'bg-purple-600 text-white'
+                                : 'text-neutral-700 hover:bg-neutral-100'
+                            )
+                          }
+                        >
+                          <UserCheck className="w-5 h-5" />
+                          <span className="flex-1">User Approvals</span>
+                          {pendingCount > 0 && (
+                            <span className="min-w-[20px] h-5 px-1.5 bg-amber-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                              {pendingCount > 99 ? '99+' : pendingCount}
+                            </span>
+                          )}
+                        </NavLink>
+                      </li>
+                    </>
                   )}
                 </>
               )}

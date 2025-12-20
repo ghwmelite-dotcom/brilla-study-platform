@@ -19,6 +19,7 @@ import {
 } from '@/pages';
 import HelpCenter from '@/pages/HelpCenter';
 import AdminApprovals from '@/pages/AdminApprovals';
+import UserManagement from '@/pages/UserManagement';
 import { VirtualLabPage } from '@/components/lab';
 import { useAuthStore } from '@/stores';
 import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/guide';
@@ -543,6 +544,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminApprovals />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="admin/users"
+            element={
+              <ProtectedRoute>
+                <UserManagement />
               </ProtectedRoute>
             }
           />
