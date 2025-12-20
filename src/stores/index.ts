@@ -6,4 +6,6 @@ export { useBattleStore } from './battleStore';
 export { useAiTutorStore } from './aiTutorStore';
 export { useExamStore } from './examStore';
 export { useEssayStore } from './essayStore';
-export type { ChatMessage } from './aiTutorStore';
+export { useChatStore } from './chatStore';
+export { useModerationStore } from './moderationStore';
+export type { ChatMessage as AiChatMessage } from './aiTutorStore';

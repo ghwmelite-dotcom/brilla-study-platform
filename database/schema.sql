@@ -533,3 +533,177 @@ CREATE INDEX IF NOT EXISTS idx_user_subject_sel_exam ON user_subject_selections(
 CREATE INDEX IF NOT EXISTS idx_ai_grading_limits_user ON ai_grading_limits(user_id);
 CREATE INDEX IF NOT EXISTS idx_practice_sessions_exam ON practice_sessions(exam_type_id);
 CREATE INDEX IF NOT EXISTS idx_practice_sessions_paper ON practice_sessions(past_paper_id);
+
+-- =============================================
+-- COMMUNITY CHAT SYSTEM TABLES
+-- =============================================
+
+-- Chat rooms (DMs, public, private, subject-specific)
+CREATE TABLE IF NOT EXISTS chat_rooms (
+    id TEXT PRIMARY KEY,
+    name TEXT,
+    description TEXT,
+    type TEXT NOT NULL CHECK (type IN ('dm', 'public', 'private', 'subject')),
+    subject_id TEXT REFERENCES subjects(id) ON DELETE SET NULL,
+    exam_type_id TEXT REFERENCES exam_types(id) ON DELETE SET NULL,
+    avatar_url TEXT,
+    is_archived INTEGER DEFAULT 0,
+    max_members INTEGER DEFAULT 500,
+    created_by TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Room members with roles
+CREATE TABLE IF NOT EXISTS chat_room_members (
+    id TEXT PRIMARY KEY,
+    room_id TEXT NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    role TEXT DEFAULT 'member' CHECK (role IN ('owner', 'moderator', 'member')),
+    nickname TEXT,
+    is_muted INTEGER DEFAULT 0,
+    joined_at TEXT DEFAULT (datetime('now')),
+    last_read_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(room_id, user_id)
+);
+
+-- Chat messages
+CREATE TABLE IF NOT EXISTS chat_messages (
+    id TEXT PRIMARY KEY,
+    room_id TEXT NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
+    sender_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    content_type TEXT DEFAULT 'text' CHECK (content_type IN ('text', 'image', 'file', 'system')),
+    reply_to_id TEXT REFERENCES chat_messages(id) ON DELETE SET NULL,
+    is_edited INTEGER DEFAULT 0,
+    is_deleted INTEGER DEFAULT 0,
+    deleted_by TEXT REFERENCES users(id),
+    deleted_reason TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Message reactions
+CREATE TABLE IF NOT EXISTS chat_message_reactions (
+    id TEXT PRIMARY KEY,
+    message_id TEXT NOT NULL REFERENCES chat_messages(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    emoji TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(message_id, user_id, emoji)
+);
+
+-- User blocks (one user blocking another)
+CREATE TABLE IF NOT EXISTS chat_user_blocks (
+    id TEXT PRIMARY KEY,
+    blocker_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    blocked_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    reason TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(blocker_id, blocked_id)
+);
+
+-- Moderation actions (mute, ban, warn, kick)
+CREATE TABLE IF NOT EXISTS chat_moderation_actions (
+    id TEXT PRIMARY KEY,
+    room_id TEXT REFERENCES chat_rooms(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    moderator_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    action_type TEXT NOT NULL CHECK (action_type IN ('mute', 'unmute', 'ban', 'unban', 'warn', 'kick')),
+    reason TEXT,
+    duration INTEGER,
+    expires_at TEXT,
+    is_active INTEGER DEFAULT 1,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Content reports
+CREATE TABLE IF NOT EXISTS chat_reports (
+    id TEXT PRIMARY KEY,
+    reporter_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    reported_user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+    message_id TEXT REFERENCES chat_messages(id) ON DELETE SET NULL,
+    room_id TEXT REFERENCES chat_rooms(id) ON DELETE SET NULL,
+    reason TEXT NOT NULL CHECK (reason IN ('spam', 'harassment', 'inappropriate', 'hate_speech', 'other')),
+    description TEXT,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'reviewing', 'resolved', 'dismissed')),
+    reviewed_by TEXT REFERENCES users(id),
+    review_notes TEXT,
+    resolution TEXT CHECK (resolution IN ('no_action', 'warning', 'message_deleted', 'user_muted', 'user_banned')),
+    created_at TEXT DEFAULT (datetime('now')),
+    reviewed_at TEXT
+);
+
+-- Profanity/word filter list
+CREATE TABLE IF NOT EXISTS chat_filtered_words (
+    id TEXT PRIMARY KEY,
+    word TEXT NOT NULL UNIQUE,
+    severity TEXT DEFAULT 'medium' CHECK (severity IN ('low', 'medium', 'high')),
+    replacement TEXT DEFAULT '***',
+    is_active INTEGER DEFAULT 1,
+    added_by TEXT REFERENCES users(id),
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Rate limiting tracking
+CREATE TABLE IF NOT EXISTS chat_rate_limits (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    room_id TEXT REFERENCES chat_rooms(id) ON DELETE CASCADE,
+    message_count INTEGER DEFAULT 0,
+    window_start TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(user_id, room_id)
+);
+
+-- Teacher moderator assignments (for subject rooms)
+CREATE TABLE IF NOT EXISTS chat_teacher_assignments (
+    id TEXT PRIMARY KEY,
+    teacher_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    subject_id TEXT NOT NULL REFERENCES subjects(id) ON DELETE CASCADE,
+    assigned_by TEXT NOT NULL REFERENCES users(id),
+    created_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(teacher_id, subject_id)
+);
+
+-- Student moderator assignments (for specific rooms)
+CREATE TABLE IF NOT EXISTS chat_student_moderators (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    room_id TEXT NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
+    assigned_by TEXT NOT NULL REFERENCES users(id),
+    expires_at TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(user_id, room_id)
+);
+
+-- Indexes for chat tables
+CREATE INDEX IF NOT EXISTS idx_chat_rooms_type ON chat_rooms(type);
+CREATE INDEX IF NOT EXISTS idx_chat_rooms_subject ON chat_rooms(subject_id);
+CREATE INDEX IF NOT EXISTS idx_chat_rooms_exam_type ON chat_rooms(exam_type_id);
+CREATE INDEX IF NOT EXISTS idx_chat_rooms_created_by ON chat_rooms(created_by);
+CREATE INDEX IF NOT EXISTS idx_chat_rooms_archived ON chat_rooms(is_archived);
+CREATE INDEX IF NOT EXISTS idx_chat_room_members_room ON chat_room_members(room_id);
+CREATE INDEX IF NOT EXISTS idx_chat_room_members_user ON chat_room_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_chat_room_members_role ON chat_room_members(role);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_room ON chat_messages(room_id);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_sender ON chat_messages(sender_id);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_created ON chat_messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_reply ON chat_messages(reply_to_id);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_deleted ON chat_messages(is_deleted);
+CREATE INDEX IF NOT EXISTS idx_chat_reactions_message ON chat_message_reactions(message_id);
+CREATE INDEX IF NOT EXISTS idx_chat_reactions_user ON chat_message_reactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_chat_user_blocks_blocker ON chat_user_blocks(blocker_id);
+CREATE INDEX IF NOT EXISTS idx_chat_user_blocks_blocked ON chat_user_blocks(blocked_id);
+CREATE INDEX IF NOT EXISTS idx_chat_moderation_user ON chat_moderation_actions(user_id);
+CREATE INDEX IF NOT EXISTS idx_chat_moderation_room ON chat_moderation_actions(room_id);
+CREATE INDEX IF NOT EXISTS idx_chat_moderation_active ON chat_moderation_actions(is_active, expires_at);
+CREATE INDEX IF NOT EXISTS idx_chat_moderation_type ON chat_moderation_actions(action_type);
+CREATE INDEX IF NOT EXISTS idx_chat_reports_status ON chat_reports(status);
+CREATE INDEX IF NOT EXISTS idx_chat_reports_reported ON chat_reports(reported_user_id);
+CREATE INDEX IF NOT EXISTS idx_chat_reports_reporter ON chat_reports(reporter_id);
+CREATE INDEX IF NOT EXISTS idx_chat_rate_limits_user ON chat_rate_limits(user_id);
+CREATE INDEX IF NOT EXISTS idx_chat_teacher_assignments_teacher ON chat_teacher_assignments(teacher_id);
+CREATE INDEX IF NOT EXISTS idx_chat_teacher_assignments_subject ON chat_teacher_assignments(subject_id);
+CREATE INDEX IF NOT EXISTS idx_chat_student_mods_user ON chat_student_moderators(user_id);
+CREATE INDEX IF NOT EXISTS idx_chat_student_mods_room ON chat_student_moderators(room_id);

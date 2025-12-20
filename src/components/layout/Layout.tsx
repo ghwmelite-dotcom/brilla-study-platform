@@ -4,6 +4,7 @@ import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { Footer } from './Footer';
 import { AiTutor, AiButton } from '@/components/ai';
+import { ChatButton, ChatSidebar } from '@/components/chat';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -35,6 +36,10 @@ export function Layout({ children }: LayoutProps) {
       </div>
 
       <Footer />
+
+      {/* Community Chat - floating button and chat panel */}
+      <ChatButton />
+      <ChatSidebar />
 
       {/* AI Tutor - floating button and chat panel */}
       <AiButton />

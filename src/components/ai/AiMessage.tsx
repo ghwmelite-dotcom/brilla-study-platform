@@ -1,8 +1,8 @@
 import { Sparkles, User } from 'lucide-react';
-import type { ChatMessage } from '@/stores';
+import type { AiChatMessage } from '@/stores';
 
 interface AiMessageProps {
-  message: ChatMessage;
+  message: AiChatMessage;
 }
 
 export function AiMessage({ message }: AiMessageProps) {

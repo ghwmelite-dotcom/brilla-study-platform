@@ -590,3 +590,205 @@ export const XP_MULTIPLIERS = {
   HARD: 2,
   EXPERT: 3,
 } as const;
+
+// =============================================
+// COMMUNITY CHAT SYSTEM
+// =============================================
+
+export type ChatRoomType = 'dm' | 'public' | 'private' | 'subject';
+export type ChatMemberRole = 'owner' | 'moderator' | 'member';
+export type ChatContentType = 'text' | 'image' | 'file' | 'system';
+export type ModerationActionType = 'mute' | 'unmute' | 'ban' | 'unban' | 'warn' | 'kick';
+export type ReportReason = 'spam' | 'harassment' | 'inappropriate' | 'hate_speech' | 'other';
+export type ReportStatus = 'pending' | 'reviewing' | 'resolved' | 'dismissed';
+export type ReportResolution = 'no_action' | 'warning' | 'message_deleted' | 'user_muted' | 'user_banned';
+
+export interface ChatRoom {
+  id: string;
+  name?: string;
+  description?: string;
+  type: ChatRoomType;
+  subjectId?: string;
+  examTypeId?: string;
+  avatarUrl?: string;
+  isArchived: boolean;
+  maxMembers: number;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  // Computed/joined
+  memberCount?: number;
+  unreadCount?: number;
+  lastMessage?: ChatMessage;
+  members?: ChatRoomMember[];
+  myRole?: ChatMemberRole;
+  isMuted?: boolean;
+  // For DMs
+  otherUser?: {
+    id: string;
+    name: string;
+    avatarUrl?: string;
+    isOnline?: boolean;
+  };
+}
+
+export interface ChatRoomMember {
+  id: string;
+  roomId: string;
+  userId: string;
+  role: ChatMemberRole;
+  nickname?: string;
+  isMuted: boolean;
+  joinedAt: string;
+  lastReadAt: string;
+  // Joined user data
+  user?: {
+    id: string;
+    name: string;
+    avatarUrl?: string;
+    isOnline?: boolean;
+  };
+}
+
+export interface ChatMessage {
+  id: string;
+  roomId: string;
+  senderId: string;
+  content: string;
+  contentType: ChatContentType;
+  replyToId?: string;
+  isEdited: boolean;
+  isDeleted: boolean;
+  deletedBy?: string;
+  deletedReason?: string;
+  createdAt: string;
+  updatedAt: string;
+  // Joined data
+  sender?: {
+    id: string;
+    name: string;
+    avatarUrl?: string;
+  };
+  replyTo?: {
+    id: string;
+    content: string;
+    senderName: string;
+  };
+  reactions?: ChatMessageReaction[];
+}
+
+export interface ChatMessageReaction {
+  emoji: string;
+  count: number;
+  userIds: string[];
+  hasReacted: boolean; // Current user has reacted
+}
+
+export interface ChatUserBlock {
+  id: string;
+  blockerId: string;
+  blockedId: string;
+  reason?: string;
+  createdAt: string;
+  // Joined
+  blockedUser?: {
+    id: string;
+    name: string;
+    avatarUrl?: string;
+  };
+}
+
+export interface ChatModerationAction {
+  id: string;
+  roomId?: string;
+  userId: string;
+  moderatorId: string;
+  actionType: ModerationActionType;
+  reason?: string;
+  duration?: number; // in minutes
+  expiresAt?: string;
+  isActive: boolean;
+  createdAt: string;
+  // Joined
+  user?: { id: string; name: string };
+  moderator?: { id: string; name: string };
+  room?: { id: string; name: string };
+}
+
+export interface ChatReport {
+  id: string;
+  reporterId: string;
+  reportedUserId?: string;
+  messageId?: string;
+  roomId?: string;
+  reason: ReportReason;
+  description?: string;
+  status: ReportStatus;
+  reviewedBy?: string;
+  reviewNotes?: string;
+  resolution?: ReportResolution;
+  createdAt: string;
+  reviewedAt?: string;
+  // Joined
+  reporter?: { id: string; name: string };
+  reportedUser?: { id: string; name: string };
+  message?: { id: string; content: string };
+  room?: { id: string; name: string };
+  reviewer?: { id: string; name: string };
+}
+
+export interface ChatFilteredWord {
+  id: string;
+  word: string;
+  severity: 'low' | 'medium' | 'high';
+  replacement: string;
+  isActive: boolean;
+  addedBy?: string;
+  createdAt: string;
+}
+
+export interface ChatTypingUser {
+  id: string;
+  name: string;
+}
+
+// WebSocket message types
+export interface ChatWSMessage {
+  type:
+    | 'room_state'
+    | 'user_joined'
+    | 'user_left'
+    | 'message'
+    | 'message_deleted'
+    | 'message_edited'
+    | 'typing_start'
+    | 'typing_stop'
+    | 'reaction_added'
+    | 'reaction_removed'
+    | 'moderation_action'
+    | 'error';
+  [key: string]: unknown;
+}
+
+// Chat store state types
+export interface CreateRoomData {
+  name?: string;
+  description?: string;
+  type: ChatRoomType;
+  subjectId?: string;
+  examTypeId?: string;
+  memberIds?: string[];
+}
+
+export interface SendMessageData {
+  content: string;
+  contentType?: ChatContentType;
+  replyToId?: string;
+}
+
+// Rate limit constants
+export const CHAT_RATE_LIMITS = {
+  MESSAGES_PER_MINUTE: 20,
+  MESSAGES_PER_HOUR: 200,
+  DM_PER_MINUTE: 10,
+} as const;
