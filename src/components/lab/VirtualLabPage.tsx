@@ -15,7 +15,7 @@ import { LabWorkspace } from './LabWorkspace';
 import { allExperiments, getExperimentBySlug } from '@/data/experiments';
 import { useLabStore } from '@/stores';
 import { cn } from '@/utils';
-import type { Experiment, LabMode } from '@/types';
+import type { Experiment } from '@/types';
 
 // Subject filter options
 const subjectFilters = [
@@ -103,15 +103,6 @@ export function VirtualLabPage() {
     setShowModeSelection(true);
   };
 
-  // Handle mode selection and session start
-  const handleModeSelect = (mode: LabMode) => {
-    if (selectedExperiment) {
-      startSession(selectedExperiment, mode);
-      setShowModeSelection(false);
-      navigate(`/virtual-lab/${selectedExperiment.slug}`);
-    }
-  };
-
   // Handle session end
   const handleEndSession = () => {
     endSession();
@@ -123,11 +114,11 @@ export function VirtualLabPage() {
     return <LabWorkspace onExit={handleEndSession} />;
   }
 
-  // If URL has experiment but no session, show experiment details
-  if (urlExperiment && !currentSession) {
-    setSelectedExperiment(urlExperiment);
-    setShowModeSelection(true);
-  }
+  // If URL has experiment but no session, show mode selection modal
+  // Using a derived state approach instead of setting state during render
+  const shouldShowModeSelectionFromUrl = urlExperiment && !currentSession && !showModeSelection && !selectedExperiment;
+  const experimentForModal = selectedExperiment || (shouldShowModeSelectionFromUrl ? urlExperiment : null);
+  const isModalOpen = showModeSelection || shouldShowModeSelectionFromUrl;
 
   return (
     <div className="space-y-6">
@@ -254,7 +245,7 @@ export function VirtualLabPage() {
       />
 
       {/* Mode Selection Modal */}
-      {showModeSelection && selectedExperiment && (
+      {isModalOpen && experimentForModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <Card className="w-full max-w-lg p-6">
             <div className="flex items-center justify-between mb-6">
@@ -265,6 +256,7 @@ export function VirtualLabPage() {
                 onClick={() => {
                   setShowModeSelection(false);
                   setSelectedExperiment(null);
+                  navigate('/virtual-lab');
                 }}
               >
                 <ArrowLeft className="w-4 h-4 mr-1" />
@@ -273,7 +265,7 @@ export function VirtualLabPage() {
             </div>
 
             <p className="text-neutral-600 mb-6">
-              <strong>{selectedExperiment.name}</strong>
+              <strong>{experimentForModal.name}</strong>
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -281,7 +273,13 @@ export function VirtualLabPage() {
               <Card
                 hoverable
                 className="p-4 cursor-pointer border-2 border-transparent hover:border-primary"
-                onClick={() => handleModeSelect('guided')}
+                onClick={() => {
+                  if (experimentForModal) {
+                    startSession(experimentForModal, 'guided');
+                    setShowModeSelection(false);
+                    navigate(`/virtual-lab/${experimentForModal.slug}`);
+                  }
+                }}
               >
                 <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-3">
                   <FlaskConical className="w-6 h-6 text-blue-600" />
@@ -303,7 +301,13 @@ export function VirtualLabPage() {
               <Card
                 hoverable
                 className="p-4 cursor-pointer border-2 border-transparent hover:border-primary"
-                onClick={() => handleModeSelect('sandbox')}
+                onClick={() => {
+                  if (experimentForModal) {
+                    startSession(experimentForModal, 'sandbox');
+                    setShowModeSelection(false);
+                    navigate(`/virtual-lab/${experimentForModal.slug}`);
+                  }
+                }}
               >
                 <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-3">
                   <Beaker className="w-6 h-6 text-green-600" />

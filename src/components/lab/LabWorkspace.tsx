@@ -229,9 +229,9 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-120px)] -mx-4 md:-mx-6">
+    <div className="flex flex-col h-full min-h-[600px]">
       {/* Top Bar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-white border-b shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-neutral-200 rounded-t-lg shrink-0">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" onClick={onExit}>
             <ArrowLeft className="w-4 h-4 mr-1" />
@@ -289,11 +289,11 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0 overflow-hidden bg-neutral-100 rounded-b-lg">
         {/* Left Panel - Procedure Guide */}
         <div className={cn(
-          'bg-white border-r overflow-y-auto transition-all shrink-0',
-          isProcedurePanelOpen ? 'w-80' : 'w-12'
+          'bg-white border-r overflow-y-auto transition-all shrink-0 hidden md:block',
+          isProcedurePanelOpen ? 'w-72 lg:w-80' : 'w-12'
         )}>
           <div className="sticky top-0 bg-white border-b z-10">
             <div className="flex items-center justify-between p-3">
@@ -365,9 +365,9 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
         </div>
 
         {/* Center - Simulation Area */}
-        <div className="flex-1 flex flex-col min-w-0 bg-neutral-50">
+        <div className="flex-1 flex flex-col min-w-0 bg-neutral-50 overflow-hidden">
           {/* Current Step Instruction */}
-          <Card className="m-4 p-4 shrink-0">
+          <Card className="mx-3 mt-3 p-4 shrink-0">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
@@ -401,7 +401,7 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
           </Card>
 
           {/* Simulation Canvas / PhET Embed */}
-          <div className="flex-1 mx-4 mb-4 min-h-0">
+          <div className="flex-1 mx-3 my-3 min-h-[300px] overflow-hidden rounded-lg border border-neutral-200">
             {currentExperiment.simulationType === 'phet' && currentExperiment.phetSimUrl ? (
               <PhETEmbed
                 simUrl={currentExperiment.phetSimUrl}
@@ -409,10 +409,10 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
                 guidanceNotes={currentExperiment.safetyNotes}
               />
             ) : (
-              <Card className="h-full flex items-center justify-center bg-white">
-                <div className="text-center">
+              <Card className="h-full flex items-center justify-center bg-white rounded-none border-0">
+                <div className="text-center p-8">
                   <FlaskConical className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
-                  <p className="text-neutral-500 mb-2">Custom Simulation</p>
+                  <p className="text-neutral-500 mb-2 font-medium">Custom Simulation</p>
                   <p className="text-sm text-neutral-400">
                     Interactive apparatus workspace coming soon
                   </p>
@@ -422,30 +422,36 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
           </div>
 
           {/* Step Navigation */}
-          <div className="flex items-center justify-between px-4 py-3 bg-white border-t shrink-0">
+          <div className="flex items-center justify-between px-3 py-2 bg-white border-t shrink-0">
             <Button
               variant="outline"
+              size="sm"
               onClick={previousStep}
               disabled={currentStepIndex === 0}
             >
               <ArrowLeft className="w-4 h-4 mr-1" />
-              Previous
+              <span className="hidden sm:inline">Previous</span>
             </Button>
 
             <div className="flex items-center gap-2">
+              {/* Mobile step indicator */}
+              <span className="text-sm text-neutral-500 md:hidden">
+                Step {currentStepIndex + 1}/{totalSteps}
+              </span>
               {!stepCompletionStatus[currentStepIndex] && (
-                <Button variant="secondary" onClick={completeStep}>
-                  <CheckCircle className="w-4 h-4 mr-1" />
-                  Mark Complete
+                <Button variant="secondary" size="sm" onClick={completeStep}>
+                  <CheckCircle className="w-4 h-4 sm:mr-1" />
+                  <span className="hidden sm:inline">Mark Complete</span>
                 </Button>
               )}
             </div>
 
             <Button
+              size="sm"
               onClick={nextStep}
               disabled={currentStepIndex === totalSteps - 1}
             >
-              Next
+              <span className="hidden sm:inline">Next</span>
               <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
           </div>
