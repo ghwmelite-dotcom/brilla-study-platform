@@ -13,6 +13,8 @@ import {
   LandingPage,
   EssayPracticePage,
   ContentManagementPage,
+  MockExamsPage,
+  SubjectCatalogPage,
 } from '@/pages';
 import { useAuthStore } from '@/stores';
 
@@ -467,6 +469,16 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="mock-exams" element={<MockExamsPage />} />
+          <Route
+            path="mock-exams/:examId"
+            element={
+              <ProtectedRoute>
+                <MockExamsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="catalog" element={<SubjectCatalogPage />} />
           <Route
             path="profile"
             element={

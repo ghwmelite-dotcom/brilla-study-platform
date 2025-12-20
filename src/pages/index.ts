@@ -10,3 +10,5 @@ export { PastPapers as PastPapersPage } from './PastPapers';
 export { LandingPage } from './Landing';
 export { EssayPracticePage } from './EssayPractice';
 export { ContentManagementPage } from './ContentManagement';
+export { MockExamsPage } from './MockExams';
+export { SubjectCatalogPage } from './SubjectCatalog';
