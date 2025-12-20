@@ -77,6 +77,23 @@ const getCurrentUser = () => {
   }
 };
 
+// Clear old cached data on load
+const STORE_VERSION = 2;
+if (typeof window !== 'undefined') {
+  try {
+    const stored = localStorage.getItem('brilla-chat');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Clear if no version or old version
+      if (!parsed.version || parsed.version < STORE_VERSION) {
+        localStorage.removeItem('brilla-chat');
+      }
+    }
+  } catch {
+    localStorage.removeItem('brilla-chat');
+  }
+}
+
 export const useChatStore = create<ChatState>()(
   persist(
     (set, get) => ({
@@ -475,6 +492,7 @@ export const useChatStore = create<ChatState>()(
     }),
     {
       name: 'brilla-chat',
+      version: STORE_VERSION,
       partialize: (state) => ({
         rooms: state.rooms,
         messagesByRoom: state.messagesByRoom,
