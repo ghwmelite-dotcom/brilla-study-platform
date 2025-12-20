@@ -17,8 +17,10 @@ import {
   SubjectCatalogPage,
   CommunityPage,
 } from '@/pages';
+import HelpCenter from '@/pages/HelpCenter';
 import { VirtualLabPage } from '@/components/lab';
 import { useAuthStore } from '@/stores';
+import { OnboardingModal, FeatureTour } from '@/components/guide';
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -521,11 +523,23 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="help"
+            element={
+              <ProtectedRoute>
+                <HelpCenter />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Catch-all redirect */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
+
+      {/* Global Guide Components */}
+      <OnboardingModal />
+      <FeatureTour />
     </BrowserRouter>
   );
 }

@@ -9,4 +9,5 @@ export { useEssayStore } from './essayStore';
 export { useChatStore } from './chatStore';
 export { useModerationStore } from './moderationStore';
 export { useLabStore } from './labStore';
+export { useGuideStore } from './guideStore';
 export type { ChatMessage as AiChatMessage, UserPersonalization } from './aiTutorStore';
