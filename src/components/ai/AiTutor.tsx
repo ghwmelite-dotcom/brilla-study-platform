@@ -69,16 +69,16 @@ export function AiTutor() {
       />
 
       {/* Chat panel */}
-      <div className="fixed bottom-0 right-0 lg:bottom-4 lg:right-4 w-full lg:w-96 h-[80vh] lg:h-[600px] bg-white rounded-t-xl lg:rounded-xl shadow-2xl z-50 flex flex-col">
+      <div className="fixed inset-x-0 bottom-0 top-4 sm:top-auto sm:inset-x-auto sm:bottom-4 sm:right-4 sm:left-auto w-full sm:w-96 sm:h-[min(600px,calc(100vh-2rem))] bg-white rounded-t-xl sm:rounded-xl shadow-2xl z-50 flex flex-col max-h-[100dvh] sm:max-h-none">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-neutral-200 bg-gradient-to-r from-primary to-accent rounded-t-xl">
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-neutral-200 bg-gradient-to-r from-primary to-accent rounded-t-xl shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <div className="text-white">
-              <h3 className="font-semibold">Brilla AI Tutor</h3>
-              <p className="text-xs text-white/80">Powered by Claude</p>
+              <h3 className="font-semibold text-sm sm:text-base">Brilla AI Tutor</h3>
+              <p className="text-xs text-white/80">Your personal study assistant</p>
             </div>
           </div>
           <button
