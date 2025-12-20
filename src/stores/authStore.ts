@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User, PendingUserData, UserStatus, SchoolLevel } from '@/types';
+import { api } from '@/lib/api';
 
 // Full pending user with all registration data
 export interface PendingUser extends PendingUserData {
@@ -141,10 +142,6 @@ const hashPassword = (password: string): string => {
   return btoa(password + '_brilla_salt');
 };
 
-// Verify password
-const verifyPassword = (password: string, hash: string): boolean => {
-  return hashPassword(password) === hash;
-};
 
 // Simulated email storage (for demo purposes - shows "sent" emails)
 interface SentEmail {
@@ -282,69 +279,46 @@ export const useAuthStore = create<AuthState>()(
       login: async (email, password) => {
         set({ isLoading: true, error: null });
         try {
-          // Load all users from storage
-          const allUsers = loadAllUsersFromStorage();
+          // Call the production API
+          const response = await api.login(email, password);
 
-          // Find user in our user list
-          const foundUser = allUsers.find(u => u.email === email);
-
-          if (foundUser) {
-            // Check if password is set
-            if (!foundUser.passwordSet) {
-              throw new Error('Please set up your password using the link sent to your email.');
-            }
-
-            // Verify password
-            const passwordValid = foundUser.passwordHash
-              ? verifyPassword(password, foundUser.passwordHash)
-              : password === 'password123'; // Fallback for legacy
-
-            if (!passwordValid) {
-              throw new Error('Invalid email or password.');
-            }
-
-            if (!foundUser.isActive) {
-              throw new Error('Your account has been deactivated. Please contact support.');
-            }
-
-            if (!foundUser.emailVerified) {
-              throw new Error('Please verify your email before logging in.');
-            }
-
-            // Update last login
-            foundUser.lastLoginAt = new Date().toISOString();
-            saveAllUsersToStorage(allUsers);
-
-            // Load pending users for admin
-            if (foundUser.role === 'admin') {
-              const pendingUsers = loadPendingUsersFromStorage();
-              const pending = pendingUsers.filter(u => u.status === 'pending');
-              set({ pendingUsers: pending, pendingCount: pending.length, allUsers });
-            }
-
-            set({
-              user: foundUser,
-              token: 'demo-token',
-              isAuthenticated: true,
-              isLoading: false,
-            });
-            return;
+          if (!response.success || !response.data) {
+            throw new Error(response.error || 'Invalid email or password.');
           }
 
-          // Check pending users (for registered users trying to login)
-          const pendingUsers = loadPendingUsersFromStorage();
-          const pendingUser = pendingUsers.find(u => u.email === email);
+          const { user: apiUser, token } = response.data;
 
-          if (pendingUser) {
-            if (pendingUser.status === 'pending') {
-              throw new Error('Your account is pending approval. You will receive a notification once approved.');
-            } else if (pendingUser.status === 'rejected') {
-              throw new Error('Your registration was not approved. Please contact support for more information.');
-            }
-          }
+          // Map API user to local user format
+          const user: ManagedUser = {
+            id: apiUser.id,
+            email: apiUser.email,
+            name: apiUser.name,
+            role: apiUser.role,
+            status: apiUser.status as UserStatus,
+            house: apiUser.house || undefined,
+            yearGroup: apiUser.yearGroup || undefined,
+            schoolLevel: apiUser.schoolLevel as SchoolLevel | undefined,
+            schoolName: apiUser.schoolName || undefined,
+            xpPoints: apiUser.xpPoints || 0,
+            level: apiUser.level || 1,
+            streakDays: apiUser.streakDays || 0,
+            aiGradingCredits: apiUser.aiGradingCredits || 0,
+            emailVerified: true,
+            isActive: true,
+            passwordSet: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
 
-          // In production, this would call the actual API
-          throw new Error('Invalid email or password.');
+          // Store the token in the API client
+          api.setToken(token);
+
+          set({
+            user,
+            token,
+            isAuthenticated: true,
+            isLoading: false,
+          });
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Login failed',
