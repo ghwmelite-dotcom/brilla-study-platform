@@ -73,7 +73,8 @@ export const useGuideStore = create<GuideState>()(
 
       // Onboarding Actions
       startOnboarding: () => {
-        set({ showOnboarding: true, onboardingStep: 0 });
+        // Reset completed state so the tour can be replayed
+        set({ showOnboarding: true, onboardingStep: 0, hasCompletedOnboarding: false });
       },
 
       nextOnboardingStep: () => {

@@ -20,7 +20,7 @@ import {
 import HelpCenter from '@/pages/HelpCenter';
 import { VirtualLabPage } from '@/components/lab';
 import { useAuthStore } from '@/stores';
-import { OnboardingModal, FeatureTour } from '@/components/guide';
+import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/guide';
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -538,6 +538,7 @@ function App() {
       </Routes>
 
       {/* Global Guide Components */}
+      <OnboardingTrigger />
       <OnboardingModal />
       <FeatureTour />
     </BrowserRouter>
