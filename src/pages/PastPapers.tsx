@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FileText,
@@ -13,7 +13,29 @@ import {
 } from 'lucide-react';
 import { Button, Card } from '@/components/common';
 import { useExamStore } from '@/stores/examStore';
+import { pastPapers as localPastPapers } from '@/data';
 import type { PastPaper } from '@/types';
+
+// Subject metadata for display
+const subjectMeta: Record<string, { name: string; color: string }> = {
+  'subj_wassce_core_math': { name: 'Core Mathematics', color: '#8B5CF6' },
+  'subj_wassce_english': { name: 'English Language', color: '#3B82F6' },
+  'subj_wassce_int_science': { name: 'Integrated Science', color: '#10B981' },
+  'subj_wassce_social': { name: 'Social Studies', color: '#F59E0B' },
+  'subj_bece_math': { name: 'Mathematics', color: '#8B5CF6' },
+  'subj_bece_english': { name: 'English Language', color: '#3B82F6' },
+  'subj_bece_science': { name: 'Integrated Science', color: '#10B981' },
+  'subj_bece_social': { name: 'Social Studies', color: '#F59E0B' },
+};
+
+// Paper type names
+const paperTypeMeta: Record<string, string> = {
+  'paper_wassce_1': 'Paper 1 - Objectives',
+  'paper_wassce_2': 'Paper 2 - Theory/Essay',
+  'paper_wassce_3': 'Paper 3 - Practical',
+  'paper_bece_1': 'Paper 1 - Objectives',
+  'paper_bece_2': 'Paper 2 - Essay',
+};
 
 export function PastPapers() {
   const navigate = useNavigate();
@@ -28,55 +50,52 @@ export function PastPapers() {
   const [selectedYear, setSelectedYear] = useState<string>('');
   const [selectedPaperType, setSelectedPaperType] = useState<string>('');
 
-  useEffect(() => {
-    fetchSubjects(currentExamType);
-    fetchPaperTypes(currentExamType);
-    fetchYears();
-    fetchPapers();
+  // Get papers from local data based on exam type
+  const getLocalPapers = useMemo(() => {
+    const examTypeId = currentExamType === 'wassce' ? 'exam_wassce' :
+                       currentExamType === 'bece' ? 'exam_bece' : 'exam_nsmq';
+
+    return localPastPapers
+      .filter(p => p.examTypeId === examTypeId)
+      .map(p => ({
+        ...p,
+        id: p.id || '',
+        subject_name: subjectMeta[p.subjectId || '']?.name || 'Unknown Subject',
+        subject_color: subjectMeta[p.subjectId || '']?.color || '#6B7280',
+        paper_type_name: paperTypeMeta[p.paperTypeId || ''] || 'Paper',
+        title: `${subjectMeta[p.subjectId || '']?.name || 'Subject'} ${p.year}`,
+      })) as (PastPaper & { subject_name: string; subject_color: string; paper_type_name: string })[];
   }, [currentExamType]);
 
   useEffect(() => {
-    fetchPapers();
-  }, [selectedSubject, selectedYear, selectedPaperType]);
+    fetchSubjects(currentExamType);
+    fetchPaperTypes(currentExamType);
 
-  const fetchYears = async () => {
-    try {
-      const params = new URLSearchParams();
-      params.append('exam_type', currentExamType);
-      if (selectedSubject) params.append('subject', selectedSubject);
+    // Set available years from local data
+    const availableYears = [...new Set(getLocalPapers.map(p => p.year))].sort((a, b) => (b || 0) - (a || 0));
+    setYears(availableYears.filter((y): y is number => y !== undefined));
 
-      const response = await fetch(`/api/papers/years?${params}`);
-      const data = await response.json();
+    // Use local data
+    setPapers(getLocalPapers);
+    setIsLoading(false);
+  }, [currentExamType, getLocalPapers]);
 
-      if (data.success) {
-        setYears(data.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch years:', error);
+  // Apply filters to local data
+  useEffect(() => {
+    let filtered = getLocalPapers;
+
+    if (selectedSubject) {
+      filtered = filtered.filter(p => p.subjectId?.includes(selectedSubject));
     }
-  };
-
-  const fetchPapers = async () => {
-    setIsLoading(true);
-    try {
-      const params = new URLSearchParams();
-      params.append('exam_type', currentExamType);
-      if (selectedSubject) params.append('subject', selectedSubject);
-      if (selectedYear) params.append('year', selectedYear);
-      if (selectedPaperType) params.append('paper_type', selectedPaperType);
-
-      const response = await fetch(`/api/papers?${params}`);
-      const data = await response.json();
-
-      if (data.success) {
-        setPapers(data.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch papers:', error);
-    } finally {
-      setIsLoading(false);
+    if (selectedYear) {
+      filtered = filtered.filter(p => p.year === parseInt(selectedYear));
     }
-  };
+    if (selectedPaperType) {
+      filtered = filtered.filter(p => p.paperTypeId?.includes(selectedPaperType));
+    }
+
+    setPapers(filtered);
+  }, [selectedSubject, selectedYear, selectedPaperType, getLocalPapers]);
 
   const clearFilters = () => {
     setSelectedSubject('');

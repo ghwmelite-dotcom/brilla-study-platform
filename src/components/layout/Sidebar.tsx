@@ -13,6 +13,7 @@ import {
   Settings,
   HelpCircle,
   FileText,
+  Upload,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { useAuthStore, useExamStore } from '@/stores';
@@ -55,8 +56,9 @@ const commonItems = [
 ];
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const { currentExamType } = useExamStore();
+  const isTeacherOrAdmin = user?.role === 'teacher' || user?.role === 'admin';
 
   // Get exam-specific navigation items
   const examItems = examSpecificItems[currentExamType] || [];
@@ -182,6 +184,25 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                       Settings
                     </NavLink>
                   </li>
+                  {isTeacherOrAdmin && (
+                    <li>
+                      <NavLink
+                        to="/content"
+                        onClick={onClose}
+                        className={({ isActive }) =>
+                          cn(
+                            'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                            isActive
+                              ? 'bg-accent text-white'
+                              : 'text-neutral-700 hover:bg-neutral-100'
+                          )
+                        }
+                      >
+                        <Upload className="w-5 h-5" />
+                        Content Manager
+                      </NavLink>
+                    </li>
+                  )}
                 </>
               )}
               <li>

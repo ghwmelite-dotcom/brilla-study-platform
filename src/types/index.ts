@@ -115,6 +115,7 @@ export interface Topic {
   description?: string;
   theoryContent?: string;
   keyFormulas?: string[];
+  displayOrder?: number;
   children?: Topic[];
   questionCount?: number;
   masteryLevel?: number;
@@ -123,6 +124,7 @@ export interface Topic {
 // Question types
 export type QuestionType =
   | 'multiple_choice'
+  | 'objective'  // Alias for multiple_choice
   | 'true_false'
   | 'direct_answer'
   | 'problem'
@@ -157,10 +159,28 @@ export interface Question {
   examTypeId?: string;
   paperTypeId?: string;
   pastPaperId?: string;
-  marks: number;
+  marks?: number;
   questionNumber?: number;
   section?: string;
   createdAt: string;
+}
+
+// Simplified question type for sample/seed data
+export interface SampleQuestion {
+  id: string;
+  topicId?: string;
+  subjectId: string;
+  questionText: string;
+  questionType: QuestionType;
+  roundType?: RoundType;
+  options?: string[];
+  correctAnswer: string;
+  explanation?: string;
+  difficulty: Difficulty;
+  points?: number;
+  timeLimit?: number;
+  examTypeId?: string;
+  paperTypeId?: string;
 }
 
 // =============================================
@@ -222,20 +242,34 @@ export interface PaperAttemptAnswer {
 export interface EssayQuestion {
   id: string;
   questionId: string;
+  subjectId?: string;
+  questionText?: string;
   wordLimitMin?: number;
   wordLimitMax?: number;
-  markingScheme: MarkingCriteria[];
+  marks?: number;
+  timeAllowed?: number;
+  markingScheme?: MarkingScheme | MarkingCriteria[];
   modelAnswer?: string;
   markingRubric?: MarkingRubric;
   aiGradingEnabled: boolean;
+  tips?: string[];
+  // Display helpers
+  subject?: string;
+  topic?: string;
   // Joined
   question?: Question;
+}
+
+export interface MarkingScheme {
+  criteria: MarkingCriteria[];
+  totalMarks: number;
 }
 
 export interface MarkingCriteria {
   name: string;
   description: string;
-  maxMarks: number;
+  maxMarks?: number;
+  maxScore?: number;
   guidelines?: string;
 }
 

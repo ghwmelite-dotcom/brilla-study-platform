@@ -11,6 +11,8 @@ import {
   BattlePage,
   PastPapersPage,
   LandingPage,
+  EssayPracticePage,
+  ContentManagementPage,
 } from '@/pages';
 import { useAuthStore } from '@/stores';
 
@@ -408,6 +410,14 @@ function App() {
             }
           />
           <Route
+            path="practice/essay"
+            element={
+              <ProtectedRoute>
+                <EssayPracticePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="competition"
             element={
               <ProtectedRoute>
@@ -462,6 +472,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="content"
+            element={
+              <ProtectedRoute>
+                <ContentManagementPage />
               </ProtectedRoute>
             }
           />

@@ -8,3 +8,5 @@ export { AnalyticsPage } from './Analytics';
 export { BattlePage } from './Battle';
 export { PastPapers as PastPapersPage } from './PastPapers';
 export { LandingPage } from './Landing';
+export { EssayPracticePage } from './EssayPractice';
+export { ContentManagementPage } from './ContentManagement';
