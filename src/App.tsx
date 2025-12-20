@@ -18,6 +18,7 @@ import {
   CommunityPage,
 } from '@/pages';
 import HelpCenter from '@/pages/HelpCenter';
+import AdminApprovals from '@/pages/AdminApprovals';
 import { VirtualLabPage } from '@/components/lab';
 import { useAuthStore } from '@/stores';
 import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/guide';
@@ -50,6 +51,7 @@ function LoginPage() {
         email: 'demo@stjohns.edu.gh',
         name: 'Demo Student',
         role: 'student' as const,
+        status: 'approved' as const,
         house: 'Blue House',
         yearGroup: 3,
         xpPoints: 0,
@@ -62,6 +64,7 @@ function LoginPage() {
         email: 'admin@stjohns.edu.gh',
         name: 'Admin User',
         role: 'admin' as const,
+        status: 'approved' as const,
         house: undefined,
         yearGroup: undefined,
         xpPoints: 0,
@@ -74,6 +77,7 @@ function LoginPage() {
         email: 'teacher@stjohns.edu.gh',
         name: 'Demo Teacher',
         role: 'teacher' as const,
+        status: 'approved' as const,
         house: undefined,
         yearGroup: undefined,
         xpPoints: 0,
@@ -196,6 +200,7 @@ function RegisterPage() {
         email: 'new@stjohns.edu.gh',
         name: 'New Student',
         role: 'student',
+        status: 'approved',
         house: 'Red House',
         yearGroup: 2,
         xpPoints: 0,
@@ -528,6 +533,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <HelpCenter />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin routes */}
+          <Route
+            path="admin/approvals"
+            element={
+              <ProtectedRoute>
+                <AdminApprovals />
               </ProtectedRoute>
             }
           />

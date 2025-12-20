@@ -60,13 +60,19 @@ export interface SubscriptionTier {
 // USER TYPES (Extended)
 // =============================================
 
+export type UserStatus = 'pending' | 'approved' | 'rejected';
+export type SchoolLevel = 'jss' | 'shs';
+
 export interface User {
   id: string;
   email: string;
   name: string;
   role: 'student' | 'teacher' | 'admin';
+  status: UserStatus;
   house?: string;
   yearGroup?: number;
+  schoolLevel?: SchoolLevel;
+  schoolName?: string;
   xpPoints: number;
   level: number;
   streakDays: number;
@@ -78,6 +84,38 @@ export interface User {
   aiGradingCredits: number;
   createdAt: string;
   updatedAt: string;
+  // Approval workflow
+  approvedBy?: string;
+  approvedAt?: string;
+  rejectedBy?: string;
+  rejectedAt?: string;
+  rejectionReason?: string;
+}
+
+// Extended registration data for pending users
+export interface PendingUserData {
+  // Common
+  email: string;
+  name: string;
+  role: 'student' | 'teacher' | 'admin';
+
+  // Student-specific
+  schoolLevel?: SchoolLevel;
+  yearGroup?: number;
+  schoolName?: string;
+  house?: string;
+
+  // Teacher-specific
+  teacherLicenseNumber?: string;
+  subjectsTaught?: string[];
+  yearsExperience?: string;
+  qualifications?: string;
+
+  // Admin-specific
+  adminCode?: string;
+
+  // Metadata
+  registeredAt: string;
 }
 
 export interface AuthState {

@@ -22,6 +22,7 @@ import {
   MessageSquare,
   Hash,
   FlaskConical,
+  UserCheck,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { useAuthStore, useExamStore, useChatStore, useProgressStore } from '@/stores';
@@ -101,17 +102,25 @@ const examModeInfo = {
 };
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, pendingCount, loadPendingUsers } = useAuthStore();
   const { currentExamType, initializeExamData } = useExamStore();
   const { openChat, setActiveTab, getUnreadCount } = useChatStore();
   const { totalQuestionsAttempted, overallAccuracy } = useProgressStore();
   const isTeacherOrAdmin = user?.role === 'teacher' || user?.role === 'admin';
+  const isAdmin = user?.role === 'admin';
   const unreadCount = getUnreadCount();
 
   // Initialize exam data on mount
   useEffect(() => {
     initializeExamData();
   }, [initializeExamData]);
+
+  // Load pending users for admin
+  useEffect(() => {
+    if (isAdmin) {
+      loadPendingUsers();
+    }
+  }, [isAdmin, loadPendingUsers]);
 
   // Get exam-specific navigation items
   const examItems = examSpecificItems[currentExamType] || [];
@@ -355,6 +364,30 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                       >
                         <Upload className="w-5 h-5" />
                         Content Manager
+                      </NavLink>
+                    </li>
+                  )}
+                  {isAdmin && (
+                    <li>
+                      <NavLink
+                        to="/admin/approvals"
+                        onClick={onClose}
+                        className={({ isActive }) =>
+                          cn(
+                            'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                            isActive
+                              ? 'bg-purple-600 text-white'
+                              : 'text-neutral-700 hover:bg-neutral-100'
+                          )
+                        }
+                      >
+                        <UserCheck className="w-5 h-5" />
+                        <span className="flex-1">User Approvals</span>
+                        {pendingCount > 0 && (
+                          <span className="min-w-[20px] h-5 px-1.5 bg-amber-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                            {pendingCount > 99 ? '99+' : pendingCount}
+                          </span>
+                        )}
                       </NavLink>
                     </li>
                   )}

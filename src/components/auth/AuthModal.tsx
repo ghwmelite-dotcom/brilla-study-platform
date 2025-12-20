@@ -17,6 +17,8 @@ import {
   Briefcase,
   FileText,
   AlertCircle,
+  Clock,
+  CheckCircle2,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/utils';
@@ -24,6 +26,7 @@ import { cn } from '@/utils';
 type AuthMode = 'login' | 'register';
 type UserRole = 'student' | 'teacher' | 'admin';
 type SchoolLevel = 'jss' | 'shs';
+type RegistrationStatus = 'idle' | 'pending' | 'error';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -36,14 +39,15 @@ interface FormErrors {
 }
 
 export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalProps) {
-  const { setUser, isLoading, clearError } = useAuthStore();
+  const { register, login, isLoading, clearError } = useAuthStore();
 
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [registrationStatus, setRegistrationStatus] = useState<RegistrationStatus>('idle');
+  const [registrationMessage, setRegistrationMessage] = useState('');
 
   // Common fields
   const [email, setEmail] = useState('');
@@ -82,7 +86,8 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
     setAdminCode('');
     setFormErrors({});
     setSelectedRole(null);
-    setRegistrationSuccess(false);
+    setRegistrationStatus('idle');
+    setRegistrationMessage('');
     clearError();
   };
 
@@ -171,113 +176,57 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
 
     try {
       if (mode === 'login') {
-        // Demo login - in production, this would call the API
-        const demoUsers = {
-          'admin@brilla.edu.gh': {
-            id: 'admin_1',
-            email: 'admin@brilla.edu.gh',
-            name: 'System Admin',
-            role: 'admin' as const,
-            xpPoints: 0,
-            level: 1,
-            streakDays: 0,
-            aiGradingCredits: 100,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          'teacher@brilla.edu.gh': {
-            id: 'teacher_1',
-            email: 'teacher@brilla.edu.gh',
-            name: 'Demo Teacher',
-            role: 'teacher' as const,
-            xpPoints: 0,
-            level: 1,
-            streakDays: 0,
-            aiGradingCredits: 50,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          'student@brilla.edu.gh': {
-            id: 'student_1',
-            email: 'student@brilla.edu.gh',
-            name: 'Demo Student',
-            role: 'student' as const,
-            house: 'Blue House',
-            yearGroup: 2,
-            xpPoints: 1500,
-            level: 5,
-            streakDays: 7,
-            aiGradingCredits: 10,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        };
-
-        const user = demoUsers[email as keyof typeof demoUsers];
-        if (user && password === 'password123') {
-          setUser(user);
-          onClose();
-        } else {
-          setFormErrors({ submit: 'Invalid email or password. Try demo accounts with password: password123' });
-        }
+        // Use store login which handles demo accounts and pending user checks
+        await login(email, password);
+        onClose();
       } else {
-        // Demo registration - create user based on role
-        const newUser = {
-          id: `${selectedRole}_${Date.now()}`,
+        // Register user - account will be pending until admin approves
+        const result = await register({
           email,
+          password,
           name,
           role: selectedRole!,
-          house: selectedRole === 'student' ? house || undefined : undefined,
+          schoolLevel: selectedRole === 'student' ? (schoolLevel as 'jss' | 'shs') : undefined,
           yearGroup: selectedRole === 'student' ? parseInt(yearGroup) : undefined,
-          xpPoints: 0,
-          level: 1,
-          streakDays: 0,
-          aiGradingCredits: selectedRole === 'admin' ? 100 : selectedRole === 'teacher' ? 50 : 10,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
+          schoolName: schoolName || undefined,
+          house: selectedRole === 'student' ? house || undefined : undefined,
+          teacherLicenseNumber: selectedRole === 'teacher' ? teacherLicenseNumber : undefined,
+          subjectsTaught: selectedRole === 'teacher' ? subjectsTaught : undefined,
+          yearsExperience: selectedRole === 'teacher' ? yearsExperience : undefined,
+          qualifications: selectedRole === 'teacher' ? qualifications : undefined,
+          adminCode: selectedRole === 'admin' ? adminCode : undefined,
+        });
 
-        // Simulate registration delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        setRegistrationSuccess(true);
-        setTimeout(() => {
-          setUser(newUser);
-          onClose();
-        }, 1500);
+        // Show pending approval message
+        setRegistrationStatus('pending');
+        setRegistrationMessage(result.message);
       }
     } catch (err) {
-      setFormErrors({ submit: 'An error occurred. Please try again.' });
+      if (mode === 'register') {
+        setRegistrationStatus('error');
+      }
+      setFormErrors({ submit: err instanceof Error ? err.message : 'An error occurred. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleDemoLogin = (role: UserRole) => {
+  const handleDemoLogin = async (role: UserRole) => {
     const demoCredentials = {
-      student: { email: 'student@brilla.edu.gh', name: 'Demo Student' },
-      teacher: { email: 'teacher@brilla.edu.gh', name: 'Demo Teacher' },
-      admin: { email: 'admin@brilla.edu.gh', name: 'System Admin' },
+      student: 'student@brilla.edu.gh',
+      teacher: 'teacher@brilla.edu.gh',
+      admin: 'admin@brilla.edu.gh',
     };
 
-    const creds = demoCredentials[role];
-    const user = {
-      id: `${role}_demo`,
-      email: creds.email,
-      name: creds.name,
-      role,
-      house: role === 'student' ? 'Blue House' : undefined,
-      yearGroup: role === 'student' ? 2 : undefined,
-      xpPoints: role === 'student' ? 1500 : 0,
-      level: role === 'student' ? 5 : 1,
-      streakDays: role === 'student' ? 7 : 0,
-      aiGradingCredits: role === 'admin' ? 100 : role === 'teacher' ? 50 : 10,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    setUser(user);
-    onClose();
+    setIsSubmitting(true);
+    try {
+      await login(demoCredentials[role], 'password123');
+      onClose();
+    } catch (err) {
+      setFormErrors({ submit: err instanceof Error ? err.message : 'Demo login failed' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const subjects = [
@@ -346,13 +295,40 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
-          {registrationSuccess ? (
+          {registrationStatus === 'pending' ? (
             <div className="text-center py-8">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <BadgeCheck className="w-8 h-8 text-green-600" />
+              <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-10 h-10 text-amber-600" />
               </div>
-              <h3 className="text-lg font-semibold text-neutral-900">Registration Successful!</h3>
-              <p className="text-neutral-600 mt-2">Welcome to Brilla! Redirecting you to the dashboard...</p>
+              <h3 className="text-xl font-semibold text-neutral-900">Registration Submitted!</h3>
+              <p className="text-neutral-600 mt-3 max-w-sm mx-auto">
+                {registrationMessage}
+              </p>
+
+              <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>
+                <ul className="text-sm text-blue-700 space-y-2 text-left">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span>An administrator will review your application</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span>You'll receive a notification once approved</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span>Then you can log in and start learning!</span>
+                  </li>
+                </ul>
+              </div>
+
+              <button
+                onClick={onClose}
+                className="mt-6 px-6 py-2.5 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                Got it, thanks!
+              </button>
             </div>
           ) : mode === 'register' && !selectedRole ? (
             // Role Selection
