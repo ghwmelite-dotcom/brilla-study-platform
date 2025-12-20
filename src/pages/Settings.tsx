@@ -13,6 +13,10 @@ import {
   EyeOff,
   Loader2,
   AlertTriangle,
+  Sun,
+  Moon,
+  Monitor,
+  Type,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/lib/api';
@@ -60,11 +64,25 @@ export default function Settings() {
   const [notificationsSaving, setNotificationsSaving] = useState(false);
   const [notificationsSuccess, setNotificationsSuccess] = useState(false);
 
-  // Appearance preferences
-  const [appearance, setAppearance] = useState({
-    theme: 'light' as 'light' | 'dark' | 'system',
-    compactMode: false,
+  // Appearance preferences - load from localStorage
+  const [appearance, setAppearance] = useState(() => {
+    const saved = localStorage.getItem('brilla-appearance');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        // fallback
+      }
+    }
+    return {
+      theme: 'light' as 'light' | 'dark' | 'system',
+      fontSize: 'medium' as 'small' | 'medium' | 'large',
+      compactMode: false,
+      reduceMotion: false,
+    };
   });
+  const [appearanceSaving, setAppearanceSaving] = useState(false);
+  const [appearanceSuccess, setAppearanceSuccess] = useState(false);
 
   const tabs = [
     { id: 'profile' as const, label: 'Profile', icon: User },
@@ -148,6 +166,55 @@ export default function Settings() {
       setTimeout(() => setNotificationsSuccess(false), 3000);
     } finally {
       setNotificationsSaving(false);
+    }
+  };
+
+  const handleAppearanceSave = async () => {
+    setAppearanceSaving(true);
+    setAppearanceSuccess(false);
+
+    try {
+      // Save to localStorage
+      localStorage.setItem('brilla-appearance', JSON.stringify(appearance));
+
+      // Apply theme to document
+      const root = document.documentElement;
+      if (appearance.theme === 'dark') {
+        root.classList.add('dark');
+      } else if (appearance.theme === 'light') {
+        root.classList.remove('dark');
+      } else {
+        // System preference
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          root.classList.add('dark');
+        } else {
+          root.classList.remove('dark');
+        }
+      }
+
+      // Apply font size
+      root.style.fontSize = appearance.fontSize === 'small' ? '14px' :
+                            appearance.fontSize === 'large' ? '18px' : '16px';
+
+      // Apply compact mode
+      if (appearance.compactMode) {
+        root.classList.add('compact');
+      } else {
+        root.classList.remove('compact');
+      }
+
+      // Apply reduce motion
+      if (appearance.reduceMotion) {
+        root.classList.add('reduce-motion');
+      } else {
+        root.classList.remove('reduce-motion');
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 300));
+      setAppearanceSuccess(true);
+      setTimeout(() => setAppearanceSuccess(false), 3000);
+    } finally {
+      setAppearanceSaving(false);
     }
   };
 
@@ -513,44 +580,154 @@ export default function Settings() {
                     <p className="text-sm text-neutral-500">Customize how Brilla looks for you</p>
                   </div>
 
-                  <div className="space-y-4">
+                  {appearanceSuccess && (
+                    <div className="p-3 bg-green-50 text-green-700 rounded-lg text-sm flex items-center gap-2">
+                      <Check className="w-4 h-4" />
+                      Appearance settings saved!
+                    </div>
+                  )}
+
+                  <div className="space-y-6">
+                    {/* Theme Selection */}
                     <div>
                       <label className="block text-sm font-medium text-neutral-700 mb-3">
                         Theme
                       </label>
                       <div className="grid grid-cols-3 gap-3">
-                        {(['light', 'dark', 'system'] as const).map((theme) => (
-                          <button
-                            key={theme}
-                            onClick={() => setAppearance({ ...appearance, theme })}
-                            className={cn(
-                              'p-4 rounded-lg border-2 transition-colors text-center capitalize',
-                              appearance.theme === theme
-                                ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                                : 'border-neutral-200 hover:border-neutral-300'
-                            )}
-                          >
-                            {theme}
-                          </button>
-                        ))}
+                        <button
+                          onClick={() => setAppearance({ ...appearance, theme: 'light' })}
+                          className={cn(
+                            'p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2',
+                            appearance.theme === 'light'
+                              ? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm'
+                              : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
+                          )}
+                        >
+                          <Sun className="w-6 h-6" />
+                          <span className="text-sm font-medium">Light</span>
+                        </button>
+                        <button
+                          onClick={() => setAppearance({ ...appearance, theme: 'dark' })}
+                          className={cn(
+                            'p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2',
+                            appearance.theme === 'dark'
+                              ? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm'
+                              : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
+                          )}
+                        >
+                          <Moon className="w-6 h-6" />
+                          <span className="text-sm font-medium">Dark</span>
+                        </button>
+                        <button
+                          onClick={() => setAppearance({ ...appearance, theme: 'system' })}
+                          className={cn(
+                            'p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2',
+                            appearance.theme === 'system'
+                              ? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm'
+                              : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
+                          )}
+                        >
+                          <Monitor className="w-6 h-6" />
+                          <span className="text-sm font-medium">System</span>
+                        </button>
                       </div>
                       <p className="mt-2 text-xs text-neutral-400">
-                        Dark mode coming soon!
+                        System theme follows your device preference
                       </p>
                     </div>
 
-                    <label className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg cursor-pointer hover:bg-neutral-100 transition-colors">
-                      <div>
-                        <p className="font-medium text-neutral-900">Compact Mode</p>
-                        <p className="text-sm text-neutral-500">Show more content with less spacing</p>
+                    {/* Font Size */}
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-3">
+                        <div className="flex items-center gap-2">
+                          <Type className="w-4 h-4" />
+                          Font Size
+                        </div>
+                      </label>
+                      <div className="grid grid-cols-3 gap-3">
+                        <button
+                          onClick={() => setAppearance({ ...appearance, fontSize: 'small' })}
+                          className={cn(
+                            'p-3 rounded-lg border-2 transition-all text-center',
+                            appearance.fontSize === 'small'
+                              ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                              : 'border-neutral-200 hover:border-neutral-300'
+                          )}
+                        >
+                          <span className="text-xs font-medium">Small</span>
+                        </button>
+                        <button
+                          onClick={() => setAppearance({ ...appearance, fontSize: 'medium' })}
+                          className={cn(
+                            'p-3 rounded-lg border-2 transition-all text-center',
+                            appearance.fontSize === 'medium'
+                              ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                              : 'border-neutral-200 hover:border-neutral-300'
+                          )}
+                        >
+                          <span className="text-sm font-medium">Medium</span>
+                        </button>
+                        <button
+                          onClick={() => setAppearance({ ...appearance, fontSize: 'large' })}
+                          className={cn(
+                            'p-3 rounded-lg border-2 transition-all text-center',
+                            appearance.fontSize === 'large'
+                              ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                              : 'border-neutral-200 hover:border-neutral-300'
+                          )}
+                        >
+                          <span className="text-base font-medium">Large</span>
+                        </button>
                       </div>
-                      <input
-                        type="checkbox"
-                        checked={appearance.compactMode}
-                        onChange={(e) => setAppearance({ ...appearance, compactMode: e.target.checked })}
-                        className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
-                      />
-                    </label>
+                    </div>
+
+                    {/* Display Options */}
+                    <div className="space-y-3">
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Display Options
+                      </label>
+
+                      <label className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg cursor-pointer hover:bg-neutral-100 transition-colors">
+                        <div>
+                          <p className="font-medium text-neutral-900">Compact Mode</p>
+                          <p className="text-sm text-neutral-500">Show more content with less spacing</p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={appearance.compactMode}
+                          onChange={(e) => setAppearance({ ...appearance, compactMode: e.target.checked })}
+                          className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
+                        />
+                      </label>
+
+                      <label className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg cursor-pointer hover:bg-neutral-100 transition-colors">
+                        <div>
+                          <p className="font-medium text-neutral-900">Reduce Motion</p>
+                          <p className="text-sm text-neutral-500">Minimize animations and transitions</p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={appearance.reduceMotion}
+                          onChange={(e) => setAppearance({ ...appearance, reduceMotion: e.target.checked })}
+                          className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-4 border-t border-neutral-200">
+                    <button
+                      onClick={handleAppearanceSave}
+                      disabled={appearanceSaving}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50"
+                    >
+                      {appearanceSaving ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Save className="w-4 h-4" />
+                      )}
+                      Save Preferences
+                    </button>
                   </div>
                 </div>
               )}
