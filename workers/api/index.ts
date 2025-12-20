@@ -1734,17 +1734,35 @@ Please explain:
 
 // AI chat
 protectedApp.post('/ai/chat', async (c) => {
-  const { message, context, conversationHistory, userId } = await c.req.json();
+  const { message, context, conversationHistory, userId, userName, userPersonalization } = await c.req.json();
   const apiKey = c.env.ANTHROPIC_API_KEY;
   const model = c.env.AI_MODEL || 'claude-3-haiku-20240307';
 
   try {
     const exam = getExamContext(context);
-    const systemPrompt = `You are Brilla AI, a helpful tutor for ${exam.examName} preparation.
+    const displayName = userName || userPersonalization?.preferredName || userPersonalization?.name;
+
+    const systemPrompt = `You are Brilla AI, a warm, encouraging, and personable tutor for ${exam.examName} preparation.
 You specialize in ${exam.subjects}.
-Be concise (keep responses under 200 words), encouraging, and focus on helping students understand concepts for their ${exam.examType.toUpperCase()} exams.
-Use markdown formatting for clarity when explaining formulas or concepts.
-${context ? `Current context: ${context}` : ''}`;
+
+PERSONALITY & COMMUNICATION STYLE:
+- Be warm, friendly, and genuinely caring - like a supportive older sibling or favorite teacher
+- Use the student's name naturally in conversation${displayName ? ` (their name is ${displayName})` : ''}
+- Be encouraging but authentic - celebrate their efforts and progress
+- Show genuine interest in helping them succeed
+- Use casual, approachable language while maintaining educational value
+- Add occasional light humor or relatable examples
+
+RESPONSE GUIDELINES:
+- Keep responses concise (under 200 words) but warm
+- Use markdown formatting for formulas and key concepts
+- End with a follow-up question or encouragement to keep the conversation going
+- Reference their progress or previous topics when relevant
+- Be patient with repeated questions - explain differently each time
+
+${context ? `Current context: ${context}` : ''}
+${userPersonalization?.weakAreas ? `Areas to focus on: ${userPersonalization.weakAreas.join(', ')}` : ''}
+${userPersonalization?.strengths ? `Student's strengths: ${userPersonalization.strengths.join(', ')}` : ''}`;
 
     let response: string;
     let provider: string;
@@ -1755,7 +1773,7 @@ ${context ? `Current context: ${context}` : ''}`;
       provider = 'anthropic';
     } else {
       // Fallback to mock response
-      response = generateMockChatResponse(message, context);
+      response = generateMockChatResponse(message, context, displayName);
       provider = 'mock';
     }
 
@@ -1766,7 +1784,7 @@ ${context ? `Current context: ${context}` : ''}`;
   } catch (error) {
     console.error('AI chat error:', error);
     // Fallback to mock on error
-    const mockResponse = generateMockChatResponse(message, context);
+    const mockResponse = generateMockChatResponse(message, context, userName);
     return c.json({
       success: true,
       data: { message: mockResponse, provider: 'mock' },
@@ -1880,23 +1898,29 @@ ${userAnswer ? `Your answer "${userAnswer}" was close, but ` : ''}Let me explain
 Pro tip: When facing similar ${exam.examType.toUpperCase()} questions, try breaking down the problem into smaller steps and verify each step before moving to the next. Practice makes perfect!`;
 }
 
-function generateMockChatResponse(message: string, context?: string): string {
+function generateMockChatResponse(message: string, context?: string, userName?: string): string {
   const lowerMessage = message.toLowerCase();
   const exam = getExamContext(context);
+  const greeting = userName ? `${userName}, ` : '';
+  const personalTouch = userName ? ` I'm here for you, ${userName}!` : '';
 
   if (lowerMessage.includes('help') || lowerMessage.includes('explain')) {
-    return `I'd be happy to help! Could you please share the specific topic or question you'd like me to explain? I can break down concepts in ${exam.subjects}.`;
+    return `${greeting}I'd be happy to help! Could you please share the specific topic or question you'd like me to explain? I can break down concepts in ${exam.subjects}.${personalTouch}`;
   }
 
   if (lowerMessage.includes('formula') || lowerMessage.includes('equation')) {
-    return `Formulas are essential for ${exam.examType.toUpperCase()} success! Here are some tips for memorizing them:\n\n1. Understand what each variable represents\n2. Practice deriving simpler formulas from first principles\n3. Create flashcards and review daily\n4. Apply formulas in practice problems\n\nWhich specific formula would you like me to explain?`;
+    return `${greeting ? `Great question, ${greeting}` : ''}Formulas are essential for ${exam.examType.toUpperCase()} success! Here are some tips for memorizing them:\n\n1. **Understand** what each variable represents\n2. **Practice** deriving simpler formulas from first principles\n3. **Create flashcards** and review daily\n4. **Apply** formulas in practice problems\n\nWhich specific formula would you like me to explain?`;
   }
 
   if (lowerMessage.includes('tip') || lowerMessage.includes('advice') || lowerMessage.includes('study')) {
-    return `Here are my top ${exam.examType.toUpperCase()} preparation tips:\n\n1. **Practice daily** - Even 30 minutes helps\n2. **Focus on weak areas** - Use analytics to identify gaps\n3. **Past questions** - Practice with previous ${exam.examType.toUpperCase()} papers\n4. **Study with peers** - Quiz each other to test understanding\n5. **Stay curious** - Understanding 'why' helps more than memorizing\n\nWhat specific area would you like advice on?`;
+    return `${greeting ? `${greeting}here are ` : 'Here are '}my top ${exam.examType.toUpperCase()} preparation tips just for you:\n\n1. **Practice daily** - Even 30 minutes helps\n2. **Focus on weak areas** - Use analytics to identify gaps\n3. **Past questions** - Practice with previous ${exam.examType.toUpperCase()} papers\n4. **Study with peers** - Quiz each other to test understanding\n5. **Stay curious** - Understanding 'why' helps more than memorizing\n\nWhat specific area would you like advice on?${userName ? ` I believe in you, ${userName}!` : ''}`;
   }
 
-  return `That's a great question! I'm here to help you prepare for ${exam.examName}. Feel free to ask me about:\n\n- Specific topics in ${exam.subjects}\n- Formula explanations and derivations\n- Study tips and strategies\n- Help understanding your wrong answers\n\nWhat would you like to explore?`;
+  if (lowerMessage.includes('hello') || lowerMessage.includes('hi ') || lowerMessage === 'hi') {
+    return `Hey${userName ? ` ${userName}` : ' there'}! Great to see you! I'm Brilla AI, your personal study companion.\n\nI'm here to help you succeed in ${exam.examName}. What would you like to work on together today?\n\nRemember - there's no such thing as a silly question!`;
+  }
+
+  return `${greeting ? `Thanks for reaching out, ${greeting}` : ''}That's a great question! I'm here to help you prepare for ${exam.examName}. Feel free to ask me about:\n\n- Specific topics in ${exam.subjects}\n- Formula explanations and derivations\n- Study tips and strategies\n- Help understanding your wrong answers\n\nWhat would you like to explore?${personalTouch}`;
 }
 
 function generateMockHint(question: string, level: number): string {

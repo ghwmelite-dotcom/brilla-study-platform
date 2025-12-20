@@ -5,31 +5,52 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  isNew?: boolean;
 }
+
+export interface UserPersonalization {
+  name: string;
+  preferredName?: string;
+  learningStyle?: 'visual' | 'auditory' | 'reading' | 'kinesthetic';
+  strengths?: string[];
+  weakAreas?: string[];
+  gradeLevel?: string;
+  previousTopics?: string[];
+  encouragementStyle?: 'motivational' | 'analytical' | 'supportive';
+}
+
+type ThinkingStage = 'idle' | 'thinking' | 'composing' | 'typing';
 
 interface AiTutorState {
   isOpen: boolean;
   messages: ChatMessage[];
   isLoading: boolean;
+  thinkingStage: ThinkingStage;
   error: string | null;
   currentContext?: string;
+  latestMessageId?: string;
+  userPersonalization?: UserPersonalization;
 
   // Actions
   openChat: (context?: string) => void;
   closeChat: () => void;
-  sendMessage: (message: string, userId: string) => Promise<void>;
-  explainQuestion: (question: string, correctAnswer: string, userAnswer?: string, isCorrect?: boolean, userId?: string) => Promise<string>;
+  sendMessage: (message: string, userId: string, userName?: string) => Promise<void>;
+  explainQuestion: (question: string, correctAnswer: string, userAnswer?: string, isCorrect?: boolean, userId?: string, context?: string) => Promise<string>;
   getHint: (question: string, hintLevel: number, userId: string) => Promise<string>;
   clearMessages: () => void;
   clearError: () => void;
+  markMessageAsOld: (messageId: string) => void;
+  setUserPersonalization: (data: Partial<UserPersonalization>) => void;
 }
 
-// Mock AI responses when API is unavailable
-function generateMockResponse(message: string): string {
+// Mock AI responses when API is unavailable - now with personalization
+function generateMockResponse(message: string, userName?: string): string {
   const lowerMessage = message.toLowerCase();
+  const greeting = userName ? `${userName}, ` : '';
+  const personalTouch = userName ? ` I'm here specifically for you, ${userName}.` : '';
 
   if (lowerMessage.includes('study') || lowerMessage.includes('tip')) {
-    return `Here are some effective study tips:
+    return `Great question, ${greeting}here are some effective study tips tailored for you:
 
 **1. Active Recall**
 Test yourself regularly instead of just re-reading notes. Try to explain concepts without looking at your materials.
@@ -46,14 +67,14 @@ Explaining concepts to classmates helps solidify your own understanding.
 **5. Take Breaks**
 Use the Pomodoro technique: 25 minutes focused study, 5 minute break.
 
-Would you like me to explain any of these strategies in more detail?`;
+Would you like me to explain any of these strategies in more detail?${personalTouch}`;
   }
 
   if (lowerMessage.includes('explain') || lowerMessage.includes('what is')) {
-    return `I'd be happy to help explain that concept!
+    return `${greeting ? `Of course, ${greeting}` : ''}I'd be happy to help explain that concept!
 
 To give you the best explanation, could you please:
-1. Specify which subject (Maths, Physics, Chemistry, Biology, or another WASSCE subject)
+1. Specify which subject (Maths, Physics, Chemistry, Biology, or another subject)
 2. Tell me what specifically you're finding confusing
 
 For example, you could ask:
@@ -61,11 +82,11 @@ For example, you could ask:
 - "What is photosynthesis and how does it work?"
 - "How do I solve quadratic equations?"
 
-I'm here to help you understand!`;
+I'm here to help you understand!${personalTouch}`;
   }
 
   if (lowerMessage.includes('formula') || lowerMessage.includes('equation')) {
-    return `Formulas are key to success in science and maths exams!
+    return `${greeting ? `Great thinking, ${greeting}` : ''}Formulas are key to success in science and maths exams!
 
 **Tips for learning formulas:**
 
@@ -78,19 +99,19 @@ Which specific formula would you like me to explain?`;
   }
 
   if (lowerMessage.includes('hello') || lowerMessage.includes('hi ') || lowerMessage === 'hi') {
-    return `Hello! I'm Brilla AI, your personal study assistant.
+    return `Hello${userName ? `, ${userName}` : ''}! I'm Brilla AI, your personal study companion.
 
-I can help you with:
-- **Explaining concepts** in any WASSCE subject
+I'm so glad you're here! I can help you with:
+- **Explaining concepts** in any subject
 - **Study tips** and exam strategies
 - **Practice questions** and worked solutions
 - **Formula explanations** and derivations
 
-What would you like help with today?`;
+What would you like to work on together today? Remember, there are no silly questions - I'm here to help you succeed!`;
   }
 
   // Default response
-  return `Thanks for your question! I'm here to help you prepare for your exams.
+  return `${greeting ? `Thanks for reaching out, ${greeting}` : 'Thanks for your question! '}I'm here to help you prepare for your exams.
 
 I can assist you with:
 - **Subject explanations** - Ask me about any topic in Maths, Sciences, English, or other subjects
@@ -98,7 +119,7 @@ I can assist you with:
 - **Exam techniques** - Learn how to approach different question types
 - **Practice problems** - Work through examples together
 
-What specific topic or question would you like help with?`;
+What specific topic or question would you like help with?${personalTouch}`;
 }
 
 // Safe JSON parse helper
@@ -115,12 +136,31 @@ async function safeJsonParse(response: Response): Promise<{ success: boolean; da
   }
 }
 
+// Simulate thinking stages with delays
+function simulateThinking(
+  setStage: (stage: ThinkingStage) => void,
+  onComplete: () => void
+) {
+  setStage('thinking');
+
+  setTimeout(() => {
+    setStage('composing');
+
+    setTimeout(() => {
+      onComplete();
+    }, 800 + Math.random() * 400);
+  }, 600 + Math.random() * 400);
+}
+
 export const useAiTutorStore = create<AiTutorState>()((set, get) => ({
   isOpen: false,
   messages: [],
   isLoading: false,
+  thinkingStage: 'idle',
   error: null,
   currentContext: undefined,
+  latestMessageId: undefined,
+  userPersonalization: undefined,
 
   openChat: (context) => {
     set({ isOpen: true, currentContext: context });
@@ -130,22 +170,49 @@ export const useAiTutorStore = create<AiTutorState>()((set, get) => ({
     set({ isOpen: false });
   },
 
-  sendMessage: async (message, userId) => {
+  setUserPersonalization: (data) => {
+    set((state) => ({
+      userPersonalization: { ...state.userPersonalization, ...data } as UserPersonalization,
+    }));
+  },
+
+  markMessageAsOld: (messageId) => {
+    set((state) => ({
+      messages: state.messages.map((m) =>
+        m.id === messageId ? { ...m, isNew: false } : m
+      ),
+    }));
+  },
+
+  sendMessage: async (message, userId, userName) => {
     const userMessage: ChatMessage = {
       id: `msg_${Date.now()}_user`,
       role: 'user',
       content: message,
       timestamp: new Date(),
+      isNew: false,
     };
 
+    // Mark all previous messages as old
     set((state) => ({
-      messages: [...state.messages, userMessage],
+      messages: [...state.messages.map((m) => ({ ...m, isNew: false })), userMessage],
       isLoading: true,
+      thinkingStage: 'thinking',
       error: null,
     }));
 
     try {
       let assistantContent: string;
+      const personalization = get().userPersonalization;
+      const displayName = userName || personalization?.preferredName || personalization?.name;
+
+      // Simulate thinking stages
+      await new Promise<void>((resolve) => {
+        simulateThinking(
+          (stage) => set({ thinkingStage: stage }),
+          resolve
+        );
+      });
 
       try {
         const response = await fetch('/api/ai/chat', {
@@ -159,6 +226,8 @@ export const useAiTutorStore = create<AiTutorState>()((set, get) => ({
               content: m.content,
             })),
             userId,
+            userName: displayName,
+            userPersonalization: personalization,
           }),
         });
 
@@ -166,45 +235,60 @@ export const useAiTutorStore = create<AiTutorState>()((set, get) => ({
 
         if (!parsed.success || !response.ok) {
           // API unavailable or returned error - use mock response
-          assistantContent = generateMockResponse(message);
+          assistantContent = generateMockResponse(message, displayName);
         } else {
-          assistantContent = (parsed.data as { data?: { message?: string } })?.data?.message || generateMockResponse(message);
+          assistantContent = (parsed.data as { data?: { message?: string } })?.data?.message || generateMockResponse(message, displayName);
         }
       } catch {
         // Network error or API unavailable - use mock response
-        assistantContent = generateMockResponse(message);
+        assistantContent = generateMockResponse(message, displayName);
       }
 
+      const messageId = `msg_${Date.now()}_assistant`;
       const assistantMessage: ChatMessage = {
-        id: `msg_${Date.now()}_assistant`,
+        id: messageId,
         role: 'assistant',
         content: assistantContent,
         timestamp: new Date(),
+        isNew: true,
       };
 
       set((state) => ({
         messages: [...state.messages, assistantMessage],
         isLoading: false,
+        thinkingStage: 'typing',
+        latestMessageId: messageId,
       }));
+
+      // Clear typing stage after a delay
+      setTimeout(() => {
+        set({ thinkingStage: 'idle' });
+      }, 500);
+
     } catch (error) {
       // Final fallback - still provide a response
+      const displayName = userName || get().userPersonalization?.name;
+      const messageId = `msg_${Date.now()}_assistant`;
       const fallbackMessage: ChatMessage = {
-        id: `msg_${Date.now()}_assistant`,
+        id: messageId,
         role: 'assistant',
-        content: generateMockResponse(message),
+        content: generateMockResponse(message, displayName),
         timestamp: new Date(),
+        isNew: true,
       };
 
       set((state) => ({
         messages: [...state.messages, fallbackMessage],
         isLoading: false,
+        thinkingStage: 'idle',
         error: null,
+        latestMessageId: messageId,
       }));
     }
   },
 
-  explainQuestion: async (question, correctAnswer, userAnswer, isCorrect, userId) => {
-    set({ isLoading: true, error: null });
+  explainQuestion: async (question, correctAnswer, userAnswer, isCorrect, userId, context) => {
+    set({ isLoading: true, thinkingStage: 'thinking', error: null });
 
     try {
       const response = await fetch('/api/ai/explain', {
@@ -216,6 +300,8 @@ export const useAiTutorStore = create<AiTutorState>()((set, get) => ({
           userAnswer,
           isCorrect,
           userId,
+          context,
+          userPersonalization: get().userPersonalization,
         }),
       });
 
@@ -223,31 +309,34 @@ export const useAiTutorStore = create<AiTutorState>()((set, get) => ({
 
       if (!parsed.success || !response.ok) {
         // Return mock explanation
+        const userName = get().userPersonalization?.name;
         const mockExplanation = isCorrect
-          ? `Excellent work! The correct answer is "${correctAnswer}".\n\nYou demonstrated a good understanding of this concept. Keep practicing to reinforce your knowledge!`
-          : `The correct answer is "${correctAnswer}".\n\n${userAnswer ? `Your answer "${userAnswer}" was not quite right. ` : ''}This concept requires understanding the underlying principles. Review the topic and try similar questions to strengthen your understanding.`;
+          ? `${userName ? `Excellent work, ${userName}! ` : 'Excellent work! '}The correct answer is "${correctAnswer}".\n\nYou demonstrated a good understanding of this concept. Keep practicing to reinforce your knowledge!`
+          : `The correct answer is "${correctAnswer}".\n\n${userAnswer ? `Your answer "${userAnswer}" was not quite right. ` : ''}This concept requires understanding the underlying principles.${userName ? ` Don't worry, ${userName} - ` : ' '}Review the topic and try similar questions to strengthen your understanding.`;
 
-        set({ isLoading: false });
+        set({ isLoading: false, thinkingStage: 'idle' });
         return mockExplanation;
       }
 
-      set({ isLoading: false });
+      set({ isLoading: false, thinkingStage: 'idle' });
       return (parsed.data as { data?: { explanation?: string } })?.data?.explanation ||
         `The correct answer is "${correctAnswer}". Keep practicing!`;
     } catch {
-      const fallbackExplanation = `The correct answer is "${correctAnswer}".\n\nThis is a common question type. Make sure you understand the key concepts and practice similar problems.`;
-      set({ isLoading: false });
+      const userName = get().userPersonalization?.name;
+      const fallbackExplanation = `The correct answer is "${correctAnswer}".\n\n${userName ? `${userName}, this` : 'This'} is a common question type. Make sure you understand the key concepts and practice similar problems.`;
+      set({ isLoading: false, thinkingStage: 'idle' });
       return fallbackExplanation;
     }
   },
 
   getHint: async (question, hintLevel, userId) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, thinkingStage: 'thinking', error: null });
 
+    const userName = get().userPersonalization?.name;
     const mockHints = [
-      "Think about the fundamental concepts involved. What principles might apply here?",
-      "Consider breaking the problem into smaller parts. What information do you already have?",
-      "Focus on the key variables and relationships. What formula or concept connects them?"
+      `${userName ? `${userName}, think` : 'Think'} about the fundamental concepts involved. What principles might apply here?`,
+      `${userName ? `You've got this, ${userName}! ` : ''}Consider breaking the problem into smaller parts. What information do you already have?`,
+      `${userName ? `Almost there, ${userName}! ` : ''}Focus on the key variables and relationships. What formula or concept connects them?`
     ];
 
     try {
@@ -260,21 +349,21 @@ export const useAiTutorStore = create<AiTutorState>()((set, get) => ({
       const parsed = await safeJsonParse(response);
 
       if (!parsed.success || !response.ok) {
-        set({ isLoading: false });
+        set({ isLoading: false, thinkingStage: 'idle' });
         return mockHints[Math.min(hintLevel - 1, mockHints.length - 1)];
       }
 
-      set({ isLoading: false });
+      set({ isLoading: false, thinkingStage: 'idle' });
       return (parsed.data as { data?: { hint?: string } })?.data?.hint ||
         mockHints[Math.min(hintLevel - 1, mockHints.length - 1)];
     } catch {
-      set({ isLoading: false });
+      set({ isLoading: false, thinkingStage: 'idle' });
       return mockHints[Math.min(hintLevel - 1, mockHints.length - 1)];
     }
   },
 
   clearMessages: () => {
-    set({ messages: [] });
+    set({ messages: [], latestMessageId: undefined });
   },
 
   clearError: () => set({ error: null }),

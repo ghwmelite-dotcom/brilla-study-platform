@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { X, Send, Loader2, Sparkles, BookOpen, Lightbulb, GraduationCap, FileText, PenTool, Calculator } from 'lucide-react';
+import { X, Send, Sparkles, BookOpen, Lightbulb, GraduationCap, FileText, PenTool, Calculator, Heart } from 'lucide-react';
 import { useAiTutorStore, useAuthStore, useExamStore } from '@/stores';
 import { AiMessage } from './AiMessage';
+import { ThinkingIndicator } from './ThinkingIndicator';
 
 // Exam-specific configurations
 const examConfigs = {
@@ -47,11 +48,14 @@ export function AiTutor() {
     isOpen,
     messages,
     isLoading,
+    thinkingStage,
     error,
     closeChat,
     sendMessage,
     clearMessages,
     clearError,
+    setUserPersonalization,
+    markMessageAsOld,
   } = useAiTutorStore();
 
   const [inputMessage, setInputMessage] = useState('');
@@ -63,10 +67,20 @@ export function AiTutor() {
     return examConfigs[currentExamType] || examConfigs.nsmq;
   }, [currentExamType]);
 
+  // Initialize user personalization when component mounts or user changes
+  useEffect(() => {
+    if (user?.name) {
+      setUserPersonalization({
+        name: user.name,
+        preferredName: user.name.split(' ')[0], // Use first name
+      });
+    }
+  }, [user?.name, setUserPersonalization]);
+
   // Scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, thinkingStage]);
 
   // Focus input when opened
   useEffect(() => {
@@ -80,8 +94,8 @@ export function AiTutor() {
 
     const message = inputMessage.trim();
     setInputMessage('');
-    // Include exam context in the message
-    await sendMessage(`[${examConfig.name} Mode] ${message}`, user.id);
+    // Include exam context and user name in the message
+    await sendMessage(`[${examConfig.name} Mode] ${message}`, user.id, user.name);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -96,6 +110,13 @@ export function AiTutor() {
     inputRef.current?.focus();
   };
 
+  const handleTypingComplete = (messageId: string) => {
+    markMessageAsOld(messageId);
+  };
+
+  // Get user's first name for personalized greeting
+  const firstName = user?.name?.split(' ')[0] || 'there';
+
   if (!isOpen) return null;
 
   return (
@@ -107,16 +128,23 @@ export function AiTutor() {
       />
 
       {/* Chat panel */}
-      <div className="fixed inset-x-0 bottom-0 top-4 sm:top-auto sm:inset-x-auto sm:bottom-4 sm:right-4 sm:left-auto w-full sm:w-96 sm:h-[min(600px,calc(100vh-2rem))] bg-white rounded-t-xl sm:rounded-xl shadow-2xl z-50 flex flex-col max-h-[100dvh] sm:max-h-none">
+      <div className="fixed inset-x-0 bottom-0 top-4 sm:top-auto sm:inset-x-auto sm:bottom-4 sm:right-4 sm:left-auto w-full sm:w-96 sm:h-[min(600px,calc(100vh-2rem))] bg-white rounded-t-xl sm:rounded-xl shadow-2xl z-50 flex flex-col max-h-[100dvh] sm:max-h-none overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-3 sm:p-4 border-b border-neutral-200 bg-gradient-to-r from-primary to-accent rounded-t-xl shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+            <div className="relative">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              </div>
+              {/* Online indicator */}
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-white" />
             </div>
             <div className="text-white">
-              <h3 className="font-semibold text-sm sm:text-base">Brilla AI Tutor</h3>
-              <p className="text-xs text-white/80">{examConfig.subtitle}</p>
+              <h3 className="font-semibold text-sm sm:text-base">Brilla AI</h3>
+              <p className="text-xs text-white/80 flex items-center gap-1">
+                <Heart className="w-3 h-3 fill-current" />
+                Your personal tutor
+              </p>
             </div>
           </div>
           <button
@@ -130,25 +158,39 @@ export function AiTutor() {
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.length === 0 ? (
-            <div className="text-center pt-8">
-              <Sparkles className="w-12 h-12 mx-auto text-primary/30 mb-4" />
-              <h4 className="font-medium text-neutral-900 mb-2">
-                Hi, I'm Brilla AI!
+            <div className="text-center pt-6">
+              {/* Personalized greeting */}
+              <div className="relative inline-block mb-4">
+                <Sparkles className="w-14 h-14 mx-auto text-primary/30" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-2xl">👋</span>
+                </div>
+              </div>
+              <h4 className="font-semibold text-neutral-900 mb-1 text-lg">
+                Hey {firstName}!
               </h4>
+              <p className="text-sm text-neutral-600 mb-2">
+                I'm Brilla AI, your personal study companion.
+              </p>
               <p className="text-sm text-neutral-500 mb-6">
                 {examConfig.welcomeMessage}
               </p>
 
               {/* Quick actions */}
               <div className="space-y-2">
+                <p className="text-xs text-neutral-400 uppercase tracking-wide mb-2">
+                  Quick actions
+                </p>
                 {examConfig.quickActions.map((action, i) => (
                   <button
                     key={i}
                     onClick={() => handleQuickAction(action.prompt)}
-                    className="flex items-center gap-2 w-full p-3 bg-neutral-50 hover:bg-neutral-100 rounded-lg transition-colors text-left"
+                    className="flex items-center gap-3 w-full p-3 bg-gradient-to-r from-neutral-50 to-neutral-100/50 hover:from-primary/5 hover:to-accent/5 rounded-xl transition-all duration-200 text-left group border border-transparent hover:border-primary/10"
                   >
-                    <action.icon className="w-4 h-4 text-primary" />
-                    <span className="text-sm text-neutral-700">{action.label}</span>
+                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+                      <action.icon className="w-4 h-4 text-primary" />
+                    </div>
+                    <span className="text-sm text-neutral-700 group-hover:text-neutral-900">{action.label}</span>
                   </button>
                 ))}
               </div>
@@ -156,21 +198,26 @@ export function AiTutor() {
           ) : (
             <>
               {messages.map((message) => (
-                <AiMessage key={message.id} message={message} />
+                <AiMessage
+                  key={message.id}
+                  message={message}
+                  isNew={message.isNew}
+                  onTypingComplete={() => handleTypingComplete(message.id)}
+                />
               ))}
-              {isLoading && (
-                <div className="flex items-center gap-2 text-neutral-500">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm">Thinking...</span>
-                </div>
+
+              {/* Thinking indicator */}
+              {isLoading && thinkingStage !== 'idle' && thinkingStage !== 'typing' && (
+                <ThinkingIndicator stage={thinkingStage} />
               )}
+
               <div ref={messagesEndRef} />
             </>
           )}
 
           {/* Error message */}
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg animate-fadeIn">
               <p className="text-sm text-red-600">{error}</p>
               <button
                 onClick={clearError}
@@ -183,7 +230,7 @@ export function AiTutor() {
         </div>
 
         {/* Input */}
-        <div className="p-4 border-t border-neutral-200">
+        <div className="p-4 border-t border-neutral-200 bg-neutral-50/50">
           <div className="flex gap-2">
             <input
               ref={inputRef}
@@ -191,14 +238,14 @@ export function AiTutor() {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask me anything..."
+              placeholder={`Ask me anything, ${firstName}...`}
               disabled={isLoading}
-              className="flex-1 px-4 py-3 bg-neutral-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+              className="flex-1 px-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 disabled:opacity-50 transition-all duration-200"
             />
             <button
               onClick={handleSend}
               disabled={!inputMessage.trim() || isLoading}
-              className="p-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
+              className="p-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
             >
               <Send className="w-5 h-5" />
             </button>
@@ -207,13 +254,24 @@ export function AiTutor() {
           {messages.length > 0 && (
             <button
               onClick={clearMessages}
-              className="w-full mt-2 text-xs text-neutral-400 hover:text-neutral-600"
+              className="w-full mt-2 text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
             >
-              Clear conversation
+              Start fresh conversation
             </button>
           )}
         </div>
       </div>
+
+      {/* Global styles for animations */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
     </>
   );
 }
