@@ -10,12 +10,16 @@ import {
   Send,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
   Lightbulb,
   FlaskConical,
   ClipboardList,
   Table,
   AlertTriangle,
   Award,
+  X,
+  Plus,
 } from 'lucide-react';
 import { Card, Button, Badge, ProgressBar } from '@/components/common';
 import { PhETEmbed } from './PhETEmbed';
@@ -60,6 +64,7 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
   const [observationText, setObservationText] = useState('');
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState<GradingResult | null>(null);
+  const [showDataPanel, setShowDataPanel] = useState(false);
 
   // Timer effect
   useEffect(() => {
@@ -289,246 +294,271 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 min-h-0 overflow-hidden bg-neutral-100 rounded-b-lg">
-        {/* Left Panel - Procedure Guide */}
-        <div className={cn(
-          'bg-white border-r overflow-y-auto transition-all shrink-0 hidden md:block',
-          isProcedurePanelOpen ? 'w-72 lg:w-80' : 'w-12'
-        )}>
-          <div className="sticky top-0 bg-white border-b z-10">
-            <div className="flex items-center justify-between p-3">
-              {isProcedurePanelOpen && (
-                <div className="flex items-center gap-2">
-                  <ClipboardList className="w-4 h-4 text-neutral-500" />
-                  <span className="font-medium text-neutral-900">Procedure</span>
-                </div>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleProcedurePanel}
-              >
-                {isProcedurePanelOpen ? (
-                  <ChevronLeft className="w-4 h-4" />
-                ) : (
-                  <ChevronRight className="w-4 h-4" />
+      <div className="flex flex-col flex-1 min-h-0 overflow-hidden bg-neutral-100 rounded-b-lg">
+        {/* Two-column layout: Procedure + Lab Simulation */}
+        <div className="flex flex-1 min-h-0 overflow-hidden">
+          {/* Left Panel - Procedure Guide (narrower) */}
+          <div className={cn(
+            'bg-white border-r overflow-y-auto transition-all shrink-0 hidden md:block',
+            isProcedurePanelOpen ? 'w-56 lg:w-64' : 'w-10'
+          )}>
+            <div className="sticky top-0 bg-white border-b z-10">
+              <div className="flex items-center justify-between p-2">
+                {isProcedurePanelOpen && (
+                  <div className="flex items-center gap-1.5">
+                    <ClipboardList className="w-4 h-4 text-neutral-500" />
+                    <span className="font-medium text-neutral-900 text-sm">Procedure</span>
+                  </div>
                 )}
-              </Button>
-            </div>
-          </div>
-
-          {isProcedurePanelOpen && (
-            <div className="p-3 space-y-2">
-              {currentExperiment.procedure.map((step, idx) => (
-                <div
-                  key={step.stepNumber}
-                  className={cn(
-                    'p-3 rounded-lg cursor-pointer transition-colors border',
-                    idx === currentStepIndex
-                      ? 'bg-primary-50 border-primary'
-                      : stepCompletionStatus[idx]
-                        ? 'bg-green-50 border-green-200'
-                        : 'bg-neutral-50 border-transparent hover:border-neutral-200'
-                  )}
-                  onClick={() => goToStep(idx)}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-1"
+                  onClick={toggleProcedurePanel}
                 >
-                  <div className="flex items-start gap-2">
-                    {stepCompletionStatus[idx] ? (
-                      <CheckCircle className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
-                    ) : (
-                      <Circle className={cn(
-                        'w-5 h-5 shrink-0 mt-0.5',
-                        idx === currentStepIndex ? 'text-primary' : 'text-neutral-300'
-                      )} />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className={cn(
-                        'text-sm',
-                        idx === currentStepIndex ? 'text-primary font-medium' : 'text-neutral-700'
-                      )}>
-                        Step {step.stepNumber}
-                      </p>
-                      <p className="text-xs text-neutral-500 line-clamp-2 mt-0.5">
-                        {step.instruction}
-                      </p>
-                    </div>
-                    {step.isCheckpoint && (
-                      <Badge variant="secondary" size="sm" className="shrink-0">
-                        {step.maxMarks}m
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Center - Simulation Area */}
-        <div className="flex-1 flex flex-col min-w-0 bg-neutral-50 overflow-hidden">
-          {/* Current Step Instruction */}
-          <Card className="mx-3 mt-3 p-4 shrink-0">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="primary">Step {currentStep.stepNumber}</Badge>
-                  {currentStep.isCheckpoint && (
-                    <Badge variant="secondary">{currentStep.maxMarks} marks</Badge>
+                  {isProcedurePanelOpen ? (
+                    <ChevronLeft className="w-4 h-4" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4" />
                   )}
-                </div>
-                <p className="text-neutral-900">{currentStep.instruction}</p>
-                {showHints && currentStep.hint && (
-                  <div className="mt-3 p-3 bg-amber-50 rounded-lg flex items-start gap-2">
-                    <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                    <p className="text-sm text-amber-800">{currentStep.hint}</p>
-                  </div>
-                )}
-                {currentStep.expectedOutcome && (
-                  <p className="text-sm text-neutral-500 mt-2">
-                    <strong>Expected:</strong> {currentStep.expectedOutcome}
-                  </p>
-                )}
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleHints}
-                className={cn(showHints && 'bg-amber-100')}
-              >
-                <Lightbulb className="w-4 h-4" />
-              </Button>
-            </div>
-          </Card>
-
-          {/* Simulation Canvas / PhET Embed */}
-          <div className="flex-1 mx-3 my-3 min-h-[300px] overflow-hidden rounded-lg border border-neutral-200">
-            {currentExperiment.simulationType === 'phet' && currentExperiment.phetSimUrl ? (
-              <PhETEmbed
-                simUrl={currentExperiment.phetSimUrl}
-                title={currentExperiment.name}
-                guidanceNotes={currentExperiment.safetyNotes}
-              />
-            ) : (
-              <Card className="h-full flex items-center justify-center bg-white rounded-none border-0">
-                <div className="text-center p-8">
-                  <FlaskConical className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
-                  <p className="text-neutral-500 mb-2 font-medium">Custom Simulation</p>
-                  <p className="text-sm text-neutral-400">
-                    Interactive apparatus workspace coming soon
-                  </p>
-                </div>
-              </Card>
-            )}
-          </div>
-
-          {/* Step Navigation */}
-          <div className="flex items-center justify-between px-3 py-2 bg-white border-t shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={previousStep}
-              disabled={currentStepIndex === 0}
-            >
-              <ArrowLeft className="w-4 h-4 mr-1" />
-              <span className="hidden sm:inline">Previous</span>
-            </Button>
-
-            <div className="flex items-center gap-2">
-              {/* Mobile step indicator */}
-              <span className="text-sm text-neutral-500 md:hidden">
-                Step {currentStepIndex + 1}/{totalSteps}
-              </span>
-              {!stepCompletionStatus[currentStepIndex] && (
-                <Button variant="secondary" size="sm" onClick={completeStep}>
-                  <CheckCircle className="w-4 h-4 sm:mr-1" />
-                  <span className="hidden sm:inline">Mark Complete</span>
                 </Button>
-              )}
+              </div>
             </div>
 
-            <Button
-              size="sm"
-              onClick={nextStep}
-              disabled={currentStepIndex === totalSteps - 1}
-            >
-              <span className="hidden sm:inline">Next</span>
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Right Panel - Data Recording */}
-        <div className="w-72 bg-white border-l overflow-y-auto shrink-0 hidden lg:block">
-          <div className="sticky top-0 bg-white border-b z-10">
-            <div className="flex items-center gap-2 p-3">
-              <Table className="w-4 h-4 text-neutral-500" />
-              <span className="font-medium text-neutral-900">Data Recording</span>
-            </div>
-          </div>
-
-          <div className="p-3 space-y-4">
-            {/* Measurements */}
-            <div>
-              <h4 className="text-sm font-medium text-neutral-700 mb-2">Measurements</h4>
-              {measurements.length > 0 ? (
-                <div className="space-y-1">
-                  {measurements.map((m) => (
-                    <div key={m.id} className="text-sm p-2 bg-neutral-50 rounded">
-                      <span className="font-mono">{m.value} {m.unit}</span>
-                      <span className="text-neutral-400 text-xs ml-2">Step {m.stepNumber}</span>
+            {isProcedurePanelOpen && (
+              <div className="p-2 space-y-1.5">
+                {currentExperiment.procedure.map((step, idx) => (
+                  <div
+                    key={step.stepNumber}
+                    className={cn(
+                      'p-2 rounded-lg cursor-pointer transition-colors border',
+                      idx === currentStepIndex
+                        ? 'bg-primary-50 border-primary'
+                        : stepCompletionStatus[idx]
+                          ? 'bg-green-50 border-green-200'
+                          : 'bg-neutral-50 border-transparent hover:border-neutral-200'
+                    )}
+                    onClick={() => goToStep(idx)}
+                  >
+                    <div className="flex items-start gap-1.5">
+                      {stepCompletionStatus[idx] ? (
+                        <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
+                      ) : (
+                        <Circle className={cn(
+                          'w-4 h-4 shrink-0 mt-0.5',
+                          idx === currentStepIndex ? 'text-primary' : 'text-neutral-300'
+                        )} />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className={cn(
+                          'text-xs font-medium',
+                          idx === currentStepIndex ? 'text-primary' : 'text-neutral-700'
+                        )}>
+                          Step {step.stepNumber}
+                        </p>
+                        <p className="text-xs text-neutral-500 line-clamp-2 mt-0.5">
+                          {step.instruction}
+                        </p>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-neutral-400">No measurements recorded</p>
-              )}
-            </div>
-
-            {/* Observations */}
-            <div>
-              <h4 className="text-sm font-medium text-neutral-700 mb-2">Observations</h4>
-              <div className="space-y-2">
-                {observations.map((obs) => (
-                  <div key={obs.id} className="text-sm p-2 bg-neutral-50 rounded">
-                    <p className="text-neutral-700">{obs.text}</p>
-                    <span className="text-neutral-400 text-xs">Step {obs.stepNumber}</span>
                   </div>
                 ))}
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={observationText}
-                    onChange={(e) => setObservationText(e.target.value)}
-                    placeholder="Add observation..."
-                    className="flex-1 text-sm px-2 py-1 border rounded"
-                    onKeyDown={(e) => e.key === 'Enter' && handleAddObservation()}
-                  />
-                  <Button size="sm" onClick={handleAddObservation}>
-                    Add
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Safety Notes */}
-            {currentExperiment.safetyNotes.length > 0 && (
-              <div>
-                <h4 className="text-sm font-medium text-neutral-700 mb-2 flex items-center gap-1">
-                  <AlertTriangle className="w-4 h-4 text-amber-500" />
-                  Safety Notes
-                </h4>
-                <ul className="text-xs text-neutral-600 space-y-1">
-                  {currentExperiment.safetyNotes.map((note, idx) => (
-                    <li key={idx} className="flex items-start gap-1">
-                      <span className="text-amber-500">!</span>
-                      {note}
-                    </li>
-                  ))}
-                </ul>
               </div>
             )}
           </div>
+
+          {/* Main Lab Area - Simulation (takes remaining width) */}
+          <div className="flex-1 flex flex-col min-w-0 bg-neutral-50 overflow-hidden">
+            {/* Current Step Instruction - Compact */}
+            <div className="mx-2 mt-2 p-3 bg-white rounded-lg border border-neutral-200 shrink-0">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Badge variant="primary" size="sm">Step {currentStep.stepNumber}</Badge>
+                    {currentStep.isCheckpoint && (
+                      <Badge variant="secondary" size="sm">{currentStep.maxMarks}m</Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-neutral-900">{currentStep.instruction}</p>
+                  {showHints && currentStep.hint && (
+                    <div className="mt-2 p-2 bg-amber-50 rounded flex items-start gap-2">
+                      <Lightbulb className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
+                      <p className="text-xs text-amber-800">{currentStep.hint}</p>
+                    </div>
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-1 shrink-0"
+                  onClick={toggleHints}
+                  title="Toggle hints"
+                >
+                  <Lightbulb className={cn('w-4 h-4', showHints && 'text-amber-500')} />
+                </Button>
+              </div>
+            </div>
+
+            {/* Simulation Canvas / PhET Embed - Takes most space */}
+            <div className="flex-1 m-2 min-h-[250px] overflow-hidden rounded-lg border border-neutral-200 bg-white">
+              {currentExperiment.simulationType === 'phet' && currentExperiment.phetSimUrl ? (
+                <PhETEmbed
+                  simUrl={currentExperiment.phetSimUrl}
+                  title={currentExperiment.name}
+                  guidanceNotes={currentExperiment.safetyNotes}
+                />
+              ) : (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <FlaskConical className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
+                    <p className="text-neutral-500 mb-2 font-medium">Custom Simulation</p>
+                    <p className="text-sm text-neutral-400">
+                      Interactive apparatus workspace coming soon
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Step Navigation + Data Toggle */}
+            <div className="flex items-center justify-between px-2 py-2 bg-white border-t shrink-0">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={previousStep}
+                disabled={currentStepIndex === 0}
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline ml-1">Prev</span>
+              </Button>
+
+              <div className="flex items-center gap-2">
+                {/* Mobile step indicator */}
+                <span className="text-xs text-neutral-500 md:hidden">
+                  {currentStepIndex + 1}/{totalSteps}
+                </span>
+
+                {/* Data Recording Toggle */}
+                <Button
+                  variant={showDataPanel ? 'secondary' : 'outline'}
+                  size="sm"
+                  onClick={() => setShowDataPanel(!showDataPanel)}
+                  className="gap-1"
+                >
+                  <Table className="w-4 h-4" />
+                  <span className="hidden sm:inline">Data</span>
+                  {(measurements.length + observations.length) > 0 && (
+                    <Badge variant="primary" size="sm" className="ml-1">
+                      {measurements.length + observations.length}
+                    </Badge>
+                  )}
+                  {showDataPanel ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />}
+                </Button>
+
+                {!stepCompletionStatus[currentStepIndex] && (
+                  <Button variant="primary" size="sm" onClick={completeStep}>
+                    <CheckCircle className="w-4 h-4" />
+                    <span className="hidden sm:inline ml-1">Done</span>
+                  </Button>
+                )}
+              </div>
+
+              <Button
+                size="sm"
+                onClick={nextStep}
+                disabled={currentStepIndex === totalSteps - 1}
+              >
+                <span className="hidden sm:inline mr-1">Next</span>
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
         </div>
+
+        {/* Bottom Panel - Data Recording (Collapsible) */}
+        {showDataPanel && (
+          <div className="bg-white border-t shrink-0 max-h-64 overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-3 py-2 border-b bg-neutral-50">
+              <div className="flex items-center gap-2">
+                <Table className="w-4 h-4 text-neutral-500" />
+                <span className="font-medium text-neutral-900 text-sm">Data Recording</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-1"
+                onClick={() => setShowDataPanel(false)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Measurements */}
+                <div>
+                  <h4 className="text-xs font-medium text-neutral-700 mb-2 uppercase tracking-wide">Measurements</h4>
+                  {measurements.length > 0 ? (
+                    <div className="space-y-1">
+                      {measurements.map((m) => (
+                        <div key={m.id} className="text-xs p-2 bg-neutral-50 rounded flex justify-between">
+                          <span className="font-mono">{m.value} {m.unit}</span>
+                          <span className="text-neutral-400">Step {m.stepNumber}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-neutral-400 italic">No measurements yet</p>
+                  )}
+                </div>
+
+                {/* Observations */}
+                <div>
+                  <h4 className="text-xs font-medium text-neutral-700 mb-2 uppercase tracking-wide">Observations</h4>
+                  <div className="space-y-1">
+                    {observations.map((obs) => (
+                      <div key={obs.id} className="text-xs p-2 bg-neutral-50 rounded">
+                        <p className="text-neutral-700">{obs.text}</p>
+                        <span className="text-neutral-400">Step {obs.stepNumber}</span>
+                      </div>
+                    ))}
+                    <div className="flex gap-1">
+                      <input
+                        type="text"
+                        value={observationText}
+                        onChange={(e) => setObservationText(e.target.value)}
+                        placeholder="Add observation..."
+                        className="flex-1 text-xs px-2 py-1.5 border rounded focus:outline-none focus:ring-1 focus:ring-primary"
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddObservation()}
+                      />
+                      <Button size="sm" className="px-2" onClick={handleAddObservation}>
+                        <Plus className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Safety Notes */}
+                {currentExperiment.safetyNotes.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-medium text-neutral-700 mb-2 uppercase tracking-wide flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3 text-amber-500" />
+                      Safety Notes
+                    </h4>
+                    <ul className="text-xs text-neutral-600 space-y-1">
+                      {currentExperiment.safetyNotes.map((note, idx) => (
+                        <li key={idx} className="flex items-start gap-1 p-1.5 bg-amber-50 rounded">
+                          <span className="text-amber-500 shrink-0">!</span>
+                          <span>{note}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Submit Confirmation Modal */}
