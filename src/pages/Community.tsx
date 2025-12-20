@@ -90,16 +90,15 @@ export function CommunityPage() {
       // TODO: Replace with API call in production
       await new Promise((resolve) => setTimeout(resolve, 300));
 
-      // Demo featured rooms based on exam type
+      // Featured rooms based on exam type - members will be updated from real data
       const demoFeatured: FeaturedRoom[] = currentExamType === 'nsmq'
         ? [
-            { id: 'room_nsmq_practice', name: 'NSMQ Speed Drills', members: 89, isHot: true },
-            { id: 'room_nsmq_riddles', name: 'Riddle Masters', members: 67 },
+            { id: 'room_nsmq_practice', name: 'NSMQ Speed Drills', members: 1 },
           ]
         : [
-            { id: 'room_wassce_physics', name: 'WASSCE Physics Study Group', members: 156, isHot: true },
-            { id: 'room_wassce_maths', name: 'WASSCE Mathematics Help', members: 234 },
-            { id: 'room_chemistry_lab', name: 'Chemistry Lab Partners', members: 67 },
+            { id: 'room_wassce_physics', name: 'WASSCE Physics Study Group', members: 1 },
+            { id: 'room_wassce_maths', name: 'WASSCE Mathematics Help', members: 1 },
+            { id: 'room_chemistry_lab', name: 'Chemistry Lab Partners', members: 1 },
           ];
       setFeaturedRooms(demoFeatured);
     } catch (error) {

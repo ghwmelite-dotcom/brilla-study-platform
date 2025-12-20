@@ -78,7 +78,7 @@ const getCurrentUser = () => {
 };
 
 // Clear old cached data on load
-const STORE_VERSION = 4;
+const STORE_VERSION = 5;
 if (typeof window !== 'undefined') {
   try {
     const stored = localStorage.getItem('brilla-chat');
@@ -113,7 +113,7 @@ const getDemoRooms = (): ChatRoom[] => {
       createdBy: 'system',
       createdAt: dayAgo,
       updatedAt: hourAgo,
-      memberCount: 156,
+      memberCount: 1,
       unreadCount: 0,
       myRole: 'member',
     },
@@ -129,7 +129,7 @@ const getDemoRooms = (): ChatRoom[] => {
       createdBy: 'system',
       createdAt: dayAgo,
       updatedAt: now,
-      memberCount: 234,
+      memberCount: 1,
       unreadCount: 0,
       myRole: 'member',
     },
@@ -144,7 +144,7 @@ const getDemoRooms = (): ChatRoom[] => {
       createdBy: 'system',
       createdAt: dayAgo,
       updatedAt: hourAgo,
-      memberCount: 89,
+      memberCount: 1,
       unreadCount: 0,
       myRole: 'member',
     },
@@ -160,7 +160,7 @@ const getDemoRooms = (): ChatRoom[] => {
       createdBy: 'system',
       createdAt: dayAgo,
       updatedAt: dayAgo,
-      memberCount: 67,
+      memberCount: 1,
       unreadCount: 0,
       myRole: 'member',
     },
