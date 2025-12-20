@@ -1,35 +1,56 @@
-import { useState } from 'react';
-import { Search, MessageSquare } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, MessageSquare, Users } from 'lucide-react';
 import { useChatStore } from '@/stores';
 import { cn } from '@/utils';
 
-// Mock users for demo
-const mockUsers = [
-  { id: 'user_1', name: 'Kofi Mensah', house: 'Blue House', level: 5, isOnline: true },
-  { id: 'user_2', name: 'Ama Asante', house: 'Red House', level: 8, isOnline: true },
-  { id: 'user_3', name: 'Kwame Boateng', house: 'Green House', level: 12, isOnline: false },
-  { id: 'user_4', name: 'Akua Adjei', house: 'Yellow House', level: 6, isOnline: true },
-  { id: 'user_5', name: 'Yaw Owusu', house: 'Blue House', level: 4, isOnline: false },
-  { id: 'user_6', name: 'Efua Mensah', house: 'Red House', level: 9, isOnline: true },
-  { id: 'user_7', name: 'Kojo Ansah', house: 'Green House', level: 7, isOnline: false },
-  { id: 'user_8', name: 'Abena Osei', house: 'Yellow House', level: 11, isOnline: true },
-];
+interface SearchUser {
+  id: string;
+  name: string;
+  house?: string;
+  level: number;
+  isOnline: boolean;
+  avatarUrl?: string;
+}
 
 export function ChatUserSearch() {
   const { startDM, searchQuery, rooms } = useChatStore();
+  const [users, setUsers] = useState<SearchUser[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
-  // Filter users based on search query
-  const filteredUsers = mockUsers.filter((user) =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Search users when query changes
+  useEffect(() => {
+    const searchUsers = async () => {
+      if (!searchQuery.trim()) {
+        setUsers([]);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        // TODO: Replace with API call
+        // const response = await fetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}`);
+        // const data = await response.json();
+        // setUsers(data.users);
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        setUsers([]);
+      } catch (error) {
+        console.error('Failed to search users:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const debounce = setTimeout(searchUsers, 300);
+    return () => clearTimeout(debounce);
+  }, [searchQuery]);
 
   // Check if DM already exists with user
   const hasDMWith = (userId: string) => {
     return rooms.some((room) => room.type === 'dm' && room.otherUser?.id === userId);
   };
 
-  const handleStartDM = async (user: typeof mockUsers[0]) => {
+  const handleStartDM = async (user: SearchUser) => {
     setIsLoading(true);
     try {
       await startDM(user.id, user.name);
@@ -40,7 +61,28 @@ export function ChatUserSearch() {
     }
   };
 
-  if (filteredUsers.length === 0) {
+  // Empty state - no search query
+  if (!searchQuery.trim()) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+        <Users className="w-12 h-12 text-neutral-300 mb-3" />
+        <p className="text-neutral-500 text-sm">Find students to connect with</p>
+        <p className="text-neutral-400 text-xs mt-1">Search by name to start a conversation</p>
+      </div>
+    );
+  }
+
+  // Loading state
+  if (isSearching) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  // No results
+  if (users.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
         <Search className="w-12 h-12 text-neutral-300 mb-3" />
@@ -52,17 +94,21 @@ export function ChatUserSearch() {
 
   return (
     <div className="divide-y divide-neutral-100">
-      {filteredUsers.map((user) => (
+      {users.map((user) => (
         <div
           key={user.id}
           className="flex items-center gap-3 p-3 hover:bg-neutral-50 transition-colors"
         >
           {/* Avatar */}
           <div className="relative">
-            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
-              <span className="text-white font-semibold">
-                {user.name.charAt(0).toUpperCase()}
-              </span>
+            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center overflow-hidden">
+              {user.avatarUrl ? (
+                <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-white font-semibold">
+                  {user.name.charAt(0).toUpperCase()}
+                </span>
+              )}
             </div>
             {/* Online indicator */}
             <span
@@ -79,7 +125,7 @@ export function ChatUserSearch() {
               <h4 className="font-medium text-neutral-900 truncate">{user.name}</h4>
               <span className="text-xs text-primary">Lv. {user.level}</span>
             </div>
-            <p className="text-xs text-neutral-500">{user.house}</p>
+            {user.house && <p className="text-xs text-neutral-500">{user.house}</p>}
           </div>
 
           {/* Message button */}

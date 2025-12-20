@@ -7,57 +7,6 @@ import type {
   ReportResolution,
 } from '@/types';
 
-// Mock data for demo
-const mockReports: ChatReport[] = [
-  {
-    id: 'report_1',
-    reporterId: 'user_1',
-    reportedUserId: 'user_5',
-    messageId: 'msg_spam_1',
-    roomId: 'room_wassce_physics',
-    reason: 'spam',
-    description: 'User is posting repeated promotional content',
-    status: 'pending',
-    createdAt: new Date(Date.now() - 7200000).toISOString(),
-    reporter: { id: 'user_1', name: 'Kofi Mensah' },
-    reportedUser: { id: 'user_5', name: 'Spam User' },
-    message: { id: 'msg_spam_1', content: 'Buy cheap answers at...' },
-    room: { id: 'room_wassce_physics', name: 'WASSCE Physics 2025' },
-  },
-  {
-    id: 'report_2',
-    reporterId: 'user_2',
-    reportedUserId: 'user_6',
-    roomId: 'room_nsmq_prep',
-    reason: 'harassment',
-    description: 'User is being rude and attacking other members',
-    status: 'pending',
-    createdAt: new Date(Date.now() - 3600000).toISOString(),
-    reporter: { id: 'user_2', name: 'Ama Asante' },
-    reportedUser: { id: 'user_6', name: 'Rude User' },
-    room: { id: 'room_nsmq_prep', name: 'NSMQ Prep Zone' },
-  },
-];
-
-const mockModerationHistory: ChatModerationAction[] = [
-  {
-    id: 'action_1',
-    userId: 'user_7',
-    moderatorId: 'user_admin',
-    actionType: 'warn',
-    reason: 'Off-topic discussions',
-    isActive: true,
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-    user: { id: 'user_7', name: 'Test User' },
-    moderator: { id: 'user_admin', name: 'Admin User' },
-  },
-];
-
-const mockFilteredWords: ChatFilteredWord[] = [
-  { id: 'word_1', word: 'spam', severity: 'low', replacement: '***', isActive: true, createdAt: new Date().toISOString() },
-  { id: 'word_2', word: 'scam', severity: 'high', replacement: '***', isActive: true, createdAt: new Date().toISOString() },
-];
-
 interface ModerationState {
   // Data
   reports: ChatReport[];
@@ -97,13 +46,24 @@ interface ModerationState {
   clearError: () => void;
   getReportsByStatus: (status: ReportStatus) => ChatReport[];
   getPendingReportsCount: () => number;
+  clearAllData: () => void;
 }
 
+// Helper to get current user from auth store
+const getCurrentUser = () => {
+  try {
+    const authState = JSON.parse(localStorage.getItem('brilla-auth') || '{}');
+    return authState?.state?.user || null;
+  } catch {
+    return null;
+  }
+};
+
 export const useModerationStore = create<ModerationState>()((set, get) => ({
-  // Initial state
-  reports: mockReports,
-  moderationHistory: mockModerationHistory,
-  filteredWords: mockFilteredWords,
+  // Initial state - empty, will be populated from API
+  reports: [],
+  moderationHistory: [],
+  filteredWords: [],
   isLoadingReports: false,
   isLoadingHistory: false,
   isLoadingWords: false,
@@ -114,7 +74,10 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   fetchReports: async (_status?: ReportStatus) => {
     set({ isLoadingReports: true, error: null });
     try {
-      // TODO: Replace with API call that filters by _status
+      // TODO: Replace with API call
+      // const response = await fetch(`/api/chat/reports?status=${status}`);
+      // const data = await response.json();
+      // set({ reports: data.reports });
       await new Promise((resolve) => setTimeout(resolve, 500));
       set({ isLoadingReports: false });
     } catch (error) {
@@ -128,6 +91,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   reviewReport: async (reportId: string, resolution: ReportResolution, notes?: string) => {
     set({ isProcessing: true, error: null });
     try {
+      const user = getCurrentUser();
       // TODO: Replace with API call
       await new Promise((resolve) => setTimeout(resolve, 300));
 
@@ -140,8 +104,8 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
                 resolution,
                 reviewNotes: notes,
                 reviewedAt: new Date().toISOString(),
-                reviewedBy: 'user_admin',
-                reviewer: { id: 'user_admin', name: 'Admin User' },
+                reviewedBy: user?.id,
+                reviewer: user ? { id: user.id, name: user.name } : undefined,
               }
             : report
         ),
@@ -158,6 +122,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   dismissReport: async (reportId: string, notes?: string) => {
     set({ isProcessing: true, error: null });
     try {
+      const user = getCurrentUser();
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       set((state) => ({
@@ -168,7 +133,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
                 status: 'dismissed' as ReportStatus,
                 reviewNotes: notes,
                 reviewedAt: new Date().toISOString(),
-                reviewedBy: 'user_admin',
+                reviewedBy: user?.id,
               }
             : report
         ),
@@ -186,7 +151,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   fetchModerationHistory: async (_userId?: string) => {
     set({ isLoadingHistory: true, error: null });
     try {
-      // TODO: Replace with API call that filters by _userId
+      // TODO: Replace with API call
       await new Promise((resolve) => setTimeout(resolve, 500));
       set({ isLoadingHistory: false });
     } catch (error) {
@@ -200,13 +165,15 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   muteUser: async (userId: string, roomId?: string, duration?: number, reason?: string) => {
     set({ isProcessing: true, error: null });
     try {
+      const moderator = getCurrentUser();
+      // TODO: Replace with API call
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const newAction: ChatModerationAction = {
         id: `action_${Date.now()}`,
         userId,
         roomId,
-        moderatorId: 'user_admin',
+        moderatorId: moderator?.id || 'unknown',
         actionType: 'mute',
         reason,
         duration,
@@ -214,7 +181,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
         isActive: true,
         createdAt: new Date().toISOString(),
         user: { id: userId, name: 'User' },
-        moderator: { id: 'user_admin', name: 'Admin User' },
+        moderator: moderator ? { id: moderator.id, name: moderator.name } : undefined,
       };
 
       set((state) => ({
@@ -232,18 +199,19 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   unmuteUser: async (userId: string, roomId?: string) => {
     set({ isProcessing: true, error: null });
     try {
+      const moderator = getCurrentUser();
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const newAction: ChatModerationAction = {
         id: `action_${Date.now()}`,
         userId,
         roomId,
-        moderatorId: 'user_admin',
+        moderatorId: moderator?.id || 'unknown',
         actionType: 'unmute',
         isActive: true,
         createdAt: new Date().toISOString(),
         user: { id: userId, name: 'User' },
-        moderator: { id: 'user_admin', name: 'Admin User' },
+        moderator: moderator ? { id: moderator.id, name: moderator.name } : undefined,
       };
 
       set((state) => ({
@@ -261,13 +229,14 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   banUser: async (userId: string, roomId?: string, duration?: number, reason?: string) => {
     set({ isProcessing: true, error: null });
     try {
+      const moderator = getCurrentUser();
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const newAction: ChatModerationAction = {
         id: `action_${Date.now()}`,
         userId,
         roomId,
-        moderatorId: 'user_admin',
+        moderatorId: moderator?.id || 'unknown',
         actionType: 'ban',
         reason,
         duration,
@@ -275,7 +244,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
         isActive: true,
         createdAt: new Date().toISOString(),
         user: { id: userId, name: 'User' },
-        moderator: { id: 'user_admin', name: 'Admin User' },
+        moderator: moderator ? { id: moderator.id, name: moderator.name } : undefined,
       };
 
       set((state) => ({
@@ -293,18 +262,19 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   unbanUser: async (userId: string, roomId?: string) => {
     set({ isProcessing: true, error: null });
     try {
+      const moderator = getCurrentUser();
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const newAction: ChatModerationAction = {
         id: `action_${Date.now()}`,
         userId,
         roomId,
-        moderatorId: 'user_admin',
+        moderatorId: moderator?.id || 'unknown',
         actionType: 'unban',
         isActive: true,
         createdAt: new Date().toISOString(),
         user: { id: userId, name: 'User' },
-        moderator: { id: 'user_admin', name: 'Admin User' },
+        moderator: moderator ? { id: moderator.id, name: moderator.name } : undefined,
       };
 
       set((state) => ({
@@ -322,19 +292,20 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   warnUser: async (userId: string, roomId?: string, reason?: string) => {
     set({ isProcessing: true, error: null });
     try {
+      const moderator = getCurrentUser();
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const newAction: ChatModerationAction = {
         id: `action_${Date.now()}`,
         userId,
         roomId,
-        moderatorId: 'user_admin',
+        moderatorId: moderator?.id || 'unknown',
         actionType: 'warn',
         reason,
         isActive: true,
         createdAt: new Date().toISOString(),
         user: { id: userId, name: 'User' },
-        moderator: { id: 'user_admin', name: 'Admin User' },
+        moderator: moderator ? { id: moderator.id, name: moderator.name } : undefined,
       };
 
       set((state) => ({
@@ -352,19 +323,20 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   kickUser: async (userId: string, roomId: string, reason?: string) => {
     set({ isProcessing: true, error: null });
     try {
+      const moderator = getCurrentUser();
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const newAction: ChatModerationAction = {
         id: `action_${Date.now()}`,
         userId,
         roomId,
-        moderatorId: 'user_admin',
+        moderatorId: moderator?.id || 'unknown',
         actionType: 'kick',
         reason,
         isActive: true,
         createdAt: new Date().toISOString(),
         user: { id: userId, name: 'User' },
-        moderator: { id: 'user_admin', name: 'Admin User' },
+        moderator: moderator ? { id: moderator.id, name: moderator.name } : undefined,
       };
 
       set((state) => ({
@@ -383,6 +355,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   fetchFilteredWords: async () => {
     set({ isLoadingWords: true, error: null });
     try {
+      // TODO: Replace with API call
       await new Promise((resolve) => setTimeout(resolve, 500));
       set({ isLoadingWords: false });
     } catch (error) {
@@ -396,6 +369,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   addFilteredWord: async (word: string, severity: 'low' | 'medium' | 'high' = 'medium') => {
     set({ isProcessing: true, error: null });
     try {
+      const user = getCurrentUser();
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const newWord: ChatFilteredWord = {
@@ -404,7 +378,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
         severity,
         replacement: '***',
         isActive: true,
-        addedBy: 'user_admin',
+        addedBy: user?.id,
         createdAt: new Date().toISOString(),
       };
 
@@ -465,5 +439,14 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
 
   getPendingReportsCount: () => {
     return get().reports.filter((report) => report.status === 'pending').length;
+  },
+
+  clearAllData: () => {
+    set({
+      reports: [],
+      moderationHistory: [],
+      filteredWords: [],
+      error: null,
+    });
   },
 }));

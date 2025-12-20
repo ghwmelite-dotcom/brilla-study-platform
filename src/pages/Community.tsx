@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   MessageSquare,
   Users,
@@ -9,84 +9,110 @@ import {
   Search,
   Plus,
   ArrowRight,
-  Flame,
   Star,
   Clock,
   UserPlus,
+  Loader2,
 } from 'lucide-react';
-import { useChatStore, useExamStore, useAuthStore } from '@/stores';
+import { useChatStore, useExamStore } from '@/stores';
 import { cn } from '@/utils';
 import { ChatCreateRoom } from '@/components/chat';
 
-// Featured rooms for each exam type
-const featuredRooms = {
-  nsmq: [
-    { id: 'room_nsmq_riddles', name: 'Riddles & Problem Solving', members: 89, isHot: true },
-    { id: 'room_nsmq_speed', name: 'Speed Practice', members: 156, isHot: false },
-    { id: 'room_nsmq_biology', name: 'Biology Round Prep', members: 67, isHot: true },
-  ],
-  wassce: [
-    { id: 'room_wassce_physics', name: 'Physics Study Group', members: 234, isHot: true },
-    { id: 'room_wassce_math', name: 'Core Mathematics Help', members: 312, isHot: true },
-    { id: 'room_wassce_english', name: 'English Essay Practice', members: 178, isHot: false },
-  ],
-  bece: [
-    { id: 'room_bece_science', name: 'Integrated Science', members: 145, isHot: true },
-    { id: 'room_bece_math', name: 'Mathematics Support', members: 203, isHot: false },
-    { id: 'room_bece_english', name: 'English Language', members: 167, isHot: false },
-  ],
-};
+interface OnlineUser {
+  id: string;
+  name: string;
+  house?: string;
+  level: number;
+  avatarUrl?: string;
+}
 
-// Online users
-const onlineUsers = [
-  { id: 'user_1', name: 'Kofi Mensah', house: 'Blue House', level: 5 },
-  { id: 'user_2', name: 'Ama Asante', house: 'Red House', level: 8 },
-  { id: 'user_3', name: 'Kwame Boateng', house: 'Green House', level: 12 },
-  { id: 'user_4', name: 'Akua Adjei', house: 'Yellow House', level: 6 },
-  { id: 'user_5', name: 'Yaw Owusu', house: 'Blue House', level: 4 },
-  { id: 'user_6', name: 'Efua Mensah', house: 'Red House', level: 9 },
-];
+interface FeaturedRoom {
+  id: string;
+  name: string;
+  members: number;
+  isHot?: boolean;
+}
 
-// Recent discussions
-const recentDiscussions = [
-  {
-    room: 'WASSCE Physics',
-    topic: 'How to solve projectile motion problems?',
-    replies: 12,
-    time: '5 min ago',
-    author: 'Kofi M.',
-  },
-  {
-    room: 'NSMQ Speed Quiz',
-    topic: 'Tips for faster mental calculations',
-    replies: 24,
-    time: '15 min ago',
-    author: 'Ama A.',
-  },
-  {
-    room: 'Core Mathematics',
-    topic: 'Integration techniques explained',
-    replies: 8,
-    time: '1 hour ago',
-    author: 'Kwame B.',
-  },
-];
+interface RecentDiscussion {
+  room: string;
+  topic: string;
+  replies: number;
+  time: string;
+  author: string;
+}
 
 export function CommunityPage() {
   const { currentExamType } = useExamStore();
-  useAuthStore(); // Ensure authenticated
   const {
     rooms,
     openChat,
     setActiveRoom,
     setActiveTab,
     startDM,
+    isLoadingRooms,
+    fetchRooms,
   } = useChatStore();
 
   const [showCreateRoom, setShowCreateRoom] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
+  const [featuredRooms, setFeaturedRooms] = useState<FeaturedRoom[]>([]);
+  const [recentDiscussions, setRecentDiscussions] = useState<RecentDiscussion[]>([]);
+  const [isLoadingOnline, setIsLoadingOnline] = useState(false);
+  const [isLoadingFeatured, setIsLoadingFeatured] = useState(false);
 
-  const examFeatured = featuredRooms[currentExamType] || featuredRooms.wassce;
+  // Fetch data on mount
+  useEffect(() => {
+    fetchRooms();
+    fetchOnlineUsers();
+    fetchFeaturedRooms();
+    fetchRecentDiscussions();
+  }, [currentExamType]);
+
+  const fetchOnlineUsers = async () => {
+    setIsLoadingOnline(true);
+    try {
+      // TODO: Replace with API call
+      // const response = await fetch('/api/users/online');
+      // const data = await response.json();
+      // setOnlineUsers(data.users);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setOnlineUsers([]);
+    } catch (error) {
+      console.error('Failed to fetch online users:', error);
+    } finally {
+      setIsLoadingOnline(false);
+    }
+  };
+
+  const fetchFeaturedRooms = async () => {
+    setIsLoadingFeatured(true);
+    try {
+      // TODO: Replace with API call
+      // const response = await fetch(`/api/chat/rooms/featured?examType=${currentExamType}`);
+      // const data = await response.json();
+      // setFeaturedRooms(data.rooms);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setFeaturedRooms([]);
+    } catch (error) {
+      console.error('Failed to fetch featured rooms:', error);
+    } finally {
+      setIsLoadingFeatured(false);
+    }
+  };
+
+  const fetchRecentDiscussions = async () => {
+    try {
+      // TODO: Replace with API call
+      // const response = await fetch('/api/chat/discussions/recent');
+      // const data = await response.json();
+      // setRecentDiscussions(data.discussions);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setRecentDiscussions([]);
+    } catch (error) {
+      console.error('Failed to fetch recent discussions:', error);
+    }
+  };
 
   // Filter rooms based on current exam type
   const myRooms = rooms.filter(
@@ -219,51 +245,86 @@ export function CommunityPage() {
               </div>
             </div>
 
-            <div className="divide-y divide-neutral-100">
-              {examFeatured.map((room) => (
+            {isLoadingFeatured ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-6 h-6 text-neutral-400 animate-spin" />
+              </div>
+            ) : featuredRooms.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                <BookOpen className="w-12 h-12 text-neutral-300 mb-3" />
+                <p className="text-neutral-500 text-sm">No featured rooms yet</p>
+                <p className="text-neutral-400 text-xs mt-1">Create the first study room for {currentExamType.toUpperCase()}</p>
                 <button
-                  key={room.id}
-                  onClick={() => handleOpenRoom(room.id)}
-                  className="w-full flex items-center gap-4 p-4 hover:bg-neutral-50 transition-colors text-left"
+                  onClick={() => setShowCreateRoom(true)}
+                  className="mt-4 px-4 py-2 bg-primary text-white text-sm rounded-lg hover:bg-primary-dark transition-colors"
                 >
-                  <div className="w-12 h-12 bg-neutral-100 rounded-xl flex items-center justify-center">
-                    <BookOpen className="w-6 h-6 text-neutral-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-neutral-900">{room.name}</h3>
-                      {room.isHot && (
-                        <span className="flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-600 text-xs font-medium rounded-full">
-                          <Flame className="w-3 h-3" /> Hot
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-neutral-500">{room.members} members active</p>
-                  </div>
-                  <ArrowRight className="w-5 h-5 text-neutral-400" />
+                  Create Room
                 </button>
-              ))}
-            </div>
+              </div>
+            ) : (
+              <div className="divide-y divide-neutral-100">
+                {featuredRooms.map((room) => (
+                  <button
+                    key={room.id}
+                    onClick={() => handleOpenRoom(room.id)}
+                    className="w-full flex items-center gap-4 p-4 hover:bg-neutral-50 transition-colors text-left"
+                  >
+                    <div className="w-12 h-12 bg-neutral-100 rounded-xl flex items-center justify-center">
+                      <BookOpen className="w-6 h-6 text-neutral-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-neutral-900">{room.name}</h3>
+                      <p className="text-sm text-neutral-500">{room.members} members active</p>
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-neutral-400" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* My Study Rooms */}
-          {myRooms.length > 0 && (
-            <div className="bg-white rounded-xl shadow-card overflow-hidden">
-              <div className="px-5 py-4 border-b border-neutral-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Hash className="w-5 h-5 text-primary" />
-                    <h2 className="font-semibold text-neutral-900">My Study Rooms</h2>
-                  </div>
+          <div className="bg-white rounded-xl shadow-card overflow-hidden">
+            <div className="px-5 py-4 border-b border-neutral-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Hash className="w-5 h-5 text-primary" />
+                  <h2 className="font-semibold text-neutral-900">My Study Rooms</h2>
+                </div>
+                <button
+                  onClick={() => { setActiveTab('chats'); openChat(); }}
+                  className="text-sm text-primary hover:text-primary-dark flex items-center gap-1"
+                >
+                  View all <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {isLoadingRooms ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-6 h-6 text-neutral-400 animate-spin" />
+              </div>
+            ) : myRooms.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                <Hash className="w-12 h-12 text-neutral-300 mb-3" />
+                <p className="text-neutral-500 text-sm">You haven't joined any rooms yet</p>
+                <p className="text-neutral-400 text-xs mt-1">Browse rooms or create your own</p>
+                <div className="flex gap-3 mt-4">
                   <button
-                    onClick={() => { setActiveTab('chats'); openChat(); }}
-                    className="text-sm text-primary hover:text-primary-dark flex items-center gap-1"
+                    onClick={handleBrowseRooms}
+                    className="px-4 py-2 border border-neutral-300 text-neutral-700 text-sm rounded-lg hover:bg-neutral-50 transition-colors"
                   >
-                    View all <ArrowRight className="w-4 h-4" />
+                    Browse Rooms
+                  </button>
+                  <button
+                    onClick={() => setShowCreateRoom(true)}
+                    className="px-4 py-2 bg-primary text-white text-sm rounded-lg hover:bg-primary-dark transition-colors"
+                  >
+                    Create Room
                   </button>
                 </div>
               </div>
-
+            ) : (
               <div className="divide-y divide-neutral-100">
                 {myRooms.map((room) => (
                   <button
@@ -300,8 +361,8 @@ export function CommunityPage() {
                   </button>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Recent Discussions */}
           <div className="bg-white rounded-xl shadow-card overflow-hidden">
@@ -312,31 +373,39 @@ export function CommunityPage() {
               </div>
             </div>
 
-            <div className="divide-y divide-neutral-100">
-              {recentDiscussions.map((discussion, i) => (
-                <button
-                  key={i}
-                  onClick={handleBrowseRooms}
-                  className="w-full p-4 hover:bg-neutral-50 transition-colors text-left"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="font-medium text-neutral-900 truncate">
-                        {discussion.topic}
-                      </p>
-                      <p className="text-sm text-neutral-500 mt-1">
-                        in <span className="text-primary">{discussion.room}</span>
-                        {' • '}{discussion.replies} replies
-                        {' • '}{discussion.time}
-                      </p>
+            {recentDiscussions.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                <MessageSquare className="w-12 h-12 text-neutral-300 mb-3" />
+                <p className="text-neutral-500 text-sm">No recent discussions</p>
+                <p className="text-neutral-400 text-xs mt-1">Start a conversation in a study room</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-neutral-100">
+                {recentDiscussions.map((discussion, i) => (
+                  <button
+                    key={i}
+                    onClick={handleBrowseRooms}
+                    className="w-full p-4 hover:bg-neutral-50 transition-colors text-left"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-medium text-neutral-900 truncate">
+                          {discussion.topic}
+                        </p>
+                        <p className="text-sm text-neutral-500 mt-1">
+                          in <span className="text-primary">{discussion.room}</span>
+                          {' • '}{discussion.replies} replies
+                          {' • '}{discussion.time}
+                        </p>
+                      </div>
+                      <span className="text-xs text-neutral-400 whitespace-nowrap">
+                        by {discussion.author}
+                      </span>
                     </div>
-                    <span className="text-xs text-neutral-400 whitespace-nowrap">
-                      by {discussion.author}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -368,38 +437,56 @@ export function CommunityPage() {
               </div>
             </div>
 
-            <div className="divide-y divide-neutral-100">
-              {onlineUsers.slice(0, 5).map((u) => (
-                <button
-                  key={u.id}
-                  onClick={() => handleStartDM(u.id, u.name)}
-                  className="w-full flex items-center gap-3 p-3 hover:bg-neutral-50 transition-colors text-left"
-                >
-                  <div className="relative">
-                    <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-semibold">
-                        {u.name.charAt(0)}
-                      </span>
-                    </div>
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-neutral-900 text-sm truncate">{u.name}</p>
-                    <p className="text-xs text-neutral-500">{u.house} • Lv. {u.level}</p>
-                  </div>
-                  <UserPlus className="w-4 h-4 text-neutral-400" />
-                </button>
-              ))}
-            </div>
+            {isLoadingOnline ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-5 h-5 text-neutral-400 animate-spin" />
+              </div>
+            ) : onlineUsers.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+                <Users className="w-10 h-10 text-neutral-300 mb-2" />
+                <p className="text-neutral-500 text-sm">No students online</p>
+                <p className="text-neutral-400 text-xs mt-1">Check back later</p>
+              </div>
+            ) : (
+              <>
+                <div className="divide-y divide-neutral-100">
+                  {onlineUsers.slice(0, 5).map((u) => (
+                    <button
+                      key={u.id}
+                      onClick={() => handleStartDM(u.id, u.name)}
+                      className="w-full flex items-center gap-3 p-3 hover:bg-neutral-50 transition-colors text-left"
+                    >
+                      <div className="relative">
+                        <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center overflow-hidden">
+                          {u.avatarUrl ? (
+                            <img src={u.avatarUrl} alt={u.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-white text-sm font-semibold">
+                              {u.name.charAt(0)}
+                            </span>
+                          )}
+                        </div>
+                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-neutral-900 text-sm truncate">{u.name}</p>
+                        <p className="text-xs text-neutral-500">{u.house} • Lv. {u.level}</p>
+                      </div>
+                      <UserPlus className="w-4 h-4 text-neutral-400" />
+                    </button>
+                  ))}
+                </div>
 
-            <div className="p-3 border-t border-neutral-100">
-              <button
-                onClick={handleFindPeople}
-                className="w-full text-center text-sm text-primary font-medium hover:text-primary-dark"
-              >
-                View all students
-              </button>
-            </div>
+                <div className="p-3 border-t border-neutral-100">
+                  <button
+                    onClick={handleFindPeople}
+                    className="w-full text-center text-sm text-primary font-medium hover:text-primary-dark"
+                  >
+                    View all students
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Community Stats */}
@@ -411,19 +498,15 @@ export function CommunityPage() {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-white/80">Active Rooms</span>
-                <span className="font-semibold">24</span>
+                <span className="font-semibold">{rooms.filter(r => r.type !== 'dm').length}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-white/80">Online Students</span>
-                <span className="font-semibold">156</span>
+                <span className="font-semibold">{onlineUsers.length}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-white/80">Messages Today</span>
-                <span className="font-semibold">1,247</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/80">Questions Answered</span>
-                <span className="font-semibold">89</span>
+                <span className="text-white/80">My Conversations</span>
+                <span className="font-semibold">{rooms.length}</span>
               </div>
             </div>
           </div>
