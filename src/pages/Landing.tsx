@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   BookOpen,
   Brain,
@@ -21,13 +21,11 @@ import {
   Quote,
   Menu,
   X,
-  Crown,
-  BookMarked,
   Download,
   Smartphone,
 } from 'lucide-react';
 import { cn } from '@/utils';
-import { useAuthStore } from '@/stores';
+import { AuthModal } from '@/components/auth';
 
 // ============================================
 // HOOKS
@@ -277,10 +275,13 @@ function StatItem({ stat, index, inView }: { stat: typeof stats[0]; index: numbe
 }
 
 // Landing Header Component
-function LandingHeader() {
+interface LandingHeaderProps {
+  onOpenAuth: (mode: 'login' | 'register') => void;
+}
+
+function LandingHeader({ onOpenAuth }: LandingHeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
   const { isInstallable, install } = usePWAInstall();
 
   useEffect(() => {
@@ -290,66 +291,6 @@ function LandingHeader() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const handleLogin = (role: 'student' | 'admin' | 'teacher') => {
-    // Demo login
-    const users = {
-      student: {
-        id: 'user_demo',
-        email: 'demo@stjohns.edu.gh',
-        name: 'Demo Student',
-        role: 'student' as const,
-        house: 'Blue House',
-        yearGroup: 3,
-        xpPoints: 1500,
-        level: 2,
-        streakDays: 5,
-        aiGradingCredits: 0,
-      },
-      admin: {
-        id: 'user_admin',
-        email: 'admin@stjohns.edu.gh',
-        name: 'Admin User',
-        role: 'admin' as const,
-        house: undefined,
-        yearGroup: undefined,
-        xpPoints: 0,
-        level: 10,
-        streakDays: 0,
-        aiGradingCredits: 100,
-      },
-      teacher: {
-        id: 'user_teacher',
-        email: 'teacher@stjohns.edu.gh',
-        name: 'Demo Teacher',
-        role: 'teacher' as const,
-        house: undefined,
-        yearGroup: undefined,
-        xpPoints: 5000,
-        level: 5,
-        streakDays: 30,
-        aiGradingCredits: 50,
-      },
-    };
-
-    useAuthStore.setState({
-      user: {
-        ...users[role],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      token: `${role}_demo_token`,
-      isAuthenticated: true,
-    });
-
-    navigate('/dashboard');
-  };
-
-  const roleButtons = [
-    { role: 'admin' as const, label: 'Admin', icon: Crown, gradient: 'from-amber-500 to-orange-500' },
-    { role: 'teacher' as const, label: 'Teacher', icon: BookMarked, gradient: 'from-emerald-500 to-teal-500' },
-    { role: 'student' as const, label: 'Student', icon: GraduationCap, gradient: 'from-blue-500 to-indigo-500' },
-  ];
 
   return (
     <header
@@ -387,40 +328,25 @@ function LandingHeader() {
             </button>
           )}
 
-          {/* Role-based Access Buttons */}
-          <div className="flex items-center gap-2 bg-white/5 backdrop-blur-xl rounded-full p-1.5 border border-white/10">
-            {roleButtons.map(({ role, label, icon: Icon, gradient }) => (
-              <button
-                key={role}
-                onClick={() => handleLogin(role)}
-                className={cn(
-                  'group relative flex items-center gap-2 px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-300',
-                  'hover:shadow-lg hover:shadow-primary/25'
-                )}
-              >
-                <div className={cn(
-                  'absolute inset-0 rounded-full bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity',
-                  gradient
-                )} />
-                <Icon className="relative w-4 h-4 text-white/80 group-hover:text-white transition-colors" />
-                <span className="relative text-white/80 group-hover:text-white transition-colors">
-                  {label}
-                </span>
-              </button>
-            ))}
-          </div>
+          {/* Sign In Button */}
+          <button
+            onClick={() => onOpenAuth('login')}
+            className="flex items-center gap-2 px-5 py-2.5 text-white/80 hover:text-white font-medium transition-colors"
+          >
+            Sign In
+          </button>
 
           {/* Get Started Button */}
-          <Link
-            to="/register"
-            className="ml-4 relative group"
+          <button
+            onClick={() => onOpenAuth('register')}
+            className="relative group"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-secondary to-yellow-400 rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
             <div className="relative flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-secondary to-yellow-400 rounded-full font-semibold text-slate-900 hover:shadow-xl hover:shadow-secondary/30 transition-all">
               Get Started
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
-          </Link>
+          </button>
         </nav>
 
         {/* Mobile Menu Button */}
@@ -447,26 +373,20 @@ function LandingHeader() {
               <span>Install App</span>
             </button>
           )}
-          {roleButtons.map(({ role, label, icon: Icon, gradient }) => (
-            <button
-              key={role}
-              onClick={() => handleLogin(role)}
-              className={cn(
-                'flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-gradient-to-r text-white font-medium transition-all hover:shadow-lg',
-                gradient
-              )}
-            >
-              <Icon className="w-5 h-5" />
-              <span>Continue as {label}</span>
-            </button>
-          ))}
-          <Link
-            to="/register"
+          <button
+            onClick={() => { setIsMobileMenuOpen(false); onOpenAuth('login'); }}
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-white/10 text-white font-medium transition-all hover:bg-white/20"
+          >
+            <Shield className="w-5 h-5" />
+            <span>Sign In</span>
+          </button>
+          <button
+            onClick={() => { setIsMobileMenuOpen(false); onOpenAuth('register'); }}
             className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-gradient-to-r from-secondary to-yellow-400 text-slate-900 font-semibold"
           >
             Create Account
             <ArrowRight className="w-5 h-5" />
-          </Link>
+          </button>
         </div>
       </div>
     </header>
@@ -632,6 +552,15 @@ export function LandingPage() {
   const testimonialsRef = useInView(0.2);
   const ctaRef = useInView(0.3);
 
+  // Auth modal state
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+
+  const handleOpenAuth = (mode: 'login' | 'register') => {
+    setAuthMode(mode);
+    setShowAuthModal(true);
+  };
+
   // Generate particles
   const particles = Array.from({ length: 50 }, (_, i) => ({
     id: i,
@@ -717,7 +646,14 @@ export function LandingPage() {
       `}</style>
 
       {/* Header */}
-      <LandingHeader />
+      <LandingHeader onOpenAuth={handleOpenAuth} />
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode={authMode}
+      />
 
       {/* Hero Section */}
       <section
@@ -837,13 +773,13 @@ export function LandingPage() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <Link to="/register" className="group relative">
+            <button onClick={() => handleOpenAuth('register')} className="group relative">
               <div className="absolute inset-0 bg-gradient-to-r from-secondary via-yellow-400 to-orange-400 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-all" />
               <div className="relative flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-secondary via-yellow-400 to-orange-400 rounded-full font-semibold text-slate-900 text-lg shadow-2xl shadow-secondary/25 hover:shadow-secondary/40 transition-all hover:scale-105">
                 <span>Start Learning Free</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </div>
-            </Link>
+            </button>
             <button className="group flex items-center gap-3 px-8 py-4 glass rounded-full font-medium text-white hover:bg-white/10 transition-all">
               <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
                 <Play className="w-5 h-5 text-white ml-0.5" />
@@ -973,8 +909,8 @@ export function LandingPage() {
                     </ul>
 
                     {/* CTA */}
-                    <Link
-                      to="/register"
+                    <button
+                      onClick={() => handleOpenAuth('register')}
                       className={cn(
                         'inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 group/btn',
                         mode.color
@@ -982,7 +918,7 @@ export function LandingPage() {
                     >
                       Get Started
                       <ChevronRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </Card3D>
@@ -1131,13 +1067,13 @@ export function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/register" className="group relative">
+            <button onClick={() => handleOpenAuth('register')} className="group relative">
               <div className="absolute inset-0 bg-gradient-to-r from-secondary to-yellow-400 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-all" />
               <div className="relative flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-secondary to-yellow-400 rounded-full font-semibold text-slate-900 text-lg shadow-2xl hover:shadow-secondary/40 transition-all hover:scale-105">
                 Create Free Account
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </div>
-            </Link>
+            </button>
           </div>
 
           <p className="mt-8 text-white/50 flex items-center justify-center gap-2">
