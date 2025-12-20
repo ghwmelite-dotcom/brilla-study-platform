@@ -23,6 +23,8 @@ export function DashboardPage() {
     totalXP,
     level,
     topicProgress,
+    getStrengths,
+    getWeaknesses,
   } = useProgressStore();
 
   if (!user) {
@@ -39,8 +41,8 @@ export function DashboardPage() {
   const xpPercentage = Math.min((xpProgress / 1000) * 100, 100);
 
   // Get real data from progress store
-  const strengths = useProgressStore((state) => state.getStrengths());
-  const weaknesses = useProgressStore((state) => state.getWeaknesses());
+  const strengths = getStrengths();
+  const weaknesses = getWeaknesses();
 
   // Define available achievements (these would come from API in production)
   const availableAchievements = [
