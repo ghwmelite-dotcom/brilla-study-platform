@@ -23,8 +23,8 @@ import {
   AlertTriangle,
   Loader2,
 } from 'lucide-react';
-import { useAuthStore } from '@/stores/authStore';
-import { AddUserModal } from '@/components/admin';
+import { useAuthStore, type ManagedUser } from '@/stores/authStore';
+import { AddUserModal, EditUserModal } from '@/components/admin';
 import { cn } from '@/utils';
 
 type RoleFilter = 'all' | 'student' | 'teacher' | 'admin';
@@ -47,6 +47,8 @@ export default function UserManagement() {
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<ManagedUser | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -453,7 +455,8 @@ export default function UserManagement() {
                               <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-neutral-200 py-1 z-20">
                                 <button
                                   onClick={() => {
-                                    // TODO: Open edit modal
+                                    setSelectedUser(u);
+                                    setShowEditModal(true);
                                     setOpenDropdown(null);
                                   }}
                                   className="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
@@ -519,6 +522,17 @@ export default function UserManagement() {
       <AddUserModal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
+        onSuccess={() => loadAllUsers()}
+      />
+
+      {/* Edit User Modal */}
+      <EditUserModal
+        isOpen={showEditModal}
+        user={selectedUser}
+        onClose={() => {
+          setShowEditModal(false);
+          setSelectedUser(null);
+        }}
         onSuccess={() => loadAllUsers()}
       />
 

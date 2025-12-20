@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { jwt } from 'hono/jwt';
+import { jwt, sign, verify } from 'hono/jwt';
+import type { JWTPayload } from 'hono/utils/jwt/types';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -10,6 +11,202 @@ interface Env {
   ANTHROPIC_API_KEY?: string;
   AI_PROVIDER?: string;
   AI_MODEL?: string;
+  RESEND_API_KEY?: string;
+  APP_URL?: string;
+}
+
+// User type for JWT payload
+interface UserPayload extends JWTPayload {
+  userId: string;
+  email: string;
+  role: 'student' | 'teacher' | 'admin';
+}
+
+// =============================================
+// UTILITY FUNCTIONS
+// =============================================
+
+// Password hashing using Web Crypto API (PBKDF2)
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(password),
+    'PBKDF2',
+    false,
+    ['deriveBits']
+  );
+
+  const hash = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 100000,
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    256
+  );
+
+  // Combine salt and hash, encode as base64
+  const combined = new Uint8Array(salt.length + hash.byteLength);
+  combined.set(salt);
+  combined.set(new Uint8Array(hash), salt.length);
+  return btoa(String.fromCharCode(...combined));
+}
+
+// Verify password against stored hash
+async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
+  try {
+    const encoder = new TextEncoder();
+    const combined = Uint8Array.from(atob(storedHash), c => c.charCodeAt(0));
+    const salt = combined.slice(0, 16);
+    const storedHashBytes = combined.slice(16);
+
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(password),
+      'PBKDF2',
+      false,
+      ['deriveBits']
+    );
+
+    const hash = await crypto.subtle.deriveBits(
+      {
+        name: 'PBKDF2',
+        salt: salt,
+        iterations: 100000,
+        hash: 'SHA-256',
+      },
+      keyMaterial,
+      256
+    );
+
+    const hashBytes = new Uint8Array(hash);
+    if (hashBytes.length !== storedHashBytes.length) return false;
+    return hashBytes.every((byte, i) => byte === storedHashBytes[i]);
+  } catch {
+    return false;
+  }
+}
+
+// Generate secure random token
+function generateToken(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Generate JWT token
+async function generateJWT(payload: UserPayload, secret: string): Promise<string> {
+  return await sign(
+    {
+      ...payload,
+      exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 7 days
+      iat: Math.floor(Date.now() / 1000),
+    },
+    secret
+  );
+}
+
+// Verify JWT token
+async function verifyJWT(token: string, secret: string): Promise<UserPayload | null> {
+  try {
+    const payload = await verify(token, secret);
+    return payload as UserPayload;
+  } catch {
+    return null;
+  }
+}
+
+// Send email via Resend
+async function sendEmail(
+  apiKey: string,
+  fromEmail: string,
+  to: string,
+  subject: string,
+  html: string
+): Promise<boolean> {
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: fromEmail,
+        to: [to],
+        subject,
+        html,
+      }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Resend API error:', errorData);
+    }
+    return response.ok;
+  } catch (error) {
+    console.error('Email send error:', error);
+    return false;
+  }
+}
+
+// Email templates
+function getVerificationEmailHTML(name: string, verificationUrl: string): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Set Up Your Password - Brilla</title>
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to Brilla!</h1>
+      </div>
+      <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+        <p style="font-size: 16px;">Hello <strong>${name}</strong>,</p>
+        <p style="font-size: 16px;">Your account has been created on the Brilla Study Platform. Click the button below to set up your password and start learning!</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${verificationUrl}" style="background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">Set Up Password</a>
+        </div>
+        <p style="font-size: 14px; color: #6b7280;">This link expires in 24 hours. If you didn't expect this email, please ignore it.</p>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+        <p style="font-size: 12px; color: #9ca3af; text-align: center;">Brilla Study Platform - Excellence in Learning</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+function getPasswordResetEmailHTML(name: string, resetUrl: string): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Reset Your Password - Brilla</title>
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 28px;">Password Reset</h1>
+      </div>
+      <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+        <p style="font-size: 16px;">Hello <strong>${name}</strong>,</p>
+        <p style="font-size: 16px;">We received a request to reset your password. Click the button below to create a new password:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${resetUrl}" style="background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">Reset Password</a>
+        </div>
+        <p style="font-size: 14px; color: #6b7280;">This link expires in 1 hour. If you didn't request this, please ignore this email.</p>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+        <p style="font-size: 12px; color: #9ca3af; text-align: center;">Brilla Study Platform - Excellence in Learning</p>
+      </div>
+    </body>
+    </html>
+  `;
 }
 
 // Claude API helper
@@ -129,69 +326,289 @@ publicApp.get('/exam-types/:slug/paper-types', async (c) => {
   }
 });
 
-// Auth routes
-publicApp.post('/auth/register', async (c) => {
-  const { email, password, name, house, yearGroup } = await c.req.json();
+// =============================================
+// AUTHENTICATION ROUTES
+// =============================================
 
-  // In production, hash the password
-  const id = `user_${Date.now()}`;
+// Register new user (self-registration goes to pending)
+publicApp.post('/auth/register', async (c) => {
+  const body = await c.req.json();
+  const { email, password, name, role, schoolLevel, yearGroup, schoolName, house,
+          teacherLicenseNumber, subjectsTaught, yearsExperience, qualifications } = body;
 
   try {
+    // Check if email already exists
+    const existing = await c.env.DB.prepare(
+      'SELECT id FROM users WHERE email = ?'
+    ).bind(email).first();
+
+    if (existing) {
+      return c.json({ success: false, error: 'An account with this email already exists.' }, 400);
+    }
+
+    // Hash password
+    const passwordHash = await hashPassword(password);
+    const id = `user_${Date.now()}`;
+    const userRole = role || 'student';
+
+    // Self-registered users go to pending status
     await c.env.DB.prepare(`
-      INSERT INTO users (id, email, password_hash, name, house, year_group)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).bind(id, email, password, name, house || null, yearGroup || null).run();
+      INSERT INTO users (id, email, password_hash, name, role, status, email_verified,
+                         school_level, year_group, school_name, house,
+                         teacher_license_number, subjects_taught, years_experience, qualifications)
+      VALUES (?, ?, ?, ?, ?, 'pending', 0, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      id, email, passwordHash, name, userRole,
+      schoolLevel || null, yearGroup || null, schoolName || null, house || null,
+      teacherLicenseNumber || null,
+      subjectsTaught ? JSON.stringify(subjectsTaught) : null,
+      yearsExperience || null, qualifications || null
+    ).run();
 
-    const user = {
-      id,
-      email,
-      name,
-      role: 'student',
-      house,
-      yearGroup,
-      xpPoints: 0,
-      level: 1,
-      streakDays: 0,
-    };
-
-    // In production, generate proper JWT
-    const token = `mock_token_${id}`;
-
-    return c.json({ success: true, data: { user, token } });
+    return c.json({
+      success: true,
+      data: {
+        status: 'pending',
+        message: 'Your registration is pending approval. You will be notified once an administrator reviews your application.',
+      }
+    });
   } catch (error) {
+    console.error('Registration error:', error);
     return c.json({ success: false, error: 'Registration failed' }, 400);
   }
 });
 
+// Login
 publicApp.post('/auth/login', async (c) => {
   const { email, password } = await c.req.json();
 
   try {
     const result = await c.env.DB.prepare(`
-      SELECT * FROM users WHERE email = ? AND password_hash = ?
-    `).bind(email, password).first();
+      SELECT * FROM users WHERE email = ?
+    `).bind(email).first();
 
     if (!result) {
-      return c.json({ success: false, error: 'Invalid credentials' }, 401);
+      return c.json({ success: false, error: 'Invalid email or password.' }, 401);
     }
+
+    // Check password
+    if (!result.password_hash) {
+      return c.json({ success: false, error: 'Please set up your password using the link sent to your email.' }, 401);
+    }
+
+    const isValidPassword = await verifyPassword(password, result.password_hash as string);
+    if (!isValidPassword) {
+      return c.json({ success: false, error: 'Invalid email or password.' }, 401);
+    }
+
+    // Check account status
+    if (result.status === 'pending') {
+      return c.json({ success: false, error: 'Your account is pending approval.' }, 401);
+    }
+    if (result.status === 'rejected') {
+      return c.json({ success: false, error: 'Your registration was not approved.' }, 401);
+    }
+    if (result.status === 'suspended' || !result.is_active) {
+      return c.json({ success: false, error: 'Your account has been suspended.' }, 401);
+    }
+    if (!result.email_verified) {
+      return c.json({ success: false, error: 'Please verify your email before logging in.' }, 401);
+    }
+
+    // Generate JWT
+    const token = await generateJWT({
+      userId: result.id as string,
+      email: result.email as string,
+      role: result.role as 'student' | 'teacher' | 'admin',
+    }, c.env.JWT_SECRET);
+
+    // Update last login
+    await c.env.DB.prepare(`
+      UPDATE users SET last_login_at = datetime('now') WHERE id = ?
+    `).bind(result.id).run();
 
     const user = {
       id: result.id,
       email: result.email,
       name: result.name,
       role: result.role,
+      status: result.status,
       house: result.house,
       yearGroup: result.year_group,
+      schoolLevel: result.school_level,
+      schoolName: result.school_name,
       xpPoints: result.xp_points,
       level: result.level,
       streakDays: result.streak_days,
+      aiGradingCredits: result.ai_grading_credits,
     };
-
-    const token = `mock_token_${result.id}`;
 
     return c.json({ success: true, data: { user, token } });
   } catch (error) {
+    console.error('Login error:', error);
     return c.json({ success: false, error: 'Login failed' }, 500);
+  }
+});
+
+// Verify token and set password (for admin-created users)
+publicApp.post('/auth/set-password', async (c) => {
+  const { token, password } = await c.req.json();
+
+  try {
+    // Find user by verification token
+    const user = await c.env.DB.prepare(`
+      SELECT * FROM users WHERE verification_token = ?
+    `).bind(token).first();
+
+    if (!user) {
+      return c.json({ success: false, error: 'Invalid or expired verification link.' }, 400);
+    }
+
+    // Check if token is expired
+    if (user.verification_token_expires_at) {
+      const expiry = new Date(user.verification_token_expires_at as string);
+      if (expiry < new Date()) {
+        return c.json({ success: false, error: 'This verification link has expired. Please request a new one.' }, 400);
+      }
+    }
+
+    // Hash new password and update user
+    const passwordHash = await hashPassword(password);
+
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        password_hash = ?,
+        email_verified = 1,
+        verification_token = NULL,
+        verification_token_expires_at = NULL,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(passwordHash, user.id).run();
+
+    return c.json({ success: true, data: { message: 'Password set successfully. You can now log in.' } });
+  } catch (error) {
+    console.error('Set password error:', error);
+    return c.json({ success: false, error: 'Failed to set password' }, 500);
+  }
+});
+
+// Verify token (check if valid without setting password)
+publicApp.get('/auth/verify-token', async (c) => {
+  const token = c.req.query('token');
+
+  if (!token) {
+    return c.json({ success: false, error: 'Token is required' }, 400);
+  }
+
+  try {
+    const user = await c.env.DB.prepare(`
+      SELECT id, name, email, verification_token_expires_at FROM users WHERE verification_token = ?
+    `).bind(token).first();
+
+    if (!user) {
+      return c.json({ success: false, valid: false, error: 'Invalid token' });
+    }
+
+    // Check if token is expired
+    if (user.verification_token_expires_at) {
+      const expiry = new Date(user.verification_token_expires_at as string);
+      if (expiry < new Date()) {
+        return c.json({ success: false, valid: false, error: 'Token expired' });
+      }
+    }
+
+    return c.json({
+      success: true,
+      valid: true,
+      data: { name: user.name, email: user.email }
+    });
+  } catch (error) {
+    return c.json({ success: false, error: 'Token verification failed' }, 500);
+  }
+});
+
+// Request password reset
+publicApp.post('/auth/forgot-password', async (c) => {
+  const { email } = await c.req.json();
+  const appUrl = c.env.APP_URL || 'https://brilla.edu.gh';
+
+  try {
+    const user = await c.env.DB.prepare(`
+      SELECT id, name, email FROM users WHERE email = ?
+    `).bind(email).first();
+
+    // Always return success to prevent email enumeration
+    if (!user) {
+      return c.json({ success: true, data: { message: 'If an account exists, a reset link will be sent.' } });
+    }
+
+    // Generate reset token
+    const resetToken = generateToken();
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
+
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        password_reset_token = ?,
+        password_reset_expires_at = ?
+      WHERE id = ?
+    `).bind(resetToken, expiresAt, user.id).run();
+
+    // Send reset email
+    if (c.env.RESEND_API_KEY) {
+      const resetUrl = `${appUrl}/reset-password?token=${resetToken}`;
+      await sendEmail(
+        c.env.RESEND_API_KEY,
+        c.env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>',
+        user.email as string,
+        'Reset Your Password - Brilla',
+        getPasswordResetEmailHTML(user.name as string, resetUrl)
+      );
+    }
+
+    return c.json({ success: true, data: { message: 'If an account exists, a reset link will be sent.' } });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    return c.json({ success: false, error: 'Failed to process request' }, 500);
+  }
+});
+
+// Reset password with token
+publicApp.post('/auth/reset-password', async (c) => {
+  const { token, password } = await c.req.json();
+
+  try {
+    const user = await c.env.DB.prepare(`
+      SELECT id, password_reset_expires_at FROM users WHERE password_reset_token = ?
+    `).bind(token).first();
+
+    if (!user) {
+      return c.json({ success: false, error: 'Invalid or expired reset link.' }, 400);
+    }
+
+    // Check if token is expired
+    if (user.password_reset_expires_at) {
+      const expiry = new Date(user.password_reset_expires_at as string);
+      if (expiry < new Date()) {
+        return c.json({ success: false, error: 'This reset link has expired.' }, 400);
+      }
+    }
+
+    // Hash new password and update user
+    const passwordHash = await hashPassword(password);
+
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        password_hash = ?,
+        password_reset_token = NULL,
+        password_reset_expires_at = NULL,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(passwordHash, user.id).run();
+
+    return c.json({ success: true, data: { message: 'Password reset successfully.' } });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    return c.json({ success: false, error: 'Failed to reset password' }, 500);
   }
 });
 
@@ -1844,6 +2261,400 @@ protectedApp.post('/ai/study-plan', async (c) => {
     return c.json({ success: false, error: 'Failed to generate study plan' }, 500);
   }
 });
+
+// =============================================
+// ADMIN USER MANAGEMENT ENDPOINTS
+// =============================================
+
+// Middleware to verify admin role
+const adminAuth = async (c: any, next: any) => {
+  const authHeader = c.req.header('Authorization');
+  if (!authHeader?.startsWith('Bearer ')) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  const token = authHeader.slice(7);
+  const payload = await verifyJWT(token, c.env.JWT_SECRET);
+
+  if (!payload) {
+    return c.json({ success: false, error: 'Invalid token' }, 401);
+  }
+
+  if (payload.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  c.set('user', payload);
+  await next();
+};
+
+// Admin routes
+const adminApp = new Hono<{ Bindings: Env }>();
+adminApp.use('*', adminAuth);
+
+// Get all users with stats
+adminApp.get('/users', async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT id, email, name, role, status, email_verified, is_active,
+             school_level, year_group, school_name, house,
+             teacher_license_number, subjects_taught, years_experience, qualifications,
+             xp_points, level, streak_days, last_login_at, created_at, updated_at
+      FROM users
+      ORDER BY created_at DESC
+    `).all();
+
+    // Parse JSON fields
+    const users = results.map((u: Record<string, unknown>) => ({
+      ...u,
+      subjectsTaught: u.subjects_taught ? JSON.parse(u.subjects_taught as string) : [],
+    }));
+
+    return c.json({ success: true, data: users });
+  } catch (error) {
+    console.error('Get users error:', error);
+    return c.json({ success: false, error: 'Failed to fetch users' }, 500);
+  }
+});
+
+// Get user stats
+adminApp.get('/users/stats', async (c) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+
+    const [total, students, teachers, admins, pending, activeToday] = await Promise.all([
+      c.env.DB.prepare('SELECT COUNT(*) as count FROM users').first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM users WHERE role = 'student' AND is_active = 1").first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM users WHERE role = 'teacher' AND is_active = 1").first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM users WHERE role = 'admin' AND is_active = 1").first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM users WHERE status = 'pending'").first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM users WHERE date(last_login_at) = ?").bind(today).first(),
+    ]);
+
+    return c.json({
+      success: true,
+      data: {
+        total: (total as any)?.count || 0,
+        students: (students as any)?.count || 0,
+        teachers: (teachers as any)?.count || 0,
+        admins: (admins as any)?.count || 0,
+        pending: (pending as any)?.count || 0,
+        activeToday: (activeToday as any)?.count || 0,
+      }
+    });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch stats' }, 500);
+  }
+});
+
+// Get pending registrations
+adminApp.get('/users/pending', async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT id, email, name, role, school_level, year_group, school_name, house,
+             teacher_license_number, subjects_taught, years_experience, qualifications,
+             created_at
+      FROM users
+      WHERE status = 'pending'
+      ORDER BY created_at DESC
+    `).all();
+
+    const users = results.map((u: Record<string, unknown>) => ({
+      ...u,
+      subjectsTaught: u.subjects_taught ? JSON.parse(u.subjects_taught as string) : [],
+    }));
+
+    return c.json({ success: true, data: users });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch pending users' }, 500);
+  }
+});
+
+// Approve user registration
+adminApp.post('/users/:id/approve', async (c) => {
+  const userId = c.req.param('id');
+  const adminUser = c.get('user') as UserPayload;
+
+  try {
+    const user = await c.env.DB.prepare(
+      "SELECT * FROM users WHERE id = ? AND status = 'pending'"
+    ).bind(userId).first();
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found or not pending' }, 404);
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        status = 'approved',
+        email_verified = 1,
+        approved_by = ?,
+        approved_at = datetime('now'),
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(adminUser.userId, userId).run();
+
+    // TODO: Send approval email notification
+
+    return c.json({ success: true, data: { message: 'User approved successfully' } });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to approve user' }, 500);
+  }
+});
+
+// Reject user registration
+adminApp.post('/users/:id/reject', async (c) => {
+  const userId = c.req.param('id');
+  const { reason } = await c.req.json();
+
+  try {
+    const user = await c.env.DB.prepare(
+      "SELECT * FROM users WHERE id = ? AND status = 'pending'"
+    ).bind(userId).first();
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found or not pending' }, 404);
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        status = 'rejected',
+        rejection_reason = ?,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(reason || null, userId).run();
+
+    return c.json({ success: true, data: { message: 'User rejected' } });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to reject user' }, 500);
+  }
+});
+
+// Create new user (admin-created, sends verification email)
+adminApp.post('/users', async (c) => {
+  const body = await c.req.json();
+  const { email, name, role, schoolLevel, yearGroup, schoolName, house,
+          teacherLicenseNumber, subjectsTaught, yearsExperience, qualifications } = body;
+  const adminUser = c.get('user') as UserPayload;
+  const appUrl = c.env.APP_URL || 'https://brilla.edu.gh';
+
+  try {
+    // Check if email already exists
+    const existing = await c.env.DB.prepare(
+      'SELECT id FROM users WHERE email = ?'
+    ).bind(email).first();
+
+    if (existing) {
+      return c.json({ success: false, error: 'An account with this email already exists.' }, 400);
+    }
+
+    const id = `user_${Date.now()}`;
+    const verificationToken = generateToken();
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
+
+    // Create user with placeholder password (they'll set real password via email)
+    // The placeholder 'UNSET' will never match any real hashed password
+    await c.env.DB.prepare(`
+      INSERT INTO users (id, email, password_hash, name, role, status, email_verified,
+                         verification_token, verification_token_expires_at,
+                         school_level, year_group, school_name, house,
+                         teacher_license_number, subjects_taught, years_experience, qualifications,
+                         created_by, is_active)
+      VALUES (?, ?, 'UNSET', ?, ?, 'approved', 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+    `).bind(
+      id, email, name, role || 'student',
+      verificationToken, tokenExpiry,
+      schoolLevel || null, yearGroup || null, schoolName || null, house || null,
+      teacherLicenseNumber || null,
+      subjectsTaught ? JSON.stringify(subjectsTaught) : null,
+      yearsExperience || null, qualifications || null,
+      adminUser.userId
+    ).run();
+
+    // Send verification email
+    if (c.env.RESEND_API_KEY) {
+      const verificationUrl = `${appUrl}/set-password?token=${verificationToken}`;
+      const emailSent = await sendEmail(
+        c.env.RESEND_API_KEY,
+        c.env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>',
+        email,
+        'Welcome to Brilla - Set Up Your Password',
+        getVerificationEmailHTML(name, verificationUrl)
+      );
+
+      if (!emailSent) {
+        console.error('Failed to send verification email to:', email);
+      }
+    } else {
+      console.log('RESEND_API_KEY not configured. Verification token:', verificationToken);
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        id,
+        email,
+        name,
+        role: role || 'student',
+        message: 'User created. Verification email sent.',
+      }
+    });
+  } catch (error) {
+    console.error('Create user error:', error);
+    return c.json({ success: false, error: 'Failed to create user' }, 500);
+  }
+});
+
+// Update user
+adminApp.put('/users/:id', async (c) => {
+  const userId = c.req.param('id');
+  const body = await c.req.json();
+  const { name, email, schoolLevel, yearGroup, schoolName, house,
+          teacherLicenseNumber, subjectsTaught, yearsExperience, qualifications } = body;
+
+  try {
+    const user = await c.env.DB.prepare(
+      'SELECT id FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        name = COALESCE(?, name),
+        email = COALESCE(?, email),
+        school_level = ?,
+        year_group = ?,
+        school_name = ?,
+        house = ?,
+        teacher_license_number = ?,
+        subjects_taught = ?,
+        years_experience = ?,
+        qualifications = ?,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(
+      name || null, email || null,
+      schoolLevel || null, yearGroup || null, schoolName || null, house || null,
+      teacherLicenseNumber || null,
+      subjectsTaught ? JSON.stringify(subjectsTaught) : null,
+      yearsExperience || null, qualifications || null,
+      userId
+    ).run();
+
+    return c.json({ success: true, data: { message: 'User updated successfully' } });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to update user' }, 500);
+  }
+});
+
+// Deactivate user
+adminApp.post('/users/:id/deactivate', async (c) => {
+  const userId = c.req.param('id');
+  const adminUser = c.get('user') as UserPayload;
+
+  // Prevent self-deactivation
+  if (userId === adminUser.userId) {
+    return c.json({ success: false, error: 'Cannot deactivate your own account' }, 400);
+  }
+
+  try {
+    await c.env.DB.prepare(`
+      UPDATE users SET is_active = 0, updated_at = datetime('now') WHERE id = ?
+    `).bind(userId).run();
+
+    return c.json({ success: true, data: { message: 'User deactivated' } });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to deactivate user' }, 500);
+  }
+});
+
+// Reactivate user
+adminApp.post('/users/:id/reactivate', async (c) => {
+  const userId = c.req.param('id');
+
+  try {
+    await c.env.DB.prepare(`
+      UPDATE users SET is_active = 1, updated_at = datetime('now') WHERE id = ?
+    `).bind(userId).run();
+
+    return c.json({ success: true, data: { message: 'User reactivated' } });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to reactivate user' }, 500);
+  }
+});
+
+// Delete user
+adminApp.delete('/users/:id', async (c) => {
+  const userId = c.req.param('id');
+  const adminUser = c.get('user') as UserPayload;
+
+  // Prevent self-deletion
+  if (userId === adminUser.userId) {
+    return c.json({ success: false, error: 'Cannot delete your own account' }, 400);
+  }
+
+  try {
+    await c.env.DB.prepare('DELETE FROM users WHERE id = ?').bind(userId).run();
+
+    return c.json({ success: true, data: { message: 'User deleted' } });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to delete user' }, 500);
+  }
+});
+
+// Resend verification email
+adminApp.post('/users/:id/resend-verification', async (c) => {
+  const userId = c.req.param('id');
+  const appUrl = c.env.APP_URL || 'https://brilla.edu.gh';
+
+  try {
+    const user = await c.env.DB.prepare(
+      'SELECT id, name, email, email_verified FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    if (user.email_verified) {
+      return c.json({ success: false, error: 'User already verified' }, 400);
+    }
+
+    // Generate new verification token
+    const verificationToken = generateToken();
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        verification_token = ?,
+        verification_token_expires_at = ?,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(verificationToken, tokenExpiry, userId).run();
+
+    // Send verification email
+    if (c.env.RESEND_API_KEY) {
+      const verificationUrl = `${appUrl}/set-password?token=${verificationToken}`;
+      await sendEmail(
+        c.env.RESEND_API_KEY,
+        c.env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>',
+        user.email as string,
+        'Welcome to Brilla - Set Up Your Password',
+        getVerificationEmailHTML(user.name as string, verificationUrl)
+      );
+    }
+
+    return c.json({ success: true, data: { message: 'Verification email sent' } });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to resend verification' }, 500);
+  }
+});
+
+// Mount admin routes
+app.route('/api/admin', adminApp);
 
 // Mount protected routes
 app.route('/api', protectedApp);

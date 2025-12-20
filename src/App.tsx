@@ -20,6 +20,7 @@ import {
 import HelpCenter from '@/pages/HelpCenter';
 import AdminApprovals from '@/pages/AdminApprovals';
 import UserManagement from '@/pages/UserManagement';
+import { SetPasswordPage } from '@/pages/SetPasswordPage';
 import { VirtualLabPage } from '@/components/lab';
 import { useAuthStore } from '@/stores';
 import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/guide';
@@ -378,6 +379,7 @@ function App() {
         {/* Auth routes (no layout) */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/set-password" element={<SetPasswordPage />} />
 
         {/* Main app routes (with layout) */}
         <Route element={<Layout />}>

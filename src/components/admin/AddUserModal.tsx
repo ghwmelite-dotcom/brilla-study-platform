@@ -554,7 +554,7 @@ export function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModalProps) 
               </button>
 
               <p className="text-xs text-neutral-500 text-center mt-2">
-                The user will be able to log in with password: <code className="bg-neutral-100 px-1 rounded">password123</code>
+                A password setup email will be sent to the user's email address.
               </p>
             </form>
           )}

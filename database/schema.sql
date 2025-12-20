@@ -224,23 +224,61 @@ CREATE TABLE IF NOT EXISTS ai_grading_limits (
 CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
+    password_hash TEXT,
     name TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('student', 'teacher', 'admin')),
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'suspended')),
+
+    -- Email verification
+    email_verified INTEGER DEFAULT 0,
+    verification_token TEXT,
+    verification_token_expires_at TEXT,
+    password_reset_token TEXT,
+    password_reset_expires_at TEXT,
+
+    -- Account status
+    is_active INTEGER DEFAULT 1,
+    last_login_at TEXT,
+    created_by TEXT REFERENCES users(id),
+    approved_by TEXT REFERENCES users(id),
+    approved_at TEXT,
+    rejection_reason TEXT,
+
+    -- Student fields
     house TEXT,
     year_group INTEGER,
+    school_level TEXT CHECK (school_level IN ('jhs', 'shs')),
+    school_name TEXT,
+
+    -- Teacher fields
+    teacher_license_number TEXT,
+    subjects_taught TEXT, -- JSON array
+    years_experience TEXT,
+    qualifications TEXT,
+
+    -- Progress & gamification
     xp_points INTEGER DEFAULT 0,
     level INTEGER DEFAULT 1,
     streak_days INTEGER DEFAULT 0,
     last_activity_date TEXT,
     avatar_url TEXT,
+
+    -- Subscription
     primary_exam_type_id TEXT REFERENCES exam_types(id),
     subscription_tier_id TEXT REFERENCES subscription_tiers(id) DEFAULT 'tier_free',
     subscription_expires_at TEXT,
     ai_grading_credits INTEGER DEFAULT 0,
+
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now'))
 );
+
+-- User indexes for performance
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_verification_token ON users(verification_token);
+CREATE INDEX IF NOT EXISTS idx_users_password_reset_token ON users(password_reset_token);
+CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
+CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
 
 -- Subjects table
 CREATE TABLE IF NOT EXISTS subjects (

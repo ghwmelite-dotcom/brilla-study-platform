@@ -9,6 +9,9 @@ export interface PendingUser extends PendingUserData {
   createdAt: string;
 }
 
+// Email verification status
+export type EmailVerificationStatus = 'verified' | 'pending' | 'expired';
+
 // Extended user with additional fields for management
 export interface ManagedUser extends User {
   schoolName?: string;
@@ -18,6 +21,13 @@ export interface ManagedUser extends User {
   qualifications?: string;
   isActive: boolean;
   lastLoginAt?: string;
+  // Email verification fields
+  emailVerified: boolean;
+  verificationToken?: string;
+  verificationTokenExpiry?: string;
+  passwordSet: boolean;
+  // Password hash (in production, this would be hashed server-side)
+  passwordHash?: string;
 }
 
 // User stats for dashboard
@@ -82,6 +92,11 @@ interface AuthState {
   reactivateUser: (userId: string) => Promise<void>;
   deleteUser: (userId: string) => Promise<void>;
   getUserStats: () => UserStats;
+  resendVerificationEmail: (userId: string) => Promise<void>;
+
+  // Email verification & password setup
+  verifyToken: (token: string) => ManagedUser | null;
+  setPassword: (token: string, password: string) => Promise<void>;
 }
 
 interface RegisterData {
@@ -106,6 +121,55 @@ interface RegisterData {
 // Storage keys (simulating database)
 const PENDING_USERS_KEY = 'brilla-pending-users';
 const ALL_USERS_KEY = 'brilla-all-users';
+const VERIFICATION_EMAILS_KEY = 'brilla-verification-emails';
+
+// Generate a random verification token
+const generateVerificationToken = (): string => {
+  return `verify_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+};
+
+// Get token expiry (24 hours from now)
+const getTokenExpiry = (): string => {
+  const expiry = new Date();
+  expiry.setHours(expiry.getHours() + 24);
+  return expiry.toISOString();
+};
+
+// Simple password hash (in production, use bcrypt on server)
+const hashPassword = (password: string): string => {
+  // Simple hash for demo - in production, this would be server-side bcrypt
+  return btoa(password + '_brilla_salt');
+};
+
+// Verify password
+const verifyPassword = (password: string, hash: string): boolean => {
+  return hashPassword(password) === hash;
+};
+
+// Simulated email storage (for demo purposes - shows "sent" emails)
+interface SentEmail {
+  id: string;
+  to: string;
+  subject: string;
+  body: string;
+  sentAt: string;
+  type: 'verification' | 'password_reset';
+}
+
+const loadSentEmails = (): SentEmail[] => {
+  try {
+    const stored = localStorage.getItem(VERIFICATION_EMAILS_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveSentEmail = (email: SentEmail) => {
+  const emails = loadSentEmails();
+  emails.push(email);
+  localStorage.setItem(VERIFICATION_EMAILS_KEY, JSON.stringify(emails));
+};
 
 // Helper to load pending users from localStorage
 const loadPendingUsersFromStorage = (): PendingUser[] => {
@@ -137,7 +201,7 @@ const saveAllUsersToStorage = (users: ManagedUser[]) => {
   localStorage.setItem(ALL_USERS_KEY, JSON.stringify(users));
 };
 
-// Default demo users
+// Default demo users (these have passwords already set)
 const getDefaultUsers = (): ManagedUser[] => [
   {
     id: 'admin_1',
@@ -150,6 +214,9 @@ const getDefaultUsers = (): ManagedUser[] => [
     streakDays: 0,
     aiGradingCredits: 100,
     isActive: true,
+    emailVerified: true,
+    passwordSet: true,
+    passwordHash: hashPassword('password123'),
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: new Date().toISOString(),
   },
@@ -167,6 +234,9 @@ const getDefaultUsers = (): ManagedUser[] => [
     streakDays: 0,
     aiGradingCredits: 50,
     isActive: true,
+    emailVerified: true,
+    passwordSet: true,
+    passwordHash: hashPassword('password123'),
     createdAt: '2024-01-15T00:00:00.000Z',
     updatedAt: new Date().toISOString(),
   },
@@ -185,6 +255,9 @@ const getDefaultUsers = (): ManagedUser[] => [
     streakDays: 7,
     aiGradingCredits: 10,
     isActive: true,
+    emailVerified: true,
+    passwordSet: true,
+    passwordHash: hashPassword('password123'),
     createdAt: '2024-02-01T00:00:00.000Z',
     updatedAt: new Date().toISOString(),
   },
@@ -215,9 +288,27 @@ export const useAuthStore = create<AuthState>()(
           // Find user in our user list
           const foundUser = allUsers.find(u => u.email === email);
 
-          if (foundUser && password === 'password123') {
+          if (foundUser) {
+            // Check if password is set
+            if (!foundUser.passwordSet) {
+              throw new Error('Please set up your password using the link sent to your email.');
+            }
+
+            // Verify password
+            const passwordValid = foundUser.passwordHash
+              ? verifyPassword(password, foundUser.passwordHash)
+              : password === 'password123'; // Fallback for legacy
+
+            if (!passwordValid) {
+              throw new Error('Invalid email or password.');
+            }
+
             if (!foundUser.isActive) {
               throw new Error('Your account has been deactivated. Please contact support.');
+            }
+
+            if (!foundUser.emailVerified) {
+              throw new Error('Please verify your email before logging in.');
             }
 
             // Update last login
@@ -253,7 +344,7 @@ export const useAuthStore = create<AuthState>()(
           }
 
           // In production, this would call the actual API
-          throw new Error('Invalid email or password. Try demo accounts with password: password123');
+          throw new Error('Invalid email or password.');
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Login failed',
@@ -429,6 +520,10 @@ export const useAuthStore = create<AuthState>()(
           throw new Error('A pending registration with this email already exists.');
         }
 
+        // Generate verification token
+        const verificationToken = generateVerificationToken();
+        const verificationTokenExpiry = getTokenExpiry();
+
         const newUser: ManagedUser = {
           id: `user_${Date.now()}`,
           email: data.email,
@@ -448,6 +543,10 @@ export const useAuthStore = create<AuthState>()(
           streakDays: 0,
           aiGradingCredits: data.role === 'admin' ? 100 : data.role === 'teacher' ? 50 : 10,
           isActive: true,
+          emailVerified: false,
+          passwordSet: false,
+          verificationToken,
+          verificationTokenExpiry,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -455,6 +554,24 @@ export const useAuthStore = create<AuthState>()(
         const updatedUsers = [...allUsers, newUser];
         saveAllUsersToStorage(updatedUsers);
         set({ allUsers: updatedUsers });
+
+        // Send verification email (simulated)
+        const verificationUrl = `${window.location.origin}/set-password?token=${verificationToken}`;
+        saveSentEmail({
+          id: `email_${Date.now()}`,
+          to: data.email,
+          subject: 'Welcome to Brilla - Set Up Your Password',
+          body: `Hello ${data.name},\n\nYour account has been created on Brilla Study Platform.\n\nPlease click the link below to set up your password:\n${verificationUrl}\n\nThis link expires in 24 hours.\n\nBest regards,\nBrilla Team`,
+          sentAt: new Date().toISOString(),
+          type: 'verification',
+        });
+
+        // Log for demo purposes
+        console.log('📧 Verification email sent:', {
+          to: data.email,
+          verificationUrl,
+          token: verificationToken,
+        });
 
         return newUser;
       },
@@ -581,6 +698,118 @@ export const useAuthStore = create<AuthState>()(
           pending: pending.length,
           activeToday,
         };
+      },
+
+      // Email verification & password setup
+      verifyToken: (token: string) => {
+        const allUsers = loadAllUsersFromStorage();
+        const user = allUsers.find(u => u.verificationToken === token);
+
+        if (!user) {
+          return null;
+        }
+
+        // Check if token is expired
+        if (user.verificationTokenExpiry) {
+          const expiry = new Date(user.verificationTokenExpiry);
+          if (expiry < new Date()) {
+            return null; // Token expired
+          }
+        }
+
+        return user;
+      },
+
+      setPassword: async (token: string, password: string) => {
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const allUsers = loadAllUsersFromStorage();
+        const userIndex = allUsers.findIndex(u => u.verificationToken === token);
+
+        if (userIndex === -1) {
+          throw new Error('Invalid or expired verification link.');
+        }
+
+        const user = allUsers[userIndex];
+
+        // Check if token is expired
+        if (user.verificationTokenExpiry) {
+          const expiry = new Date(user.verificationTokenExpiry);
+          if (expiry < new Date()) {
+            throw new Error('This verification link has expired. Please request a new one.');
+          }
+        }
+
+        // Set password and mark as verified
+        allUsers[userIndex] = {
+          ...user,
+          passwordHash: hashPassword(password),
+          passwordSet: true,
+          emailVerified: true,
+          verificationToken: undefined,
+          verificationTokenExpiry: undefined,
+          updatedAt: new Date().toISOString(),
+        };
+
+        saveAllUsersToStorage(allUsers);
+        set({ allUsers });
+
+        // Log success
+        console.log('✅ Password set successfully for:', user.email);
+      },
+
+      resendVerificationEmail: async (userId: string) => {
+        const { user } = get();
+        if (!user || user.role !== 'admin') {
+          throw new Error('Only admins can resend verification emails');
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const allUsers = loadAllUsersFromStorage();
+        const userIndex = allUsers.findIndex(u => u.id === userId);
+
+        if (userIndex === -1) {
+          throw new Error('User not found');
+        }
+
+        const targetUser = allUsers[userIndex];
+
+        if (targetUser.passwordSet && targetUser.emailVerified) {
+          throw new Error('This user has already set their password.');
+        }
+
+        // Generate new verification token
+        const verificationToken = generateVerificationToken();
+        const verificationTokenExpiry = getTokenExpiry();
+
+        allUsers[userIndex] = {
+          ...targetUser,
+          verificationToken,
+          verificationTokenExpiry,
+          updatedAt: new Date().toISOString(),
+        };
+
+        saveAllUsersToStorage(allUsers);
+        set({ allUsers });
+
+        // Send verification email (simulated)
+        const verificationUrl = `${window.location.origin}/set-password?token=${verificationToken}`;
+        saveSentEmail({
+          id: `email_${Date.now()}`,
+          to: targetUser.email,
+          subject: 'Brilla - Password Setup Link (Resent)',
+          body: `Hello ${targetUser.name},\n\nA new password setup link has been generated for your Brilla account.\n\nPlease click the link below to set up your password:\n${verificationUrl}\n\nThis link expires in 24 hours.\n\nBest regards,\nBrilla Team`,
+          sentAt: new Date().toISOString(),
+          type: 'verification',
+        });
+
+        // Log for demo purposes
+        console.log('📧 Verification email resent:', {
+          to: targetUser.email,
+          verificationUrl,
+          token: verificationToken,
+        });
       },
     }),
     {
