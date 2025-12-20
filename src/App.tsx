@@ -15,6 +15,7 @@ import {
   ContentManagementPage,
   MockExamsPage,
   SubjectCatalogPage,
+  CommunityPage,
 } from '@/pages';
 import { useAuthStore } from '@/stores';
 
@@ -479,6 +480,14 @@ function App() {
             }
           />
           <Route path="catalog" element={<SubjectCatalogPage />} />
+          <Route
+            path="community"
+            element={
+              <ProtectedRoute>
+                <CommunityPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="profile"
             element={

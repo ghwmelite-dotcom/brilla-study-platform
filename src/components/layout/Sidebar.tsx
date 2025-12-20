@@ -8,7 +8,6 @@ import {
   Trophy,
   Medal,
   Shield,
-  BarChart3,
   Swords,
   User,
   Settings,
@@ -19,9 +18,12 @@ import {
   GraduationCap,
   Zap,
   ClipboardList,
+  Users,
+  MessageSquare,
+  Hash,
 } from 'lucide-react';
 import { cn } from '@/utils';
-import { useAuthStore, useExamStore } from '@/stores';
+import { useAuthStore, useExamStore, useChatStore } from '@/stores';
 import { SubjectNavigation } from '@/components/subjects';
 import { ExamModeSwitcher } from '@/components/exam';
 
@@ -58,11 +60,17 @@ const examSpecificItems = {
   ],
 };
 
-// Common items for all modes
-const commonItems = [
+// Community navigation items
+const communityNavItems = [
+  { path: '/community', label: 'Community Hub', icon: Users, auth: true },
   { path: '/house-cup', label: 'House Cup', icon: Shield, auth: true },
-  { path: '/analytics', label: 'Analytics', icon: BarChart3, auth: true },
   { path: '/leaderboard', label: 'Leaderboard', icon: Medal },
+];
+
+// Chat quick actions (not routes, but actions)
+const chatActions = [
+  { id: 'rooms', label: 'Study Rooms', icon: Hash },
+  { id: 'chats', label: 'Messages', icon: MessageSquare },
 ];
 
 // Exam mode descriptions
@@ -93,7 +101,9 @@ const examModeInfo = {
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { isAuthenticated, user } = useAuthStore();
   const { currentExamType, initializeExamData } = useExamStore();
+  const { openChat, setActiveTab, getUnreadCount } = useChatStore();
   const isTeacherOrAdmin = user?.role === 'teacher' || user?.role === 'admin';
+  const unreadCount = getUnreadCount();
 
   // Initialize exam data on mount
   useEffect(() => {
@@ -213,7 +223,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               Community
             </h3>
             <ul className="space-y-1">
-              {commonItems.map((item) => {
+              {communityNavItems.map((item) => {
                 if ('auth' in item && item.auth && !isAuthenticated) return null;
 
                 return (
@@ -236,6 +246,28 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   </li>
                 );
               })}
+
+              {/* Chat Quick Actions */}
+              {isAuthenticated && chatActions.map((action) => (
+                <li key={action.id}>
+                  <button
+                    onClick={() => {
+                      setActiveTab(action.id as 'chats' | 'rooms');
+                      openChat();
+                      onClose();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors text-neutral-700 hover:bg-neutral-100"
+                  >
+                    <action.icon className="w-5 h-5" />
+                    <span className="flex-1 text-left">{action.label}</span>
+                    {action.id === 'chats' && unreadCount > 0 && (
+                      <span className="min-w-[20px] h-5 px-1.5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
 
