@@ -44,8 +44,8 @@ export function ChatSidebar() {
           'fixed z-50 bg-white shadow-2xl flex flex-col',
           // Mobile: full screen from top with margin
           'inset-x-0 bottom-0 top-4 rounded-t-xl',
-          // Desktop: fixed panel on right
-          'sm:inset-auto sm:right-4 sm:bottom-4 sm:top-auto',
+          // Desktop: fixed panel on left
+          'sm:inset-auto sm:left-4 sm:bottom-4 sm:top-auto',
           'sm:w-[400px] sm:h-[min(700px,calc(100vh-2rem))] sm:rounded-xl',
           'max-h-[100dvh] sm:max-h-none'
         )}

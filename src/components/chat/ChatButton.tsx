@@ -13,7 +13,7 @@ export function ChatButton() {
     <button
       onClick={toggleChat}
       className={cn(
-        'fixed bottom-20 right-4 z-30',
+        'fixed bottom-6 left-4 sm:left-6 z-30',
         'w-14 h-14 rounded-full',
         'bg-gradient-to-br from-secondary to-accent',
         'shadow-lg hover:shadow-xl',
@@ -34,9 +34,12 @@ export function ChatButton() {
       )}
 
       {/* Tooltip */}
-      <span className="absolute right-full mr-3 px-3 py-1.5 bg-neutral-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+      <span className="absolute left-full ml-3 px-3 py-1.5 bg-neutral-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
         Community Chat
       </span>
+
+      {/* Pulse effect */}
+      <span className="absolute inset-0 rounded-full bg-secondary animate-ping opacity-20" />
     </button>
   );
 }
