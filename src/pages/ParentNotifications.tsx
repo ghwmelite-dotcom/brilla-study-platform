@@ -13,7 +13,7 @@ import {
   UserMinus,
   Filter,
 } from 'lucide-react';
-import { Card, CardHeader, Button, Badge } from '@/components/common';
+import { Card, Button, Badge } from '@/components/common';
 import { useParentStore, useAuthStore } from '@/stores';
 import { cn } from '@/utils';
 import type { ParentNotificationType } from '@/types';

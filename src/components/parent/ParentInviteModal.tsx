@@ -116,7 +116,7 @@ export function ParentInviteModal({ isOpen, onClose }: ParentInviteModalProps) {
             {/* Existing Links */}
             {currentInviteCode.existingLinks > 0 && (
               <div className="flex items-center justify-center">
-                <Badge variant="info" size="sm">
+                <Badge variant="secondary" size="sm">
                   {currentInviteCode.existingLinks} parent{currentInviteCode.existingLinks > 1 ? 's' : ''} already linked
                 </Badge>
               </div>

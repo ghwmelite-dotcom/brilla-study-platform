@@ -186,7 +186,6 @@ export function ParentSettingsPage() {
   const {
     linkedStudents,
     preferences,
-    isLoading,
     fetchLinkedStudents,
     fetchPreferences,
     updatePreferences,

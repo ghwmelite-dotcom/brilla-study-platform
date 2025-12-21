@@ -98,7 +98,7 @@ export interface PendingUserData {
   // Common
   email: string;
   name: string;
-  role: 'student' | 'teacher' | 'admin';
+  role: 'student' | 'teacher' | 'admin' | 'parent';
 
   // Student-specific
   schoolLevel?: SchoolLevel;

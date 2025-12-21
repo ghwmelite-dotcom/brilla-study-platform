@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import {
   Shield,
   Search,
-  Filter,
   AlertTriangle,
   CheckCircle2,
   XCircle,
@@ -14,7 +13,6 @@ import {
   ChevronLeft,
   ChevronRight,
   RefreshCw,
-  Eye,
   FileText,
   Loader2,
 } from 'lucide-react';
@@ -58,9 +56,6 @@ export function AuditLog() {
   const [loginAttempts, setLoginAttempts] = useState<LoginAttempt[]>([]);
   const [loginsPagination, setLoginsPagination] = useState({ page: 1, pages: 1, total: 0 });
   const [showFailedOnly, setShowFailedOnly] = useState(false);
-
-  // User activity (for drill-down)
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const fetchStats = async () => {
     try {

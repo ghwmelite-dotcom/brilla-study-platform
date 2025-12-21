@@ -3,6 +3,7 @@ import {
   X,
   Mail,
   User,
+  Users,
   GraduationCap,
   BookOpen,
   Shield,
@@ -187,6 +188,7 @@ export function EditUserModal({ isOpen, user, onClose, onSuccess }: EditUserModa
       student: { icon: GraduationCap, color: 'bg-blue-100 text-blue-700', label: 'Student' },
       teacher: { icon: BookOpen, color: 'bg-green-100 text-green-700', label: 'Teacher' },
       admin: { icon: Shield, color: 'bg-purple-100 text-purple-700', label: 'Administrator' },
+      parent: { icon: Users, color: 'bg-amber-100 text-amber-700', label: 'Parent' },
     };
     const badge = badges[user.role];
     const Icon = badge.icon;
