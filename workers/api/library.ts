@@ -103,6 +103,34 @@ function getUserId(c: Context): string | undefined {
 // PUBLIC LIBRARY ROUTES
 // =============================================
 
+// Serve files from R2 bucket
+libraryApp.get('/files/*', async (c) => {
+  try {
+    // Extract the file path from the URL (handles /api/library/files/...)
+    const url = new URL(c.req.url);
+    const path = url.pathname.split('/files/')[1] || '';
+
+    if (!c.env.LIBRARY_BUCKET) {
+      return c.json({ success: false, error: 'Storage not configured' }, 500);
+    }
+
+    const object = await c.env.LIBRARY_BUCKET.get(path);
+
+    if (!object) {
+      return c.json({ success: false, error: 'File not found' }, 404);
+    }
+
+    const headers = new Headers();
+    headers.set('Content-Type', object.httpMetadata?.contentType || 'application/octet-stream');
+    headers.set('Cache-Control', 'public, max-age=31536000');
+
+    return new Response(object.body, { headers });
+  } catch (error) {
+    console.error('Error serving file:', error);
+    return c.json({ success: false, error: 'Failed to serve file' }, 500);
+  }
+});
+
 // Get all library resources with filtering and pagination
 libraryApp.get('/resources', async (c) => {
   try {
@@ -863,7 +891,8 @@ libraryApp.post('/upload', async (c) => {
         },
       });
 
-      contentUrl = `https://library.brilla.app/${fileKey}`;
+      // Use our API to serve files from R2
+      contentUrl = `https://brilla-api.ghwmelite.workers.dev/api/library/files/${fileKey}`;
       fileSize = file.size;
     }
 
