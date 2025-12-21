@@ -130,6 +130,8 @@ interface RegisterData {
 // Storage keys (simulating database for fallback/demo)
 const PENDING_USERS_KEY = 'brilla-pending-users';
 const ALL_USERS_KEY = 'brilla-all-users';
+const DEMO_USERS_VERSION_KEY = 'brilla-demo-users-version';
+const CURRENT_DEMO_VERSION = 2; // Increment this when demo users change
 
 // Simple password hash (in production, use bcrypt on server)
 const hashPassword = (password: string): string => {
@@ -155,8 +157,28 @@ const savePendingUsersToStorage = (users: PendingUser[]) => {
 // Helper to load all users from localStorage
 const loadAllUsersFromStorage = (): ManagedUser[] => {
   try {
+    // Check if demo users version is current
+    const storedVersion = localStorage.getItem(DEMO_USERS_VERSION_KEY);
+    const currentVersion = parseInt(storedVersion || '0', 10);
+
+    if (currentVersion < CURRENT_DEMO_VERSION) {
+      // Reset to new default users when version changes
+      console.log('Demo users version updated, resetting to new defaults');
+      const defaultUsers = getDefaultUsers();
+      saveAllUsersToStorage(defaultUsers);
+      localStorage.setItem(DEMO_USERS_VERSION_KEY, String(CURRENT_DEMO_VERSION));
+      return defaultUsers;
+    }
+
     const stored = localStorage.getItem(ALL_USERS_KEY);
-    return stored ? JSON.parse(stored) : getDefaultUsers();
+    if (!stored) {
+      const defaultUsers = getDefaultUsers();
+      saveAllUsersToStorage(defaultUsers);
+      localStorage.setItem(DEMO_USERS_VERSION_KEY, String(CURRENT_DEMO_VERSION));
+      return defaultUsers;
+    }
+
+    return JSON.parse(stored);
   } catch {
     return getDefaultUsers();
   }
@@ -168,10 +190,11 @@ const saveAllUsersToStorage = (users: ManagedUser[]) => {
 };
 
 // Default demo users (these have passwords already set)
+// Using brillaprep.org domain to match production
 const getDefaultUsers = (): ManagedUser[] => [
   {
     id: 'admin_1',
-    email: 'admin@brilla.edu.gh',
+    email: 'admin@brillaprep.org',
     name: 'System Admin',
     role: 'admin',
     status: 'approved',
@@ -182,13 +205,13 @@ const getDefaultUsers = (): ManagedUser[] => [
     isActive: true,
     emailVerified: true,
     passwordSet: true,
-    passwordHash: hashPassword('password123'),
+    passwordHash: hashPassword('Admin123!'),
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: new Date().toISOString(),
   },
   {
     id: 'teacher_1',
-    email: 'teacher@brilla.edu.gh',
+    email: 'teacher@brillaprep.org',
     name: 'Demo Teacher',
     role: 'teacher',
     status: 'approved',
@@ -202,13 +225,13 @@ const getDefaultUsers = (): ManagedUser[] => [
     isActive: true,
     emailVerified: true,
     passwordSet: true,
-    passwordHash: hashPassword('password123'),
+    passwordHash: hashPassword('Teacher123!'),
     createdAt: '2024-01-15T00:00:00.000Z',
     updatedAt: new Date().toISOString(),
   },
   {
     id: 'student_1',
-    email: 'student@brilla.edu.gh',
+    email: 'student@brillaprep.org',
     name: 'Demo Student',
     role: 'student',
     status: 'approved',
@@ -223,7 +246,26 @@ const getDefaultUsers = (): ManagedUser[] => [
     isActive: true,
     emailVerified: true,
     passwordSet: true,
-    passwordHash: hashPassword('password123'),
+    passwordHash: hashPassword('Student123!'),
+    createdAt: '2024-02-01T00:00:00.000Z',
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'parent_1',
+    email: 'parent@brillaprep.org',
+    name: 'Demo Parent',
+    role: 'parent',
+    status: 'approved',
+    phoneNumber: '+233201234567',
+    linkedStudentCount: 1,
+    xpPoints: 0,
+    level: 1,
+    streakDays: 0,
+    aiGradingCredits: 0,
+    isActive: true,
+    emailVerified: true,
+    passwordSet: true,
+    passwordHash: hashPassword('Parent123!'),
     createdAt: '2024-02-01T00:00:00.000Z',
     updatedAt: new Date().toISOString(),
   },

@@ -446,6 +446,14 @@ INSERT INTO houses (id, name, color, icon, description, is_default) VALUES
 ('house_green', 'Green House', '#22C55E', 'shield', 'The house of growth and harmony', 1),
 ('house_yellow', 'Yellow House', '#EAB308', 'shield', 'The house of energy and optimism', 1);
 
--- Insert sample user for testing
-INSERT INTO users (id, email, password_hash, name, role, house, year_group, xp_points, level, streak_days) VALUES
-('user_demo', 'demo@stjohns.edu.gh', '$2a$10$demopasswordhash', 'Demo Student', 'student', 'house_blue', 3, 1500, 2, 5);
+-- Insert demo users for testing
+-- Note: Password hashes need to be generated at runtime using the API's hashPassword function
+-- Run the /api/admin/setup endpoint after deployment to create these users with proper hashes
+-- Or use: INSERT INTO users ... with password_hash set to NULL, then use set-password flow
+
+-- Demo users placeholder (passwords will be set via the setup endpoint)
+INSERT OR IGNORE INTO users (id, email, password_hash, name, role, status, is_active, email_verified, xp_points, level, streak_days, ai_grading_credits) VALUES
+('admin_1', 'admin@brillaprep.org', NULL, 'System Admin', 'admin', 'approved', 1, 1, 0, 1, 0, 100),
+('teacher_1', 'teacher@brillaprep.org', NULL, 'Demo Teacher', 'teacher', 'approved', 1, 1, 0, 1, 0, 50),
+('student_1', 'student@brillaprep.org', NULL, 'Demo Student', 'student', 'approved', 1, 1, 1500, 5, 7, 10),
+('parent_1', 'parent@brillaprep.org', NULL, 'Demo Parent', 'parent', 'approved', 1, 1, 0, 1, 0, 0);

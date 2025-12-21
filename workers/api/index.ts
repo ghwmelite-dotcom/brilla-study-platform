@@ -669,6 +669,68 @@ publicApp.post('/auth/reset-password', async (c) => {
   }
 });
 
+// Setup endpoint - Initialize demo users with passwords
+// This should only be called once during initial setup
+publicApp.post('/auth/setup', async (c) => {
+  const { setupKey, users } = await c.req.json();
+
+  // Simple security check - require a setup key that matches JWT_SECRET
+  // In production, you might use a separate SETUP_KEY secret
+  if (setupKey !== c.env.JWT_SECRET) {
+    return c.json({ success: false, error: 'Invalid setup key' }, 401);
+  }
+
+  try {
+    const results = [];
+
+    // Default demo users if none provided
+    const demoUsers = users || [
+      { email: 'admin@brillaprep.org', password: 'Admin123!', name: 'System Admin', role: 'admin' },
+      { email: 'teacher@brillaprep.org', password: 'Teacher123!', name: 'Demo Teacher', role: 'teacher' },
+      { email: 'student@brillaprep.org', password: 'Student123!', name: 'Demo Student', role: 'student' },
+      { email: 'parent@brillaprep.org', password: 'Parent123!', name: 'Demo Parent', role: 'parent' },
+    ];
+
+    for (const user of demoUsers) {
+      // Check if user exists
+      const existing = await c.env.DB.prepare(
+        'SELECT id, password_hash FROM users WHERE email = ?'
+      ).bind(user.email).first();
+
+      const passwordHash = await hashPassword(user.password);
+
+      if (existing) {
+        // Update password if user exists
+        await c.env.DB.prepare(`
+          UPDATE users SET password_hash = ?, updated_at = datetime('now')
+          WHERE email = ?
+        `).bind(passwordHash, user.email).run();
+        results.push({ email: user.email, action: 'updated' });
+      } else {
+        // Create user if doesn't exist
+        const userId = `${user.role}_${Date.now()}`;
+        await c.env.DB.prepare(`
+          INSERT INTO users (id, email, password_hash, name, role, status, is_active, email_verified, xp_points, level, streak_days, ai_grading_credits)
+          VALUES (?, ?, ?, ?, ?, 'approved', 1, 1, 0, 1, 0, ?)
+        `).bind(
+          userId,
+          user.email,
+          passwordHash,
+          user.name,
+          user.role,
+          user.role === 'admin' ? 100 : user.role === 'teacher' ? 50 : 10
+        ).run();
+        results.push({ email: user.email, action: 'created' });
+      }
+    }
+
+    return c.json({ success: true, data: { message: 'Setup completed', results } });
+  } catch (error) {
+    console.error('Setup error:', error);
+    return c.json({ success: false, error: 'Setup failed: ' + (error instanceof Error ? error.message : 'Unknown error') }, 500);
+  }
+});
+
 // Subjects - Now with exam_type and category filtering
 publicApp.get('/subjects', async (c) => {
   const examType = c.req.query('exam_type'); // e.g., 'wassce', 'bece', 'nsmq'

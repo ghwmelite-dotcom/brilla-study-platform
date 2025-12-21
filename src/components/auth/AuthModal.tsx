@@ -230,16 +230,17 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
   };
 
   const handleDemoLogin = async (role: UserRole) => {
-    const demoCredentials = {
-      student: 'student@brilla.edu.gh',
-      teacher: 'teacher@brilla.edu.gh',
-      admin: 'admin@brilla.edu.gh',
-      parent: 'parent@brilla.edu.gh',
+    const demoCredentials: Record<UserRole, { email: string; password: string }> = {
+      student: { email: 'student@brillaprep.org', password: 'Student123!' },
+      teacher: { email: 'teacher@brillaprep.org', password: 'Teacher123!' },
+      admin: { email: 'admin@brillaprep.org', password: 'Admin123!' },
+      parent: { email: 'parent@brillaprep.org', password: 'Parent123!' },
     };
 
     setIsSubmitting(true);
     try {
-      await login(demoCredentials[role], 'password123');
+      const creds = demoCredentials[role];
+      await login(creds.email, creds.password);
       onClose();
     } catch (err) {
       setFormErrors({ submit: err instanceof Error ? err.message : 'Demo login failed' });
