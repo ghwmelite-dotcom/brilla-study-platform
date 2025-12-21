@@ -1,0 +1,1 @@
+export { XpEventBanner } from './XpEventBanner';

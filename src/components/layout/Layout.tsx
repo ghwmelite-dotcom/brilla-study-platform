@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { Footer } from './Footer';
+import { MobileBottomNav } from './MobileBottomNav';
 import { AiTutor, AiButton } from '@/components/ai';
 import { ChatButton, ChatSidebar } from '@/components/chat';
 
@@ -26,7 +27,7 @@ export function Layout({ children }: LayoutProps) {
           onClose={() => setIsSidebarOpen(false)}
         />
 
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto pb-20 lg:pb-0">
           {children || (
             <div className="max-w-7xl mx-auto px-4 py-6 lg:px-6">
               <Outlet />
@@ -36,6 +37,9 @@ export function Layout({ children }: LayoutProps) {
       </div>
 
       <Footer />
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
 
       {/* Community Chat - floating button and chat panel */}
       <ChatButton />

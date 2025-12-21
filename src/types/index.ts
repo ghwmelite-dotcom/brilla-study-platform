@@ -554,6 +554,212 @@ export interface LeaderboardEntry {
   house?: string;
 }
 
+// Quest types
+export type QuestType = 'daily' | 'weekly' | 'special';
+export type QuestStatus = 'active' | 'completed' | 'expired' | 'claimed';
+export type QuestDifficulty = 'easy' | 'medium' | 'hard';
+export type QuestRequirementType =
+  | 'answer_questions'
+  | 'correct_answers'
+  | 'complete_topics'
+  | 'earn_xp'
+  | 'maintain_streak'
+  | 'win_battles'
+  | 'perfect_quiz'
+  | 'study_time'
+  | 'help_others';
+
+export interface QuestTemplate {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  questType: QuestType;
+  requirementType: QuestRequirementType;
+  requirementValue: number;
+  xpReward: number;
+  coinReward?: number;
+  difficulty: QuestDifficulty;
+  subjectId?: string;
+  isActive: boolean;
+}
+
+export interface UserQuest {
+  id: string;
+  userId: string;
+  questTemplateId: string;
+  progress: number;
+  target: number;
+  status: QuestStatus;
+  startedAt: string;
+  completedAt?: string;
+  claimedAt?: string;
+  expiresAt: string;
+  // Joined data
+  quest?: QuestTemplate;
+}
+
+export interface WeeklyChallenge {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  startDate: string;
+  endDate: string;
+  requirementType: QuestRequirementType;
+  requirementValue: number;
+  xpReward: number;
+  bonusReward?: string;
+  isActive: boolean;
+  subjectId?: string;
+  // User progress
+  userProgress?: number;
+  userStatus?: QuestStatus;
+}
+
+// Streak Protection types
+export interface StreakProtection {
+  available: number;
+  isActive: boolean;
+  lastUsed?: string;
+  canUseToday: boolean;
+}
+
+export interface StreakMilestone {
+  id: string;
+  days: number;
+  name: string;
+  description: string;
+  xpReward: number;
+  protectionReward: number;
+  badgeId?: string;
+  isClaimed?: boolean;
+}
+
+export interface StreakInfo {
+  currentStreak: number;
+  longestStreak: number;
+  lastActivity?: string;
+  protection: StreakProtection;
+  nextMilestone?: StreakMilestone;
+  recentMilestones: StreakMilestone[];
+}
+
+// Study Reminder types
+export interface ReminderSettings {
+  id: string;
+  userId: string;
+  enabled: boolean;
+  dailyGoalReminder: boolean;
+  streakReminder: boolean;
+  questReminder: boolean;
+  studyTime: string;
+  timezone: string;
+  daysOfWeek: number[];
+  pushEnabled: boolean;
+  emailEnabled: boolean;
+}
+
+// Friend types
+export type FriendshipStatus = 'pending' | 'accepted' | 'blocked';
+
+export interface Friend {
+  id: string;
+  odUserId: string;
+  odName: string;
+  avatar?: string;
+  house?: string;
+  level: number;
+  xp: number;
+  status: FriendshipStatus;
+  isOnline?: boolean;
+  lastActive?: string;
+}
+
+// Friend Challenge types
+export type ChallengeType = 'quiz_battle' | 'xp_race' | 'streak_challenge' | 'topic_mastery';
+export type ChallengeStatus = 'pending' | 'accepted' | 'declined' | 'active' | 'completed' | 'expired';
+
+export interface FriendChallenge {
+  id: string;
+  challengerId: string;
+  challengedId: string;
+  challengerName?: string;
+  challengedName?: string;
+  challengeType: ChallengeType;
+  subjectId?: string;
+  topicId?: string;
+  targetValue?: number;
+  durationHours: number;
+  status: ChallengeStatus;
+  challengerProgress: number;
+  challengedProgress: number;
+  winnerId?: string;
+  xpWager: number;
+  createdAt: string;
+  startedAt?: string;
+  endsAt?: string;
+}
+
+// XP Event types
+export type XpEventType = 'global' | 'subject' | 'topic' | 'house' | 'personal';
+
+export interface XpEvent {
+  id: string;
+  name: string;
+  description: string;
+  multiplier: number;
+  eventType: XpEventType;
+  subjectId?: string;
+  houseId?: string;
+  startTime: string;
+  endTime: string;
+  isActive: boolean;
+  timeRemaining?: number;
+}
+
+// Study Group types
+export type GroupMemberRole = 'owner' | 'admin' | 'member';
+
+export interface StudyGroup {
+  id: string;
+  name: string;
+  description?: string;
+  icon: string;
+  color: string;
+  ownerId: string;
+  subjectId?: string;
+  isPublic: boolean;
+  maxMembers: number;
+  memberCount: number;
+  weeklyGoalXp: number;
+  weeklyProgress: number;
+  createdAt: string;
+}
+
+export interface StudyGroupMember {
+  id: string;
+  groupId: string;
+  userId: string;
+  userName?: string;
+  userAvatar?: string;
+  role: GroupMemberRole;
+  weeklyXpContribution: number;
+  joinedAt: string;
+  lastActive?: string;
+}
+
+export interface StudyGroupMessage {
+  id: string;
+  groupId: string;
+  userId: string;
+  userName?: string;
+  userAvatar?: string;
+  message: string;
+  messageType: 'text' | 'achievement' | 'milestone' | 'challenge';
+  createdAt: string;
+}
+
 // API Response types
 export interface ApiResponse<T> {
   success: boolean;

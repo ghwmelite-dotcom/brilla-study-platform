@@ -3,3 +3,4 @@ export { useQuestions, useSubjects, useTopics } from './useQuestions';
 export { useProgress } from './useProgress';
 export { useVoiceRecognition } from './useVoiceRecognition';
 export type { VoiceStatus, VoiceRecognitionResult, UseVoiceRecognitionOptions } from './useVoiceRecognition';
+export { useGamification } from './useGamification';

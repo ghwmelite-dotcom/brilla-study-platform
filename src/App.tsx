@@ -1,46 +1,69 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import { Layout } from '@/components/layout';
-import {
-  HomePage,
-  DashboardPage,
-  TopicsPage,
-  PracticePage,
-  CompetitionPage,
-  HouseCupPage,
-  AnalyticsPage,
-  BattlePage,
-  PastPapersPage,
-  LandingPage,
-  EssayPracticePage,
-  ContentManagementPage,
-  MockExamsPage,
-  SubjectCatalogPage,
-  CommunityPage,
-  SettingsPage,
-} from '@/pages';
-import HelpCenter from '@/pages/HelpCenter';
-import AdminApprovals from '@/pages/AdminApprovals';
-import UserManagement from '@/pages/UserManagement';
-import AuditLog from '@/pages/AuditLog';
-import { SetPasswordPage } from '@/pages/SetPasswordPage';
-import { ParentDashboardPage } from '@/pages/ParentDashboard';
-import { ParentSettingsPage } from '@/pages/ParentSettings';
-import { ParentNotificationsPage } from '@/pages/ParentNotifications';
-import { VirtualLabPage } from '@/components/lab';
 import { useAuthStore } from '@/stores';
 import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/guide';
+import { ToastContainer } from '@/components/toast';
 
-// Teacher pages
-import TeacherDashboard from '@/pages/TeacherDashboard';
-import AssessmentList from '@/pages/AssessmentList';
-import AssessmentBuilder from '@/pages/AssessmentBuilder';
-import AssessmentGrading from '@/pages/AssessmentGrading';
-import ClassManagement from '@/pages/ClassManagement';
+// Loading component for lazy-loaded pages
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+    </div>
+  );
+}
 
-// Student assessment pages
-import AssignedAssessments from '@/pages/AssignedAssessments';
-import TakeAssessment from '@/pages/TakeAssessment';
-import AssessmentResults from '@/pages/AssessmentResults';
+// Wrapper for lazy-loaded components
+function LazyPage({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<PageLoader />}>{children}</Suspense>;
+}
+
+// Core pages (loaded immediately for fast initial load)
+import { HomePage } from '@/pages/Home';
+import { DashboardPage } from '@/pages/Dashboard';
+import { LandingPage } from '@/pages/Landing';
+
+// Lazy loaded pages (direct imports for true code splitting)
+const TopicsPage = lazy(() => import('@/pages/Topics').then(m => ({ default: m.TopicsPage })));
+const PracticePage = lazy(() => import('@/pages/Practice').then(m => ({ default: m.PracticePage })));
+const CompetitionPage = lazy(() => import('@/pages/Competition').then(m => ({ default: m.CompetitionPage })));
+const HouseCupPage = lazy(() => import('@/pages/HouseCup').then(m => ({ default: m.HouseCupPage })));
+const AnalyticsPage = lazy(() => import('@/pages/Analytics').then(m => ({ default: m.AnalyticsPage })));
+const BattlePage = lazy(() => import('@/pages/Battle').then(m => ({ default: m.BattlePage })));
+const PastPapersPage = lazy(() => import('@/pages/PastPapers').then(m => ({ default: m.PastPapers })));
+const EssayPracticePage = lazy(() => import('@/pages/EssayPractice').then(m => ({ default: m.EssayPracticePage })));
+const ContentManagementPage = lazy(() => import('@/pages/ContentManagement').then(m => ({ default: m.ContentManagementPage })));
+const MockExamsPage = lazy(() => import('@/pages/MockExams').then(m => ({ default: m.MockExamsPage })));
+const SubjectCatalogPage = lazy(() => import('@/pages/SubjectCatalog').then(m => ({ default: m.SubjectCatalogPage })));
+const CommunityPage = lazy(() => import('@/pages/Community').then(m => ({ default: m.CommunityPage })));
+const SettingsPage = lazy(() => import('@/pages/Settings'));
+
+const HelpCenter = lazy(() => import('@/pages/HelpCenter'));
+const AdminApprovals = lazy(() => import('@/pages/AdminApprovals'));
+const UserManagement = lazy(() => import('@/pages/UserManagement'));
+const AuditLog = lazy(() => import('@/pages/AuditLog'));
+const SetPasswordPage = lazy(() => import('@/pages/SetPasswordPage').then(m => ({ default: m.SetPasswordPage })));
+const ParentDashboardPage = lazy(() => import('@/pages/ParentDashboard').then(m => ({ default: m.ParentDashboardPage })));
+const ParentSettingsPage = lazy(() => import('@/pages/ParentSettings').then(m => ({ default: m.ParentSettingsPage })));
+const ParentNotificationsPage = lazy(() => import('@/pages/ParentNotifications').then(m => ({ default: m.ParentNotificationsPage })));
+const VirtualLabPage = lazy(() => import('@/components/lab').then(m => ({ default: m.VirtualLabPage })));
+
+// Teacher pages (lazy loaded)
+const TeacherDashboard = lazy(() => import('@/pages/TeacherDashboard'));
+const AssessmentList = lazy(() => import('@/pages/AssessmentList'));
+const AssessmentBuilder = lazy(() => import('@/pages/AssessmentBuilder'));
+const AssessmentGrading = lazy(() => import('@/pages/AssessmentGrading'));
+const ClassManagement = lazy(() => import('@/pages/ClassManagement'));
+
+// Student assessment pages (lazy loaded)
+const AssignedAssessments = lazy(() => import('@/pages/AssignedAssessments'));
+const TakeAssessment = lazy(() => import('@/pages/TakeAssessment'));
+const AssessmentResults = lazy(() => import('@/pages/AssessmentResults'));
+const QuestsPage = lazy(() => import('@/pages/QuestsPage'));
+const FriendsPage = lazy(() => import('@/pages/FriendsPage'));
+const StudyGroupsPage = lazy(() => import('@/pages/StudyGroupsPage'));
+const LeaderboardPage = lazy(() => import('@/pages/Leaderboard'));
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -339,16 +362,6 @@ function RegisterPage() {
   );
 }
 
-// Leaderboard Page (placeholder)
-function LeaderboardPage() {
-  return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-display font-bold text-neutral-900">Leaderboard</h1>
-      <p className="text-neutral-500">Coming soon! Track your ranking against other students.</p>
-    </div>
-  );
-}
-
 // Profile Page (placeholder)
 function ProfilePage() {
   const { user } = useAuthStore();
@@ -422,7 +435,7 @@ function App() {
         {/* Auth routes (no layout) */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/set-password" element={<SetPasswordPage />} />
+        <Route path="/set-password" element={<LazyPage><SetPasswordPage /></LazyPage>} />
 
         {/* Main app routes (with layout) */}
         <Route element={<Layout />}>
@@ -438,7 +451,7 @@ function App() {
             path="topics"
             element={
               <ProtectedRoute>
-                <TopicsPage />
+                <LazyPage><TopicsPage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -446,7 +459,7 @@ function App() {
             path="topics/:subjectSlug"
             element={
               <ProtectedRoute>
-                <TopicsPage />
+                <LazyPage><TopicsPage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -454,7 +467,7 @@ function App() {
             path="topics/:subjectSlug/:topicSlug"
             element={
               <ProtectedRoute>
-                <TopicsPage />
+                <LazyPage><TopicsPage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -462,7 +475,7 @@ function App() {
             path="practice"
             element={
               <ProtectedRoute>
-                <PracticePage />
+                <LazyPage><PracticePage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -470,7 +483,7 @@ function App() {
             path="practice/essay"
             element={
               <ProtectedRoute>
-                <EssayPracticePage />
+                <LazyPage><EssayPracticePage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -478,16 +491,48 @@ function App() {
             path="competition"
             element={
               <ProtectedRoute>
-                <CompetitionPage />
+                <LazyPage><CompetitionPage /></LazyPage>
               </ProtectedRoute>
             }
           />
-          <Route path="leaderboard" element={<LeaderboardPage />} />
+          <Route path="leaderboard" element={<LazyPage><LeaderboardPage /></LazyPage>} />
+          <Route
+            path="quests"
+            element={
+              <ProtectedRoute>
+                <LazyPage><QuestsPage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="friends"
+            element={
+              <ProtectedRoute>
+                <LazyPage><FriendsPage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="study-groups"
+            element={
+              <ProtectedRoute>
+                <LazyPage><StudyGroupsPage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="study-groups/:groupId"
+            element={
+              <ProtectedRoute>
+                <LazyPage><StudyGroupsPage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="house-cup"
             element={
               <ProtectedRoute>
-                <HouseCupPage />
+                <LazyPage><HouseCupPage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -495,7 +540,7 @@ function App() {
             path="analytics"
             element={
               <ProtectedRoute>
-                <AnalyticsPage />
+                <LazyPage><AnalyticsPage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -503,7 +548,7 @@ function App() {
             path="battle"
             element={
               <ProtectedRoute>
-                <BattlePage />
+                <LazyPage><BattlePage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -511,34 +556,34 @@ function App() {
             path="battle/:id"
             element={
               <ProtectedRoute>
-                <BattlePage />
+                <LazyPage><BattlePage /></LazyPage>
               </ProtectedRoute>
             }
           />
-          <Route path="past-papers" element={<PastPapersPage />} />
+          <Route path="past-papers" element={<LazyPage><PastPapersPage /></LazyPage>} />
           <Route
             path="past-papers/:paperId"
             element={
               <ProtectedRoute>
-                <PastPapersPage />
+                <LazyPage><PastPapersPage /></LazyPage>
               </ProtectedRoute>
             }
           />
-          <Route path="mock-exams" element={<MockExamsPage />} />
+          <Route path="mock-exams" element={<LazyPage><MockExamsPage /></LazyPage>} />
           <Route
             path="mock-exams/:examId"
             element={
               <ProtectedRoute>
-                <MockExamsPage />
+                <LazyPage><MockExamsPage /></LazyPage>
               </ProtectedRoute>
             }
           />
-          <Route path="catalog" element={<SubjectCatalogPage />} />
+          <Route path="catalog" element={<LazyPage><SubjectCatalogPage /></LazyPage>} />
           <Route
             path="virtual-lab"
             element={
               <ProtectedRoute>
-                <VirtualLabPage />
+                <LazyPage><VirtualLabPage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -546,7 +591,7 @@ function App() {
             path="virtual-lab/:experimentSlug"
             element={
               <ProtectedRoute>
-                <VirtualLabPage />
+                <LazyPage><VirtualLabPage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -554,7 +599,7 @@ function App() {
             path="community"
             element={
               <ProtectedRoute>
-                <CommunityPage />
+                <LazyPage><CommunityPage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -570,7 +615,7 @@ function App() {
             path="settings"
             element={
               <ProtectedRoute>
-                <SettingsPage />
+                <LazyPage><SettingsPage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -578,7 +623,7 @@ function App() {
             path="content"
             element={
               <ProtectedRoute>
-                <ContentManagementPage />
+                <LazyPage><ContentManagementPage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -586,7 +631,7 @@ function App() {
             path="help"
             element={
               <ProtectedRoute>
-                <HelpCenter />
+                <LazyPage><HelpCenter /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -596,7 +641,7 @@ function App() {
             path="parent"
             element={
               <ProtectedRoute>
-                <ParentDashboardPage />
+                <LazyPage><ParentDashboardPage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -604,7 +649,7 @@ function App() {
             path="parent/notifications"
             element={
               <ProtectedRoute>
-                <ParentNotificationsPage />
+                <LazyPage><ParentNotificationsPage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -612,7 +657,7 @@ function App() {
             path="parent/settings"
             element={
               <ProtectedRoute>
-                <ParentSettingsPage />
+                <LazyPage><ParentSettingsPage /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -622,7 +667,7 @@ function App() {
             path="admin/approvals"
             element={
               <ProtectedRoute>
-                <AdminApprovals />
+                <LazyPage><AdminApprovals /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -630,7 +675,7 @@ function App() {
             path="admin/users"
             element={
               <ProtectedRoute>
-                <UserManagement />
+                <LazyPage><UserManagement /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -638,7 +683,7 @@ function App() {
             path="admin/audit"
             element={
               <ProtectedRoute>
-                <AuditLog />
+                <LazyPage><AuditLog /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -648,7 +693,7 @@ function App() {
             path="teacher"
             element={
               <ProtectedRoute>
-                <TeacherDashboard />
+                <LazyPage><TeacherDashboard /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -656,7 +701,7 @@ function App() {
             path="teacher/assessments"
             element={
               <ProtectedRoute>
-                <AssessmentList />
+                <LazyPage><AssessmentList /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -664,7 +709,7 @@ function App() {
             path="teacher/assessments/new"
             element={
               <ProtectedRoute>
-                <AssessmentBuilder />
+                <LazyPage><AssessmentBuilder /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -672,7 +717,7 @@ function App() {
             path="teacher/assessments/:id/edit"
             element={
               <ProtectedRoute>
-                <AssessmentBuilder />
+                <LazyPage><AssessmentBuilder /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -680,7 +725,7 @@ function App() {
             path="teacher/grading"
             element={
               <ProtectedRoute>
-                <AssessmentGrading />
+                <LazyPage><AssessmentGrading /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -688,7 +733,7 @@ function App() {
             path="teacher/classes"
             element={
               <ProtectedRoute>
-                <ClassManagement />
+                <LazyPage><ClassManagement /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -698,7 +743,7 @@ function App() {
             path="assessments"
             element={
               <ProtectedRoute>
-                <AssignedAssessments />
+                <LazyPage><AssignedAssessments /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -706,7 +751,7 @@ function App() {
             path="assessments/:id/take"
             element={
               <ProtectedRoute>
-                <TakeAssessment />
+                <LazyPage><TakeAssessment /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -714,7 +759,7 @@ function App() {
             path="assessments/:id/results"
             element={
               <ProtectedRoute>
-                <AssessmentResults />
+                <LazyPage><AssessmentResults /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -728,6 +773,9 @@ function App() {
       <OnboardingTrigger />
       <OnboardingModal />
       <FeatureTour />
+
+      {/* Global Toast Notifications */}
+      <ToastContainer />
     </BrowserRouter>
   );
 }

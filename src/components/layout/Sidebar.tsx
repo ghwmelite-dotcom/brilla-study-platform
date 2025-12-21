@@ -26,6 +26,7 @@ import {
   Bell,
   ClipboardCheck,
   FolderOpen,
+  Target,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { useAuthStore, useExamStore, useChatStore, useProgressStore, useParentStore, useGradingStore } from '@/stores';
@@ -86,6 +87,9 @@ const communityNavItems = [
   { path: '/community', label: 'Community Hub', icon: Users, auth: true },
   { path: '/house-cup', label: 'House Cup', icon: Shield, auth: true },
   { path: '/leaderboard', label: 'Leaderboard', icon: Medal },
+  { path: '/quests', label: 'Quests', icon: Target, auth: true },
+  { path: '/friends', label: 'Friends', icon: UserCheck, auth: true },
+  { path: '/study-groups', label: 'Study Groups', icon: Users, auth: true },
 ];
 
 // Chat quick actions (not routes, but actions)

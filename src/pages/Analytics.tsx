@@ -16,6 +16,8 @@ import {
   StatsCard,
   StrengthsWeaknesses,
   PredictedScore,
+  GoalProgress,
+  StudyRecommendations,
 } from '@/components/analytics';
 import type {
   DailyProgress,
@@ -207,6 +209,22 @@ export function AnalyticsPage() {
         weaknesses={weaknesses}
         onTopicClick={handleTopicClick}
       />
+
+      {/* Goals and Recommendations */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <GoalProgress />
+        <StudyRecommendations
+          onActionClick={(rec) => {
+            if (rec.topicId) {
+              navigate(`/topics?focus=${rec.topicId}`);
+            } else if (rec.type === 'challenge') {
+              navigate('/practice');
+            } else {
+              navigate('/practice');
+            }
+          }}
+        />
+      </div>
 
       {/* Subject Performance Table */}
       <div className="bg-white rounded-xl shadow-card p-6">

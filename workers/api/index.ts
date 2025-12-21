@@ -900,13 +900,14 @@ publicApp.get('/achievements', async (c) => {
   }
 });
 
-// Leaderboard
+// Leaderboard - Top 100 users by XP
 publicApp.get('/leaderboard', async (c) => {
   const period = c.req.query('period') || 'weekly';
 
   try {
-    const { results } = await c.env.DB.prepare(`
-      SELECT l.*, u.name as user_name, u.avatar_url as user_avatar, u.house
+    // First try to get from leaderboard table
+    let results = await c.env.DB.prepare(`
+      SELECT l.*, u.name as user_name, u.avatar_url as user_avatar, u.house, u.xp_points, u.level
       FROM leaderboard l
       JOIN users u ON l.user_id = u.id
       WHERE l.period = ?
@@ -914,9 +915,604 @@ publicApp.get('/leaderboard', async (c) => {
       LIMIT 100
     `).bind(period).all();
 
-    return c.json({ success: true, data: { entries: results, period } });
+    // If leaderboard table is empty, fall back to users table directly
+    if (results.results.length === 0) {
+      results = await c.env.DB.prepare(`
+        SELECT
+          'lb_' || id as id,
+          id as user_id,
+          name as user_name,
+          avatar_url as user_avatar,
+          house,
+          xp_points as score,
+          level
+        FROM users
+        WHERE role = 'student' AND status = 'approved'
+        ORDER BY xp_points DESC
+        LIMIT 100
+      `).all();
+    }
+
+    // Add rank numbers
+    const entries = results.results.map((entry: Record<string, unknown>, index: number) => ({
+      ...entry,
+      rank: index + 1,
+    }));
+
+    // Get total count
+    const countResult = await c.env.DB.prepare(`
+      SELECT COUNT(*) as total FROM users WHERE role = 'student' AND status = 'approved'
+    `).first();
+
+    return c.json({
+      success: true,
+      data: {
+        entries,
+        period,
+        total: (countResult as Record<string, number>)?.total || entries.length,
+      },
+    });
   } catch (error) {
+    console.error('Leaderboard error:', error);
     return c.json({ success: false, error: 'Failed to fetch leaderboard' }, 500);
+  }
+});
+
+// Get user's specific rank
+publicApp.get('/leaderboard/user/:userId', async (c) => {
+  const userId = c.req.param('userId');
+  const period = c.req.query('period') || 'weekly';
+
+  try {
+    // Get user's score
+    const user = await c.env.DB.prepare(`
+      SELECT id, xp_points as score FROM users WHERE id = ?
+    `).bind(userId).first() as Record<string, unknown> | null;
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    // Count users with higher score (to determine rank)
+    const rankResult = await c.env.DB.prepare(`
+      SELECT COUNT(*) + 1 as rank
+      FROM users
+      WHERE role = 'student' AND status = 'approved' AND xp_points > ?
+    `).bind(user.score).first() as Record<string, number>;
+
+    // Get total participants
+    const totalResult = await c.env.DB.prepare(`
+      SELECT COUNT(*) as total FROM users WHERE role = 'student' AND status = 'approved'
+    `).first() as Record<string, number>;
+
+    return c.json({
+      success: true,
+      data: {
+        rank: rankResult?.rank || 1,
+        score: user.score,
+        total: totalResult?.total || 1,
+      },
+    });
+  } catch (error) {
+    console.error('User rank error:', error);
+    return c.json({ success: false, error: 'Failed to fetch user rank' }, 500);
+  }
+});
+
+// =============================================
+// QUESTS ENDPOINTS
+// =============================================
+
+// Get daily quests for user
+protectedApp.get('/quests/daily', async (c) => {
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  try {
+    // Get current date for daily reset
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    // First check if user has daily quests for today
+    const existingQuests = await c.env.DB.prepare(`
+      SELECT uq.*, qt.name as quest_name, qt.description as quest_description,
+             qt.icon as quest_icon, qt.xp_reward, qt.coin_reward, qt.difficulty,
+             qt.requirement_type
+      FROM user_quests uq
+      JOIN quest_templates qt ON uq.quest_template_id = qt.id
+      WHERE uq.user_id = ? AND qt.quest_type = 'daily'
+        AND uq.expires_at >= ?
+      ORDER BY qt.difficulty, qt.id
+    `).bind(userId, today).all();
+
+    if (existingQuests.results && existingQuests.results.length > 0) {
+      return c.json({
+        success: true,
+        data: { quests: existingQuests.results },
+      });
+    }
+
+    // No quests for today - assign new ones
+    const templates = await c.env.DB.prepare(`
+      SELECT * FROM quest_templates
+      WHERE quest_type = 'daily' AND is_active = 1
+      ORDER BY RANDOM() LIMIT 5
+    `).all();
+
+    if (!templates.results || templates.results.length === 0) {
+      // Return empty if no templates exist
+      return c.json({ success: true, data: { quests: [] } });
+    }
+
+    // Create user quests
+    const insertQuests = templates.results.map((t: Record<string, unknown>) =>
+      c.env.DB.prepare(`
+        INSERT INTO user_quests (id, user_id, quest_template_id, progress, target, status, expires_at)
+        VALUES (?, ?, ?, 0, ?, 'active', ?)
+      `).bind(
+        `uq_${crypto.randomUUID()}`,
+        userId,
+        t.id,
+        t.requirement_value,
+        tomorrow
+      )
+    );
+
+    await c.env.DB.batch(insertQuests);
+
+    // Fetch the newly created quests
+    const newQuests = await c.env.DB.prepare(`
+      SELECT uq.*, qt.name as quest_name, qt.description as quest_description,
+             qt.icon as quest_icon, qt.xp_reward, qt.coin_reward, qt.difficulty,
+             qt.requirement_type
+      FROM user_quests uq
+      JOIN quest_templates qt ON uq.quest_template_id = qt.id
+      WHERE uq.user_id = ? AND qt.quest_type = 'daily' AND uq.expires_at >= ?
+      ORDER BY qt.difficulty, qt.id
+    `).bind(userId, today).all();
+
+    return c.json({
+      success: true,
+      data: { quests: newQuests.results || [] },
+    });
+  } catch (error) {
+    console.error('Daily quests error:', error);
+    return c.json({ success: false, error: 'Failed to fetch daily quests' }, 500);
+  }
+});
+
+// Get weekly quests for user
+protectedApp.get('/quests/weekly', async (c) => {
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  try {
+    // Calculate week start (Monday) and end (Sunday)
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - daysToMonday);
+    weekStart.setHours(0, 0, 0, 0);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 7);
+
+    const weekStartStr = weekStart.toISOString().split('T')[0];
+    const weekEndStr = weekEnd.toISOString().split('T')[0];
+
+    // Check for existing weekly quests
+    const existingQuests = await c.env.DB.prepare(`
+      SELECT uq.*, qt.name as quest_name, qt.description as quest_description,
+             qt.icon as quest_icon, qt.xp_reward, qt.coin_reward, qt.difficulty,
+             qt.requirement_type
+      FROM user_quests uq
+      JOIN quest_templates qt ON uq.quest_template_id = qt.id
+      WHERE uq.user_id = ? AND qt.quest_type = 'weekly'
+        AND uq.expires_at >= ?
+      ORDER BY qt.difficulty, qt.id
+    `).bind(userId, weekStartStr).all();
+
+    if (existingQuests.results && existingQuests.results.length > 0) {
+      return c.json({
+        success: true,
+        data: { quests: existingQuests.results },
+      });
+    }
+
+    // Assign new weekly quests
+    const templates = await c.env.DB.prepare(`
+      SELECT * FROM quest_templates
+      WHERE quest_type = 'weekly' AND is_active = 1
+      ORDER BY RANDOM() LIMIT 3
+    `).all();
+
+    if (!templates.results || templates.results.length === 0) {
+      return c.json({ success: true, data: { quests: [] } });
+    }
+
+    const insertQuests = templates.results.map((t: Record<string, unknown>) =>
+      c.env.DB.prepare(`
+        INSERT INTO user_quests (id, user_id, quest_template_id, progress, target, status, expires_at)
+        VALUES (?, ?, ?, 0, ?, 'active', ?)
+      `).bind(
+        `uq_${crypto.randomUUID()}`,
+        userId,
+        t.id,
+        t.requirement_value,
+        weekEndStr
+      )
+    );
+
+    await c.env.DB.batch(insertQuests);
+
+    const newQuests = await c.env.DB.prepare(`
+      SELECT uq.*, qt.name as quest_name, qt.description as quest_description,
+             qt.icon as quest_icon, qt.xp_reward, qt.coin_reward, qt.difficulty,
+             qt.requirement_type
+      FROM user_quests uq
+      JOIN quest_templates qt ON uq.quest_template_id = qt.id
+      WHERE uq.user_id = ? AND qt.quest_type = 'weekly' AND uq.expires_at >= ?
+      ORDER BY qt.difficulty, qt.id
+    `).bind(userId, weekStartStr).all();
+
+    return c.json({
+      success: true,
+      data: { quests: newQuests.results || [] },
+    });
+  } catch (error) {
+    console.error('Weekly quests error:', error);
+    return c.json({ success: false, error: 'Failed to fetch weekly quests' }, 500);
+  }
+});
+
+// Get current weekly challenge
+protectedApp.get('/quests/weekly-challenge', async (c) => {
+  const userId = getUserId(c);
+
+  try {
+    const now = new Date().toISOString();
+
+    const challenge = await c.env.DB.prepare(`
+      SELECT wc.*, uwc.progress as user_progress, uwc.status as user_status
+      FROM weekly_challenges wc
+      LEFT JOIN user_weekly_challenges uwc ON wc.id = uwc.challenge_id AND uwc.user_id = ?
+      WHERE wc.is_active = 1 AND wc.start_date <= ? AND wc.end_date >= ?
+      ORDER BY wc.created_at DESC
+      LIMIT 1
+    `).bind(userId || '', now, now).first();
+
+    return c.json({
+      success: true,
+      data: { challenge },
+    });
+  } catch (error) {
+    console.error('Weekly challenge error:', error);
+    return c.json({ success: false, error: 'Failed to fetch weekly challenge' }, 500);
+  }
+});
+
+// Claim quest reward
+protectedApp.post('/quests/:questId/claim', async (c) => {
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  const questId = c.req.param('questId');
+
+  try {
+    // Get the quest
+    const quest = await c.env.DB.prepare(`
+      SELECT uq.*, qt.xp_reward, qt.coin_reward
+      FROM user_quests uq
+      JOIN quest_templates qt ON uq.quest_template_id = qt.id
+      WHERE uq.id = ? AND uq.user_id = ?
+    `).bind(questId, userId).first() as Record<string, unknown> | null;
+
+    if (!quest) {
+      return c.json({ success: false, error: 'Quest not found' }, 404);
+    }
+
+    if (quest.status !== 'completed') {
+      return c.json({ success: false, error: 'Quest not completed yet' }, 400);
+    }
+
+    // Mark as claimed
+    await c.env.DB.prepare(`
+      UPDATE user_quests SET status = 'claimed', claimed_at = datetime('now')
+      WHERE id = ?
+    `).bind(questId).run();
+
+    // Award XP
+    const xpReward = quest.xp_reward as number;
+    await c.env.DB.prepare(`
+      UPDATE users SET xp_points = xp_points + ? WHERE id = ?
+    `).bind(xpReward, userId).run();
+
+    // Record completion
+    await c.env.DB.prepare(`
+      INSERT INTO quest_completions (id, user_id, quest_template_id, xp_earned, quest_type)
+      VALUES (?, ?, ?, ?, (SELECT quest_type FROM quest_templates WHERE id = ?))
+    `).bind(`qc_${crypto.randomUUID()}`, userId, quest.quest_template_id, xpReward, quest.quest_template_id).run();
+
+    return c.json({
+      success: true,
+      data: {
+        xp: xpReward,
+        coins: quest.coin_reward || 0,
+      },
+    });
+  } catch (error) {
+    console.error('Claim quest error:', error);
+    return c.json({ success: false, error: 'Failed to claim reward' }, 500);
+  }
+});
+
+// Update quest progress (internal helper - called after answering questions, etc.)
+protectedApp.post('/quests/progress', async (c) => {
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  try {
+    const { requirementType, amount } = await c.req.json();
+
+    // Update all active quests matching the requirement type
+    await c.env.DB.prepare(`
+      UPDATE user_quests
+      SET progress = MIN(progress + ?, target)
+      WHERE user_id = ? AND status = 'active'
+        AND quest_template_id IN (
+          SELECT id FROM quest_templates WHERE requirement_type = ?
+        )
+    `).bind(amount, userId, requirementType).run();
+
+    // Check and mark completed quests
+    await c.env.DB.prepare(`
+      UPDATE user_quests
+      SET status = 'completed', completed_at = datetime('now')
+      WHERE user_id = ? AND status = 'active' AND progress >= target
+    `).bind(userId).run();
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Update progress error:', error);
+    return c.json({ success: false, error: 'Failed to update progress' }, 500);
+  }
+});
+
+// =============================================
+// STREAK ENDPOINTS
+// =============================================
+
+// Get streak info and milestones
+protectedApp.get('/streak/info', async (c) => {
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  try {
+    // Get user streak data
+    const user = await c.env.DB.prepare(`
+      SELECT streak_days, longest_streak, streak_protections, streak_freeze_active, streak_last_activity
+      FROM users WHERE id = ?
+    `).bind(userId).first() as Record<string, unknown> | null;
+
+    // Get milestones with claimed status
+    const milestones = await c.env.DB.prepare(`
+      SELECT sm.*,
+        CASE WHEN usm.id IS NOT NULL THEN 1 ELSE 0 END as is_claimed
+      FROM streak_milestones sm
+      LEFT JOIN user_streak_milestones usm ON sm.id = usm.milestone_id AND usm.user_id = ?
+      ORDER BY sm.days ASC
+    `).bind(userId).all();
+
+    return c.json({
+      success: true,
+      data: {
+        currentStreak: user?.streak_days || 0,
+        longestStreak: user?.longest_streak || 0,
+        lastActivity: user?.streak_last_activity,
+        protectionsAvailable: user?.streak_protections || 0,
+        protectionActive: !!user?.streak_freeze_active,
+        protectionLastUsed: null,
+        milestones: milestones.results || [],
+      },
+    });
+  } catch (error) {
+    console.error('Streak info error:', error);
+    return c.json({ success: false, error: 'Failed to fetch streak info' }, 500);
+  }
+});
+
+// Use streak protection
+protectedApp.post('/streak/use-protection', async (c) => {
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  try {
+    // Check if user has protections
+    const user = await c.env.DB.prepare(`
+      SELECT streak_protections, streak_freeze_active FROM users WHERE id = ?
+    `).bind(userId).first() as Record<string, unknown> | null;
+
+    if (!user || (user.streak_protections as number) < 1) {
+      return c.json({ success: false, error: 'No streak protections available' }, 400);
+    }
+
+    if (user.streak_freeze_active) {
+      return c.json({ success: false, error: 'Streak protection already active' }, 400);
+    }
+
+    // Activate protection
+    await c.env.DB.prepare(`
+      UPDATE users
+      SET streak_protections = streak_protections - 1,
+          streak_freeze_active = 1,
+          streak_protection_used_at = datetime('now')
+      WHERE id = ?
+    `).bind(userId).run();
+
+    // Log the action
+    await c.env.DB.prepare(`
+      INSERT INTO streak_protection_log (id, user_id, action, amount, reason, streak_before)
+      VALUES (?, ?, 'used', 1, 'Manual activation', (SELECT streak_days FROM users WHERE id = ?))
+    `).bind(`spl_${crypto.randomUUID()}`, userId, userId).run();
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Use protection error:', error);
+    return c.json({ success: false, error: 'Failed to use protection' }, 500);
+  }
+});
+
+// Claim streak milestone
+protectedApp.post('/streak/milestones/:milestoneId/claim', async (c) => {
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  const milestoneId = c.req.param('milestoneId');
+
+  try {
+    // Check if already claimed
+    const existing = await c.env.DB.prepare(`
+      SELECT id FROM user_streak_milestones WHERE user_id = ? AND milestone_id = ?
+    `).bind(userId, milestoneId).first();
+
+    if (existing) {
+      return c.json({ success: false, error: 'Milestone already claimed' }, 400);
+    }
+
+    // Get milestone and user streak
+    const milestone = await c.env.DB.prepare(`
+      SELECT * FROM streak_milestones WHERE id = ?
+    `).bind(milestoneId).first() as Record<string, unknown> | null;
+
+    const user = await c.env.DB.prepare(`
+      SELECT streak_days FROM users WHERE id = ?
+    `).bind(userId).first() as Record<string, unknown> | null;
+
+    if (!milestone) {
+      return c.json({ success: false, error: 'Milestone not found' }, 404);
+    }
+
+    if (!user || (user.streak_days as number) < (milestone.days as number)) {
+      return c.json({ success: false, error: 'Milestone not yet achieved' }, 400);
+    }
+
+    // Claim milestone
+    await c.env.DB.prepare(`
+      INSERT INTO user_streak_milestones (id, user_id, milestone_id)
+      VALUES (?, ?, ?)
+    `).bind(`usm_${crypto.randomUUID()}`, userId, milestoneId).run();
+
+    // Award rewards
+    const xpReward = milestone.xp_reward as number;
+    const protectionReward = milestone.protection_reward as number;
+
+    await c.env.DB.prepare(`
+      UPDATE users
+      SET xp_points = xp_points + ?,
+          streak_protections = streak_protections + ?
+      WHERE id = ?
+    `).bind(xpReward, protectionReward, userId).run();
+
+    // Log if protections earned
+    if (protectionReward > 0) {
+      await c.env.DB.prepare(`
+        INSERT INTO streak_protection_log (id, user_id, action, amount, reason)
+        VALUES (?, ?, 'earned', ?, ?)
+      `).bind(`spl_${crypto.randomUUID()}`, userId, protectionReward, `Streak milestone: ${milestone.name}`).run();
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        xp: xpReward,
+        protections: protectionReward,
+      },
+    });
+  } catch (error) {
+    console.error('Claim milestone error:', error);
+    return c.json({ success: false, error: 'Failed to claim milestone' }, 500);
+  }
+});
+
+// Record study activity (updates streak)
+protectedApp.post('/streak/activity', async (c) => {
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  try {
+    const today = new Date().toISOString().split('T')[0];
+
+    // Get user's last activity
+    const user = await c.env.DB.prepare(`
+      SELECT streak_days, longest_streak, streak_last_activity, streak_freeze_active
+      FROM users WHERE id = ?
+    `).bind(userId).first() as Record<string, unknown> | null;
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    const lastActivity = user.streak_last_activity as string | null;
+    let currentStreak = (user.streak_days as number) || 0;
+    let longestStreak = (user.longest_streak as number) || 0;
+
+    if (lastActivity) {
+      const lastDate = new Date(lastActivity).toISOString().split('T')[0];
+      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+      if (lastDate === today) {
+        // Already recorded today
+        return c.json({ success: true, data: { streak: currentStreak } });
+      } else if (lastDate === yesterday) {
+        // Continued streak
+        currentStreak += 1;
+      } else if (user.streak_freeze_active) {
+        // Missed day but had protection active
+        currentStreak += 1;
+      } else {
+        // Streak broken
+        currentStreak = 1;
+      }
+    } else {
+      // First activity
+      currentStreak = 1;
+    }
+
+    longestStreak = Math.max(longestStreak, currentStreak);
+
+    // Update user
+    await c.env.DB.prepare(`
+      UPDATE users
+      SET streak_days = ?,
+          longest_streak = ?,
+          streak_last_activity = ?,
+          streak_freeze_active = 0
+      WHERE id = ?
+    `).bind(currentStreak, longestStreak, today, userId).run();
+
+    return c.json({
+      success: true,
+      data: { streak: currentStreak, longest: longestStreak },
+    });
+  } catch (error) {
+    console.error('Record activity error:', error);
+    return c.json({ success: false, error: 'Failed to record activity' }, 500);
   }
 });
 
