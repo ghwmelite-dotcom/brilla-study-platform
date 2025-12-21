@@ -48,7 +48,13 @@ async function verifyJWT(token: string, secret: string): Promise<{ userId: strin
 const libraryApp = new Hono<{ Bindings: Env }>();
 
 // Auth middleware - sets userId and userRole in context if valid token provided
+// Skip auth for file serving endpoints (public access)
 libraryApp.use('*', async (c, next) => {
+  // Skip auth for file serving - files should be publicly accessible
+  if (c.req.path.includes('/files/')) {
+    return next();
+  }
+
   const authHeader = c.req.header('Authorization');
 
   if (authHeader?.startsWith('Bearer ')) {
