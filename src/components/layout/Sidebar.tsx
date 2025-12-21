@@ -27,6 +27,8 @@ import {
   ClipboardCheck,
   FolderOpen,
   Target,
+  Library,
+  Heart,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { useAuthStore, useExamStore, useChatStore, useProgressStore, useParentStore, useGradingStore } from '@/stores';
@@ -81,6 +83,12 @@ const examSpecificItems = {
     { path: '/mock-exams', label: 'Mock Exams', icon: ClipboardList },
   ],
 };
+
+// Learning Resources navigation items
+const resourcesNavItems = [
+  { path: '/library', label: 'E-Library', icon: Library },
+  { path: '/counselor', label: 'AI Counselor', icon: Heart, auth: true },
+];
 
 // Community navigation items
 const communityNavItems = [
@@ -342,6 +350,40 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               </ul>
             </div>
           )}
+
+          {/* Learning Resources */}
+          <div>
+            <h3 className="px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
+              Resources
+            </h3>
+            <ul className="space-y-1">
+              {resourcesNavItems.map((item) => {
+                if ('auth' in item && item.auth && !isAuthenticated) return null;
+
+                return (
+                  <li key={item.path}>
+                    <NavLink
+                      to={item.path}
+                      onClick={onClose}
+                      className={({ isActive }) =>
+                        cn(
+                          'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                          isActive
+                            ? item.path === '/counselor'
+                              ? 'bg-green-600 text-white'
+                              : 'bg-primary text-white'
+                            : 'text-neutral-700 hover:bg-neutral-100'
+                        )
+                      }
+                    >
+                      <item.icon className="w-5 h-5" />
+                      {item.label}
+                    </NavLink>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
 
           {/* Community Features */}
           <div>

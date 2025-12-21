@@ -22,5 +22,8 @@ export { useReminderStore } from './reminderStore';
 export { useFriendStore } from './friendStore';
 export { useXpEventStore } from './xpEventStore';
 export { useStudyGroupStore } from './studyGroupStore';
+export { useLibraryStore } from './libraryStore';
+export { useCounselorStore } from './counselorStore';
+export { useCounselorReportsStore } from './counselorReportsStore';
 export type { Toast, ToastType } from './toastStore';
 export type { ChatMessage as AiChatMessage, UserPersonalization } from './aiTutorStore';

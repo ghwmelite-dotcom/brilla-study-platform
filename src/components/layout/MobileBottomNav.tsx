@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Brain, Trophy, User } from 'lucide-react';
+import { Home, BookOpen, Brain, Trophy, Library } from 'lucide-react';
 import { cn } from '@/utils';
 import { useAuthStore } from '@/stores';
 
@@ -14,8 +14,8 @@ const navItems: NavItem[] = [
   { path: '/', label: 'Home', icon: Home },
   { path: '/topics', label: 'Topics', icon: BookOpen },
   { path: '/practice', label: 'Practice', icon: Brain, auth: true },
+  { path: '/library', label: 'Library', icon: Library },
   { path: '/leaderboard', label: 'Ranks', icon: Trophy },
-  { path: '/profile', label: 'Profile', icon: User, auth: true },
 ];
 
 export function MobileBottomNav() {

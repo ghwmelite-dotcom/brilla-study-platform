@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { jwt, sign, verify } from 'hono/jwt';
 import type { JWTPayload } from 'hono/utils/jwt/types';
+import { libraryApp } from './library';
+import { counselorApp } from './counselor';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -13,6 +15,7 @@ interface Env {
   AI_MODEL?: string;
   RESEND_API_KEY?: string;
   APP_URL?: string;
+  LIBRARY_BUCKET?: R2Bucket;
 }
 
 // User type for JWT payload
@@ -6637,6 +6640,12 @@ protectedApp.get('/students/search', async (c) => {
 
 // Mount protected routes (must be after all protectedApp routes are defined)
 app.route('/api', protectedApp);
+
+// Mount Library routes
+app.route('/api/library', libraryApp);
+
+// Mount Counselor routes
+app.route('/api/counselor', counselorApp);
 
 // 404 handler
 app.notFound((c) => {

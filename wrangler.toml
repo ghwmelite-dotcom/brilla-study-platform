@@ -14,6 +14,11 @@ FROM_EMAIL = "Brilla Study Platform <noreply@brillaprep.org>"
 # wrangler secret put ANTHROPIC_API_KEY (your Claude API key)
 # wrangler secret put RESEND_API_KEY    (your Resend API key for emails)
 
+# R2 Storage for E-Library multimedia content
+[[r2_buckets]]
+binding = "LIBRARY_BUCKET"
+bucket_name = "brilla-library"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "brilla-db"
@@ -35,3 +40,7 @@ FROM_EMAIL = "Brilla Study Platform <noreply@brillaprep.org>"
 binding = "DB"
 database_name = "brilla-db"
 database_id = "aa806d65-d3dd-4cf9-9cac-e3ddd252f937"
+
+[[env.production.r2_buckets]]
+binding = "LIBRARY_BUCKET"
+bucket_name = "brilla-library"

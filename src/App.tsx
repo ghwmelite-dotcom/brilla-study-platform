@@ -46,6 +46,7 @@ const AuditLog = lazy(() => import('@/pages/AuditLog'));
 const SetPasswordPage = lazy(() => import('@/pages/SetPasswordPage').then(m => ({ default: m.SetPasswordPage })));
 const ParentDashboardPage = lazy(() => import('@/pages/ParentDashboard').then(m => ({ default: m.ParentDashboardPage })));
 const ParentSettingsPage = lazy(() => import('@/pages/ParentSettings').then(m => ({ default: m.ParentSettingsPage })));
+const ParentReportsPage = lazy(() => import('@/pages/ParentReports').then(m => ({ default: m.ParentReportsPage })));
 const ParentNotificationsPage = lazy(() => import('@/pages/ParentNotifications').then(m => ({ default: m.ParentNotificationsPage })));
 const VirtualLabPage = lazy(() => import('@/components/lab').then(m => ({ default: m.VirtualLabPage })));
 
@@ -64,6 +65,8 @@ const QuestsPage = lazy(() => import('@/pages/QuestsPage'));
 const FriendsPage = lazy(() => import('@/pages/FriendsPage'));
 const StudyGroupsPage = lazy(() => import('@/pages/StudyGroupsPage'));
 const LeaderboardPage = lazy(() => import('@/pages/Leaderboard'));
+const LibraryPage = lazy(() => import('@/pages/Library').then(m => ({ default: m.LibraryPage })));
+const CounselorPage = lazy(() => import('@/pages/Counselor').then(m => ({ default: m.CounselorPage })));
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -595,6 +598,45 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* E-Library routes */}
+          <Route path="library" element={<LazyPage><LibraryPage /></LazyPage>} />
+          <Route path="library/:resourceId" element={<LazyPage><LibraryPage /></LazyPage>} />
+          <Route
+            path="library/collections"
+            element={
+              <ProtectedRoute>
+                <LazyPage><LibraryPage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="library/collections/:collectionId"
+            element={
+              <ProtectedRoute>
+                <LazyPage><LibraryPage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* AI Counselor routes */}
+          <Route
+            path="counselor"
+            element={
+              <ProtectedRoute>
+                <LazyPage><CounselorPage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="counselor/:conversationId"
+            element={
+              <ProtectedRoute>
+                <LazyPage><CounselorPage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="community"
             element={
@@ -658,6 +700,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <LazyPage><ParentSettingsPage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="parent/reports"
+            element={
+              <ProtectedRoute>
+                <LazyPage><ParentReportsPage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="parent/reports/:reportId"
+            element={
+              <ProtectedRoute>
+                <LazyPage><ParentReportsPage /></LazyPage>
               </ProtectedRoute>
             }
           />

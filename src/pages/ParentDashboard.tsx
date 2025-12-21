@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Users,
   Bell,
@@ -14,11 +14,16 @@ import {
   AlertCircle,
   CheckCircle,
   BookOpen,
+  FileText,
+  Heart,
+  AlertTriangle,
 } from 'lucide-react';
 import { Card, CardHeader, Button, Badge, ProgressBar, CircularProgress } from '@/components/common';
-import { useParentStore, useAuthStore } from '@/stores';
+import { useParentStore, useAuthStore, useCounselorReportsStore } from '@/stores';
+import { AlertCard } from '@/components/counselorReports';
 import { cn } from '@/utils';
-import type { ParentStudentLink, StudentProgressSummary } from '@/types';
+import type { ParentStudentLink, StudentProgressSummary, CounselorReport, WellbeingAlert } from '@/types';
+import { CONCERN_LEVEL_CONFIG } from '@/types/counselorReports';
 
 // Student Card Component
 function StudentCard({
@@ -172,8 +177,126 @@ function NotificationPreview({
   );
 }
 
+// Counselor Reports Preview Component
+function CounselorReportsPreview({
+  reports,
+  alerts,
+  onViewReport,
+  onViewAllReports,
+}: {
+  reports: CounselorReport[];
+  alerts: WellbeingAlert[];
+  onViewReport: (report: CounselorReport) => void;
+  onViewAllReports: () => void;
+}) {
+  const unresolvedAlerts = alerts.filter(a => !a.isResolved);
+  const unreadReports = reports.filter(r => !r.isReadByParent);
+
+  return (
+    <Card className="p-6">
+      <CardHeader
+        title="Counselor Insights"
+        action={
+          <div className="flex items-center gap-2">
+            {unreadReports.length > 0 && (
+              <Badge variant="primary" size="sm">{unreadReports.length} new</Badge>
+            )}
+            {unresolvedAlerts.length > 0 && (
+              <Badge variant="warning" size="sm">{unresolvedAlerts.length} alerts</Badge>
+            )}
+          </div>
+        }
+      />
+
+      {/* Alerts Section */}
+      {unresolvedAlerts.length > 0 && (
+        <div className="mb-4">
+          <p className="text-sm font-medium text-neutral-700 mb-2 flex items-center gap-1">
+            <AlertTriangle className="w-4 h-4 text-orange-500" />
+            Attention Needed
+          </p>
+          <div className="space-y-2">
+            {unresolvedAlerts.slice(0, 2).map((alert) => (
+              <AlertCard key={alert.id} alert={alert} compact />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recent Reports */}
+      {reports.length > 0 ? (
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-neutral-700 flex items-center gap-1">
+            <FileText className="w-4 h-4 text-primary" />
+            Recent Reports
+          </p>
+          {reports.slice(0, 2).map((report) => (
+            <div
+              key={report.id}
+              onClick={() => onViewReport(report)}
+              className={cn(
+                'p-3 rounded-lg cursor-pointer hover:bg-neutral-50 transition-colors border',
+                !report.isReadByParent ? 'border-primary bg-primary/5' : 'border-neutral-200'
+              )}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-sm text-neutral-900">{report.studentName}</span>
+                  {!report.isReadByParent && (
+                    <span className="text-xs bg-primary text-white px-1.5 py-0.5 rounded">New</span>
+                  )}
+                </div>
+                <span className="text-xs text-neutral-500">
+                  {new Date(report.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+              <p className="text-xs text-neutral-500 line-clamp-1">{report.summary}</p>
+              <div className="flex items-center gap-2 mt-2">
+                <div
+                  className="text-xs px-1.5 py-0.5 rounded-full"
+                  style={{
+                    backgroundColor: CONCERN_LEVEL_CONFIG[report.concernLevel].bgColor,
+                    color: CONCERN_LEVEL_CONFIG[report.concernLevel].color,
+                  }}
+                >
+                  {CONCERN_LEVEL_CONFIG[report.concernLevel].label}
+                </div>
+                {report.wellbeingScore && (
+                  <span className="text-xs text-neutral-500">
+                    Wellbeing: {report.wellbeingScore}%
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-6">
+          <Heart className="w-10 h-10 text-neutral-300 mx-auto mb-2" />
+          <p className="text-neutral-500 text-sm">No counselor reports yet</p>
+          <p className="text-xs text-neutral-400 mt-1">
+            Reports will be generated as your ward uses the counselor
+          </p>
+        </div>
+      )}
+
+      <Button
+        variant="outline"
+        fullWidth
+        size="sm"
+        className="mt-4"
+        rightIcon={<ChevronRight className="w-4 h-4" />}
+        onClick={onViewAllReports}
+      >
+        View All Reports
+      </Button>
+    </Card>
+  );
+}
+
 export function ParentDashboardPage() {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const {
     linkedStudents,
     selectedStudentId,
@@ -187,6 +310,13 @@ export function ParentDashboardPage() {
     fetchNotifications,
   } = useParentStore();
 
+  const {
+    reports,
+    alerts,
+    loadReports,
+    loadAlerts,
+  } = useCounselorReportsStore();
+
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Load data on mount
@@ -195,6 +325,8 @@ export function ParentDashboardPage() {
       await Promise.all([
         fetchLinkedStudents(),
         fetchNotifications(),
+        loadReports(),
+        loadAlerts(),
       ]);
       setIsInitialLoad(false);
     };
@@ -511,6 +643,14 @@ export function ParentDashboardPage() {
               unreadCount={unreadCount}
             />
 
+            {/* Counselor Reports */}
+            <CounselorReportsPreview
+              reports={reports.filter(r => r.studentId === selectedStudentId)}
+              alerts={alerts.filter(a => a.studentId === selectedStudentId)}
+              onViewReport={(report) => navigate(`/parent/reports/${report.id}`)}
+              onViewAllReports={() => navigate('/parent/reports')}
+            />
+
             {/* Quick Actions */}
             <Card className="p-6">
               <CardHeader title="Quick Actions" />
@@ -518,6 +658,11 @@ export function ParentDashboardPage() {
                 <Link to={`/parent/student/${selectedStudentId}`} className="block">
                   <Button variant="outline" fullWidth leftIcon={<TrendingUp className="w-4 h-4" />}>
                     View Detailed Progress
+                  </Button>
+                </Link>
+                <Link to="/parent/reports" className="block">
+                  <Button variant="outline" fullWidth leftIcon={<FileText className="w-4 h-4" />}>
+                    Counselor Reports
                   </Button>
                 </Link>
                 <Link to="/parent/settings" className="block">
