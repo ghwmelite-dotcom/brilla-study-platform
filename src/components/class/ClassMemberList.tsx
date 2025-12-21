@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { ClassMember } from '@/types';
-import { cn } from '@/utils';
 
 interface ClassMemberListProps {
   classId: string;

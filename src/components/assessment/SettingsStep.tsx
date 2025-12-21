@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Shuffle, RefreshCw, Award, CheckCircle } from 'lucide-react';
+import { Eye, Shuffle, RefreshCw, Award, CheckCircle } from 'lucide-react';
 import type { AssessmentDraft } from '@/types';
 import { cn } from '@/utils';
 

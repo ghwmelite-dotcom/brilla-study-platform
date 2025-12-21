@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Calendar, Clock, AlertTriangle, Info } from 'lucide-react';
 import type { AssessmentDraft } from '@/types';
 import { cn } from '@/utils';

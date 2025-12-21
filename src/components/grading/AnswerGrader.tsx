@@ -26,7 +26,6 @@ export function AnswerGrader({ answer, questionNumber }: AnswerGraderProps) {
   // Mock question data - in real app, this would come from the answer or question
   const maxMarks = 5; // This should come from the actual question
   const questionText = 'Sample question text would appear here';
-  const questionType = 'essay'; // This should come from actual data
 
   const handleGrade = async (value: number) => {
     setMarks(value);

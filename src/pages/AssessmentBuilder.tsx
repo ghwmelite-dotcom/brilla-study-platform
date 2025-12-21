@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { useAssessmentStore } from '@/stores/assessmentStore';
-import type { AssessmentType, AssessmentDraft } from '@/types';
+import type { AssessmentType } from '@/types';
 import {
   BasicInfoStep,
   TimingStep,
@@ -50,6 +50,7 @@ export default function AssessmentBuilder() {
     initDraft,
     updateDraft,
     saveDraft,
+    saveDraftAsAssessment,
     publishAssessment,
     clearDraft,
     clearError,
@@ -139,8 +140,11 @@ export default function AssessmentBuilder() {
 
     setIsPublishing(true);
     try {
-      const assessment = await publishAssessment();
-      if (assessment) {
+      // First save/create the assessment
+      const assessment = await saveDraftAsAssessment();
+      if (assessment?.id) {
+        // Then publish it
+        await publishAssessment(assessment.id);
         clearDraft();
         navigate('/teacher/assessments');
       }
@@ -248,7 +252,6 @@ export default function AssessmentBuilder() {
           <div className="flex items-center justify-between">
             {STEPS.map((step, index) => {
               const status = getStepStatus(step.id);
-              const Icon = step.icon;
 
               return (
                 <div key={step.id} className="flex items-center">

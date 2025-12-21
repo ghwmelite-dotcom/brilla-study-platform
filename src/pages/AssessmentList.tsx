@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   Plus,
   Search,
-  Filter,
   ArrowLeft,
   RefreshCw,
   ChevronDown,
@@ -16,8 +15,6 @@ import {
   Edit,
   Copy,
   Trash2,
-  Eye,
-  Send,
   Users,
   Clock,
   Calendar,

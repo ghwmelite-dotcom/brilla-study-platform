@@ -22,7 +22,7 @@ type TabFilter = 'pending' | 'completed' | 'all';
 
 export default function AssignedAssessments() {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const {
     pendingAssessments,
     completedAssessments,
@@ -30,7 +30,6 @@ export default function AssignedAssessments() {
     isLoading,
     error,
     fetchAssignedAssessments,
-    clearError,
   } = useStudentAssessmentStore();
 
   const [activeTab, setActiveTab] = useState<TabFilter>('pending');

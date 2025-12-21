@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   Search,
-  Filter,
   RefreshCw,
   ChevronDown,
   X,
@@ -18,11 +17,11 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { useGradingStore } from '@/stores/gradingStore';
-import type { AssessmentAttempt, GradingStatus } from '@/types';
+import type { AssessmentAttempt, AssessmentGradingStatus } from '@/types';
 import { GradingPanel } from '@/components/grading';
 import { cn } from '@/utils';
 
-type StatusFilter = GradingStatus | 'all';
+type StatusFilter = AssessmentGradingStatus | 'all';
 
 export default function AssessmentGrading() {
   const navigate = useNavigate();
@@ -95,7 +94,7 @@ export default function AssessmentGrading() {
     return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   };
 
-  const getStatusBadge = (status: GradingStatus) => {
+  const getStatusBadge = (status: AssessmentGradingStatus) => {
     switch (status) {
       case 'pending':
         return (

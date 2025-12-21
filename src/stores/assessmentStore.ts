@@ -2,46 +2,42 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type {
   Assessment,
-  AssessmentQuestion,
   AssessmentDraft,
   AssessmentQuestionDraft,
   AssessmentAssignmentDraft,
   AssessmentFilters,
   StudentClass,
-  ClassMember,
   TeacherDashboardStats,
   AssessmentType,
   Question,
 } from '@/types';
 import { api } from '@/lib/api';
 
-// Default draft state
+// Default draft state (flat structure for easy form binding)
 const defaultDraft: AssessmentDraft = {
   step: 0,
-  basicInfo: {
-    title: '',
-    description: '',
-    assessmentType: 'quiz',
-    subjectId: undefined,
-    instructions: '',
-  },
-  timing: {
-    timeLimit: undefined,
-    startDate: undefined,
-    endDate: undefined,
-    lateSubmissionAllowed: false,
-    latePenaltyPercent: 0,
-  },
-  settings: {
-    passingScore: undefined,
-    showCorrectAnswers: true,
-    showScoreImmediately: true,
-    shuffleQuestions: false,
-    shuffleOptions: false,
-    oneQuestionPerPage: false,
-    allowReview: true,
-    maxAttempts: 1,
-  },
+  // Basic Info
+  title: '',
+  description: '',
+  assessmentType: 'quiz',
+  subjectId: undefined,
+  instructions: '',
+  // Timing
+  timeLimit: undefined,
+  startDate: undefined,
+  endDate: undefined,
+  lateSubmissionAllowed: false,
+  latePenaltyPercent: 0,
+  // Settings
+  passingScore: undefined,
+  showCorrectAnswers: true,
+  showScoreImmediately: true,
+  shuffleQuestions: false,
+  shuffleOptions: false,
+  oneQuestionPerPage: false,
+  allowReview: true,
+  maxAttempts: 1,
+  // Questions and Assignments
   questions: [],
   assignments: [],
 };
@@ -141,16 +137,16 @@ interface AssessmentState {
   initDraft: (type?: AssessmentType) => void;
   loadAssessmentIntoDraft: (assessment: Assessment) => void;
   updateDraft: (updates: Partial<AssessmentDraft>) => void;
-  updateDraftBasicInfo: (info: Partial<AssessmentDraft['basicInfo']>) => void;
-  updateDraftTiming: (timing: Partial<AssessmentDraft['timing']>) => void;
-  updateDraftSettings: (settings: Partial<AssessmentDraft['settings']>) => void;
   addDraftQuestion: (question: AssessmentQuestionDraft) => void;
+  addDraftQuestions: (questions: AssessmentQuestionDraft[]) => void;
   removeDraftQuestion: (id: string) => void;
   updateDraftQuestion: (id: string, updates: Partial<AssessmentQuestionDraft>) => void;
   reorderDraftQuestions: (startIndex: number, endIndex: number) => void;
   setDraftAssignments: (assignments: AssessmentAssignmentDraft[]) => void;
   setDraftStep: (step: number) => void;
   resetDraft: () => void;
+  clearDraft: () => void;
+  saveDraft: () => Promise<boolean>;
   saveDraftAsAssessment: () => Promise<Assessment | null>;
 
   // ========================================
@@ -238,17 +234,24 @@ export const useAssessmentStore = create<AssessmentState>()(
 
         try {
           const assessmentData = {
-            title: draft.basicInfo.title,
-            description: draft.basicInfo.description,
-            assessmentType: draft.basicInfo.assessmentType,
-            subjectId: draft.basicInfo.subjectId,
-            instructions: draft.basicInfo.instructions,
-            timeLimit: draft.timing.timeLimit,
-            startDate: draft.timing.startDate,
-            endDate: draft.timing.endDate,
-            lateSubmissionAllowed: draft.timing.lateSubmissionAllowed,
-            latePenaltyPercent: draft.timing.latePenaltyPercent,
-            ...draft.settings,
+            title: draft.title,
+            description: draft.description,
+            assessmentType: draft.assessmentType,
+            subjectId: draft.subjectId,
+            instructions: draft.instructions,
+            timeLimit: draft.timeLimit,
+            startDate: draft.startDate,
+            endDate: draft.endDate,
+            lateSubmissionAllowed: draft.lateSubmissionAllowed,
+            latePenaltyPercent: draft.latePenaltyPercent,
+            passingScore: draft.passingScore,
+            showCorrectAnswers: draft.showCorrectAnswers,
+            showScoreImmediately: draft.showScoreImmediately,
+            shuffleQuestions: draft.shuffleQuestions,
+            shuffleOptions: draft.shuffleOptions,
+            oneQuestionPerPage: draft.oneQuestionPerPage,
+            allowReview: draft.allowReview,
+            maxAttempts: draft.maxAttempts,
             questions: draft.questions,
             assignments: draft.assignments,
           };
@@ -757,10 +760,7 @@ export const useAssessmentStore = create<AssessmentState>()(
         set({
           draft: {
             ...defaultDraft,
-            basicInfo: {
-              ...defaultDraft.basicInfo,
-              assessmentType: type || 'quiz',
-            },
+            assessmentType: type || 'quiz',
           },
           isEditMode: false,
           editingAssessmentId: null,
@@ -770,45 +770,42 @@ export const useAssessmentStore = create<AssessmentState>()(
       loadAssessmentIntoDraft: (assessment: Assessment) => {
         set({
           draft: {
+            id: assessment.id,
             step: 0,
-            basicInfo: {
-              title: assessment.title,
-              description: assessment.description || '',
-              assessmentType: assessment.assessmentType,
-              subjectId: assessment.subjectId,
-              instructions: assessment.instructions || '',
-            },
-            timing: {
-              timeLimit: assessment.timeLimit,
-              startDate: assessment.startDate,
-              endDate: assessment.endDate,
-              lateSubmissionAllowed: assessment.lateSubmissionAllowed,
-              latePenaltyPercent: assessment.latePenaltyPercent,
-            },
-            settings: {
-              passingScore: assessment.passingScore,
-              showCorrectAnswers: assessment.showCorrectAnswers,
-              showScoreImmediately: assessment.showScoreImmediately,
-              shuffleQuestions: assessment.shuffleQuestions,
-              shuffleOptions: assessment.shuffleOptions,
-              oneQuestionPerPage: assessment.oneQuestionPerPage,
-              allowReview: assessment.allowReview,
-              maxAttempts: assessment.maxAttempts,
-            },
-            questions: (assessment.questions || []).map((q) => ({
+            // Basic Info
+            title: assessment.title,
+            description: assessment.description || '',
+            assessmentType: assessment.assessmentType,
+            subjectId: assessment.subjectId,
+            instructions: assessment.instructions || '',
+            // Timing
+            timeLimit: assessment.timeLimit,
+            startDate: assessment.startDate,
+            endDate: assessment.endDate,
+            lateSubmissionAllowed: assessment.lateSubmissionAllowed,
+            latePenaltyPercent: assessment.latePenaltyPercent,
+            // Settings
+            passingScore: assessment.passingScore,
+            showCorrectAnswers: assessment.showCorrectAnswers,
+            showScoreImmediately: assessment.showScoreImmediately,
+            shuffleQuestions: assessment.shuffleQuestions,
+            shuffleOptions: assessment.shuffleOptions,
+            oneQuestionPerPage: assessment.oneQuestionPerPage,
+            allowReview: assessment.allowReview,
+            maxAttempts: assessment.maxAttempts,
+            // Questions
+            questions: (assessment.questions || []).map((q, index) => ({
               id: q.id,
-              source: q.questionId ? 'existing' : 'custom',
+              source: (q.questionId ? 'existing' : 'custom') as 'existing' | 'custom',
               questionId: q.questionId,
-              customData: q.customQuestionText
-                ? {
-                    questionText: q.customQuestionText,
-                    questionType: q.customQuestionType || 'multiple_choice',
-                    options: q.customOptions,
-                    correctAnswer: q.customCorrectAnswer || '',
-                    explanation: q.customExplanation,
-                  }
-                : undefined,
+              customQuestionText: q.customQuestionText,
+              customQuestionType: q.customQuestionType,
+              customOptions: q.customOptions,
+              customCorrectAnswer: q.customCorrectAnswer,
+              customExplanation: q.customExplanation,
+              displayOrder: index,
               marks: q.marks,
+              question: q.question,
             })),
             assignments: [],
           },
@@ -823,38 +820,20 @@ export const useAssessmentStore = create<AssessmentState>()(
         }));
       },
 
-      updateDraftBasicInfo: (info: Partial<AssessmentDraft['basicInfo']>) => {
-        set((state) => ({
-          draft: {
-            ...state.draft,
-            basicInfo: { ...state.draft.basicInfo, ...info },
-          },
-        }));
-      },
-
-      updateDraftTiming: (timing: Partial<AssessmentDraft['timing']>) => {
-        set((state) => ({
-          draft: {
-            ...state.draft,
-            timing: { ...state.draft.timing, ...timing },
-          },
-        }));
-      },
-
-      updateDraftSettings: (settings: Partial<AssessmentDraft['settings']>) => {
-        set((state) => ({
-          draft: {
-            ...state.draft,
-            settings: { ...state.draft.settings, ...settings },
-          },
-        }));
-      },
-
       addDraftQuestion: (question: AssessmentQuestionDraft) => {
         set((state) => ({
           draft: {
             ...state.draft,
             questions: [...state.draft.questions, question],
+          },
+        }));
+      },
+
+      addDraftQuestions: (questions: AssessmentQuestionDraft[]) => {
+        set((state) => ({
+          draft: {
+            ...state.draft,
+            questions: [...state.draft.questions, ...questions],
           },
         }));
       },
@@ -884,6 +863,10 @@ export const useAssessmentStore = create<AssessmentState>()(
           const questions = [...state.draft.questions];
           const [removed] = questions.splice(startIndex, 1);
           questions.splice(endIndex, 0, removed);
+          // Update displayOrder
+          questions.forEach((q, i) => {
+            q.displayOrder = i;
+          });
           return {
             draft: { ...state.draft, questions },
           };
@@ -910,24 +893,44 @@ export const useAssessmentStore = create<AssessmentState>()(
         });
       },
 
+      clearDraft: () => {
+        set({
+          draft: { ...defaultDraft },
+          isEditMode: false,
+          editingAssessmentId: null,
+        });
+      },
+
+      saveDraft: async () => {
+        // Draft is auto-persisted via zustand persist middleware
+        // This function is for explicit save actions
+        return true;
+      },
+
       saveDraftAsAssessment: async () => {
-        const { isEditMode, editingAssessmentId } = get();
+        const { isEditMode, editingAssessmentId, draft } = get();
 
         if (isEditMode && editingAssessmentId) {
           // Update existing
-          const { draft } = get();
           await get().updateAssessment(editingAssessmentId, {
-            title: draft.basicInfo.title,
-            description: draft.basicInfo.description,
-            assessmentType: draft.basicInfo.assessmentType,
-            subjectId: draft.basicInfo.subjectId,
-            instructions: draft.basicInfo.instructions,
-            timeLimit: draft.timing.timeLimit,
-            startDate: draft.timing.startDate,
-            endDate: draft.timing.endDate,
-            lateSubmissionAllowed: draft.timing.lateSubmissionAllowed,
-            latePenaltyPercent: draft.timing.latePenaltyPercent,
-            ...draft.settings,
+            title: draft.title,
+            description: draft.description,
+            assessmentType: draft.assessmentType,
+            subjectId: draft.subjectId,
+            instructions: draft.instructions,
+            timeLimit: draft.timeLimit,
+            startDate: draft.startDate,
+            endDate: draft.endDate,
+            lateSubmissionAllowed: draft.lateSubmissionAllowed,
+            latePenaltyPercent: draft.latePenaltyPercent,
+            passingScore: draft.passingScore,
+            showCorrectAnswers: draft.showCorrectAnswers,
+            showScoreImmediately: draft.showScoreImmediately,
+            shuffleQuestions: draft.shuffleQuestions,
+            shuffleOptions: draft.shuffleOptions,
+            oneQuestionPerPage: draft.oneQuestionPerPage,
+            allowReview: draft.allowReview,
+            maxAttempts: draft.maxAttempts,
           });
           return get().currentAssessment;
         } else {

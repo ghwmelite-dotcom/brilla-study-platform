@@ -3,7 +3,7 @@ import type {
   AssessmentAttempt,
   AssessmentAttemptAnswer,
   GradingFilters,
-  GradingStatus,
+  AssessmentGradingStatus,
 } from '@/types';
 import { api } from '@/lib/api';
 
@@ -251,7 +251,7 @@ export const useGradingStore = create<GradingState>((set, get) => ({
         currentAttempt: state.currentAttempt
           ? {
               ...state.currentAttempt,
-              gradingStatus: 'complete' as GradingStatus,
+              gradingStatus: 'complete' as AssessmentGradingStatus,
               status: 'graded',
               teacherFeedback: feedback,
               gradedAt: new Date().toISOString(),

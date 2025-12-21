@@ -6,11 +6,9 @@ import {
   BookOpen,
   Search,
   Check,
-  X,
   Loader2,
-  ChevronDown,
 } from 'lucide-react';
-import type { AssessmentDraft, AssessmentAssignmentDraft, StudentClass } from '@/types';
+import type { AssessmentDraft, AssessmentAssignmentDraft } from '@/types';
 import { useAssessmentStore } from '@/stores/assessmentStore';
 import { api } from '@/lib/api';
 import { cn } from '@/utils';

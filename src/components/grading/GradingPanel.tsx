@@ -3,7 +3,6 @@ import {
   X,
   User,
   Clock,
-  CheckCircle,
   ChevronLeft,
   ChevronRight,
   MessageSquare,

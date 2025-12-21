@@ -175,7 +175,8 @@ export type QuestionType =
   | 'practical'
   | 'calculation'
   | 'diagram'
-  | 'comprehension';
+  | 'comprehension'
+  | 'fill_blank';
 
 export type RoundType = 'round_one' | 'speed_race' | 'problem_of_day' | 'true_false' | 'riddles';
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
@@ -1135,7 +1136,7 @@ export type AssessmentType = 'quiz' | 'homework' | 'mock_exam';
 export type AssessmentStatus = 'draft' | 'published' | 'archived' | 'closed';
 export type AssignmentType = 'individual' | 'class' | 'school_level';
 export type AttemptStatus = 'in_progress' | 'submitted' | 'graded' | 'late';
-export type GradingStatus = 'pending' | 'partial' | 'complete';
+export type AssessmentGradingStatus = 'pending' | 'partial' | 'complete';
 
 // Student Class/Group
 export interface StudentClass {
@@ -1284,7 +1285,7 @@ export interface AssessmentAttempt {
   isLate: boolean;
   latePenaltyApplied: number;
   // Grading
-  gradingStatus: GradingStatus;
+  gradingStatus: AssessmentGradingStatus;
   gradedBy?: string;
   gradedAt?: string;
   teacherFeedback?: string;
@@ -1349,33 +1350,32 @@ export interface AssessmentSettings {
   maxAttempts?: number;
 }
 
-// Assessment Builder Draft
+// Assessment Builder Draft (flat structure for easy form binding)
 export interface AssessmentDraft {
+  id?: string;
   step: number;
-  basicInfo: {
-    title: string;
-    description: string;
-    assessmentType: AssessmentType;
-    subjectId?: string;
-    instructions?: string;
-  };
-  timing: {
-    timeLimit?: number;
-    startDate?: string;
-    endDate?: string;
-    lateSubmissionAllowed: boolean;
-    latePenaltyPercent: number;
-  };
-  settings: {
-    passingScore?: number;
-    showCorrectAnswers: boolean;
-    showScoreImmediately: boolean;
-    shuffleQuestions: boolean;
-    shuffleOptions: boolean;
-    oneQuestionPerPage: boolean;
-    allowReview: boolean;
-    maxAttempts?: number;
-  };
+  // Basic Info
+  title: string;
+  description: string;
+  assessmentType: AssessmentType;
+  subjectId?: string;
+  instructions?: string;
+  // Timing
+  timeLimit?: number;
+  startDate?: string;
+  endDate?: string;
+  lateSubmissionAllowed: boolean;
+  latePenaltyPercent: number;
+  // Settings
+  passingScore?: number;
+  showCorrectAnswers: boolean;
+  showScoreImmediately: boolean;
+  shuffleQuestions: boolean;
+  shuffleOptions: boolean;
+  oneQuestionPerPage: boolean;
+  allowReview: boolean;
+  maxAttempts?: number;
+  // Questions and Assignments
   questions: AssessmentQuestionDraft[];
   assignments: AssessmentAssignmentDraft[];
 }
@@ -1384,20 +1384,25 @@ export interface AssessmentQuestionDraft {
   id: string; // temp ID for ordering
   source: 'existing' | 'custom';
   questionId?: string;
-  customData?: {
-    questionText: string;
-    questionType: QuestionType;
-    options?: { text: string; isCorrect: boolean }[];
-    correctAnswer: string;
-    explanation?: string;
-    imageUrl?: string;
-  };
+  // Custom question fields (flat for easy form binding)
+  customQuestionText?: string;
+  customQuestionType?: QuestionType;
+  customOptions?: { id: string; text: string; isCorrect: boolean }[];
+  customCorrectAnswer?: string;
+  customExplanation?: string;
+  customImageUrl?: string;
+  // Ordering and marks
+  displayOrder: number;
   marks: number;
+  // Joined question data (when source is 'existing')
+  question?: Question;
 }
 
 export interface AssessmentAssignmentDraft {
-  type: AssignmentType;
+  assignmentType: AssignmentType;
+  studentId?: string;
   studentIds?: string[];
+  classId?: string;
   classIds?: string[];
   schoolLevel?: 'jhs' | 'shs';
   yearGroup?: number;
@@ -1414,7 +1419,7 @@ export interface AssessmentFilters {
 
 export interface GradingFilters {
   assessmentId?: string;
-  status?: GradingStatus;
+  status?: AssessmentGradingStatus;
   search?: string;
 }
 

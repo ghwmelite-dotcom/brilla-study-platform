@@ -3,8 +3,6 @@ import {
   Clock,
   HelpCircle,
   Users,
-  Calendar,
-  CheckCircle,
   AlertTriangle,
   Send,
   Loader2,

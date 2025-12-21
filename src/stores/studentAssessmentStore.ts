@@ -3,7 +3,6 @@ import { persist } from 'zustand/middleware';
 import type {
   Assessment,
   AssessmentAttempt,
-  AssessmentAttemptAnswer,
   AssessmentQuestion,
 } from '@/types';
 import { api } from '@/lib/api';

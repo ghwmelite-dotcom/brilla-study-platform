@@ -10,7 +10,6 @@ import {
   Loader2,
   CheckCircle,
   X,
-  BookOpen,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { useStudentAssessmentStore } from '@/stores/studentAssessmentStore';
@@ -24,7 +23,6 @@ export default function TakeAssessment() {
   const { isAuthenticated } = useAuthStore();
   const {
     currentAssessment,
-    currentAttempt,
     currentQuestions,
     currentQuestionIndex,
     answers,
@@ -48,7 +46,6 @@ export default function TakeAssessment() {
     setTimerWarningShown,
     submitAttempt,
     clearCurrentAssessment,
-    clearError,
   } = useStudentAssessmentStore();
 
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);

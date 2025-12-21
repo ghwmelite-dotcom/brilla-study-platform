@@ -6,11 +6,9 @@ import {
   Trash2,
   BookOpen,
   GraduationCap,
-  Calendar,
 } from 'lucide-react';
 import type { StudentClass } from '@/types';
 import { useState } from 'react';
-import { cn } from '@/utils';
 
 interface ClassCardProps {
   classItem: StudentClass;

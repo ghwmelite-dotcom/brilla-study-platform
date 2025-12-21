@@ -4,7 +4,6 @@ import {
   Plus,
   Trash2,
   Check,
-  GripVertical,
 } from 'lucide-react';
 import type { AssessmentQuestionDraft, QuestionType, QuestionOption } from '@/types';
 import { cn } from '@/utils';
@@ -83,10 +82,12 @@ export function QuestionCreator({ initialData, onSave, onClose }: QuestionCreato
     if (!validate()) return;
 
     const question: AssessmentQuestionDraft = {
+      id: initialData?.id || `custom_${Date.now()}`,
+      source: 'custom',
       customQuestionText: questionText.trim(),
       customQuestionType: questionType,
       marks,
-      displayOrder: 0,
+      displayOrder: initialData?.displayOrder || 0,
     };
 
     if (questionType === 'multiple_choice') {

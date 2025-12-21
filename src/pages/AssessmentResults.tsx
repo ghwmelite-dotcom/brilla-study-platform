@@ -6,7 +6,6 @@ import {
   XCircle,
   Clock,
   Award,
-  FileText,
   Loader2,
   ChevronDown,
   ChevronUp,
@@ -21,7 +20,7 @@ export default function AssessmentResults() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
-  const { lastResult, isLoading, error, fetchAttemptResults } = useStudentAssessmentStore();
+  const { lastResult, isLoading, error } = useStudentAssessmentStore();
 
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set());
 

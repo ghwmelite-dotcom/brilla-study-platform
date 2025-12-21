@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import {
-  Plus,
-  Search,
   GripVertical,
   Trash2,
   Edit,
@@ -25,7 +23,7 @@ export function QuestionsStep({ draft, onUpdate }: QuestionsStepProps) {
   const [showPicker, setShowPicker] = useState(false);
   const [showCreator, setShowCreator] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<AssessmentQuestionDraft | null>(null);
-  const [expandedQuestion, setExpandedQuestion] = useState<string | null>(null);
+  const [expandedQuestion] = useState<string | null>(null);
 
   const totalMarks = draft.questions.reduce((sum, q) => sum + q.marks, 0);
 

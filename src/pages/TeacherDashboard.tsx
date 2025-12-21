@@ -8,9 +8,6 @@ import {
   ClipboardCheck,
   Plus,
   ChevronRight,
-  Calendar,
-  Clock,
-  TrendingUp,
   AlertCircle,
   Loader2,
   BookOpen,
@@ -25,11 +22,7 @@ export default function TeacherDashboard() {
   const { user, isAuthenticated } = useAuthStore();
   const { assessments, classes, fetchAssessments, fetchClasses, isLoading } =
     useAssessmentStore();
-  const {
-    pendingCount,
-    fetchGradingQueue,
-    isLoading: gradingLoading,
-  } = useGradingStore();
+  const { pendingCount, fetchGradingQueue } = useGradingStore();
 
   const isTeacher = user?.role === 'teacher' || user?.role === 'admin';
 

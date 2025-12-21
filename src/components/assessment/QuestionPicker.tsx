@@ -3,7 +3,6 @@ import {
   Search,
   X,
   Check,
-  Filter,
   ChevronDown,
   Loader2,
   BookOpen,
@@ -77,14 +76,17 @@ export function QuestionPicker({ onSelect, onClose, existingIds }: QuestionPicke
   const handleAdd = () => {
     const selected = questions
       .filter((q) => selectedIds.has(q.id))
-      .map((q) => ({
+      .map((q, index) => ({
+        id: `temp_${q.id}_${Date.now()}`,
+        source: 'existing' as const,
         questionId: q.id,
         customQuestionText: q.questionText,
-        customQuestionType: q.type,
+        customQuestionType: q.questionType,
         customOptions: q.options,
         customCorrectAnswer: q.correctAnswer,
-        marks: 1,
-        displayOrder: 0,
+        marks: q.marks || 1,
+        displayOrder: index,
+        question: q,
       }));
     onSelect(selected);
   };
@@ -260,10 +262,10 @@ export function QuestionPicker({ onSelect, onClose, existingIds }: QuestionPicke
                           <span
                             className={cn(
                               'px-2 py-0.5 rounded text-xs font-medium',
-                              getTypeColor(question.type)
+                              getTypeColor(question.questionType)
                             )}
                           >
-                            {getTypeLabel(question.type)}
+                            {getTypeLabel(question.questionType)}
                           </span>
                           {question.difficulty && (
                             <span className="px-2 py-0.5 bg-neutral-100 text-neutral-600 rounded text-xs">
