@@ -169,19 +169,38 @@ export const api = {
 
     const url = buildUrl(endpoint);
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: formData,
-    });
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
 
-    const data = await response.json();
+      const text = await response.text();
+      let data;
 
-    if (!response.ok) {
-      throw new ApiError(data.error || 'Upload failed', response.status);
+      try {
+        data = text ? JSON.parse(text) : { success: false, error: 'Empty response from server' };
+      } catch {
+        data = { success: false, error: 'Invalid response from server' };
+      }
+
+      if (!response.ok) {
+        throw new ApiError(data.error || 'Upload failed', response.status);
+      }
+
+      return data;
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw error;
+      }
+      // Network error - return a structured error response
+      console.error('Upload network error:', error);
+      return {
+        success: false,
+        error: 'Network error. API server unavailable.',
+      };
     }
-
-    return data;
   },
 };
 

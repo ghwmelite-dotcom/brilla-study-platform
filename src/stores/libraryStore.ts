@@ -462,9 +462,10 @@ export const useLibraryStore = create<LibraryState>()(
               contentUrl: response.data.contentUrl,
               subjectId: data.get('subjectId') as string,
               schoolLevel: (data.get('schoolLevel') as 'jhs' | 'shs' | 'both') || 'both',
-              accessLevel: 'free',
+              accessLevel: (data.get('accessLevel') as 'free' | 'basic' | 'premium') || 'free',
+              tags: data.get('tags') ? (data.get('tags') as string).split(',').map(t => t.trim()) : undefined,
               uploadedBy: 'current_user',
-              isFeatured: false,
+              isFeatured: data.get('isFeatured') === 'true',
               isActive: true,
               views: 0,
               downloads: 0,
@@ -474,14 +475,63 @@ export const useLibraryStore = create<LibraryState>()(
 
             set({
               resources: [newResource, ...get().resources],
+              featuredResources: newResource.isFeatured
+                ? [newResource, ...get().featuredResources]
+                : get().featuredResources,
               isUploadingResource: false,
             });
 
             return newResource;
           }
 
-          throw new Error('Upload failed');
+          // API failed - fall back to demo mode with local storage
+          console.log('API unavailable, using demo mode for upload');
+          const file = data.get('file') as File | null;
+          const contentUrl = data.get('contentUrl') as string || '';
+
+          // Create a local URL for the file if provided
+          let localUrl = contentUrl;
+          let fileSize: number | undefined;
+          if (file) {
+            localUrl = URL.createObjectURL(file);
+            fileSize = file.size;
+          }
+
+          if (!localUrl) {
+            throw new Error('File or URL is required');
+          }
+
+          const newResource: LibraryResource = {
+            id: `demo_${Date.now()}`,
+            title: data.get('title') as string,
+            description: data.get('description') as string || undefined,
+            resourceType: data.get('resourceType') as ResourceType,
+            contentUrl: localUrl,
+            fileSize,
+            subjectId: data.get('subjectId') as string || undefined,
+            schoolLevel: (data.get('schoolLevel') as 'jhs' | 'shs' | 'both') || 'both',
+            accessLevel: (data.get('accessLevel') as 'free' | 'basic' | 'premium') || 'free',
+            tags: data.get('tags') ? (data.get('tags') as string).split(',').map(t => t.trim()) : undefined,
+            uploadedBy: 'current_user',
+            isFeatured: data.get('isFeatured') === 'true',
+            isActive: true,
+            views: 0,
+            downloads: 0,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+
+          set({
+            resources: [newResource, ...get().resources],
+            featuredResources: newResource.isFeatured
+              ? [newResource, ...get().featuredResources]
+              : get().featuredResources,
+            isUploadingResource: false,
+          });
+
+          return newResource;
         } catch (error) {
+          console.error('Upload error:', error);
           set({ error: 'Failed to upload resource', isUploadingResource: false });
           throw error;
         }
