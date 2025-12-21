@@ -32,7 +32,7 @@ class ApiError extends Error {
 // Get auth token from localStorage
 function getAuthToken(): string | null {
   try {
-    const authStore = localStorage.getItem('brilla-auth-v1');
+    const authStore = localStorage.getItem('brilla-auth');
     if (authStore) {
       const parsed = JSON.parse(authStore);
       return parsed.state?.token || null;
@@ -46,7 +46,7 @@ function getAuthToken(): string | null {
 // Get user info for headers
 function getUserInfo(): { userId?: string; role?: string } {
   try {
-    const authStore = localStorage.getItem('brilla-auth-v1');
+    const authStore = localStorage.getItem('brilla-auth');
     if (authStore) {
       const parsed = JSON.parse(authStore);
       const user = parsed.state?.user;
