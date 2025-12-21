@@ -51,7 +51,8 @@ const libraryApp = new Hono<{ Bindings: Env }>();
 // Skip auth for file serving endpoints (public access)
 libraryApp.use('*', async (c, next) => {
   // Skip auth for file serving - files should be publicly accessible
-  if (c.req.path.includes('/files/')) {
+  const url = new URL(c.req.url);
+  if (url.pathname.includes('/files/')) {
     return next();
   }
 

@@ -6700,14 +6700,14 @@ protectedApp.get('/students/search', async (c) => {
   }
 });
 
-// Mount protected routes (must be after all protectedApp routes are defined)
-app.route('/api', protectedApp);
-
-// Mount Library routes
+// Mount Library routes (before protectedApp to allow public file access)
 app.route('/api/library', libraryApp);
 
 // Mount Counselor routes
 app.route('/api/counselor', counselorApp);
+
+// Mount protected routes (must be after all protectedApp routes are defined)
+app.route('/api', protectedApp);
 
 // 404 handler
 app.notFound((c) => {
