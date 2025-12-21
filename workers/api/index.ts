@@ -1274,8 +1274,65 @@ publicApp.get('/battles/:id', async (c) => {
 // Mount public routes
 app.route('/api', publicApp);
 
-// Protected routes (would add JWT middleware in production)
+// Protected routes with JWT authentication middleware
 const protectedApp = new Hono<{ Bindings: Env }>();
+
+// Authentication middleware for protected routes
+protectedApp.use('*', async (c, next) => {
+  const authHeader = c.req.header('Authorization');
+
+  // Skip auth for OPTIONS requests (CORS preflight)
+  if (c.req.method === 'OPTIONS') {
+    return next();
+  }
+
+  // Check for Authorization header
+  if (!authHeader?.startsWith('Bearer ')) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+
+  // Handle demo tokens
+  if (token.endsWith('_demo_token')) {
+    // For demo mode, get the user based on token prefix
+    const tokenPrefix = token.replace('_demo_token', '');
+    const demoUsers: Record<string, { id: string; role: string }> = {
+      'student': { id: 'demo_student_1', role: 'student' },
+      'teacher': { id: 'demo_teacher_1', role: 'teacher' },
+      'admin': { id: 'demo_admin_1', role: 'admin' },
+    };
+    const demoUser = demoUsers[tokenPrefix];
+    if (demoUser) {
+      c.set('userId', demoUser.id);
+      c.set('userRole', demoUser.role);
+      return next();
+    }
+  }
+
+  // Verify JWT token
+  try {
+    const payload = await verifyJWT(token, c.env.JWT_SECRET);
+    if (!payload) {
+      return c.json({ success: false, error: 'Invalid token' }, 401);
+    }
+    c.set('userId', payload.userId);
+    c.set('userRole', payload.role);
+    return next();
+  } catch (error) {
+    console.error('Token verification error:', error);
+    return c.json({ success: false, error: 'Invalid token' }, 401);
+  }
+});
+
+// Helper to get user from context or header (for backwards compatibility)
+function getUserId(c: { get: (key: string) => string | undefined; req: { header: (name: string) => string | undefined } }): string | undefined {
+  return c.get('userId') || c.req.header('x-user-id');
+}
+
+function getUserRole(c: { get: (key: string) => string | undefined; req: { header: (name: string) => string | undefined } }): string | undefined {
+  return c.get('userRole') || c.req.header('x-user-role');
+}
 
 // Submit answer
 protectedApp.post('/questions/:id/attempt', async (c) => {
@@ -3678,8 +3735,7 @@ adminApp.post('/users/:id/resend-verification', async (c) => {
 // Mount admin routes
 app.route('/api/admin', adminApp);
 
-// Mount protected routes
-app.route('/api', protectedApp);
+// Note: protectedApp routes are defined below and mounted at the end of the file
 
 // Helper function to get exam-specific context
 function getExamContext(context?: string): { examType: string; examName: string; examDescription: string; subjects: string } {
@@ -4304,7 +4360,7 @@ protectedApp.get('/admin/audit/user/:userId/activity', userAuth, async (c) => {
 // Get teacher's classes
 protectedApp.get('/classes', async (c) => {
   try {
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
 
     const classes = await c.env.DB.prepare(`
       SELECT c.*,
@@ -4344,7 +4400,7 @@ protectedApp.get('/classes', async (c) => {
 // Create a class
 protectedApp.post('/classes', async (c) => {
   try {
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
     const { name, description, schoolLevel, yearGroup, subjectId, academicYear, color } = await c.req.json();
 
     if (!name?.trim()) {
@@ -4385,7 +4441,7 @@ protectedApp.post('/classes', async (c) => {
 protectedApp.get('/classes/:id', async (c) => {
   try {
     const classId = c.req.param('id');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
 
     const classData = await c.env.DB.prepare(`
       SELECT c.*, s.name as subject_name
@@ -4450,7 +4506,7 @@ protectedApp.get('/classes/:id', async (c) => {
 protectedApp.put('/classes/:id', async (c) => {
   try {
     const classId = c.req.param('id');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
     const updates = await c.req.json();
 
     const existing = await c.env.DB.prepare(`
@@ -4489,7 +4545,7 @@ protectedApp.put('/classes/:id', async (c) => {
 protectedApp.delete('/classes/:id', async (c) => {
   try {
     const classId = c.req.param('id');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
 
     await c.env.DB.prepare(`
       UPDATE classes SET is_active = 0 WHERE id = ? AND teacher_id = ?
@@ -4506,7 +4562,7 @@ protectedApp.delete('/classes/:id', async (c) => {
 protectedApp.post('/classes/:id/members', async (c) => {
   try {
     const classId = c.req.param('id');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
     const { studentIds } = await c.req.json();
 
     if (!studentIds || !Array.isArray(studentIds) || studentIds.length === 0) {
@@ -4548,7 +4604,7 @@ protectedApp.post('/classes/:id/members', async (c) => {
 protectedApp.delete('/classes/:classId/members/:memberId', async (c) => {
   try {
     const { classId, memberId } = c.req.param();
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
 
     // Verify class belongs to teacher
     const classData = await c.env.DB.prepare(`
@@ -4575,7 +4631,7 @@ protectedApp.delete('/classes/:classId/members/:memberId', async (c) => {
 // Get teacher's assessments
 protectedApp.get('/assessments', async (c) => {
   try {
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
     const status = c.req.query('status');
     const type = c.req.query('type');
     const subjectId = c.req.query('subjectId');
@@ -4661,7 +4717,7 @@ protectedApp.get('/assessments', async (c) => {
 // Create assessment
 protectedApp.post('/assessments', async (c) => {
   try {
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
     const data = await c.req.json();
 
     const id = `assess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -4734,7 +4790,7 @@ protectedApp.post('/assessments', async (c) => {
 protectedApp.get('/assessments/:id', async (c) => {
   try {
     const assessmentId = c.req.param('id');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
 
     const assessment = await c.env.DB.prepare(`
       SELECT a.*, s.name as subject_name
@@ -4841,7 +4897,7 @@ protectedApp.get('/assessments/:id', async (c) => {
 protectedApp.put('/assessments/:id', async (c) => {
   try {
     const assessmentId = c.req.param('id');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
     const updates = await c.req.json();
 
     const existing = await c.env.DB.prepare(`
@@ -4909,7 +4965,7 @@ protectedApp.put('/assessments/:id', async (c) => {
 protectedApp.delete('/assessments/:id', async (c) => {
   try {
     const assessmentId = c.req.param('id');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
 
     const existing = await c.env.DB.prepare(`
       SELECT status FROM assessments WHERE id = ? AND teacher_id = ?
@@ -4941,7 +4997,7 @@ protectedApp.delete('/assessments/:id', async (c) => {
 protectedApp.post('/assessments/:id/publish', async (c) => {
   try {
     const assessmentId = c.req.param('id');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
 
     const existing = await c.env.DB.prepare(`
       SELECT id, status FROM assessments WHERE id = ? AND teacher_id = ?
@@ -4976,7 +5032,7 @@ protectedApp.post('/assessments/:id/publish', async (c) => {
 protectedApp.post('/assessments/:id/duplicate', async (c) => {
   try {
     const assessmentId = c.req.param('id');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
 
     const original = await c.env.DB.prepare(`
       SELECT * FROM assessments WHERE id = ? AND teacher_id = ?
@@ -5039,7 +5095,7 @@ protectedApp.post('/assessments/:id/duplicate', async (c) => {
 protectedApp.post('/assessments/:id/questions', async (c) => {
   try {
     const assessmentId = c.req.param('id');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
     const { questions } = await c.req.json();
 
     const existing = await c.env.DB.prepare(`
@@ -5092,7 +5148,7 @@ protectedApp.post('/assessments/:id/questions', async (c) => {
 protectedApp.delete('/assessments/:assessmentId/questions/:questionId', async (c) => {
   try {
     const { assessmentId, questionId } = c.req.param();
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
 
     const existing = await c.env.DB.prepare(`
       SELECT id FROM assessments WHERE id = ? AND teacher_id = ?
@@ -5131,7 +5187,7 @@ protectedApp.delete('/assessments/:assessmentId/questions/:questionId', async (c
 protectedApp.post('/assessments/:id/assign', async (c) => {
   try {
     const assessmentId = c.req.param('id');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
     const { assignments } = await c.req.json();
 
     const existing = await c.env.DB.prepare(`
@@ -5180,7 +5236,7 @@ protectedApp.post('/assessments/:id/assign', async (c) => {
 // Get assigned assessments for student
 protectedApp.get('/student/assessments', async (c) => {
   try {
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
 
     // Get user info for school level matching
     const user = await c.env.DB.prepare(`
@@ -5254,7 +5310,7 @@ protectedApp.get('/student/assessments', async (c) => {
 protectedApp.post('/student/assessments/:id/start', async (c) => {
   try {
     const assessmentId = c.req.param('id');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
 
     // Get assessment
     const assessment = await c.env.DB.prepare(`
@@ -5333,7 +5389,7 @@ protectedApp.post('/student/assessments/:id/start', async (c) => {
 // Save answer
 protectedApp.put('/student/assessments/:id/answer', async (c) => {
   try {
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
     const { attemptId, questionId, answer } = await c.req.json();
 
     // Verify attempt belongs to user and is in progress
@@ -5364,7 +5420,7 @@ protectedApp.put('/student/assessments/:id/answer', async (c) => {
 protectedApp.post('/student/assessments/:id/submit', async (c) => {
   try {
     const assessmentId = c.req.param('id');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
     const { attemptId, answers } = await c.req.json();
 
     // Verify attempt
@@ -5484,7 +5540,7 @@ protectedApp.post('/student/assessments/:id/submit', async (c) => {
 protectedApp.get('/student/attempts/:id', async (c) => {
   try {
     const attemptId = c.req.param('id');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
 
     const attempt = await c.env.DB.prepare(`
       SELECT aa.*, a.title, a.show_correct_answers, a.show_score_immediately
@@ -5552,7 +5608,7 @@ protectedApp.get('/student/attempts/:id', async (c) => {
 // Get grading queue
 protectedApp.get('/grading', async (c) => {
   try {
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
     const assessmentId = c.req.query('assessmentId');
     const status = c.req.query('status');
 
@@ -5627,7 +5683,7 @@ protectedApp.get('/grading', async (c) => {
 protectedApp.get('/grading/:attemptId', async (c) => {
   try {
     const attemptId = c.req.param('attemptId');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
 
     const attempt = await c.env.DB.prepare(`
       SELECT aa.*, a.title, u.name as student_name
@@ -5693,7 +5749,7 @@ protectedApp.get('/grading/:attemptId', async (c) => {
 protectedApp.post('/grading/:attemptId/answer/:answerId', async (c) => {
   try {
     const { attemptId, answerId } = c.req.param();
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
     const { marks, comment } = await c.req.json();
 
     // Verify teacher owns the assessment
@@ -5738,7 +5794,7 @@ protectedApp.post('/grading/:attemptId/answer/:answerId', async (c) => {
 protectedApp.post('/grading/:attemptId/complete', async (c) => {
   try {
     const attemptId = c.req.param('attemptId');
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
     const { feedback } = await c.req.json();
 
     const attempt = await c.env.DB.prepare(`
@@ -5784,7 +5840,7 @@ protectedApp.post('/grading/:attemptId/complete', async (c) => {
 // Teacher dashboard stats
 protectedApp.get('/teacher/dashboard', async (c) => {
   try {
-    const userId = c.req.header('x-user-id');
+    const userId = getUserId(c);
 
     // Get assessment counts
     const assessmentStats = await c.env.DB.prepare(`
@@ -5982,6 +6038,9 @@ protectedApp.get('/students/search', async (c) => {
     return c.json({ success: false, error: 'Failed to search students' }, 500);
   }
 });
+
+// Mount protected routes (must be after all protectedApp routes are defined)
+app.route('/api', protectedApp);
 
 // 404 handler
 app.notFound((c) => {
