@@ -9,7 +9,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { useLibraryStore, useAuthStore } from '@/stores';
-import { ResourceCard, ResourceFilters } from '@/components/library';
+import { ResourceCard, ResourceFilters, ResourceViewerModal, UploadResourceModal } from '@/components/library';
 import type { LibraryResource } from '@/types';
 
 export function LibraryPage() {
@@ -26,9 +26,14 @@ export function LibraryPage() {
     loadFeatured,
     loadCollections,
     selectResource,
+    selectedResource,
+    rateResource,
+    trackDownload,
   } = useLibraryStore();
 
   const [activeTab, setActiveTab] = useState<'browse' | 'collections' | 'recent'>('browse');
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
 
   useEffect(() => {
     loadResources();
@@ -40,7 +45,25 @@ export function LibraryPage() {
 
   const handleResourceSelect = (resource: LibraryResource) => {
     selectResource(resource);
-    navigate(`/library/${resource.id}`);
+    setIsViewerOpen(true);
+  };
+
+  const handleCloseViewer = () => {
+    setIsViewerOpen(false);
+    selectResource(null);
+  };
+
+  const handleRate = async (resource: LibraryResource, rating: number) => {
+    await rateResource(resource.id, rating);
+  };
+
+  const handleDownload = async (resource: LibraryResource) => {
+    await trackDownload(resource.id);
+  };
+
+  const handleUploadSuccess = () => {
+    loadResources();
+    loadFeatured();
   };
 
   return (
@@ -51,8 +74,11 @@ export function LibraryPage() {
           <h1 className="text-2xl font-display font-bold text-neutral-900">E-Library</h1>
           <p className="text-neutral-500">Digital resources to power your learning</p>
         </div>
-        {user?.role === 'admin' && (
-          <button className="btn btn-primary flex items-center gap-2">
+        {(user?.role === 'admin' || user?.role === 'teacher') && (
+          <button
+            onClick={() => setIsUploadOpen(true)}
+            className="btn btn-primary flex items-center gap-2"
+          >
             <Plus className="w-4 h-4" />
             Upload Resource
           </button>
@@ -273,6 +299,22 @@ export function LibraryPage() {
           )}
         </div>
       )}
+
+      {/* Resource Viewer Modal */}
+      <ResourceViewerModal
+        resource={selectedResource}
+        isOpen={isViewerOpen}
+        onClose={handleCloseViewer}
+        onRate={handleRate}
+        onDownload={handleDownload}
+      />
+
+      {/* Upload Resource Modal */}
+      <UploadResourceModal
+        isOpen={isUploadOpen}
+        onClose={() => setIsUploadOpen(false)}
+        onSuccess={handleUploadSuccess}
+      />
     </div>
   );
 }
