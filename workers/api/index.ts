@@ -250,6 +250,66 @@ app.use('*', cors());
 // Public routes (no auth required)
 const publicApp = new Hono<{ Bindings: Env }>();
 
+// Protected routes with JWT authentication middleware
+const protectedApp = new Hono<{ Bindings: Env }>();
+
+// Authentication middleware for protected routes
+protectedApp.use('*', async (c, next) => {
+  const authHeader = c.req.header('Authorization');
+
+  // Skip auth for OPTIONS requests (CORS preflight)
+  if (c.req.method === 'OPTIONS') {
+    return next();
+  }
+
+  // Check for Authorization header
+  if (!authHeader?.startsWith('Bearer ')) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+
+  // Handle demo tokens
+  if (token.endsWith('_demo_token')) {
+    // For demo mode, get the user based on token prefix
+    const tokenPrefix = token.replace('_demo_token', '');
+    const demoUsers: Record<string, { id: string; role: string }> = {
+      'student': { id: 'demo_student_1', role: 'student' },
+      'teacher': { id: 'demo_teacher_1', role: 'teacher' },
+      'admin': { id: 'demo_admin_1', role: 'admin' },
+    };
+    const demoUser = demoUsers[tokenPrefix];
+    if (demoUser) {
+      c.set('userId', demoUser.id);
+      c.set('userRole', demoUser.role);
+      return next();
+    }
+  }
+
+  // Verify JWT token
+  try {
+    const payload = await verifyJWT(token, c.env.JWT_SECRET);
+    if (!payload) {
+      return c.json({ success: false, error: 'Invalid token' }, 401);
+    }
+    c.set('userId', payload.userId);
+    c.set('userRole', payload.role);
+    return next();
+  } catch (error) {
+    console.error('Token verification error:', error);
+    return c.json({ success: false, error: 'Invalid token' }, 401);
+  }
+});
+
+// Helper to get user from context or header (for backwards compatibility)
+function getUserId(c: { get: (key: string) => string | undefined; req: { header: (name: string) => string | undefined } }): string | undefined {
+  return c.get('userId') || c.req.header('x-user-id');
+}
+
+function getUserRole(c: { get: (key: string) => string | undefined; req: { header: (name: string) => string | undefined } }): string | undefined {
+  return c.get('userRole') || c.req.header('x-user-role');
+}
+
 // Health check
 publicApp.get('/health', (c) => {
   return c.json({ status: 'ok', environment: c.env.ENVIRONMENT });
@@ -1934,66 +1994,6 @@ publicApp.get('/battles/:id', async (c) => {
 
 // Mount public routes
 app.route('/api', publicApp);
-
-// Protected routes with JWT authentication middleware
-const protectedApp = new Hono<{ Bindings: Env }>();
-
-// Authentication middleware for protected routes
-protectedApp.use('*', async (c, next) => {
-  const authHeader = c.req.header('Authorization');
-
-  // Skip auth for OPTIONS requests (CORS preflight)
-  if (c.req.method === 'OPTIONS') {
-    return next();
-  }
-
-  // Check for Authorization header
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
-  }
-
-  const token = authHeader.replace('Bearer ', '');
-
-  // Handle demo tokens
-  if (token.endsWith('_demo_token')) {
-    // For demo mode, get the user based on token prefix
-    const tokenPrefix = token.replace('_demo_token', '');
-    const demoUsers: Record<string, { id: string; role: string }> = {
-      'student': { id: 'demo_student_1', role: 'student' },
-      'teacher': { id: 'demo_teacher_1', role: 'teacher' },
-      'admin': { id: 'demo_admin_1', role: 'admin' },
-    };
-    const demoUser = demoUsers[tokenPrefix];
-    if (demoUser) {
-      c.set('userId', demoUser.id);
-      c.set('userRole', demoUser.role);
-      return next();
-    }
-  }
-
-  // Verify JWT token
-  try {
-    const payload = await verifyJWT(token, c.env.JWT_SECRET);
-    if (!payload) {
-      return c.json({ success: false, error: 'Invalid token' }, 401);
-    }
-    c.set('userId', payload.userId);
-    c.set('userRole', payload.role);
-    return next();
-  } catch (error) {
-    console.error('Token verification error:', error);
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-});
-
-// Helper to get user from context or header (for backwards compatibility)
-function getUserId(c: { get: (key: string) => string | undefined; req: { header: (name: string) => string | undefined } }): string | undefined {
-  return c.get('userId') || c.req.header('x-user-id');
-}
-
-function getUserRole(c: { get: (key: string) => string | undefined; req: { header: (name: string) => string | undefined } }): string | undefined {
-  return c.get('userRole') || c.req.header('x-user-role');
-}
 
 // Submit answer
 protectedApp.post('/questions/:id/attempt', async (c) => {
