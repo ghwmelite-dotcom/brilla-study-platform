@@ -63,11 +63,19 @@ function getUserInfo(): { userId?: string; role?: string } {
 
 // Build URL with query parameters
 function buildUrl(endpoint: string, params?: Record<string, string | number | boolean | undefined>): string {
-  const url = new URL(endpoint, window.location.origin);
+  let fullUrl: string;
 
-  if (!endpoint.startsWith('http')) {
-    url.pathname = `${API_BASE_URL}${endpoint}`;
+  if (endpoint.startsWith('http')) {
+    fullUrl = endpoint;
+  } else if (API_BASE_URL.startsWith('http')) {
+    // API_BASE_URL is an absolute URL (production)
+    fullUrl = `${API_BASE_URL}${endpoint}`;
+  } else {
+    // API_BASE_URL is a relative path (development)
+    fullUrl = `${window.location.origin}${API_BASE_URL}${endpoint}`;
   }
+
+  const url = new URL(fullUrl);
 
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
