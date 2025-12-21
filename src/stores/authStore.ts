@@ -248,43 +248,80 @@ export const useAuthStore = create<AuthState>()(
       login: async (email, password) => {
         set({ isLoading: true, error: null });
         try {
-          // Call the production API
+          // Try the production API first
           const response = await api.login(email, password);
 
-          if (!response.success || !response.data) {
-            throw new Error(response.error || 'Invalid email or password.');
+          if (response.success && response.data) {
+            const { user: apiUser, token } = response.data;
+
+            // Map API user to local user format
+            const user: ManagedUser = {
+              id: apiUser.id,
+              email: apiUser.email,
+              name: apiUser.name,
+              role: apiUser.role,
+              status: apiUser.status as UserStatus,
+              house: apiUser.house || undefined,
+              yearGroup: apiUser.yearGroup || undefined,
+              schoolLevel: apiUser.schoolLevel as SchoolLevel | undefined,
+              schoolName: apiUser.schoolName || undefined,
+              xpPoints: apiUser.xpPoints || 0,
+              level: apiUser.level || 1,
+              streakDays: apiUser.streakDays || 0,
+              aiGradingCredits: apiUser.aiGradingCredits || 0,
+              emailVerified: true,
+              isActive: true,
+              passwordSet: true,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+
+            // Store the token in the API client
+            api.setToken(token);
+
+            set({
+              user,
+              token,
+              isAuthenticated: true,
+              isLoading: false,
+            });
+            return;
           }
 
-          const { user: apiUser, token } = response.data;
+          // If API returned an error (not network error), throw it
+          if (response.error && !response.error.includes('Network error')) {
+            throw new Error(response.error);
+          }
 
-          // Map API user to local user format
-          const user: ManagedUser = {
-            id: apiUser.id,
-            email: apiUser.email,
-            name: apiUser.name,
-            role: apiUser.role,
-            status: apiUser.status as UserStatus,
-            house: apiUser.house || undefined,
-            yearGroup: apiUser.yearGroup || undefined,
-            schoolLevel: apiUser.schoolLevel as SchoolLevel | undefined,
-            schoolName: apiUser.schoolName || undefined,
-            xpPoints: apiUser.xpPoints || 0,
-            level: apiUser.level || 1,
-            streakDays: apiUser.streakDays || 0,
-            aiGradingCredits: apiUser.aiGradingCredits || 0,
-            emailVerified: true,
-            isActive: true,
-            passwordSet: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
+          // Fall back to demo mode if API is unavailable
+          console.log('API unavailable, using demo mode login');
+          const allUsers = loadAllUsersFromStorage();
+          const demoUser = allUsers.find(u => u.email === email);
 
-          // Store the token in the API client
-          api.setToken(token);
+          if (!demoUser) {
+            throw new Error('Invalid email or password.');
+          }
+
+          // Verify password for demo user
+          if (!demoUser.passwordHash || demoUser.passwordHash !== hashPassword(password)) {
+            throw new Error('Invalid email or password.');
+          }
+
+          // Check account status
+          if (!demoUser.isActive) {
+            throw new Error('Your account has been deactivated.');
+          }
+
+          if (!demoUser.emailVerified) {
+            throw new Error('Please verify your email before logging in.');
+          }
+
+          // Generate a demo token
+          const demoToken = `demo_${Date.now()}_${btoa(email)}`;
 
           set({
-            user,
-            token,
+            user: demoUser,
+            token: demoToken,
             isAuthenticated: true,
             isLoading: false,
           });
