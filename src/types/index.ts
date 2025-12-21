@@ -62,12 +62,13 @@ export interface SubscriptionTier {
 
 export type UserStatus = 'pending' | 'approved' | 'rejected';
 export type SchoolLevel = 'jss' | 'shs';
+export type UserRole = 'student' | 'teacher' | 'admin' | 'parent';
 
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'student' | 'teacher' | 'admin';
+  role: UserRole;
   status: UserStatus;
   house?: string;
   yearGroup?: number;
@@ -830,6 +831,301 @@ export const CHAT_RATE_LIMITS = {
   MESSAGES_PER_HOUR: 200,
   DM_PER_MINUTE: 10,
 } as const;
+
+// =============================================
+// PARENT MONITORING SYSTEM
+// =============================================
+
+// Parent-Student Link Types
+export type ParentLinkStatus = 'pending' | 'active' | 'revoked' | 'expired';
+export type RelationshipType = 'parent' | 'guardian';
+
+export interface ParentStudentLink {
+  id: string;
+  parentId: string;
+  studentId: string;
+  inviteCode?: string;
+  inviteCodeExpiresAt?: string;
+  status: ParentLinkStatus;
+  relationshipType: RelationshipType;
+  studentOptedOut: boolean;
+  optedOutAt?: string;
+  createdAt: string;
+  verifiedAt?: string;
+  // Joined student data
+  student?: {
+    id: string;
+    name: string;
+    email?: string;
+    schoolLevel?: SchoolLevel;
+    yearGroup?: number;
+    house?: string;
+    avatarUrl?: string;
+    xpPoints?: number;
+    level?: number;
+    streakDays?: number;
+    lastActiveAt?: string;
+  };
+  // Joined parent data (for student view)
+  parent?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
+}
+
+// Parent Notification Types
+export type ParentNotificationType =
+  | 'achievement_unlocked'
+  | 'streak_milestone'
+  | 'topic_mastered'
+  | 'low_performance'
+  | 'weekly_summary'
+  | 'link_request'
+  | 'student_opted_out'
+  | 'link_confirmed';
+
+export interface ParentNotification {
+  id: string;
+  parentId: string;
+  studentId: string;
+  type: ParentNotificationType;
+  title: string;
+  message: string;
+  data?: Record<string, unknown>;
+  isRead: boolean;
+  emailSent: boolean;
+  createdAt: string;
+  // Joined data
+  student?: {
+    id: string;
+    name: string;
+    avatarUrl?: string;
+  };
+}
+
+// Parent Notification Preferences
+export interface ParentNotificationPreferences {
+  id?: string;
+  parentId?: string;
+  achievementAlerts: boolean;
+  streakAlerts: boolean;
+  lowPerformanceAlerts: boolean;
+  weeklySummary: boolean;
+  emailNotifications: boolean;
+  lowPerformanceThreshold: number; // percentage (0-100)
+}
+
+// Student Progress Summary (for parent dashboard)
+export interface StudentProgressSummary {
+  studentId: string;
+  studentName: string;
+  studentAvatar?: string;
+  schoolLevel?: SchoolLevel;
+  yearGroup?: number;
+  house?: string;
+  // Progress stats
+  xpPoints: number;
+  level: number;
+  streakDays: number;
+  longestStreak: number;
+  totalQuestionsAttempted: number;
+  totalCorrect: number;
+  overallAccuracy: number;
+  // Topic mastery
+  topicsStarted: number;
+  topicsMastered: number; // 80%+ mastery
+  // Recent activity
+  recentAchievements: Achievement[];
+  strengthAreas: TopicMastery[];
+  weakAreas: TopicMastery[];
+  lastActiveAt?: string;
+  // Exam preferences
+  primaryExamType?: string;
+}
+
+export interface TopicMastery {
+  topicId: string;
+  topicName: string;
+  subjectName: string;
+  mastery: number; // 0-100
+  questionsAttempted: number;
+  questionsCorrect: number;
+}
+
+// Student Activity (for parent view)
+export interface StudentActivity {
+  id: string;
+  type: 'practice_session' | 'achievement' | 'battle' | 'paper_attempt' | 'essay';
+  title: string;
+  description: string;
+  score?: number;
+  maxScore?: number;
+  xpEarned?: number;
+  timestamp: string;
+  // Additional context
+  subjectName?: string;
+  topicName?: string;
+  achievementIcon?: string;
+}
+
+// Parent Activity Log Entry
+export interface ParentActivityLogEntry {
+  id: string;
+  parentId: string;
+  studentId: string;
+  action: 'view_progress' | 'view_activity' | 'view_topics' | 'view_achievements' | 'link_student' | 'unlink_student';
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: string;
+}
+
+// Invite Code Response
+export interface InviteCodeResponse {
+  code: string;
+  expiresAt: string;
+  existingLinks: number;
+}
+
+// =============================================
+// AUDIT SYSTEM TYPES
+// =============================================
+
+export type AuditActionCategory =
+  | 'auth'           // Login, logout, password changes
+  | 'user_management' // Registration, approval, role changes
+  | 'content'        // Questions, topics, subjects
+  | 'practice'       // Practice sessions, attempts
+  | 'parent'         // Parent linking, monitoring
+  | 'admin'          // Admin actions
+  | 'settings'       // User/system settings changes
+  | 'api'            // API access, rate limiting
+  | 'security';      // Security events
+
+export type AuditStatus = 'success' | 'failure' | 'warning';
+
+export interface AuditLogEntry {
+  id: string;
+  userId?: string;
+  userEmail?: string;
+  userRole?: string;
+  action: string;
+  actionCategory: AuditActionCategory;
+  targetType?: string;
+  targetId?: string;
+  targetDetails?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  requestPath?: string;
+  requestMethod?: string;
+  status: AuditStatus;
+  errorMessage?: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  // Joined data for display
+  userName?: string;
+}
+
+export type SecurityEventType =
+  | 'failed_login'
+  | 'account_locked'
+  | 'password_reset'
+  | 'suspicious_activity'
+  | 'rate_limit_exceeded'
+  | 'unauthorized_access'
+  | 'permission_escalation'
+  | 'data_export'
+  | 'bulk_operation'
+  | 'api_key_usage';
+
+export type SecuritySeverity = 'low' | 'medium' | 'high' | 'critical';
+
+export interface SecurityEvent {
+  id: string;
+  eventType: SecurityEventType;
+  severity: SecuritySeverity;
+  userId?: string;
+  userEmail?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  description: string;
+  metadata?: Record<string, unknown>;
+  isResolved: boolean;
+  resolvedBy?: string;
+  resolvedAt?: string;
+  resolutionNotes?: string;
+  createdAt: string;
+  // Joined data
+  userName?: string;
+  resolvedByName?: string;
+}
+
+export interface LoginAttempt {
+  id: string;
+  email: string;
+  ipAddress?: string;
+  userAgent?: string;
+  success: boolean;
+  failureReason?: string;
+  createdAt: string;
+}
+
+export interface UserSession {
+  id: string;
+  userId: string;
+  tokenHash: string;
+  ipAddress?: string;
+  userAgent?: string;
+  deviceInfo?: string;
+  isActive: boolean;
+  lastActivityAt: string;
+  expiresAt: string;
+  createdAt: string;
+  // Joined
+  userName?: string;
+  userEmail?: string;
+}
+
+export interface DataChangeLog {
+  id: string;
+  tableName: string;
+  recordId: string;
+  operation: 'INSERT' | 'UPDATE' | 'DELETE';
+  changedBy?: string;
+  oldValues?: Record<string, unknown>;
+  newValues?: Record<string, unknown>;
+  changedFields?: string[];
+  reason?: string;
+  createdAt: string;
+  // Joined
+  changedByName?: string;
+}
+
+// Audit Dashboard Statistics
+export interface AuditDashboardStats {
+  totalEvents: number;
+  todayEvents: number;
+  failedLogins24h: number;
+  activeSecurityEvents: number;
+  criticalEvents: number;
+  topActions: { action: string; count: number }[];
+  eventsByCategory: { category: AuditActionCategory; count: number }[];
+  eventsByHour: { hour: number; count: number }[];
+  recentSecurityEvents: SecurityEvent[];
+}
+
+// Audit Log Filters
+export interface AuditLogFilters {
+  userId?: string;
+  actionCategory?: AuditActionCategory;
+  action?: string;
+  status?: AuditStatus;
+  targetType?: string;
+  startDate?: string;
+  endDate?: string;
+  ipAddress?: string;
+  search?: string;
+}
 
 // =============================================
 // VIRTUAL LAB TYPES

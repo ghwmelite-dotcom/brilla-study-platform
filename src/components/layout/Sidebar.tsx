@@ -23,11 +23,19 @@ import {
   Hash,
   FlaskConical,
   UserCheck,
+  Bell,
 } from 'lucide-react';
 import { cn } from '@/utils';
-import { useAuthStore, useExamStore, useChatStore, useProgressStore } from '@/stores';
+import { useAuthStore, useExamStore, useChatStore, useProgressStore, useParentStore } from '@/stores';
 import { SubjectNavigation } from '@/components/subjects';
 import { ExamModeSwitcher } from '@/components/exam';
+
+// Parent navigation items
+const parentNavItems = [
+  { path: '/parent', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/parent/notifications', label: 'Notifications', icon: Bell },
+  { path: '/parent/settings', label: 'Settings', icon: Settings },
+];
 
 interface SidebarProps {
   isOpen: boolean;
@@ -106,8 +114,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { currentExamType, initializeExamData } = useExamStore();
   const { openChat, setActiveTab, getUnreadCount } = useChatStore();
   const { totalQuestionsAttempted, overallAccuracy } = useProgressStore();
+  const { unreadCount: parentUnreadCount, fetchNotifications } = useParentStore();
   const isTeacherOrAdmin = user?.role === 'teacher' || user?.role === 'admin';
   const isAdmin = user?.role === 'admin';
+  const isParent = user?.role === 'parent';
   const unreadCount = getUnreadCount();
 
   // Initialize exam data on mount
@@ -121,6 +131,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       loadPendingUsers();
     }
   }, [isAdmin, loadPendingUsers]);
+
+  // Load notifications for parent
+  useEffect(() => {
+    if (isParent) {
+      fetchNotifications();
+    }
+  }, [isParent, fetchNotifications]);
 
   // Get exam-specific navigation items
   const examItems = examSpecificItems[currentExamType] || [];
@@ -147,13 +164,88 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         )}
       >
         <nav className="p-4 space-y-6">
-          {/* Mobile Exam Switcher */}
-          <div className="lg:hidden">
-            <ExamModeSwitcher />
-          </div>
+          {/* Parent-specific sidebar */}
+          {isParent && (
+            <>
+              {/* Parent Header */}
+              <div className="rounded-lg p-4 bg-green-50 border border-green-200">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  <span className="text-sm font-semibold text-green-700">Parent Dashboard</span>
+                </div>
+                <p className="text-xs text-green-600 mt-1 ml-4">Monitor your ward's progress</p>
+              </div>
 
-          {/* Exam Mode Indicator */}
-          <div className={cn('rounded-lg p-3', examInfo.bgColor)}>
+              {/* Parent Navigation */}
+              <div>
+                <h3 className="px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
+                  Navigation
+                </h3>
+                <ul className="space-y-1">
+                  {parentNavItems.map((item) => (
+                    <li key={item.path}>
+                      <NavLink
+                        to={item.path}
+                        onClick={onClose}
+                        className={({ isActive }) =>
+                          cn(
+                            'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                            isActive
+                              ? 'bg-green-600 text-white'
+                              : 'text-neutral-700 hover:bg-neutral-100'
+                          )
+                        }
+                      >
+                        <item.icon className="w-5 h-5" />
+                        <span className="flex-1">{item.label}</span>
+                        {item.path === '/parent/notifications' && parentUnreadCount > 0 && (
+                          <span className="min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                            {parentUnreadCount > 99 ? '99+' : parentUnreadCount}
+                          </span>
+                        )}
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Help Link */}
+              <div className="border-t border-neutral-200 pt-4">
+                <NavLink
+                  to="/help"
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                      isActive
+                        ? 'bg-primary text-white'
+                        : 'text-neutral-700 hover:bg-neutral-100'
+                    )
+                  }
+                >
+                  <HelpCircle className="w-5 h-5" />
+                  Help & Support
+                </NavLink>
+              </div>
+
+              {/* Parent Branding */}
+              <div className="text-center text-xs text-neutral-500 pt-4 border-t border-neutral-200">
+                <p className="font-medium">Brilla Study Platform</p>
+                <p>Parent Monitoring Portal</p>
+              </div>
+            </>
+          )}
+
+          {/* Regular sidebar for non-parent users */}
+          {!isParent && (
+            <>
+              {/* Mobile Exam Switcher */}
+              <div className="lg:hidden">
+                <ExamModeSwitcher />
+              </div>
+
+              {/* Exam Mode Indicator */}
+              <div className={cn('rounded-lg p-3', examInfo.bgColor)}>
             <div className="flex items-center gap-2">
               <div className={cn('w-2 h-2 rounded-full bg-gradient-to-r', examInfo.color)} />
               <span className={cn('text-sm font-semibold', examInfo.textColor)}>
@@ -408,6 +500,23 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           )}
                         </NavLink>
                       </li>
+                      <li>
+                        <NavLink
+                          to="/admin/audit"
+                          onClick={onClose}
+                          className={({ isActive }) =>
+                            cn(
+                              'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                              isActive
+                                ? 'bg-rose-600 text-white'
+                                : 'text-neutral-700 hover:bg-neutral-100'
+                            )
+                          }
+                        >
+                          <Shield className="w-5 h-5" />
+                          Audit Log
+                        </NavLink>
+                      </li>
                     </>
                   )}
                 </>
@@ -441,6 +550,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               {currentExamType === 'bece' && 'BECE Exam Prep'}
             </p>
           </div>
+            </>
+          )}
         </nav>
       </aside>
     </>

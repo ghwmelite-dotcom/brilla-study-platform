@@ -226,7 +226,7 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT,
     name TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('student', 'teacher', 'admin')),
+    role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('student', 'teacher', 'admin', 'parent')),
     status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'suspended')),
 
     -- Email verification
@@ -745,3 +745,214 @@ CREATE INDEX IF NOT EXISTS idx_chat_teacher_assignments_teacher ON chat_teacher_
 CREATE INDEX IF NOT EXISTS idx_chat_teacher_assignments_subject ON chat_teacher_assignments(subject_id);
 CREATE INDEX IF NOT EXISTS idx_chat_student_mods_user ON chat_student_moderators(user_id);
 CREATE INDEX IF NOT EXISTS idx_chat_student_mods_room ON chat_student_moderators(room_id);
+
+-- =============================================
+-- PARENT MONITORING SYSTEM TABLES
+-- =============================================
+
+-- Parent-Student Relationships
+-- Links parents/guardians to students via invite codes
+CREATE TABLE IF NOT EXISTS parent_student_links (
+    id TEXT PRIMARY KEY,
+    parent_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    student_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    invite_code TEXT UNIQUE,
+    invite_code_expires_at TEXT,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'revoked', 'expired')),
+    relationship_type TEXT DEFAULT 'parent' CHECK (relationship_type IN ('parent', 'guardian')),
+    student_opted_out INTEGER DEFAULT 0,
+    opted_out_at TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    verified_at TEXT,
+    UNIQUE(parent_id, student_id)
+);
+
+-- Parent Notifications
+-- Stores notifications sent to parents about their wards
+CREATE TABLE IF NOT EXISTS parent_notifications (
+    id TEXT PRIMARY KEY,
+    parent_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    student_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type TEXT NOT NULL CHECK (type IN (
+        'achievement_unlocked',
+        'streak_milestone',
+        'topic_mastered',
+        'low_performance',
+        'weekly_summary',
+        'link_request',
+        'student_opted_out',
+        'link_confirmed'
+    )),
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    data TEXT, -- JSON for additional context
+    is_read INTEGER DEFAULT 0,
+    email_sent INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Parent Notification Preferences
+-- Customizable alert settings for each parent
+CREATE TABLE IF NOT EXISTS parent_notification_preferences (
+    id TEXT PRIMARY KEY,
+    parent_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    achievement_alerts INTEGER DEFAULT 1,
+    streak_alerts INTEGER DEFAULT 1,
+    low_performance_alerts INTEGER DEFAULT 1,
+    weekly_summary INTEGER DEFAULT 1,
+    email_notifications INTEGER DEFAULT 1,
+    low_performance_threshold INTEGER DEFAULT 40,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(parent_id)
+);
+
+-- Parent Activity Log (for audit trail)
+CREATE TABLE IF NOT EXISTS parent_activity_log (
+    id TEXT PRIMARY KEY,
+    parent_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    student_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    action TEXT NOT NULL CHECK (action IN (
+        'view_progress',
+        'view_activity',
+        'view_topics',
+        'view_achievements',
+        'link_student',
+        'unlink_student'
+    )),
+    ip_address TEXT,
+    user_agent TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Indexes for parent system
+CREATE INDEX IF NOT EXISTS idx_parent_links_parent ON parent_student_links(parent_id);
+CREATE INDEX IF NOT EXISTS idx_parent_links_student ON parent_student_links(student_id);
+CREATE INDEX IF NOT EXISTS idx_parent_links_code ON parent_student_links(invite_code);
+CREATE INDEX IF NOT EXISTS idx_parent_links_status ON parent_student_links(status);
+CREATE INDEX IF NOT EXISTS idx_parent_links_active ON parent_student_links(status, student_opted_out);
+CREATE INDEX IF NOT EXISTS idx_parent_notifications_parent ON parent_notifications(parent_id);
+CREATE INDEX IF NOT EXISTS idx_parent_notifications_student ON parent_notifications(student_id);
+CREATE INDEX IF NOT EXISTS idx_parent_notifications_unread ON parent_notifications(parent_id, is_read);
+CREATE INDEX IF NOT EXISTS idx_parent_notifications_type ON parent_notifications(type);
+CREATE INDEX IF NOT EXISTS idx_parent_notifications_created ON parent_notifications(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_parent_activity_parent ON parent_activity_log(parent_id);
+CREATE INDEX IF NOT EXISTS idx_parent_activity_student ON parent_activity_log(student_id);
+CREATE INDEX IF NOT EXISTS idx_parent_activity_created ON parent_activity_log(created_at DESC);
+
+-- ===========================================
+-- AUDIT SYSTEM TABLES
+-- ===========================================
+
+-- Central Audit Log
+CREATE TABLE IF NOT EXISTS audit_log (
+    id TEXT PRIMARY KEY,
+    user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+    user_email TEXT,
+    user_role TEXT,
+    action TEXT NOT NULL,
+    action_category TEXT NOT NULL CHECK (action_category IN (
+        'auth', 'user_management', 'content', 'practice',
+        'parent', 'admin', 'settings', 'api', 'security'
+    )),
+    target_type TEXT,
+    target_id TEXT,
+    target_details TEXT,
+    ip_address TEXT,
+    user_agent TEXT,
+    request_path TEXT,
+    request_method TEXT,
+    status TEXT DEFAULT 'success' CHECK (status IN ('success', 'failure', 'warning')),
+    error_message TEXT,
+    metadata TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Security Events
+CREATE TABLE IF NOT EXISTS security_events (
+    id TEXT PRIMARY KEY,
+    event_type TEXT NOT NULL CHECK (event_type IN (
+        'failed_login', 'account_locked', 'password_reset',
+        'suspicious_activity', 'rate_limit_exceeded', 'unauthorized_access',
+        'permission_escalation', 'data_export', 'bulk_operation', 'api_key_usage'
+    )),
+    severity TEXT DEFAULT 'low' CHECK (severity IN ('low', 'medium', 'high', 'critical')),
+    user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+    user_email TEXT,
+    ip_address TEXT,
+    user_agent TEXT,
+    description TEXT NOT NULL,
+    metadata TEXT,
+    is_resolved INTEGER DEFAULT 0,
+    resolved_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+    resolved_at TEXT,
+    resolution_notes TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Login Attempts
+CREATE TABLE IF NOT EXISTS login_attempts (
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    ip_address TEXT,
+    user_agent TEXT,
+    success INTEGER DEFAULT 0,
+    failure_reason TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- User Sessions
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash TEXT NOT NULL,
+    ip_address TEXT,
+    user_agent TEXT,
+    device_info TEXT,
+    is_active INTEGER DEFAULT 1,
+    last_activity_at TEXT DEFAULT (datetime('now')),
+    expires_at TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Data Change Log
+CREATE TABLE IF NOT EXISTS data_change_log (
+    id TEXT PRIMARY KEY,
+    table_name TEXT NOT NULL,
+    record_id TEXT NOT NULL,
+    operation TEXT NOT NULL CHECK (operation IN ('INSERT', 'UPDATE', 'DELETE')),
+    changed_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+    old_values TEXT,
+    new_values TEXT,
+    changed_fields TEXT,
+    reason TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Audit System Indexes
+CREATE INDEX IF NOT EXISTS idx_audit_log_user ON audit_log(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_log_action ON audit_log(action);
+CREATE INDEX IF NOT EXISTS idx_audit_log_category ON audit_log(action_category);
+CREATE INDEX IF NOT EXISTS idx_audit_log_target ON audit_log(target_type, target_id);
+CREATE INDEX IF NOT EXISTS idx_audit_log_created ON audit_log(created_at);
+CREATE INDEX IF NOT EXISTS idx_audit_log_status ON audit_log(status);
+CREATE INDEX IF NOT EXISTS idx_audit_log_ip ON audit_log(ip_address);
+
+CREATE INDEX IF NOT EXISTS idx_security_events_type ON security_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_security_events_severity ON security_events(severity);
+CREATE INDEX IF NOT EXISTS idx_security_events_user ON security_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_security_events_unresolved ON security_events(is_resolved, severity);
+CREATE INDEX IF NOT EXISTS idx_security_events_created ON security_events(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_login_attempts_email ON login_attempts(email);
+CREATE INDEX IF NOT EXISTS idx_login_attempts_ip ON login_attempts(ip_address);
+CREATE INDEX IF NOT EXISTS idx_login_attempts_created ON login_attempts(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_user_sessions_user ON user_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_active ON user_sessions(user_id, is_active);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_token ON user_sessions(token_hash);
+
+CREATE INDEX IF NOT EXISTS idx_data_change_table ON data_change_log(table_name);
+CREATE INDEX IF NOT EXISTS idx_data_change_record ON data_change_log(table_name, record_id);
+CREATE INDEX IF NOT EXISTS idx_data_change_user ON data_change_log(changed_by);
+CREATE INDEX IF NOT EXISTS idx_data_change_created ON data_change_log(created_at);

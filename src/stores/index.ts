@@ -10,4 +10,5 @@ export { useChatStore } from './chatStore';
 export { useModerationStore } from './moderationStore';
 export { useLabStore } from './labStore';
 export { useGuideStore } from './guideStore';
+export { useParentStore } from './parentStore';
 export type { ChatMessage as AiChatMessage, UserPersonalization } from './aiTutorStore';

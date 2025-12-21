@@ -21,7 +21,11 @@ import {
 import HelpCenter from '@/pages/HelpCenter';
 import AdminApprovals from '@/pages/AdminApprovals';
 import UserManagement from '@/pages/UserManagement';
+import AuditLog from '@/pages/AuditLog';
 import { SetPasswordPage } from '@/pages/SetPasswordPage';
+import { ParentDashboardPage } from '@/pages/ParentDashboard';
+import { ParentSettingsPage } from '@/pages/ParentSettings';
+import { ParentNotificationsPage } from '@/pages/ParentNotifications';
 import { VirtualLabPage } from '@/components/lab';
 import { useAuthStore } from '@/stores';
 import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/guide';
@@ -47,7 +51,7 @@ function LoginPage() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const handleDemoLogin = (role: 'student' | 'admin' | 'teacher' = 'student') => {
+  const handleDemoLogin = (role: 'student' | 'admin' | 'teacher' | 'parent' = 'student') => {
     const users = {
       student: {
         id: 'user_demo',
@@ -57,6 +61,7 @@ function LoginPage() {
         status: 'approved' as const,
         house: 'Blue House',
         yearGroup: 3,
+        schoolLevel: 'shs' as const,
         xpPoints: 0,
         level: 1,
         streakDays: 0,
@@ -88,6 +93,19 @@ function LoginPage() {
         streakDays: 0,
         aiGradingCredits: 50,
       },
+      parent: {
+        id: 'user_parent',
+        email: 'parent@example.com',
+        name: 'Demo Parent',
+        role: 'parent' as const,
+        status: 'approved' as const,
+        house: undefined,
+        yearGroup: undefined,
+        xpPoints: 0,
+        level: 1,
+        streakDays: 0,
+        aiGradingCredits: 0,
+      },
     };
 
     const selectedUser = users[role];
@@ -102,8 +120,12 @@ function LoginPage() {
       isAuthenticated: true,
     });
 
-    // Redirect to dashboard after login
-    navigate('/dashboard');
+    // Redirect based on role
+    if (role === 'parent') {
+      navigate('/parent');
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   return (
@@ -144,8 +166,8 @@ function LoginPage() {
             </div>
           </div>
 
-          {/* Teacher and Student buttons */}
-          <div className="grid grid-cols-2 gap-3">
+          {/* Teacher, Student, and Parent buttons */}
+          <div className="grid grid-cols-3 gap-3">
             <button
               type="button"
               onClick={() => handleDemoLogin('teacher')}
@@ -161,6 +183,14 @@ function LoginPage() {
               className="py-3 px-4 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
             >
               Student
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDemoLogin('parent')}
+              disabled={isLoading}
+              className="py-3 px-4 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
+            >
+              Parent
             </button>
           </div>
         </div>
@@ -549,6 +579,32 @@ function App() {
             }
           />
 
+          {/* Parent routes */}
+          <Route
+            path="parent"
+            element={
+              <ProtectedRoute>
+                <ParentDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="parent/notifications"
+            element={
+              <ProtectedRoute>
+                <ParentNotificationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="parent/settings"
+            element={
+              <ProtectedRoute>
+                <ParentSettingsPage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Admin routes */}
           <Route
             path="admin/approvals"
@@ -563,6 +619,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <UserManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="admin/audit"
+            element={
+              <ProtectedRoute>
+                <AuditLog />
               </ProtectedRoute>
             }
           />

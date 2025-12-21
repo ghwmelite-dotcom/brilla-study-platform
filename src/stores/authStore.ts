@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { User, PendingUserData, UserStatus, SchoolLevel } from '@/types';
+import type { User, PendingUserData, UserStatus, SchoolLevel, UserRole } from '@/types';
 import { api } from '@/lib/api';
 
 // Full pending user with all registration data
@@ -29,6 +29,9 @@ export interface ManagedUser extends User {
   passwordSet: boolean;
   // Password hash (in production, this would be hashed server-side)
   passwordHash?: string;
+  // Parent-specific fields
+  phoneNumber?: string;
+  linkedStudentCount?: number;
 }
 
 // User stats for dashboard
@@ -45,7 +48,7 @@ export interface UserStats {
 export interface CreateUserData {
   email: string;
   name: string;
-  role: 'student' | 'teacher' | 'admin';
+  role: UserRole;
   schoolLevel?: SchoolLevel;
   yearGroup?: number;
   schoolName?: string;
@@ -54,6 +57,8 @@ export interface CreateUserData {
   subjectsTaught?: string[];
   yearsExperience?: string;
   qualifications?: string;
+  // Parent-specific fields
+  phoneNumber?: string;
 }
 
 interface AuthState {
@@ -104,7 +109,7 @@ interface RegisterData {
   email: string;
   password: string;
   name: string;
-  role: 'student' | 'teacher' | 'admin';
+  role: UserRole;
   // Student fields
   schoolLevel?: SchoolLevel;
   yearGroup?: number;
@@ -117,6 +122,9 @@ interface RegisterData {
   qualifications?: string;
   // Admin fields
   adminCode?: string;
+  // Parent fields
+  phoneNumber?: string;
+  inviteCode?: string; // Optional: link to student during registration
 }
 
 // Storage keys (simulating database for fallback/demo)

@@ -19,12 +19,14 @@ import {
   AlertCircle,
   Clock,
   CheckCircle2,
+  Users,
+  Phone,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/utils';
 
 type AuthMode = 'login' | 'register';
-type UserRole = 'student' | 'teacher' | 'admin';
+type UserRole = 'student' | 'teacher' | 'admin' | 'parent';
 type SchoolLevel = 'jss' | 'shs';
 type RegistrationStatus = 'idle' | 'pending' | 'error';
 
@@ -70,6 +72,10 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
   // Admin-specific fields
   const [adminCode, setAdminCode] = useState('');
 
+  // Parent-specific fields
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [parentInviteCode, setParentInviteCode] = useState('');
+
   const resetForm = () => {
     setEmail('');
     setPassword('');
@@ -84,6 +90,8 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
     setYearsExperience('');
     setQualifications('');
     setAdminCode('');
+    setPhoneNumber('');
+    setParentInviteCode('');
     setFormErrors({});
     setSelectedRole(null);
     setRegistrationStatus('idle');
@@ -160,6 +168,14 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           errors.adminCode = 'Admin invitation code is required';
         }
       }
+
+      if (selectedRole === 'parent') {
+        if (!phoneNumber.trim()) {
+          errors.phoneNumber = 'Phone number is required';
+        } else if (!/^(\+233|0)\d{9}$/.test(phoneNumber.replace(/\s/g, ''))) {
+          errors.phoneNumber = 'Please enter a valid Ghanaian phone number';
+        }
+      }
     }
 
     setFormErrors(errors);
@@ -195,6 +211,8 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           yearsExperience: selectedRole === 'teacher' ? yearsExperience : undefined,
           qualifications: selectedRole === 'teacher' ? qualifications : undefined,
           adminCode: selectedRole === 'admin' ? adminCode : undefined,
+          phoneNumber: selectedRole === 'parent' ? phoneNumber : undefined,
+          inviteCode: selectedRole === 'parent' && parentInviteCode ? parentInviteCode : undefined,
         });
 
         // Show pending approval message
@@ -216,6 +234,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
       student: 'student@brilla.edu.gh',
       teacher: 'teacher@brilla.edu.gh',
       admin: 'admin@brilla.edu.gh',
+      parent: 'parent@brilla.edu.gh',
     };
 
     setIsSubmitting(true);
@@ -371,6 +390,19 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                 <div className="text-left">
                   <h3 className="font-semibold text-neutral-900">Administrator</h3>
                   <p className="text-sm text-neutral-500">School admin with invitation code</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setSelectedRole('parent')}
+                className="w-full flex items-center gap-4 p-4 border-2 border-neutral-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all group"
+              >
+                <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center group-hover:bg-amber-200 transition-colors">
+                  <Users className="w-6 h-6 text-amber-600" />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-semibold text-neutral-900">Parent/Guardian</h3>
+                  <p className="text-sm text-neutral-500">Monitor your ward's learning progress</p>
                 </div>
               </button>
 
@@ -733,6 +765,59 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                       <p className="text-xs text-neutral-500 mt-1">Contact your school or Brilla support for an admin code</p>
                     </div>
                   )}
+
+                  {/* Parent-specific fields */}
+                  {selectedRole === 'parent' && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-1">
+                          Phone Number
+                        </label>
+                        <div className="relative">
+                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                          <input
+                            type="tel"
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            placeholder="e.g., 0244123456 or +233244123456"
+                            className={cn(
+                              'w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20',
+                              formErrors.phoneNumber ? 'border-red-300' : 'border-neutral-300'
+                            )}
+                          />
+                        </div>
+                        {formErrors.phoneNumber && <p className="text-red-500 text-xs mt-1">{formErrors.phoneNumber}</p>}
+                        <p className="text-xs text-neutral-500 mt-1">We'll use this for important notifications about your ward</p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-1">
+                          Student Invite Code (Optional)
+                        </label>
+                        <div className="relative">
+                          <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                          <input
+                            type="text"
+                            value={parentInviteCode}
+                            onChange={(e) => setParentInviteCode(e.target.value.toUpperCase())}
+                            placeholder="e.g., ABC123"
+                            maxLength={6}
+                            className="w-full pl-10 pr-4 py-2.5 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 uppercase"
+                          />
+                        </div>
+                        <p className="text-xs text-neutral-500 mt-1">
+                          If your child gave you an invite code, enter it here. You can also add it later from settings.
+                        </p>
+                      </div>
+
+                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <p className="text-sm text-amber-800">
+                          <strong>How it works:</strong> Your child generates an invite code from their account.
+                          Once linked, you can view their learning progress, achievements, and study activity.
+                        </p>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
 
@@ -762,7 +847,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-4 gap-2">
                     <button
                       type="button"
                       onClick={() => handleDemoLogin('student')}
@@ -786,6 +871,14 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                     >
                       <Shield className="w-5 h-5 text-purple-600" />
                       <span className="text-xs font-medium">Admin</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDemoLogin('parent')}
+                      className="flex flex-col items-center gap-1 p-3 border border-neutral-200 rounded-lg hover:border-amber-500 hover:bg-amber-50 transition-all"
+                    >
+                      <Users className="w-5 h-5 text-amber-600" />
+                      <span className="text-xs font-medium">Parent</span>
                     </button>
                   </div>
                 </>

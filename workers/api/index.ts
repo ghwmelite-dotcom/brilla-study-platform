@@ -19,7 +19,7 @@ interface Env {
 interface UserPayload extends JWTPayload {
   userId: string;
   email: string;
-  role: 'student' | 'teacher' | 'admin';
+  role: 'student' | 'teacher' | 'admin' | 'parent';
 }
 
 // =============================================
@@ -381,6 +381,7 @@ publicApp.post('/auth/register', async (c) => {
 // Login
 publicApp.post('/auth/login', async (c) => {
   const { email, password } = await c.req.json();
+  const clientInfo = getClientInfo(c);
 
   try {
     const result = await c.env.DB.prepare(`
@@ -388,30 +389,71 @@ publicApp.post('/auth/login', async (c) => {
     `).bind(email).first();
 
     if (!result) {
+      // Log failed login attempt
+      await logLoginAttempt(c.env.DB, email, false, {
+        ...clientInfo,
+        failureReason: 'User not found',
+      });
       return c.json({ success: false, error: 'Invalid email or password.' }, 401);
     }
 
     // Check password
     if (!result.password_hash) {
+      await logLoginAttempt(c.env.DB, email, false, {
+        ...clientInfo,
+        failureReason: 'Password not set',
+      });
       return c.json({ success: false, error: 'Please set up your password using the link sent to your email.' }, 401);
     }
 
     const isValidPassword = await verifyPassword(password, result.password_hash as string);
     if (!isValidPassword) {
+      await logLoginAttempt(c.env.DB, email, false, {
+        ...clientInfo,
+        failureReason: 'Invalid password',
+      });
+      // Check for multiple failed attempts and log security event
+      const { results: recentFailures } = await c.env.DB.prepare(`
+        SELECT COUNT(*) as count FROM login_attempts
+        WHERE email = ? AND success = 0 AND created_at >= datetime('now', '-1 hour')
+      `).bind(email).all();
+      const failCount = (recentFailures[0] as { count: number })?.count || 0;
+      if (failCount >= 5) {
+        await logSecurityEvent(c.env.DB, 'failed_login', failCount >= 10 ? 'high' : 'medium',
+          `Multiple failed login attempts for ${email} (${failCount} in last hour)`,
+          { userEmail: email, ...clientInfo, metadata: { attemptCount: failCount } }
+        );
+      }
       return c.json({ success: false, error: 'Invalid email or password.' }, 401);
     }
 
     // Check account status
     if (result.status === 'pending') {
+      await logLoginAttempt(c.env.DB, email, false, {
+        ...clientInfo,
+        failureReason: 'Account pending approval',
+      });
       return c.json({ success: false, error: 'Your account is pending approval.' }, 401);
     }
     if (result.status === 'rejected') {
+      await logLoginAttempt(c.env.DB, email, false, {
+        ...clientInfo,
+        failureReason: 'Account rejected',
+      });
       return c.json({ success: false, error: 'Your registration was not approved.' }, 401);
     }
     if (result.status === 'suspended' || !result.is_active) {
+      await logLoginAttempt(c.env.DB, email, false, {
+        ...clientInfo,
+        failureReason: 'Account suspended',
+      });
       return c.json({ success: false, error: 'Your account has been suspended.' }, 401);
     }
     if (!result.email_verified) {
+      await logLoginAttempt(c.env.DB, email, false, {
+        ...clientInfo,
+        failureReason: 'Email not verified',
+      });
       return c.json({ success: false, error: 'Please verify your email before logging in.' }, 401);
     }
 
@@ -426,6 +468,18 @@ publicApp.post('/auth/login', async (c) => {
     await c.env.DB.prepare(`
       UPDATE users SET last_login_at = datetime('now') WHERE id = ?
     `).bind(result.id).run();
+
+    // Log successful login
+    await logLoginAttempt(c.env.DB, email, true, clientInfo);
+    await logAudit({
+      db: c.env.DB,
+      userId: result.id as string,
+      userEmail: result.email as string,
+      userRole: result.role as string,
+      action: 'login',
+      actionCategory: 'auth',
+      ...clientInfo,
+    });
 
     const user = {
       id: result.id,
@@ -2346,6 +2400,842 @@ protectedApp.post('/users/me/change-password', userAuth, async (c) => {
 });
 
 // =============================================
+// PARENT MONITORING ENDPOINTS
+// =============================================
+
+// Generate 6-character invite code for student
+function generateInviteCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Excluding confusing chars
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
+// =============================================
+// AUDIT LOGGING UTILITIES
+// =============================================
+
+type AuditCategory = 'auth' | 'user_management' | 'content' | 'practice' | 'parent' | 'admin' | 'settings' | 'api' | 'security';
+type AuditStatus = 'success' | 'failure' | 'warning';
+type SecurityEventType = 'failed_login' | 'account_locked' | 'password_reset' | 'suspicious_activity' | 'rate_limit_exceeded' | 'unauthorized_access' | 'permission_escalation' | 'data_export' | 'bulk_operation' | 'api_key_usage';
+type SecuritySeverity = 'low' | 'medium' | 'high' | 'critical';
+
+interface AuditLogParams {
+  db: D1Database;
+  userId?: string;
+  userEmail?: string;
+  userRole?: string;
+  action: string;
+  actionCategory: AuditCategory;
+  targetType?: string;
+  targetId?: string;
+  targetDetails?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  requestPath?: string;
+  requestMethod?: string;
+  status?: AuditStatus;
+  errorMessage?: string;
+  metadata?: Record<string, unknown>;
+}
+
+// Main audit logging function
+async function logAudit(params: AuditLogParams): Promise<void> {
+  try {
+    const id = `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    await params.db.prepare(`
+      INSERT INTO audit_log (
+        id, user_id, user_email, user_role, action, action_category,
+        target_type, target_id, target_details, ip_address, user_agent,
+        request_path, request_method, status, error_message, metadata
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      id,
+      params.userId || null,
+      params.userEmail || null,
+      params.userRole || null,
+      params.action,
+      params.actionCategory,
+      params.targetType || null,
+      params.targetId || null,
+      params.targetDetails || null,
+      params.ipAddress || null,
+      params.userAgent || null,
+      params.requestPath || null,
+      params.requestMethod || null,
+      params.status || 'success',
+      params.errorMessage || null,
+      params.metadata ? JSON.stringify(params.metadata) : null
+    ).run();
+  } catch (error) {
+    console.error('Failed to log audit entry:', error);
+  }
+}
+
+// Log security events
+async function logSecurityEvent(
+  db: D1Database,
+  eventType: SecurityEventType,
+  severity: SecuritySeverity,
+  description: string,
+  options: {
+    userId?: string;
+    userEmail?: string;
+    ipAddress?: string;
+    userAgent?: string;
+    metadata?: Record<string, unknown>;
+  } = {}
+): Promise<void> {
+  try {
+    const id = `sec_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    await db.prepare(`
+      INSERT INTO security_events (
+        id, event_type, severity, user_id, user_email, ip_address, user_agent, description, metadata
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      id,
+      eventType,
+      severity,
+      options.userId || null,
+      options.userEmail || null,
+      options.ipAddress || null,
+      options.userAgent || null,
+      description,
+      options.metadata ? JSON.stringify(options.metadata) : null
+    ).run();
+  } catch (error) {
+    console.error('Failed to log security event:', error);
+  }
+}
+
+// Log login attempts
+async function logLoginAttempt(
+  db: D1Database,
+  email: string,
+  success: boolean,
+  options: {
+    ipAddress?: string;
+    userAgent?: string;
+    failureReason?: string;
+  } = {}
+): Promise<void> {
+  try {
+    const id = `login_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    await db.prepare(`
+      INSERT INTO login_attempts (id, email, ip_address, user_agent, success, failure_reason)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(
+      id,
+      email,
+      options.ipAddress || null,
+      options.userAgent || null,
+      success ? 1 : 0,
+      options.failureReason || null
+    ).run();
+  } catch (error) {
+    console.error('Failed to log login attempt:', error);
+  }
+}
+
+// Log data changes for compliance
+async function logDataChange(
+  db: D1Database,
+  tableName: string,
+  recordId: string,
+  operation: 'INSERT' | 'UPDATE' | 'DELETE',
+  changedBy: string | null,
+  options: {
+    oldValues?: Record<string, unknown>;
+    newValues?: Record<string, unknown>;
+    changedFields?: string[];
+    reason?: string;
+  } = {}
+): Promise<void> {
+  try {
+    const id = `change_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    await db.prepare(`
+      INSERT INTO data_change_log (
+        id, table_name, record_id, operation, changed_by,
+        old_values, new_values, changed_fields, reason
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      id,
+      tableName,
+      recordId,
+      operation,
+      changedBy,
+      options.oldValues ? JSON.stringify(options.oldValues) : null,
+      options.newValues ? JSON.stringify(options.newValues) : null,
+      options.changedFields ? JSON.stringify(options.changedFields) : null,
+      options.reason || null
+    ).run();
+  } catch (error) {
+    console.error('Failed to log data change:', error);
+  }
+}
+
+// Helper to get client info from request
+function getClientInfo(c: { req: { header: (name: string) => string | undefined; path: string; method: string } }): {
+  ipAddress: string;
+  userAgent: string;
+  requestPath: string;
+  requestMethod: string;
+} {
+  return {
+    ipAddress: c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown',
+    userAgent: c.req.header('user-agent') || 'unknown',
+    requestPath: c.req.path,
+    requestMethod: c.req.method,
+  };
+}
+
+// Student: Generate parent invite code
+protectedApp.post('/students/parent-invite', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+
+  if (user.role !== 'student') {
+    return c.json({ success: false, error: 'Only students can generate parent invite codes' }, 403);
+  }
+
+  try {
+    // Check for existing active/pending links
+    const { results: existingLinks } = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM parent_student_links
+      WHERE student_id = ? AND status IN ('active', 'pending')
+    `).bind(user.userId).all();
+
+    const existingCount = (existingLinks[0] as { count: number })?.count || 0;
+
+    // Generate unique invite code
+    let inviteCode = generateInviteCode();
+    let attempts = 0;
+    while (attempts < 10) {
+      const existing = await c.env.DB.prepare(`
+        SELECT id FROM parent_student_links WHERE invite_code = ?
+      `).bind(inviteCode).first();
+      if (!existing) break;
+      inviteCode = generateInviteCode();
+      attempts++;
+    }
+
+    // Create pending link with invite code (expires in 48 hours)
+    const id = `psl_${Date.now()}`;
+    const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+
+    await c.env.DB.prepare(`
+      INSERT INTO parent_student_links (id, parent_id, student_id, invite_code, invite_code_expires_at, status)
+      VALUES (?, '', ?, ?, ?, 'pending')
+    `).bind(id, user.userId, inviteCode, expiresAt).run();
+
+    return c.json({
+      success: true,
+      data: {
+        code: inviteCode,
+        expiresAt,
+        existingLinks: existingCount,
+      },
+    });
+  } catch (error) {
+    console.error('Generate invite code error:', error);
+    return c.json({ success: false, error: 'Failed to generate invite code' }, 500);
+  }
+});
+
+// Student: Get linked parents
+protectedApp.get('/students/parent-links', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+
+  if (user.role !== 'student') {
+    return c.json({ success: false, error: 'Only students can view their parent links' }, 403);
+  }
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT psl.*, u.name as parent_name, u.email as parent_email
+      FROM parent_student_links psl
+      LEFT JOIN users u ON psl.parent_id = u.id
+      WHERE psl.student_id = ? AND psl.status IN ('active', 'pending')
+      ORDER BY psl.created_at DESC
+    `).bind(user.userId).all();
+
+    return c.json({ success: true, data: results });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch parent links' }, 500);
+  }
+});
+
+// Student: Revoke parent access (SHS only)
+protectedApp.delete('/students/parent-link/:parentId', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  const parentId = c.req.param('parentId');
+
+  if (user.role !== 'student') {
+    return c.json({ success: false, error: 'Only students can revoke parent access' }, 403);
+  }
+
+  try {
+    // Check if student is SHS level (can opt-out)
+    const student = await c.env.DB.prepare(`
+      SELECT school_level FROM users WHERE id = ?
+    `).bind(user.userId).first();
+
+    if (student?.school_level !== 'shs') {
+      return c.json({ success: false, error: 'Only SHS students can revoke parent access' }, 403);
+    }
+
+    // Update link status to revoked
+    await c.env.DB.prepare(`
+      UPDATE parent_student_links
+      SET status = 'revoked', student_opted_out = 1, opted_out_at = datetime('now')
+      WHERE student_id = ? AND parent_id = ?
+    `).bind(user.userId, parentId).run();
+
+    // Create notification for parent
+    const notifId = `pn_${Date.now()}`;
+    await c.env.DB.prepare(`
+      INSERT INTO parent_notifications (id, parent_id, student_id, type, title, message)
+      VALUES (?, ?, ?, 'student_opted_out', 'Access Revoked', 'Your ward has revoked your monitoring access.')
+    `).bind(notifId, parentId, user.userId).run();
+
+    return c.json({ success: true, data: { message: 'Parent access revoked' } });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to revoke parent access' }, 500);
+  }
+});
+
+// Parent: Link to student using invite code
+protectedApp.post('/parents/link', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  const { inviteCode, relationshipType } = await c.req.json();
+
+  if (user.role !== 'parent') {
+    return c.json({ success: false, error: 'Only parents can link to students' }, 403);
+  }
+
+  try {
+    // Find pending link with this code
+    const link = await c.env.DB.prepare(`
+      SELECT psl.*, u.name as student_name, u.email as student_email
+      FROM parent_student_links psl
+      JOIN users u ON psl.student_id = u.id
+      WHERE psl.invite_code = ? AND psl.status = 'pending'
+    `).bind(inviteCode.toUpperCase()).first();
+
+    if (!link) {
+      return c.json({ success: false, error: 'Invalid or expired invite code' }, 400);
+    }
+
+    // Check if code is expired
+    if (link.invite_code_expires_at) {
+      const expiry = new Date(link.invite_code_expires_at as string);
+      if (expiry < new Date()) {
+        return c.json({ success: false, error: 'This invite code has expired' }, 400);
+      }
+    }
+
+    // Check if already linked
+    const existingLink = await c.env.DB.prepare(`
+      SELECT id FROM parent_student_links
+      WHERE parent_id = ? AND student_id = ? AND status = 'active'
+    `).bind(user.userId, link.student_id).first();
+
+    if (existingLink) {
+      return c.json({ success: false, error: 'You are already linked to this student' }, 400);
+    }
+
+    // Update the link with parent info
+    await c.env.DB.prepare(`
+      UPDATE parent_student_links
+      SET parent_id = ?, status = 'active', relationship_type = ?, verified_at = datetime('now'),
+          invite_code = NULL, invite_code_expires_at = NULL
+      WHERE id = ?
+    `).bind(user.userId, relationshipType || 'parent', link.id).run();
+
+    // Create notification for student
+    const notifId = `pn_${Date.now()}`;
+    const parentUser = await c.env.DB.prepare(`
+      SELECT name FROM users WHERE id = ?
+    `).bind(user.userId).first();
+
+    await c.env.DB.prepare(`
+      INSERT INTO parent_notifications (id, parent_id, student_id, type, title, message)
+      VALUES (?, ?, ?, 'link_confirmed', 'Parent Linked', ?)
+    `).bind(notifId, user.userId, link.student_id,
+           `${parentUser?.name || 'A parent'} has linked to your account.`).run();
+
+    // Create default notification preferences for parent
+    const prefId = `pnp_${Date.now()}`;
+    await c.env.DB.prepare(`
+      INSERT OR IGNORE INTO parent_notification_preferences (id, parent_id)
+      VALUES (?, ?)
+    `).bind(prefId, user.userId).run();
+
+    return c.json({
+      success: true,
+      data: {
+        message: 'Successfully linked to student',
+        student: {
+          id: link.student_id,
+          name: link.student_name,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Link parent error:', error);
+    return c.json({ success: false, error: 'Failed to link to student' }, 500);
+  }
+});
+
+// Parent: Get linked students
+protectedApp.get('/parents/students', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+
+  if (user.role !== 'parent') {
+    return c.json({ success: false, error: 'Only parents can view linked students' }, 403);
+  }
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT psl.*,
+             u.name as student_name, u.email as student_email, u.avatar_url as student_avatar,
+             u.school_level, u.year_group, u.house, u.xp_points, u.level, u.streak_days,
+             u.last_activity_date as last_active_at
+      FROM parent_student_links psl
+      JOIN users u ON psl.student_id = u.id
+      WHERE psl.parent_id = ? AND psl.status = 'active' AND psl.student_opted_out = 0
+      ORDER BY u.name
+    `).bind(user.userId).all();
+
+    // Map to expected format
+    const students = results.map((r: any) => ({
+      id: r.id,
+      parentId: r.parent_id,
+      studentId: r.student_id,
+      status: r.status,
+      relationshipType: r.relationship_type,
+      studentOptedOut: r.student_opted_out === 1,
+      createdAt: r.created_at,
+      verifiedAt: r.verified_at,
+      student: {
+        id: r.student_id,
+        name: r.student_name,
+        email: r.student_email,
+        avatarUrl: r.student_avatar,
+        schoolLevel: r.school_level,
+        yearGroup: r.year_group,
+        house: r.house,
+        xpPoints: r.xp_points,
+        level: r.level,
+        streakDays: r.streak_days,
+        lastActiveAt: r.last_active_at,
+      },
+    }));
+
+    return c.json({ success: true, data: students });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch linked students' }, 500);
+  }
+});
+
+// Parent: Get student progress summary
+protectedApp.get('/parents/students/:studentId/progress', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  const studentId = c.req.param('studentId');
+
+  if (user.role !== 'parent') {
+    return c.json({ success: false, error: 'Only parents can view student progress' }, 403);
+  }
+
+  try {
+    // Verify parent has active link to student
+    const link = await c.env.DB.prepare(`
+      SELECT id FROM parent_student_links
+      WHERE parent_id = ? AND student_id = ? AND status = 'active' AND student_opted_out = 0
+    `).bind(user.userId, studentId).first();
+
+    if (!link) {
+      return c.json({ success: false, error: 'Not authorized to view this student' }, 403);
+    }
+
+    // Get student info
+    const student = await c.env.DB.prepare(`
+      SELECT id, name, avatar_url, school_level, year_group, house,
+             xp_points, level, streak_days, last_activity_date
+      FROM users WHERE id = ?
+    `).bind(studentId).first();
+
+    if (!student) {
+      return c.json({ success: false, error: 'Student not found' }, 404);
+    }
+
+    // Get overall stats
+    const { results: stats } = await c.env.DB.prepare(`
+      SELECT COUNT(*) as total_attempted, SUM(is_correct) as total_correct
+      FROM question_attempts WHERE user_id = ?
+    `).bind(studentId).all();
+
+    const attemptStats = stats[0] as { total_attempted: number; total_correct: number };
+
+    // Get topic mastery info
+    const { results: topicProgress } = await c.env.DB.prepare(`
+      SELECT up.*, t.name as topic_name, s.name as subject_name
+      FROM user_progress up
+      JOIN topics t ON up.topic_id = t.id
+      JOIN subjects s ON t.subject_id = s.id
+      WHERE up.user_id = ?
+      ORDER BY up.mastery_level DESC
+    `).bind(studentId).all();
+
+    // Categorize topics
+    const strengths = topicProgress.filter((t: any) => t.mastery_level >= 70).slice(0, 5);
+    const weaknesses = topicProgress.filter((t: any) => t.mastery_level < 50 && t.questions_attempted >= 5).slice(0, 5);
+
+    // Get recent achievements
+    const { results: achievements } = await c.env.DB.prepare(`
+      SELECT ua.*, a.name, a.description, a.icon
+      FROM user_achievements ua
+      JOIN achievements a ON ua.achievement_id = a.id
+      WHERE ua.user_id = ?
+      ORDER BY ua.unlocked_at DESC
+      LIMIT 5
+    `).bind(studentId).all();
+
+    // Get longest streak
+    const userRecord = await c.env.DB.prepare(`
+      SELECT MAX(streak_days) as longest_streak FROM users WHERE id = ?
+    `).bind(studentId).first();
+
+    // Log parent access
+    const logId = `pal_${Date.now()}`;
+    await c.env.DB.prepare(`
+      INSERT INTO parent_activity_log (id, parent_id, student_id, action)
+      VALUES (?, ?, ?, 'view_progress')
+    `).bind(logId, user.userId, studentId).run();
+
+    return c.json({
+      success: true,
+      data: {
+        studentId: student.id,
+        studentName: student.name,
+        studentAvatar: student.avatar_url,
+        schoolLevel: student.school_level,
+        yearGroup: student.year_group,
+        house: student.house,
+        xpPoints: student.xp_points || 0,
+        level: student.level || 1,
+        streakDays: student.streak_days || 0,
+        longestStreak: userRecord?.longest_streak || student.streak_days || 0,
+        totalQuestionsAttempted: attemptStats?.total_attempted || 0,
+        totalCorrect: attemptStats?.total_correct || 0,
+        overallAccuracy: attemptStats?.total_attempted
+          ? Math.round((attemptStats.total_correct / attemptStats.total_attempted) * 100)
+          : 0,
+        topicsStarted: topicProgress.length,
+        topicsMastered: topicProgress.filter((t: any) => t.mastery_level >= 80).length,
+        strengthAreas: strengths.map((t: any) => ({
+          topicId: t.topic_id,
+          topicName: t.topic_name,
+          subjectName: t.subject_name,
+          mastery: t.mastery_level,
+          questionsAttempted: t.questions_attempted,
+          questionsCorrect: t.questions_correct,
+        })),
+        weakAreas: weaknesses.map((t: any) => ({
+          topicId: t.topic_id,
+          topicName: t.topic_name,
+          subjectName: t.subject_name,
+          mastery: t.mastery_level,
+          questionsAttempted: t.questions_attempted,
+          questionsCorrect: t.questions_correct,
+        })),
+        recentAchievements: achievements.map((a: any) => ({
+          id: a.achievement_id,
+          name: a.name,
+          description: a.description,
+          icon: a.icon,
+          unlockedAt: a.unlocked_at,
+        })),
+        lastActiveAt: student.last_activity_date,
+      },
+    });
+  } catch (error) {
+    console.error('Get student progress error:', error);
+    return c.json({ success: false, error: 'Failed to fetch student progress' }, 500);
+  }
+});
+
+// Parent: Get student activity timeline
+protectedApp.get('/parents/students/:studentId/activity', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  const studentId = c.req.param('studentId');
+  const limit = parseInt(c.req.query('limit') || '30');
+
+  if (user.role !== 'parent') {
+    return c.json({ success: false, error: 'Only parents can view student activity' }, 403);
+  }
+
+  try {
+    // Verify parent has active link to student
+    const link = await c.env.DB.prepare(`
+      SELECT id FROM parent_student_links
+      WHERE parent_id = ? AND student_id = ? AND status = 'active' AND student_opted_out = 0
+    `).bind(user.userId, studentId).first();
+
+    if (!link) {
+      return c.json({ success: false, error: 'Not authorized to view this student' }, 403);
+    }
+
+    // Get recent practice sessions
+    const { results: sessions } = await c.env.DB.prepare(`
+      SELECT ps.*, s.name as subject_name, t.name as topic_name
+      FROM practice_sessions ps
+      LEFT JOIN subjects s ON ps.subject_id = s.id
+      LEFT JOIN topics t ON ps.topic_id = t.id
+      WHERE ps.user_id = ?
+      ORDER BY ps.started_at DESC
+      LIMIT ?
+    `).bind(studentId, limit).all();
+
+    // Get recent achievements
+    const { results: achievements } = await c.env.DB.prepare(`
+      SELECT ua.unlocked_at as timestamp, a.name, a.description, a.icon, a.xp_reward
+      FROM user_achievements ua
+      JOIN achievements a ON ua.achievement_id = a.id
+      WHERE ua.user_id = ?
+      ORDER BY ua.unlocked_at DESC
+      LIMIT ?
+    `).bind(studentId, limit).all();
+
+    // Combine and sort activities
+    const activities: any[] = [];
+
+    sessions.forEach((s: any) => {
+      activities.push({
+        id: s.id,
+        type: 'practice_session',
+        title: `${s.mode === 'topic_drill' ? 'Topic Practice' : s.mode.replace('_', ' ')}`,
+        description: s.topic_name ? `Practiced ${s.topic_name}` : (s.subject_name ? `${s.subject_name} practice` : 'General practice'),
+        score: s.correct_count,
+        maxScore: s.questions_count,
+        xpEarned: s.score,
+        timestamp: s.started_at,
+        subjectName: s.subject_name,
+        topicName: s.topic_name,
+      });
+    });
+
+    achievements.forEach((a: any) => {
+      activities.push({
+        id: `ach_${a.timestamp}`,
+        type: 'achievement',
+        title: 'Achievement Unlocked',
+        description: a.name,
+        xpEarned: a.xp_reward,
+        timestamp: a.timestamp,
+        achievementIcon: a.icon,
+      });
+    });
+
+    // Sort by timestamp
+    activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    // Log access
+    const logId = `pal_${Date.now()}`;
+    await c.env.DB.prepare(`
+      INSERT INTO parent_activity_log (id, parent_id, student_id, action)
+      VALUES (?, ?, ?, 'view_activity')
+    `).bind(logId, user.userId, studentId).run();
+
+    return c.json({ success: true, data: activities.slice(0, limit) });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch student activity' }, 500);
+  }
+});
+
+// Parent: Get notifications
+protectedApp.get('/parents/notifications', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  const unreadOnly = c.req.query('unreadOnly') === 'true';
+  const limit = parseInt(c.req.query('limit') || '50');
+
+  if (user.role !== 'parent') {
+    return c.json({ success: false, error: 'Only parents can view notifications' }, 403);
+  }
+
+  try {
+    let query = `
+      SELECT pn.*, u.name as student_name, u.avatar_url as student_avatar
+      FROM parent_notifications pn
+      JOIN users u ON pn.student_id = u.id
+      WHERE pn.parent_id = ?
+    `;
+
+    if (unreadOnly) {
+      query += ' AND pn.is_read = 0';
+    }
+
+    query += ' ORDER BY pn.created_at DESC LIMIT ?';
+
+    const { results } = await c.env.DB.prepare(query).bind(user.userId, limit).all();
+
+    // Get unread count
+    const unreadResult = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM parent_notifications
+      WHERE parent_id = ? AND is_read = 0
+    `).bind(user.userId).first();
+
+    return c.json({
+      success: true,
+      data: {
+        notifications: results.map((n: any) => ({
+          id: n.id,
+          parentId: n.parent_id,
+          studentId: n.student_id,
+          type: n.type,
+          title: n.title,
+          message: n.message,
+          data: n.data ? JSON.parse(n.data) : null,
+          isRead: n.is_read === 1,
+          emailSent: n.email_sent === 1,
+          createdAt: n.created_at,
+          student: {
+            id: n.student_id,
+            name: n.student_name,
+            avatarUrl: n.student_avatar,
+          },
+        })),
+        unreadCount: unreadResult?.count || 0,
+      },
+    });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch notifications' }, 500);
+  }
+});
+
+// Parent: Mark notification as read
+protectedApp.put('/parents/notifications/:id/read', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  const notificationId = c.req.param('id');
+
+  if (user.role !== 'parent') {
+    return c.json({ success: false, error: 'Only parents can mark notifications' }, 403);
+  }
+
+  try {
+    await c.env.DB.prepare(`
+      UPDATE parent_notifications SET is_read = 1 WHERE id = ? AND parent_id = ?
+    `).bind(notificationId, user.userId).run();
+
+    return c.json({ success: true, data: { message: 'Notification marked as read' } });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to mark notification' }, 500);
+  }
+});
+
+// Parent: Mark all notifications as read
+protectedApp.put('/parents/notifications/read-all', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+
+  if (user.role !== 'parent') {
+    return c.json({ success: false, error: 'Only parents can mark notifications' }, 403);
+  }
+
+  try {
+    await c.env.DB.prepare(`
+      UPDATE parent_notifications SET is_read = 1 WHERE parent_id = ?
+    `).bind(user.userId).run();
+
+    return c.json({ success: true, data: { message: 'All notifications marked as read' } });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to mark notifications' }, 500);
+  }
+});
+
+// Parent: Get notification preferences
+protectedApp.get('/parents/preferences', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+
+  if (user.role !== 'parent') {
+    return c.json({ success: false, error: 'Only parents can view preferences' }, 403);
+  }
+
+  try {
+    let prefs = await c.env.DB.prepare(`
+      SELECT * FROM parent_notification_preferences WHERE parent_id = ?
+    `).bind(user.userId).first();
+
+    // Return defaults if no preferences set
+    if (!prefs) {
+      prefs = {
+        achievement_alerts: 1,
+        streak_alerts: 1,
+        low_performance_alerts: 1,
+        weekly_summary: 1,
+        email_notifications: 1,
+        low_performance_threshold: 40,
+      };
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        achievementAlerts: prefs.achievement_alerts === 1,
+        streakAlerts: prefs.streak_alerts === 1,
+        lowPerformanceAlerts: prefs.low_performance_alerts === 1,
+        weeklySummary: prefs.weekly_summary === 1,
+        emailNotifications: prefs.email_notifications === 1,
+        lowPerformanceThreshold: prefs.low_performance_threshold || 40,
+      },
+    });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch preferences' }, 500);
+  }
+});
+
+// Parent: Update notification preferences
+protectedApp.put('/parents/preferences', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  const prefs = await c.req.json();
+
+  if (user.role !== 'parent') {
+    return c.json({ success: false, error: 'Only parents can update preferences' }, 403);
+  }
+
+  try {
+    // Upsert preferences
+    await c.env.DB.prepare(`
+      INSERT INTO parent_notification_preferences
+        (id, parent_id, achievement_alerts, streak_alerts, low_performance_alerts,
+         weekly_summary, email_notifications, low_performance_threshold, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+      ON CONFLICT(parent_id) DO UPDATE SET
+        achievement_alerts = excluded.achievement_alerts,
+        streak_alerts = excluded.streak_alerts,
+        low_performance_alerts = excluded.low_performance_alerts,
+        weekly_summary = excluded.weekly_summary,
+        email_notifications = excluded.email_notifications,
+        low_performance_threshold = excluded.low_performance_threshold,
+        updated_at = datetime('now')
+    `).bind(
+      `pnp_${user.userId}`,
+      user.userId,
+      prefs.achievementAlerts ? 1 : 0,
+      prefs.streakAlerts ? 1 : 0,
+      prefs.lowPerformanceAlerts ? 1 : 0,
+      prefs.weeklySummary ? 1 : 0,
+      prefs.emailNotifications ? 1 : 0,
+      prefs.lowPerformanceThreshold || 40
+    ).run();
+
+    return c.json({ success: true, data: { message: 'Preferences updated' } });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to update preferences' }, 500);
+  }
+});
+
+// =============================================
 // ADMIN USER MANAGEMENT ENDPOINTS
 // =============================================
 
@@ -2457,6 +3347,7 @@ adminApp.get('/users/pending', async (c) => {
 adminApp.post('/users/:id/approve', async (c) => {
   const userId = c.req.param('id');
   const adminUser = c.get('user') as UserPayload;
+  const clientInfo = getClientInfo(c);
 
   try {
     const user = await c.env.DB.prepare(
@@ -2477,6 +3368,28 @@ adminApp.post('/users/:id/approve', async (c) => {
       WHERE id = ?
     `).bind(adminUser.userId, userId).run();
 
+    // Log the approval action
+    await logAudit({
+      db: c.env.DB,
+      userId: adminUser.userId,
+      userEmail: adminUser.email,
+      userRole: adminUser.role,
+      action: 'approve_user',
+      actionCategory: 'user_management',
+      targetType: 'user',
+      targetId: userId,
+      targetDetails: `Approved ${user.email} (${user.role})`,
+      ...clientInfo,
+    });
+
+    // Log data change
+    await logDataChange(c.env.DB, 'users', userId, 'UPDATE', adminUser.userId, {
+      oldValues: { status: 'pending' },
+      newValues: { status: 'approved' },
+      changedFields: ['status', 'email_verified', 'approved_by', 'approved_at'],
+      reason: 'Admin approval',
+    });
+
     // TODO: Send approval email notification
 
     return c.json({ success: true, data: { message: 'User approved successfully' } });
@@ -2489,6 +3402,8 @@ adminApp.post('/users/:id/approve', async (c) => {
 adminApp.post('/users/:id/reject', async (c) => {
   const userId = c.req.param('id');
   const { reason } = await c.req.json();
+  const adminUser = c.get('user') as UserPayload;
+  const clientInfo = getClientInfo(c);
 
   try {
     const user = await c.env.DB.prepare(
@@ -2503,9 +3418,33 @@ adminApp.post('/users/:id/reject', async (c) => {
       UPDATE users SET
         status = 'rejected',
         rejection_reason = ?,
+        rejected_by = ?,
+        rejected_at = datetime('now'),
         updated_at = datetime('now')
       WHERE id = ?
-    `).bind(reason || null, userId).run();
+    `).bind(reason || null, adminUser.userId, userId).run();
+
+    // Log the rejection action
+    await logAudit({
+      db: c.env.DB,
+      userId: adminUser.userId,
+      userEmail: adminUser.email,
+      userRole: adminUser.role,
+      action: 'reject_user',
+      actionCategory: 'user_management',
+      targetType: 'user',
+      targetId: userId,
+      targetDetails: `Rejected ${user.email} (${user.role})${reason ? `: ${reason}` : ''}`,
+      ...clientInfo,
+    });
+
+    // Log data change
+    await logDataChange(c.env.DB, 'users', userId, 'UPDATE', adminUser.userId, {
+      oldValues: { status: 'pending' },
+      newValues: { status: 'rejected', rejection_reason: reason },
+      changedFields: ['status', 'rejection_reason', 'rejected_by', 'rejected_at'],
+      reason: 'Admin rejection',
+    });
 
     return c.json({ success: true, data: { message: 'User rejected' } });
   } catch (error) {
@@ -2826,6 +3765,535 @@ function generateMockHint(question: string, level: number): string {
 
   return hints[Math.min(level - 1, hints.length - 1)];
 }
+
+// =============================================
+// ADMIN AUDIT LOG ENDPOINTS
+// =============================================
+
+// Admin: Get audit log dashboard stats
+protectedApp.get('/admin/audit/stats', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  if (user.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  try {
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+
+    // Get counts in parallel
+    const [totalResult, todayResult, failedLoginsResult, securityResult, criticalResult] = await Promise.all([
+      c.env.DB.prepare('SELECT COUNT(*) as count FROM audit_log').first(),
+      c.env.DB.prepare('SELECT COUNT(*) as count FROM audit_log WHERE created_at >= ?').bind(todayStart).first(),
+      c.env.DB.prepare('SELECT COUNT(*) as count FROM login_attempts WHERE success = 0 AND created_at >= ?').bind(yesterday).first(),
+      c.env.DB.prepare('SELECT COUNT(*) as count FROM security_events WHERE is_resolved = 0').first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM security_events WHERE severity = 'critical' AND is_resolved = 0").first(),
+    ]);
+
+    // Get top actions
+    const { results: topActions } = await c.env.DB.prepare(`
+      SELECT action, COUNT(*) as count FROM audit_log
+      WHERE created_at >= datetime('now', '-7 days')
+      GROUP BY action ORDER BY count DESC LIMIT 10
+    `).all();
+
+    // Get events by category
+    const { results: eventsByCategory } = await c.env.DB.prepare(`
+      SELECT action_category as category, COUNT(*) as count FROM audit_log
+      WHERE created_at >= datetime('now', '-7 days')
+      GROUP BY action_category ORDER BY count DESC
+    `).all();
+
+    // Get recent security events
+    const { results: recentSecurityEvents } = await c.env.DB.prepare(`
+      SELECT se.*, u.name as user_name, r.name as resolved_by_name
+      FROM security_events se
+      LEFT JOIN users u ON se.user_id = u.id
+      LEFT JOIN users r ON se.resolved_by = r.id
+      WHERE se.is_resolved = 0
+      ORDER BY
+        CASE se.severity
+          WHEN 'critical' THEN 1
+          WHEN 'high' THEN 2
+          WHEN 'medium' THEN 3
+          ELSE 4
+        END,
+        se.created_at DESC
+      LIMIT 10
+    `).all();
+
+    return c.json({
+      success: true,
+      stats: {
+        totalEvents: (totalResult as { count: number })?.count || 0,
+        todayEvents: (todayResult as { count: number })?.count || 0,
+        failedLogins24h: (failedLoginsResult as { count: number })?.count || 0,
+        activeSecurityEvents: (securityResult as { count: number })?.count || 0,
+        criticalEvents: (criticalResult as { count: number })?.count || 0,
+        topActions,
+        eventsByCategory,
+        recentSecurityEvents: recentSecurityEvents.map((e: Record<string, unknown>) => ({
+          id: e.id,
+          eventType: e.event_type,
+          severity: e.severity,
+          userId: e.user_id,
+          userEmail: e.user_email,
+          userName: e.user_name,
+          ipAddress: e.ip_address,
+          description: e.description,
+          metadata: e.metadata ? JSON.parse(e.metadata as string) : null,
+          isResolved: Boolean(e.is_resolved),
+          createdAt: e.created_at,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching audit stats:', error);
+    return c.json({ success: false, error: 'Failed to fetch audit stats' }, 500);
+  }
+});
+
+// Admin: Get audit log entries with filters
+protectedApp.get('/admin/audit/logs', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  if (user.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  try {
+    const page = parseInt(c.req.query('page') || '1');
+    const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100);
+    const offset = (page - 1) * limit;
+
+    // Filters
+    const userId = c.req.query('userId');
+    const actionCategory = c.req.query('category');
+    const action = c.req.query('action');
+    const status = c.req.query('status');
+    const targetType = c.req.query('targetType');
+    const startDate = c.req.query('startDate');
+    const endDate = c.req.query('endDate');
+    const ipAddress = c.req.query('ipAddress');
+    const search = c.req.query('search');
+
+    // Build query dynamically
+    let whereConditions: string[] = [];
+    let params: (string | number)[] = [];
+
+    if (userId) {
+      whereConditions.push('al.user_id = ?');
+      params.push(userId);
+    }
+    if (actionCategory) {
+      whereConditions.push('al.action_category = ?');
+      params.push(actionCategory);
+    }
+    if (action) {
+      whereConditions.push('al.action = ?');
+      params.push(action);
+    }
+    if (status) {
+      whereConditions.push('al.status = ?');
+      params.push(status);
+    }
+    if (targetType) {
+      whereConditions.push('al.target_type = ?');
+      params.push(targetType);
+    }
+    if (startDate) {
+      whereConditions.push('al.created_at >= ?');
+      params.push(startDate);
+    }
+    if (endDate) {
+      whereConditions.push('al.created_at <= ?');
+      params.push(endDate);
+    }
+    if (ipAddress) {
+      whereConditions.push('al.ip_address = ?');
+      params.push(ipAddress);
+    }
+    if (search) {
+      whereConditions.push('(al.action LIKE ? OR al.target_details LIKE ? OR al.user_email LIKE ?)');
+      params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+    }
+
+    const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
+    // Get total count
+    const countQuery = `SELECT COUNT(*) as count FROM audit_log al ${whereClause}`;
+    const countResult = await c.env.DB.prepare(countQuery).bind(...params).first();
+    const total = (countResult as { count: number })?.count || 0;
+
+    // Get entries
+    const query = `
+      SELECT al.*, u.name as user_name
+      FROM audit_log al
+      LEFT JOIN users u ON al.user_id = u.id
+      ${whereClause}
+      ORDER BY al.created_at DESC
+      LIMIT ? OFFSET ?
+    `;
+    const { results } = await c.env.DB.prepare(query).bind(...params, limit, offset).all();
+
+    return c.json({
+      success: true,
+      logs: results.map((log: Record<string, unknown>) => ({
+        id: log.id,
+        userId: log.user_id,
+        userEmail: log.user_email,
+        userRole: log.user_role,
+        userName: log.user_name,
+        action: log.action,
+        actionCategory: log.action_category,
+        targetType: log.target_type,
+        targetId: log.target_id,
+        targetDetails: log.target_details,
+        ipAddress: log.ip_address,
+        userAgent: log.user_agent,
+        requestPath: log.request_path,
+        requestMethod: log.request_method,
+        status: log.status,
+        errorMessage: log.error_message,
+        metadata: log.metadata ? JSON.parse(log.metadata as string) : null,
+        createdAt: log.created_at,
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching audit logs:', error);
+    return c.json({ success: false, error: 'Failed to fetch audit logs' }, 500);
+  }
+});
+
+// Admin: Get security events
+protectedApp.get('/admin/audit/security-events', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  if (user.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  try {
+    const unresolvedOnly = c.req.query('unresolvedOnly') === 'true';
+    const severity = c.req.query('severity');
+    const eventType = c.req.query('eventType');
+    const page = parseInt(c.req.query('page') || '1');
+    const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100);
+    const offset = (page - 1) * limit;
+
+    let whereConditions: string[] = [];
+    let params: (string | number)[] = [];
+
+    if (unresolvedOnly) {
+      whereConditions.push('se.is_resolved = 0');
+    }
+    if (severity) {
+      whereConditions.push('se.severity = ?');
+      params.push(severity);
+    }
+    if (eventType) {
+      whereConditions.push('se.event_type = ?');
+      params.push(eventType);
+    }
+
+    const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
+    const countResult = await c.env.DB.prepare(`SELECT COUNT(*) as count FROM security_events se ${whereClause}`).bind(...params).first();
+    const total = (countResult as { count: number })?.count || 0;
+
+    const { results } = await c.env.DB.prepare(`
+      SELECT se.*, u.name as user_name, r.name as resolved_by_name
+      FROM security_events se
+      LEFT JOIN users u ON se.user_id = u.id
+      LEFT JOIN users r ON se.resolved_by = r.id
+      ${whereClause}
+      ORDER BY
+        CASE se.severity
+          WHEN 'critical' THEN 1
+          WHEN 'high' THEN 2
+          WHEN 'medium' THEN 3
+          ELSE 4
+        END,
+        se.created_at DESC
+      LIMIT ? OFFSET ?
+    `).bind(...params, limit, offset).all();
+
+    return c.json({
+      success: true,
+      events: results.map((e: Record<string, unknown>) => ({
+        id: e.id,
+        eventType: e.event_type,
+        severity: e.severity,
+        userId: e.user_id,
+        userEmail: e.user_email,
+        userName: e.user_name,
+        ipAddress: e.ip_address,
+        userAgent: e.user_agent,
+        description: e.description,
+        metadata: e.metadata ? JSON.parse(e.metadata as string) : null,
+        isResolved: Boolean(e.is_resolved),
+        resolvedBy: e.resolved_by,
+        resolvedByName: e.resolved_by_name,
+        resolvedAt: e.resolved_at,
+        resolutionNotes: e.resolution_notes,
+        createdAt: e.created_at,
+      })),
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    });
+  } catch (error) {
+    console.error('Error fetching security events:', error);
+    return c.json({ success: false, error: 'Failed to fetch security events' }, 500);
+  }
+});
+
+// Admin: Resolve security event
+protectedApp.put('/admin/audit/security-events/:id/resolve', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  if (user.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  const eventId = c.req.param('id');
+  const body = await c.req.json();
+  const { notes } = body;
+
+  try {
+    await c.env.DB.prepare(`
+      UPDATE security_events
+      SET is_resolved = 1, resolved_by = ?, resolved_at = datetime('now'), resolution_notes = ?
+      WHERE id = ?
+    `).bind(user.userId, notes || null, eventId).run();
+
+    // Log this action
+    const clientInfo = getClientInfo(c);
+    await logAudit({
+      db: c.env.DB,
+      userId: user.userId,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'resolve_security_event',
+      actionCategory: 'security',
+      targetType: 'security_event',
+      targetId: eventId,
+      ...clientInfo,
+    });
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error resolving security event:', error);
+    return c.json({ success: false, error: 'Failed to resolve security event' }, 500);
+  }
+});
+
+// Admin: Get login attempts
+protectedApp.get('/admin/audit/login-attempts', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  if (user.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  try {
+    const email = c.req.query('email');
+    const ipAddress = c.req.query('ipAddress');
+    const failedOnly = c.req.query('failedOnly') === 'true';
+    const page = parseInt(c.req.query('page') || '1');
+    const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100);
+    const offset = (page - 1) * limit;
+
+    let whereConditions: string[] = [];
+    let params: (string | number)[] = [];
+
+    if (email) {
+      whereConditions.push('email LIKE ?');
+      params.push(`%${email}%`);
+    }
+    if (ipAddress) {
+      whereConditions.push('ip_address = ?');
+      params.push(ipAddress);
+    }
+    if (failedOnly) {
+      whereConditions.push('success = 0');
+    }
+
+    const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
+    const countResult = await c.env.DB.prepare(`SELECT COUNT(*) as count FROM login_attempts ${whereClause}`).bind(...params).first();
+    const total = (countResult as { count: number })?.count || 0;
+
+    const { results } = await c.env.DB.prepare(`
+      SELECT * FROM login_attempts
+      ${whereClause}
+      ORDER BY created_at DESC
+      LIMIT ? OFFSET ?
+    `).bind(...params, limit, offset).all();
+
+    return c.json({
+      success: true,
+      attempts: results.map((a: Record<string, unknown>) => ({
+        id: a.id,
+        email: a.email,
+        ipAddress: a.ip_address,
+        userAgent: a.user_agent,
+        success: Boolean(a.success),
+        failureReason: a.failure_reason,
+        createdAt: a.created_at,
+      })),
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    });
+  } catch (error) {
+    console.error('Error fetching login attempts:', error);
+    return c.json({ success: false, error: 'Failed to fetch login attempts' }, 500);
+  }
+});
+
+// Admin: Get data change logs
+protectedApp.get('/admin/audit/data-changes', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  if (user.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  try {
+    const tableName = c.req.query('tableName');
+    const recordId = c.req.query('recordId');
+    const operation = c.req.query('operation');
+    const page = parseInt(c.req.query('page') || '1');
+    const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100);
+    const offset = (page - 1) * limit;
+
+    let whereConditions: string[] = [];
+    let params: (string | number)[] = [];
+
+    if (tableName) {
+      whereConditions.push('dcl.table_name = ?');
+      params.push(tableName);
+    }
+    if (recordId) {
+      whereConditions.push('dcl.record_id = ?');
+      params.push(recordId);
+    }
+    if (operation) {
+      whereConditions.push('dcl.operation = ?');
+      params.push(operation);
+    }
+
+    const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
+    const countResult = await c.env.DB.prepare(`SELECT COUNT(*) as count FROM data_change_log dcl ${whereClause}`).bind(...params).first();
+    const total = (countResult as { count: number })?.count || 0;
+
+    const { results } = await c.env.DB.prepare(`
+      SELECT dcl.*, u.name as changed_by_name
+      FROM data_change_log dcl
+      LEFT JOIN users u ON dcl.changed_by = u.id
+      ${whereClause}
+      ORDER BY dcl.created_at DESC
+      LIMIT ? OFFSET ?
+    `).bind(...params, limit, offset).all();
+
+    return c.json({
+      success: true,
+      changes: results.map((ch: Record<string, unknown>) => ({
+        id: ch.id,
+        tableName: ch.table_name,
+        recordId: ch.record_id,
+        operation: ch.operation,
+        changedBy: ch.changed_by,
+        changedByName: ch.changed_by_name,
+        oldValues: ch.old_values ? JSON.parse(ch.old_values as string) : null,
+        newValues: ch.new_values ? JSON.parse(ch.new_values as string) : null,
+        changedFields: ch.changed_fields ? JSON.parse(ch.changed_fields as string) : null,
+        reason: ch.reason,
+        createdAt: ch.created_at,
+      })),
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    });
+  } catch (error) {
+    console.error('Error fetching data changes:', error);
+    return c.json({ success: false, error: 'Failed to fetch data changes' }, 500);
+  }
+});
+
+// Admin: Get user activity timeline
+protectedApp.get('/admin/audit/user/:userId/activity', userAuth, async (c) => {
+  const adminUser = c.get('user') as UserPayload;
+  if (adminUser.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  const userId = c.req.param('userId');
+  const page = parseInt(c.req.query('page') || '1');
+  const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100);
+  const offset = (page - 1) * limit;
+
+  try {
+    // Get user info
+    const userInfo = await c.env.DB.prepare(`
+      SELECT id, name, email, role, status, created_at FROM users WHERE id = ?
+    `).bind(userId).first();
+
+    if (!userInfo) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    // Get activity count
+    const countResult = await c.env.DB.prepare('SELECT COUNT(*) as count FROM audit_log WHERE user_id = ?').bind(userId).first();
+    const total = (countResult as { count: number })?.count || 0;
+
+    // Get activity logs
+    const { results } = await c.env.DB.prepare(`
+      SELECT * FROM audit_log WHERE user_id = ?
+      ORDER BY created_at DESC
+      LIMIT ? OFFSET ?
+    `).bind(userId, limit, offset).all();
+
+    // Get login stats
+    const loginStats = await c.env.DB.prepare(`
+      SELECT
+        COUNT(*) as total_attempts,
+        SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as successful,
+        SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) as failed
+      FROM login_attempts WHERE email = ?
+    `).bind((userInfo as { email: string }).email).first();
+
+    return c.json({
+      success: true,
+      user: {
+        id: userInfo.id,
+        name: userInfo.name,
+        email: userInfo.email,
+        role: userInfo.role,
+        status: userInfo.status,
+        createdAt: userInfo.created_at,
+      },
+      loginStats: {
+        totalAttempts: (loginStats as Record<string, number>)?.total_attempts || 0,
+        successful: (loginStats as Record<string, number>)?.successful || 0,
+        failed: (loginStats as Record<string, number>)?.failed || 0,
+      },
+      activity: results.map((log: Record<string, unknown>) => ({
+        id: log.id,
+        action: log.action,
+        actionCategory: log.action_category,
+        targetType: log.target_type,
+        targetId: log.target_id,
+        targetDetails: log.target_details,
+        ipAddress: log.ip_address,
+        status: log.status,
+        createdAt: log.created_at,
+      })),
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    });
+  } catch (error) {
+    console.error('Error fetching user activity:', error);
+    return c.json({ success: false, error: 'Failed to fetch user activity' }, 500);
+  }
+});
 
 // 404 handler
 app.notFound((c) => {
