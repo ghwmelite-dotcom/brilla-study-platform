@@ -4295,6 +4295,1694 @@ protectedApp.get('/admin/audit/user/:userId/activity', userAuth, async (c) => {
   }
 });
 
+// =============================================
+// TEACHER ASSESSMENT SYSTEM ENDPOINTS
+// =============================================
+
+// ========== CLASS MANAGEMENT ==========
+
+// Get teacher's classes
+protectedApp.get('/classes', async (c) => {
+  try {
+    const userId = c.req.header('x-user-id');
+
+    const classes = await c.env.DB.prepare(`
+      SELECT c.*,
+        (SELECT COUNT(*) FROM class_members WHERE class_id = c.id AND is_active = 1) as member_count,
+        s.name as subject_name
+      FROM classes c
+      LEFT JOIN subjects s ON c.subject_id = s.id
+      WHERE c.teacher_id = ? AND c.is_active = 1
+      ORDER BY c.created_at DESC
+    `).bind(userId).all();
+
+    return c.json({
+      success: true,
+      data: classes.results.map((cls: Record<string, unknown>) => ({
+        id: cls.id,
+        teacherId: cls.teacher_id,
+        name: cls.name,
+        description: cls.description,
+        schoolLevel: cls.school_level,
+        yearGroup: cls.year_group,
+        subjectId: cls.subject_id,
+        academicYear: cls.academic_year,
+        isActive: cls.is_active === 1,
+        color: cls.color,
+        createdAt: cls.created_at,
+        updatedAt: cls.updated_at,
+        memberCount: cls.member_count,
+        subject: cls.subject_name ? { id: cls.subject_id, name: cls.subject_name } : undefined,
+      })),
+    });
+  } catch (error) {
+    console.error('Error fetching classes:', error);
+    return c.json({ success: false, error: 'Failed to fetch classes' }, 500);
+  }
+});
+
+// Create a class
+protectedApp.post('/classes', async (c) => {
+  try {
+    const userId = c.req.header('x-user-id');
+    const { name, description, schoolLevel, yearGroup, subjectId, academicYear, color } = await c.req.json();
+
+    if (!name?.trim()) {
+      return c.json({ success: false, error: 'Class name is required' }, 400);
+    }
+
+    const id = `class_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    await c.env.DB.prepare(`
+      INSERT INTO classes (id, teacher_id, name, description, school_level, year_group, subject_id, academic_year, color)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(id, userId, name.trim(), description || null, schoolLevel || null, yearGroup || null, subjectId || null, academicYear || null, color || '#3B82F6').run();
+
+    return c.json({
+      success: true,
+      data: {
+        id,
+        teacherId: userId,
+        name: name.trim(),
+        description,
+        schoolLevel,
+        yearGroup,
+        subjectId,
+        academicYear,
+        color: color || '#3B82F6',
+        isActive: true,
+        memberCount: 0,
+        createdAt: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error('Error creating class:', error);
+    return c.json({ success: false, error: 'Failed to create class' }, 500);
+  }
+});
+
+// Get class details with members
+protectedApp.get('/classes/:id', async (c) => {
+  try {
+    const classId = c.req.param('id');
+    const userId = c.req.header('x-user-id');
+
+    const classData = await c.env.DB.prepare(`
+      SELECT c.*, s.name as subject_name
+      FROM classes c
+      LEFT JOIN subjects s ON c.subject_id = s.id
+      WHERE c.id = ? AND c.teacher_id = ?
+    `).bind(classId, userId).first();
+
+    if (!classData) {
+      return c.json({ success: false, error: 'Class not found' }, 404);
+    }
+
+    const members = await c.env.DB.prepare(`
+      SELECT cm.*, u.name, u.email, u.avatar_url, u.year_group, u.school_level
+      FROM class_members cm
+      JOIN users u ON cm.student_id = u.id
+      WHERE cm.class_id = ? AND cm.is_active = 1
+      ORDER BY u.name
+    `).bind(classId).all();
+
+    return c.json({
+      success: true,
+      data: {
+        id: classData.id,
+        teacherId: classData.teacher_id,
+        name: classData.name,
+        description: classData.description,
+        schoolLevel: classData.school_level,
+        yearGroup: classData.year_group,
+        subjectId: classData.subject_id,
+        academicYear: classData.academic_year,
+        isActive: classData.is_active === 1,
+        color: classData.color,
+        createdAt: classData.created_at,
+        updatedAt: classData.updated_at,
+        subject: classData.subject_name ? { id: classData.subject_id, name: classData.subject_name } : undefined,
+        memberCount: members.results.length,
+        members: members.results.map((m: Record<string, unknown>) => ({
+          id: m.id,
+          classId: m.class_id,
+          studentId: m.student_id,
+          joinedAt: m.joined_at,
+          isActive: m.is_active === 1,
+          student: {
+            id: m.student_id,
+            name: m.name,
+            email: m.email,
+            avatarUrl: m.avatar_url,
+            yearGroup: m.year_group,
+            schoolLevel: m.school_level,
+          },
+        })),
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching class:', error);
+    return c.json({ success: false, error: 'Failed to fetch class' }, 500);
+  }
+});
+
+// Update class
+protectedApp.put('/classes/:id', async (c) => {
+  try {
+    const classId = c.req.param('id');
+    const userId = c.req.header('x-user-id');
+    const updates = await c.req.json();
+
+    const existing = await c.env.DB.prepare(`
+      SELECT id FROM classes WHERE id = ? AND teacher_id = ?
+    `).bind(classId, userId).first();
+
+    if (!existing) {
+      return c.json({ success: false, error: 'Class not found' }, 404);
+    }
+
+    const fields: string[] = [];
+    const values: unknown[] = [];
+
+    if (updates.name !== undefined) { fields.push('name = ?'); values.push(updates.name); }
+    if (updates.description !== undefined) { fields.push('description = ?'); values.push(updates.description); }
+    if (updates.schoolLevel !== undefined) { fields.push('school_level = ?'); values.push(updates.schoolLevel); }
+    if (updates.yearGroup !== undefined) { fields.push('year_group = ?'); values.push(updates.yearGroup); }
+    if (updates.subjectId !== undefined) { fields.push('subject_id = ?'); values.push(updates.subjectId); }
+    if (updates.academicYear !== undefined) { fields.push('academic_year = ?'); values.push(updates.academicYear); }
+    if (updates.color !== undefined) { fields.push('color = ?'); values.push(updates.color); }
+
+    fields.push('updated_at = ?');
+    values.push(new Date().toISOString());
+    values.push(classId);
+
+    await c.env.DB.prepare(`UPDATE classes SET ${fields.join(', ')} WHERE id = ?`).bind(...values).run();
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error updating class:', error);
+    return c.json({ success: false, error: 'Failed to update class' }, 500);
+  }
+});
+
+// Delete class
+protectedApp.delete('/classes/:id', async (c) => {
+  try {
+    const classId = c.req.param('id');
+    const userId = c.req.header('x-user-id');
+
+    await c.env.DB.prepare(`
+      UPDATE classes SET is_active = 0 WHERE id = ? AND teacher_id = ?
+    `).bind(classId, userId).run();
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting class:', error);
+    return c.json({ success: false, error: 'Failed to delete class' }, 500);
+  }
+});
+
+// Add members to class
+protectedApp.post('/classes/:id/members', async (c) => {
+  try {
+    const classId = c.req.param('id');
+    const userId = c.req.header('x-user-id');
+    const { studentIds } = await c.req.json();
+
+    if (!studentIds || !Array.isArray(studentIds) || studentIds.length === 0) {
+      return c.json({ success: false, error: 'Student IDs are required' }, 400);
+    }
+
+    // Verify class belongs to teacher
+    const classData = await c.env.DB.prepare(`
+      SELECT id FROM classes WHERE id = ? AND teacher_id = ?
+    `).bind(classId, userId).first();
+
+    if (!classData) {
+      return c.json({ success: false, error: 'Class not found' }, 404);
+    }
+
+    // Add members
+    const added: string[] = [];
+    for (const studentId of studentIds) {
+      try {
+        const id = `member_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        await c.env.DB.prepare(`
+          INSERT OR IGNORE INTO class_members (id, class_id, student_id)
+          VALUES (?, ?, ?)
+        `).bind(id, classId, studentId).run();
+        added.push(studentId);
+      } catch {
+        // Skip duplicates
+      }
+    }
+
+    return c.json({ success: true, data: { added } });
+  } catch (error) {
+    console.error('Error adding members:', error);
+    return c.json({ success: false, error: 'Failed to add members' }, 500);
+  }
+});
+
+// Remove member from class
+protectedApp.delete('/classes/:classId/members/:memberId', async (c) => {
+  try {
+    const { classId, memberId } = c.req.param();
+    const userId = c.req.header('x-user-id');
+
+    // Verify class belongs to teacher
+    const classData = await c.env.DB.prepare(`
+      SELECT id FROM classes WHERE id = ? AND teacher_id = ?
+    `).bind(classId, userId).first();
+
+    if (!classData) {
+      return c.json({ success: false, error: 'Class not found' }, 404);
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE class_members SET is_active = 0 WHERE id = ? AND class_id = ?
+    `).bind(memberId, classId).run();
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error removing member:', error);
+    return c.json({ success: false, error: 'Failed to remove member' }, 500);
+  }
+});
+
+// ========== ASSESSMENTS ==========
+
+// Get teacher's assessments
+protectedApp.get('/assessments', async (c) => {
+  try {
+    const userId = c.req.header('x-user-id');
+    const status = c.req.query('status');
+    const type = c.req.query('type');
+    const subjectId = c.req.query('subjectId');
+    const search = c.req.query('search');
+
+    let query = `
+      SELECT a.*,
+        s.name as subject_name,
+        s.color as subject_color,
+        (SELECT COUNT(*) FROM assessment_questions WHERE assessment_id = a.id) as question_count,
+        (SELECT COUNT(*) FROM assessment_attempts WHERE assessment_id = a.id) as attempt_count,
+        (SELECT AVG(percentage) FROM assessment_attempts WHERE assessment_id = a.id AND status = 'graded') as avg_score,
+        (SELECT COUNT(*) FROM assessment_attempts WHERE assessment_id = a.id AND grading_status = 'pending') as pending_grading
+      FROM assessments a
+      LEFT JOIN subjects s ON a.subject_id = s.id
+      WHERE a.teacher_id = ?
+    `;
+    const params: unknown[] = [userId];
+
+    if (status) {
+      query += ' AND a.status = ?';
+      params.push(status);
+    }
+    if (type) {
+      query += ' AND a.assessment_type = ?';
+      params.push(type);
+    }
+    if (subjectId) {
+      query += ' AND a.subject_id = ?';
+      params.push(subjectId);
+    }
+    if (search) {
+      query += ' AND a.title LIKE ?';
+      params.push(`%${search}%`);
+    }
+
+    query += ' ORDER BY a.created_at DESC';
+
+    const assessments = await c.env.DB.prepare(query).bind(...params).all();
+
+    return c.json({
+      success: true,
+      data: assessments.results.map((a: Record<string, unknown>) => ({
+        id: a.id,
+        teacherId: a.teacher_id,
+        title: a.title,
+        description: a.description,
+        instructions: a.instructions,
+        assessmentType: a.assessment_type,
+        status: a.status,
+        subjectId: a.subject_id,
+        topicIds: a.topic_ids ? JSON.parse(a.topic_ids as string) : [],
+        timeLimit: a.time_limit,
+        startDate: a.start_date,
+        endDate: a.end_date,
+        lateSubmissionAllowed: a.late_submission_allowed === 1,
+        latePenaltyPercent: a.late_penalty_percent,
+        totalMarks: a.total_marks,
+        passingScore: a.passing_score,
+        showCorrectAnswers: a.show_correct_answers === 1,
+        showScoreImmediately: a.show_score_immediately === 1,
+        shuffleQuestions: a.shuffle_questions === 1,
+        shuffleOptions: a.shuffle_options === 1,
+        oneQuestionPerPage: a.one_question_per_page === 1,
+        allowReview: a.allow_review === 1,
+        maxAttempts: a.max_attempts,
+        createdAt: a.created_at,
+        updatedAt: a.updated_at,
+        publishedAt: a.published_at,
+        questionCount: a.question_count,
+        attemptCount: a.attempt_count,
+        averageScore: a.avg_score,
+        pendingGradingCount: a.pending_grading,
+        subject: a.subject_name ? { id: a.subject_id, name: a.subject_name, color: a.subject_color } : undefined,
+      })),
+    });
+  } catch (error) {
+    console.error('Error fetching assessments:', error);
+    return c.json({ success: false, error: 'Failed to fetch assessments' }, 500);
+  }
+});
+
+// Create assessment
+protectedApp.post('/assessments', async (c) => {
+  try {
+    const userId = c.req.header('x-user-id');
+    const data = await c.req.json();
+
+    const id = `assess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    await c.env.DB.prepare(`
+      INSERT INTO assessments (
+        id, teacher_id, title, description, instructions, assessment_type, status,
+        subject_id, topic_ids, time_limit, start_date, end_date,
+        late_submission_allowed, late_penalty_percent, total_marks, passing_score,
+        show_correct_answers, show_score_immediately, shuffle_questions, shuffle_options,
+        one_question_per_page, allow_review, max_attempts
+      ) VALUES (?, ?, ?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      id, userId, data.title, data.description || null, data.instructions || null, data.assessmentType,
+      data.subjectId || null, data.topicIds ? JSON.stringify(data.topicIds) : null,
+      data.timeLimit || null, data.startDate || null, data.endDate || null,
+      data.lateSubmissionAllowed ? 1 : 0, data.latePenaltyPercent || 0,
+      0, data.passingScore || null,
+      data.showCorrectAnswers !== false ? 1 : 0, data.showScoreImmediately !== false ? 1 : 0,
+      data.shuffleQuestions ? 1 : 0, data.shuffleOptions ? 1 : 0,
+      data.oneQuestionPerPage ? 1 : 0, data.allowReview !== false ? 1 : 0,
+      data.maxAttempts || 1
+    ).run();
+
+    // Add questions if provided
+    let totalMarks = 0;
+    if (data.questions && Array.isArray(data.questions)) {
+      for (let i = 0; i < data.questions.length; i++) {
+        const q = data.questions[i];
+        const qId = `aq_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 6)}`;
+        totalMarks += q.marks || 1;
+
+        await c.env.DB.prepare(`
+          INSERT INTO assessment_questions (
+            id, assessment_id, question_id, custom_question_text, custom_question_type,
+            custom_options, custom_correct_answer, custom_explanation, marks, display_order
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(
+          qId, id, q.questionId || null,
+          q.customData?.questionText || null, q.customData?.questionType || null,
+          q.customData?.options ? JSON.stringify(q.customData.options) : null,
+          q.customData?.correctAnswer || null, q.customData?.explanation || null,
+          q.marks || 1, i
+        ).run();
+      }
+
+      // Update total marks
+      await c.env.DB.prepare(`UPDATE assessments SET total_marks = ? WHERE id = ?`).bind(totalMarks, id).run();
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        id,
+        teacherId: userId,
+        title: data.title,
+        assessmentType: data.assessmentType,
+        status: 'draft',
+        totalMarks,
+        createdAt: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error('Error creating assessment:', error);
+    return c.json({ success: false, error: 'Failed to create assessment' }, 500);
+  }
+});
+
+// Get assessment details
+protectedApp.get('/assessments/:id', async (c) => {
+  try {
+    const assessmentId = c.req.param('id');
+    const userId = c.req.header('x-user-id');
+
+    const assessment = await c.env.DB.prepare(`
+      SELECT a.*, s.name as subject_name
+      FROM assessments a
+      LEFT JOIN subjects s ON a.subject_id = s.id
+      WHERE a.id = ? AND a.teacher_id = ?
+    `).bind(assessmentId, userId).first();
+
+    if (!assessment) {
+      return c.json({ success: false, error: 'Assessment not found' }, 404);
+    }
+
+    // Get questions
+    const questions = await c.env.DB.prepare(`
+      SELECT aq.*, q.question_text, q.question_type, q.options, q.correct_answer, q.explanation
+      FROM assessment_questions aq
+      LEFT JOIN questions q ON aq.question_id = q.id
+      WHERE aq.assessment_id = ?
+      ORDER BY aq.display_order
+    `).bind(assessmentId).all();
+
+    // Get assignments
+    const assignments = await c.env.DB.prepare(`
+      SELECT aa.*, u.name as student_name, u.email as student_email, c.name as class_name,
+        (SELECT COUNT(*) FROM class_members WHERE class_id = c.id AND is_active = 1) as class_member_count
+      FROM assessment_assignments aa
+      LEFT JOIN users u ON aa.student_id = u.id
+      LEFT JOIN classes c ON aa.class_id = c.id
+      WHERE aa.assessment_id = ?
+    `).bind(assessmentId).all();
+
+    return c.json({
+      success: true,
+      data: {
+        id: assessment.id,
+        teacherId: assessment.teacher_id,
+        title: assessment.title,
+        description: assessment.description,
+        instructions: assessment.instructions,
+        assessmentType: assessment.assessment_type,
+        status: assessment.status,
+        subjectId: assessment.subject_id,
+        topicIds: assessment.topic_ids ? JSON.parse(assessment.topic_ids as string) : [],
+        timeLimit: assessment.time_limit,
+        startDate: assessment.start_date,
+        endDate: assessment.end_date,
+        lateSubmissionAllowed: assessment.late_submission_allowed === 1,
+        latePenaltyPercent: assessment.late_penalty_percent,
+        totalMarks: assessment.total_marks,
+        passingScore: assessment.passing_score,
+        showCorrectAnswers: assessment.show_correct_answers === 1,
+        showScoreImmediately: assessment.show_score_immediately === 1,
+        shuffleQuestions: assessment.shuffle_questions === 1,
+        shuffleOptions: assessment.shuffle_options === 1,
+        oneQuestionPerPage: assessment.one_question_per_page === 1,
+        allowReview: assessment.allow_review === 1,
+        maxAttempts: assessment.max_attempts,
+        createdAt: assessment.created_at,
+        updatedAt: assessment.updated_at,
+        publishedAt: assessment.published_at,
+        subject: assessment.subject_name ? { id: assessment.subject_id, name: assessment.subject_name } : undefined,
+        questions: questions.results.map((q: Record<string, unknown>) => ({
+          id: q.id,
+          assessmentId: q.assessment_id,
+          questionId: q.question_id,
+          customQuestionText: q.custom_question_text,
+          customQuestionType: q.custom_question_type,
+          customOptions: q.custom_options ? JSON.parse(q.custom_options as string) : null,
+          customCorrectAnswer: q.custom_correct_answer,
+          customExplanation: q.custom_explanation,
+          marks: q.marks,
+          displayOrder: q.display_order,
+          isRequired: q.is_required === 1,
+          question: q.question_id ? {
+            id: q.question_id,
+            questionText: q.question_text,
+            questionType: q.question_type,
+            options: q.options ? JSON.parse(q.options as string) : null,
+            correctAnswer: q.correct_answer,
+            explanation: q.explanation,
+          } : undefined,
+        })),
+        assignments: assignments.results.map((a: Record<string, unknown>) => ({
+          id: a.id,
+          assessmentId: a.assessment_id,
+          assignmentType: a.assignment_type,
+          studentId: a.student_id,
+          classId: a.class_id,
+          schoolLevel: a.school_level,
+          yearGroup: a.year_group,
+          assignedAt: a.assigned_at,
+          student: a.student_id ? { id: a.student_id, name: a.student_name, email: a.student_email } : undefined,
+          class: a.class_id ? { id: a.class_id, name: a.class_name, memberCount: a.class_member_count } : undefined,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching assessment:', error);
+    return c.json({ success: false, error: 'Failed to fetch assessment' }, 500);
+  }
+});
+
+// Update assessment
+protectedApp.put('/assessments/:id', async (c) => {
+  try {
+    const assessmentId = c.req.param('id');
+    const userId = c.req.header('x-user-id');
+    const updates = await c.req.json();
+
+    const existing = await c.env.DB.prepare(`
+      SELECT id, status FROM assessments WHERE id = ? AND teacher_id = ?
+    `).bind(assessmentId, userId).first();
+
+    if (!existing) {
+      return c.json({ success: false, error: 'Assessment not found' }, 404);
+    }
+
+    const fields: string[] = [];
+    const values: unknown[] = [];
+
+    const allowedFields = ['title', 'description', 'instructions', 'assessmentType', 'subjectId',
+      'timeLimit', 'startDate', 'endDate', 'lateSubmissionAllowed', 'latePenaltyPercent',
+      'passingScore', 'showCorrectAnswers', 'showScoreImmediately', 'shuffleQuestions',
+      'shuffleOptions', 'oneQuestionPerPage', 'allowReview', 'maxAttempts'];
+
+    const fieldMap: Record<string, string> = {
+      assessmentType: 'assessment_type',
+      subjectId: 'subject_id',
+      timeLimit: 'time_limit',
+      startDate: 'start_date',
+      endDate: 'end_date',
+      lateSubmissionAllowed: 'late_submission_allowed',
+      latePenaltyPercent: 'late_penalty_percent',
+      passingScore: 'passing_score',
+      showCorrectAnswers: 'show_correct_answers',
+      showScoreImmediately: 'show_score_immediately',
+      shuffleQuestions: 'shuffle_questions',
+      shuffleOptions: 'shuffle_options',
+      oneQuestionPerPage: 'one_question_per_page',
+      allowReview: 'allow_review',
+      maxAttempts: 'max_attempts',
+    };
+
+    for (const key of allowedFields) {
+      if (updates[key] !== undefined) {
+        const dbField = fieldMap[key] || key;
+        fields.push(`${dbField} = ?`);
+        if (typeof updates[key] === 'boolean') {
+          values.push(updates[key] ? 1 : 0);
+        } else {
+          values.push(updates[key]);
+        }
+      }
+    }
+
+    if (fields.length > 0) {
+      fields.push('updated_at = ?');
+      values.push(new Date().toISOString());
+      values.push(assessmentId);
+
+      await c.env.DB.prepare(`UPDATE assessments SET ${fields.join(', ')} WHERE id = ?`).bind(...values).run();
+    }
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error updating assessment:', error);
+    return c.json({ success: false, error: 'Failed to update assessment' }, 500);
+  }
+});
+
+// Delete assessment (draft only)
+protectedApp.delete('/assessments/:id', async (c) => {
+  try {
+    const assessmentId = c.req.param('id');
+    const userId = c.req.header('x-user-id');
+
+    const existing = await c.env.DB.prepare(`
+      SELECT status FROM assessments WHERE id = ? AND teacher_id = ?
+    `).bind(assessmentId, userId).first();
+
+    if (!existing) {
+      return c.json({ success: false, error: 'Assessment not found' }, 404);
+    }
+
+    if (existing.status !== 'draft') {
+      return c.json({ success: false, error: 'Only draft assessments can be deleted' }, 400);
+    }
+
+    // Delete questions first
+    await c.env.DB.prepare(`DELETE FROM assessment_questions WHERE assessment_id = ?`).bind(assessmentId).run();
+    // Delete assignments
+    await c.env.DB.prepare(`DELETE FROM assessment_assignments WHERE assessment_id = ?`).bind(assessmentId).run();
+    // Delete assessment
+    await c.env.DB.prepare(`DELETE FROM assessments WHERE id = ?`).bind(assessmentId).run();
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting assessment:', error);
+    return c.json({ success: false, error: 'Failed to delete assessment' }, 500);
+  }
+});
+
+// Publish assessment
+protectedApp.post('/assessments/:id/publish', async (c) => {
+  try {
+    const assessmentId = c.req.param('id');
+    const userId = c.req.header('x-user-id');
+
+    const existing = await c.env.DB.prepare(`
+      SELECT id, status FROM assessments WHERE id = ? AND teacher_id = ?
+    `).bind(assessmentId, userId).first();
+
+    if (!existing) {
+      return c.json({ success: false, error: 'Assessment not found' }, 404);
+    }
+
+    // Check has questions
+    const questionCount = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM assessment_questions WHERE assessment_id = ?
+    `).bind(assessmentId).first();
+
+    if (!questionCount || (questionCount.count as number) === 0) {
+      return c.json({ success: false, error: 'Assessment must have at least one question' }, 400);
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE assessments SET status = 'published', published_at = ?, updated_at = ?
+      WHERE id = ?
+    `).bind(new Date().toISOString(), new Date().toISOString(), assessmentId).run();
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error publishing assessment:', error);
+    return c.json({ success: false, error: 'Failed to publish assessment' }, 500);
+  }
+});
+
+// Duplicate assessment
+protectedApp.post('/assessments/:id/duplicate', async (c) => {
+  try {
+    const assessmentId = c.req.param('id');
+    const userId = c.req.header('x-user-id');
+
+    const original = await c.env.DB.prepare(`
+      SELECT * FROM assessments WHERE id = ? AND teacher_id = ?
+    `).bind(assessmentId, userId).first();
+
+    if (!original) {
+      return c.json({ success: false, error: 'Assessment not found' }, 404);
+    }
+
+    const newId = `assess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    await c.env.DB.prepare(`
+      INSERT INTO assessments (
+        id, teacher_id, title, description, instructions, assessment_type, status,
+        subject_id, topic_ids, time_limit, start_date, end_date,
+        late_submission_allowed, late_penalty_percent, total_marks, passing_score,
+        show_correct_answers, show_score_immediately, shuffle_questions, shuffle_options,
+        one_question_per_page, allow_review, max_attempts
+      ) VALUES (?, ?, ?, ?, ?, ?, 'draft', ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      newId, userId, `${original.title} (Copy)`, original.description, original.instructions,
+      original.assessment_type, original.subject_id, original.topic_ids, original.time_limit,
+      original.late_submission_allowed, original.late_penalty_percent, original.total_marks,
+      original.passing_score, original.show_correct_answers, original.show_score_immediately,
+      original.shuffle_questions, original.shuffle_options, original.one_question_per_page,
+      original.allow_review, original.max_attempts
+    ).run();
+
+    // Copy questions
+    const questions = await c.env.DB.prepare(`
+      SELECT * FROM assessment_questions WHERE assessment_id = ? ORDER BY display_order
+    `).bind(assessmentId).all();
+
+    for (const q of questions.results) {
+      const qId = `aq_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      await c.env.DB.prepare(`
+        INSERT INTO assessment_questions (
+          id, assessment_id, question_id, custom_question_text, custom_question_type,
+          custom_options, custom_correct_answer, custom_explanation, marks, display_order, is_required
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        qId, newId, (q as Record<string, unknown>).question_id, (q as Record<string, unknown>).custom_question_text,
+        (q as Record<string, unknown>).custom_question_type, (q as Record<string, unknown>).custom_options,
+        (q as Record<string, unknown>).custom_correct_answer, (q as Record<string, unknown>).custom_explanation,
+        (q as Record<string, unknown>).marks, (q as Record<string, unknown>).display_order, (q as Record<string, unknown>).is_required
+      ).run();
+    }
+
+    return c.json({
+      success: true,
+      data: { id: newId, title: `${original.title} (Copy)`, status: 'draft' },
+    });
+  } catch (error) {
+    console.error('Error duplicating assessment:', error);
+    return c.json({ success: false, error: 'Failed to duplicate assessment' }, 500);
+  }
+});
+
+// Add questions to assessment
+protectedApp.post('/assessments/:id/questions', async (c) => {
+  try {
+    const assessmentId = c.req.param('id');
+    const userId = c.req.header('x-user-id');
+    const { questions } = await c.req.json();
+
+    const existing = await c.env.DB.prepare(`
+      SELECT id FROM assessments WHERE id = ? AND teacher_id = ?
+    `).bind(assessmentId, userId).first();
+
+    if (!existing) {
+      return c.json({ success: false, error: 'Assessment not found' }, 404);
+    }
+
+    // Get current max order
+    const maxOrder = await c.env.DB.prepare(`
+      SELECT MAX(display_order) as max_order FROM assessment_questions WHERE assessment_id = ?
+    `).bind(assessmentId).first();
+
+    let order = ((maxOrder?.max_order as number) || -1) + 1;
+    let totalNewMarks = 0;
+
+    for (const q of questions) {
+      const qId = `aq_${Date.now()}_${order}_${Math.random().toString(36).substr(2, 6)}`;
+      totalNewMarks += q.marks || 1;
+
+      await c.env.DB.prepare(`
+        INSERT INTO assessment_questions (
+          id, assessment_id, question_id, custom_question_text, custom_question_type,
+          custom_options, custom_correct_answer, custom_explanation, marks, display_order
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        qId, assessmentId, q.questionId || null,
+        q.customData?.questionText || null, q.customData?.questionType || null,
+        q.customData?.options ? JSON.stringify(q.customData.options) : null,
+        q.customData?.correctAnswer || null, q.customData?.explanation || null,
+        q.marks || 1, order++
+      ).run();
+    }
+
+    // Update total marks
+    await c.env.DB.prepare(`
+      UPDATE assessments SET total_marks = total_marks + ?, updated_at = ? WHERE id = ?
+    `).bind(totalNewMarks, new Date().toISOString(), assessmentId).run();
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error adding questions:', error);
+    return c.json({ success: false, error: 'Failed to add questions' }, 500);
+  }
+});
+
+// Remove question from assessment
+protectedApp.delete('/assessments/:assessmentId/questions/:questionId', async (c) => {
+  try {
+    const { assessmentId, questionId } = c.req.param();
+    const userId = c.req.header('x-user-id');
+
+    const existing = await c.env.DB.prepare(`
+      SELECT id FROM assessments WHERE id = ? AND teacher_id = ?
+    `).bind(assessmentId, userId).first();
+
+    if (!existing) {
+      return c.json({ success: false, error: 'Assessment not found' }, 404);
+    }
+
+    // Get question marks to subtract
+    const question = await c.env.DB.prepare(`
+      SELECT marks FROM assessment_questions WHERE id = ? AND assessment_id = ?
+    `).bind(questionId, assessmentId).first();
+
+    if (!question) {
+      return c.json({ success: false, error: 'Question not found' }, 404);
+    }
+
+    await c.env.DB.prepare(`
+      DELETE FROM assessment_questions WHERE id = ? AND assessment_id = ?
+    `).bind(questionId, assessmentId).run();
+
+    // Update total marks
+    await c.env.DB.prepare(`
+      UPDATE assessments SET total_marks = total_marks - ?, updated_at = ? WHERE id = ?
+    `).bind(question.marks, new Date().toISOString(), assessmentId).run();
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error removing question:', error);
+    return c.json({ success: false, error: 'Failed to remove question' }, 500);
+  }
+});
+
+// Assign assessment
+protectedApp.post('/assessments/:id/assign', async (c) => {
+  try {
+    const assessmentId = c.req.param('id');
+    const userId = c.req.header('x-user-id');
+    const { assignments } = await c.req.json();
+
+    const existing = await c.env.DB.prepare(`
+      SELECT id FROM assessments WHERE id = ? AND teacher_id = ?
+    `).bind(assessmentId, userId).first();
+
+    if (!existing) {
+      return c.json({ success: false, error: 'Assessment not found' }, 404);
+    }
+
+    for (const assignment of assignments) {
+      if (assignment.type === 'individual' && assignment.studentIds) {
+        for (const studentId of assignment.studentIds) {
+          const id = `aa_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+          await c.env.DB.prepare(`
+            INSERT OR IGNORE INTO assessment_assignments (id, assessment_id, assignment_type, student_id, assigned_by)
+            VALUES (?, ?, 'individual', ?, ?)
+          `).bind(id, assessmentId, studentId, userId).run();
+        }
+      } else if (assignment.type === 'class' && assignment.classIds) {
+        for (const classId of assignment.classIds) {
+          const id = `aa_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+          await c.env.DB.prepare(`
+            INSERT OR IGNORE INTO assessment_assignments (id, assessment_id, assignment_type, class_id, assigned_by)
+            VALUES (?, ?, 'class', ?, ?)
+          `).bind(id, assessmentId, classId, userId).run();
+        }
+      } else if (assignment.type === 'school_level') {
+        const id = `aa_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+        await c.env.DB.prepare(`
+          INSERT OR IGNORE INTO assessment_assignments (id, assessment_id, assignment_type, school_level, year_group, assigned_by)
+          VALUES (?, ?, 'school_level', ?, ?, ?)
+        `).bind(id, assessmentId, assignment.schoolLevel, assignment.yearGroup || null, userId).run();
+      }
+    }
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error assigning assessment:', error);
+    return c.json({ success: false, error: 'Failed to assign assessment' }, 500);
+  }
+});
+
+// ========== STUDENT ASSESSMENT ENDPOINTS ==========
+
+// Get assigned assessments for student
+protectedApp.get('/student/assessments', async (c) => {
+  try {
+    const userId = c.req.header('x-user-id');
+
+    // Get user info for school level matching
+    const user = await c.env.DB.prepare(`
+      SELECT school_level, year_group FROM users WHERE id = ?
+    `).bind(userId).first();
+
+    // Get assessments assigned to student (individual, class, or school level)
+    const assessments = await c.env.DB.prepare(`
+      SELECT DISTINCT a.*, s.name as subject_name, s.color as subject_color,
+        (SELECT COUNT(*) FROM assessment_questions WHERE assessment_id = a.id) as question_count,
+        (SELECT id FROM assessment_attempts WHERE assessment_id = a.id AND student_id = ? AND status = 'in_progress' LIMIT 1) as in_progress_attempt,
+        (SELECT MAX(attempt_number) FROM assessment_attempts WHERE assessment_id = a.id AND student_id = ?) as attempts_made,
+        (SELECT percentage FROM assessment_attempts WHERE assessment_id = a.id AND student_id = ? AND status = 'graded' ORDER BY attempt_number DESC LIMIT 1) as last_score
+      FROM assessments a
+      LEFT JOIN subjects s ON a.subject_id = s.id
+      LEFT JOIN assessment_assignments aa ON aa.assessment_id = a.id
+      LEFT JOIN class_members cm ON cm.class_id = aa.class_id AND cm.student_id = ?
+      WHERE a.status = 'published'
+        AND (
+          aa.student_id = ?
+          OR cm.student_id = ?
+          OR (aa.assignment_type = 'school_level' AND aa.school_level = ? AND (aa.year_group IS NULL OR aa.year_group = ?))
+        )
+      ORDER BY a.end_date ASC, a.created_at DESC
+    `).bind(userId, userId, userId, userId, userId, userId, user?.school_level, user?.year_group).all();
+
+    const pending: Record<string, unknown>[] = [];
+    const completed: Record<string, unknown>[] = [];
+
+    for (const a of assessments.results) {
+      const assessment = {
+        id: a.id,
+        title: a.title,
+        description: a.description,
+        assessmentType: a.assessment_type,
+        subjectId: a.subject_id,
+        timeLimit: a.time_limit,
+        startDate: a.start_date,
+        endDate: a.end_date,
+        totalMarks: a.total_marks,
+        maxAttempts: a.max_attempts,
+        questionCount: a.question_count,
+        inProgressAttempt: a.in_progress_attempt,
+        attemptsMade: a.attempts_made || 0,
+        lastScore: a.last_score,
+        subject: a.subject_name ? { id: a.subject_id, name: a.subject_name, color: a.subject_color } : undefined,
+      };
+
+      const attemptsMade = (a.attempts_made as number) || 0;
+      const maxAttempts = (a.max_attempts as number) || 1;
+      const hasCompleted = attemptsMade >= maxAttempts && !a.in_progress_attempt;
+
+      if (hasCompleted) {
+        completed.push(assessment);
+      } else {
+        pending.push(assessment);
+      }
+    }
+
+    return c.json({
+      success: true,
+      data: { pending, completed, all: assessments.results },
+    });
+  } catch (error) {
+    console.error('Error fetching student assessments:', error);
+    return c.json({ success: false, error: 'Failed to fetch assessments' }, 500);
+  }
+});
+
+// Start assessment attempt
+protectedApp.post('/student/assessments/:id/start', async (c) => {
+  try {
+    const assessmentId = c.req.param('id');
+    const userId = c.req.header('x-user-id');
+
+    // Get assessment
+    const assessment = await c.env.DB.prepare(`
+      SELECT * FROM assessments WHERE id = ? AND status = 'published'
+    `).bind(assessmentId).first();
+
+    if (!assessment) {
+      return c.json({ success: false, error: 'Assessment not found' }, 404);
+    }
+
+    // Check for existing in-progress attempt
+    const existingAttempt = await c.env.DB.prepare(`
+      SELECT id FROM assessment_attempts WHERE assessment_id = ? AND student_id = ? AND status = 'in_progress'
+    `).bind(assessmentId, userId).first();
+
+    if (existingAttempt) {
+      return c.json({ success: false, error: 'You have an in-progress attempt. Please resume it.' }, 400);
+    }
+
+    // Check max attempts
+    const attemptCount = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM assessment_attempts WHERE assessment_id = ? AND student_id = ?
+    `).bind(assessmentId, userId).first();
+
+    if (assessment.max_attempts && (attemptCount?.count as number) >= (assessment.max_attempts as number)) {
+      return c.json({ success: false, error: 'Maximum attempts reached' }, 400);
+    }
+
+    // Create attempt
+    const attemptId = `attempt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const attemptNumber = ((attemptCount?.count as number) || 0) + 1;
+
+    await c.env.DB.prepare(`
+      INSERT INTO assessment_attempts (id, assessment_id, student_id, attempt_number, max_score)
+      VALUES (?, ?, ?, ?, ?)
+    `).bind(attemptId, assessmentId, userId, attemptNumber, assessment.total_marks).run();
+
+    // Get questions (shuffled if enabled)
+    let questionsQuery = `
+      SELECT aq.*, q.question_text, q.question_type, q.options, q.correct_answer
+      FROM assessment_questions aq
+      LEFT JOIN questions q ON aq.question_id = q.id
+      WHERE aq.assessment_id = ?
+    `;
+    questionsQuery += assessment.shuffle_questions === 1 ? ' ORDER BY RANDOM()' : ' ORDER BY aq.display_order';
+
+    const questions = await c.env.DB.prepare(questionsQuery).bind(assessmentId).all();
+
+    return c.json({
+      success: true,
+      data: {
+        attempt: {
+          id: attemptId,
+          assessmentId,
+          studentId: userId,
+          attemptNumber,
+          status: 'in_progress',
+          startedAt: new Date().toISOString(),
+          maxScore: assessment.total_marks,
+        },
+        questions: questions.results.map((q: Record<string, unknown>) => ({
+          id: q.id,
+          questionText: q.custom_question_text || q.question_text,
+          questionType: q.custom_question_type || q.question_type,
+          options: q.custom_options ? JSON.parse(q.custom_options as string) : (q.options ? JSON.parse(q.options as string) : null),
+          marks: q.marks,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error('Error starting attempt:', error);
+    return c.json({ success: false, error: 'Failed to start assessment' }, 500);
+  }
+});
+
+// Save answer
+protectedApp.put('/student/assessments/:id/answer', async (c) => {
+  try {
+    const userId = c.req.header('x-user-id');
+    const { attemptId, questionId, answer } = await c.req.json();
+
+    // Verify attempt belongs to user and is in progress
+    const attempt = await c.env.DB.prepare(`
+      SELECT id FROM assessment_attempts WHERE id = ? AND student_id = ? AND status = 'in_progress'
+    `).bind(attemptId, userId).first();
+
+    if (!attempt) {
+      return c.json({ success: false, error: 'Attempt not found or already submitted' }, 404);
+    }
+
+    // Upsert answer
+    const answerId = `ans_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+    await c.env.DB.prepare(`
+      INSERT INTO assessment_attempt_answers (id, attempt_id, assessment_question_id, answer_text)
+      VALUES (?, ?, ?, ?)
+      ON CONFLICT (attempt_id, assessment_question_id) DO UPDATE SET answer_text = ?, answered_at = datetime('now')
+    `).bind(answerId, attemptId, questionId, answer, answer).run();
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error saving answer:', error);
+    return c.json({ success: false, error: 'Failed to save answer' }, 500);
+  }
+});
+
+// Submit assessment
+protectedApp.post('/student/assessments/:id/submit', async (c) => {
+  try {
+    const assessmentId = c.req.param('id');
+    const userId = c.req.header('x-user-id');
+    const { attemptId, answers } = await c.req.json();
+
+    // Verify attempt
+    const attempt = await c.env.DB.prepare(`
+      SELECT aa.*, a.end_date, a.late_submission_allowed, a.late_penalty_percent, a.show_score_immediately
+      FROM assessment_attempts aa
+      JOIN assessments a ON aa.assessment_id = a.id
+      WHERE aa.id = ? AND aa.student_id = ? AND aa.status = 'in_progress'
+    `).bind(attemptId, userId).first();
+
+    if (!attempt) {
+      return c.json({ success: false, error: 'Attempt not found or already submitted' }, 404);
+    }
+
+    // Save all answers and auto-grade objectives
+    let autoScore = 0;
+    const questions = await c.env.DB.prepare(`
+      SELECT aq.id, aq.marks, aq.custom_correct_answer, aq.custom_question_type, q.correct_answer, q.question_type
+      FROM assessment_questions aq
+      LEFT JOIN questions q ON aq.question_id = q.id
+      WHERE aq.assessment_id = ?
+    `).bind(assessmentId).all();
+
+    for (const q of questions.results) {
+      const qData = q as Record<string, unknown>;
+      const answer = answers[qData.id as string];
+      const correctAnswer = qData.custom_correct_answer || qData.correct_answer;
+      const questionType = qData.custom_question_type || qData.question_type;
+
+      // Auto-grade objective questions
+      const isObjective = ['multiple_choice', 'true_false', 'direct_answer'].includes(questionType as string);
+      let isCorrect = null;
+      let marks = 0;
+
+      if (isObjective && answer && correctAnswer) {
+        isCorrect = answer.toLowerCase().trim() === (correctAnswer as string).toLowerCase().trim();
+        marks = isCorrect ? (qData.marks as number) : 0;
+        autoScore += marks;
+      }
+
+      // Upsert answer
+      const answerId = `ans_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+      await c.env.DB.prepare(`
+        INSERT INTO assessment_attempt_answers (id, attempt_id, assessment_question_id, answer_text, is_correct, auto_marks)
+        VALUES (?, ?, ?, ?, ?, ?)
+        ON CONFLICT (attempt_id, assessment_question_id) DO UPDATE SET
+          answer_text = ?, is_correct = ?, auto_marks = ?, answered_at = datetime('now')
+      `).bind(answerId, attemptId, qData.id, answer || '', isCorrect, marks, answer || '', isCorrect, marks).run();
+    }
+
+    // Check if late
+    const now = new Date();
+    const isLate = attempt.end_date && new Date(attempt.end_date as string) < now;
+    let latePenalty = 0;
+    if (isLate && attempt.late_penalty_percent) {
+      latePenalty = Math.floor(autoScore * ((attempt.late_penalty_percent as number) / 100));
+    }
+
+    // Check if needs manual grading
+    const needsManualGrading = questions.results.some((q: Record<string, unknown>) => {
+      const type = q.custom_question_type || q.question_type;
+      return ['essay', 'short_answer'].includes(type as string);
+    });
+
+    const totalScore = autoScore - latePenalty;
+    const percentage = attempt.max_score ? Math.round((totalScore / (attempt.max_score as number)) * 100) : 0;
+
+    // Update attempt
+    await c.env.DB.prepare(`
+      UPDATE assessment_attempts SET
+        status = ?,
+        submitted_at = ?,
+        time_taken = (strftime('%s', 'now') - strftime('%s', started_at)),
+        auto_score = ?,
+        total_score = ?,
+        percentage = ?,
+        is_late = ?,
+        late_penalty_applied = ?,
+        grading_status = ?,
+        updated_at = ?
+      WHERE id = ?
+    `).bind(
+      needsManualGrading ? 'submitted' : 'graded',
+      new Date().toISOString(),
+      autoScore,
+      totalScore,
+      percentage,
+      isLate ? 1 : 0,
+      latePenalty,
+      needsManualGrading ? 'pending' : 'complete',
+      new Date().toISOString(),
+      attemptId
+    ).run();
+
+    return c.json({
+      success: true,
+      data: {
+        id: attemptId,
+        status: needsManualGrading ? 'submitted' : 'graded',
+        autoScore,
+        totalScore,
+        maxScore: attempt.max_score,
+        percentage,
+        isLate,
+        latePenalty,
+        gradingStatus: needsManualGrading ? 'pending' : 'complete',
+        showScore: attempt.show_score_immediately === 1,
+      },
+    });
+  } catch (error) {
+    console.error('Error submitting assessment:', error);
+    return c.json({ success: false, error: 'Failed to submit assessment' }, 500);
+  }
+});
+
+// Get attempt results
+protectedApp.get('/student/attempts/:id', async (c) => {
+  try {
+    const attemptId = c.req.param('id');
+    const userId = c.req.header('x-user-id');
+
+    const attempt = await c.env.DB.prepare(`
+      SELECT aa.*, a.title, a.show_correct_answers, a.show_score_immediately
+      FROM assessment_attempts aa
+      JOIN assessments a ON aa.assessment_id = a.id
+      WHERE aa.id = ? AND aa.student_id = ?
+    `).bind(attemptId, userId).first();
+
+    if (!attempt) {
+      return c.json({ success: false, error: 'Attempt not found' }, 404);
+    }
+
+    // Get answers with questions
+    const answers = await c.env.DB.prepare(`
+      SELECT aaa.*, aq.marks, aq.custom_question_text, aq.custom_correct_answer, aq.custom_explanation,
+        q.question_text, q.correct_answer, q.explanation
+      FROM assessment_attempt_answers aaa
+      JOIN assessment_questions aq ON aaa.assessment_question_id = aq.id
+      LEFT JOIN questions q ON aq.question_id = q.id
+      WHERE aaa.attempt_id = ?
+    `).bind(attemptId).all();
+
+    return c.json({
+      success: true,
+      data: {
+        id: attempt.id,
+        assessmentId: attempt.assessment_id,
+        assessmentTitle: attempt.title,
+        attemptNumber: attempt.attempt_number,
+        status: attempt.status,
+        startedAt: attempt.started_at,
+        submittedAt: attempt.submitted_at,
+        timeTaken: attempt.time_taken,
+        autoScore: attempt.show_score_immediately ? attempt.auto_score : null,
+        manualScore: attempt.show_score_immediately ? attempt.manual_score : null,
+        totalScore: attempt.show_score_immediately ? attempt.total_score : null,
+        maxScore: attempt.max_score,
+        percentage: attempt.show_score_immediately ? attempt.percentage : null,
+        isLate: attempt.is_late === 1,
+        gradingStatus: attempt.grading_status,
+        teacherFeedback: attempt.teacher_feedback,
+        answers: answers.results.map((a: Record<string, unknown>) => ({
+          id: a.id,
+          questionId: a.assessment_question_id,
+          questionText: a.custom_question_text || a.question_text,
+          answerText: a.answer_text,
+          isCorrect: a.is_correct,
+          autoMarks: a.auto_marks,
+          manualMarks: a.manual_marks,
+          maxMarks: a.marks,
+          teacherComment: a.teacher_comment,
+          correctAnswer: attempt.show_correct_answers ? (a.custom_correct_answer || a.correct_answer) : null,
+          explanation: attempt.show_correct_answers ? (a.custom_explanation || a.explanation) : null,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching results:', error);
+    return c.json({ success: false, error: 'Failed to fetch results' }, 500);
+  }
+});
+
+// ========== GRADING ENDPOINTS ==========
+
+// Get grading queue
+protectedApp.get('/grading', async (c) => {
+  try {
+    const userId = c.req.header('x-user-id');
+    const assessmentId = c.req.query('assessmentId');
+    const status = c.req.query('status');
+
+    let query = `
+      SELECT aa.*, a.title as assessment_title, u.name as student_name, u.email as student_email
+      FROM assessment_attempts aa
+      JOIN assessments a ON aa.assessment_id = a.id
+      JOIN users u ON aa.student_id = u.id
+      WHERE a.teacher_id = ? AND aa.status IN ('submitted', 'graded')
+    `;
+    const params: unknown[] = [userId];
+
+    if (assessmentId) {
+      query += ' AND aa.assessment_id = ?';
+      params.push(assessmentId);
+    }
+    if (status === 'pending') {
+      query += ' AND aa.grading_status = ?';
+      params.push('pending');
+    } else if (status === 'partial') {
+      query += ' AND aa.grading_status = ?';
+      params.push('partial');
+    }
+
+    query += ' ORDER BY aa.submitted_at DESC';
+
+    const attempts = await c.env.DB.prepare(query).bind(...params).all();
+
+    // Get counts
+    const counts = await c.env.DB.prepare(`
+      SELECT
+        SUM(CASE WHEN aa.grading_status = 'pending' THEN 1 ELSE 0 END) as pending_count,
+        SUM(CASE WHEN aa.grading_status = 'partial' THEN 1 ELSE 0 END) as partial_count,
+        SUM(CASE WHEN aa.grading_status = 'complete' AND date(aa.graded_at) = date('now') THEN 1 ELSE 0 END) as completed_today
+      FROM assessment_attempts aa
+      JOIN assessments a ON aa.assessment_id = a.id
+      WHERE a.teacher_id = ? AND aa.status IN ('submitted', 'graded')
+    `).bind(userId).first();
+
+    return c.json({
+      success: true,
+      data: {
+        attempts: attempts.results.map((a: Record<string, unknown>) => ({
+          id: a.id,
+          assessmentId: a.assessment_id,
+          assessmentTitle: a.assessment_title,
+          studentId: a.student_id,
+          attemptNumber: a.attempt_number,
+          status: a.status,
+          submittedAt: a.submitted_at,
+          autoScore: a.auto_score,
+          manualScore: a.manual_score,
+          totalScore: a.total_score,
+          maxScore: a.max_score,
+          percentage: a.percentage,
+          gradingStatus: a.grading_status,
+          student: { id: a.student_id, name: a.student_name, email: a.student_email },
+        })),
+        total: attempts.results.length,
+        pendingCount: counts?.pending_count || 0,
+        partialCount: counts?.partial_count || 0,
+        completedTodayCount: counts?.completed_today || 0,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching grading queue:', error);
+    return c.json({ success: false, error: 'Failed to fetch grading queue' }, 500);
+  }
+});
+
+// Get attempt for grading
+protectedApp.get('/grading/:attemptId', async (c) => {
+  try {
+    const attemptId = c.req.param('attemptId');
+    const userId = c.req.header('x-user-id');
+
+    const attempt = await c.env.DB.prepare(`
+      SELECT aa.*, a.title, u.name as student_name
+      FROM assessment_attempts aa
+      JOIN assessments a ON aa.assessment_id = a.id
+      JOIN users u ON aa.student_id = u.id
+      WHERE aa.id = ? AND a.teacher_id = ?
+    `).bind(attemptId, userId).first();
+
+    if (!attempt) {
+      return c.json({ success: false, error: 'Attempt not found' }, 404);
+    }
+
+    const answers = await c.env.DB.prepare(`
+      SELECT aaa.*, aq.marks, aq.custom_question_text, aq.custom_question_type,
+        aq.custom_correct_answer, q.question_text, q.question_type, q.correct_answer
+      FROM assessment_attempt_answers aaa
+      JOIN assessment_questions aq ON aaa.assessment_question_id = aq.id
+      LEFT JOIN questions q ON aq.question_id = q.id
+      WHERE aaa.attempt_id = ?
+    `).bind(attemptId).all();
+
+    return c.json({
+      success: true,
+      data: {
+        attempt: {
+          id: attempt.id,
+          assessmentId: attempt.assessment_id,
+          assessmentTitle: attempt.title,
+          studentName: attempt.student_name,
+          attemptNumber: attempt.attempt_number,
+          status: attempt.status,
+          submittedAt: attempt.submitted_at,
+          autoScore: attempt.auto_score,
+          manualScore: attempt.manual_score,
+          totalScore: attempt.total_score,
+          maxScore: attempt.max_score,
+          gradingStatus: attempt.grading_status,
+          teacherFeedback: attempt.teacher_feedback,
+        },
+        answers: answers.results.map((a: Record<string, unknown>) => ({
+          id: a.id,
+          questionId: a.assessment_question_id,
+          questionText: a.custom_question_text || a.question_text,
+          questionType: a.custom_question_type || a.question_type,
+          correctAnswer: a.custom_correct_answer || a.correct_answer,
+          answerText: a.answer_text,
+          maxMarks: a.marks,
+          isCorrect: a.is_correct,
+          autoMarks: a.auto_marks,
+          manualMarks: a.manual_marks,
+          teacherComment: a.teacher_comment,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error('Error loading attempt:', error);
+    return c.json({ success: false, error: 'Failed to load attempt' }, 500);
+  }
+});
+
+// Grade single answer
+protectedApp.post('/grading/:attemptId/answer/:answerId', async (c) => {
+  try {
+    const { attemptId, answerId } = c.req.param();
+    const userId = c.req.header('x-user-id');
+    const { marks, comment } = await c.req.json();
+
+    // Verify teacher owns the assessment
+    const attempt = await c.env.DB.prepare(`
+      SELECT aa.id FROM assessment_attempts aa
+      JOIN assessments a ON aa.assessment_id = a.id
+      WHERE aa.id = ? AND a.teacher_id = ?
+    `).bind(attemptId, userId).first();
+
+    if (!attempt) {
+      return c.json({ success: false, error: 'Attempt not found' }, 404);
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE assessment_attempt_answers SET
+        manual_marks = ?, teacher_comment = ?, graded_by = ?, graded_at = ?
+      WHERE id = ? AND attempt_id = ?
+    `).bind(marks, comment || null, userId, new Date().toISOString(), answerId, attemptId).run();
+
+    // Update attempt manual score
+    const totalManual = await c.env.DB.prepare(`
+      SELECT SUM(COALESCE(manual_marks, 0)) as total FROM assessment_attempt_answers WHERE attempt_id = ?
+    `).bind(attemptId).first();
+
+    await c.env.DB.prepare(`
+      UPDATE assessment_attempts SET
+        manual_score = ?,
+        total_score = auto_score + ?,
+        grading_status = 'partial',
+        updated_at = ?
+      WHERE id = ?
+    `).bind(totalManual?.total || 0, totalManual?.total || 0, new Date().toISOString(), attemptId).run();
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error grading answer:', error);
+    return c.json({ success: false, error: 'Failed to grade answer' }, 500);
+  }
+});
+
+// Complete grading
+protectedApp.post('/grading/:attemptId/complete', async (c) => {
+  try {
+    const attemptId = c.req.param('attemptId');
+    const userId = c.req.header('x-user-id');
+    const { feedback } = await c.req.json();
+
+    const attempt = await c.env.DB.prepare(`
+      SELECT aa.id, aa.auto_score, aa.max_score FROM assessment_attempts aa
+      JOIN assessments a ON aa.assessment_id = a.id
+      WHERE aa.id = ? AND a.teacher_id = ?
+    `).bind(attemptId, userId).first();
+
+    if (!attempt) {
+      return c.json({ success: false, error: 'Attempt not found' }, 404);
+    }
+
+    // Calculate final score
+    const totalManual = await c.env.DB.prepare(`
+      SELECT SUM(COALESCE(manual_marks, 0)) as total FROM assessment_attempt_answers WHERE attempt_id = ?
+    `).bind(attemptId).first();
+
+    const manualScore = (totalManual?.total as number) || 0;
+    const totalScore = (attempt.auto_score as number) + manualScore;
+    const percentage = attempt.max_score ? Math.round((totalScore / (attempt.max_score as number)) * 100) : 0;
+
+    await c.env.DB.prepare(`
+      UPDATE assessment_attempts SET
+        status = 'graded',
+        manual_score = ?,
+        total_score = ?,
+        percentage = ?,
+        grading_status = 'complete',
+        graded_by = ?,
+        graded_at = ?,
+        teacher_feedback = ?,
+        updated_at = ?
+      WHERE id = ?
+    `).bind(manualScore, totalScore, percentage, userId, new Date().toISOString(), feedback || null, new Date().toISOString(), attemptId).run();
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error completing grading:', error);
+    return c.json({ success: false, error: 'Failed to complete grading' }, 500);
+  }
+});
+
+// Teacher dashboard stats
+protectedApp.get('/teacher/dashboard', async (c) => {
+  try {
+    const userId = c.req.header('x-user-id');
+
+    // Get assessment counts
+    const assessmentStats = await c.env.DB.prepare(`
+      SELECT
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'published' THEN 1 ELSE 0 END) as published,
+        SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END) as draft
+      FROM assessments WHERE teacher_id = ?
+    `).bind(userId).first();
+
+    // Get class counts
+    const classStats = await c.env.DB.prepare(`
+      SELECT COUNT(DISTINCT c.id) as total_classes,
+        (SELECT COUNT(DISTINCT cm.student_id) FROM class_members cm
+         JOIN classes cl ON cm.class_id = cl.id WHERE cl.teacher_id = ? AND cm.is_active = 1) as total_students
+      FROM classes c WHERE c.teacher_id = ? AND c.is_active = 1
+    `).bind(userId, userId).first();
+
+    // Get pending grading count
+    const pendingGrading = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM assessment_attempts aa
+      JOIN assessments a ON aa.assessment_id = a.id
+      WHERE a.teacher_id = ? AND aa.grading_status = 'pending'
+    `).bind(userId).first();
+
+    // Get recent submissions
+    const recentSubmissions = await c.env.DB.prepare(`
+      SELECT aa.*, a.title as assessment_title, u.name as student_name
+      FROM assessment_attempts aa
+      JOIN assessments a ON aa.assessment_id = a.id
+      JOIN users u ON aa.student_id = u.id
+      WHERE a.teacher_id = ? AND aa.status IN ('submitted', 'graded')
+      ORDER BY aa.submitted_at DESC LIMIT 5
+    `).bind(userId).all();
+
+    // Get upcoming deadlines
+    const upcomingDeadlines = await c.env.DB.prepare(`
+      SELECT id, title, assessment_type, end_date, subject_id
+      FROM assessments
+      WHERE teacher_id = ? AND status = 'published' AND end_date > datetime('now')
+      ORDER BY end_date ASC LIMIT 5
+    `).bind(userId).all();
+
+    return c.json({
+      success: true,
+      data: {
+        totalAssessments: assessmentStats?.total || 0,
+        publishedAssessments: assessmentStats?.published || 0,
+        draftAssessments: assessmentStats?.draft || 0,
+        totalClasses: classStats?.total_classes || 0,
+        totalStudents: classStats?.total_students || 0,
+        pendingGrading: pendingGrading?.count || 0,
+        recentSubmissions: recentSubmissions.results.map((s: Record<string, unknown>) => ({
+          id: s.id,
+          assessmentTitle: s.assessment_title,
+          studentName: s.student_name,
+          submittedAt: s.submitted_at,
+          gradingStatus: s.grading_status,
+        })),
+        upcomingDeadlines: upcomingDeadlines.results.map((d: Record<string, unknown>) => ({
+          id: d.id,
+          title: d.title,
+          assessmentType: d.assessment_type,
+          endDate: d.end_date,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard:', error);
+    return c.json({ success: false, error: 'Failed to fetch dashboard' }, 500);
+  }
+});
+
+// Question bank search (for question picker)
+protectedApp.get('/questions/bank', async (c) => {
+  try {
+    const search = c.req.query('search');
+    const subjectId = c.req.query('subject');
+    const topicId = c.req.query('topic');
+    const difficulty = c.req.query('difficulty');
+    const questionType = c.req.query('type');
+    const limit = parseInt(c.req.query('limit') || '20');
+    const offset = parseInt(c.req.query('offset') || '0');
+
+    let query = `
+      SELECT q.*, t.name as topic_name, s.name as subject_name
+      FROM questions q
+      LEFT JOIN topics t ON q.topic_id = t.id
+      LEFT JOIN subjects s ON q.subject_id = s.id
+      WHERE 1=1
+    `;
+    const params: unknown[] = [];
+
+    if (search) {
+      query += ' AND q.question_text LIKE ?';
+      params.push(`%${search}%`);
+    }
+    if (subjectId) {
+      query += ' AND q.subject_id = ?';
+      params.push(subjectId);
+    }
+    if (topicId) {
+      query += ' AND q.topic_id = ?';
+      params.push(topicId);
+    }
+    if (difficulty) {
+      query += ' AND q.difficulty = ?';
+      params.push(difficulty);
+    }
+    if (questionType) {
+      query += ' AND q.question_type = ?';
+      params.push(questionType);
+    }
+
+    // Count total
+    const countQuery = query.replace('SELECT q.*, t.name as topic_name, s.name as subject_name', 'SELECT COUNT(*) as count');
+    const total = await c.env.DB.prepare(countQuery).bind(...params).first();
+
+    query += ' ORDER BY q.created_at DESC LIMIT ? OFFSET ?';
+    params.push(limit, offset);
+
+    const questions = await c.env.DB.prepare(query).bind(...params).all();
+
+    return c.json({
+      success: true,
+      data: {
+        questions: questions.results.map((q: Record<string, unknown>) => ({
+          id: q.id,
+          questionText: q.question_text,
+          questionType: q.question_type,
+          options: q.options ? JSON.parse(q.options as string) : null,
+          correctAnswer: q.correct_answer,
+          explanation: q.explanation,
+          difficulty: q.difficulty,
+          points: q.points,
+          topicId: q.topic_id,
+          topicName: q.topic_name,
+          subjectId: q.subject_id,
+          subjectName: q.subject_name,
+        })),
+        total: total?.count || 0,
+      },
+    });
+  } catch (error) {
+    console.error('Error searching questions:', error);
+    return c.json({ success: false, error: 'Failed to search questions' }, 500);
+  }
+});
+
+// Search students (for adding to classes)
+protectedApp.get('/students/search', async (c) => {
+  try {
+    const search = c.req.query('search');
+    const schoolLevel = c.req.query('schoolLevel');
+    const yearGroup = c.req.query('yearGroup');
+    const limit = parseInt(c.req.query('limit') || '20');
+
+    let query = `
+      SELECT id, name, email, avatar_url, school_level, year_group
+      FROM users WHERE role = 'student' AND status = 'approved'
+    `;
+    const params: unknown[] = [];
+
+    if (search) {
+      query += ' AND (name LIKE ? OR email LIKE ?)';
+      params.push(`%${search}%`, `%${search}%`);
+    }
+    if (schoolLevel) {
+      query += ' AND school_level = ?';
+      params.push(schoolLevel);
+    }
+    if (yearGroup) {
+      query += ' AND year_group = ?';
+      params.push(parseInt(yearGroup));
+    }
+
+    query += ' ORDER BY name LIMIT ?';
+    params.push(limit);
+
+    const students = await c.env.DB.prepare(query).bind(...params).all();
+
+    return c.json({
+      success: true,
+      data: students.results.map((s: Record<string, unknown>) => ({
+        id: s.id,
+        name: s.name,
+        email: s.email,
+        avatarUrl: s.avatar_url,
+        schoolLevel: s.school_level,
+        yearGroup: s.year_group,
+      })),
+    });
+  } catch (error) {
+    console.error('Error searching students:', error);
+    return c.json({ success: false, error: 'Failed to search students' }, 500);
+  }
+});
+
 // 404 handler
 app.notFound((c) => {
   return c.json({ success: false, error: 'Not found' }, 404);

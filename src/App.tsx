@@ -30,6 +30,18 @@ import { VirtualLabPage } from '@/components/lab';
 import { useAuthStore } from '@/stores';
 import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/guide';
 
+// Teacher pages
+import TeacherDashboard from '@/pages/TeacherDashboard';
+import AssessmentList from '@/pages/AssessmentList';
+import AssessmentBuilder from '@/pages/AssessmentBuilder';
+import AssessmentGrading from '@/pages/AssessmentGrading';
+import ClassManagement from '@/pages/ClassManagement';
+
+// Student assessment pages
+import AssignedAssessments from '@/pages/AssignedAssessments';
+import TakeAssessment from '@/pages/TakeAssessment';
+import AssessmentResults from '@/pages/AssessmentResults';
+
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -627,6 +639,82 @@ function App() {
             element={
               <ProtectedRoute>
                 <AuditLog />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Teacher routes */}
+          <Route
+            path="teacher"
+            element={
+              <ProtectedRoute>
+                <TeacherDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="teacher/assessments"
+            element={
+              <ProtectedRoute>
+                <AssessmentList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="teacher/assessments/new"
+            element={
+              <ProtectedRoute>
+                <AssessmentBuilder />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="teacher/assessments/:id/edit"
+            element={
+              <ProtectedRoute>
+                <AssessmentBuilder />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="teacher/grading"
+            element={
+              <ProtectedRoute>
+                <AssessmentGrading />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="teacher/classes"
+            element={
+              <ProtectedRoute>
+                <ClassManagement />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Student assessment routes */}
+          <Route
+            path="assessments"
+            element={
+              <ProtectedRoute>
+                <AssignedAssessments />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="assessments/:id/take"
+            element={
+              <ProtectedRoute>
+                <TakeAssessment />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="assessments/:id/results"
+            element={
+              <ProtectedRoute>
+                <AssessmentResults />
               </ProtectedRoute>
             }
           />

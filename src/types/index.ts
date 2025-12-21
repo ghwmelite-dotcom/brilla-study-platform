@@ -1128,6 +1128,310 @@ export interface AuditLogFilters {
 }
 
 // =============================================
+// TEACHER ASSESSMENT SYSTEM TYPES
+// =============================================
+
+export type AssessmentType = 'quiz' | 'homework' | 'mock_exam';
+export type AssessmentStatus = 'draft' | 'published' | 'archived' | 'closed';
+export type AssignmentType = 'individual' | 'class' | 'school_level';
+export type AttemptStatus = 'in_progress' | 'submitted' | 'graded' | 'late';
+export type GradingStatus = 'pending' | 'partial' | 'complete';
+
+// Student Class/Group
+export interface StudentClass {
+  id: string;
+  teacherId: string;
+  name: string;
+  description?: string;
+  schoolLevel?: 'jhs' | 'shs';
+  yearGroup?: number;
+  subjectId?: string;
+  academicYear?: string;
+  isActive: boolean;
+  color: string;
+  createdAt: string;
+  updatedAt: string;
+  // Computed/Joined
+  memberCount?: number;
+  members?: ClassMember[];
+  subject?: { id: string; name: string };
+  teacher?: { id: string; name: string };
+}
+
+// Class Member
+export interface ClassMember {
+  id: string;
+  classId: string;
+  studentId: string;
+  joinedAt: string;
+  isActive: boolean;
+  // Joined
+  student?: {
+    id: string;
+    name: string;
+    email: string;
+    avatarUrl?: string;
+    yearGroup?: number;
+    schoolLevel?: string;
+  };
+}
+
+// Assessment
+export interface Assessment {
+  id: string;
+  teacherId: string;
+  title: string;
+  description?: string;
+  instructions?: string;
+  assessmentType: AssessmentType;
+  status: AssessmentStatus;
+  // Subject/Topic
+  subjectId?: string;
+  topicIds?: string[];
+  examTypeId?: string;
+  // Timing
+  timeLimit?: number; // minutes
+  startDate?: string;
+  endDate?: string;
+  lateSubmissionAllowed: boolean;
+  latePenaltyPercent: number;
+  // Grading
+  totalMarks: number;
+  passingScore?: number;
+  showCorrectAnswers: boolean;
+  showScoreImmediately: boolean;
+  // Question config
+  shuffleQuestions: boolean;
+  shuffleOptions: boolean;
+  oneQuestionPerPage: boolean;
+  allowReview: boolean;
+  maxAttempts?: number;
+  // Metadata
+  createdAt: string;
+  updatedAt: string;
+  publishedAt?: string;
+  archivedAt?: string;
+  // Computed/Joined
+  questionCount?: number;
+  questions?: AssessmentQuestion[];
+  assignments?: AssessmentAssignment[];
+  attemptCount?: number;
+  averageScore?: number;
+  completedCount?: number;
+  pendingGradingCount?: number;
+  teacher?: { id: string; name: string };
+  subject?: { id: string; name: string; color?: string };
+}
+
+// Assessment Question
+export interface AssessmentQuestion {
+  id: string;
+  assessmentId: string;
+  questionId?: string; // null if custom
+  // Custom question data
+  customQuestionText?: string;
+  customQuestionType?: QuestionType;
+  customOptions?: QuestionOption[];
+  customCorrectAnswer?: string;
+  customExplanation?: string;
+  customImageUrl?: string;
+  // Config
+  marks: number;
+  displayOrder: number;
+  isRequired: boolean;
+  createdAt: string;
+  // Joined
+  question?: Question;
+}
+
+// Assessment Assignment
+export interface AssessmentAssignment {
+  id: string;
+  assessmentId: string;
+  assignmentType: AssignmentType;
+  studentId?: string;
+  classId?: string;
+  schoolLevel?: 'jhs' | 'shs';
+  yearGroup?: number;
+  assignedAt: string;
+  assignedBy: string;
+  customStartDate?: string;
+  customEndDate?: string;
+  // Joined
+  student?: { id: string; name: string; email: string };
+  class?: { id: string; name: string; memberCount: number };
+}
+
+// Assessment Attempt
+export interface AssessmentAttempt {
+  id: string;
+  assessmentId: string;
+  studentId: string;
+  attemptNumber: number;
+  status: AttemptStatus;
+  // Timing
+  startedAt: string;
+  submittedAt?: string;
+  timeTaken?: number; // seconds
+  // Scores
+  autoScore: number;
+  manualScore: number;
+  totalScore: number;
+  maxScore: number;
+  percentage?: number;
+  grade?: string;
+  // Late
+  isLate: boolean;
+  latePenaltyApplied: number;
+  // Grading
+  gradingStatus: GradingStatus;
+  gradedBy?: string;
+  gradedAt?: string;
+  teacherFeedback?: string;
+  // Metadata
+  createdAt: string;
+  updatedAt: string;
+  // Joined
+  assessment?: Assessment;
+  student?: { id: string; name: string; email: string; avatarUrl?: string };
+  answers?: AssessmentAttemptAnswer[];
+}
+
+// Assessment Attempt Answer
+export interface AssessmentAttemptAnswer {
+  id: string;
+  attemptId: string;
+  assessmentQuestionId: string;
+  // Answer
+  answerText?: string;
+  answerOptions?: string[]; // for multiple select
+  // Auto-grading
+  isCorrect?: boolean; // null for essays
+  autoMarks: number;
+  // Manual grading
+  manualMarks?: number;
+  teacherComment?: string;
+  gradedBy?: string;
+  gradedAt?: string;
+  // Timing
+  timeTaken?: number;
+  answeredAt: string;
+  // Joined
+  assessmentQuestion?: AssessmentQuestion;
+}
+
+// Assessment Template
+export interface AssessmentTemplate {
+  id: string;
+  teacherId: string;
+  name: string;
+  description?: string;
+  assessmentType: AssessmentType;
+  subjectId?: string;
+  settings: AssessmentSettings;
+  isShared: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Assessment Settings (for templates and defaults)
+export interface AssessmentSettings {
+  timeLimit?: number;
+  lateSubmissionAllowed: boolean;
+  latePenaltyPercent: number;
+  passingScore?: number;
+  showCorrectAnswers: boolean;
+  showScoreImmediately: boolean;
+  shuffleQuestions: boolean;
+  shuffleOptions: boolean;
+  oneQuestionPerPage: boolean;
+  allowReview: boolean;
+  maxAttempts?: number;
+}
+
+// Assessment Builder Draft
+export interface AssessmentDraft {
+  step: number;
+  basicInfo: {
+    title: string;
+    description: string;
+    assessmentType: AssessmentType;
+    subjectId?: string;
+    instructions?: string;
+  };
+  timing: {
+    timeLimit?: number;
+    startDate?: string;
+    endDate?: string;
+    lateSubmissionAllowed: boolean;
+    latePenaltyPercent: number;
+  };
+  settings: {
+    passingScore?: number;
+    showCorrectAnswers: boolean;
+    showScoreImmediately: boolean;
+    shuffleQuestions: boolean;
+    shuffleOptions: boolean;
+    oneQuestionPerPage: boolean;
+    allowReview: boolean;
+    maxAttempts?: number;
+  };
+  questions: AssessmentQuestionDraft[];
+  assignments: AssessmentAssignmentDraft[];
+}
+
+export interface AssessmentQuestionDraft {
+  id: string; // temp ID for ordering
+  source: 'existing' | 'custom';
+  questionId?: string;
+  customData?: {
+    questionText: string;
+    questionType: QuestionType;
+    options?: { text: string; isCorrect: boolean }[];
+    correctAnswer: string;
+    explanation?: string;
+    imageUrl?: string;
+  };
+  marks: number;
+}
+
+export interface AssessmentAssignmentDraft {
+  type: AssignmentType;
+  studentIds?: string[];
+  classIds?: string[];
+  schoolLevel?: 'jhs' | 'shs';
+  yearGroup?: number;
+}
+
+// Filter Types
+export interface AssessmentFilters {
+  status?: AssessmentStatus;
+  type?: AssessmentType;
+  subjectId?: string;
+  search?: string;
+  dateRange?: { start: string; end: string };
+}
+
+export interface GradingFilters {
+  assessmentId?: string;
+  status?: GradingStatus;
+  search?: string;
+}
+
+// Teacher Dashboard Stats
+export interface TeacherDashboardStats {
+  totalAssessments: number;
+  publishedAssessments: number;
+  draftAssessments: number;
+  totalClasses: number;
+  totalStudents: number;
+  pendingGrading: number;
+  recentSubmissions: AssessmentAttempt[];
+  upcomingDeadlines: Assessment[];
+  classPerformance: { classId: string; className: string; avgScore: number }[];
+}
+
+// =============================================
 // VIRTUAL LAB TYPES
 // =============================================
 

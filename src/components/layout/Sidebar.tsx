@@ -24,11 +24,21 @@ import {
   FlaskConical,
   UserCheck,
   Bell,
+  ClipboardCheck,
+  FolderOpen,
 } from 'lucide-react';
 import { cn } from '@/utils';
-import { useAuthStore, useExamStore, useChatStore, useProgressStore, useParentStore } from '@/stores';
+import { useAuthStore, useExamStore, useChatStore, useProgressStore, useParentStore, useGradingStore } from '@/stores';
 import { SubjectNavigation } from '@/components/subjects';
 import { ExamModeSwitcher } from '@/components/exam';
+
+// Teacher navigation items
+const teacherNavItems = [
+  { path: '/teacher', label: 'Teacher Dashboard', icon: LayoutDashboard },
+  { path: '/teacher/assessments', label: 'Assessments', icon: FileText },
+  { path: '/teacher/grading', label: 'Grading', icon: ClipboardCheck, badge: true },
+  { path: '/teacher/classes', label: 'Classes', icon: FolderOpen },
+];
 
 // Parent navigation items
 const parentNavItems = [
@@ -115,6 +125,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { openChat, setActiveTab, getUnreadCount } = useChatStore();
   const { totalQuestionsAttempted, overallAccuracy } = useProgressStore();
   const { unreadCount: parentUnreadCount, fetchNotifications } = useParentStore();
+  const { pendingCount: gradingPendingCount, fetchGradingQueue } = useGradingStore();
   const isTeacherOrAdmin = user?.role === 'teacher' || user?.role === 'admin';
   const isAdmin = user?.role === 'admin';
   const isParent = user?.role === 'parent';
@@ -138,6 +149,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       fetchNotifications();
     }
   }, [isParent, fetchNotifications]);
+
+  // Load grading queue for teachers
+  useEffect(() => {
+    if (isTeacherOrAdmin) {
+      fetchGradingQueue();
+    }
+  }, [isTeacherOrAdmin, fetchGradingQueue]);
 
   // Get exam-specific navigation items
   const examItems = examSpecificItems[currentExamType] || [];
@@ -441,23 +459,50 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     </NavLink>
                   </li>
                   {isTeacherOrAdmin && (
-                    <li>
-                      <NavLink
-                        to="/content"
-                        onClick={onClose}
-                        className={({ isActive }) =>
-                          cn(
-                            'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
-                            isActive
-                              ? 'bg-accent text-white'
-                              : 'text-neutral-700 hover:bg-neutral-100'
-                          )
-                        }
-                      >
-                        <Upload className="w-5 h-5" />
-                        Content Manager
-                      </NavLink>
-                    </li>
+                    <>
+                      <li>
+                        <NavLink
+                          to="/content"
+                          onClick={onClose}
+                          className={({ isActive }) =>
+                            cn(
+                              'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                              isActive
+                                ? 'bg-accent text-white'
+                                : 'text-neutral-700 hover:bg-neutral-100'
+                            )
+                          }
+                        >
+                          <Upload className="w-5 h-5" />
+                          Content Manager
+                        </NavLink>
+                      </li>
+                      {/* Teacher Navigation */}
+                      {teacherNavItems.map((item) => (
+                        <li key={item.path}>
+                          <NavLink
+                            to={item.path}
+                            onClick={onClose}
+                            className={({ isActive }) =>
+                              cn(
+                                'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                                isActive
+                                  ? 'bg-purple-600 text-white'
+                                  : 'text-neutral-700 hover:bg-neutral-100'
+                              )
+                            }
+                          >
+                            <item.icon className="w-5 h-5" />
+                            <span className="flex-1">{item.label}</span>
+                            {item.badge && gradingPendingCount > 0 && (
+                              <span className="min-w-[20px] h-5 px-1.5 bg-amber-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                                {gradingPendingCount > 99 ? '99+' : gradingPendingCount}
+                              </span>
+                            )}
+                          </NavLink>
+                        </li>
+                      ))}
+                    </>
                   )}
                   {isAdmin && (
                     <>
