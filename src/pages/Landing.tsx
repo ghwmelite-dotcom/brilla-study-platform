@@ -41,35 +41,6 @@ import { AuthModal } from '@/components/auth';
 // HOOKS
 // ============================================
 
-// Animated counter hook
-function useCounter(end: number, duration: number = 2000, start: boolean = true) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!start) return;
-
-    let startTime: number;
-    let animationFrame: number;
-
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      // Easing function for smooth animation
-      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-      setCount(Math.floor(easeOutQuart * end));
-
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate);
-      }
-    };
-
-    animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [end, duration, start]);
-
-  return count;
-}
-
 // Intersection observer hook for scroll animations
 function useInView(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
@@ -260,8 +231,6 @@ function TypewriterText({ texts, className = '' }: { texts: string[]; className?
 
 // Stat item component
 function StatItem({ stat, index, inView }: { stat: typeof stats[0]; index: number; inView: boolean }) {
-  const count = useCounter(stat.value, 2000, inView);
-
   return (
     <div
       className={cn(
@@ -275,8 +244,8 @@ function StatItem({ stat, index, inView }: { stat: typeof stats[0]; index: numbe
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 mb-4 group-hover:scale-110 transition-transform">
           <stat.icon className="w-7 h-7 text-secondary" />
         </div>
-        <div className="text-4xl md:text-5xl font-bold text-white mb-1 tabular-nums">
-          {count}{stat.suffix}
+        <div className="text-2xl md:text-3xl font-bold text-white mb-1">
+          {stat.text}
         </div>
         <div className="text-white/70 text-sm">{stat.label}</div>
       </div>
@@ -447,10 +416,10 @@ function PWAInstallBanner() {
 // ============================================
 
 const stats = [
-  { value: 50000, suffix: '+', label: 'Active Students', icon: Users },
-  { value: 10000, suffix: '+', label: 'Practice Questions', icon: BookOpen },
-  { value: 95, suffix: '%', label: 'Success Rate', icon: TrendingUp },
-  { value: 500, suffix: '+', label: 'Schools', icon: GraduationCap },
+  { text: 'Growing Community', label: 'Join Learners Across Ghana', icon: Users },
+  { text: 'Comprehensive', label: 'Question Bank', icon: BookOpen },
+  { text: 'Built For', label: 'WASSCE & BECE Success', icon: TrendingUp },
+  { text: 'Trusted By', label: 'Schools Nationwide', icon: GraduationCap },
 ];
 
 const examModes = [
@@ -532,7 +501,7 @@ const platformCapabilities = [
       { name: 'E-Library', description: 'PDFs, videos, audio, interactive content' },
       { name: 'Past Papers', description: 'WASSCE & BECE with marking schemes' },
       { name: 'Topic Notes', description: 'Comprehensive study materials' },
-      { name: 'Practice Questions', description: '10,000+ curated questions' },
+      { name: 'Practice Questions', description: 'Comprehensive question bank' },
     ],
   },
   {
@@ -849,7 +818,7 @@ export function LandingPage() {
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-green-400" />
-              <span>500+ Schools Trust Us</span>
+              <span>Trusted by Schools</span>
             </div>
           </div>
         </div>
