@@ -253,31 +253,18 @@ const mockExamConfigs = {
   },
 };
 
-// User's exam history (mock data)
-const mockExamHistory = [
-  {
-    id: 'attempt_1',
-    examId: 'mock_wassce_core_math',
-    examName: 'Core Mathematics',
-    paper: 'Paper 1',
-    score: 38,
-    maxScore: 50,
-    percentage: 76,
-    completedAt: '2024-12-15T10:30:00',
-    duration: 85,
-  },
-  {
-    id: 'attempt_2',
-    examId: 'mock_wassce_english',
-    examName: 'English Language',
-    paper: 'Paper 1',
-    score: 65,
-    maxScore: 80,
-    percentage: 81,
-    completedAt: '2024-12-14T14:00:00',
-    duration: 55,
-  },
-];
+// User's exam history - will be populated from API/store with real data
+const mockExamHistory: {
+  id: string;
+  examId: string;
+  examName: string;
+  paper: string;
+  score: number;
+  maxScore: number;
+  percentage: number;
+  completedAt: string;
+  duration: number;
+}[] = [];
 
 type TabType = 'available' | 'history' | 'scheduled';
 
