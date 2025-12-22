@@ -24,6 +24,7 @@ interface PDFViewerProps {
   onDownload?: () => void;
   className?: string;
   initialPage?: number;
+  canDownload?: boolean;
 }
 
 export function PDFViewer({
@@ -34,6 +35,7 @@ export function PDFViewer({
   onDownload,
   className,
   initialPage = 1,
+  canDownload = true,
 }: PDFViewerProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
@@ -219,14 +221,16 @@ export function PDFViewer({
             <RotateCw className="w-4 h-4" />
           </Button>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleDownload}
-            title="Download"
-          >
-            <Download className="w-4 h-4" />
-          </Button>
+          {canDownload && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleDownload}
+              title="Download"
+            >
+              <Download className="w-4 h-4" />
+            </Button>
+          )}
 
           <Button
             variant="ghost"

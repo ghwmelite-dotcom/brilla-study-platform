@@ -467,6 +467,7 @@ export const useLibraryStore = create<LibraryState>()(
               uploadedBy: 'current_user',
               isFeatured: data.get('isFeatured') === 'true',
               isActive: true,
+              isDownloadable: data.get('isDownloadable') !== 'false',
               views: 0,
               downloads: 0,
               createdAt: new Date().toISOString(),
@@ -515,6 +516,7 @@ export const useLibraryStore = create<LibraryState>()(
             uploadedBy: 'current_user',
             isFeatured: data.get('isFeatured') === 'true',
             isActive: true,
+            isDownloadable: data.get('isDownloadable') !== 'false',
             views: 0,
             downloads: 0,
             createdAt: new Date().toISOString(),
@@ -539,13 +541,32 @@ export const useLibraryStore = create<LibraryState>()(
 
       updateResource: async (id: string, updates: Partial<LibraryResource>) => {
         try {
-          await api.put(`/library/resources/${id}`, updates);
+          const response = await api.put<{ message: string }>(`/library/resources/${id}`, updates);
+
+          if (!response.success) {
+            throw new Error(response.error || 'Failed to update resource');
+          }
+
+          const updatedResource = { ...updates, updatedAt: new Date().toISOString() };
           set({
             resources: get().resources.map(r =>
-              r.id === id ? { ...r, ...updates, updatedAt: new Date().toISOString() } : r
+              r.id === id ? { ...r, ...updatedResource } : r
             ),
+            featuredResources: get().featuredResources.map(r =>
+              r.id === id ? { ...r, ...updatedResource } : r
+            ),
+            recentlyViewed: get().recentlyViewed.map(r =>
+              r.id === id ? { ...r, ...updatedResource } : r
+            ),
+            selectedResource: get().selectedResource?.id === id
+              ? { ...get().selectedResource!, ...updatedResource }
+              : get().selectedResource,
           });
         } catch (error) {
+          console.error('Update resource error:', error);
+          if (error instanceof Error) {
+            throw error;
+          }
           throw new Error('Failed to update resource');
         }
       },
@@ -562,6 +583,30 @@ export const useLibraryStore = create<LibraryState>()(
       // Utility
       selectResource: (resource: LibraryResource | null) => {
         set({ selectedResource: resource });
+
+        // Track view when a resource is selected (not when deselecting)
+        if (resource) {
+          // Call the API to track the view in the background
+          api.get<LibraryResource>(`/library/resources/${resource.id}`)
+            .then(response => {
+              if (response.success && response.data) {
+                // Update the resource with fresh data (including updated view count)
+                set({ selectedResource: response.data });
+
+                // Also update in the resources list
+                const resources = get().resources;
+                const updatedResources = resources.map(r =>
+                  r.id === resource.id ? response.data! : r
+                );
+                set({ resources: updatedResources });
+
+                // Add to recently viewed
+                const recentlyViewed = get().recentlyViewed.filter(r => r.id !== resource.id);
+                set({ recentlyViewed: [response.data, ...recentlyViewed].slice(0, 10) });
+              }
+            })
+            .catch(err => console.error('Failed to track view:', err));
+        }
       },
 
       clearError: () => {

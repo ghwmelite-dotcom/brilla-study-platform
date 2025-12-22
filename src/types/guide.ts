@@ -22,7 +22,9 @@ export type GuideCategory =
   | 'social'
   | 'progress'
   | 'tools'
-  | 'advanced';
+  | 'advanced'
+  | 'library'
+  | 'counselor';
 
 export interface GuideStep {
   id: string;

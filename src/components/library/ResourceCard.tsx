@@ -231,12 +231,12 @@ export function ResourceCard({
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
               <Eye className="w-3 h-3" />
-              {resource.views.toLocaleString()}
+              {(resource.views ?? 0).toLocaleString()}
             </span>
-            {resource.downloads > 0 && (
+            {(resource.downloads ?? 0) > 0 && (
               <span className="flex items-center gap-1">
                 <Download className="w-3 h-3" />
-                {resource.downloads.toLocaleString()}
+                {(resource.downloads ?? 0).toLocaleString()}
               </span>
             )}
           </div>

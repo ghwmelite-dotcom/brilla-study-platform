@@ -254,6 +254,7 @@ libraryApp.get('/resources', async (c) => {
           accessLevel: r.access_level,
           tags: r.tags ? JSON.parse(r.tags as string) : [],
           isFeatured: !!r.is_featured,
+          isDownloadable: r.is_downloadable !== 0,
           views: r.views,
           downloads: r.downloads,
           rating: r.avg_rating,
@@ -309,6 +310,7 @@ libraryApp.get('/featured', async (c) => {
         fileSize: r.file_size,
         duration: r.duration,
         accessLevel: r.access_level,
+        isDownloadable: r.is_downloadable !== 0,
         views: r.views,
         rating: r.avg_rating,
         ratingCount: r.rating_count,
@@ -414,6 +416,7 @@ libraryApp.get('/resources/:id', async (c) => {
         accessLevel: resource.access_level,
         tags: resource.tags ? JSON.parse(resource.tags as string) : [],
         isFeatured: !!resource.is_featured,
+        isDownloadable: resource.is_downloadable !== 0,
         views: resource.views,
         downloads: resource.downloads,
         rating: resource.avg_rating,
@@ -459,6 +462,7 @@ libraryApp.get('/subjects/:subjectId/resources', async (c) => {
         description: r.description,
         resourceType: r.resource_type,
         thumbnailUrl: r.thumbnail_url,
+        isDownloadable: r.is_downloadable !== 0,
         views: r.views,
         rating: r.avg_rating,
       })),
@@ -857,15 +861,23 @@ libraryApp.post('/upload', async (c) => {
     const userId = getUserId(c);
     const userRole = c.get('userRole') || c.req.header('x-user-role');
 
+    console.log('Upload request - userId:', userId, 'userRole:', userRole);
+
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
 
     if (!['admin', 'teacher'].includes(userRole as string)) {
-      return c.json({ success: false, error: 'Permission denied' }, 403);
+      return c.json({ success: false, error: `Permission denied. Role '${userRole}' not allowed.` }, 403);
     }
 
-    const formData = await c.req.formData();
+    let formData;
+    try {
+      formData = await c.req.formData();
+    } catch (formError) {
+      console.error('FormData parsing error:', formError);
+      return c.json({ success: false, error: 'Failed to parse form data' }, 400);
+    }
     const file = formData.get('file') as File | null;
     const title = formData.get('title') as string;
     const description = formData.get('description') as string | null;
@@ -875,6 +887,7 @@ libraryApp.post('/upload', async (c) => {
     const schoolLevel = formData.get('schoolLevel') as string | null;
     const accessLevel = formData.get('accessLevel') as string || 'free';
     const tags = formData.get('tags') as string | null;
+    const isDownloadable = formData.get('isDownloadable') !== 'false'; // Default to true
 
     if (!title?.trim()) {
       return c.json({ success: false, error: 'Title is required' }, 400);
@@ -889,18 +902,29 @@ libraryApp.post('/upload', async (c) => {
 
     // Upload file to R2 if provided
     if (file && c.env.LIBRARY_BUCKET) {
-      const fileExtension = file.name.split('.').pop();
-      const fileKey = `resources/${Date.now()}_${crypto.randomUUID()}.${fileExtension}`;
+      try {
+        const fileExtension = file.name.split('.').pop();
+        const fileKey = `resources/${Date.now()}_${crypto.randomUUID()}.${fileExtension}`;
 
-      await c.env.LIBRARY_BUCKET.put(fileKey, file.stream(), {
-        httpMetadata: {
-          contentType: file.type,
-        },
-      });
+        console.log('Uploading file to R2:', fileKey, 'size:', file.size);
 
-      // Use our API to serve files from R2
-      contentUrl = `https://brilla-api.ghwmelite.workers.dev/api/library/files/${fileKey}`;
-      fileSize = file.size;
+        await c.env.LIBRARY_BUCKET.put(fileKey, file.stream(), {
+          httpMetadata: {
+            contentType: file.type,
+          },
+        });
+
+        // Use our API to serve files from R2
+        contentUrl = `https://brilla-api.ghwmelite.workers.dev/api/library/files/${fileKey}`;
+        fileSize = file.size;
+        console.log('File uploaded successfully:', contentUrl);
+      } catch (r2Error) {
+        console.error('R2 upload error:', r2Error);
+        return c.json({ success: false, error: 'Failed to upload file to storage' }, 500);
+      }
+    } else if (file && !c.env.LIBRARY_BUCKET) {
+      console.error('R2 bucket not configured');
+      return c.json({ success: false, error: 'Storage not configured on server' }, 500);
     }
 
     if (!contentUrl) {
@@ -909,26 +933,63 @@ libraryApp.post('/upload', async (c) => {
 
     const resourceId = `res_${Date.now()}`;
 
-    await c.env.DB.prepare(`
-      INSERT INTO library_resources (
-        id, title, description, resource_type, content_url, file_size,
-        subject_id, topic_id, school_level, access_level, tags,
-        uploaded_by, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
-    `).bind(
-      resourceId,
-      title.trim(),
-      description || null,
-      resourceType,
-      contentUrl,
-      fileSize,
-      subjectId || null,
-      topicId || null,
-      schoolLevel || null,
-      accessLevel,
-      tags ? JSON.stringify(tags.split(',').map((t: string) => t.trim())) : null,
-      userId
-    ).run();
+    // Verify user exists in database, or find matching user by role
+    let actualUserId = userId;
+    try {
+      const userExists = await c.env.DB.prepare(
+        'SELECT id FROM users WHERE id = ?'
+      ).bind(userId).first();
+
+      if (!userExists) {
+        // User ID from session doesn't exist - try to find a matching user
+        console.log(`User ${userId} not found in database, looking for matching user...`);
+        const matchingUser = await c.env.DB.prepare(
+          'SELECT id FROM users WHERE role = ? LIMIT 1'
+        ).bind(userRole).first();
+
+        if (matchingUser) {
+          actualUserId = matchingUser.id as string;
+          console.log(`Using matching user ID: ${actualUserId}`);
+        } else {
+          // No matching user found - use a system ID
+          actualUserId = 'system_upload';
+          console.log('No matching user found, using system_upload');
+        }
+      }
+    } catch (userCheckError) {
+      console.error('Error checking user:', userCheckError);
+      // Continue with original userId
+    }
+
+    try {
+      await c.env.DB.prepare(`
+        INSERT INTO library_resources (
+          id, title, description, resource_type, content_url, file_size,
+          subject_id, topic_id, school_level, access_level, tags,
+          uploaded_by, is_downloadable, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+      `).bind(
+        resourceId,
+        title.trim(),
+        description || null,
+        resourceType,
+        contentUrl,
+        fileSize,
+        subjectId || null,
+        topicId || null,
+        schoolLevel || null,
+        accessLevel,
+        tags ? JSON.stringify(tags.split(',').map((t: string) => t.trim())) : null,
+        actualUserId,
+        isDownloadable ? 1 : 0
+      ).run();
+
+      console.log('Resource saved to database:', resourceId);
+    } catch (dbError) {
+      console.error('Database insert error:', dbError);
+      const errMsg = dbError instanceof Error ? dbError.message : 'Unknown error';
+      return c.json({ success: false, error: `Failed to save resource to database: ${errMsg}` }, 500);
+    }
 
     return c.json({
       success: true,
@@ -936,7 +997,8 @@ libraryApp.post('/upload', async (c) => {
     });
   } catch (error) {
     console.error('Error uploading resource:', error);
-    return c.json({ success: false, error: 'Failed to upload resource' }, 500);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return c.json({ success: false, error: `Failed to upload resource: ${errorMessage}` }, 500);
   }
 });
 
@@ -965,7 +1027,19 @@ libraryApp.put('/resources/:id', async (c) => {
     }
 
     const body = await c.req.json();
-    const { title, description, subjectId, topicId, schoolLevel, accessLevel, tags, isFeatured, isActive } = body;
+    const { title, description, subjectId, topicId, schoolLevel, accessLevel, tags, isFeatured, isActive, isDownloadable } = body;
+
+    // Convert undefined to null for D1 compatibility
+    const safeTitle = title !== undefined ? (title || null) : null;
+    const safeDescription = description !== undefined ? description : null;
+    const safeSubjectId = subjectId !== undefined ? subjectId : null;
+    const safeTopicId = topicId !== undefined ? topicId : null;
+    const safeSchoolLevel = schoolLevel !== undefined ? schoolLevel : null;
+    const safeAccessLevel = accessLevel !== undefined ? accessLevel : null;
+    const safeTags = tags !== undefined ? (Array.isArray(tags) ? JSON.stringify(tags) : null) : null;
+    const safeIsFeatured = isFeatured !== undefined ? (isFeatured ? 1 : 0) : null;
+    const safeIsActive = isActive !== undefined ? (isActive ? 1 : 0) : null;
+    const safeIsDownloadable = isDownloadable !== undefined ? (isDownloadable ? 1 : 0) : null;
 
     await c.env.DB.prepare(`
       UPDATE library_resources SET
@@ -978,18 +1052,20 @@ libraryApp.put('/resources/:id', async (c) => {
         tags = COALESCE(?, tags),
         is_featured = COALESCE(?, is_featured),
         is_active = COALESCE(?, is_active),
+        is_downloadable = COALESCE(?, is_downloadable),
         updated_at = datetime('now')
       WHERE id = ?
     `).bind(
-      title || null,
-      description,
-      subjectId,
-      topicId,
-      schoolLevel,
-      accessLevel,
-      tags ? JSON.stringify(tags) : null,
-      isFeatured !== undefined ? (isFeatured ? 1 : 0) : null,
-      isActive !== undefined ? (isActive ? 1 : 0) : null,
+      safeTitle,
+      safeDescription,
+      safeSubjectId,
+      safeTopicId,
+      safeSchoolLevel,
+      safeAccessLevel,
+      safeTags,
+      safeIsFeatured,
+      safeIsActive,
+      safeIsDownloadable,
       resourceId
     ).run();
 
@@ -1000,7 +1076,7 @@ libraryApp.put('/resources/:id', async (c) => {
   }
 });
 
-// Delete resource (admin only)
+// Delete resource (admin or resource owner)
 libraryApp.delete('/resources/:id', async (c) => {
   try {
     const resourceId = c.req.param('id');
@@ -1011,8 +1087,32 @@ libraryApp.delete('/resources/:id', async (c) => {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
 
-    if (userRole !== 'admin') {
-      return c.json({ success: false, error: 'Admin access required' }, 403);
+    // Check if resource exists and get owner
+    const resource = await c.env.DB.prepare(
+      'SELECT uploaded_by, content_url FROM library_resources WHERE id = ?'
+    ).bind(resourceId).first();
+
+    if (!resource) {
+      return c.json({ success: false, error: 'Resource not found' }, 404);
+    }
+
+    // Allow admin to delete any resource, or owner to delete their own
+    if (userRole !== 'admin' && resource.uploaded_by !== userId) {
+      return c.json({ success: false, error: 'Permission denied' }, 403);
+    }
+
+    // Optionally delete from R2 if it's a file we uploaded
+    const contentUrl = resource.content_url as string;
+    if (contentUrl.includes('/api/library/files/') && c.env.LIBRARY_BUCKET) {
+      const fileKey = contentUrl.split('/files/')[1];
+      if (fileKey) {
+        try {
+          await c.env.LIBRARY_BUCKET.delete(fileKey);
+        } catch (e) {
+          console.error('Failed to delete file from R2:', e);
+          // Continue with soft delete even if R2 delete fails
+        }
+      }
     }
 
     // Soft delete (set is_active = 0)

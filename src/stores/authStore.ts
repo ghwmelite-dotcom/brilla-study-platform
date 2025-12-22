@@ -131,7 +131,7 @@ interface RegisterData {
 const PENDING_USERS_KEY = 'brilla-pending-users';
 const ALL_USERS_KEY = 'brilla-all-users';
 const DEMO_USERS_VERSION_KEY = 'brilla-demo-users-version';
-const CURRENT_DEMO_VERSION = 2; // Increment this when demo users change
+const CURRENT_DEMO_VERSION = 3; // Increment this when demo users change
 
 // Simple password hash (in production, use bcrypt on server)
 const hashPassword = (password: string): string => {
@@ -190,12 +190,12 @@ const saveAllUsersToStorage = (users: ManagedUser[]) => {
 };
 
 // Default demo users (these have passwords already set)
-// Using brillaprep.org domain to match production
+// IDs must match production database for demo mode fallback to work
 const getDefaultUsers = (): ManagedUser[] => [
   {
-    id: 'admin_1',
+    id: 'admin_prod_001',
     email: 'admin@brillaprep.org',
-    name: 'System Admin',
+    name: 'Admin User',
     role: 'admin',
     status: 'approved',
     xpPoints: 0,
@@ -210,7 +210,7 @@ const getDefaultUsers = (): ManagedUser[] => [
     updatedAt: new Date().toISOString(),
   },
   {
-    id: 'teacher_1',
+    id: 'teacher_1766327981453',
     email: 'teacher@brillaprep.org',
     name: 'Demo Teacher',
     role: 'teacher',
@@ -230,7 +230,7 @@ const getDefaultUsers = (): ManagedUser[] => [
     updatedAt: new Date().toISOString(),
   },
   {
-    id: 'student_1',
+    id: 'student_1766327981521',
     email: 'student@brillaprep.org',
     name: 'Demo Student',
     role: 'student',

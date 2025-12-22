@@ -32,6 +32,14 @@ import {
   FlaskConical,
   BookMarked,
   Medal,
+  Heart,
+  Video,
+  Headphones,
+  FileQuestion,
+  GraduationCap,
+  Shield,
+  Calendar,
+  Bell,
 } from 'lucide-react';
 import { useExamStore } from '@/stores';
 import { useGuideStore } from '@/stores/guideStore';
@@ -65,6 +73,14 @@ const iconMap: Record<string, React.ElementType> = {
   Wrench,
   Rocket,
   HelpCircle,
+  Heart,
+  Video,
+  Headphones,
+  FileQuestion,
+  GraduationCap,
+  Shield,
+  Calendar,
+  Bell,
 };
 
 const categoryIcons: Record<GuideCategory, React.ElementType> = {
@@ -75,6 +91,8 @@ const categoryIcons: Record<GuideCategory, React.ElementType> = {
   'progress': TrendingUp,
   'tools': Wrench,
   'advanced': Zap,
+  'library': Library,
+  'counselor': Heart,
 };
 
 function GuideCard({ guide, onClick }: { guide: FeatureGuide; onClick: () => void }) {
@@ -235,6 +253,8 @@ export default function HelpCenter() {
       'getting-started': [],
       'practice': [],
       'exams': [],
+      'library': [],
+      'counselor': [],
       'social': [],
       'progress': [],
       'tools': [],

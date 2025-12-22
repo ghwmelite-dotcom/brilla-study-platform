@@ -69,6 +69,7 @@ export function UploadResourceModal({ isOpen, onClose, onSuccess }: UploadResour
   const [accessLevel, setAccessLevel] = useState<'free' | 'basic' | 'premium'>('free');
   const [tags, setTags] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
+  const [isDownloadable, setIsDownloadable] = useState(true);
 
   const [isDragging, setIsDragging] = useState(false);
 
@@ -86,6 +87,7 @@ export function UploadResourceModal({ isOpen, onClose, onSuccess }: UploadResour
     setAccessLevel('free');
     setTags('');
     setIsFeatured(false);
+    setIsDownloadable(true);
     setUploadProgress(0);
     setError(null);
   };
@@ -166,6 +168,7 @@ export function UploadResourceModal({ isOpen, onClose, onSuccess }: UploadResour
       formData.append('accessLevel', accessLevel);
       formData.append('tags', tags);
       formData.append('isFeatured', String(isFeatured));
+      formData.append('isDownloadable', String(isDownloadable));
 
       if (subjectId) {
         formData.append('subjectId', subjectId);
@@ -471,6 +474,20 @@ export function UploadResourceModal({ isOpen, onClose, onSuccess }: UploadResour
                   placeholder="mathematics, algebra, equations"
                   className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 />
+              </div>
+
+              {/* Downloadable Toggle */}
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="downloadable"
+                  checked={isDownloadable}
+                  onChange={(e) => setIsDownloadable(e.target.checked)}
+                  className="w-4 h-4 text-primary rounded border-neutral-300 focus:ring-primary"
+                />
+                <label htmlFor="downloadable" className="text-sm text-neutral-700">
+                  Allow users to download this resource
+                </label>
               </div>
 
               {/* Featured Toggle */}

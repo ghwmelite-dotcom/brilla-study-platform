@@ -540,11 +540,17 @@ export const useCounselorStore = create<CounselorState>()(
             createdAt: new Date().toISOString(),
           };
 
-          await api.post('/counselor/wellbeing/log', {
+          const response = await api.post('/counselor/wellbeing/log', {
             stressLevel: data.stressLevel,
             studySatisfaction: data.studySatisfaction,
+            energyLevel: data.energyLevel,
+            mood: data.mood,
             notes: data.notes,
           });
+
+          if (!response.success) {
+            throw new Error(response.error || 'Failed to log wellbeing');
+          }
 
           set({
             todayWellbeingLog: log,
@@ -552,6 +558,7 @@ export const useCounselorStore = create<CounselorState>()(
             showWellbeingCheckIn: false,
           });
         } catch (error) {
+          console.error('Error logging wellbeing:', error);
           throw new Error('Failed to log wellbeing');
         }
       },

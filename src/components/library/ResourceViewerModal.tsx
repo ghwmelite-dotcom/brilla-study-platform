@@ -14,10 +14,15 @@ import {
   BookmarkCheck,
   Maximize2,
   Minimize2,
+  Trash2,
+  AlertTriangle,
+  Loader2,
+  Pencil,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { Button } from '@/components/common';
 import { PDFViewer } from './PDFViewer';
+import { useAuthStore } from '@/stores';
 import type { LibraryResource, ResourceType } from '@/types';
 
 interface ResourceViewerModalProps {
@@ -27,6 +32,8 @@ interface ResourceViewerModalProps {
   onBookmark?: (resource: LibraryResource) => void;
   onRate?: (resource: LibraryResource, rating: number) => void;
   onDownload?: (resource: LibraryResource) => void;
+  onDelete?: (resource: LibraryResource) => Promise<void>;
+  onEdit?: (resource: LibraryResource) => void;
 }
 
 const typeIcons: Record<ResourceType, React.ElementType> = {
@@ -69,16 +76,23 @@ export function ResourceViewerModal({
   onBookmark,
   onRate,
   onDownload,
+  onDelete,
+  onEdit,
 }: ResourceViewerModalProps) {
+  const { user } = useAuthStore();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (resource) {
       setIsBookmarked(resource.isBookmarked || false);
+      // Load user's existing rating if available
+      setUserRating(resource.userRating?.rating || 0);
     }
   }, [resource]);
 
@@ -137,6 +151,32 @@ export function ResourceViewerModal({
     }
   };
 
+  const handleDelete = async () => {
+    if (!resource || !onDelete) return;
+    setIsDeleting(true);
+    try {
+      await onDelete(resource);
+      setShowDeleteConfirm(false);
+      onClose();
+    } catch (error) {
+      console.error('Failed to delete resource:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Check if user can edit/delete this resource (admin or owner)
+  const canModify = user && (
+    user.role === 'admin' ||
+    (user.role === 'teacher' && resource.uploadedBy === user.id)
+  );
+
+  const canEdit = canModify && onEdit;
+  const canDelete = canModify && onDelete;
+
+  // Check if download is allowed
+  const canDownload = resource.isDownloadable !== false;
+
   const renderContent = () => {
     switch (resource.resourceType) {
       case 'pdf':
@@ -147,6 +187,7 @@ export function ResourceViewerModal({
               title={resource.title}
               onProgress={setProgress}
               onDownload={handleDownload}
+              canDownload={canDownload}
               className="h-full"
             />
           </div>
@@ -158,6 +199,7 @@ export function ResourceViewerModal({
             <video
               src={resource.contentUrl}
               controls
+              controlsList={canDownload ? undefined : 'nodownload'}
               className="max-w-full max-h-full"
               onTimeUpdate={(e) => {
                 const video = e.target as HTMLVideoElement;
@@ -181,6 +223,7 @@ export function ResourceViewerModal({
             <audio
               src={resource.contentUrl}
               controls
+              controlsList={canDownload ? undefined : 'nodownload'}
               className="w-full max-w-md"
               onTimeUpdate={(e) => {
                 const audio = e.target as HTMLAudioElement;
@@ -225,10 +268,14 @@ export function ResourceViewerModal({
             <File className="w-24 h-24 text-neutral-300 mb-6" />
             <h3 className="text-xl font-semibold text-neutral-900 mb-2">{resource.title}</h3>
             <p className="text-neutral-500 mb-6 text-center max-w-md">{resource.description}</p>
-            <Button onClick={handleDownload}>
-              <Download className="w-4 h-4 mr-2" />
-              Download File
-            </Button>
+            {canDownload ? (
+              <Button onClick={handleDownload}>
+                <Download className="w-4 h-4 mr-2" />
+                Download File
+              </Button>
+            ) : (
+              <p className="text-sm text-neutral-400">Download not available for this resource</p>
+            )}
           </div>
         );
     }
@@ -322,9 +369,33 @@ export function ResourceViewerModal({
               <Share2 className="w-5 h-5" />
             </Button>
 
-            {(resource.resourceType === 'pdf' || resource.resourceType === 'document') && (
-              <Button variant="ghost" size="sm" onClick={handleDownload}>
+            {canDownload && (resource.resourceType === 'pdf' || resource.resourceType === 'document') && (
+              <Button variant="ghost" size="sm" onClick={handleDownload} title="Download">
                 <Download className="w-5 h-5" />
+              </Button>
+            )}
+
+            {canEdit && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onEdit(resource)}
+                className="text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                title="Edit resource"
+              >
+                <Pencil className="w-5 h-5" />
+              </Button>
+            )}
+
+            {canDelete && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                title="Delete resource"
+              >
+                <Trash2 className="w-5 h-5" />
               </Button>
             )}
 
@@ -377,11 +448,11 @@ export function ResourceViewerModal({
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-neutral-500">Views</p>
-                    <p className="font-semibold text-neutral-900">{resource.views.toLocaleString()}</p>
+                    <p className="font-semibold text-neutral-900">{(resource.views ?? 0).toLocaleString()}</p>
                   </div>
                   <div>
                     <p className="text-neutral-500">Downloads</p>
-                    <p className="font-semibold text-neutral-900">{resource.downloads.toLocaleString()}</p>
+                    <p className="font-semibold text-neutral-900">{(resource.downloads ?? 0).toLocaleString()}</p>
                   </div>
                   {resource.rating && (
                     <div>
@@ -446,6 +517,60 @@ export function ResourceViewerModal({
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowDeleteConfirm(false)}
+          />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-neutral-900">Delete Resource</h3>
+                <p className="text-sm text-neutral-500">This action cannot be undone</p>
+              </div>
+            </div>
+
+            <p className="text-neutral-600 mb-6">
+              Are you sure you want to delete "<span className="font-medium">{resource.title}</span>"?
+              This will remove the resource from the library.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

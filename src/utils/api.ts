@@ -163,6 +163,9 @@ export const api = {
     const token = getAuthToken();
     const userInfo = getUserInfo();
 
+    console.log('Upload - token:', token ? 'present' : 'missing');
+    console.log('Upload - userInfo:', userInfo);
+
     const headers: HeadersInit = {};
 
     if (token) {
@@ -174,6 +177,8 @@ export const api = {
     if (userInfo.role) {
       headers['x-user-role'] = userInfo.role;
     }
+
+    console.log('Upload - headers being sent:', headers);
 
     const url = buildUrl(endpoint);
 

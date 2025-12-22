@@ -11,7 +11,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useCounselorStore, useAuthStore } from '@/stores';
-import { CounselorChat } from '@/components/counselor';
+import { CounselorChat, WellbeingCheckIn } from '@/components/counselor';
 import type { CounselorType } from '@/types';
 import { COUNSELOR_CONFIGS, MOOD_OPTIONS } from '@/types/counselor';
 
@@ -232,6 +232,9 @@ export function CounselorPage() {
 
       {/* Floating Chat Modal */}
       <CounselorChat />
+
+      {/* Wellbeing Check-in Modal */}
+      <WellbeingCheckIn />
     </div>
   );
 }

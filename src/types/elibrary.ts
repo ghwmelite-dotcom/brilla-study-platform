@@ -22,6 +22,7 @@ export interface LibraryResource {
   uploadedBy: string;
   isFeatured: boolean;
   isActive: boolean;
+  isDownloadable: boolean; // Whether users can download this resource
   views: number;
   downloads: number;
   createdAt: string;
@@ -34,6 +35,7 @@ export interface LibraryResource {
   ratingCount?: number;
   userProgress?: number;
   isBookmarked?: boolean;
+  userRating?: { rating: number; review?: string };
 }
 
 // User Collection (Bookmarks/Playlists)
@@ -142,6 +144,7 @@ export interface LibraryUploadRequest {
   accessLevel?: AccessLevel;
   tags?: string[];
   isFeatured?: boolean;
+  isDownloadable?: boolean;
 }
 
 // Resource type metadata

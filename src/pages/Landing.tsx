@@ -23,6 +23,16 @@ import {
   X,
   Download,
   Smartphone,
+  Heart,
+  FileText,
+  Video,
+  Headphones,
+  BarChart3,
+  Flame,
+  Swords,
+  Library,
+  PenTool,
+  MessageCircle,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { AuthModal } from '@/components/auth';
@@ -479,39 +489,78 @@ const examModes = [
 const features = [
   {
     icon: Brain,
-    title: 'AI-Powered Learning',
-    description: 'Adaptive algorithms identify your weaknesses and create personalized study plans.',
+    title: 'AI-Powered Tutoring',
+    description: 'Get instant explanations and personalized guidance from our intelligent AI tutor.',
     gradient: 'from-purple-500 to-pink-500',
   },
   {
-    icon: Zap,
-    title: 'Speed Training',
-    description: 'Master the art of quick thinking with time-bound challenges and instant feedback.',
-    gradient: 'from-yellow-500 to-orange-500',
-  },
-  {
-    icon: Target,
-    title: 'Topic Mastery',
-    description: 'Deep dive into specific topics with theory, formulas, and unlimited practice.',
+    icon: BookOpen,
+    title: 'E-Library',
+    description: 'Access thousands of PDFs, videos, audio lessons, and interactive learning materials.',
     gradient: 'from-blue-500 to-cyan-500',
   },
   {
-    icon: Trophy,
-    title: 'Competition Mode',
-    description: 'Experience the thrill of real NSMQ competitions with full simulation.',
-    gradient: 'from-amber-500 to-red-500',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Smart Analytics',
-    description: 'Track improvement with detailed insights and performance predictions.',
+    icon: Users,
+    title: 'AI Student Counselor',
+    description: 'Get academic guidance, career advice, and wellbeing support from AI counselors.',
     gradient: 'from-green-500 to-emerald-500',
   },
   {
-    icon: Shield,
-    title: 'House System',
-    description: 'Compete with your school house and climb the leaderboard together.',
+    icon: Trophy,
+    title: 'NSMQ Competition Mode',
+    description: 'Full 5-round simulation with live 1v1 battles and speed training.',
+    gradient: 'from-amber-500 to-red-500',
+  },
+  {
+    icon: Target,
+    title: 'Smart Practice',
+    description: 'Adaptive questions that evolve with your skill level for maximum learning.',
     gradient: 'from-indigo-500 to-purple-500',
+  },
+  {
+    icon: TrendingUp,
+    title: 'Advanced Analytics',
+    description: 'Detailed insights into your progress with performance predictions.',
+    gradient: 'from-rose-500 to-orange-500',
+  },
+];
+
+const platformCapabilities = [
+  {
+    category: 'Learning Resources',
+    items: [
+      { name: 'E-Library', description: 'PDFs, videos, audio, interactive content' },
+      { name: 'Past Papers', description: 'WASSCE & BECE with marking schemes' },
+      { name: 'Topic Notes', description: 'Comprehensive study materials' },
+      { name: 'Practice Questions', description: '10,000+ curated questions' },
+    ],
+  },
+  {
+    category: 'AI Features',
+    items: [
+      { name: 'AI Tutor', description: 'Instant explanations & guidance' },
+      { name: 'AI Counselor', description: 'Academic, career & wellness support' },
+      { name: 'Essay Grading', description: 'Instant AI feedback on essays' },
+      { name: 'Adaptive Learning', description: 'Personalized question difficulty' },
+    ],
+  },
+  {
+    category: 'Competition & Games',
+    items: [
+      { name: 'NSMQ Simulation', description: 'All 5 rounds recreated' },
+      { name: 'Live Battles', description: 'Real-time 1v1 competitions' },
+      { name: 'House Cup', description: 'Compete for your school house' },
+      { name: 'Leaderboards', description: 'National & school rankings' },
+    ],
+  },
+  {
+    category: 'Progress & Motivation',
+    items: [
+      { name: 'Daily Quests', description: 'Challenges with XP rewards' },
+      { name: 'Streak System', description: 'Build study habits with streaks' },
+      { name: 'Achievements', description: 'Unlock badges & milestones' },
+      { name: 'Analytics Dashboard', description: 'Track every metric' },
+    ],
   },
 ];
 
@@ -973,6 +1022,249 @@ export function LandingPage() {
                 <p className="text-white/60 leading-relaxed">{feature.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Platform Capabilities Section */}
+      <section className="relative py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-slate-950" />
+        <GradientOrb className="w-[400px] h-[400px] bg-emerald-500/20 -left-48 top-1/4" delay={1} />
+        <GradientOrb className="w-[300px] h-[300px] bg-blue-500/20 -right-32 bottom-1/4" delay={3} />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <span className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm font-medium text-white/80 mb-6">
+              <Library className="w-4 h-4 text-secondary" />
+              Complete Platform
+            </span>
+            <h2 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
+              Everything in{' '}
+              <span className="text-gradient">One Place</span>
+            </h2>
+            <p className="text-xl text-white/60 max-w-2xl mx-auto">
+              From learning resources to AI-powered tools, we've built everything you need to excel.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {platformCapabilities.map((category, catIndex) => (
+              <div
+                key={category.category}
+                className="glass rounded-2xl p-6 hover:bg-white/10 transition-all duration-300"
+              >
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  {catIndex === 0 && <FileText className="w-5 h-5 text-blue-400" />}
+                  {catIndex === 1 && <Brain className="w-5 h-5 text-purple-400" />}
+                  {catIndex === 2 && <Swords className="w-5 h-5 text-amber-400" />}
+                  {catIndex === 3 && <Flame className="w-5 h-5 text-orange-400" />}
+                  {category.category}
+                </h3>
+                <ul className="space-y-3">
+                  {category.items.map((item) => (
+                    <li key={item.name} className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-white font-medium text-sm">{item.name}</p>
+                        <p className="text-white/50 text-xs">{item.description}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* E-Library & AI Counselor Highlight */}
+      <section className="relative py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-primary-dark/10 to-slate-950" />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* E-Library Card */}
+            <Card3D>
+              <div className="glass rounded-3xl p-8 h-full group cursor-pointer hover:bg-white/10 transition-all">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                    <Library className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">E-Library</h3>
+                    <p className="text-white/50">Digital Learning Hub</p>
+                  </div>
+                </div>
+                <p className="text-white/70 mb-6 leading-relaxed">
+                  Access a rich collection of educational resources including PDF textbooks, video lessons,
+                  audio lectures, and interactive content. Upload, organize, and track your learning progress.
+                </p>
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="flex items-center gap-2 text-white/80">
+                    <FileText className="w-4 h-4 text-red-400" />
+                    <span className="text-sm">PDF Documents</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-white/80">
+                    <Video className="w-4 h-4 text-purple-400" />
+                    <span className="text-sm">Video Lessons</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-white/80">
+                    <Headphones className="w-4 h-4 text-green-400" />
+                    <span className="text-sm">Audio Content</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-white/80">
+                    <BarChart3 className="w-4 h-4 text-amber-400" />
+                    <span className="text-sm">Progress Tracking</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleOpenAuth('register')}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-cyan-500 hover:shadow-lg transition-all"
+                >
+                  Explore Library
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </Card3D>
+
+            {/* AI Counselor Card */}
+            <Card3D>
+              <div className="glass rounded-3xl p-8 h-full group cursor-pointer hover:bg-white/10 transition-all">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                    <Heart className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">AI Student Counselor</h3>
+                    <p className="text-white/50">Your Personal Guide</p>
+                  </div>
+                </div>
+                <p className="text-white/70 mb-6 leading-relaxed">
+                  Get personalized support from AI counselors specialized in academics, career guidance,
+                  and student wellbeing. Available 24/7 to help you navigate your educational journey.
+                </p>
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="flex items-center gap-2 text-white/80">
+                    <GraduationCap className="w-4 h-4 text-blue-400" />
+                    <span className="text-sm">Academic Advice</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-white/80">
+                    <TrendingUp className="w-4 h-4 text-purple-400" />
+                    <span className="text-sm">Career Guidance</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-white/80">
+                    <Heart className="w-4 h-4 text-rose-400" />
+                    <span className="text-sm">Wellbeing Support</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-white/80">
+                    <MessageCircle className="w-4 h-4 text-green-400" />
+                    <span className="text-sm">24/7 Available</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleOpenAuth('register')}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-lg transition-all"
+                >
+                  Talk to Counselor
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </Card3D>
+          </div>
+        </div>
+      </section>
+
+      {/* For Schools & Parents Section */}
+      <section className="relative py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-slate-950" />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <span className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm font-medium text-white/80 mb-6">
+              <Users className="w-4 h-4 text-secondary" />
+              For Everyone
+            </span>
+            <h2 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
+              Built for{' '}
+              <span className="text-gradient">Students, Teachers & Parents</span>
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Students */}
+            <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-secondary to-orange-500 flex items-center justify-center mx-auto mb-6">
+                <GraduationCap className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-4">Students</h3>
+              <p className="text-white/60 mb-6">
+                Practice with AI tutoring, compete in battles, track your progress, and access the E-Library.
+              </p>
+              <ul className="text-left space-y-2 text-white/70">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                  Unlimited practice questions
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                  AI tutor & counselor access
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                  Competition & leaderboards
+                </li>
+              </ul>
+            </div>
+
+            {/* Teachers */}
+            <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center mx-auto mb-6">
+                <PenTool className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-4">Teachers</h3>
+              <p className="text-white/60 mb-6">
+                Manage classes, create assessments, upload resources, and monitor student performance.
+              </p>
+              <ul className="text-left space-y-2 text-white/70">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                  Class management tools
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                  Assessment builder
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                  E-Library uploads
+                </li>
+              </ul>
+            </div>
+
+            {/* Parents */}
+            <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center mx-auto mb-6">
+                <Shield className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-4">Parents</h3>
+              <p className="text-white/60 mb-6">
+                Monitor your child's progress, receive reports, and stay connected with their learning journey.
+              </p>
+              <ul className="text-left space-y-2 text-white/70">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                  Progress monitoring
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                  Weekly reports
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                  Study time insights
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>

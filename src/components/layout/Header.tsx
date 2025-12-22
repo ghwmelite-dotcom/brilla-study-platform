@@ -11,11 +11,13 @@ import {
   Flame,
   Star,
 } from 'lucide-react';
-import { useState } from 'react';
-import { useAuthStore } from '@/stores';
+import { useState, useEffect } from 'react';
+import { useAuthStore, useNotificationStore } from '@/stores';
 import { Button } from '@/components/common';
 import { ExamModeSwitcher } from '@/components/exam';
+import { StreakPopup, XPPopup, NotificationDropdown } from '@/components/header';
 import { formatNumber } from '@/utils';
+import { cn } from '@/utils';
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -25,8 +27,35 @@ interface HeaderProps {
 export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuthStore();
+  const {
+    unreadCount,
+    isStreakPopupOpen,
+    isXPPopupOpen,
+    isNotificationPanelOpen,
+    toggleStreakPopup,
+    toggleXPPopup,
+    toggleNotificationPanel,
+    closeAllPopups,
+    fetchUnreadCount,
+  } = useNotificationStore();
+
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // Fetch unread count on mount and periodically
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchUnreadCount();
+      const interval = setInterval(fetchUnreadCount, 60000); // Every minute
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, fetchUnreadCount]);
+
+  // Close popups when clicking profile dropdown
+  const handleProfileToggle = () => {
+    closeAllPopups();
+    setIsProfileOpen(!isProfileOpen);
+  };
 
   const getPageTitle = () => {
     const path = location.pathname;
@@ -98,31 +127,87 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
 
           {isAuthenticated && user ? (
             <>
-              {/* Stats */}
-              <div className="hidden sm:flex items-center gap-4 mr-2">
-                <div className="flex items-center gap-1 text-sm">
-                  <Flame className="w-4 h-4 text-orange-500" />
-                  <span className="font-medium">{user.streakDays}</span>
+              {/* Stats - Now clickable */}
+              <div className="hidden sm:flex items-center gap-2 mr-2">
+                {/* Streak Button */}
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      toggleStreakPopup();
+                    }}
+                    className={cn(
+                      'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all',
+                      isStreakPopupOpen
+                        ? 'bg-orange-100 text-orange-700'
+                        : 'hover:bg-orange-50 text-neutral-700 hover:text-orange-600'
+                    )}
+                  >
+                    <Flame className={cn('w-4 h-4', isStreakPopupOpen ? 'text-orange-500' : 'text-orange-500')} />
+                    <span className="font-semibold">{user.streakDays}</span>
+                  </button>
+                  <StreakPopup
+                    isOpen={isStreakPopupOpen}
+                    onClose={closeAllPopups}
+                  />
                 </div>
-                <div className="flex items-center gap-1 text-sm">
-                  <Star className="w-4 h-4 text-secondary" />
-                  <span className="font-medium">{formatNumber(user.xpPoints)}</span>
+
+                {/* XP Button */}
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      toggleXPPopup();
+                    }}
+                    className={cn(
+                      'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all',
+                      isXPPopupOpen
+                        ? 'bg-amber-100 text-amber-700'
+                        : 'hover:bg-amber-50 text-neutral-700 hover:text-amber-600'
+                    )}
+                  >
+                    <Star className={cn('w-4 h-4', isXPPopupOpen ? 'text-amber-500' : 'text-amber-500')} />
+                    <span className="font-semibold">{formatNumber(user.xpPoints)}</span>
+                  </button>
+                  <XPPopup
+                    isOpen={isXPPopupOpen}
+                    onClose={closeAllPopups}
+                  />
                 </div>
               </div>
 
               {/* Notifications */}
-              <button
-                className="relative p-2 rounded-lg text-neutral-600 hover:bg-neutral-100"
-                aria-label="Notifications"
-              >
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full" />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    toggleNotificationPanel();
+                  }}
+                  className={cn(
+                    'relative p-2 rounded-lg transition-all',
+                    isNotificationPanelOpen
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-neutral-600 hover:bg-neutral-100'
+                  )}
+                  aria-label="Notifications"
+                >
+                  <Bell className="w-5 h-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center px-1 text-xs font-bold bg-red-500 text-white rounded-full">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+                <NotificationDropdown
+                  isOpen={isNotificationPanelOpen}
+                  onClose={closeAllPopups}
+                />
+              </div>
 
               {/* Profile dropdown */}
               <div className="relative">
                 <button
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  onClick={handleProfileToggle}
                   className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-neutral-100"
                 >
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">

@@ -9,7 +9,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { useLibraryStore, useAuthStore } from '@/stores';
-import { ResourceCard, ResourceFilters, ResourceViewerModal, UploadResourceModal } from '@/components/library';
+import { ResourceCard, ResourceFilters, ResourceViewerModal, UploadResourceModal, EditResourceModal } from '@/components/library';
 import type { LibraryResource } from '@/types';
 
 export function LibraryPage() {
@@ -29,11 +29,14 @@ export function LibraryPage() {
     selectedResource,
     rateResource,
     trackDownload,
+    deleteResource,
   } = useLibraryStore();
 
   const [activeTab, setActiveTab] = useState<'browse' | 'collections' | 'recent'>('browse');
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [resourceToEdit, setResourceToEdit] = useState<LibraryResource | null>(null);
 
   useEffect(() => {
     loadResources();
@@ -59,6 +62,28 @@ export function LibraryPage() {
 
   const handleDownload = async (resource: LibraryResource) => {
     await trackDownload(resource.id);
+  };
+
+  const handleDelete = async (resource: LibraryResource) => {
+    await deleteResource(resource.id);
+    // Reload resources after deletion
+    loadResources();
+    loadFeatured();
+  };
+
+  const handleEdit = (resource: LibraryResource) => {
+    setResourceToEdit(resource);
+    setIsEditOpen(true);
+  };
+
+  const handleEditSuccess = () => {
+    // Reload resources after edit
+    loadResources();
+    loadFeatured();
+    // Also refresh the selected resource if it's the one being edited
+    if (selectedResource && resourceToEdit && selectedResource.id === resourceToEdit.id) {
+      selectResource(null);
+    }
   };
 
   const handleUploadSuccess = () => {
@@ -307,6 +332,8 @@ export function LibraryPage() {
         onClose={handleCloseViewer}
         onRate={handleRate}
         onDownload={handleDownload}
+        onDelete={handleDelete}
+        onEdit={handleEdit}
       />
 
       {/* Upload Resource Modal */}
@@ -314,6 +341,17 @@ export function LibraryPage() {
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
         onSuccess={handleUploadSuccess}
+      />
+
+      {/* Edit Resource Modal */}
+      <EditResourceModal
+        resource={resourceToEdit}
+        isOpen={isEditOpen}
+        onClose={() => {
+          setIsEditOpen(false);
+          setResourceToEdit(null);
+        }}
+        onSuccess={handleEditSuccess}
       />
     </div>
   );
