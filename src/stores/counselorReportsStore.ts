@@ -477,35 +477,68 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
       },
 
       // Message Actions
-      loadMessages: async (_studentId) => {
+      loadMessages: async (studentId) => {
         set({ isLoading: true, error: null });
         try {
-          // TODO: Replace with API call
-          await new Promise(resolve => setTimeout(resolve, 300));
+          const params = studentId ? `?studentId=${studentId}` : '';
+          const response = await api.get(`/counselor/parent-messages${params}`);
+          if (response.success) {
+            const messages = response.data.map((m: any) => ({
+              id: m.id,
+              reportId: m.reportId,
+              parentId: m.parentId,
+              studentId: m.studentId,
+              senderRole: m.senderRole,
+              senderName: m.senderName,
+              message: m.content,
+              isRead: m.isRead,
+              readAt: m.readAt,
+              createdAt: m.createdAt,
+            }));
+            const unreadCount = messages.filter((m: ParentCounselorMessage) => !m.isRead).length;
+            set({
+              messages,
+              unreadMessagesCount: unreadCount,
+              isLoading: false,
+            });
+          } else {
+            // Fall back to empty if API fails
+            set({
+              messages: [],
+              unreadMessagesCount: 0,
+              isLoading: false,
+            });
+          }
+        } catch (error) {
+          console.error('Failed to load messages:', error);
           set({
-            messages: [], // No demo messages for now
+            messages: [],
             unreadMessagesCount: 0,
             isLoading: false,
           });
-        } catch (error) {
-          set({ error: 'Failed to load messages', isLoading: false });
         }
       },
 
       sendMessage: async (studentId, message, reportId) => {
         try {
-          // TODO: Replace with API call
-          const newMessage: ParentCounselorMessage = {
-            id: `msg_${Date.now()}`,
-            reportId,
-            parentId: 'current_parent', // Would come from auth
+          const response = await api.post('/counselor/parent-messages', {
             studentId,
-            senderRole: 'parent',
-            message,
-            isRead: false,
-            createdAt: new Date().toISOString(),
-          };
-          set({ messages: [...get().messages, newMessage] });
+            content: message,
+            reportId,
+          });
+          if (response.success) {
+            const newMessage: ParentCounselorMessage = {
+              id: response.data.id,
+              reportId,
+              parentId: response.data.senderId,
+              studentId,
+              senderRole: 'parent',
+              message,
+              isRead: false,
+              createdAt: response.data.createdAt,
+            };
+            set({ messages: [...get().messages, newMessage] });
+          }
         } catch (error) {
           set({ error: 'Failed to send message' });
         }
@@ -513,7 +546,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
 
       markMessageAsRead: async (messageId) => {
         try {
-          // TODO: Replace with API call
+          await api.post(`/counselor/parent-messages/${messageId}/read`, {});
           set({
             messages: get().messages.map(m =>
               m.id === messageId ? { ...m, isRead: true, readAt: new Date().toISOString() } : m
@@ -529,26 +562,47 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
       loadSchedules: async () => {
         set({ isLoading: true, error: null });
         try {
-          // TODO: Replace with API call
-          await new Promise(resolve => setTimeout(resolve, 300));
-          set({ reportSchedules: [], isLoading: false });
+          const response = await api.get('/counselor/schedules');
+          if (response.success) {
+            const schedules = response.data.map((s: any) => ({
+              id: s.id,
+              studentId: s.studentId,
+              studentName: s.studentName,
+              parentId: s.parentId,
+              reportType: s.reportType,
+              frequency: s.frequency,
+              nextScheduledAt: s.nextScheduledAt,
+              isActive: s.isActive,
+              createdAt: s.createdAt,
+            }));
+            set({ reportSchedules: schedules, isLoading: false });
+          } else {
+            set({ reportSchedules: [], isLoading: false });
+          }
         } catch (error) {
-          set({ error: 'Failed to load schedules', isLoading: false });
+          console.error('Failed to load schedules:', error);
+          set({ reportSchedules: [], isLoading: false });
         }
       },
 
       createSchedule: async (studentId, reportType) => {
         try {
-          // TODO: Replace with API call
-          const newSchedule: ReportSchedule = {
-            id: `sched_${Date.now()}`,
+          const response = await api.post('/counselor/schedules', {
             studentId,
-            parentId: 'current_parent',
             reportType,
-            isActive: true,
-            createdAt: new Date().toISOString(),
-          };
-          set({ reportSchedules: [...get().reportSchedules, newSchedule] });
+            frequency: reportType === 'weekly' ? 'weekly' : reportType === 'monthly' ? 'monthly' : 'weekly',
+          });
+          if (response.success) {
+            const newSchedule: ReportSchedule = {
+              id: response.data.id,
+              studentId,
+              parentId: '',
+              reportType,
+              isActive: true,
+              createdAt: new Date().toISOString(),
+            };
+            set({ reportSchedules: [...get().reportSchedules, newSchedule] });
+          }
         } catch (error) {
           set({ error: 'Failed to create schedule' });
         }
@@ -556,7 +610,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
 
       updateSchedule: async (scheduleId, isActive) => {
         try {
-          // TODO: Replace with API call
+          await api.put(`/counselor/schedules/${scheduleId}`, { isActive });
           set({
             reportSchedules: get().reportSchedules.map(s =>
               s.id === scheduleId ? { ...s, isActive } : s
@@ -569,7 +623,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
 
       deleteSchedule: async (scheduleId) => {
         try {
-          // TODO: Replace with API call
+          await api.delete(`/counselor/schedules/${scheduleId}`);
           set({
             reportSchedules: get().reportSchedules.filter(s => s.id !== scheduleId),
           });
@@ -579,14 +633,30 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
       },
 
       // Session Actions
-      loadSessionSummaries: async (_studentId) => {
+      loadSessionSummaries: async (studentId) => {
         set({ isLoading: true, error: null });
         try {
-          // TODO: Replace with API call
-          await new Promise(resolve => setTimeout(resolve, 300));
-          set({ sessionSummaries: [], isLoading: false });
+          const params = studentId ? `?studentId=${studentId}` : '';
+          const response = await api.get(`/counselor/session-summaries${params}`);
+          if (response.success) {
+            const summaries = response.data.map((s: any) => ({
+              id: s.id,
+              counselorType: s.counselorType,
+              title: s.title,
+              messageCount: s.messageCount,
+              status: s.status,
+              lastMessage: s.lastMessage,
+              lastSentiment: s.lastSentiment,
+              createdAt: s.createdAt,
+              lastMessageAt: s.lastMessageAt,
+            }));
+            set({ sessionSummaries: summaries, isLoading: false });
+          } else {
+            set({ sessionSummaries: [], isLoading: false });
+          }
         } catch (error) {
-          set({ error: 'Failed to load session summaries', isLoading: false });
+          console.error('Failed to load session summaries:', error);
+          set({ sessionSummaries: [], isLoading: false });
         }
       },
 

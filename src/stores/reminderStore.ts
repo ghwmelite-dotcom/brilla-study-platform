@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ReminderSettings } from '@/types';
-import { api } from '@/lib/api';
+import { api } from '@/utils/api';
 
 interface ReminderState {
   settings: ReminderSettings | null;
@@ -43,7 +43,7 @@ export const useReminderStore = create<ReminderState>()(
               push_enabled: number;
               email_enabled: number;
             } | null;
-          }>('/reminders/settings');
+          }>('/notifications/reminders/settings');
 
           if (response.success && response.data?.settings) {
             const s = response.data.settings;
@@ -97,7 +97,7 @@ export const useReminderStore = create<ReminderState>()(
         try {
           const newSettings = { ...settings, ...updates };
 
-          const response = await api.post('/reminders/settings', {
+          const response = await api.post('/notifications/reminders/settings', {
             enabled: newSettings.enabled,
             daily_goal_reminder: newSettings.dailyGoalReminder,
             streak_reminder: newSettings.streakReminder,

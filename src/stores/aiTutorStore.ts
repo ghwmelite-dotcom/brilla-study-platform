@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { getApiUrl, getAuthHeaders } from '../utils/api';
 
 export interface ChatMessage {
   id: string;
@@ -6,6 +8,8 @@ export interface ChatMessage {
   content: string;
   timestamp: Date;
   isNew?: boolean;
+  messageType?: 'chat' | 'explanation' | 'hint' | 'step_by_step';
+  questionId?: string;
 }
 
 export interface UserPersonalization {
@@ -19,6 +23,18 @@ export interface UserPersonalization {
   encouragementStyle?: 'motivational' | 'analytical' | 'supportive';
 }
 
+export interface QuestionContext {
+  id?: string;
+  subject?: string;
+  topic?: string;
+  questionText: string;
+  options?: string[];
+  correctAnswer: string;
+  userAnswer?: string;
+  isCorrect?: boolean;
+  explanation?: string;
+}
+
 type ThinkingStage = 'idle' | 'thinking' | 'composing' | 'typing';
 
 interface AiTutorState {
@@ -30,20 +46,26 @@ interface AiTutorState {
   currentContext?: string;
   latestMessageId?: string;
   userPersonalization?: UserPersonalization;
+  conversationId?: string;
+  examType?: string;
+  subjectId?: string;
+  topicId?: string;
 
   // Actions
-  openChat: (context?: string) => void;
+  openChat: (context?: string, examType?: string, subjectId?: string, topicId?: string) => void;
   closeChat: () => void;
   sendMessage: (message: string, userId: string, userName?: string) => Promise<void>;
-  explainQuestion: (question: string, correctAnswer: string, userAnswer?: string, isCorrect?: boolean, userId?: string, context?: string) => Promise<string>;
-  getHint: (question: string, hintLevel: number, userId: string) => Promise<string>;
+  explainQuestion: (questionContext: QuestionContext, userId: string) => Promise<string>;
+  getHint: (questionContext: QuestionContext, hintLevel: number, userId: string) => Promise<{ hint: string; hasMoreHints: boolean }>;
+  getStepByStep: (questionContext: QuestionContext, userId: string) => Promise<string>;
   clearMessages: () => void;
   clearError: () => void;
   markMessageAsOld: (messageId: string) => void;
   setUserPersonalization: (data: Partial<UserPersonalization>) => void;
+  startNewConversation: () => void;
 }
 
-// Mock AI responses when API is unavailable - now with personalization
+// Mock AI responses when API is unavailable
 function generateMockResponse(message: string, userName?: string): string {
   const lowerMessage = message.toLowerCase();
   const greeting = userName ? `${userName}, ` : '';
@@ -122,6 +144,67 @@ I can assist you with:
 What specific topic or question would you like help with?${personalTouch}`;
 }
 
+// Mock explanation generator
+function generateMockExplanation(questionContext: QuestionContext, userName?: string): string {
+  const { isCorrect, correctAnswer, userAnswer, topic, subject } = questionContext;
+
+  if (isCorrect) {
+    return `${userName ? `Excellent work, ${userName}! ` : 'Excellent work! '}You got it right! 🎉
+
+The correct answer is **${correctAnswer}**.
+
+**Why this is correct:**
+This question is about ${topic || 'this topic'} in ${subject || 'this subject'}. Understanding the core concept here will help you with similar questions.
+
+**Key Takeaway:** Keep practicing questions like this to reinforce your understanding!`;
+  } else {
+    return `Good try! Let's learn from this. 📚
+
+The correct answer is **${correctAnswer}**${userAnswer ? `, but you selected **${userAnswer}**` : ''}.
+
+**Why the correct answer is right:**
+This relates to a key concept in ${topic || 'this topic'}. Take a moment to review this topic.
+
+**Common mistake:** Many students confuse this concept. The key is to remember the fundamental principle.
+
+**Study Tip:** Review ${topic || 'this topic'} in your textbook and try more practice questions.`;
+  }
+}
+
+// Mock hint generator
+function generateMockHint(hintLevel: number, topic?: string, userName?: string): string {
+  const hints = [
+    `${userName ? `${userName}, think` : 'Think'} about the fundamental concepts involved in ${topic || 'this topic'}. What principles might apply here?`,
+    `${userName ? `You've got this, ${userName}! ` : ''}Consider breaking the problem into smaller parts. What information do you already have? Look for key words in the question.`,
+    `${userName ? `Almost there, ${userName}! ` : ''}Focus on the key variables and relationships. The answer involves understanding how ${topic || 'the concept'} works in practice.`
+  ];
+
+  return hints[Math.min(hintLevel - 1, hints.length - 1)];
+}
+
+// Mock step-by-step generator
+function generateMockStepByStep(questionContext: QuestionContext): string {
+  const { questionText, correctAnswer, topic, subject } = questionContext;
+
+  return `Let's solve this step by step:
+
+**Problem:** ${questionText}
+
+**Step 1:** Identify what we're looking for
+We need to find the answer related to ${topic || 'this concept'}.
+
+**Step 2:** Recall the relevant concept
+Remember the key principle from ${subject || 'this subject'}.
+
+**Step 3:** Apply the concept
+Using what we know, we can work through the options.
+
+**Step 4:** Check our answer
+The correct answer is **${correctAnswer}**.
+
+**Why:** This follows from the core principle we applied. Make sure you understand each step before moving on!`;
+}
+
 // Safe JSON parse helper
 async function safeJsonParse(response: Response): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
   try {
@@ -152,219 +235,397 @@ function simulateThinking(
   }, 600 + Math.random() * 400);
 }
 
-export const useAiTutorStore = create<AiTutorState>()((set, get) => ({
-  isOpen: false,
-  messages: [],
-  isLoading: false,
-  thinkingStage: 'idle',
-  error: null,
-  currentContext: undefined,
-  latestMessageId: undefined,
-  userPersonalization: undefined,
-
-  openChat: (context) => {
-    set({ isOpen: true, currentContext: context });
-  },
-
-  closeChat: () => {
-    set({ isOpen: false });
-  },
-
-  setUserPersonalization: (data) => {
-    set((state) => ({
-      userPersonalization: { ...state.userPersonalization, ...data } as UserPersonalization,
-    }));
-  },
-
-  markMessageAsOld: (messageId) => {
-    set((state) => ({
-      messages: state.messages.map((m) =>
-        m.id === messageId ? { ...m, isNew: false } : m
-      ),
-    }));
-  },
-
-  sendMessage: async (message, userId, userName) => {
-    const userMessage: ChatMessage = {
-      id: `msg_${Date.now()}_user`,
-      role: 'user',
-      content: message,
-      timestamp: new Date(),
-      isNew: false,
-    };
-
-    // Mark all previous messages as old
-    set((state) => ({
-      messages: [...state.messages.map((m) => ({ ...m, isNew: false })), userMessage],
-      isLoading: true,
-      thinkingStage: 'thinking',
+export const useAiTutorStore = create<AiTutorState>()(
+  persist(
+    (set, get) => ({
+      isOpen: false,
+      messages: [],
+      isLoading: false,
+      thinkingStage: 'idle',
       error: null,
-    }));
+      currentContext: undefined,
+      latestMessageId: undefined,
+      userPersonalization: undefined,
+      conversationId: undefined,
+      examType: undefined,
+      subjectId: undefined,
+      topicId: undefined,
 
-    try {
-      let assistantContent: string;
-      const personalization = get().userPersonalization;
-      const displayName = userName || personalization?.preferredName || personalization?.name;
-
-      // Simulate thinking stages
-      await new Promise<void>((resolve) => {
-        simulateThinking(
-          (stage) => set({ thinkingStage: stage }),
-          resolve
-        );
-      });
-
-      try {
-        const response = await fetch('/api/ai/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message,
-            context: get().currentContext,
-            conversationHistory: get().messages.map((m) => ({
-              role: m.role,
-              content: m.content,
-            })),
-            userId,
-            userName: displayName,
-            userPersonalization: personalization,
-          }),
+      openChat: (context, examType, subjectId, topicId) => {
+        set({
+          isOpen: true,
+          currentContext: context,
+          examType,
+          subjectId,
+          topicId,
         });
+      },
 
-        const parsed = await safeJsonParse(response);
+      closeChat: () => {
+        set({ isOpen: false });
+      },
 
-        if (!parsed.success || !response.ok) {
-          // API unavailable or returned error - use mock response
-          assistantContent = generateMockResponse(message, displayName);
-        } else {
-          assistantContent = (parsed.data as { data?: { message?: string } })?.data?.message || generateMockResponse(message, displayName);
+      startNewConversation: () => {
+        set({
+          conversationId: undefined,
+          messages: [],
+          latestMessageId: undefined
+        });
+      },
+
+      setUserPersonalization: (data) => {
+        set((state) => ({
+          userPersonalization: { ...state.userPersonalization, ...data } as UserPersonalization,
+        }));
+      },
+
+      markMessageAsOld: (messageId) => {
+        set((state) => ({
+          messages: state.messages.map((m) =>
+            m.id === messageId ? { ...m, isNew: false } : m
+          ),
+        }));
+      },
+
+      sendMessage: async (message, userId, userName) => {
+        const userMessage: ChatMessage = {
+          id: `msg_${Date.now()}_user`,
+          role: 'user',
+          content: message,
+          timestamp: new Date(),
+          isNew: false,
+          messageType: 'chat',
+        };
+
+        // Mark all previous messages as old
+        set((state) => ({
+          messages: [...state.messages.map((m) => ({ ...m, isNew: false })), userMessage],
+          isLoading: true,
+          thinkingStage: 'thinking',
+          error: null,
+        }));
+
+        try {
+          let assistantContent: string;
+          let newConversationId: string | undefined;
+          const personalization = get().userPersonalization;
+          const displayName = userName || personalization?.preferredName || personalization?.name;
+
+          // Simulate thinking stages
+          await new Promise<void>((resolve) => {
+            simulateThinking(
+              (stage) => set({ thinkingStage: stage }),
+              resolve
+            );
+          });
+
+          try {
+            const response = await fetch(getApiUrl('/api/tutor/chat'), {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...getAuthHeaders(),
+                'x-user-id': userId,
+              },
+              body: JSON.stringify({
+                conversationId: get().conversationId,
+                message,
+                context: get().currentContext,
+                examType: get().examType,
+                subjectId: get().subjectId,
+                topicId: get().topicId,
+              }),
+            });
+
+            const parsed = await safeJsonParse(response);
+
+            if (!parsed.success || !response.ok) {
+              // API unavailable or returned error - use mock response
+              assistantContent = generateMockResponse(message, displayName);
+            } else {
+              const responseData = parsed.data as {
+                success: boolean;
+                data?: {
+                  conversationId?: string;
+                  assistantMessage?: { content?: string };
+                }
+              };
+
+              if (responseData.success && responseData.data) {
+                assistantContent = responseData.data.assistantMessage?.content || generateMockResponse(message, displayName);
+                newConversationId = responseData.data.conversationId;
+              } else {
+                assistantContent = generateMockResponse(message, displayName);
+              }
+            }
+          } catch {
+            // Network error or API unavailable - use mock response
+            assistantContent = generateMockResponse(message, displayName);
+          }
+
+          const messageId = `msg_${Date.now()}_assistant`;
+          const assistantMessage: ChatMessage = {
+            id: messageId,
+            role: 'assistant',
+            content: assistantContent,
+            timestamp: new Date(),
+            isNew: true,
+            messageType: 'chat',
+          };
+
+          set((state) => ({
+            messages: [...state.messages, assistantMessage],
+            isLoading: false,
+            thinkingStage: 'typing',
+            latestMessageId: messageId,
+            conversationId: newConversationId || state.conversationId,
+          }));
+
+          // Clear typing stage after a delay
+          setTimeout(() => {
+            set({ thinkingStage: 'idle' });
+          }, 500);
+
+        } catch {
+          // Final fallback - still provide a response
+          const displayName = userName || get().userPersonalization?.name;
+          const messageId = `msg_${Date.now()}_assistant`;
+          const fallbackMessage: ChatMessage = {
+            id: messageId,
+            role: 'assistant',
+            content: generateMockResponse(message, displayName),
+            timestamp: new Date(),
+            isNew: true,
+            messageType: 'chat',
+          };
+
+          set((state) => ({
+            messages: [...state.messages, fallbackMessage],
+            isLoading: false,
+            thinkingStage: 'idle',
+            error: null,
+            latestMessageId: messageId,
+          }));
         }
-      } catch {
-        // Network error or API unavailable - use mock response
-        assistantContent = generateMockResponse(message, displayName);
-      }
+      },
 
-      const messageId = `msg_${Date.now()}_assistant`;
-      const assistantMessage: ChatMessage = {
-        id: messageId,
-        role: 'assistant',
-        content: assistantContent,
-        timestamp: new Date(),
-        isNew: true,
-      };
+      explainQuestion: async (questionContext, userId) => {
+        set({ isLoading: true, thinkingStage: 'thinking', error: null });
 
-      set((state) => ({
-        messages: [...state.messages, assistantMessage],
-        isLoading: false,
-        thinkingStage: 'typing',
-        latestMessageId: messageId,
-      }));
-
-      // Clear typing stage after a delay
-      setTimeout(() => {
-        set({ thinkingStage: 'idle' });
-      }, 500);
-
-    } catch (error) {
-      // Final fallback - still provide a response
-      const displayName = userName || get().userPersonalization?.name;
-      const messageId = `msg_${Date.now()}_assistant`;
-      const fallbackMessage: ChatMessage = {
-        id: messageId,
-        role: 'assistant',
-        content: generateMockResponse(message, displayName),
-        timestamp: new Date(),
-        isNew: true,
-      };
-
-      set((state) => ({
-        messages: [...state.messages, fallbackMessage],
-        isLoading: false,
-        thinkingStage: 'idle',
-        error: null,
-        latestMessageId: messageId,
-      }));
-    }
-  },
-
-  explainQuestion: async (question, correctAnswer, userAnswer, isCorrect, userId, context) => {
-    set({ isLoading: true, thinkingStage: 'thinking', error: null });
-
-    try {
-      const response = await fetch('/api/ai/explain', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question,
-          correctAnswer,
-          userAnswer,
-          isCorrect,
-          userId,
-          context,
-          userPersonalization: get().userPersonalization,
-        }),
-      });
-
-      const parsed = await safeJsonParse(response);
-
-      if (!parsed.success || !response.ok) {
-        // Return mock explanation
         const userName = get().userPersonalization?.name;
-        const mockExplanation = isCorrect
-          ? `${userName ? `Excellent work, ${userName}! ` : 'Excellent work! '}The correct answer is "${correctAnswer}".\n\nYou demonstrated a good understanding of this concept. Keep practicing to reinforce your knowledge!`
-          : `The correct answer is "${correctAnswer}".\n\n${userAnswer ? `Your answer "${userAnswer}" was not quite right. ` : ''}This concept requires understanding the underlying principles.${userName ? ` Don't worry, ${userName} - ` : ' '}Review the topic and try similar questions to strengthen your understanding.`;
 
-        set({ isLoading: false, thinkingStage: 'idle' });
-        return mockExplanation;
-      }
+        try {
+          // Simulate thinking
+          await new Promise<void>((resolve) => {
+            simulateThinking(
+              (stage) => set({ thinkingStage: stage }),
+              resolve
+            );
+          });
 
-      set({ isLoading: false, thinkingStage: 'idle' });
-      return (parsed.data as { data?: { explanation?: string } })?.data?.explanation ||
-        `The correct answer is "${correctAnswer}". Keep practicing!`;
-    } catch {
-      const userName = get().userPersonalization?.name;
-      const fallbackExplanation = `The correct answer is "${correctAnswer}".\n\n${userName ? `${userName}, this` : 'This'} is a common question type. Make sure you understand the key concepts and practice similar problems.`;
-      set({ isLoading: false, thinkingStage: 'idle' });
-      return fallbackExplanation;
+          const response = await fetch(getApiUrl('/api/tutor/explain'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...getAuthHeaders(),
+              'x-user-id': userId,
+            },
+            body: JSON.stringify({
+              questionId: questionContext.id,
+              questionText: questionContext.questionText,
+              subject: questionContext.subject,
+              topic: questionContext.topic,
+              options: questionContext.options,
+              correctAnswer: questionContext.correctAnswer,
+              userAnswer: questionContext.userAnswer,
+              isCorrect: questionContext.isCorrect,
+              existingExplanation: questionContext.explanation,
+              conversationId: get().conversationId,
+            }),
+          });
+
+          const parsed = await safeJsonParse(response);
+
+          if (!parsed.success || !response.ok) {
+            set({ isLoading: false, thinkingStage: 'idle' });
+            return generateMockExplanation(questionContext, userName);
+          }
+
+          const responseData = parsed.data as {
+            success: boolean;
+            data?: {
+              explanation?: string;
+              conversationId?: string;
+            };
+          };
+
+          if (responseData.success && responseData.data?.explanation) {
+            if (responseData.data.conversationId) {
+              set({ conversationId: responseData.data.conversationId });
+            }
+            set({ isLoading: false, thinkingStage: 'idle' });
+            return responseData.data.explanation;
+          }
+
+          set({ isLoading: false, thinkingStage: 'idle' });
+          return generateMockExplanation(questionContext, userName);
+        } catch {
+          set({ isLoading: false, thinkingStage: 'idle' });
+          return generateMockExplanation(questionContext, userName);
+        }
+      },
+
+      getHint: async (questionContext, hintLevel, userId) => {
+        set({ isLoading: true, thinkingStage: 'thinking', error: null });
+
+        const userName = get().userPersonalization?.name;
+
+        try {
+          // Simulate thinking
+          await new Promise<void>((resolve) => {
+            simulateThinking(
+              (stage) => set({ thinkingStage: stage }),
+              resolve
+            );
+          });
+
+          const response = await fetch(getApiUrl('/api/tutor/hint'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...getAuthHeaders(),
+              'x-user-id': userId,
+            },
+            body: JSON.stringify({
+              questionId: questionContext.id,
+              questionText: questionContext.questionText,
+              subject: questionContext.subject,
+              topic: questionContext.topic,
+              options: questionContext.options,
+              correctAnswer: questionContext.correctAnswer,
+              hintLevel,
+              conversationId: get().conversationId,
+            }),
+          });
+
+          const parsed = await safeJsonParse(response);
+
+          if (!parsed.success || !response.ok) {
+            set({ isLoading: false, thinkingStage: 'idle' });
+            return {
+              hint: generateMockHint(hintLevel, questionContext.topic, userName),
+              hasMoreHints: hintLevel < 3,
+            };
+          }
+
+          const responseData = parsed.data as {
+            success: boolean;
+            data?: {
+              hint?: string;
+              hasMoreHints?: boolean;
+              conversationId?: string;
+            };
+          };
+
+          if (responseData.success && responseData.data?.hint) {
+            if (responseData.data.conversationId) {
+              set({ conversationId: responseData.data.conversationId });
+            }
+            set({ isLoading: false, thinkingStage: 'idle' });
+            return {
+              hint: responseData.data.hint,
+              hasMoreHints: responseData.data.hasMoreHints ?? hintLevel < 3,
+            };
+          }
+
+          set({ isLoading: false, thinkingStage: 'idle' });
+          return {
+            hint: generateMockHint(hintLevel, questionContext.topic, userName),
+            hasMoreHints: hintLevel < 3,
+          };
+        } catch {
+          set({ isLoading: false, thinkingStage: 'idle' });
+          return {
+            hint: generateMockHint(hintLevel, questionContext.topic, userName),
+            hasMoreHints: hintLevel < 3,
+          };
+        }
+      },
+
+      getStepByStep: async (questionContext, userId) => {
+        set({ isLoading: true, thinkingStage: 'thinking', error: null });
+
+        try {
+          // Simulate thinking
+          await new Promise<void>((resolve) => {
+            simulateThinking(
+              (stage) => set({ thinkingStage: stage }),
+              resolve
+            );
+          });
+
+          const response = await fetch(getApiUrl('/api/tutor/step-by-step'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...getAuthHeaders(),
+              'x-user-id': userId,
+            },
+            body: JSON.stringify({
+              questionId: questionContext.id,
+              questionText: questionContext.questionText,
+              subject: questionContext.subject,
+              topic: questionContext.topic,
+              options: questionContext.options,
+              correctAnswer: questionContext.correctAnswer,
+              explanation: questionContext.explanation,
+              conversationId: get().conversationId,
+            }),
+          });
+
+          const parsed = await safeJsonParse(response);
+
+          if (!parsed.success || !response.ok) {
+            set({ isLoading: false, thinkingStage: 'idle' });
+            return generateMockStepByStep(questionContext);
+          }
+
+          const responseData = parsed.data as {
+            success: boolean;
+            data?: {
+              solution?: string;
+              conversationId?: string;
+            };
+          };
+
+          if (responseData.success && responseData.data?.solution) {
+            if (responseData.data.conversationId) {
+              set({ conversationId: responseData.data.conversationId });
+            }
+            set({ isLoading: false, thinkingStage: 'idle' });
+            return responseData.data.solution;
+          }
+
+          set({ isLoading: false, thinkingStage: 'idle' });
+          return generateMockStepByStep(questionContext);
+        } catch {
+          set({ isLoading: false, thinkingStage: 'idle' });
+          return generateMockStepByStep(questionContext);
+        }
+      },
+
+      clearMessages: () => {
+        set({ messages: [], latestMessageId: undefined, conversationId: undefined });
+      },
+
+      clearError: () => set({ error: null }),
+    }),
+    {
+      name: 'brilla-ai-tutor',
+      partialize: (state) => ({
+        userPersonalization: state.userPersonalization,
+        conversationId: state.conversationId,
+      }),
     }
-  },
-
-  getHint: async (question, hintLevel, userId) => {
-    set({ isLoading: true, thinkingStage: 'thinking', error: null });
-
-    const userName = get().userPersonalization?.name;
-    const mockHints = [
-      `${userName ? `${userName}, think` : 'Think'} about the fundamental concepts involved. What principles might apply here?`,
-      `${userName ? `You've got this, ${userName}! ` : ''}Consider breaking the problem into smaller parts. What information do you already have?`,
-      `${userName ? `Almost there, ${userName}! ` : ''}Focus on the key variables and relationships. What formula or concept connects them?`
-    ];
-
-    try {
-      const response = await fetch('/api/ai/hint', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, hintLevel, userId }),
-      });
-
-      const parsed = await safeJsonParse(response);
-
-      if (!parsed.success || !response.ok) {
-        set({ isLoading: false, thinkingStage: 'idle' });
-        return mockHints[Math.min(hintLevel - 1, mockHints.length - 1)];
-      }
-
-      set({ isLoading: false, thinkingStage: 'idle' });
-      return (parsed.data as { data?: { hint?: string } })?.data?.hint ||
-        mockHints[Math.min(hintLevel - 1, mockHints.length - 1)];
-    } catch {
-      set({ isLoading: false, thinkingStage: 'idle' });
-      return mockHints[Math.min(hintLevel - 1, mockHints.length - 1)];
-    }
-  },
-
-  clearMessages: () => {
-    set({ messages: [], latestMessageId: undefined });
-  },
-
-  clearError: () => set({ error: null }),
-}));
+  )
+);

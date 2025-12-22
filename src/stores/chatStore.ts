@@ -7,12 +7,15 @@ import type {
   CreateRoomData,
   ChatRoomType,
 } from '@/types';
+import { getApiUrl, getAuthHeaders } from '../utils/api';
 
 interface ChatState {
   // Connection state
   isConnected: boolean;
   connectionError: string | null;
   ws: WebSocket | null;
+  pollingInterval: NodeJS.Timeout | null;
+  lastPollTime: string | null;
 
   // Data
   rooms: ChatRoom[];
@@ -58,6 +61,11 @@ interface ChatState {
 
   // Typing indicators
   setTyping: (isTyping: boolean) => void;
+
+  // Polling
+  startPolling: () => void;
+  stopPolling: () => void;
+  pollForUpdates: () => Promise<void>;
 
   // Utility
   markAsRead: (roomId: string) => void;
@@ -250,54 +258,95 @@ export const useChatStore = create<ChatState>()(
       fetchRooms: async () => {
         set({ isLoadingRooms: true });
         try {
-          // TODO: Replace with API call in production
-          // const response = await fetch('/api/chat/rooms');
-          // const data = await response.json();
-          // set({ rooms: data.rooms });
-          await new Promise((resolve) => setTimeout(resolve, 300));
-
-          // Load demo rooms if no rooms exist
-          const { rooms } = get();
-          if (rooms.length === 0) {
+          const user = getCurrentUser();
+          if (!user?.id) {
+            // Use demo rooms if not authenticated
             const demoRooms = getDemoRooms();
+            set({ rooms: demoRooms, isLoadingRooms: false, isConnected: true });
+            return;
+          }
+
+          const response = await fetch(getApiUrl('/api/chat/rooms'), {
+            headers: {
+              ...getAuthHeaders(),
+              'x-user-id': user.id,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch rooms');
+          }
+
+          const data = await response.json();
+
+          if (data.success && data.data) {
             set({
-              rooms: demoRooms,
+              rooms: data.data,
               isLoadingRooms: false,
               isConnected: true,
             });
           } else {
+            // Fallback to demo rooms
+            const demoRooms = getDemoRooms();
+            set({ rooms: demoRooms, isLoadingRooms: false, isConnected: true });
+          }
+        } catch {
+          // Fallback to demo rooms on error
+          const { rooms } = get();
+          if (rooms.length === 0) {
+            const demoRooms = getDemoRooms();
+            set({ rooms: demoRooms, isLoadingRooms: false, isConnected: true });
+          } else {
             set({ isLoadingRooms: false, isConnected: true });
           }
-        } catch (error) {
-          set({
-            connectionError: 'Failed to load rooms',
-            isLoadingRooms: false,
-          });
         }
       },
 
       fetchMessages: async (roomId: string) => {
         set({ isLoadingMessages: true });
         try {
-          // TODO: Replace with API call in production
-          // const response = await fetch(`/api/chat/rooms/${roomId}/messages`);
-          // const data = await response.json();
-          await new Promise((resolve) => setTimeout(resolve, 200));
+          const user = getCurrentUser();
+          if (!user?.id) {
+            const { messagesByRoom } = get();
+            if (!messagesByRoom[roomId]) {
+              set({ messagesByRoom: { ...messagesByRoom, [roomId]: [] } });
+            }
+            set({ isLoadingMessages: false });
+            return;
+          }
 
+          const response = await fetch(getApiUrl(`/api/chat/rooms/${roomId}/messages`), {
+            headers: {
+              ...getAuthHeaders(),
+              'x-user-id': user.id,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch messages');
+          }
+
+          const data = await response.json();
           const { messagesByRoom } = get();
 
-          // Initialize empty messages array for the room if not exists
-          if (!messagesByRoom[roomId]) {
+          if (data.success && data.data) {
             set({
-              messagesByRoom: { ...messagesByRoom, [roomId]: [] },
+              messagesByRoom: { ...messagesByRoom, [roomId]: data.data },
+              isLoadingMessages: false,
+              lastPollTime: new Date().toISOString(),
             });
+          } else {
+            if (!messagesByRoom[roomId]) {
+              set({ messagesByRoom: { ...messagesByRoom, [roomId]: [] } });
+            }
+            set({ isLoadingMessages: false });
+          }
+        } catch {
+          const { messagesByRoom } = get();
+          if (!messagesByRoom[roomId]) {
+            set({ messagesByRoom: { ...messagesByRoom, [roomId]: [] } });
           }
           set({ isLoadingMessages: false });
-        } catch (error) {
-          set({
-            connectionError: 'Failed to load messages',
-            isLoadingMessages: false,
-          });
         }
       },
 
@@ -313,13 +362,42 @@ export const useChatStore = create<ChatState>()(
         const user = getCurrentUser();
         const userId = user?.id || 'anonymous';
 
-        // TODO: Replace with API call
-        // const response = await fetch('/api/chat/rooms', {
-        //   method: 'POST',
-        //   body: JSON.stringify(data),
-        // });
-        // const newRoom = await response.json();
+        try {
+          if (user?.id) {
+            const response = await fetch(getApiUrl('/api/chat/rooms'), {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...getAuthHeaders(),
+                'x-user-id': user.id,
+              },
+              body: JSON.stringify(data),
+            });
 
+            if (response.ok) {
+              const result = await response.json();
+              if (result.success && result.data) {
+                const newRoom: ChatRoom = {
+                  ...result.data,
+                  memberCount: 1,
+                  unreadCount: 0,
+                  myRole: 'owner',
+                };
+
+                set((state) => ({
+                  rooms: [newRoom, ...state.rooms],
+                  messagesByRoom: { ...state.messagesByRoom, [newRoom.id]: [] },
+                }));
+
+                return newRoom;
+              }
+            }
+          }
+        } catch {
+          // Fallback to local creation
+        }
+
+        // Fallback: create room locally
         const newRoom: ChatRoom = {
           id: `room_${Date.now()}`,
           name: data.name,
@@ -346,18 +424,54 @@ export const useChatStore = create<ChatState>()(
       },
 
       joinRoom: async (roomId: string) => {
-        // TODO: API call to join room
+        const user = getCurrentUser();
+
+        try {
+          if (user?.id) {
+            const response = await fetch(getApiUrl(`/api/chat/rooms/${roomId}/join`), {
+              method: 'POST',
+              headers: {
+                ...getAuthHeaders(),
+                'x-user-id': user.id,
+              },
+            });
+
+            if (response.ok) {
+              // Refresh rooms to get updated data
+              get().fetchRooms();
+              return;
+            }
+          }
+        } catch {
+          // Fallback to local update
+        }
+
         set((state) => ({
           rooms: state.rooms.map((room) =>
             room.id === roomId
-              ? { ...room, memberCount: (room.memberCount || 0) + 1 }
+              ? { ...room, memberCount: (room.memberCount || 0) + 1, myRole: 'member' }
               : room
           ),
         }));
       },
 
       leaveRoom: async (roomId: string) => {
-        // TODO: API call to leave room
+        const user = getCurrentUser();
+
+        try {
+          if (user?.id) {
+            await fetch(getApiUrl(`/api/chat/rooms/${roomId}/leave`), {
+              method: 'POST',
+              headers: {
+                ...getAuthHeaders(),
+                'x-user-id': user.id,
+              },
+            });
+          }
+        } catch {
+          // Continue with local update
+        }
+
         set((state) => ({
           rooms: state.rooms.filter((room) => room.id !== roomId),
           activeRoomId: state.activeRoomId === roomId ? null : state.activeRoomId,
@@ -368,7 +482,7 @@ export const useChatStore = create<ChatState>()(
         const currentUser = getCurrentUser();
         const currentUserId = currentUser?.id || 'anonymous';
 
-        // Check if DM already exists
+        // Check if DM already exists locally
         const existingDM = get().rooms.find(
           (room) => room.type === 'dm' && room.otherUser?.id === userId
         );
@@ -377,13 +491,56 @@ export const useChatStore = create<ChatState>()(
           return existingDM;
         }
 
-        // TODO: Replace with API call
-        // const response = await fetch('/api/chat/dm', {
-        //   method: 'POST',
-        //   body: JSON.stringify({ userId }),
-        // });
-        // const newRoom = await response.json();
+        try {
+          if (currentUser?.id) {
+            const response = await fetch(getApiUrl('/api/chat/dm'), {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...getAuthHeaders(),
+                'x-user-id': currentUser.id,
+              },
+              body: JSON.stringify({ targetUserId: userId }),
+            });
 
+            if (response.ok) {
+              const result = await response.json();
+              if (result.success && result.data) {
+                const newRoom: ChatRoom = {
+                  id: result.data.roomId,
+                  type: 'dm',
+                  isArchived: false,
+                  maxMembers: 2,
+                  createdBy: currentUserId,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                  memberCount: 2,
+                  unreadCount: 0,
+                  otherUser: result.data.otherUser,
+                };
+
+                if (!result.data.isNew) {
+                  // DM already existed on server
+                  set({ activeRoomId: newRoom.id });
+                  get().fetchRooms(); // Refresh to get the room
+                  return newRoom;
+                }
+
+                set((state) => ({
+                  rooms: [newRoom, ...state.rooms],
+                  messagesByRoom: { ...state.messagesByRoom, [newRoom.id]: [] },
+                  activeRoomId: newRoom.id,
+                }));
+
+                return newRoom;
+              }
+            }
+          }
+        } catch {
+          // Fallback to local creation
+        }
+
+        // Fallback: create DM locally
         const newRoom: ChatRoom = {
           id: `dm_${Date.now()}`,
           type: 'dm',
@@ -421,15 +578,10 @@ export const useChatStore = create<ChatState>()(
 
         set({ isSendingMessage: true });
 
-        // TODO: Replace with API call
-        // const response = await fetch(`/api/chat/rooms/${activeRoomId}/messages`, {
-        //   method: 'POST',
-        //   body: JSON.stringify({ content, replyToId }),
-        // });
-        // const newMessage = await response.json();
-
+        // Create optimistic message
+        const tempId = `msg_${Date.now()}`;
         const newMessage: ChatMessage = {
-          id: `msg_${Date.now()}`,
+          id: tempId,
           roomId: activeRoomId,
           senderId: userId,
           content: content.trim(),
@@ -450,6 +602,7 @@ export const useChatStore = create<ChatState>()(
           reactions: [],
         };
 
+        // Optimistically add message
         const roomMessages = messagesByRoom[activeRoomId] || [];
         set({
           messagesByRoom: {
@@ -457,8 +610,43 @@ export const useChatStore = create<ChatState>()(
             [activeRoomId]: [...roomMessages, newMessage],
           },
           replyingTo: null,
-          isSendingMessage: false,
         });
+
+        try {
+          if (user?.id) {
+            const response = await fetch(getApiUrl(`/api/chat/rooms/${activeRoomId}/messages`), {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...getAuthHeaders(),
+                'x-user-id': user.id,
+              },
+              body: JSON.stringify({
+                content: content.trim(),
+                replyToId: replyToId || replyingTo?.id,
+              }),
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              if (result.success && result.data) {
+                // Replace temp message with server response
+                set((state) => ({
+                  messagesByRoom: {
+                    ...state.messagesByRoom,
+                    [activeRoomId]: state.messagesByRoom[activeRoomId].map((msg) =>
+                      msg.id === tempId ? { ...result.data, reactions: [] } : msg
+                    ),
+                  },
+                }));
+              }
+            }
+          }
+        } catch {
+          // Keep optimistic message on error
+        }
+
+        set({ isSendingMessage: false });
 
         // Update last message in room
         set((state) => ({
@@ -474,7 +662,9 @@ export const useChatStore = create<ChatState>()(
         const { activeRoomId, messagesByRoom } = get();
         if (!activeRoomId) return;
 
-        // TODO: API call to edit message
+        const user = getCurrentUser();
+
+        // Optimistic update
         set({
           messagesByRoom: {
             ...messagesByRoom,
@@ -485,23 +675,55 @@ export const useChatStore = create<ChatState>()(
             ),
           },
         });
+
+        try {
+          if (user?.id) {
+            await fetch(getApiUrl(`/api/chat/messages/${messageId}`), {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                ...getAuthHeaders(),
+                'x-user-id': user.id,
+              },
+              body: JSON.stringify({ content: newContent }),
+            });
+          }
+        } catch {
+          // Keep optimistic update
+        }
       },
 
       deleteMessage: async (messageId: string) => {
         const { activeRoomId, messagesByRoom } = get();
         if (!activeRoomId) return;
 
-        // TODO: API call to delete message
+        const user = getCurrentUser();
+
+        // Optimistic update
         set({
           messagesByRoom: {
             ...messagesByRoom,
             [activeRoomId]: messagesByRoom[activeRoomId].map((msg) =>
               msg.id === messageId
-                ? { ...msg, isDeleted: true, content: 'This message was deleted' }
+                ? { ...msg, isDeleted: true, content: '[Message deleted]' }
                 : msg
             ),
           },
         });
+
+        try {
+          if (user?.id) {
+            await fetch(getApiUrl(`/api/chat/messages/${messageId}`), {
+              method: 'DELETE',
+              headers: {
+                ...getAuthHeaders(),
+                'x-user-id': user.id,
+              },
+            });
+          }
+        } catch {
+          // Keep optimistic update
+        }
       },
 
       addReaction: (messageId: string, emoji: string) => {
@@ -575,8 +797,96 @@ export const useChatStore = create<ChatState>()(
         });
       },
 
-      setTyping: (_isTyping: boolean) => {
-        // TODO: Send typing indicator via WebSocket in production
+      setTyping: async (isTyping: boolean) => {
+        const { activeRoomId } = get();
+        if (!activeRoomId || !isTyping) return;
+
+        const user = getCurrentUser();
+        if (!user?.id) return;
+
+        try {
+          await fetch(getApiUrl(`/api/chat/rooms/${activeRoomId}/typing`), {
+            method: 'POST',
+            headers: {
+              ...getAuthHeaders(),
+              'x-user-id': user.id,
+            },
+          });
+        } catch {
+          // Ignore typing indicator errors
+        }
+      },
+
+      // Polling functions
+      startPolling: () => {
+        const { pollingInterval } = get();
+        if (pollingInterval) return; // Already polling
+
+        const interval = setInterval(() => {
+          get().pollForUpdates();
+        }, 3000); // Poll every 3 seconds
+
+        set({ pollingInterval: interval });
+      },
+
+      stopPolling: () => {
+        const { pollingInterval } = get();
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+          set({ pollingInterval: null });
+        }
+      },
+
+      pollForUpdates: async () => {
+        const { activeRoomId, lastPollTime, messagesByRoom } = get();
+        if (!activeRoomId) return;
+
+        const user = getCurrentUser();
+        if (!user?.id) return;
+
+        try {
+          const since = lastPollTime || new Date(Date.now() - 60000).toISOString();
+          const response = await fetch(
+            getApiUrl(`/api/chat/rooms/${activeRoomId}/poll?since=${encodeURIComponent(since)}`),
+            {
+              headers: {
+                ...getAuthHeaders(),
+                'x-user-id': user.id,
+              },
+            }
+          );
+
+          if (!response.ok) return;
+
+          const result = await response.json();
+          if (!result.success || !result.data) return;
+
+          const { messages, typingUsers, serverTime } = result.data;
+
+          // Add new messages (avoid duplicates)
+          if (messages && messages.length > 0) {
+            const currentMessages = messagesByRoom[activeRoomId] || [];
+            const currentIds = new Set(currentMessages.map((m) => m.id));
+            const newMessages = messages.filter((m: ChatMessage) => !currentIds.has(m.id));
+
+            if (newMessages.length > 0) {
+              set((state) => ({
+                messagesByRoom: {
+                  ...state.messagesByRoom,
+                  [activeRoomId]: [...currentMessages, ...newMessages],
+                },
+              }));
+            }
+          }
+
+          // Update typing users
+          set({
+            typingUsers: typingUsers || [],
+            lastPollTime: serverTime || new Date().toISOString(),
+          });
+        } catch {
+          // Ignore polling errors
+        }
       },
 
       markAsRead: (roomId: string) => {

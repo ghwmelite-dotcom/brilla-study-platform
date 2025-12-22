@@ -67,6 +67,7 @@ const StudyGroupsPage = lazy(() => import('@/pages/StudyGroupsPage'));
 const LeaderboardPage = lazy(() => import('@/pages/Leaderboard'));
 const LibraryPage = lazy(() => import('@/pages/Library').then(m => ({ default: m.LibraryPage })));
 const CounselorPage = lazy(() => import('@/pages/Counselor').then(m => ({ default: m.CounselorPage })));
+const ModerationDashboard = lazy(() => import('@/pages/ModerationDashboard'));
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -742,6 +743,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <LazyPage><AuditLog /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="admin/moderation"
+            element={
+              <ProtectedRoute>
+                <LazyPage><ModerationDashboard /></LazyPage>
               </ProtectedRoute>
             }
           />

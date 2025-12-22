@@ -4,6 +4,10 @@ import { jwt, sign, verify } from 'hono/jwt';
 import type { JWTPayload } from 'hono/utils/jwt/types';
 import { libraryApp } from './library';
 import { counselorApp } from './counselor';
+import { notificationsApp } from './notifications';
+import { tutorApp } from './tutor';
+import { chatApp } from './chat';
+import { moderationApp } from './moderation';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -6705,6 +6709,18 @@ app.route('/api/library', libraryApp);
 
 // Mount Counselor routes
 app.route('/api/counselor', counselorApp);
+
+// Mount Notifications routes
+app.route('/api/notifications', notificationsApp);
+
+// Mount AI Tutor routes
+app.route('/api/tutor', tutorApp);
+
+// Mount Chat routes
+app.route('/api/chat', chatApp);
+
+// Mount Moderation routes
+app.route('/api/moderation', moderationApp);
 
 // Mount protected routes (must be after all protectedApp routes are defined)
 app.route('/api', protectedApp);
