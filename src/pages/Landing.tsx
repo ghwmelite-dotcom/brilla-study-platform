@@ -10,7 +10,6 @@ import {
   ArrowRight,
   Star,
   CheckCircle2,
-  Play,
   GraduationCap,
   Award,
   TrendingUp,
@@ -785,8 +784,8 @@ export function LandingPage() {
 
           {/* Subtitle */}
           <p className="text-xl md:text-2xl text-white/70 max-w-3xl mx-auto mb-12 leading-relaxed">
-            Join <span className="text-white font-semibold">50,000+</span> students mastering exams with
-            AI-powered practice, past papers, and competition simulations.
+            Master your exams with AI-powered practice, comprehensive past papers,
+            and realistic competition simulations.
           </p>
 
           {/* CTA Buttons */}
@@ -798,11 +797,9 @@ export function LandingPage() {
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </div>
             </button>
-            <button className="group flex items-center gap-3 px-8 py-4 glass rounded-full font-medium text-white hover:bg-white/10 transition-all">
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                <Play className="w-5 h-5 text-white ml-0.5" />
-              </div>
-              <span>Watch Demo</span>
+            <button onClick={() => handleOpenAuth('login')} className="group flex items-center gap-3 px-8 py-4 glass rounded-full font-medium text-white hover:bg-white/10 transition-all">
+              <span>Sign In</span>
+              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
 
