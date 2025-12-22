@@ -3157,6 +3157,125 @@ protectedApp.put('/users/me', userAuth, async (c) => {
   }
 });
 
+// Upload avatar
+protectedApp.post('/users/me/avatar', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+
+  try {
+    // Check if R2 bucket is configured
+    if (!c.env.LIBRARY_BUCKET) {
+      return c.json({ success: false, error: 'Storage not configured' }, 500);
+    }
+
+    // Parse FormData
+    const formData = await c.req.formData();
+    const file = formData.get('avatar') as File | null;
+
+    if (!file) {
+      return c.json({ success: false, error: 'No file provided' }, 400);
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      return c.json({ success: false, error: 'Invalid file type. Please upload a JPEG, PNG, WebP, or GIF image.' }, 400);
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      return c.json({ success: false, error: 'File too large. Maximum size is 5MB.' }, 400);
+    }
+
+    // Get current avatar URL to delete old file
+    const currentUser = await c.env.DB.prepare(
+      'SELECT avatar_url FROM users WHERE id = ?'
+    ).bind(user.userId).first();
+
+    // Delete old avatar from R2 if exists
+    if (currentUser?.avatar_url) {
+      const oldUrl = currentUser.avatar_url as string;
+      const oldKey = oldUrl.split('/files/')[1];
+      if (oldKey) {
+        try {
+          await c.env.LIBRARY_BUCKET.delete(oldKey);
+        } catch (e) {
+          console.error('Failed to delete old avatar:', e);
+        }
+      }
+    }
+
+    // Generate unique file key
+    const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    const fileKey = `avatars/${user.userId}_${Date.now()}.${fileExtension}`;
+
+    // Upload to R2
+    await c.env.LIBRARY_BUCKET.put(fileKey, file.stream(), {
+      httpMetadata: {
+        contentType: file.type,
+      },
+    });
+
+    // Generate avatar URL
+    const avatarUrl = `https://brilla-api.ghwmelite.workers.dev/api/library/files/${fileKey}`;
+
+    // Update database
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        avatar_url = ?,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(avatarUrl, user.userId).run();
+
+    return c.json({ success: true, data: { avatarUrl } });
+  } catch (error) {
+    console.error('Avatar upload error:', error);
+    return c.json({ success: false, error: 'Failed to upload avatar' }, 500);
+  }
+});
+
+// Delete avatar
+protectedApp.delete('/users/me/avatar', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+
+  try {
+    // Get current avatar URL
+    const currentUser = await c.env.DB.prepare(
+      'SELECT avatar_url FROM users WHERE id = ?'
+    ).bind(user.userId).first();
+
+    if (!currentUser?.avatar_url) {
+      return c.json({ success: true, data: { message: 'No avatar to delete' } });
+    }
+
+    // Delete from R2 if bucket is configured
+    if (c.env.LIBRARY_BUCKET) {
+      const oldUrl = currentUser.avatar_url as string;
+      const oldKey = oldUrl.split('/files/')[1];
+      if (oldKey) {
+        try {
+          await c.env.LIBRARY_BUCKET.delete(oldKey);
+        } catch (e) {
+          console.error('Failed to delete avatar from R2:', e);
+        }
+      }
+    }
+
+    // Update database
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        avatar_url = NULL,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(user.userId).run();
+
+    return c.json({ success: true, data: { message: 'Avatar deleted successfully' } });
+  } catch (error) {
+    console.error('Avatar delete error:', error);
+    return c.json({ success: false, error: 'Failed to delete avatar' }, 500);
+  }
+});
+
 // Change password
 protectedApp.post('/users/me/change-password', userAuth, async (c) => {
   const user = c.get('user') as UserPayload;

@@ -210,10 +210,18 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
                   onClick={handleProfileToggle}
                   className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-neutral-100"
                 >
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">
-                      {user.name.charAt(0).toUpperCase()}
-                    </span>
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center overflow-hidden">
+                    {user.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt={user.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-white text-sm font-medium">
+                        {user.name.charAt(0).toUpperCase()}
+                      </span>
+                    )}
                   </div>
                   <ChevronDown className="w-4 h-4 text-neutral-500 hidden sm:block" />
                 </button>

@@ -17,6 +17,8 @@ import {
   Moon,
   Monitor,
   Type,
+  Camera,
+  Trash2,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/lib/api';
@@ -38,6 +40,10 @@ export default function Settings() {
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
+
+  // Avatar state
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
 
   // Password form state
   const [passwordForm, setPasswordForm] = useState({
@@ -114,6 +120,76 @@ export default function Settings() {
       setProfileError(error instanceof Error ? error.message : 'Failed to update profile');
     } finally {
       setProfileSaving(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      setAvatarError('Please upload a JPEG, PNG, WebP, or GIF image');
+      return;
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setAvatarError('Image must be smaller than 5MB');
+      return;
+    }
+
+    setAvatarUploading(true);
+    setAvatarError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://brilla-api.ghwmelite.workers.dev/api'}/users/me/avatar`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('brilla-token') || ''}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to upload avatar');
+      }
+
+      // Update local state
+      updateProfile({ avatarUrl: data.data.avatarUrl });
+    } catch (error) {
+      setAvatarError(error instanceof Error ? error.message : 'Failed to upload avatar');
+    } finally {
+      setAvatarUploading(false);
+      // Reset file input
+      e.target.value = '';
+    }
+  };
+
+  const handleAvatarRemove = async () => {
+    setAvatarUploading(true);
+    setAvatarError(null);
+
+    try {
+      const response = await api.delete('/users/me/avatar');
+
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to remove avatar');
+      }
+
+      // Update local state
+      updateProfile({ avatarUrl: undefined });
+    } catch (error) {
+      setAvatarError(error instanceof Error ? error.message : 'Failed to remove avatar');
+    } finally {
+      setAvatarUploading(false);
     }
   };
 
@@ -293,6 +369,62 @@ export default function Settings() {
                       Profile updated successfully!
                     </div>
                   )}
+
+                  {/* Avatar Section */}
+                  <div className="flex items-center gap-6 pb-6 border-b border-neutral-200">
+                    <div className="relative">
+                      {user.avatarUrl ? (
+                        <img
+                          src={user.avatarUrl}
+                          alt={user.name}
+                          className="w-20 h-20 rounded-full object-cover border-2 border-neutral-200"
+                        />
+                      ) : (
+                        <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center border-2 border-neutral-200">
+                          <span className="text-2xl font-semibold text-indigo-600">
+                            {user.name?.charAt(0).toUpperCase() || 'U'}
+                          </span>
+                        </div>
+                      )}
+                      {avatarUploading && (
+                        <div className="absolute inset-0 bg-white/80 rounded-full flex items-center justify-center">
+                          <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <p className="text-sm font-medium text-neutral-700">Profile Photo</p>
+                      <div className="flex items-center gap-2">
+                        <label className="cursor-pointer">
+                          <span className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium transition-colors">
+                            <Camera className="w-4 h-4" />
+                            Upload Photo
+                          </span>
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,image/gif"
+                            className="hidden"
+                            onChange={handleAvatarUpload}
+                            disabled={avatarUploading}
+                          />
+                        </label>
+                        {user.avatarUrl && (
+                          <button
+                            onClick={handleAvatarRemove}
+                            disabled={avatarUploading}
+                            className="inline-flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-xs text-neutral-400">JPEG, PNG, WebP or GIF. Max 5MB.</p>
+                      {avatarError && (
+                        <p className="text-xs text-red-600">{avatarError}</p>
+                      )}
+                    </div>
+                  </div>
 
                   <div className="space-y-4">
                     <div>
