@@ -106,6 +106,17 @@ const mockExamConfigs = {
         difficulty: 'Advanced',
         color: '#22C55E',
       },
+      {
+        id: 'mock_wassce_elective_math',
+        name: 'Elective Mathematics',
+        subject: 'Elective Mathematics',
+        papers: [
+          { type: 'Paper 1', questions: 50, duration: 90, marks: 50, format: 'Objectives' },
+          { type: 'Paper 2', questions: 10, duration: 180, marks: 100, format: 'Essay/Structured' },
+        ],
+        difficulty: 'Advanced',
+        color: '#6366F1',
+      },
     ],
   },
   bece: {
