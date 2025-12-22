@@ -245,6 +245,8 @@ export const useChatStore = create<ChatState>()(
       isLoadingRooms: false,
       isLoadingMessages: false,
       isSendingMessage: false,
+      pollingInterval: null,
+      lastPollTime: null,
 
       // UI Actions
       openChat: () => set({ isChatOpen: true }),

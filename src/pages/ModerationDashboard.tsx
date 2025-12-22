@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useModerationStore } from '@/stores/moderationStore';
 import { useAuthStore } from '@/stores/authStore';
 import { Navigate } from 'react-router-dom';
-import type { ReportStatus, ReportResolution, ChatReport, ChatModerationAction, ChatFilteredWord } from '@/types';
+import type { ReportStatus, ReportResolution, ChatReport } from '@/types';
 
 // Report reason labels
 const REASON_LABELS: Record<string, string> = {
@@ -324,14 +324,14 @@ export default function ModerationDashboard() {
                             Issue Warning
                           </button>
                           <button
-                            onClick={() => handleResolveReport(selectedReport.id, 'mute')}
+                            onClick={() => handleResolveReport(selectedReport.id, 'user_muted')}
                             disabled={isProcessing}
                             className="px-4 py-2 bg-orange-100 text-orange-800 rounded-md hover:bg-orange-200 disabled:opacity-50"
                           >
                             Mute User
                           </button>
                           <button
-                            onClick={() => handleResolveReport(selectedReport.id, 'ban')}
+                            onClick={() => handleResolveReport(selectedReport.id, 'user_banned')}
                             disabled={isProcessing}
                             className="px-4 py-2 bg-red-100 text-red-800 rounded-md hover:bg-red-200 disabled:opacity-50"
                           >

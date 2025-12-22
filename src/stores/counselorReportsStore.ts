@@ -481,8 +481,8 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
         set({ isLoading: true, error: null });
         try {
           const params = studentId ? `?studentId=${studentId}` : '';
-          const response = await api.get(`/counselor/parent-messages${params}`);
-          if (response.success) {
+          const response = await api.get<any[]>(`/counselor/parent-messages${params}`);
+          if (response.success && response.data) {
             const messages = response.data.map((m: any) => ({
               id: m.id,
               reportId: m.reportId,
@@ -521,12 +521,12 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
 
       sendMessage: async (studentId, message, reportId) => {
         try {
-          const response = await api.post('/counselor/parent-messages', {
+          const response = await api.post<{ id: string; senderId: string; createdAt: string }>('/counselor/parent-messages', {
             studentId,
             content: message,
             reportId,
           });
-          if (response.success) {
+          if (response.success && response.data) {
             const newMessage: ParentCounselorMessage = {
               id: response.data.id,
               reportId,
@@ -562,8 +562,8 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
       loadSchedules: async () => {
         set({ isLoading: true, error: null });
         try {
-          const response = await api.get('/counselor/schedules');
-          if (response.success) {
+          const response = await api.get<any[]>('/counselor/schedules');
+          if (response.success && response.data) {
             const schedules = response.data.map((s: any) => ({
               id: s.id,
               studentId: s.studentId,
@@ -587,12 +587,12 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
 
       createSchedule: async (studentId, reportType) => {
         try {
-          const response = await api.post('/counselor/schedules', {
+          const response = await api.post<{ id: string }>('/counselor/schedules', {
             studentId,
             reportType,
             frequency: reportType === 'weekly' ? 'weekly' : reportType === 'monthly' ? 'monthly' : 'weekly',
           });
-          if (response.success) {
+          if (response.success && response.data) {
             const newSchedule: ReportSchedule = {
               id: response.data.id,
               studentId,
@@ -637,18 +637,24 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
         set({ isLoading: true, error: null });
         try {
           const params = studentId ? `?studentId=${studentId}` : '';
-          const response = await api.get(`/counselor/session-summaries${params}`);
-          if (response.success) {
-            const summaries = response.data.map((s: any) => ({
+          const response = await api.get<any[]>(`/counselor/session-summaries${params}`);
+          if (response.success && response.data) {
+            const summaries: CounselorSessionSummary[] = response.data.map((s: any) => ({
               id: s.id,
-              counselorType: s.counselorType,
-              title: s.title,
-              messageCount: s.messageCount,
-              status: s.status,
-              lastMessage: s.lastMessage,
-              lastSentiment: s.lastSentiment,
+              conversationId: s.conversationId || s.id,
+              studentId: s.studentId || studentId || '',
+              sessionDate: s.sessionDate || s.createdAt,
+              durationMinutes: s.durationMinutes,
+              briefSummary: s.briefSummary || s.lastMessage || '',
+              mainTopics: s.mainTopics || [],
+              emotionalState: s.emotionalState,
+              keyConcerns: s.keyConcerns || [],
+              breakthroughs: s.breakthroughs || [],
+              studentActionItems: s.studentActionItems || [],
+              recommendedResources: s.recommendedResources || [],
+              requiresAttention: s.requiresAttention || false,
+              attentionReason: s.attentionReason,
               createdAt: s.createdAt,
-              lastMessageAt: s.lastMessageAt,
             }));
             set({ sessionSummaries: summaries, isLoading: false });
           } else {

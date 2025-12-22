@@ -219,3 +219,35 @@ export const api = {
 
 export { ApiError };
 export type { ApiResponse };
+
+// Helper exports for stores that need direct access
+export function getApiUrl(path?: string): string {
+  if (path) {
+    if (API_BASE_URL.startsWith('http')) {
+      return `${API_BASE_URL}${path.replace('/api', '')}`;
+    }
+    return `${window.location.origin}${API_BASE_URL}${path.replace('/api', '')}`;
+  }
+  return API_BASE_URL;
+}
+
+export function getAuthHeaders(): Record<string, string> {
+  const token = getAuthToken();
+  const userInfo = getUserInfo();
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  if (userInfo.userId) {
+    headers['x-user-id'] = userInfo.userId;
+  }
+  if (userInfo.role) {
+    headers['x-user-role'] = userInfo.role;
+  }
+
+  return headers;
+}

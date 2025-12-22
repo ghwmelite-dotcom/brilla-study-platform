@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useReminderStore } from '@/stores/reminderStore';
+import type { ReminderSettings as ReminderSettingsType } from '@/types';
 
 const DAYS_OF_WEEK = [
   { value: 0, label: 'Sun' },
@@ -29,7 +30,7 @@ export function ReminderSettings() {
     fetchSettings();
   }, [fetchSettings]);
 
-  const handleToggle = async (key: keyof typeof settings, value: boolean) => {
+  const handleToggle = async (key: keyof ReminderSettingsType, value: boolean) => {
     if (!settings) return;
 
     setIsSaving(true);
