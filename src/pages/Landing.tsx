@@ -288,9 +288,12 @@ function LandingHeader({ onOpenAuth }: LandingHeaderProps) {
               <span className="text-white font-bold text-xl">B</span>
             </div>
           </div>
-          <span className="font-display font-bold text-2xl text-white">
-            Brilla
-          </span>
+          <div className="flex flex-col">
+            <span className="font-display font-bold text-2xl text-white leading-tight">
+              Brilla Prep
+            </span>
+            <span className="text-[10px] text-white/60 tracking-wider">Prepare. Excel. Succeed.</span>
+          </div>
         </Link>
 
         {/* Desktop Navigation */}
@@ -392,7 +395,7 @@ function PWAInstallBanner() {
             <Smartphone className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
-            <h4 className="text-white font-semibold mb-1">Install Brilla App</h4>
+            <h4 className="text-white font-semibold mb-1">Install Brilla Prep</h4>
             <p className="text-white/60 text-sm mb-3">
               Get the full experience with offline access and faster loading.
             </p>
@@ -534,7 +537,7 @@ const platformCapabilities = [
 
 const testimonials = [
   {
-    quote: "Brilla completely transformed how I prepare for NSMQ. The speed rounds are incredibly effective!",
+    quote: "Brilla Prep completely transformed how I prepare for NSMQ. The speed rounds are incredibly effective!",
     author: "Kwame Asante",
     role: "SHS 3, Presec Legon",
     avatar: "K",
@@ -548,7 +551,7 @@ const testimonials = [
     rating: 5,
   },
   {
-    quote: "Our school's NSMQ team uses Brilla daily. It's become essential to our training regimen.",
+    quote: "Our school's NSMQ team uses Brilla Prep daily. It's become essential to our training regimen.",
     author: "Mr. Samuel Osei",
     role: "Science Teacher, Mfantsipim",
     avatar: "S",
@@ -777,8 +780,8 @@ export function LandingPage() {
             <br />
             <span className="text-white">with </span>
             <span className="relative">
-              <span className="text-gradient">Brilla</span>
-              <Sparkles className="absolute -top-2 -right-6 w-6 h-6 text-secondary animate-pulse" />
+              <span className="text-gradient">Brilla Prep</span>
+              <Sparkles className="absolute -top-2 -right-8 w-6 h-6 text-secondary animate-pulse" />
             </span>
           </h1>
 
@@ -1320,7 +1323,7 @@ export function LandingPage() {
           </h2>
 
           <p className="text-xl text-white/70 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Join the thousands of students already preparing smarter with Brilla.
+            Join students preparing smarter with Brilla Prep.
             Your journey to academic excellence starts here.
           </p>
 
@@ -1347,14 +1350,17 @@ export function LandingPage() {
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             {/* Brand */}
             <div className="md:col-span-1">
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 mb-4">
                 <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                   <span className="text-white font-bold text-xl">B</span>
                 </div>
-                <span className="font-display font-bold text-2xl text-white">Brilla</span>
+                <div className="flex flex-col">
+                  <span className="font-display font-bold text-2xl text-white leading-tight">Brilla Prep</span>
+                  <span className="text-[10px] text-white/50 tracking-wider">Prepare. Excel. Succeed.</span>
+                </div>
               </div>
               <p className="text-white/50 leading-relaxed">
-                Ghana's leading exam preparation platform for NSMQ, WASSCE, and BECE.
+                NSMQ training platform for St John's Grammar School, Ghana. Excel in Math, Physics, Chemistry, and Biology.
               </p>
             </div>
 
@@ -1391,12 +1397,11 @@ export function LandingPage() {
 
           <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-white/40">
-              &copy; {new Date().getFullYear()} Brilla Study Platform. Made with love in Ghana.
+              &copy; {new Date().getFullYear()} Brilla Prep. All rights reserved.
             </p>
-            <div className="flex items-center gap-2">
-              <span className="text-white/40">Designed for </span>
-              <span className="text-2xl">🇬🇭</span>
-            </div>
+            <p className="text-white/40 flex items-center gap-1">
+              Empowering champions <Heart className="w-4 h-4 text-accent fill-accent" /> one question at a time
+            </p>
           </div>
         </div>
       </footer>

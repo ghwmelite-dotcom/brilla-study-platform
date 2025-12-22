@@ -66,7 +66,7 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
     if (path.startsWith('/competition')) return 'Competition';
     if (path === '/leaderboard') return 'Leaderboard';
     if (path === '/profile') return 'Profile';
-    return 'Brilla';
+    return 'Brilla Prep';
   };
 
   return (
@@ -89,7 +89,7 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
               <span className="text-white font-bold text-lg">B</span>
             </div>
             <span className="hidden sm:block font-display font-bold text-xl text-neutral-900">
-              Brilla
+              Brilla Prep
             </span>
           </Link>
 

@@ -260,7 +260,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
               {/* Parent Branding */}
               <div className="text-center text-xs text-neutral-500 pt-4 border-t border-neutral-200">
-                <p className="font-medium">Brilla Study Platform</p>
+                <p className="font-medium">Brilla Prep</p>
                 <p>Parent Monitoring Portal</p>
               </div>
             </>
@@ -634,7 +634,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           {/* Platform branding */}
           <div className="text-center text-xs text-neutral-500 pt-4 border-t border-neutral-200">
-            <p className="font-medium">Brilla Study Platform</p>
+            <p className="font-medium">Brilla Prep</p>
             <p>
               {currentExamType === 'nsmq' && 'NSMQ Competition Prep'}
               {currentExamType === 'wassce' && 'WASSCE Exam Prep'}

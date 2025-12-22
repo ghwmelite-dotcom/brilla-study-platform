@@ -10,14 +10,15 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-1">
               <div className="w-8 h-8 rounded-lg bg-gradient-ghana flex items-center justify-center">
                 <span className="text-white font-bold text-lg">B</span>
               </div>
               <span className="font-display font-bold text-xl text-neutral-900">
-                Brilla
+                Brilla Prep
               </span>
             </div>
+            <p className="text-xs text-primary font-medium mb-3">Prepare. Excel. Succeed.</p>
             <p className="text-sm text-neutral-600">
               NSMQ training platform for St John's Grammar School, Ghana.
               Excel in Math, Physics, Chemistry, and Biology.
@@ -109,10 +110,10 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-8 pt-6 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-neutral-500">
-            © {currentYear} Brilla Study Platform. All rights reserved.
+            © {currentYear} Brilla Prep. All rights reserved.
           </p>
           <p className="text-sm text-neutral-500 flex items-center gap-1">
-            Made with <Heart className="w-4 h-4 text-accent fill-accent" /> for NSMQ success
+            Empowering champions <Heart className="w-4 h-4 text-accent fill-accent" /> one question at a time
           </p>
         </div>
       </div>
