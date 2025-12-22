@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
+import { getDemoDataFlags, isDemoUserId } from './demoUtils';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -834,14 +835,15 @@ chatApp.post('/rooms/:id/messages', async (c) => {
     }
 
     const messageId = generateId('msg');
+    const demoFlags = getDemoDataFlags(userId);
 
     await c.env.DB.prepare(`
-      INSERT INTO chat_messages (id, room_id, sender_id, content, content_type, file_url, file_name, file_size, reply_to_id, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+      INSERT INTO chat_messages (id, room_id, sender_id, content, content_type, file_url, file_name, file_size, reply_to_id, is_demo_data, expires_at, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
     `).bind(
       messageId, roomId, userId, content?.trim() || '',
       contentType, fileUrl || null, fileName || null, fileSize || null,
-      replyToId || null
+      replyToId || null, demoFlags.is_demo_data, demoFlags.expires_at
     ).run();
 
     // Update room timestamp

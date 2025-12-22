@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
+import { getDemoDataFlags, isDemoUserId } from './demoUtils';
 
 // Types for Cloudflare bindings
 interface Env {

@@ -246,6 +246,54 @@ async function callClaudeAPI(
   return data.content[0]?.text || 'No response generated.';
 }
 
+// =============================================
+// DEMO DATA ISOLATION UTILITIES
+// =============================================
+
+// Demo user email patterns (users with these emails are considered demo users)
+const DEMO_EMAIL_PATTERNS = ['@brillaprep.org'];
+
+// Demo user IDs (explicit list of demo user IDs)
+const DEMO_USER_IDS = [
+  'admin_prod_001',
+  'teacher_1766327981453',
+  'student_1766327981521',
+  'parent_1',
+  'demo_student_1',
+  'demo_teacher_1',
+  'demo_admin_1',
+];
+
+// Check if a user ID is a demo user
+function isDemoUserId(userId: string): boolean {
+  return DEMO_USER_IDS.includes(userId) || userId.startsWith('demo_');
+}
+
+// Check if an email belongs to a demo user
+function isDemoEmail(email: string): boolean {
+  return DEMO_EMAIL_PATTERNS.some(pattern => email.endsWith(pattern));
+}
+
+// Get demo data flags for database inserts
+// Returns { is_demo_data: 0|1, expires_at: string|null }
+function getDemoDataFlags(userId: string): { is_demo_data: number; expires_at: string | null } {
+  if (isDemoUserId(userId)) {
+    // Demo data expires in 24 hours
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    return { is_demo_data: 1, expires_at: expiresAt };
+  }
+  return { is_demo_data: 0, expires_at: null };
+}
+
+// SQL fragment for demo data columns
+function getDemoDataSQL(userId: string): string {
+  const flags = getDemoDataFlags(userId);
+  if (flags.is_demo_data) {
+    return `, is_demo_data, expires_at) VALUES (?, ?, ?, ..., 1, '${flags.expires_at}'`;
+  }
+  return `, is_demo_data, expires_at) VALUES (?, ?, ?, ..., 0, NULL`;
+}
+
 const app = new Hono<{ Bindings: Env }>();
 
 // Middleware
@@ -286,6 +334,7 @@ protectedApp.use('*', async (c, next) => {
     if (demoUser) {
       c.set('userId', demoUser.id);
       c.set('userRole', demoUser.role);
+      c.set('isDemo', true); // Mark as demo user
       return next();
     }
   }
@@ -298,12 +347,20 @@ protectedApp.use('*', async (c, next) => {
     }
     c.set('userId', payload.userId);
     c.set('userRole', payload.role);
+    // Check if this is a demo user by their ID or email
+    const isDemo = isDemoUserId(payload.userId) || isDemoEmail(payload.email);
+    c.set('isDemo', isDemo);
     return next();
   } catch (error) {
     console.error('Token verification error:', error);
     return c.json({ success: false, error: 'Invalid token' }, 401);
   }
 });
+
+// Helper to check if current user is demo
+function isUserDemo(c: { get: (key: string) => boolean | undefined }): boolean {
+  return c.get('isDemo') === true;
+}
 
 // Helper to get user from context or header (for backwards compatibility)
 function getUserId(c: { get: (key: string) => string | undefined; req: { header: (name: string) => string | undefined } }): string | undefined {
@@ -2018,12 +2075,13 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
                       (question.correct_answer as string).toLowerCase().trim();
     const pointsEarned = isCorrect ? (question.points as number) : 0;
 
-    // Record the attempt
+    // Record the attempt with demo data flags
     const attemptId = `attempt_${Date.now()}`;
+    const demoFlags = getDemoDataFlags(userId);
     await c.env.DB.prepare(`
-      INSERT INTO question_attempts (id, user_id, question_id, user_answer, is_correct, time_taken, points_earned)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).bind(attemptId, userId, questionId, answer, isCorrect ? 1 : 0, 0, pointsEarned).run();
+      INSERT INTO question_attempts (id, user_id, question_id, user_answer, is_correct, time_taken, points_earned, is_demo_data, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(attemptId, userId, questionId, answer, isCorrect ? 1 : 0, 0, pointsEarned, demoFlags.is_demo_data, demoFlags.expires_at).run();
 
     return c.json({
       success: true,
@@ -2117,10 +2175,11 @@ protectedApp.post('/houses/points', async (c) => {
     const period = `${now.getFullYear()}-W${weekNum.toString().padStart(2, '0')}`;
 
     const id = `hp_${Date.now()}`;
+    const demoFlags = getDemoDataFlags(userId);
     await c.env.DB.prepare(`
-      INSERT INTO house_points (id, house_id, user_id, points, source, source_id, period)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).bind(id, houseId, userId, points, source, sourceId || null, period).run();
+      INSERT INTO house_points (id, house_id, user_id, points, source, source_id, period, is_demo_data, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(id, houseId, userId, points, source, sourceId || null, period, demoFlags.is_demo_data, demoFlags.expires_at).run();
 
     return c.json({ success: true, data: { id, houseId, userId, points, source, period } });
   } catch (error) {
@@ -2181,16 +2240,19 @@ protectedApp.post('/battles', async (c) => {
     }));
 
     const battleId = `battle_${Date.now()}`;
+    const demoFlags = getDemoDataFlags(userId);
     await c.env.DB.prepare(`
-      INSERT INTO battles (id, challenger_id, subject_id, difficulty, question_count, questions, status)
-      VALUES (?, ?, ?, ?, ?, ?, 'waiting')
+      INSERT INTO battles (id, challenger_id, subject_id, difficulty, question_count, questions, status, is_demo_data, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?, 'waiting', ?, ?)
     `).bind(
       battleId,
       userId,
       subjectId || null,
       difficulty || 'medium',
       questionCount || 10,
-      JSON.stringify(parsedQuestions)
+      JSON.stringify(parsedQuestions),
+      demoFlags.is_demo_data,
+      demoFlags.expires_at
     ).run();
 
     // Get challenger info
@@ -2311,12 +2373,13 @@ protectedApp.post('/battles/:id/answer', async (c) => {
     const isCorrect = answer.toLowerCase().trim() === question.correct_answer.toLowerCase().trim();
     const pointsEarned = isCorrect ? (question.points || 3) : 0;
 
-    // Record answer
+    // Record answer with demo data flags
     const answerId = `ba_${Date.now()}_${userId}`;
+    const demoFlags = getDemoDataFlags(userId);
     await c.env.DB.prepare(`
-      INSERT INTO battle_answers (id, battle_id, user_id, question_index, answer, is_correct, time_taken, points_earned)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(answerId, battleId, userId, questionIndex, answer, isCorrect ? 1 : 0, timeTaken || 0, pointsEarned).run();
+      INSERT INTO battle_answers (id, battle_id, user_id, question_index, answer, is_correct, time_taken, points_earned, is_demo_data, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(answerId, battleId, userId, questionIndex, answer, isCorrect ? 1 : 0, timeTaken || 0, pointsEarned, demoFlags.is_demo_data, demoFlags.expires_at).run();
 
     // Update score
     const scoreField = userId === battle.challenger_id ? 'challenger_score' : 'opponent_score';
@@ -2464,11 +2527,12 @@ protectedApp.post('/papers/:id/attempt', async (c) => {
 
     const attemptId = `pa_${Date.now()}`;
     const timeAllowed = paper.time_allowed || paper.typical_duration || 180; // Default 3 hours
+    const demoFlags = getDemoDataFlags(userId);
 
     await c.env.DB.prepare(`
-      INSERT INTO paper_attempts (id, user_id, paper_id, status, time_allowed)
-      VALUES (?, ?, ?, 'in_progress', ?)
-    `).bind(attemptId, userId, paperId, timeAllowed).run();
+      INSERT INTO paper_attempts (id, user_id, paper_id, status, time_allowed, is_demo_data, expires_at)
+      VALUES (?, ?, ?, 'in_progress', ?, ?, ?)
+    `).bind(attemptId, userId, paperId, timeAllowed, demoFlags.is_demo_data, demoFlags.expires_at).run();
 
     return c.json({
       success: true,
@@ -2679,9 +2743,10 @@ protectedApp.post('/essays/submit', async (c) => {
     const wordCount = answerText.trim().split(/\s+/).filter((w: string) => w.length > 0).length;
 
     const attemptId = `ea_${Date.now()}`;
+    const demoFlags = getDemoDataFlags(userId);
     await c.env.DB.prepare(`
-      INSERT INTO essay_attempts (id, user_id, question_id, answer_text, word_count, grading_type, grading_status)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO essay_attempts (id, user_id, question_id, answer_text, word_count, grading_type, grading_status, is_demo_data, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       attemptId,
       userId,
@@ -2689,7 +2754,9 @@ protectedApp.post('/essays/submit', async (c) => {
       answerText,
       wordCount,
       wantsAIGrading ? 'ai' : 'self',
-      wantsAIGrading ? 'pending' : 'graded'
+      wantsAIGrading ? 'pending' : 'graded',
+      demoFlags.is_demo_data,
+      demoFlags.expires_at
     ).run();
 
     // Deduct AI credit if using AI grading
@@ -6736,4 +6803,81 @@ app.onError((err, c) => {
   return c.json({ success: false, error: 'Internal server error' }, 500);
 });
 
-export default app;
+// =============================================
+// SCHEDULED HANDLER - Demo Data Cleanup (Cron)
+// =============================================
+
+// List of tables that need demo data cleanup
+const DEMO_DATA_TABLES = [
+  'user_progress',
+  'question_attempts',
+  'essay_attempts',
+  'paper_attempts',
+  'paper_attempt_answers',
+  'practice_sessions',
+  'user_achievements',
+  'battles',
+  'battle_answers',
+  'house_points',
+  'user_exam_preferences',
+  'user_subject_selections',
+  'chat_messages',
+  'chat_message_reactions',
+  'competitions',
+  'leaderboard',
+  'assessment_attempts',
+  'assessment_attempt_answers',
+  'parent_notifications',
+  'parent_activity_log',
+  'counselor_sessions',
+  'counselor_messages',
+  'tutor_conversations',
+  'tutor_messages',
+  'library_resources',
+  'notifications',
+];
+
+// Scheduled cleanup function
+async function cleanupExpiredDemoData(db: D1Database): Promise<{ tablesProcessed: number; rowsDeleted: number }> {
+  const now = new Date().toISOString();
+  let totalDeleted = 0;
+  let tablesProcessed = 0;
+
+  for (const table of DEMO_DATA_TABLES) {
+    try {
+      // Delete expired demo data
+      const result = await db.prepare(`
+        DELETE FROM ${table}
+        WHERE is_demo_data = 1 AND expires_at IS NOT NULL AND expires_at < ?
+      `).bind(now).run();
+
+      if (result.meta.changes > 0) {
+        console.log(`Cleaned up ${result.meta.changes} expired demo records from ${table}`);
+        totalDeleted += result.meta.changes;
+      }
+      tablesProcessed++;
+    } catch (error) {
+      // Table might not have the columns yet (migration not run)
+      console.log(`Skipping ${table}: ${error instanceof Error ? error.message : 'unknown error'}`);
+    }
+  }
+
+  return { tablesProcessed, rowsDeleted: totalDeleted };
+}
+
+// Cloudflare Worker with scheduled handler
+export default {
+  fetch: app.fetch,
+
+  // Scheduled handler for Cron triggers
+  async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+    console.log(`Scheduled cleanup triggered at ${new Date().toISOString()}`);
+
+    try {
+      const result = await cleanupExpiredDemoData(env.DB);
+      console.log(`Demo data cleanup complete: ${result.rowsDeleted} rows deleted from ${result.tablesProcessed} tables`);
+    } catch (error) {
+      console.error('Demo data cleanup failed:', error);
+    }
+  },
+};

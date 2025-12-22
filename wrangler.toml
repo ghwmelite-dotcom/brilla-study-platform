@@ -44,3 +44,11 @@ database_id = "aa806d65-d3dd-4cf9-9cac-e3ddd252f937"
 [[env.production.r2_buckets]]
 binding = "LIBRARY_BUCKET"
 bucket_name = "brilla-library"
+
+# Cron trigger for demo data cleanup (runs every 6 hours)
+# This cleans up expired demo user data to keep production database clean
+[triggers]
+crons = ["0 */6 * * *"]
+
+[env.production.triggers]
+crons = ["0 */6 * * *"]
