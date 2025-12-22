@@ -911,8 +911,7 @@ async function generateReportWithClaude(
   const apiKey = env.ANTHROPIC_API_KEY;
 
   if (!apiKey) {
-    // Return a template report if no API key
-    return generateTemplateReport(data);
+    throw new Error('ANTHROPIC_API_KEY not configured. AI-generated reports require a valid API key.');
   }
 
   const prompt = `Generate a comprehensive counselor report for a student. Use the data provided to create insightful observations and recommendations.
@@ -975,8 +974,9 @@ Please provide a JSON response with the following structure:
     });
 
     if (!response.ok) {
-      console.error('Claude API error for report generation');
-      return generateTemplateReport(data);
+      const errorText = await response.text();
+      console.error('Claude API error for report generation:', errorText);
+      throw new Error(`Claude API error: ${response.status} - Failed to generate AI report`);
     }
 
     const result = await response.json() as {
@@ -991,70 +991,13 @@ Please provide a JSON response with the following structure:
       return JSON.parse(jsonMatch[0]);
     }
 
-    return generateTemplateReport(data);
+    throw new Error('Failed to parse AI response - invalid JSON format');
   } catch (error) {
     console.error('Error generating report with Claude:', error);
-    return generateTemplateReport(data);
+    throw error;
   }
 }
 
-// Template report generator (fallback)
-function generateTemplateReport(data: {
-  studentName: string;
-  schoolLevel: string;
-  yearGroup: number;
-  dateRange: { start: string; end: string };
-  performance: { totalAttempts: number; accuracy: number };
-  wellbeing: { avgStress: number | null; avgSatisfaction: number | null };
-  sessions: { count: number; types: string[] };
-  streak: { current: number; longest: number };
-}) {
-  const accuracy = data.performance.accuracy;
-  const attempts = data.performance.totalAttempts;
-  const streak = data.streak.current;
-
-  let concernLevel = 'none';
-  if (data.wellbeing.avgStress && data.wellbeing.avgStress >= 4) concernLevel = 'moderate';
-  if (accuracy < 50 && attempts > 10) concernLevel = 'low';
-
-  return {
-    summary: `${data.studentName} completed ${attempts} practice questions with ${accuracy}% accuracy during this period. ${streak > 0 ? `They maintained a ${streak}-day study streak.` : 'Consistent study habits could be improved.'}`,
-    academicPerformance: {
-      overallScore: accuracy,
-      strengths: accuracy >= 70 ? ['Consistent practice', 'Good accuracy'] : ['Willing to practice'],
-      areasForImprovement: accuracy < 70 ? ['Improve accuracy', 'Review difficult topics'] : ['Challenge with harder questions'],
-      subjectBreakdown: [{ subject: 'Overall', score: accuracy, trend: 'stable' }],
-    },
-    wellbeingAssessment: {
-      overallMood: data.wellbeing.avgSatisfaction && data.wellbeing.avgSatisfaction >= 3 ? 'positive' : 'neutral',
-      stressLevel: data.wellbeing.avgStress && data.wellbeing.avgStress >= 4 ? 'high' : data.wellbeing.avgStress && data.wellbeing.avgStress >= 2 ? 'moderate' : 'low',
-      engagementLevel: attempts >= 50 ? 'high' : attempts >= 20 ? 'medium' : 'low',
-      socialInteraction: 'moderate',
-    },
-    keyInsights: [
-      `Completed ${attempts} practice questions this period`,
-      `Accuracy rate of ${accuracy}%`,
-      streak > 0 ? `Maintained ${streak}-day study streak` : 'Study streak could be improved',
-    ],
-    recommendations: [
-      {
-        category: 'academic',
-        priority: accuracy < 60 ? 'high' : 'medium',
-        recommendation: accuracy < 60 ? 'Focus on reviewing fundamental concepts' : 'Continue current study pace',
-        actionItems: ['Review past mistakes', 'Practice daily'],
-      },
-    ],
-    goals: [
-      {
-        goal: accuracy < 70 ? 'Achieve 70% accuracy' : 'Maintain high performance',
-        targetDate: new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0],
-        status: 'suggested',
-        milestones: ['Complete 50 practice questions', 'Review weak topics'],
-      },
-    ],
-    concernLevel,
-  };
-}
 
 // Get reports for a student (parent/counselor/admin)
 counselorApp.get('/reports', async (c) => {
