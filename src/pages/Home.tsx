@@ -107,7 +107,7 @@ export function HomePage() {
               </Button>
             </Link>
             <Link to="/dashboard">
-              <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-primary">
+              <Button variant="ghost" size="lg" className="border-2 border-white !text-white hover:!bg-white hover:!text-primary">
                 View Dashboard
               </Button>
             </Link>
