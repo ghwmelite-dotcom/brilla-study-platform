@@ -418,7 +418,7 @@ function PWAInstallBanner() {
 const stats = [
   { text: 'Growing Community', label: 'Join Learners Across Ghana', icon: Users },
   { text: 'Comprehensive', label: 'Question Bank', icon: BookOpen },
-  { text: 'Built For', label: 'WASSCE & BECE Success', icon: TrendingUp },
+  { text: 'Built For', label: 'NSMQ, WASSCE & BECE Success', icon: TrendingUp },
   { text: 'Trusted By', label: 'Schools Nationwide', icon: GraduationCap },
 ];
 
