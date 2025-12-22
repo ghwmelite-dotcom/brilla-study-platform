@@ -1360,7 +1360,7 @@ export function LandingPage() {
                 </div>
               </div>
               <p className="text-white/50 leading-relaxed">
-                NSMQ training platform for St John's Grammar School, Ghana. Excel in Math, Physics, Chemistry, and Biology.
+                Ace your BECE, WASSCE, and NSMQ. Master Mathematics, Physics, Chemistry, and Biology with confidence.
               </p>
             </div>
 

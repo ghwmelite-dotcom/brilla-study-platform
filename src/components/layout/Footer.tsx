@@ -20,8 +20,7 @@ export function Footer() {
             </div>
             <p className="text-xs text-primary font-medium mb-3">Prepare. Excel. Succeed.</p>
             <p className="text-sm text-neutral-600">
-              NSMQ training platform for St John's Grammar School, Ghana.
-              Excel in Math, Physics, Chemistry, and Biology.
+              Ace your BECE, WASSCE, and NSMQ. Master Mathematics, Physics, Chemistry, and Biology with confidence.
             </p>
           </div>
 
