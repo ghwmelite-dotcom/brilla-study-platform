@@ -6,9 +6,12 @@
 // Demo user email patterns (users with these emails are considered demo users)
 export const DEMO_EMAIL_PATTERNS = ['@brillaprep.org'];
 
+// Excluded emails (real accounts that use demo email domain)
+export const EXCLUDED_DEMO_EMAILS = ['admin@brillaprep.org'];
+
 // Demo user IDs (explicit list of demo user IDs)
+// Note: admin_prod_001 is NOT a demo account - it's the main admin
 export const DEMO_USER_IDS = [
-  'admin_prod_001',
   'teacher_1766327981453',
   'student_1766327981521',
   'parent_1',
@@ -17,10 +20,14 @@ export const DEMO_USER_IDS = [
   'demo_admin_1',
 ];
 
+// Excluded user IDs (real accounts)
+export const EXCLUDED_DEMO_IDS = ['admin_prod_001'];
+
 /**
  * Check if a user ID belongs to a demo user
  */
 export function isDemoUserId(userId: string): boolean {
+  if (EXCLUDED_DEMO_IDS.includes(userId)) return false;
   return DEMO_USER_IDS.includes(userId) || userId.startsWith('demo_');
 }
 
@@ -28,6 +35,7 @@ export function isDemoUserId(userId: string): boolean {
  * Check if an email belongs to a demo user
  */
 export function isDemoEmail(email: string): boolean {
+  if (EXCLUDED_DEMO_EMAILS.includes(email.toLowerCase())) return false;
   return DEMO_EMAIL_PATTERNS.some(pattern => email.endsWith(pattern));
 }
 
