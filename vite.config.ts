@@ -20,12 +20,28 @@ export default defineConfig({
           'vendor-icons': ['lucide-react'],
           // State management
           'vendor-state': ['zustand'],
-          // Recharts for analytics
+          // Recharts for analytics (loaded lazily)
           'vendor-charts': ['recharts'],
+          // PDF viewer library (loaded lazily with library page)
+          'vendor-pdf': ['react-pdf', 'pdfjs-dist'],
+          // KaTeX for math rendering
+          'vendor-math': ['katex'],
         },
       },
     },
+    // Increase chunk size warning limit for PDF viewer
     chunkSizeWarningLimit: 600,
+    // Enable minification
+    minify: 'esbuild',
+    // Source maps for production debugging (can disable for smaller builds)
+    sourcemap: false,
+    // Target modern browsers for smaller bundles
+    target: 'es2020',
+  },
+  // Optimize dependencies pre-bundling
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom', 'zustand', 'lucide-react'],
+    exclude: ['react-pdf', 'pdfjs-dist'], // Exclude heavy libs from pre-bundling
   },
   server: {
     port: 3000,

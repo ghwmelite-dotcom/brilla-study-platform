@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   X,
   Mail,
@@ -44,6 +44,45 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
   const { register, login, isLoading, clearError } = useAuthStore();
 
   const [mode, setMode] = useState<AuthMode>(initialMode);
+
+  // Sync mode with initialMode when modal opens and reset form when closed
+  useEffect(() => {
+    if (isOpen) {
+      setMode(initialMode);
+    }
+  }, [isOpen, initialMode]);
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      // Delay reset to avoid UI flicker during close animation
+      const timer = setTimeout(() => {
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setName('');
+        setSchoolLevel('');
+        setYearGroup('');
+        setSchoolName('');
+        setHouse('');
+        setTeacherLicenseNumber('');
+        setSubjectsTaught([]);
+        setYearsExperience('');
+        setQualifications('');
+        setAdminCode('');
+        setPhoneNumber('');
+        setParentInviteCode('');
+        setFormErrors({});
+        setSelectedRole(null);
+        setRegistrationStatus('idle');
+        setRegistrationMessage('');
+        setShowPassword(false);
+        clearError();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, clearError]);
+
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState<FormErrors>({});

@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Layout } from '@/components/layout';
 import { useAuthStore } from '@/stores';
 import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/guide';
@@ -83,87 +83,38 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 // Login Page (placeholder)
 function LoginPage() {
   const navigate = useNavigate();
-  const { isLoading, error, isAuthenticated } = useAuthStore();
+  const { isLoading, error, isAuthenticated, login, clearError } = useAuthStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Redirect if already authenticated
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const handleDemoLogin = (role: 'student' | 'admin' | 'teacher' | 'parent' = 'student') => {
-    const users = {
-      student: {
-        id: 'student_1',
-        email: 'student@brillaprep.org',
-        name: 'Demo Student',
-        role: 'student' as const,
-        status: 'approved' as const,
-        house: 'Blue House',
-        yearGroup: 2,
-        schoolLevel: 'shs' as const,
-        xpPoints: 1500,
-        level: 5,
-        streakDays: 7,
-        aiGradingCredits: 10,
-      },
-      admin: {
-        id: 'admin_1',
-        email: 'admin@brillaprep.org',
-        name: 'System Admin',
-        role: 'admin' as const,
-        status: 'approved' as const,
-        house: undefined,
-        yearGroup: undefined,
-        xpPoints: 0,
-        level: 1,
-        streakDays: 0,
-        aiGradingCredits: 100,
-      },
-      teacher: {
-        id: 'teacher_1',
-        email: 'teacher@brillaprep.org',
-        name: 'Demo Teacher',
-        role: 'teacher' as const,
-        status: 'approved' as const,
-        house: undefined,
-        yearGroup: undefined,
-        xpPoints: 0,
-        level: 1,
-        streakDays: 0,
-        aiGradingCredits: 50,
-      },
-      parent: {
-        id: 'parent_1',
-        email: 'parent@brillaprep.org',
-        name: 'Demo Parent',
-        role: 'parent' as const,
-        status: 'approved' as const,
-        house: undefined,
-        yearGroup: undefined,
-        xpPoints: 0,
-        level: 1,
-        streakDays: 0,
-        aiGradingCredits: 0,
-      },
+  const handleDemoLogin = async (role: 'student' | 'admin' | 'teacher' | 'parent' = 'student') => {
+    const demoCredentials: Record<typeof role, { email: string; password: string }> = {
+      student: { email: 'student@brillaprep.org', password: 'Student123!' },
+      teacher: { email: 'teacher@brillaprep.org', password: 'Teacher123!' },
+      admin: { email: 'admin@brillaprep.org', password: 'Admin123!' },
+      parent: { email: 'parent@brillaprep.org', password: 'Parent123!' },
     };
 
-    const selectedUser = users[role];
+    setIsSubmitting(true);
+    clearError();
 
-    useAuthStore.setState({
-      user: {
-        ...selectedUser,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      token: `${role}_demo_token`,
-      isAuthenticated: true,
-    });
-
-    // Redirect based on role
-    if (role === 'parent') {
-      navigate('/parent');
-    } else {
-      navigate('/dashboard');
+    try {
+      const creds = demoCredentials[role];
+      await login(creds.email, creds.password);
+      // Redirect based on role
+      if (role === 'parent') {
+        navigate('/parent');
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      console.error('Demo login failed:', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -190,10 +141,10 @@ function LoginPage() {
           <button
             type="button"
             onClick={() => handleDemoLogin('admin')}
-            disabled={isLoading}
+            disabled={isLoading || isSubmitting}
             className="w-full py-3 px-4 bg-accent text-white rounded-lg font-semibold hover:bg-accent-dark active:scale-[0.98] transition-all disabled:opacity-50 shadow-md"
           >
-            {isLoading ? 'Signing in...' : 'Sign In as Admin'}
+            {isLoading || isSubmitting ? 'Signing in...' : 'Sign In as Admin'}
           </button>
 
           <div className="relative">
@@ -210,7 +161,7 @@ function LoginPage() {
             <button
               type="button"
               onClick={() => handleDemoLogin('teacher')}
-              disabled={isLoading}
+              disabled={isLoading || isSubmitting}
               className="py-3 px-4 bg-secondary text-neutral-900 rounded-lg font-medium hover:bg-secondary-dark active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
             >
               Teacher
@@ -218,7 +169,7 @@ function LoginPage() {
             <button
               type="button"
               onClick={() => handleDemoLogin('student')}
-              disabled={isLoading}
+              disabled={isLoading || isSubmitting}
               className="py-3 px-4 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
             >
               Student
@@ -226,7 +177,7 @@ function LoginPage() {
             <button
               type="button"
               onClick={() => handleDemoLogin('parent')}
-              disabled={isLoading}
+              disabled={isLoading || isSubmitting}
               className="py-3 px-4 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
             >
               Parent

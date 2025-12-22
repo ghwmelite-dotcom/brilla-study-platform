@@ -285,7 +285,11 @@ export const useAuthStore = create<AuthState>()(
 
       setUser: (user) => set({ user, isAuthenticated: !!user && user.status === 'approved' }),
 
-      setToken: (token) => set({ token }),
+      setToken: (token) => {
+        // Also update the API client token
+        api.setToken(token);
+        set({ token });
+      },
 
       login: async (email, password) => {
         set({ isLoading: true, error: null });
@@ -430,6 +434,9 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        // Clear token from API client
+        api.setToken(null);
+
         set({
           user: null,
           token: null,
@@ -830,6 +837,12 @@ export const useAuthStore = create<AuthState>()(
         token: state.token,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        // Restore token to API client after rehydration
+        if (state?.token) {
+          api.setToken(state.token);
+        }
+      },
     }
   )
 );
