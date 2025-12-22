@@ -15,7 +15,7 @@ import {
 import { Card, Button, Badge, Input, ProgressBar } from '@/components/common';
 import { cn } from '@/utils';
 
-// Sample data - would come from API
+// Topic structure - mastery and questionCount will be populated from API based on user progress
 const subjectsData = {
   mathematics: {
     id: 'mathematics',
@@ -28,44 +28,44 @@ const subjectsData = {
         id: 'algebra',
         name: 'Algebra',
         description: 'Fundamental algebraic concepts and operations',
-        questionCount: 25,
-        mastery: 72,
+        questionCount: 0,
+        mastery: 0,
         subtopics: [
-          { id: 'quadratic', name: 'Quadratic Equations', questionCount: 10, mastery: 85 },
-          { id: 'linear', name: 'Linear Equations', questionCount: 8, mastery: 90 },
-          { id: 'polynomials', name: 'Polynomials', questionCount: 7, mastery: 45 },
+          { id: 'quadratic', name: 'Quadratic Equations', questionCount: 0, mastery: 0 },
+          { id: 'linear', name: 'Linear Equations', questionCount: 0, mastery: 0 },
+          { id: 'polynomials', name: 'Polynomials', questionCount: 0, mastery: 0 },
         ],
       },
       {
         id: 'geometry',
         name: 'Geometry',
         description: 'Study of shapes, sizes, and properties of space',
-        questionCount: 20,
-        mastery: 68,
+        questionCount: 0,
+        mastery: 0,
         subtopics: [],
       },
       {
         id: 'trigonometry',
         name: 'Trigonometry',
         description: 'Study of triangles and trigonometric functions',
-        questionCount: 18,
-        mastery: 55,
+        questionCount: 0,
+        mastery: 0,
         subtopics: [],
       },
       {
         id: 'calculus',
         name: 'Calculus',
         description: 'Study of rates of change and accumulation',
-        questionCount: 22,
-        mastery: 40,
+        questionCount: 0,
+        mastery: 0,
         subtopics: [],
       },
       {
         id: 'statistics',
         name: 'Statistics & Probability',
         description: 'Analysis of data and chance',
-        questionCount: 15,
-        mastery: 78,
+        questionCount: 0,
+        mastery: 0,
         subtopics: [],
       },
     ],
@@ -77,11 +77,11 @@ const subjectsData = {
     color: 'bg-purple-500',
     description: 'Explore the fundamental laws of the universe',
     topics: [
-      { id: 'mechanics', name: 'Mechanics', description: 'Study of motion and forces', questionCount: 30, mastery: 82, subtopics: [] },
-      { id: 'electricity', name: 'Electricity & Magnetism', description: 'Electric charges and magnetic fields', questionCount: 25, mastery: 65, subtopics: [] },
-      { id: 'waves', name: 'Waves & Optics', description: 'Wave motion and light', questionCount: 20, mastery: 58, subtopics: [] },
-      { id: 'thermodynamics', name: 'Thermodynamics', description: 'Heat and energy transfer', questionCount: 18, mastery: 45, subtopics: [] },
-      { id: 'modern', name: 'Modern Physics', description: 'Quantum mechanics and relativity', questionCount: 15, mastery: 30, subtopics: [] },
+      { id: 'mechanics', name: 'Mechanics', description: 'Study of motion and forces', questionCount: 0, mastery: 0, subtopics: [] },
+      { id: 'electricity', name: 'Electricity & Magnetism', description: 'Electric charges and magnetic fields', questionCount: 0, mastery: 0, subtopics: [] },
+      { id: 'waves', name: 'Waves & Optics', description: 'Wave motion and light', questionCount: 0, mastery: 0, subtopics: [] },
+      { id: 'thermodynamics', name: 'Thermodynamics', description: 'Heat and energy transfer', questionCount: 0, mastery: 0, subtopics: [] },
+      { id: 'modern', name: 'Modern Physics', description: 'Quantum mechanics and relativity', questionCount: 0, mastery: 0, subtopics: [] },
     ],
   },
   chemistry: {
@@ -91,11 +91,11 @@ const subjectsData = {
     color: 'bg-green-500',
     description: 'Discover the science of matter and its interactions',
     topics: [
-      { id: 'atomic', name: 'Atomic Structure', description: 'Structure of atoms and electron configuration', questionCount: 20, mastery: 70, subtopics: [] },
-      { id: 'bonding', name: 'Chemical Bonding', description: 'How atoms combine to form compounds', questionCount: 18, mastery: 75, subtopics: [] },
-      { id: 'stoichiometry', name: 'Stoichiometry', description: 'Quantitative relationships in reactions', questionCount: 22, mastery: 60, subtopics: [] },
-      { id: 'equilibrium', name: 'Chemical Equilibrium', description: 'Balance in reversible reactions', questionCount: 15, mastery: 48, subtopics: [] },
-      { id: 'organic', name: 'Organic Chemistry', description: 'Chemistry of carbon compounds', questionCount: 25, mastery: 35, subtopics: [] },
+      { id: 'atomic', name: 'Atomic Structure', description: 'Structure of atoms and electron configuration', questionCount: 0, mastery: 0, subtopics: [] },
+      { id: 'bonding', name: 'Chemical Bonding', description: 'How atoms combine to form compounds', questionCount: 0, mastery: 0, subtopics: [] },
+      { id: 'stoichiometry', name: 'Stoichiometry', description: 'Quantitative relationships in reactions', questionCount: 0, mastery: 0, subtopics: [] },
+      { id: 'equilibrium', name: 'Chemical Equilibrium', description: 'Balance in reversible reactions', questionCount: 0, mastery: 0, subtopics: [] },
+      { id: 'organic', name: 'Organic Chemistry', description: 'Chemistry of carbon compounds', questionCount: 0, mastery: 0, subtopics: [] },
     ],
   },
   biology: {
@@ -105,11 +105,11 @@ const subjectsData = {
     color: 'bg-amber-500',
     description: 'Study life and living organisms',
     topics: [
-      { id: 'cells', name: 'Cell Biology', description: 'Structure and function of cells', questionCount: 22, mastery: 88, subtopics: [] },
-      { id: 'genetics', name: 'Genetics', description: 'Study of heredity and variation', questionCount: 20, mastery: 72, subtopics: [] },
-      { id: 'ecology', name: 'Ecology', description: 'Organisms and their environment', questionCount: 18, mastery: 48, subtopics: [] },
-      { id: 'physiology', name: 'Human Physiology', description: 'Functions of the human body', questionCount: 25, mastery: 65, subtopics: [] },
-      { id: 'biochemistry', name: 'Biochemistry', description: 'Chemical processes in living organisms', questionCount: 15, mastery: 55, subtopics: [] },
+      { id: 'cells', name: 'Cell Biology', description: 'Structure and function of cells', questionCount: 0, mastery: 0, subtopics: [] },
+      { id: 'genetics', name: 'Genetics', description: 'Study of heredity and variation', questionCount: 0, mastery: 0, subtopics: [] },
+      { id: 'ecology', name: 'Ecology', description: 'Organisms and their environment', questionCount: 0, mastery: 0, subtopics: [] },
+      { id: 'physiology', name: 'Human Physiology', description: 'Functions of the human body', questionCount: 0, mastery: 0, subtopics: [] },
+      { id: 'biochemistry', name: 'Biochemistry', description: 'Chemical processes in living organisms', questionCount: 0, mastery: 0, subtopics: [] },
     ],
   },
 };

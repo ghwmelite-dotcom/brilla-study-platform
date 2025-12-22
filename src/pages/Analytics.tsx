@@ -27,9 +27,7 @@ import type {
 } from '@/utils/analyticsUtils';
 import {
   generateEmptyHeatmap,
-  getHeatmapLevel,
   calculateAccuracy,
-  calculatePredictedNsmqScore,
 } from '@/utils/analyticsUtils';
 
 export function AnalyticsPage() {
@@ -46,66 +44,23 @@ export function AnalyticsPage() {
   const [predictedScore, setPredictedScore] = useState(0);
 
   useEffect(() => {
-    // Simulate loading analytics data
+    // Load analytics data from API
     const loadAnalytics = async () => {
       setIsLoading(true);
 
-      // Generate demo weekly progress
-      const demoProgress: DailyProgress[] = [];
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const questions = Math.floor(Math.random() * 30) + 5;
-        const correct = Math.floor(questions * (0.6 + Math.random() * 0.3));
-        demoProgress.push({
-          date: date.toISOString().split('T')[0],
-          questionsAttempted: questions,
-          questionsCorrect: correct,
-          accuracy: calculateAccuracy(correct, questions),
-          xpEarned: correct * 10 + Math.floor(Math.random() * 50),
-        });
-      }
-      setWeeklyProgress(demoProgress);
+      // TODO: Replace with actual API call to fetch user analytics
+      // For now, initialize with empty data - will be populated when user has real activity
+      setWeeklyProgress([]);
+      setSubjectPerformance([]);
+      setStrengths([]);
+      setWeaknesses([]);
 
-      // Generate demo subject performance
-      setSubjectPerformance([
-        { subject: 'Mathematics', subjectId: 'sub_math', totalQuestions: 150, correctAnswers: 120, accuracy: 80, masteryLevel: 75, color: '#3B82F6' },
-        { subject: 'Physics', subjectId: 'sub_physics', totalQuestions: 100, correctAnswers: 70, accuracy: 70, masteryLevel: 65, color: '#8B5CF6' },
-        { subject: 'Chemistry', subjectId: 'sub_chem', totalQuestions: 80, correctAnswers: 60, accuracy: 75, masteryLevel: 60, color: '#22C55E' },
-        { subject: 'Biology', subjectId: 'sub_bio', totalQuestions: 60, correctAnswers: 50, accuracy: 83, masteryLevel: 55, color: '#F59E0B' },
-      ]);
-
-      // Generate demo strengths
-      setStrengths([
-        { topicId: 'top_alg', topicName: 'Algebra', subjectName: 'Mathematics', masteryLevel: 92, questionsAttempted: 45, accuracy: 90, isStrength: true },
-        { topicId: 'top_mech', topicName: 'Mechanics', subjectName: 'Physics', masteryLevel: 85, questionsAttempted: 30, accuracy: 87, isStrength: true },
-        { topicId: 'top_org', topicName: 'Organic Chemistry', subjectName: 'Chemistry', masteryLevel: 80, questionsAttempted: 25, accuracy: 82, isStrength: true },
-      ]);
-
-      // Generate demo weaknesses
-      setWeaknesses([
-        { topicId: 'top_calc', topicName: 'Calculus', subjectName: 'Mathematics', masteryLevel: 35, questionsAttempted: 20, accuracy: 45, isStrength: false },
-        { topicId: 'top_thermo', topicName: 'Thermodynamics', subjectName: 'Physics', masteryLevel: 40, questionsAttempted: 15, accuracy: 50, isStrength: false },
-        { topicId: 'top_genetics', topicName: 'Genetics', subjectName: 'Biology', masteryLevel: 45, questionsAttempted: 18, accuracy: 52, isStrength: false },
-      ]);
-
-      // Generate heatmap data (last 90 days)
+      // Generate empty heatmap (last 90 days) - will show user's actual activity
       const heatmap = generateEmptyHeatmap(90);
-      heatmap.forEach((day) => {
-        const count = Math.floor(Math.random() * 40);
-        day.count = count;
-        day.level = getHeatmapLevel(count);
-      });
       setHeatmapData(heatmap);
 
-      // Calculate predicted score
-      const score = calculatePredictedNsmqScore({
-        accuracy: 75,
-        averageTime: 18,
-        subjectCoverage: 70,
-        questionCount: 390,
-      });
-      setPredictedScore(score);
+      // Predicted score starts at 0 until user has enough data
+      setPredictedScore(0);
 
       setIsLoading(false);
     };
