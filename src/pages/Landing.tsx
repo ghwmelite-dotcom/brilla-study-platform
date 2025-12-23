@@ -32,6 +32,13 @@ import {
   Library,
   PenTool,
   MessageCircle,
+  Crown,
+  Gift,
+  DollarSign,
+  Coins,
+  Rocket,
+  BadgeCheck,
+  PartyPopper,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { AuthModal } from '@/components/auth';
@@ -84,8 +91,13 @@ function useMouseParallax(intensity = 0.02) {
 }
 
 // PWA Install prompt hook
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 function usePWAInstall() {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
 
@@ -98,7 +110,7 @@ function usePWAInstall() {
 
     const handler = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e);
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsInstallable(true);
     };
 
@@ -371,6 +383,172 @@ function LandingHeader({ onOpenAuth }: LandingHeaderProps) {
         </div>
       </div>
     </header>
+  );
+}
+
+// Promotional Popup Component
+function PromoPopup({ onOpenAuth }: { onOpenAuth: (mode: 'login' | 'register') => void }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
+
+  useEffect(() => {
+    // Check if user has dismissed before
+    const dismissed = sessionStorage.getItem('brilla_promo_dismissed');
+    if (dismissed) {
+      setIsDismissed(true);
+      return;
+    }
+
+    // Show popup after 8 seconds
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleDismiss = () => {
+    setIsVisible(false);
+    setIsDismissed(true);
+    sessionStorage.setItem('brilla_promo_dismissed', 'true');
+  };
+
+  if (!isVisible || isDismissed) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in"
+        onClick={handleDismiss}
+      />
+
+      {/* Popup */}
+      <div className="relative w-full max-w-lg animate-scale-in">
+        {/* Glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary via-pink-500 to-purple-500 rounded-3xl blur-2xl opacity-30 animate-pulse-glow" />
+
+        <div className="relative bg-slate-900 rounded-3xl overflow-hidden border border-white/10">
+          {/* Close button */}
+          <button
+            onClick={handleDismiss}
+            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+          >
+            <X className="w-5 h-5 text-white/70" />
+          </button>
+
+          {/* Header with gradient */}
+          <div className="relative h-32 bg-gradient-to-r from-secondary via-pink-500 to-purple-500 flex items-center justify-center overflow-hidden">
+            {/* Animated particles */}
+            {[...Array(10)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-2 h-2 rounded-full bg-white/30 animate-float"
+                style={{
+                  left: `${10 + i * 10}%`,
+                  top: `${20 + (i % 3) * 20}%`,
+                  animationDelay: `${i * 0.3}s`,
+                }}
+              />
+            ))}
+            <div className="relative flex items-center gap-3">
+              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                <Gift className="w-8 h-8 text-white" />
+              </div>
+              <div className="text-left">
+                <p className="text-white/80 text-sm font-medium">Limited Time</p>
+                <p className="text-white text-2xl font-bold">14 Days FREE!</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-6">
+            <h3 className="text-2xl font-bold text-white text-center mb-2">
+              Start Your Free Trial Today
+            </h3>
+            <p className="text-white/60 text-center mb-6">
+              Get full access to all premium features. No credit card needed!
+            </p>
+
+            {/* Features */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              {[
+                { icon: Brain, text: 'AI Tutoring', color: 'text-purple-400' },
+                { icon: PenTool, text: 'Essay Grading', color: 'text-pink-400' },
+                { icon: Trophy, text: 'Competitions', color: 'text-amber-400' },
+                { icon: Library, text: 'E-Library', color: 'text-blue-400' },
+              ].map((item) => (
+                <div key={item.text} className="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-2">
+                  <item.icon className={`w-4 h-4 ${item.color}`} />
+                  <span className="text-white/80 text-sm">{item.text}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="space-y-3">
+              <button
+                onClick={() => { handleDismiss(); onOpenAuth('register'); }}
+                className="w-full py-4 bg-gradient-to-r from-secondary via-pink-500 to-purple-500 rounded-xl font-semibold text-white text-lg hover:shadow-lg hover:shadow-secondary/30 transition-all flex items-center justify-center gap-2"
+              >
+                <Rocket className="w-5 h-5" />
+                Start Free Trial
+              </button>
+              <button
+                onClick={handleDismiss}
+                className="w-full py-3 text-white/50 hover:text-white/70 transition-colors text-sm"
+              >
+                Maybe later
+              </button>
+            </div>
+
+            {/* Affiliate teaser */}
+            <div className="mt-6 pt-4 border-t border-white/10">
+              <div className="flex items-center justify-center gap-2 text-sm">
+                <Coins className="w-4 h-4 text-amber-400" />
+                <span className="text-white/60">
+                  Earn up to <span className="text-amber-400 font-semibold">50% commission</span> as an affiliate!
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Floating CTA Button (appears after scrolling)
+function FloatingCTA({ onOpenAuth }: { onOpenAuth: (mode: 'login' | 'register') => void }) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show after scrolling past 500px
+      setIsVisible(window.scrollY > 500);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
+      <button
+        onClick={() => onOpenAuth('register')}
+        className="group relative"
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary to-pink-500 rounded-full blur-lg opacity-60 group-hover:opacity-80 transition-all" />
+        <div className="relative flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-secondary via-pink-500 to-purple-500 rounded-full font-semibold text-white shadow-2xl hover:scale-105 transition-all">
+          <Sparkles className="w-5 h-5" />
+          <span>Start 14-Day Free Trial</span>
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </div>
+      </button>
+    </div>
   );
 }
 
@@ -659,6 +837,11 @@ export function LandingPage() {
         .animate-shimmer { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); background-size: 200% 100%; animation: shimmer 2s infinite; }
         .animate-spin-slow { animation: spin-slow 30s linear infinite; }
         .animate-border-dance { background-size: 300% 300%; animation: border-dance 4s ease infinite; }
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .glass-hover:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
         .text-gradient { background: linear-gradient(135deg, #FFD700, #FFA500, #FF6B35); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
@@ -850,6 +1033,51 @@ export function LandingPage() {
                 inView={statsRef.inView}
               />
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Mini Promo Banner - Strategic placement after stats */}
+      <section className="relative py-8 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary/10 via-pink-500/10 to-purple-500/10" />
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 py-6 px-8 glass rounded-2xl border border-secondary/20">
+            <div className="flex items-center gap-4">
+              <div className="flex -space-x-2">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center text-white font-bold border-2 border-slate-900">
+                  <Gift className="w-5 h-5" />
+                </div>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-secondary to-amber-400 flex items-center justify-center text-white font-bold border-2 border-slate-900">
+                  <Crown className="w-5 h-5" />
+                </div>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white font-bold border-2 border-slate-900">
+                  <Coins className="w-5 h-5" />
+                </div>
+              </div>
+              <div>
+                <p className="text-white font-semibold">
+                  <span className="text-emerald-400">14-Day Free Trial</span>
+                  {' '}+ Earn up to{' '}
+                  <span className="text-secondary">50% Commission</span>
+                  {' '}as an Affiliate!
+                </p>
+                <p className="text-white/60 text-sm">No credit card required. Start learning and earning today.</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleOpenAuth('register')}
+                className="px-6 py-3 bg-gradient-to-r from-secondary to-amber-400 rounded-xl font-semibold text-slate-900 hover:shadow-lg hover:shadow-secondary/30 transition-all whitespace-nowrap"
+              >
+                Start Free Trial
+              </button>
+              <Link
+                to="/affiliate"
+                className="px-6 py-3 glass rounded-xl font-medium text-white hover:bg-white/10 transition-all whitespace-nowrap"
+              >
+                Learn More
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -1298,6 +1526,384 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ========================================== */}
+      {/* FREE TRIAL SECTION */}
+      {/* ========================================== */}
+      <section className="relative py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-emerald-950/30 to-slate-950" />
+        <GradientOrb className="w-[500px] h-[500px] bg-emerald-500/30 -left-32 top-0" delay={0} />
+        <GradientOrb className="w-[400px] h-[400px] bg-cyan-500/30 -right-32 bottom-0" delay={2} />
+
+        {/* Animated confetti-like particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 rounded-full animate-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                backgroundColor: ['#10B981', '#06B6D4', '#8B5CF6', '#F59E0B'][i % 4],
+                opacity: 0.3,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${5 + Math.random() * 5}s`,
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="relative max-w-6xl mx-auto px-4">
+          <div className="relative glass rounded-3xl p-8 md:p-12 overflow-hidden">
+            {/* Gradient border effect */}
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 opacity-20" />
+            <div className="absolute inset-[1px] rounded-3xl bg-slate-900/95" />
+
+            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
+              {/* Left side - Content */}
+              <div className="flex-1 text-center lg:text-left">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full text-emerald-400 text-sm font-medium mb-6">
+                  <Gift className="w-4 h-4" />
+                  Limited Time Offer
+                </div>
+
+                <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-6">
+                  Start Your{' '}
+                  <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                    14-Day Free Trial
+                  </span>
+                </h2>
+
+                <p className="text-xl text-white/70 mb-8 leading-relaxed">
+                  Experience all premium features absolutely free. No credit card required.
+                  Cancel anytime. Your success journey starts here!
+                </p>
+
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                  {[
+                    { icon: Brain, text: 'AI Tutoring' },
+                    { icon: PenTool, text: 'Essay Grading' },
+                    { icon: Library, text: 'Full E-Library' },
+                    { icon: Trophy, text: 'Competitions' },
+                  ].map((item) => (
+                    <div key={item.text} className="flex items-center gap-2 text-white/80">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                        <item.icon className="w-4 h-4 text-emerald-400" />
+                      </div>
+                      <span>{item.text}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => handleOpenAuth('register')}
+                  className="group relative inline-flex items-center gap-3"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-all" />
+                  <div className="relative flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full font-semibold text-white text-lg shadow-2xl shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all hover:scale-105">
+                    <Rocket className="w-5 h-5" />
+                    Start Free Trial
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </button>
+              </div>
+
+              {/* Right side - Visual */}
+              <div className="flex-shrink-0 relative">
+                <div className="relative w-64 h-64 md:w-80 md:h-80">
+                  {/* Rotating ring */}
+                  <div className="absolute inset-0 rounded-full border-2 border-dashed border-emerald-500/30 animate-spin-slow" />
+                  <div className="absolute inset-4 rounded-full border-2 border-dashed border-cyan-500/30 animate-spin-slow" style={{ animationDirection: 'reverse' }} />
+
+                  {/* Center content */}
+                  <div className="absolute inset-8 rounded-full bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 backdrop-blur-xl flex flex-col items-center justify-center">
+                    <div className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                      14
+                    </div>
+                    <div className="text-xl text-white/80 font-medium">Days Free</div>
+                    <div className="text-sm text-white/50 mt-1">Full Access</div>
+                  </div>
+
+                  {/* Floating badges */}
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-amber-500 rounded-full text-white text-sm font-semibold shadow-lg animate-bounce">
+                    No Credit Card!
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================== */}
+      {/* PRICING PREVIEW SECTION */}
+      {/* ========================================== */}
+      <section className="relative py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-slate-950" />
+        <GradientOrb className="w-[400px] h-[400px] bg-purple-500/20 -right-32 top-1/4" delay={1} />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <span className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm font-medium text-white/80 mb-6">
+              <Crown className="w-4 h-4 text-secondary" />
+              Simple Pricing
+            </span>
+            <h2 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
+              Affordable Plans for{' '}
+              <span className="text-gradient">Everyone</span>
+            </h2>
+            <p className="text-xl text-white/60 max-w-2xl mx-auto">
+              Start free, upgrade when ready. Plans designed for Ghanaian students and teachers.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Free Plan */}
+            <div className="glass rounded-3xl p-8 hover:bg-white/10 transition-all group">
+              <div className="w-14 h-14 rounded-2xl bg-neutral-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Zap className="w-7 h-7 text-neutral-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
+              <p className="text-white/50 mb-6">Get started with basics</p>
+              <div className="flex items-baseline mb-8">
+                <span className="text-5xl font-bold text-white">0</span>
+                <span className="text-xl text-white/50 ml-2">GHS</span>
+              </div>
+              <ul className="space-y-3 mb-8">
+                {['Unlimited questions', 'Model answers', 'Basic analytics', 'Community access'].map((feature) => (
+                  <li key={feature} className="flex items-center gap-2 text-white/70">
+                    <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => handleOpenAuth('register')}
+                className="w-full py-3 px-4 rounded-xl border border-white/20 text-white font-medium hover:bg-white/10 transition-all"
+              >
+                Get Started
+              </button>
+            </div>
+
+            {/* Student Premium */}
+            <div className="relative glass rounded-3xl p-8 border-2 border-secondary/50 hover:border-secondary transition-all group">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <span className="px-4 py-1.5 bg-gradient-to-r from-secondary to-amber-400 rounded-full text-slate-900 text-sm font-semibold flex items-center gap-1">
+                  <Star className="w-4 h-4" />
+                  Most Popular
+                </span>
+              </div>
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-secondary/30 to-amber-500/30 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Crown className="w-7 h-7 text-secondary" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">Student</h3>
+              <p className="text-white/50 mb-6">Full access for students</p>
+              <div className="flex items-baseline mb-2">
+                <span className="text-5xl font-bold text-white">50</span>
+                <span className="text-xl text-white/50 ml-2">GHS/mo</span>
+              </div>
+              <p className="text-sm text-emerald-400 mb-8">or 480 GHS/year (save 20%)</p>
+              <ul className="space-y-3 mb-8">
+                {['Everything in Free', 'AI essay grading', 'Full past papers', 'Advanced analytics', 'Priority support'].map((feature) => (
+                  <li key={feature} className="flex items-center gap-2 text-white/70">
+                    <CheckCircle2 className="w-5 h-5 text-secondary flex-shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => handleOpenAuth('register')}
+                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-secondary to-amber-400 text-slate-900 font-semibold hover:shadow-lg hover:shadow-secondary/30 transition-all"
+              >
+                Start Free Trial
+              </button>
+            </div>
+
+            {/* Teacher Premium */}
+            <div className="glass rounded-3xl p-8 hover:bg-white/10 transition-all group">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/30 to-indigo-500/30 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <GraduationCap className="w-7 h-7 text-blue-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">Teacher</h3>
+              <p className="text-white/50 mb-6">Complete teaching toolkit</p>
+              <div className="flex items-baseline mb-2">
+                <span className="text-5xl font-bold text-white">75</span>
+                <span className="text-xl text-white/50 ml-2">GHS/mo</span>
+              </div>
+              <p className="text-sm text-emerald-400 mb-8">or 720 GHS/year (save 20%)</p>
+              <ul className="space-y-3 mb-8">
+                {['Everything in Student', 'Class management', 'Assessment builder', 'Student analytics', 'Bulk grading'].map((feature) => (
+                  <li key={feature} className="flex items-center gap-2 text-white/70">
+                    <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => handleOpenAuth('register')}
+                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all"
+              >
+                Start Free Trial
+              </button>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Link
+              to="/pricing"
+              className="inline-flex items-center gap-2 text-secondary hover:text-secondary/80 font-medium transition-colors"
+            >
+              View full pricing details
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================== */}
+      {/* AFFILIATE PROGRAM SECTION */}
+      {/* ========================================== */}
+      <section className="relative py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-pink-950/20 to-slate-950" />
+        <GradientOrb className="w-[500px] h-[500px] bg-pink-500/30 -left-48 top-1/4" delay={0} />
+        <GradientOrb className="w-[400px] h-[400px] bg-purple-500/30 -right-32 bottom-1/4" delay={2} />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-full text-pink-400 text-sm font-medium mb-6">
+              <Coins className="w-4 h-4" />
+              Earn While You Learn
+            </span>
+            <h2 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
+              Join the{' '}
+              <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
+                Brilla Ambassador
+              </span>
+              {' '}Program
+            </h2>
+            <p className="text-xl text-white/60 max-w-3xl mx-auto">
+              Share Brilla Prep with friends and earn up to 50% commission on every subscription.
+              The more you share, the more you earn!
+            </p>
+          </div>
+
+          {/* Commission Tiers */}
+          <div className="grid md:grid-cols-5 gap-4 mb-16">
+            {[
+              { rank: 'Scout', icon: '🔰', refs: '1-5', rate: '25%', color: 'from-emerald-500 to-green-600' },
+              { rank: 'Champion', icon: '⚔️', refs: '6-15', rate: '30%', color: 'from-blue-500 to-indigo-600' },
+              { rank: 'Ambassador', icon: '🛡️', refs: '16-30', rate: '40%', color: 'from-purple-500 to-violet-600' },
+              { rank: 'Legend', icon: '👑', refs: '31-50', rate: '50%', color: 'from-amber-500 to-orange-600' },
+              { rank: 'Elite', icon: '💎', refs: '51+', rate: '50%+', color: 'from-pink-500 to-rose-600' },
+            ].map((tier, index) => (
+              <Card3D key={tier.rank}>
+                <div
+                  className={cn(
+                    'relative glass rounded-2xl p-6 text-center group cursor-pointer transition-all duration-500',
+                    index === 4 && 'md:col-span-1'
+                  )}
+                >
+                  <div className={cn(
+                    'absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br',
+                    tier.color
+                  )} style={{ padding: '1px' }}>
+                    <div className="w-full h-full bg-slate-900 rounded-2xl" />
+                  </div>
+
+                  <div className="relative z-10">
+                    <div className="text-4xl mb-3">{tier.icon}</div>
+                    <h4 className="text-lg font-bold text-white mb-1">{tier.rank}</h4>
+                    <p className="text-white/50 text-sm mb-3">{tier.refs} referrals</p>
+                    <div className={cn(
+                      'inline-block px-4 py-2 rounded-full bg-gradient-to-r font-bold text-white',
+                      tier.color
+                    )}>
+                      {tier.rate}
+                    </div>
+                  </div>
+                </div>
+              </Card3D>
+            ))}
+          </div>
+
+          {/* Benefits Grid */}
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mx-auto mb-6">
+                <DollarSign className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">Instant Mobile Money</h3>
+              <p className="text-white/60">
+                Get paid directly to your MTN MoMo, Vodafone Cash, or AirtelTigo Money. Fast and hassle-free!
+              </p>
+            </div>
+
+            <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center mx-auto mb-6">
+                <Trophy className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">Leaderboards & Prizes</h3>
+              <p className="text-white/60">
+                Compete on individual and school leaderboards. Top affiliates win monthly cash prizes!
+              </p>
+            </div>
+
+            <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center mx-auto mb-6">
+                <Sparkles className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">XP & Achievements</h3>
+              <p className="text-white/60">
+                Earn XP, unlock badges, complete challenges, and level up your affiliate rank!
+              </p>
+            </div>
+          </div>
+
+          {/* Teacher Bonus Banner */}
+          <div className="relative glass rounded-2xl p-8 mb-12 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-orange-500/10" />
+            <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+                  <GraduationCap className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 rounded-full text-amber-400 text-sm font-medium mb-2">
+                    <BadgeCheck className="w-4 h-4" />
+                    Teacher Bonus
+                  </div>
+                  <h3 className="text-2xl font-bold text-white">Teachers get 1.5x faster tier progression!</h3>
+                  <p className="text-white/60">Refer students and climb the ranks 50% faster than everyone else.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => handleOpenAuth('register')}
+                className="flex-shrink-0 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+              >
+                Join as Teacher
+              </button>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center">
+            <button
+              onClick={() => handleOpenAuth('register')}
+              className="group relative inline-flex items-center gap-3"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-all" />
+              <div className="relative flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-full font-semibold text-white text-lg shadow-2xl hover:shadow-purple-500/40 transition-all hover:scale-105">
+                <PartyPopper className="w-5 h-5" />
+                Start Earning Today
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </button>
+            <p className="mt-4 text-white/50">
+              Join thousands of students and teachers earning with Brilla
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA Section */}
       <section
         ref={ctaRef.ref}
@@ -1408,6 +2014,12 @@ export function LandingPage() {
 
       {/* PWA Install Banner */}
       <PWAInstallBanner />
+
+      {/* Promotional Popup */}
+      <PromoPopup onOpenAuth={handleOpenAuth} />
+
+      {/* Floating CTA */}
+      <FloatingCTA onOpenAuth={handleOpenAuth} />
     </div>
   );
 }

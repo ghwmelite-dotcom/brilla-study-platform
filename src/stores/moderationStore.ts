@@ -63,7 +63,7 @@ interface ModerationState {
 
   // Report actions
   fetchReports: (status?: ReportStatus, limit?: number, offset?: number) => Promise<void>;
-  getReportDetails: (reportId: string) => Promise<{ report: ChatReport; userHistory: any } | null>;
+  getReportDetails: (reportId: string) => Promise<{ report: ChatReport; userHistory: unknown } | null>;
   submitReport: (reportedUserId: string, reason: string, description?: string, messageId?: string, roomId?: string) => Promise<boolean>;
   reviewReport: (reportId: string, resolution: ReportResolution, notes?: string) => Promise<void>;
   dismissReport: (reportId: string, notes?: string) => Promise<void>;
@@ -133,7 +133,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
       const data = await response.json();
 
       // Map API response to store format
-      const reports: ChatReport[] = (data.reports || []).map((r: any) => ({
+      const reports: ChatReport[] = (data.reports || []).map((r: Record<string, unknown>) => ({
         id: r.id,
         reporterId: r.reporter_id,
         reportedUserId: r.reported_user_id,
@@ -326,7 +326,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
 
       const data = await response.json();
 
-      const actions: ChatModerationAction[] = (data.actions || []).map((a: any) => ({
+      const actions: ChatModerationAction[] = (data.actions || []).map((a: Record<string, unknown>) => ({
         id: a.id,
         userId: a.user_id,
         roomId: a.room_id,
@@ -668,7 +668,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
 
       const data = await response.json();
 
-      const words: ChatFilteredWord[] = (data.filters || []).map((f: any) => ({
+      const words: ChatFilteredWord[] = (data.filters || []).map((f: Record<string, unknown>) => ({
         id: f.id,
         word: f.word,
         severity: f.severity,

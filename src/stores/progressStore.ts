@@ -226,12 +226,13 @@ export const useProgressStore = create<ProgressState>()(
             case 'xp_earned':
               isUnlocked = totalXP >= achievement.requirementValue;
               break;
-            case 'mastery_level':
+            case 'mastery_level': {
               const masteredTopics = Object.values(topicProgress).filter(
                 (p) => p.masteryLevel >= 80
               ).length;
               isUnlocked = masteredTopics >= achievement.requirementValue;
               break;
+            }
           }
 
           if (isUnlocked) {

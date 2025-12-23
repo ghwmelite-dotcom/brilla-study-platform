@@ -70,12 +70,10 @@ export default function ModerationDashboard() {
   const [newWord, setNewWord] = useState('');
   const [newWordSeverity, setNewWordSeverity] = useState<'low' | 'medium' | 'high'>('medium');
 
-  // Redirect non-admin users
-  if (user?.role !== 'admin') {
-    return <Navigate to="/dashboard" replace />;
-  }
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
+    if (!isAdmin) return;
     if (activeTab === 'reports') {
       fetchReports(statusFilter || undefined);
     } else if (activeTab === 'history') {
@@ -85,7 +83,12 @@ export default function ModerationDashboard() {
     } else if (activeTab === 'stats') {
       fetchStats();
     }
-  }, [activeTab, statusFilter]);
+  }, [activeTab, statusFilter, isAdmin, fetchReports, fetchModerationHistory, fetchFilteredWords, fetchStats]);
+
+  // Redirect non-admin users
+  if (!isAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleResolveReport = async (reportId: string, resolution: ReportResolution) => {
     await reviewReport(reportId, resolution, reviewNotes);

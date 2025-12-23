@@ -100,7 +100,7 @@ function MilestoneCard({ milestone, currentStreak, onClaim }: MilestoneCardProps
 }
 
 export function StreakPanel() {
-  const { streakInfo, milestones, isLoading, fetchStreakInfo, useProtection, claimMilestone } =
+  const { streakInfo, milestones, isLoading, fetchStreakInfo, useProtection: activateProtection, claimMilestone } =
     useStreakStore();
   const toast = useToastStore();
   const { awardXP } = useGamification();
@@ -110,7 +110,7 @@ export function StreakPanel() {
   }, [fetchStreakInfo]);
 
   const handleUseProtection = async () => {
-    const success = await useProtection();
+    const success = await activateProtection();
     if (success) {
       toast.showSuccess('Streak Protected!', 'Your streak is now frozen for today');
     } else {

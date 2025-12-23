@@ -18,6 +18,21 @@ import { useParentStore, useAuthStore } from '@/stores';
 import { cn } from '@/utils';
 import type { ParentNotificationType } from '@/types';
 
+// Notification data types
+interface LowPerformanceData {
+  accuracy: number;
+  subject?: string;
+}
+
+interface StreakMilestoneData {
+  days: number;
+}
+
+interface TopicMasteredData {
+  topicName: string;
+  mastery: number;
+}
+
 // Notification icon and color by type
 const notificationConfig: Record<ParentNotificationType, { icon: typeof Bell; bgColor: string; iconColor: string }> = {
   achievement_unlocked: { icon: Award, bgColor: 'bg-yellow-100', iconColor: 'text-yellow-600' },
@@ -218,8 +233,8 @@ export function ParentNotificationsPage() {
                     {notification.type === 'low_performance' && notification.data && (
                       <div className="mt-2 p-2 bg-red-50 rounded-lg">
                         <p className="text-sm text-red-600">
-                          Accuracy dropped to {(notification.data as any).accuracy}% in{' '}
-                          {(notification.data as any).subject || 'recent practice'}
+                          Accuracy dropped to {(notification.data as unknown as LowPerformanceData).accuracy}% in{' '}
+                          {(notification.data as unknown as LowPerformanceData).subject || 'recent practice'}
                         </p>
                       </div>
                     )}
@@ -228,7 +243,7 @@ export function ParentNotificationsPage() {
                       <div className="mt-2 flex items-center gap-2">
                         <Flame className="w-4 h-4 text-orange-500" />
                         <span className="text-sm text-orange-600 font-medium">
-                          {(notification.data as any).days}-day streak achieved!
+                          {(notification.data as unknown as StreakMilestoneData).days}-day streak achieved!
                         </span>
                       </div>
                     )}
@@ -237,8 +252,8 @@ export function ParentNotificationsPage() {
                       <div className="mt-2 flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-green-500" />
                         <span className="text-sm text-green-600">
-                          Mastered {(notification.data as any).topicName} with{' '}
-                          {(notification.data as any).mastery}% accuracy
+                          Mastered {(notification.data as unknown as TopicMasteredData).topicName} with{' '}
+                          {(notification.data as unknown as TopicMasteredData).mastery}% accuracy
                         </span>
                       </div>
                     )}

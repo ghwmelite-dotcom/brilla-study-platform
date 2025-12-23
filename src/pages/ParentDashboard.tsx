@@ -108,12 +108,21 @@ function StudentCard({
   );
 }
 
+interface ParentNotification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  createdAt: string;
+  isRead: boolean;
+}
+
 // Notification Preview Component
 function NotificationPreview({
   notifications,
   unreadCount,
 }: {
-  notifications: any[];
+  notifications: ParentNotification[];
   unreadCount: number;
 }) {
   const recentNotifs = notifications.slice(0, 3);

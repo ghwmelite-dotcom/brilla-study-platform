@@ -11,7 +11,7 @@ export interface Notification {
   message: string;
   icon?: string;
   link?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   isRead: boolean;
   createdAt: string;
   readAt?: string;

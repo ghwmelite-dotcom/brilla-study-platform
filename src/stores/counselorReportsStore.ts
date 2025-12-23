@@ -347,21 +347,20 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
         set({ isLoading: true, error: null });
         try {
           const params = studentId ? `?studentId=${studentId}` : '';
-          const response = await api.get<any[]>(`/counselor/parent-messages${params}`);
+          const response = await api.get<Record<string, unknown>[]>(`/counselor/parent-messages${params}`);
           if (response.success && response.data) {
-            const messages = response.data.map((m: any) => ({
-              id: m.id,
-              reportId: m.reportId,
-              parentId: m.parentId,
-              studentId: m.studentId,
-              senderRole: m.senderRole,
-              senderName: m.senderName,
-              message: m.content,
-              isRead: m.isRead,
-              readAt: m.readAt,
-              createdAt: m.createdAt,
+            const messages: ParentCounselorMessage[] = response.data.map((m) => ({
+              id: m.id as string,
+              reportId: m.reportId as string | undefined,
+              parentId: m.parentId as string,
+              studentId: m.studentId as string,
+              senderRole: m.senderRole as ParentCounselorMessage['senderRole'],
+              message: (m.content || m.message) as string,
+              isRead: m.isRead as boolean,
+              readAt: m.readAt as string | undefined,
+              createdAt: m.createdAt as string,
             }));
-            const unreadCount = messages.filter((m: ParentCounselorMessage) => !m.isRead).length;
+            const unreadCount = messages.filter((m) => !m.isRead).length;
             set({
               messages,
               unreadMessagesCount: unreadCount,
@@ -428,18 +427,17 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
       loadSchedules: async () => {
         set({ isLoading: true, error: null });
         try {
-          const response = await api.get<any[]>('/counselor/schedules');
+          const response = await api.get<Record<string, unknown>[]>('/counselor/schedules');
           if (response.success && response.data) {
-            const schedules = response.data.map((s: any) => ({
-              id: s.id,
-              studentId: s.studentId,
-              studentName: s.studentName,
-              parentId: s.parentId,
-              reportType: s.reportType,
-              frequency: s.frequency,
-              nextScheduledAt: s.nextScheduledAt,
-              isActive: s.isActive,
-              createdAt: s.createdAt,
+            const schedules: ReportSchedule[] = response.data.map((s) => ({
+              id: s.id as string,
+              studentId: s.studentId as string,
+              parentId: s.parentId as string,
+              reportType: s.reportType as ReportSchedule['reportType'],
+              isActive: s.isActive as boolean,
+              lastGeneratedAt: s.lastGeneratedAt as string | undefined,
+              nextGenerationAt: (s.nextGenerationAt || s.nextScheduledAt) as string | undefined,
+              createdAt: s.createdAt as string,
             }));
             set({ reportSchedules: schedules, isLoading: false });
           } else {
@@ -503,24 +501,24 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
         set({ isLoading: true, error: null });
         try {
           const params = studentId ? `?studentId=${studentId}` : '';
-          const response = await api.get<any[]>(`/counselor/session-summaries${params}`);
+          const response = await api.get<Record<string, unknown>[]>(`/counselor/session-summaries${params}`);
           if (response.success && response.data) {
-            const summaries: CounselorSessionSummary[] = response.data.map((s: any) => ({
-              id: s.id,
-              conversationId: s.conversationId || s.id,
-              studentId: s.studentId || studentId || '',
-              sessionDate: s.sessionDate || s.createdAt,
-              durationMinutes: s.durationMinutes,
-              briefSummary: s.briefSummary || s.lastMessage || '',
-              mainTopics: s.mainTopics || [],
-              emotionalState: s.emotionalState,
-              keyConcerns: s.keyConcerns || [],
-              breakthroughs: s.breakthroughs || [],
-              studentActionItems: s.studentActionItems || [],
-              recommendedResources: s.recommendedResources || [],
-              requiresAttention: s.requiresAttention || false,
-              attentionReason: s.attentionReason,
-              createdAt: s.createdAt,
+            const summaries: CounselorSessionSummary[] = response.data.map((s) => ({
+              id: s.id as string,
+              conversationId: (s.conversationId || s.id) as string,
+              studentId: (s.studentId || studentId || '') as string,
+              sessionDate: (s.sessionDate || s.createdAt) as string,
+              durationMinutes: s.durationMinutes as number | undefined,
+              briefSummary: (s.briefSummary || s.lastMessage || '') as string,
+              mainTopics: (s.mainTopics || []) as string[],
+              emotionalState: s.emotionalState as CounselorSessionSummary['emotionalState'],
+              keyConcerns: (s.keyConcerns || []) as string[],
+              breakthroughs: (s.breakthroughs || []) as string[],
+              studentActionItems: (s.studentActionItems || []) as string[],
+              recommendedResources: (s.recommendedResources || []) as CounselorSessionSummary['recommendedResources'],
+              requiresAttention: (s.requiresAttention || false) as boolean,
+              attentionReason: s.attentionReason as string | undefined,
+              createdAt: s.createdAt as string,
             }));
             set({ sessionSummaries: summaries, isLoading: false });
           } else {
