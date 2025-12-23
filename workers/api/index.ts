@@ -22,6 +22,7 @@ interface Env {
   AI_MODEL?: string;
   RESEND_API_KEY?: string;
   APP_URL?: string;
+  FROM_EMAIL?: string;
   LIBRARY_BUCKET?: R2Bucket;
   PAYSTACK_SECRET_KEY?: string;
   PAYSTACK_PUBLIC_KEY?: string;
@@ -565,16 +566,17 @@ publicApp.post('/auth/register', async (c) => {
 
       // Send email notification to admins
       if (c.env.RESEND_API_KEY && admins.length > 0) {
-        const appUrl = c.env.APP_URL || 'https://brillaprep.com';
+        const appUrl = c.env.APP_URL || 'https://brillaprep.org';
+        const fromEmail = c.env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>';
         const adminEmails = (admins as { email: string }[]).map(a => a.email);
 
-        // Send to first admin (or could send to all)
+        // Send to all admins
         const emailHtml = getNewRegistrationEmailHTML(name, email, roleLabel, appUrl);
 
         for (const adminEmail of adminEmails) {
           await sendEmail(
             c.env.RESEND_API_KEY,
-            'Brilla Prep <notifications@brillaprep.com>',
+            fromEmail,
             adminEmail,
             `New ${roleLabel} Registration Awaiting Approval`,
             emailHtml
