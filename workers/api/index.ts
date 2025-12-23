@@ -4,10 +4,13 @@ import { jwt, sign, verify } from 'hono/jwt';
 import type { JWTPayload } from 'hono/utils/jwt/types';
 import { libraryApp } from './library';
 import { counselorApp } from './counselor';
-import { notificationsApp } from './notifications';
+import { notificationsApp, createNotification } from './notifications';
 import { tutorApp } from './tutor';
 import { chatApp } from './chat';
 import { moderationApp } from './moderation';
+import { paymentsApp } from './payments';
+import { subscriptionsApp } from './subscriptions';
+import { affiliatesApp } from './affiliates';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -20,6 +23,9 @@ interface Env {
   RESEND_API_KEY?: string;
   APP_URL?: string;
   LIBRARY_BUCKET?: R2Bucket;
+  PAYSTACK_SECRET_KEY?: string;
+  PAYSTACK_PUBLIC_KEY?: string;
+  PAYSTACK_WEBHOOK_SECRET?: string;
 }
 
 // User type for JWT payload
@@ -208,6 +214,40 @@ function getPasswordResetEmailHTML(name: string, resetUrl: string): string {
           <a href="${resetUrl}" style="background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">Reset Password</a>
         </div>
         <p style="font-size: 14px; color: #6b7280;">This link expires in 1 hour. If you didn't request this, please ignore this email.</p>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+        <p style="font-size: 12px; color: #9ca3af; text-align: center;">Brilla Study Platform - Excellence in Learning</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+function getNewRegistrationEmailHTML(userName: string, userEmail: string, userRole: string, appUrl: string): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>New Registration Awaiting Approval - Brilla</title>
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #059669 0%, #0d9488 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 28px;">New Registration Request</h1>
+      </div>
+      <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+        <p style="font-size: 16px;">Hello Admin,</p>
+        <p style="font-size: 16px;">A new user has registered on Brilla Study Platform and is awaiting your approval:</p>
+        <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <p style="margin: 8px 0; font-size: 15px;"><strong>Name:</strong> ${userName}</p>
+          <p style="margin: 8px 0; font-size: 15px;"><strong>Email:</strong> ${userEmail}</p>
+          <p style="margin: 8px 0; font-size: 15px;"><strong>Role:</strong> ${userRole}</p>
+          <p style="margin: 8px 0; font-size: 15px;"><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+        </div>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${appUrl}/admin/approvals" style="background: linear-gradient(135deg, #059669 0%, #0d9488 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">Review Registration</a>
+        </div>
+        <p style="font-size: 14px; color: #6b7280;">Please review this registration request at your earliest convenience.</p>
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
         <p style="font-size: 12px; color: #9ca3af; text-align: center;">Brilla Study Platform - Excellence in Learning</p>
       </div>
@@ -496,6 +536,55 @@ publicApp.post('/auth/register', async (c) => {
       subjectsTaught ? JSON.stringify(subjectsTaught) : null,
       yearsExperience || null, qualifications || null
     ).run();
+
+    // Notify all admin users about the new registration
+    try {
+      const { results: admins } = await c.env.DB.prepare(
+        "SELECT id, email, name FROM users WHERE role = 'admin' AND status = 'approved'"
+      ).all();
+
+      const roleLabel = userRole.charAt(0).toUpperCase() + userRole.slice(1);
+      const notificationTitle = `New ${roleLabel} Registration`;
+      const notificationMessage = `${name} (${email}) has registered as a ${userRole} and is awaiting approval.`;
+
+      // Create in-app notification for each admin
+      for (const admin of admins as { id: string; email: string; name: string }[]) {
+        await createNotification(
+          c.env.DB,
+          admin.id,
+          'system',
+          notificationTitle,
+          notificationMessage,
+          {
+            icon: 'user-plus',
+            link: '/admin/approvals',
+            metadata: { registrationId: id, registrantEmail: email, registrantRole: userRole }
+          }
+        );
+      }
+
+      // Send email notification to admins
+      if (c.env.RESEND_API_KEY && admins.length > 0) {
+        const appUrl = c.env.APP_URL || 'https://brillaprep.com';
+        const adminEmails = (admins as { email: string }[]).map(a => a.email);
+
+        // Send to first admin (or could send to all)
+        const emailHtml = getNewRegistrationEmailHTML(name, email, roleLabel, appUrl);
+
+        for (const adminEmail of adminEmails) {
+          await sendEmail(
+            c.env.RESEND_API_KEY,
+            'Brilla Prep <notifications@brillaprep.com>',
+            adminEmail,
+            `New ${roleLabel} Registration Awaiting Approval`,
+            emailHtml
+          );
+        }
+      }
+    } catch (notifyError) {
+      // Log but don't fail the registration if notification fails
+      console.error('Failed to notify admins:', notifyError);
+    }
 
     return c.json({
       success: true,
@@ -6915,6 +7004,15 @@ app.route('/api/chat', chatApp);
 
 // Mount Moderation routes
 app.route('/api/moderation', moderationApp);
+
+// Mount Payments routes
+app.route('/api/payments', paymentsApp);
+
+// Mount Subscriptions routes
+app.route('/api/subscriptions', subscriptionsApp);
+
+// Mount Affiliates routes (includes public /ref/:code endpoint)
+app.route('/api/affiliates', affiliatesApp);
 
 // Mount protected routes (must be after all protectedApp routes are defined)
 app.route('/api', protectedApp);
