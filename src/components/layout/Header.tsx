@@ -46,7 +46,7 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
   useEffect(() => {
     if (isAuthenticated) {
       fetchUnreadCount();
-      const interval = setInterval(fetchUnreadCount, 60000); // Every minute
+      const interval = setInterval(fetchUnreadCount, 30000); // Every 30 seconds
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, fetchUnreadCount]);
