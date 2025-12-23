@@ -3,15 +3,38 @@ import { api } from '@/lib/api';
 
 // Notification sound helper
 let audioContext: AudioContext | null = null;
+let audioEnabled = false;
+let initialLoadComplete = false;
+
+// Initialize audio context on user interaction
+function initAudioContext() {
+  if (audioEnabled) return;
+
+  try {
+    audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    audioEnabled = true;
+
+    // Remove listeners after successful init
+    document.removeEventListener('click', initAudioContext);
+    document.removeEventListener('keydown', initAudioContext);
+  } catch (error) {
+    console.warn('Could not initialize audio context:', error);
+  }
+}
+
+// Add listeners for user interaction to enable audio
+if (typeof document !== 'undefined') {
+  document.addEventListener('click', initAudioContext, { once: true });
+  document.addEventListener('keydown', initAudioContext, { once: true });
+}
 
 function playNotificationSound() {
-  try {
-    // Create audio context on first use (required for user gesture policy)
-    if (!audioContext) {
-      audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-    }
+  if (!audioEnabled || !audioContext) {
+    return;
+  }
 
-    // Resume if suspended (browser policy)
+  try {
+    // Resume if suspended
     if (audioContext.state === 'suspended') {
       audioContext.resume();
     }
@@ -174,9 +197,13 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       const response = await api.get<{ count: number }>('/notifications/count');
       if (response.success && response.data) {
         const newCount = response.data.count;
-        // Play sound if there are new notifications
-        if (newCount > currentCount && currentCount >= 0) {
+        // Play sound if there are NEW notifications (skip initial page load)
+        if (initialLoadComplete && newCount > currentCount) {
           playNotificationSound();
+        }
+        // Mark initial load as complete after first successful fetch
+        if (!initialLoadComplete) {
+          initialLoadComplete = true;
         }
         set({ unreadCount: newCount });
       }
