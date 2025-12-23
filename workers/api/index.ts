@@ -223,6 +223,67 @@ function getPasswordResetEmailHTML(name: string, resetUrl: string): string {
   `;
 }
 
+function getApprovalEmailHTML(userName: string, appUrl: string): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Account Approved - Brilla</title>
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 28px;">🎉 You're Approved!</h1>
+      </div>
+      <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+        <p style="font-size: 16px;">Hello <strong>${userName}</strong>,</p>
+        <p style="font-size: 16px;">Great news! Your Brilla Study Platform account has been approved. You can now log in and start your learning journey!</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${appUrl}/login" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">Log In Now</a>
+        </div>
+        <p style="font-size: 14px; color: #6b7280;">Welcome to Brilla! We're excited to have you join our community of learners.</p>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+        <p style="font-size: 12px; color: #9ca3af; text-align: center;">Brilla Study Platform - Excellence in Learning</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+function getRejectionEmailHTML(userName: string, reason: string | null, appUrl: string): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Registration Update - Brilla</title>
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 28px;">Registration Update</h1>
+      </div>
+      <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+        <p style="font-size: 16px;">Hello <strong>${userName}</strong>,</p>
+        <p style="font-size: 16px;">Thank you for your interest in Brilla Study Platform. Unfortunately, we were unable to approve your registration at this time.</p>
+        ${reason ? `
+        <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
+          <p style="margin: 0; font-size: 14px;"><strong>Reason:</strong> ${reason}</p>
+        </div>
+        ` : ''}
+        <p style="font-size: 14px; color: #6b7280;">If you believe this was a mistake or would like to provide additional information, please contact us or try registering again.</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${appUrl}" style="background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">Visit Brilla</a>
+        </div>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+        <p style="font-size: 12px; color: #9ca3af; text-align: center;">Brilla Study Platform - Excellence in Learning</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
 function getNewRegistrationEmailHTML(userName: string, userEmail: string, userRole: string, appUrl: string): string {
   return `
     <!DOCTYPE html>
@@ -4397,7 +4458,24 @@ adminApp.post('/users/:id/approve', async (c) => {
       reason: 'Admin approval',
     });
 
-    // TODO: Send approval email notification
+    // Send approval email notification
+    if (c.env.RESEND_API_KEY && user.email) {
+      try {
+        const appUrl = c.env.APP_URL || 'https://brillaprep.org';
+        const fromEmail = c.env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>';
+        const emailHtml = getApprovalEmailHTML(user.name as string, appUrl);
+
+        await sendEmail(
+          c.env.RESEND_API_KEY,
+          fromEmail,
+          user.email as string,
+          'Your Brilla Account Has Been Approved! 🎉',
+          emailHtml
+        );
+      } catch (emailError) {
+        console.error('Failed to send approval email:', emailError);
+      }
+    }
 
     return c.json({ success: true, data: { message: 'User approved successfully' } });
   } catch (error) {
@@ -4452,6 +4530,26 @@ adminApp.post('/users/:id/reject', async (c) => {
       changedFields: ['status', 'rejection_reason', 'rejected_by', 'rejected_at'],
       reason: 'Admin rejection',
     });
+
+    // Send rejection email notification
+    if (c.env.RESEND_API_KEY && user.email) {
+      try {
+        const appUrl = c.env.APP_URL || 'https://brillaprep.org';
+        const fromEmail = c.env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>';
+        const emailHtml = getRejectionEmailHTML(user.name as string, reason || null, appUrl);
+
+        await sendEmail(
+          c.env.RESEND_API_KEY,
+          fromEmail,
+          user.email as string,
+          'Registration Update - Brilla Study Platform',
+          emailHtml
+        );
+      } catch (emailError) {
+        console.error('Failed to send rejection email:', emailError);
+        // Don't fail the rejection if email fails
+      }
+    }
 
     return c.json({ success: true, data: { message: 'User rejected' } });
   } catch (error) {
