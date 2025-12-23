@@ -33,6 +33,7 @@ export function PendingUsersPanel({ className }: PendingUsersPanelProps) {
   const [showRejectModal, setShowRejectModal] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [actionResult, setActionResult] = useState<{ userId: string; type: 'approved' | 'rejected' } | null>(null);
+  const [rejectError, setRejectError] = useState<string | null>(null);
 
   useEffect(() => {
     loadPendingUsers();
@@ -52,8 +53,12 @@ export function PendingUsersPanel({ className }: PendingUsersPanelProps) {
   };
 
   const handleReject = async (userId: string) => {
-    if (!rejectReason.trim()) return;
+    if (!rejectReason.trim()) {
+      setRejectError('Please enter a rejection reason');
+      return;
+    }
 
+    setRejectError(null);
     setProcessingId(userId);
     try {
       await rejectUser(userId, rejectReason);
@@ -63,6 +68,7 @@ export function PendingUsersPanel({ className }: PendingUsersPanelProps) {
       setTimeout(() => setActionResult(null), 2000);
     } catch (error) {
       console.error('Failed to reject user:', error);
+      setRejectError(error instanceof Error ? error.message : 'Failed to reject user. Please try again.');
     } finally {
       setProcessingId(null);
     }
@@ -330,7 +336,12 @@ export function PendingUsersPanel({ className }: PendingUsersPanelProps) {
                   <span>Approve</span>
                 </button>
                 <button
-                  onClick={() => setShowRejectModal(user.id)}
+                  type="button"
+                  onClick={() => {
+                    setRejectError(null);
+                    setRejectReason('');
+                    setShowRejectModal(user.id);
+                  }}
                   disabled={processingId === user.id}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white text-red-600 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
@@ -371,21 +382,32 @@ export function PendingUsersPanel({ className }: PendingUsersPanelProps) {
               </label>
               <textarea
                 value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
+                onChange={(e) => {
+                  setRejectReason(e.target.value);
+                  if (rejectError) setRejectError(null);
+                }}
                 placeholder="e.g., Invalid GES license number, incomplete information..."
                 rows={3}
                 className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 resize-none"
               />
             </div>
 
+            {rejectError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                {rejectError}
+              </div>
+            )}
+
             <div className="flex items-center gap-2">
               <button
+                type="button"
                 onClick={() => setShowRejectModal(null)}
                 className="flex-1 px-4 py-2 text-neutral-700 bg-neutral-100 rounded-lg hover:bg-neutral-200 transition-colors"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={() => handleReject(showRejectModal)}
                 disabled={!rejectReason.trim() || processingId === showRejectModal}
                 className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
