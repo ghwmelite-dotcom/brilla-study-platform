@@ -1,6 +1,41 @@
 import { create } from 'zustand';
 import { api } from '@/lib/api';
 
+// Notification sound helper
+let audioContext: AudioContext | null = null;
+
+function playNotificationSound() {
+  try {
+    // Create audio context on first use (required for user gesture policy)
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    }
+
+    // Resume if suspended (browser policy)
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
+
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    // Pleasant notification tone (two-tone chime)
+    oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A5
+    oscillator.frequency.setValueAtTime(1108.73, audioContext.currentTime + 0.1); // C#6
+
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.3);
+  } catch (error) {
+    console.warn('Could not play notification sound:', error);
+  }
+}
+
 // Types
 export type NotificationType = 'achievement' | 'streak' | 'xp' | 'challenge' | 'content' | 'system' | 'reminder' | 'social';
 
@@ -135,9 +170,15 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
   fetchUnreadCount: async () => {
     try {
+      const currentCount = get().unreadCount;
       const response = await api.get<{ count: number }>('/notifications/count');
       if (response.success && response.data) {
-        set({ unreadCount: response.data.count });
+        const newCount = response.data.count;
+        // Play sound if there are new notifications
+        if (newCount > currentCount && currentCount >= 0) {
+          playNotificationSound();
+        }
+        set({ unreadCount: newCount });
       }
     } catch (error) {
       console.error('Failed to fetch unread count:', error);
