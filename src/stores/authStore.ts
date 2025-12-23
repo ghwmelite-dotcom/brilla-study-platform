@@ -85,7 +85,7 @@ interface AuthState {
   clearError: () => void;
 
   // Admin actions - Approvals
-  loadPendingUsers: () => void;
+  loadPendingUsers: () => Promise<void>;
   approveUser: (userId: string) => Promise<void>;
   rejectUser: (userId: string, reason: string) => Promise<void>;
   getPendingCount: () => number;
@@ -455,10 +455,41 @@ export const useAuthStore = create<AuthState>()(
       clearError: () => set({ error: null }),
 
       // Admin actions
-      loadPendingUsers: () => {
-        const pendingUsers = loadPendingUsersFromStorage();
-        const pending = pendingUsers.filter(u => u.status === 'pending');
-        set({ pendingUsers: pending, pendingCount: pending.length });
+      loadPendingUsers: async () => {
+        try {
+          const response = await api.get<Record<string, unknown>[]>('/admin/users/pending');
+          if (response.success && response.data) {
+            const pending: PendingUser[] = response.data.map((u) => ({
+              id: u.id as string,
+              email: u.email as string,
+              name: u.name as string,
+              role: u.role as UserRole,
+              status: 'pending' as const,
+              schoolLevel: u.school_level as SchoolLevel | undefined,
+              yearGroup: u.year_group as number | undefined,
+              schoolName: u.school_name as string | undefined,
+              house: u.house as string | undefined,
+              teacherLicenseNumber: u.teacher_license_number as string | undefined,
+              subjectsTaught: u.subjectsTaught as string[] | undefined,
+              yearsExperience: u.years_experience as string | undefined,
+              qualifications: u.qualifications as string | undefined,
+              registeredAt: u.created_at as string,
+              createdAt: u.created_at as string,
+            }));
+            set({ pendingUsers: pending, pendingCount: pending.length });
+          } else {
+            // Fallback to localStorage for demo mode
+            const pendingUsers = loadPendingUsersFromStorage();
+            const pending = pendingUsers.filter(u => u.status === 'pending');
+            set({ pendingUsers: pending, pendingCount: pending.length });
+          }
+        } catch (error) {
+          console.error('Failed to load pending users:', error);
+          // Fallback to localStorage
+          const pendingUsers = loadPendingUsersFromStorage();
+          const pending = pendingUsers.filter(u => u.status === 'pending');
+          set({ pendingUsers: pending, pendingCount: pending.length });
+        }
       },
 
       approveUser: async (userId: string) => {
@@ -467,27 +498,19 @@ export const useAuthStore = create<AuthState>()(
           throw new Error('Only admins can approve users');
         }
 
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        const allPending = loadPendingUsersFromStorage();
-        const userIndex = allPending.findIndex(u => u.id === userId);
-
-        if (userIndex === -1) {
-          throw new Error('User not found');
+        try {
+          const response = await api.post(`/admin/users/${userId}/approve`, {});
+          if (response.success) {
+            // Refresh the pending list from API
+            const { loadPendingUsers } = get();
+            await loadPendingUsers();
+          } else {
+            throw new Error(response.error || 'Failed to approve user');
+          }
+        } catch (error) {
+          console.error('Failed to approve user:', error);
+          throw error;
         }
-
-        // Update user status
-        allPending[userIndex].status = 'approved';
-        savePendingUsersToStorage(allPending);
-
-        // Refresh the pending list
-        const pending = allPending.filter(u => u.status === 'pending');
-        set({ pendingUsers: pending, pendingCount: pending.length });
-
-        // In production, this would also:
-        // 1. Create the actual user account
-        // 2. Send email notification to the user
-        // 3. Log the approval action
       },
 
       rejectUser: async (userId: string, reason: string) => {
@@ -496,30 +519,23 @@ export const useAuthStore = create<AuthState>()(
           throw new Error('Only admins can reject users');
         }
 
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        const allPending = loadPendingUsersFromStorage();
-        const userIndex = allPending.findIndex(u => u.id === userId);
-
-        if (userIndex === -1) {
-          throw new Error('User not found');
+        try {
+          const response = await api.post(`/admin/users/${userId}/reject`, { reason });
+          if (response.success) {
+            // Refresh the pending list from API
+            const { loadPendingUsers } = get();
+            await loadPendingUsers();
+          } else {
+            throw new Error(response.error || 'Failed to reject user');
+          }
+        } catch (error) {
+          console.error('Failed to reject user:', error);
+          throw error;
         }
-
-        // Update user status
-        allPending[userIndex].status = 'rejected';
-        savePendingUsersToStorage(allPending);
-
-        // Refresh the pending list
-        const pending = allPending.filter(u => u.status === 'pending');
-        set({ pendingUsers: pending, pendingCount: pending.length });
-
-        // In production, this would also send rejection email with reason
-        console.log(`User ${userId} rejected with reason: ${reason}`);
       },
 
       getPendingCount: () => {
-        const pendingUsers = loadPendingUsersFromStorage();
-        return pendingUsers.filter(u => u.status === 'pending').length;
+        return get().pendingCount;
       },
 
       // User Management Actions
