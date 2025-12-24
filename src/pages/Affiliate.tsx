@@ -797,11 +797,11 @@ export default function Affiliate() {
                       </div>
 
                       <button
-                        disabled={profile.stats.availableEarnings < 10}
+                        disabled={profile.stats.availableEarnings < 100}
                         className="w-full bg-primary text-white py-3 rounded-xl font-medium hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {profile.stats.availableEarnings < 10
-                          ? 'Minimum withdrawal: 10 GHS'
+                        {profile.stats.availableEarnings < 100
+                          ? 'Minimum withdrawal: 100 GHS'
                           : `Withdraw ${profile.stats.availableEarnings} GHS`}
                       </button>
                     </div>

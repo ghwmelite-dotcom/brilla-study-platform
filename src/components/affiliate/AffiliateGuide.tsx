@@ -45,7 +45,7 @@ const TIERS = [
 const FAQS = [
   {
     question: 'How do I get paid?',
-    answer: 'Earnings are paid directly to your Mobile Money account. Set up your payment details in the Earnings tab, and request a withdrawal once you reach the minimum balance of 10 GHS.',
+    answer: 'Earnings are paid directly to your Mobile Money account. Set up your payment details in the Earnings tab, and request a withdrawal once you reach the minimum balance of 100 GHS.',
   },
   {
     question: 'When do I earn commission?',
@@ -301,7 +301,7 @@ export default function AffiliateGuide({ isOpen, onClose, referralLink }: Affili
                   { icon: Users, title: 'Friends Sign Up', description: 'When someone clicks your link and creates an account, they\'re linked to you as the referrer.', color: 'bg-purple-500' },
                   { icon: Play, title: 'They Start Trial', description: 'Your referral gets a 14-day free trial with full premium access. Your commission becomes "pending".', color: 'bg-amber-500' },
                   { icon: DollarSign, title: 'They Subscribe', description: 'When they subscribe to premium, your pending commission is confirmed and added to your balance!', color: 'bg-green-500' },
-                  { icon: Wallet, title: 'You Withdraw', description: 'Once you have 10 GHS or more, withdraw directly to your Mobile Money account anytime.', color: 'bg-pink-500' },
+                  { icon: Wallet, title: 'You Withdraw', description: 'Once you have 100 GHS or more, withdraw directly to your Mobile Money account anytime.', color: 'bg-pink-500' },
                 ].map((step, index) => (
                   <div
                     key={index}
