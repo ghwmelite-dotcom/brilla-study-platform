@@ -91,11 +91,11 @@ class ApiClient {
   // AUTH ENDPOINTS
   // =============================================
 
-  async login(email: string, password: string) {
-    return this.post<{ user: User; token: string }>('/auth/login', { email, password });
+  async login(email: string, password: string, turnstileToken?: string) {
+    return this.post<{ user: User; token: string }>('/auth/login', { email, password, turnstileToken });
   }
 
-  async register(data: RegisterData) {
+  async register(data: RegisterData & { turnstileToken?: string }) {
     return this.post<{ status: string; message: string }>('/auth/register', data);
   }
 
@@ -103,16 +103,16 @@ class ApiClient {
     return this.get<{ name: string; email: string }>(`/auth/verify-token?token=${token}`);
   }
 
-  async setPassword(token: string, password: string) {
-    return this.post<{ message: string }>('/auth/set-password', { token, password });
+  async setPassword(token: string, password: string, turnstileToken?: string) {
+    return this.post<{ message: string }>('/auth/set-password', { token, password, turnstileToken });
   }
 
-  async forgotPassword(email: string) {
-    return this.post<{ message: string }>('/auth/forgot-password', { email });
+  async forgotPassword(email: string, turnstileToken?: string) {
+    return this.post<{ message: string }>('/auth/forgot-password', { email, turnstileToken });
   }
 
-  async resetPassword(token: string, password: string) {
-    return this.post<{ message: string }>('/auth/reset-password', { token, password });
+  async resetPassword(token: string, password: string, turnstileToken?: string) {
+    return this.post<{ message: string }>('/auth/reset-password', { token, password, turnstileToken });
   }
 
   // =============================================

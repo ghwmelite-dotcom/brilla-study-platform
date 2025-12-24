@@ -26,6 +26,7 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/utils';
 import { PlanSelectionStep } from './PlanSelectionStep';
+import { Turnstile, useTurnstile } from '@/components/common/Turnstile';
 
 type AuthMode = 'login' | 'register';
 type UserRole = 'student' | 'teacher' | 'admin' | 'parent';
@@ -45,6 +46,7 @@ interface FormErrors {
 
 export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalProps) {
   const { register, login, isLoading, clearError } = useAuthStore();
+  const turnstile = useTurnstile();
 
   const [mode, setMode] = useState<AuthMode>(initialMode);
 
@@ -82,11 +84,12 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
         setRegistrationStatus('idle');
         setRegistrationMessage('');
         setShowPassword(false);
+        turnstile.reset();
         clearError();
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [isOpen, clearError]);
+  }, [isOpen, clearError, turnstile]);
 
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [selectedTierId, setSelectedTierId] = useState<string | null>(null);
@@ -176,6 +179,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
 
   const handleModeSwitch = (newMode: AuthMode) => {
     resetForm();
+    turnstile.reset();
     setMode(newMode);
   };
 
@@ -262,13 +266,19 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
 
     if (!validateForm()) return;
 
+    // Verify Turnstile is completed
+    if (!turnstile.isVerified || !turnstile.token) {
+      setFormErrors({ submit: 'Please complete the security check.' });
+      return;
+    }
+
     setIsSubmitting(true);
     clearError();
 
     try {
       if (mode === 'login') {
         // Use store login which handles demo accounts and pending user checks
-        await login(email, password);
+        await login(email, password, turnstile.token);
         onClose();
       } else {
         // Register user - account will be pending until admin approves
@@ -289,6 +299,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           phoneNumber: selectedRole === 'parent' ? phoneNumber : undefined,
           inviteCode: selectedRole === 'parent' && parentInviteCode ? parentInviteCode : undefined,
           selectedTierId: selectedTierId || undefined,
+          turnstileToken: turnstile.token,
         });
 
         // Show pending approval message
@@ -300,6 +311,8 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
         setRegistrationStatus('error');
       }
       setFormErrors({ submit: err instanceof Error ? err.message : 'An error occurred. Please try again.' });
+      // Reset turnstile on error so user can try again
+      turnstile.reset();
     } finally {
       setIsSubmitting(false);
     }
@@ -926,9 +939,20 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                 </>
               )}
 
+              {/* Turnstile Security Check */}
+              <div className="flex justify-center">
+                <Turnstile
+                  onVerify={turnstile.handleVerify}
+                  onError={turnstile.handleError}
+                  onExpire={turnstile.handleExpire}
+                  theme="light"
+                  size="normal"
+                />
+              </div>
+
               <button
                 type="submit"
-                disabled={isSubmitting || isLoading}
+                disabled={isSubmitting || isLoading || !turnstile.isVerified}
                 className="w-full py-3 bg-gradient-to-r from-primary to-accent text-white font-medium rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting || isLoading ? (

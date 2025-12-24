@@ -23,6 +23,7 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/lib/api';
 import { cn } from '@/utils';
+import { Turnstile, useTurnstile } from '@/components/common/Turnstile';
 
 type SettingsTab = 'profile' | 'password' | 'notifications' | 'appearance';
 
@@ -30,6 +31,7 @@ export default function Settings() {
   const navigate = useNavigate();
   const { user, updateProfile } = useAuthStore();
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
+  const passwordTurnstile = useTurnstile();
 
   // Profile form state
   const [profileForm, setProfileForm] = useState({
@@ -211,10 +213,17 @@ export default function Settings() {
       return;
     }
 
+    if (!passwordTurnstile.isVerified || !passwordTurnstile.token) {
+      setPasswordError('Please complete the security check');
+      setPasswordSaving(false);
+      return;
+    }
+
     try {
       const response = await api.post('/users/me/change-password', {
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword,
+        turnstileToken: passwordTurnstile.token,
       });
 
       if (!response.success) {
@@ -223,9 +232,11 @@ export default function Settings() {
 
       setPasswordSuccess(true);
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      passwordTurnstile.reset();
       setTimeout(() => setPasswordSuccess(false), 3000);
     } catch (error) {
       setPasswordError(error instanceof Error ? error.message : 'Failed to change password');
+      passwordTurnstile.reset();
     } finally {
       setPasswordSaving(false);
     }
@@ -601,10 +612,21 @@ export default function Settings() {
                     </div>
                   </div>
 
+                  {/* Turnstile Security Check */}
+                  <div className="flex justify-center pt-2">
+                    <Turnstile
+                      onVerify={passwordTurnstile.handleVerify}
+                      onError={passwordTurnstile.handleError}
+                      onExpire={passwordTurnstile.handleExpire}
+                      theme="light"
+                      size="normal"
+                    />
+                  </div>
+
                   <div className="flex justify-end pt-4 border-t border-neutral-200">
                     <button
                       onClick={handlePasswordChange}
-                      disabled={passwordSaving || !passwordForm.currentPassword || !passwordForm.newPassword}
+                      disabled={passwordSaving || !passwordForm.currentPassword || !passwordForm.newPassword || !passwordTurnstile.isVerified}
                       className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50"
                     >
                       {passwordSaving ? (

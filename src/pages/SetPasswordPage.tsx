@@ -13,10 +13,12 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { cn } from '@/utils';
+import { Turnstile, useTurnstile } from '@/components/common/Turnstile';
 
 export function SetPasswordPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const turnstile = useTurnstile();
 
   const token = searchParams.get('token');
 
@@ -78,17 +80,24 @@ export function SetPasswordPage() {
       return;
     }
 
+    if (!turnstile.isVerified || !turnstile.token) {
+      setError('Please complete the security check.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const response = await api.setPassword(token!, password);
+      const response = await api.setPassword(token!, password, turnstile.token);
       if (response.success) {
         setIsSuccess(true);
       } else {
         setError(response.error || 'Failed to set password.');
+        turnstile.reset();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to set password.');
+      turnstile.reset();
     } finally {
       setIsSubmitting(false);
     }
@@ -287,13 +296,24 @@ export function SetPasswordPage() {
               )}
             </div>
 
+            {/* Turnstile Security Check */}
+            <div className="flex justify-center">
+              <Turnstile
+                onVerify={turnstile.handleVerify}
+                onError={turnstile.handleError}
+                onExpire={turnstile.handleExpire}
+                theme="light"
+                size="normal"
+              />
+            </div>
+
             {/* Submit button */}
             <button
               type="submit"
-              disabled={isSubmitting || !isPasswordValid || !passwordsMatch}
+              disabled={isSubmitting || !isPasswordValid || !passwordsMatch || !turnstile.isVerified}
               className={cn(
                 'w-full py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2',
-                isSubmitting || !isPasswordValid || !passwordsMatch
+                isSubmitting || !isPasswordValid || !passwordsMatch || !turnstile.isVerified
                   ? 'bg-neutral-200 text-neutral-500 cursor-not-allowed'
                   : 'bg-primary text-white hover:bg-primary-dark'
               )}

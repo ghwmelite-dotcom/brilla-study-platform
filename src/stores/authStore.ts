@@ -59,6 +59,8 @@ export interface CreateUserData {
   qualifications?: string;
   // Parent-specific fields
   phoneNumber?: string;
+  // Turnstile token for bot protection
+  turnstileToken?: string;
 }
 
 interface AuthState {
@@ -78,7 +80,7 @@ interface AuthState {
   // Actions
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, turnstileToken?: string) => Promise<void>;
   register: (data: RegisterData) => Promise<{ success: boolean; status: UserStatus; message: string }>;
   logout: () => void;
   updateProfile: (updates: Partial<User>) => void;
@@ -159,6 +161,8 @@ interface RegisterData {
   inviteCode?: string; // Optional: link to student during registration
   // Premium tier selection (for auto-trial on approval)
   selectedTierId?: string;
+  // Turnstile token for bot protection
+  turnstileToken?: string;
 }
 
 // Storage keys (simulating database for fallback/demo)
@@ -325,11 +329,11 @@ export const useAuthStore = create<AuthState>()(
         set({ token });
       },
 
-      login: async (email, password) => {
+      login: async (email, password, turnstileToken?) => {
         set({ isLoading: true, error: null });
         try {
           // Try the production API first
-          const response = await api.login(email, password);
+          const response = await api.login(email, password, turnstileToken);
 
           if (response.success && response.data) {
             const { user: apiUser, token } = response.data;

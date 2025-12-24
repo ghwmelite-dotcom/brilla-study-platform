@@ -18,6 +18,7 @@ import {
 import { useAuthStore, type CreateUserData } from '@/stores/authStore';
 import { cn } from '@/utils';
 import type { SchoolLevel } from '@/types';
+import { Turnstile, useTurnstile } from '@/components/common/Turnstile';
 
 type UserRole = 'student' | 'teacher' | 'admin';
 
@@ -33,6 +34,7 @@ interface FormErrors {
 
 export function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModalProps) {
   const { createUser } = useAuthStore();
+  const turnstile = useTurnstile();
 
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
@@ -69,6 +71,7 @@ export function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModalProps) 
     setFormErrors({});
     setSelectedRole(null);
     setSuccessMessage('');
+    turnstile.reset();
   };
 
   const handleClose = () => {
@@ -120,11 +123,16 @@ export function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModalProps) 
 
     if (!validateForm()) return;
 
+    if (!turnstile.isVerified || !turnstile.token) {
+      setFormErrors({ submit: 'Please complete the security check.' });
+      return;
+    }
+
     setIsSubmitting(true);
     setFormErrors({});
 
     try {
-      const userData: CreateUserData = {
+      const userData: CreateUserData & { turnstileToken: string } = {
         email,
         name,
         role: selectedRole!,
@@ -136,6 +144,7 @@ export function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModalProps) 
         subjectsTaught: selectedRole === 'teacher' ? subjectsTaught : undefined,
         yearsExperience: selectedRole === 'teacher' ? yearsExperience : undefined,
         qualifications: selectedRole === 'teacher' ? qualifications : undefined,
+        turnstileToken: turnstile.token,
       };
 
       await createUser(userData);
@@ -147,6 +156,7 @@ export function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModalProps) 
       }, 1500);
     } catch (err) {
       setFormErrors({ submit: err instanceof Error ? err.message : 'Failed to create user' });
+      turnstile.reset();
     } finally {
       setIsSubmitting(false);
     }
@@ -534,10 +544,21 @@ export function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModalProps) 
                 </div>
               )}
 
+              {/* Turnstile Security Check */}
+              <div className="flex justify-center mt-4">
+                <Turnstile
+                  onVerify={turnstile.handleVerify}
+                  onError={turnstile.handleError}
+                  onExpire={turnstile.handleExpire}
+                  theme="light"
+                  size="normal"
+                />
+              </div>
+
               {/* Submit */}
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !turnstile.isVerified}
                 className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
               >
                 {isSubmitting ? (

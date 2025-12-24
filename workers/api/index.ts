@@ -27,6 +27,7 @@ interface Env {
   PAYSTACK_SECRET_KEY?: string;
   PAYSTACK_PUBLIC_KEY?: string;
   PAYSTACK_WEBHOOK_SECRET?: string;
+  TURNSTILE_SECRET?: string;
 }
 
 // User type for JWT payload
@@ -130,6 +131,44 @@ async function verifyJWT(token: string, secret: string): Promise<UserPayload | n
     return payload as UserPayload;
   } catch {
     return null;
+  }
+}
+
+// Cloudflare Turnstile verification
+interface TurnstileVerifyResponse {
+  success: boolean;
+  'error-codes'?: string[];
+  challenge_ts?: string;
+  hostname?: string;
+}
+
+async function verifyTurnstile(token: string, secretKey: string, remoteip?: string): Promise<boolean> {
+  try {
+    const formData = new URLSearchParams();
+    formData.append('secret', secretKey);
+    formData.append('response', token);
+    if (remoteip) {
+      formData.append('remoteip', remoteip);
+    }
+
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: formData.toString(),
+    });
+
+    const result = await response.json() as TurnstileVerifyResponse;
+
+    if (!result.success) {
+      console.error('Turnstile verification failed:', result['error-codes']);
+    }
+
+    return result.success;
+  } catch (error) {
+    console.error('Turnstile verification error:', error);
+    return false;
   }
 }
 
@@ -582,7 +621,18 @@ publicApp.post('/auth/register', async (c) => {
   const body = await c.req.json();
   const { email, password, name, role, schoolLevel, yearGroup, schoolName, house,
           teacherLicenseNumber, subjectsTaught, yearsExperience, qualifications,
-          selectedTierId } = body;
+          selectedTierId, turnstileToken } = body;
+
+  // Verify Turnstile token
+  if (c.env.TURNSTILE_SECRET && turnstileToken) {
+    const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For');
+    const isValidTurnstile = await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET, clientIp);
+    if (!isValidTurnstile) {
+      return c.json({ success: false, error: 'Security verification failed. Please try again.' }, 400);
+    }
+  } else if (c.env.TURNSTILE_SECRET && !turnstileToken) {
+    return c.json({ success: false, error: 'Security verification required.' }, 400);
+  }
 
   try {
     // Check if email already exists
@@ -680,8 +730,19 @@ publicApp.post('/auth/register', async (c) => {
 
 // Login
 publicApp.post('/auth/login', async (c) => {
-  const { email, password } = await c.req.json();
+  const { email, password, turnstileToken } = await c.req.json();
   const clientInfo = getClientInfo(c);
+
+  // Verify Turnstile token
+  if (c.env.TURNSTILE_SECRET && turnstileToken) {
+    const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For');
+    const isValidTurnstile = await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET, clientIp);
+    if (!isValidTurnstile) {
+      return c.json({ success: false, error: 'Security verification failed. Please try again.' }, 400);
+    }
+  } else if (c.env.TURNSTILE_SECRET && !turnstileToken) {
+    return c.json({ success: false, error: 'Security verification required.' }, 400);
+  }
 
   try {
     const result = await c.env.DB.prepare(`
@@ -806,7 +867,18 @@ publicApp.post('/auth/login', async (c) => {
 
 // Verify token and set password (for admin-created users)
 publicApp.post('/auth/set-password', async (c) => {
-  const { token, password } = await c.req.json();
+  const { token, password, turnstileToken } = await c.req.json();
+
+  // Verify Turnstile token
+  if (c.env.TURNSTILE_SECRET && turnstileToken) {
+    const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For');
+    const isValidTurnstile = await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET, clientIp);
+    if (!isValidTurnstile) {
+      return c.json({ success: false, error: 'Security verification failed. Please try again.' }, 400);
+    }
+  } else if (c.env.TURNSTILE_SECRET && !turnstileToken) {
+    return c.json({ success: false, error: 'Security verification required.' }, 400);
+  }
 
   try {
     // Find user by verification token
@@ -883,8 +955,19 @@ publicApp.get('/auth/verify-token', async (c) => {
 
 // Request password reset
 publicApp.post('/auth/forgot-password', async (c) => {
-  const { email } = await c.req.json();
+  const { email, turnstileToken } = await c.req.json();
   const appUrl = c.env.APP_URL || 'https://brilla.edu.gh';
+
+  // Verify Turnstile token
+  if (c.env.TURNSTILE_SECRET && turnstileToken) {
+    const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For');
+    const isValidTurnstile = await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET, clientIp);
+    if (!isValidTurnstile) {
+      return c.json({ success: false, error: 'Security verification failed. Please try again.' }, 400);
+    }
+  } else if (c.env.TURNSTILE_SECRET && !turnstileToken) {
+    return c.json({ success: false, error: 'Security verification required.' }, 400);
+  }
 
   try {
     const user = await c.env.DB.prepare(`
@@ -928,7 +1011,18 @@ publicApp.post('/auth/forgot-password', async (c) => {
 
 // Reset password with token
 publicApp.post('/auth/reset-password', async (c) => {
-  const { token, password } = await c.req.json();
+  const { token, password, turnstileToken } = await c.req.json();
+
+  // Verify Turnstile token
+  if (c.env.TURNSTILE_SECRET && turnstileToken) {
+    const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For');
+    const isValidTurnstile = await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET, clientIp);
+    if (!isValidTurnstile) {
+      return c.json({ success: false, error: 'Security verification failed. Please try again.' }, 400);
+    }
+  } else if (c.env.TURNSTILE_SECRET && !turnstileToken) {
+    return c.json({ success: false, error: 'Security verification required.' }, 400);
+  }
 
   try {
     const user = await c.env.DB.prepare(`
@@ -3447,7 +3541,18 @@ protectedApp.delete('/users/me/avatar', userAuth, async (c) => {
 // Change password
 protectedApp.post('/users/me/change-password', userAuth, async (c) => {
   const user = c.get('user') as UserPayload;
-  const { currentPassword, newPassword } = await c.req.json();
+  const { currentPassword, newPassword, turnstileToken } = await c.req.json();
+
+  // Verify Turnstile token
+  if (c.env.TURNSTILE_SECRET && turnstileToken) {
+    const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For');
+    const isValidTurnstile = await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET, clientIp);
+    if (!isValidTurnstile) {
+      return c.json({ success: false, error: 'Security verification failed. Please try again.' }, 400);
+    }
+  } else if (c.env.TURNSTILE_SECRET && !turnstileToken) {
+    return c.json({ success: false, error: 'Security verification required.' }, 400);
+  }
 
   try {
     // Get current password hash
@@ -5115,9 +5220,20 @@ adminApp.post('/users/:id/reject', async (c) => {
 adminApp.post('/users', async (c) => {
   const body = await c.req.json();
   const { email, name, role, schoolLevel, yearGroup, schoolName, house,
-          teacherLicenseNumber, subjectsTaught, yearsExperience, qualifications } = body;
+          teacherLicenseNumber, subjectsTaught, yearsExperience, qualifications, turnstileToken } = body;
   const adminUser = c.get('user') as UserPayload;
   const appUrl = c.env.APP_URL || 'https://brilla.edu.gh';
+
+  // Verify Turnstile token
+  if (c.env.TURNSTILE_SECRET && turnstileToken) {
+    const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For');
+    const isValidTurnstile = await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET, clientIp);
+    if (!isValidTurnstile) {
+      return c.json({ success: false, error: 'Security verification failed. Please try again.' }, 400);
+    }
+  } else if (c.env.TURNSTILE_SECRET && !turnstileToken) {
+    return c.json({ success: false, error: 'Security verification required.' }, 400);
+  }
 
   try {
     // Check if email already exists
