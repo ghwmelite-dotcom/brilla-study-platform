@@ -50,11 +50,27 @@ export function Turnstile({
 }: TurnstileProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
+  const mountedRef = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
+  // Use refs for callbacks to prevent re-renders
+  const onVerifyRef = useRef(onVerify);
+  const onErrorRef = useRef(onError);
+  const onExpireRef = useRef(onExpire);
+
+  // Update refs when callbacks change
+  useEffect(() => {
+    onVerifyRef.current = onVerify;
+    onErrorRef.current = onError;
+    onExpireRef.current = onExpire;
+  }, [onVerify, onError, onExpire]);
+
   const renderWidget = useCallback(() => {
     if (!containerRef.current || !window.turnstile) return;
+    if (mountedRef.current) return; // Already rendered
+
+    mountedRef.current = true;
 
     // Remove existing widget if any
     if (widgetIdRef.current) {
@@ -72,27 +88,29 @@ export function Turnstile({
       widgetIdRef.current = window.turnstile.render(containerRef.current, {
         sitekey: TURNSTILE_SITE_KEY,
         callback: (token: string) => {
-          onVerify(token);
+          onVerifyRef.current(token);
         },
         'error-callback': () => {
           setHasError(true);
-          onError?.();
+          onErrorRef.current?.();
         },
         'expired-callback': () => {
-          onExpire?.();
+          onExpireRef.current?.();
         },
         theme,
         size,
       });
-    } catch {
+    } catch (err) {
+      console.error('Turnstile render error:', err);
       setHasError(true);
-      onError?.();
+      onErrorRef.current?.();
     }
-  }, [onVerify, onError, onExpire, theme, size]);
+  }, [theme, size]);
 
   const handleRetry = () => {
     setHasError(false);
     setIsLoading(true);
+    mountedRef.current = false; // Allow re-render
     renderWidget();
   };
 
@@ -115,32 +133,65 @@ export function Turnstile({
           clearInterval(checkTurnstile);
           renderWidget();
         }
-      }, 100);
+      }, 50);
 
-      return () => clearInterval(checkTurnstile);
+      // Timeout after 5 seconds
+      const timeout = setTimeout(() => {
+        clearInterval(checkTurnstile);
+        if (!window.turnstile) {
+          setIsLoading(false);
+          setHasError(true);
+        }
+      }, 5000);
+
+      return () => {
+        clearInterval(checkTurnstile);
+        clearTimeout(timeout);
+      };
     }
 
-    // Load the Turnstile script
+    // Load the Turnstile script with explicit render mode
     const script = document.createElement('script');
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
     script.async = true;
     script.defer = true;
 
+    let waitInterval: ReturnType<typeof setInterval> | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
     script.onload = () => {
-      // Small delay to ensure turnstile is fully initialized
-      setTimeout(renderWidget, 100);
+      // Wait for turnstile to be fully available
+      waitInterval = setInterval(() => {
+        if (window.turnstile) {
+          if (waitInterval) clearInterval(waitInterval);
+          renderWidget();
+        }
+      }, 50);
+
+      // Timeout after 5 seconds
+      timeoutId = setTimeout(() => {
+        if (waitInterval) clearInterval(waitInterval);
+        if (!window.turnstile) {
+          setIsLoading(false);
+          setHasError(true);
+          onErrorRef.current?.();
+        }
+      }, 5000);
     };
 
     script.onerror = () => {
       setIsLoading(false);
       setHasError(true);
-      onError?.();
+      onErrorRef.current?.();
     };
 
     document.head.appendChild(script);
 
     // Cleanup
     return () => {
+      if (waitInterval) clearInterval(waitInterval);
+      if (timeoutId) clearTimeout(timeoutId);
+      mountedRef.current = false;
       if (widgetIdRef.current && window.turnstile) {
         try {
           window.turnstile.remove(widgetIdRef.current);
@@ -149,7 +200,7 @@ export function Turnstile({
         }
       }
     };
-  }, [renderWidget, onError]);
+  }, [renderWidget]);
 
   if (isLoading) {
     return (
