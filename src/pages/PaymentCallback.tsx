@@ -36,7 +36,7 @@ export default function PaymentCallback() {
           setStatus('failed');
           setErrorMessage('Payment verification failed. Please contact support if you were charged.');
         }
-      } catch (error) {
+      } catch {
         setStatus('failed');
         setErrorMessage('An error occurred while verifying your payment.');
       }

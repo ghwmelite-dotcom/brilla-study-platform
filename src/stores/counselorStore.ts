@@ -261,8 +261,8 @@ export const useCounselorStore = create<CounselorState>()(
           } else {
             set({ conversations: DEMO_CONVERSATIONS });
           }
-        } catch (error) {
-          console.error('Failed to load conversations:', error);
+        } catch {
+          console.error('Failed to load conversations');
           set({ conversations: DEMO_CONVERSATIONS });
         }
       },
@@ -335,7 +335,7 @@ export const useCounselorStore = create<CounselorState>()(
           if (initialMessage) {
             await get().sendMessage(initialMessage);
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to start conversation', isLoading: false });
         }
       },
@@ -354,7 +354,7 @@ export const useCounselorStore = create<CounselorState>()(
               isLoading: false,
             });
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to load conversation', isLoading: false });
         }
       },
@@ -371,7 +371,7 @@ export const useCounselorStore = create<CounselorState>()(
           if (get().currentConversation?.id === id) {
             set({ currentConversation: null, messages: [] });
           }
-        } catch (error) {
+        } catch {
           throw new Error('Failed to archive conversation');
         }
       },
@@ -386,7 +386,7 @@ export const useCounselorStore = create<CounselorState>()(
           if (get().currentConversation?.id === id) {
             set({ currentConversation: null, messages: [] });
           }
-        } catch (error) {
+        } catch {
           throw new Error('Failed to delete conversation');
         }
       },
@@ -482,9 +482,9 @@ export const useCounselorStore = create<CounselorState>()(
               },
             });
           }
-        } catch (error) {
+        } catch {
           // Fallback to mock on error
-          console.error('API error, using mock response:', error);
+          console.error('API error, using mock response');
           const mockResponse = generateMockResponse(message, counselorType, studentContext?.name);
 
           const counselorMessage: CounselorMessage = {
@@ -525,8 +525,8 @@ export const useCounselorStore = create<CounselorState>()(
             rating,
             feedbackType,
           });
-        } catch (error) {
-          console.error('Failed to submit feedback:', error);
+        } catch {
+          console.error('Failed to submit feedback');
         }
       },
 
@@ -557,8 +557,8 @@ export const useCounselorStore = create<CounselorState>()(
             wellbeingHistory: [log, ...get().wellbeingHistory],
             showWellbeingCheckIn: false,
           });
-        } catch (error) {
-          console.error('Error logging wellbeing:', error);
+        } catch {
+          console.error('Error logging wellbeing');
           throw new Error('Failed to log wellbeing');
         }
       },
@@ -571,8 +571,8 @@ export const useCounselorStore = create<CounselorState>()(
           } else {
             set({ wellbeingHistory: DEMO_WELLBEING });
           }
-        } catch (error) {
-          console.error('Failed to load wellbeing history:', error);
+        } catch {
+          console.error('Failed to load wellbeing history');
           set({ wellbeingHistory: DEMO_WELLBEING });
         }
       },

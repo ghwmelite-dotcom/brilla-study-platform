@@ -181,9 +181,9 @@ export const useLibraryStore = create<LibraryState>()(
               isLoading: false,
             });
           }
-        } catch (error) {
+        } catch {
           // Fallback to demo data on error
-          console.error('API error, using demo data:', error);
+          console.error('API error, using demo data');
           set({
             resources: DEMO_RESOURCES,
             totalResources: DEMO_RESOURCES.length,
@@ -203,8 +203,8 @@ export const useLibraryStore = create<LibraryState>()(
             const featured = DEMO_RESOURCES.filter(r => r.isFeatured);
             set({ featuredResources: featured });
           }
-        } catch (error) {
-          console.error('Failed to load featured resources:', error);
+        } catch {
+          console.error('Failed to load featured resources');
           const featured = DEMO_RESOURCES.filter(r => r.isFeatured);
           set({ featuredResources: featured });
         }
@@ -229,7 +229,7 @@ export const useLibraryStore = create<LibraryState>()(
             }
           }
           set({ isLoading: false });
-        } catch (error) {
+        } catch {
           // Fallback to demo data
           const resource = DEMO_RESOURCES.find(r => r.id === id);
           if (resource) {
@@ -251,8 +251,8 @@ export const useLibraryStore = create<LibraryState>()(
           ).slice(0, 4);
 
           set({ relatedResources: related });
-        } catch (error) {
-          console.error('Failed to load related resources:', error);
+        } catch {
+          console.error('Failed to load related resources');
         }
       },
 
@@ -294,8 +294,8 @@ export const useLibraryStore = create<LibraryState>()(
           } else {
             set({ collections: DEMO_COLLECTIONS });
           }
-        } catch (error) {
-          console.error('Failed to load collections:', error);
+        } catch {
+          console.error('Failed to load collections');
           set({ collections: DEMO_COLLECTIONS });
         }
       },
@@ -306,8 +306,8 @@ export const useLibraryStore = create<LibraryState>()(
           if (collection) {
             set({ selectedCollection: collection });
           }
-        } catch (error) {
-          console.error('Failed to load collection:', error);
+        } catch {
+          console.error('Failed to load collection');
         }
       },
 
@@ -325,7 +325,7 @@ export const useLibraryStore = create<LibraryState>()(
           }
 
           throw new Error('Failed to create collection');
-        } catch (error) {
+        } catch {
           throw new Error('Failed to create collection');
         }
       },
@@ -338,7 +338,7 @@ export const useLibraryStore = create<LibraryState>()(
               c.id === id ? { ...c, ...updates, updatedAt: new Date().toISOString() } : c
             ),
           });
-        } catch (error) {
+        } catch {
           throw new Error('Failed to update collection');
         }
       },
@@ -347,7 +347,7 @@ export const useLibraryStore = create<LibraryState>()(
         try {
           await api.delete(`/library/collections/${id}`);
           set({ collections: get().collections.filter(c => c.id !== id) });
-        } catch (error) {
+        } catch {
           throw new Error('Failed to delete collection');
         }
       },
@@ -362,7 +362,7 @@ export const useLibraryStore = create<LibraryState>()(
                 : c
             ),
           });
-        } catch (error) {
+        } catch {
           throw new Error('Failed to add to collection');
         }
       },
@@ -377,7 +377,7 @@ export const useLibraryStore = create<LibraryState>()(
                 : c
             ),
           });
-        } catch (error) {
+        } catch {
           throw new Error('Failed to remove from collection');
         }
       },
@@ -399,7 +399,7 @@ export const useLibraryStore = create<LibraryState>()(
           set({
             userRatings: { ...get().userRatings, [resourceId]: newRating },
           });
-        } catch (error) {
+        } catch {
           throw new Error('Failed to rate resource');
         }
       },
@@ -425,8 +425,8 @@ export const useLibraryStore = create<LibraryState>()(
           set({
             userProgress: { ...get().userProgress, [resourceId]: progress },
           });
-        } catch (error) {
-          console.error('Failed to update progress:', error);
+        } catch {
+          console.error('Failed to update progress');
         }
       },
 
@@ -442,8 +442,8 @@ export const useLibraryStore = create<LibraryState>()(
         try {
           // Increment download count on the server
           console.log('Tracked download for:', resourceId);
-        } catch (error) {
-          console.error('Failed to track download:', error);
+        } catch {
+          console.error('Failed to track download');
         }
       },
 
@@ -532,10 +532,10 @@ export const useLibraryStore = create<LibraryState>()(
           });
 
           return newResource;
-        } catch (error) {
-          console.error('Upload error:', error);
+        } catch (err) {
+          console.error('Upload error:', err);
           set({ error: 'Failed to upload resource', isUploadingResource: false });
-          throw error;
+          throw err;
         }
       },
 
@@ -562,10 +562,10 @@ export const useLibraryStore = create<LibraryState>()(
               ? { ...get().selectedResource!, ...updatedResource }
               : get().selectedResource,
           });
-        } catch (error) {
-          console.error('Update resource error:', error);
-          if (error instanceof Error) {
-            throw error;
+        } catch (err) {
+          console.error('Update resource error:', err);
+          if (err instanceof Error) {
+            throw err;
           }
           throw new Error('Failed to update resource');
         }
@@ -575,7 +575,7 @@ export const useLibraryStore = create<LibraryState>()(
         try {
           await api.delete(`/library/resources/${id}`);
           set({ resources: get().resources.filter(r => r.id !== id) });
-        } catch (error) {
+        } catch {
           throw new Error('Failed to delete resource');
         }
       },

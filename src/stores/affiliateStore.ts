@@ -89,7 +89,7 @@ export const useAffiliateStore = create<AffiliateState>()(
           } else {
             set({ isAffiliate: false, isLoading: false });
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to fetch profile', isLoading: false, isAffiliate: false });
         }
       },
@@ -116,7 +116,7 @@ export const useAffiliateStore = create<AffiliateState>()(
           } else {
             set({ error: data.error, isLoading: false });
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to fetch dashboard', isLoading: false });
         }
       },
@@ -148,7 +148,7 @@ export const useAffiliateStore = create<AffiliateState>()(
             set({ error: data.error, isLoading: false });
             return false;
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to join program', isLoading: false });
           return false;
         }
@@ -173,8 +173,8 @@ export const useAffiliateStore = create<AffiliateState>()(
           if (data.success) {
             set({ referrals: data.data.referrals });
           }
-        } catch (error) {
-          console.error('Failed to fetch referrals:', error);
+        } catch {
+          console.error('Failed to fetch referrals');
         }
       },
 
@@ -197,8 +197,8 @@ export const useAffiliateStore = create<AffiliateState>()(
           if (data.success) {
             set({ commissions: data.data });
           }
-        } catch (error) {
-          console.error('Failed to fetch commissions:', error);
+        } catch {
+          console.error('Failed to fetch commissions');
         }
       },
 
@@ -218,8 +218,8 @@ export const useAffiliateStore = create<AffiliateState>()(
           if (data.success) {
             set({ challenges: data.data });
           }
-        } catch (error) {
-          console.error('Failed to fetch challenges:', error);
+        } catch {
+          console.error('Failed to fetch challenges');
         }
       },
 
@@ -246,8 +246,8 @@ export const useAffiliateStore = create<AffiliateState>()(
             };
           }
           return null;
-        } catch (error) {
-          console.error('Failed to claim challenge:', error);
+        } catch {
+          console.error('Failed to claim challenge');
           return null;
         }
       },
@@ -268,8 +268,8 @@ export const useAffiliateStore = create<AffiliateState>()(
           if (data.success) {
             set({ achievements: data.data });
           }
-        } catch (error) {
-          console.error('Failed to fetch achievements:', error);
+        } catch {
+          console.error('Failed to fetch achievements');
         }
       },
 
@@ -291,8 +291,8 @@ export const useAffiliateStore = create<AffiliateState>()(
           if (data.success) {
             set({ leaderboard: data.data.leaderboard });
           }
-        } catch (error) {
-          console.error('Failed to fetch leaderboard:', error);
+        } catch {
+          console.error('Failed to fetch leaderboard');
         }
       },
 
@@ -314,8 +314,8 @@ export const useAffiliateStore = create<AffiliateState>()(
           if (data.success) {
             set({ schoolLeaderboard: data.data.leaderboard });
           }
-        } catch (error) {
-          console.error('Failed to fetch school leaderboard:', error);
+        } catch {
+          console.error('Failed to fetch school leaderboard');
         }
       },
 
@@ -335,8 +335,8 @@ export const useAffiliateStore = create<AffiliateState>()(
           if (data.success) {
             set({ payouts: data.data });
           }
-        } catch (error) {
-          console.error('Failed to fetch payouts:', error);
+        } catch {
+          console.error('Failed to fetch payouts');
         }
       },
 
@@ -370,7 +370,7 @@ export const useAffiliateStore = create<AffiliateState>()(
             set({ error: data.error });
             return false;
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to request payout', isLoading: false });
           return false;
         }
@@ -408,7 +408,7 @@ export const useAffiliateStore = create<AffiliateState>()(
             set({ error: data.error });
             return false;
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to update mobile money details', isLoading: false });
           return false;
         }
@@ -421,8 +421,8 @@ export const useAffiliateStore = create<AffiliateState>()(
         try {
           await navigator.clipboard.writeText(profile.referralLink);
           return true;
-        } catch (error) {
-          console.error('Failed to copy referral link:', error);
+        } catch {
+          console.error('Failed to copy referral link');
           return false;
         }
       },

@@ -117,7 +117,7 @@ const subjectsData = {
 const subjects = Object.values(subjectsData);
 
 export function TopicsPage() {
-  const { subjectSlug, topicSlug: _topicSlug } = useParams();
+  const { subjectSlug } = useParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
 

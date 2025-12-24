@@ -72,7 +72,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
           } else {
             set({ error: data.error, isLoading: false });
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to fetch plans', isLoading: false });
         }
       },
@@ -103,7 +103,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
           } else {
             set({ error: data.error, isLoading: false });
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to fetch subscription status', isLoading: false });
         }
       },
@@ -124,8 +124,8 @@ export const useSubscriptionStore = create<SubscriptionState>()(
           if (data.success) {
             set({ trialStatus: data.data.trial });
           }
-        } catch (error) {
-          console.error('Failed to fetch trial status:', error);
+        } catch {
+          console.error('Failed to fetch trial status');
         }
       },
 
@@ -156,7 +156,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
             set({ error: data.error, isLoading: false });
             return false;
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to start trial', isLoading: false });
           return false;
         }
@@ -182,8 +182,8 @@ export const useSubscriptionStore = create<SubscriptionState>()(
             return true;
           }
           return false;
-        } catch (error) {
-          console.error('Failed to complete trial task:', error);
+        } catch {
+          console.error('Failed to complete trial task');
           return false;
         }
       },
@@ -207,8 +207,8 @@ export const useSubscriptionStore = create<SubscriptionState>()(
             return true;
           }
           return false;
-        } catch (error) {
-          console.error('Failed to claim bonus week:', error);
+        } catch {
+          console.error('Failed to claim bonus week');
           return false;
         }
       },
@@ -240,7 +240,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
             set({ error: data.error });
             return null;
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to initialize payment', isLoading: false });
           return null;
         }
@@ -277,7 +277,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
             set({ error: data.error });
             return { success: false };
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to verify payment', isLoading: false });
           return { success: false };
         }
@@ -299,8 +299,8 @@ export const useSubscriptionStore = create<SubscriptionState>()(
           if (data.success) {
             set({ paymentHistory: data.data });
           }
-        } catch (error) {
-          console.error('Failed to fetch payment history:', error);
+        } catch {
+          console.error('Failed to fetch payment history');
         }
       },
 
@@ -331,7 +331,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
             set({ error: data.error });
             return false;
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to cancel subscription', isLoading: false });
           return false;
         }
@@ -366,8 +366,8 @@ export const useSubscriptionStore = create<SubscriptionState>()(
             hasAccess: false,
             features: {},
           };
-        } catch (error) {
-          console.error('Failed to fetch feature access:', error);
+        } catch {
+          console.error('Failed to fetch feature access');
           return {
             isSubscribed: false,
             isTrial: false,

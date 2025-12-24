@@ -174,7 +174,7 @@ export function useVoiceRecognition(options: UseVoiceRecognitionOptions = {}) {
 
     try {
       recognitionRef.current.start();
-    } catch (err) {
+    } catch {
       // Handle if already started
       recognitionRef.current.stop();
       setTimeout(() => {

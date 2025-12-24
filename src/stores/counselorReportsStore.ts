@@ -146,7 +146,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
             },
             isLoading: false,
           });
-        } catch (error) {
+        } catch {
           // Fallback to demo data
           set({
             linkedStudents: DEMO_LINKED_STUDENTS,
@@ -173,7 +173,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
           } else {
             set({ linkedStudents: DEMO_LINKED_STUDENTS, isLoading: false });
           }
-        } catch (error) {
+        } catch {
           set({ linkedStudents: DEMO_LINKED_STUDENTS, isLoading: false });
         }
       },
@@ -205,7 +205,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
             }
             set({ reports: filteredReports, reportFilters: filters || {}, isLoadingReports: false });
           }
-        } catch (error) {
+        } catch {
           set({ reports: DEMO_REPORTS, isLoadingReports: false });
         }
       },
@@ -224,7 +224,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
               set({ error: 'Report not found', isLoading: false });
             }
           }
-        } catch (error) {
+        } catch {
           const report = DEMO_REPORTS.find(r => r.id === reportId);
           if (report) {
             set({ currentReport: report, isLoading: false });
@@ -246,7 +246,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
           set({ isLoading: false });
           // Reload reports to include the new one
           await get().loadReports();
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to request report', isLoading: false });
         }
       },
@@ -262,8 +262,8 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
               ? { ...get().currentReport!, isReadByParent: true, readAt: new Date().toISOString() }
               : get().currentReport,
           });
-        } catch (error) {
-          console.error('Failed to mark report as read:', error);
+        } catch {
+          console.error('Failed to mark report as read');
         }
       },
 
@@ -278,7 +278,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
               ? { ...get().currentReport!, parentFeedback: feedback }
               : get().currentReport,
           });
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to submit feedback' });
         }
       },
@@ -309,7 +309,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
               isLoading: false,
             });
           }
-        } catch (error) {
+        } catch {
           set({ alerts: DEMO_ALERTS, isLoading: false });
         }
       },
@@ -321,8 +321,8 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
               a.id === alertId ? { ...a, parentNotified: true, notifiedAt: new Date().toISOString() } : a
             ),
           });
-        } catch (error) {
-          console.error('Failed to acknowledge alert:', error);
+        } catch {
+          console.error('Failed to acknowledge alert');
         }
       },
 
@@ -337,7 +337,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
             ),
             unresolvedAlertsCount: get().unresolvedAlertsCount - 1,
           });
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to resolve alert' });
         }
       },
@@ -374,8 +374,8 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
               isLoading: false,
             });
           }
-        } catch (error) {
-          console.error('Failed to load messages:', error);
+        } catch {
+          console.error('Failed to load messages');
           set({
             messages: [],
             unreadMessagesCount: 0,
@@ -404,7 +404,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
             };
             set({ messages: [...get().messages, newMessage] });
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to send message' });
         }
       },
@@ -418,8 +418,8 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
             ),
             unreadMessagesCount: Math.max(0, get().unreadMessagesCount - 1),
           });
-        } catch (error) {
-          console.error('Failed to mark message as read:', error);
+        } catch {
+          console.error('Failed to mark message as read');
         }
       },
 
@@ -443,8 +443,8 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
           } else {
             set({ reportSchedules: [], isLoading: false });
           }
-        } catch (error) {
-          console.error('Failed to load schedules:', error);
+        } catch {
+          console.error('Failed to load schedules');
           set({ reportSchedules: [], isLoading: false });
         }
       },
@@ -467,7 +467,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
             };
             set({ reportSchedules: [...get().reportSchedules, newSchedule] });
           }
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to create schedule' });
         }
       },
@@ -480,7 +480,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
               s.id === scheduleId ? { ...s, isActive } : s
             ),
           });
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to update schedule' });
         }
       },
@@ -491,7 +491,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
           set({
             reportSchedules: get().reportSchedules.filter(s => s.id !== scheduleId),
           });
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to delete schedule' });
         }
       },
@@ -524,8 +524,8 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
           } else {
             set({ sessionSummaries: [], isLoading: false });
           }
-        } catch (error) {
-          console.error('Failed to load session summaries:', error);
+        } catch {
+          console.error('Failed to load session summaries');
           set({ sessionSummaries: [], isLoading: false });
         }
       },

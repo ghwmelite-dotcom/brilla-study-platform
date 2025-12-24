@@ -15,16 +15,6 @@ import { cn } from '@/utils';
 
 export function DashboardPage() {
   const { user } = useAuthStore();
-
-  // Redirect admins to admin dashboard
-  if (user?.role === 'admin') {
-    return <Navigate to="/admin" replace />;
-  }
-
-  // Redirect parents to parent dashboard
-  if (user?.role === 'parent') {
-    return <Navigate to="/parent" replace />;
-  }
   const {
     totalQuestionsAttempted,
     totalCorrect,
@@ -37,6 +27,16 @@ export function DashboardPage() {
     getStrengths,
     getWeaknesses,
   } = useProgressStore();
+
+  // Redirect admins to admin dashboard
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
+  // Redirect parents to parent dashboard
+  if (user?.role === 'parent') {
+    return <Navigate to="/parent" replace />;
+  }
 
   if (!user) {
     return (
