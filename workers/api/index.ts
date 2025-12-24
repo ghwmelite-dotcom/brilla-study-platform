@@ -1049,14 +1049,16 @@ publicApp.post('/auth/login', async (c) => {
           country: c.req.header('CF-IPCountry') || undefined
         };
 
-        // Send alert asynchronously (don't wait for it)
-        sendSecurityAlertToAdmins(
-          c.env.DB,
-          c.env.RESEND_API_KEY,
-          c.env.FROM_EMAIL,
-          c.env.APP_URL || 'https://brillaprep.org',
-          alertDetails
-        ).catch(err => console.error('Failed to send security alert:', err));
+        // Send alert in background using waitUntil to keep worker alive
+        c.executionCtx.waitUntil(
+          sendSecurityAlertToAdmins(
+            c.env.DB,
+            c.env.RESEND_API_KEY,
+            c.env.FROM_EMAIL,
+            c.env.APP_URL || 'https://brillaprep.org',
+            alertDetails
+          ).catch(err => console.error('Failed to send security alert:', err))
+        );
       }
 
       return rateLimitResponse(c, emailRateLimit);
