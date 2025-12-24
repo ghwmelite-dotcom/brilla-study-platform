@@ -527,6 +527,132 @@ function getNewRegistrationEmailHTML(userName: string, userEmail: string, userRo
   `;
 }
 
+// Security alert email for blocked login attempts
+interface SecurityAlertDetails {
+  targetEmail: string;
+  ipAddress: string;
+  attemptCount: number;
+  blockDuration: string;
+  userAgent?: string;
+  country?: string;
+}
+
+function getSecurityAlertEmailHTML(details: SecurityAlertDetails, appUrl: string): string {
+  const severityColor = details.attemptCount >= 10 ? '#dc2626' : '#f59e0b'; // Red for high, amber for medium
+  const severityText = details.attemptCount >= 10 ? 'HIGH' : 'MEDIUM';
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Security Alert - Blocked Login Attempts</title>
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, ${severityColor} 0%, #991b1b 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 28px;">🚨 Security Alert</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 14px;">Blocked Login Attempts Detected</p>
+      </div>
+      <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+        <div style="background: ${severityColor}15; border-left: 4px solid ${severityColor}; padding: 15px; margin-bottom: 20px; border-radius: 0 8px 8px 0;">
+          <p style="margin: 0; font-weight: 600; color: ${severityColor};">Severity: ${severityText}</p>
+          <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">Multiple failed login attempts have been blocked</p>
+        </div>
+
+        <p style="font-size: 16px;">Hello Admin,</p>
+        <p style="font-size: 16px;">Our security system has blocked suspicious login activity on the Brilla Study Platform:</p>
+
+        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e5e7eb;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 8px 0; font-size: 14px; color: #6b7280; width: 140px;">Target Account:</td>
+              <td style="padding: 8px 0; font-size: 14px; font-weight: 600;">${details.targetEmail}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">IP Address:</td>
+              <td style="padding: 8px 0; font-size: 14px; font-family: monospace; background: #f3f4f6; padding: 4px 8px; border-radius: 4px; display: inline-block;">${details.ipAddress}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Failed Attempts:</td>
+              <td style="padding: 8px 0; font-size: 14px; font-weight: 600; color: ${severityColor};">${details.attemptCount} attempts</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Block Duration:</td>
+              <td style="padding: 8px 0; font-size: 14px;">${details.blockDuration}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Time:</td>
+              <td style="padding: 8px 0; font-size: 14px;">${new Date().toLocaleString('en-US', { timeZone: 'UTC' })} UTC</td>
+            </tr>
+            ${details.country ? `
+            <tr>
+              <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Location:</td>
+              <td style="padding: 8px 0; font-size: 14px;">${details.country}</td>
+            </tr>
+            ` : ''}
+          </table>
+        </div>
+
+        <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+          <p style="margin: 0; font-size: 14px; color: #92400e;">
+            <strong>Recommended Actions:</strong>
+          </p>
+          <ul style="margin: 10px 0 0 0; padding-left: 20px; font-size: 14px; color: #92400e;">
+            <li>Review the account for any unauthorized access</li>
+            <li>Consider notifying the account owner</li>
+            <li>Monitor for additional suspicious activity from this IP</li>
+          </ul>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${appUrl}/admin/audit" style="background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">View Audit Log</a>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+        <p style="font-size: 12px; color: #9ca3af; text-align: center;">Brilla Study Platform Security System</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+// Send security alert to all admins
+async function sendSecurityAlertToAdmins(
+  db: D1Database,
+  resendApiKey: string,
+  fromEmail: string,
+  appUrl: string,
+  details: SecurityAlertDetails
+): Promise<void> {
+  try {
+    // Get all admin emails
+    const { results: admins } = await db.prepare(
+      "SELECT email FROM users WHERE role = 'admin' AND status = 'approved' AND is_active = 1"
+    ).all();
+
+    if (!admins || admins.length === 0) {
+      console.log('No admin emails found for security alert');
+      return;
+    }
+
+    const emailHtml = getSecurityAlertEmailHTML(details, appUrl);
+    const subject = `🚨 Security Alert: Blocked Login Attempts for ${details.targetEmail}`;
+
+    // Send to all admins
+    for (const admin of admins as { email: string }[]) {
+      try {
+        await sendEmail(resendApiKey, fromEmail, admin.email, subject, emailHtml);
+        console.log(`Security alert sent to ${admin.email}`);
+      } catch (error) {
+        console.error(`Failed to send security alert to ${admin.email}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to send security alerts:', error);
+  }
+}
+
 // Claude API helper
 async function callClaudeAPI(
   apiKey: string,
@@ -911,6 +1037,28 @@ publicApp.post('/auth/login', async (c) => {
   if (email) {
     const emailRateLimit = await checkRateLimit(c.env.DB, email.toLowerCase(), 'login');
     if (!emailRateLimit.allowed) {
+      // Send security alert to admins for blocked login attempts
+      if (c.env.RESEND_API_KEY && c.env.FROM_EMAIL) {
+        const blockDurationMinutes = Math.ceil((emailRateLimit.retryAfter || 1800) / 60);
+        const alertDetails: SecurityAlertDetails = {
+          targetEmail: email.toLowerCase(),
+          ipAddress: clientIp,
+          attemptCount: RATE_LIMITS['login'].maxRequests,
+          blockDuration: `${blockDurationMinutes} minutes`,
+          userAgent: clientInfo.userAgent,
+          country: c.req.header('CF-IPCountry') || undefined
+        };
+
+        // Send alert asynchronously (don't wait for it)
+        sendSecurityAlertToAdmins(
+          c.env.DB,
+          c.env.RESEND_API_KEY,
+          c.env.FROM_EMAIL,
+          c.env.APP_URL || 'https://brillaprep.org',
+          alertDetails
+        ).catch(err => console.error('Failed to send security alert:', err));
+      }
+
       return rateLimitResponse(c, emailRateLimit);
     }
   }
