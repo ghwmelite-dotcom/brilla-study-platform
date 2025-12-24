@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partnership Proposal - Lynx Group & ACN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 0.75in;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #18181b;
+            line-height: 1.6;
+            font-size: 11pt;
+        }
+
+        .page {
+            page-break-after: always;
+            min-height: 100vh;
+            padding: 40px 0;
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-weight: 700;
+            line-height: 1.2;
+            color: #09090b;
+        }
+
+        h1 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 42pt;
+            font-weight: 400;
+            margin-bottom: 16px;
+        }
+
+        h1 em {
+            font-style: italic;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 24pt;
+            font-weight: 400;
+            margin-bottom: 16px;
+        }
+
+        h2 em {
+            font-style: italic;
+            color: #6366f1;
+        }
+
+        h3 {
+            font-size: 14pt;
+            margin-bottom: 8px;
+        }
+
+        h4 {
+            font-size: 11pt;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #71717a;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: #52525b;
+            margin-bottom: 12px;
+        }
+
+        .lead {
+            font-size: 13pt;
+            color: #3f3f46;
+            line-height: 1.7;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e4e4e7;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-mark {
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            border-radius: 3px;
+        }
+
+        .logo-text {
+            font-size: 10pt;
+            font-weight: 500;
+            color: #71717a;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .contact {
+            font-size: 9pt;
+            color: #71717a;
+            text-align: right;
+        }
+
+        .contact a {
+            color: #6366f1;
+            text-decoration: none;
+        }
+
+        /* Cover */
+        .cover {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 80vh;
+            text-align: center;
+        }
+
+        .cover h1 {
+            font-size: 48pt;
+            margin-bottom: 24px;
+        }
+
+        .cover .subtitle {
+            font-size: 14pt;
+            color: #71717a;
+            margin-bottom: 48px;
+        }
+
+        .platforms {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+        }
+
+        .platform-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #fafafa;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+        }
+
+        .platform-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .platform-dot.brilla { background: #6366f1; }
+        .platform-dot.trade { background: #10b981; }
+
+        .platform-name {
+            font-weight: 600;
+            color: #09090b;
+        }
+
+        .platform-label {
+            font-size: 9pt;
+            color: #71717a;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 48px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .section-number {
+            font-size: 9pt;
+            font-weight: 700;
+            color: #a855f7;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .section-line {
+            flex: 1;
+            height: 1px;
+            background: #e4e4e7;
+        }
+
+        /* Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        /* Cards */
+        .card {
+            padding: 20px;
+            background: #fafafa;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+        }
+
+        .card-icon {
+            font-size: 24pt;
+            margin-bottom: 12px;
+        }
+
+        .card h3 {
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            font-size: 10pt;
+            margin-bottom: 0;
+        }
+
+        /* Platform Section */
+        .platform-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .platform-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Instrument Serif', serif;
+            font-size: 20pt;
+            color: white;
+        }
+
+        .platform-icon.brilla { background: linear-gradient(135deg, #6366f1, #818cf8); }
+        .platform-icon.trade { background: linear-gradient(135deg, #10b981, #34d399); }
+
+        .platform-info h3 {
+            font-size: 16pt;
+            margin-bottom: 2px;
+        }
+
+        .platform-info span {
+            font-size: 10pt;
+            color: #6366f1;
+        }
+
+        .platform-info span.trade-url {
+            color: #10b981;
+        }
+
+        /* Stats */
+        .stats-box {
+            background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+            border: 1px solid #c4b5fd;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin: 24px 0;
+        }
+
+        .stats-box.trade-stats {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border-color: #6ee7b7;
+        }
+
+        .stat-main {
+            font-size: 36pt;
+            font-weight: 700;
+            color: #6366f1;
+            line-height: 1;
+        }
+
+        .trade-stats .stat-main {
+            color: #10b981;
+        }
+
+        .stat-desc {
+            font-size: 11pt;
+            color: #52525b;
+            margin-top: 8px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            margin-top: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 14pt;
+            font-weight: 700;
+            color: #09090b;
+        }
+
+        .stat-label {
+            font-size: 9pt;
+            color: #71717a;
+        }
+
+        /* Comparison */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 24px;
+            align-items: start;
+            margin: 24px 0;
+        }
+
+        .compare-col {
+            padding: 20px;
+            background: #fafafa;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+        }
+
+        .compare-col.highlight {
+            background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+            border-color: #c4b5fd;
+        }
+
+        .compare-col h4 {
+            margin-bottom: 16px;
+            color: #09090b;
+        }
+
+        .compare-col ul {
+            list-style: none;
+        }
+
+        .compare-col li {
+            padding: 6px 0;
+            font-size: 10pt;
+            color: #52525b;
+            border-bottom: 1px solid #e4e4e7;
+        }
+
+        .compare-col li:last-child {
+            border-bottom: none;
+        }
+
+        .compare-equals {
+            font-size: 24pt;
+            color: #a855f7;
+            font-weight: 300;
+            padding-top: 40px;
+        }
+
+        /* Benefits */
+        .benefit-card {
+            border: 1px solid #e4e4e7;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .benefit-header {
+            padding: 16px 20px;
+            background: #09090b;
+            color: white;
+        }
+
+        .benefit-header.lynx {
+            background: linear-gradient(135deg, #09090b, #27272a);
+        }
+
+        .benefit-header.me {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+        }
+
+        .benefit-header h3 {
+            color: white;
+            font-size: 12pt;
+            margin: 0;
+        }
+
+        .benefit-list {
+            padding: 16px 20px;
+            list-style: none;
+        }
+
+        .benefit-list li {
+            display: flex;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f4f4f5;
+        }
+
+        .benefit-list li:last-child {
+            border-bottom: none;
+        }
+
+        .benefit-icon {
+            color: #a855f7;
+            font-size: 8pt;
+            margin-top: 4px;
+        }
+
+        .benefit-list strong {
+            display: block;
+            font-size: 10pt;
+            color: #09090b;
+            margin-bottom: 2px;
+        }
+
+        .benefit-list span {
+            font-size: 9pt;
+            color: #71717a;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .timeline-step {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 11pt;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 12pt;
+            color: #09090b;
+            margin-bottom: 4px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .step-content p {
+            font-size: 10pt;
+            margin: 0;
+        }
+
+        /* Mission Box */
+        .mission-box {
+            background: #fafafa;
+            border-left: 4px solid #6366f1;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .mission-box.trade-mission {
+            border-color: #10b981;
+        }
+
+        .mission-box h4 {
+            color: #09090b;
+            margin-bottom: 8px;
+        }
+
+        .mission-box p {
+            margin: 0;
+            font-size: 10pt;
+        }
+
+        /* CTA */
+        .cta {
+            text-align: center;
+            padding: 48px;
+            background: linear-gradient(135deg, #f5f3ff, #fdf4ff);
+            border-radius: 16px;
+            margin-top: 48px;
+        }
+
+        .cta h2 {
+            margin-bottom: 16px;
+        }
+
+        .cta p {
+            max-width: 500px;
+            margin: 0 auto 24px;
+        }
+
+        .cta-email {
+            display: inline-block;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 11pt;
+        }
+
+        .cta-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .cta-link {
+            font-size: 10pt;
+            color: #6366f1;
+            text-decoration: none;
+        }
+
+        .tagline {
+            margin-top: 32px;
+            font-size: 10pt;
+            color: #a1a1aa;
+            font-style: italic;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid #e4e4e7;
+            text-align: center;
+            font-size: 9pt;
+            color: #a1a1aa;
+        }
+
+        /* Print Specific */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .page {
+                page-break-after: always;
+            }
+
+            .no-break {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cover Page -->
+    <div class="page">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-mark"></div>
+                <span class="logo-text">Partnership Proposal</span>
+            </div>
+            <div class="contact">
+                <div>ohwpstudios@gmail.com</div>
+                <div><a href="https://lynx-presentation.pages.dev">View Interactive Version</a></div>
+            </div>
+        </div>
+
+        <div class="cover">
+            <h1>The future of<br><em>African tech</em><br>deserves a voice.</h1>
+            <p class="subtitle">A partnership proposal for Lynx Group & ACN</p>
+            <div class="platforms">
+                <div class="platform-chip">
+                    <span class="platform-dot brilla"></span>
+                    <span class="platform-name">BrillaPrep</span>
+                    <span class="platform-label">EdTech</span>
+                </div>
+                <div class="platform-chip">
+                    <span class="platform-dot trade"></span>
+                    <span class="platform-name">TradeMetricsPro</span>
+                    <span class="platform-label">FinTech</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Proposition & Context -->
+    <div class="page">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-mark"></div>
+                <span class="logo-text">Partnership Proposal</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-number">01 The Proposition</span>
+                <div class="section-line"></div>
+            </div>
+            <h2>I want Lynx to <em>represent me.</em></h2>
+            <p class="lead">I'm a Ghanaian tech founder building two platforms that are solving real problems. I want Lynx to leverage your network, media connections, and business expertise to bring my platforms to Ghana first, then scale across Africa and beyond.</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-number">02 The Insight</span>
+                <div class="section-line"></div>
+            </div>
+            <h2>Tech founders are <em>the new artists.</em></h2>
+
+            <div class="comparison">
+                <div class="compare-col">
+                    <h4>Artists</h4>
+                    <ul>
+                        <li>Create songs & albums</li>
+                        <li>Perform on stages</li>
+                        <li>Build loyal fanbases</li>
+                        <li>Sign deals & close partnerships</li>
+                    </ul>
+                </div>
+                <div class="compare-equals">=</div>
+                <div class="compare-col highlight">
+                    <h4>Tech Founders</h4>
+                    <ul>
+                        <li>Create platforms & products</li>
+                        <li>Launch to millions of users</li>
+                        <li>Build dedicated user bases</li>
+                        <li>Close investment rounds</li>
+                    </ul>
+                </div>
+            </div>
+
+            <p class="lead" style="text-align: center; color: #71717a;">Both create lasting value. Both deserve strategic representation and professional management.</p>
+        </div>
+    </div>
+
+    <!-- BrillaPrep -->
+    <div class="page">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-mark"></div>
+                <span class="logo-text">Partnership Proposal</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-number">03 Platform: BrillaPrep</span>
+                <div class="section-line"></div>
+            </div>
+
+            <div class="platform-header">
+                <div class="platform-icon brilla">B</div>
+                <div class="platform-info">
+                    <h3>BrillaPrep</h3>
+                    <span>brillaprep.org</span>
+                </div>
+            </div>
+
+            <h2>The AI-powered study companion for <em>every</em> Ghanaian student.</h2>
+            <p class="lead">BrillaPrep is a comprehensive exam preparation platform designed specifically for students preparing for WASSCE, BECE, and the National Science & Maths Quiz (NSMQ). We combine official past questions with AI-powered practice to help students excel in their exams.</p>
+
+            <div class="grid-4" style="margin-top: 24px;">
+                <div class="card no-break">
+                    <div class="card-icon">&#128218;</div>
+                    <h3>Official Past Questions</h3>
+                    <p>Access authentic WAEC past questions from 2010-2024 across all major subjects including Mathematics, English, Science, and more.</p>
+                </div>
+                <div class="card no-break">
+                    <div class="card-icon">&#129302;</div>
+                    <h3>AI-Powered Practice</h3>
+                    <p>Our AI generates unlimited practice questions in the exact style and difficulty of real exams, with detailed explanations for every answer.</p>
+                </div>
+                <div class="card no-break">
+                    <div class="card-icon">&#128241;</div>
+                    <h3>Offline Mode</h3>
+                    <p>Download questions and study materials for offline use. Perfect for students in areas with limited internet connectivity.</p>
+                </div>
+                <div class="card no-break">
+                    <div class="card-icon">&#128200;</div>
+                    <h3>Performance Analytics</h3>
+                    <p>Track your progress with detailed analytics. See which subjects need more attention and watch your scores improve over time.</p>
+                </div>
+            </div>
+
+            <div class="stats-box">
+                <div class="stat-main">900,000</div>
+                <div class="stat-desc">students sit for WASSCE & BECE yearly in Ghana alone</div>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-value">5M+</div>
+                        <div class="stat-label">West Africa TAM</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">GHS 15-100</div>
+                        <div class="stat-label">Monthly Plans</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">LIVE</div>
+                        <div class="stat-label">brillaprep.org</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mission-box">
+                <h4>Our Mission</h4>
+                <p>To give every Ghanaian student the tools they need to achieve their academic dreams, regardless of their location or financial background. Quality education should never be a privilege reserved for the few.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TradeMetricsPro -->
+    <div class="page">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-mark"></div>
+                <span class="logo-text">Partnership Proposal</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-number">04 Platform: TradeMetricsPro</span>
+                <div class="section-line"></div>
+            </div>
+
+            <div class="platform-header">
+                <div class="platform-icon trade">T</div>
+                <div class="platform-info">
+                    <h3>TradeMetricsPro</h3>
+                    <span class="trade-url">ea.trademetricspro.com</span>
+                </div>
+            </div>
+
+            <h2>Professional trading bot development for the <em>global market.</em></h2>
+            <p class="lead">TradeMetricsPro is a professional algorithmic trading development service. We transform trading strategies and ideas into fully automated Expert Advisors (EAs) for MetaTrader 4 and MetaTrader 5 platforms, serving traders worldwide.</p>
+
+            <div class="grid-4" style="margin-top: 24px;">
+                <div class="card no-break">
+                    <div class="card-icon">&#128202;</div>
+                    <h3>Custom EA Development</h3>
+                    <p>We build fully automated Expert Advisors tailored to your exact trading strategy. Every EA is optimized for performance, risk management, and reliability.</p>
+                </div>
+                <div class="card no-break">
+                    <div class="card-icon">&#128736;</div>
+                    <h3>Strategy Conversion</h3>
+                    <p>Have a profitable manual strategy? We convert it into an automated system that trades 24/7 without emotional interference or human error.</p>
+                </div>
+                <div class="card no-break">
+                    <div class="card-icon">&#128201;</div>
+                    <h3>Comprehensive Backtesting</h3>
+                    <p>Every EA undergoes rigorous backtesting across multiple market conditions, timeframes, and currency pairs to ensure consistent performance.</p>
+                </div>
+                <div class="card no-break">
+                    <div class="card-icon">&#128295;</div>
+                    <h3>Ongoing Support</h3>
+                    <p>Markets evolve, and so should your trading bots. We provide ongoing support, updates, and optimization services for all our clients.</p>
+                </div>
+            </div>
+
+            <div class="stats-box trade-stats">
+                <div class="stat-main">200+</div>
+                <div class="stat-desc">traders served across the globe</div>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-value">2-4 weeks</div>
+                        <div class="stat-label">Avg. Delivery</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">$500+</div>
+                        <div class="stat-label">Per Project</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">LIVE</div>
+                        <div class="stat-label">ea.trademetricspro.com</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mission-box trade-mission">
+                <h4>What Sets Us Apart</h4>
+                <p>We don't just code your strategy; we help you refine it. Every project includes a consultation phase where we analyze your approach, identify potential issues, and suggest optimizations before writing a single line of code.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Partnership & Roadmap -->
+    <div class="page">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-mark"></div>
+                <span class="logo-text">Partnership Proposal</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-number">05 The Partnership</span>
+                <div class="section-line"></div>
+            </div>
+            <h2>A win for <em>both</em> sides.</h2>
+
+            <div class="grid-2" style="margin-top: 24px;">
+                <div class="benefit-card no-break">
+                    <div class="benefit-header lynx">
+                        <h3>What Lynx Gets</h3>
+                    </div>
+                    <ul class="benefit-list">
+                        <li>
+                            <span class="benefit-icon">&#9670;</span>
+                            <div>
+                                <strong>First-mover advantage in tech talent management</strong>
+                                <span>Be the first entertainment company in Ghana to expand into tech founder representation.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="benefit-icon">&#9670;</span>
+                            <div>
+                                <strong>Recurring revenue streams</strong>
+                                <span>Commission on SaaS subscriptions and service fees that grow over time.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="benefit-icon">&#9670;</span>
+                            <div>
+                                <strong>Global client base exposure</strong>
+                                <span>TradeMetricsPro serves clients internationally, bringing global visibility.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="benefit-icon">&#9670;</span>
+                            <div>
+                                <strong>Compelling PR narrative</strong>
+                                <span>"Lynx: From Music to Tech" - a story that writes itself.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="benefit-card no-break">
+                    <div class="benefit-header me">
+                        <h3>What I Get</h3>
+                    </div>
+                    <ul class="benefit-list">
+                        <li>
+                            <span class="benefit-icon">&#9670;</span>
+                            <div>
+                                <strong>Access to your powerful network</strong>
+                                <span>Media connections, brand partnerships, and business relationships built over years.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="benefit-icon">&#9670;</span>
+                            <div>
+                                <strong>Credibility through association</strong>
+                                <span>The Lynx brand carries weight in Ghana and across Africa.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="benefit-icon">&#9670;</span>
+                            <div>
+                                <strong>Strategic market access</strong>
+                                <span>A clear path from Ghana to West Africa to global markets.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="benefit-icon">&#9670;</span>
+                            <div>
+                                <strong>Guidance from your experience</strong>
+                                <span>Learn from the journey of building Lynx and the African Creative Network.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" style="margin-top: 48px;">
+            <div class="section-title">
+                <span class="section-number">06 The Vision</span>
+                <div class="section-line"></div>
+            </div>
+            <h2>Ghana first. <em>Then the world.</em></h2>
+
+            <div class="timeline" style="margin-top: 24px;">
+                <div class="timeline-step no-break">
+                    <div class="step-number">01</div>
+                    <div class="step-content">
+                        <h4>Ghana</h4>
+                        <p>Establish BrillaPrep as the leading exam prep platform. Build partnerships with schools and educational institutions.</p>
+                    </div>
+                </div>
+                <div class="timeline-step no-break">
+                    <div class="step-number">02</div>
+                    <div class="step-content">
+                        <h4>West Africa</h4>
+                        <p>Expand to Nigeria, Ivory Coast, Sierra Leone, and other WASSCE-participating countries with localized content.</p>
+                    </div>
+                </div>
+                <div class="timeline-step no-break">
+                    <div class="step-number">03</div>
+                    <div class="step-content">
+                        <h4>Global Scale</h4>
+                        <p>Scale TradeMetricsPro internationally with PR amplification. Position both platforms for investment and acquisition.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="page">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-mark"></div>
+                <span class="logo-text">Partnership Proposal</span>
+            </div>
+        </div>
+
+        <div class="cta" style="margin-top: 80px;">
+            <h2>Let's make <em>history.</em></h2>
+            <p class="lead">Richie built Lynx by seeing what Ghana's creative industry could become. This is that same moment for tech. Let's work together to show Africa and the world what Ghanaian tech founders can achieve.</p>
+
+            <a href="mailto:ohwpstudios@gmail.com" class="cta-email">Start the conversation</a>
+
+            <div class="cta-links">
+                <a href="https://brillaprep.org" class="cta-link">brillaprep.org</a>
+                <a href="https://ea.trademetricspro.com" class="cta-link">ea.trademetricspro.com</a>
+            </div>
+
+            <p class="tagline">Building systems that outlive us.</p>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 Partnership Proposal. All rights reserved.</p>
+            <p style="margin-top: 8px;">View interactive version: <a href="https://lynx-presentation.pages.dev" style="color: #6366f1;">lynx-presentation.pages.dev</a></p>
+        </div>
+    </div>
+
+</body>
+</html>

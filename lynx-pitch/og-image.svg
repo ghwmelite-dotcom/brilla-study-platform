@@ -1,0 +1,55 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#09090b"/>
+      <stop offset="100%" style="stop-color:#18181b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a855f7"/>
+      <stop offset="100%" style="stop-color:#6366f1"/>
+    </linearGradient>
+    <linearGradient id="brilla" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#a855f7"/>
+    </linearGradient>
+    <linearGradient id="trade" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#3b82f6"/>
+    </linearGradient>
+    <filter id="blur1" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="60"/>
+    </filter>
+    <filter id="blur2" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="40"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Orbs -->
+  <circle cx="950" cy="150" r="200" fill="#a855f7" opacity="0.3" filter="url(#blur1)"/>
+  <circle cx="1050" cy="350" r="150" fill="#6366f1" opacity="0.25" filter="url(#blur1)"/>
+  <circle cx="900" cy="500" r="120" fill="#10b981" opacity="0.2" filter="url(#blur2)"/>
+
+  <!-- Brand mark -->
+  <rect x="80" y="80" width="16" height="16" rx="4" fill="url(#accent)"/>
+  <text x="108" y="93" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#a1a1aa" letter-spacing="0.05em">PROPOSAL</text>
+
+  <!-- Main Title -->
+  <text x="80" y="260" font-family="Inter, sans-serif" font-size="72" font-weight="700" fill="#ffffff" letter-spacing="-0.03em">The future of</text>
+  <text x="80" y="345" font-family="Georgia, serif" font-size="72" font-style="italic" fill="url(#accent)" letter-spacing="-0.03em">African tech</text>
+  <text x="80" y="430" font-family="Inter, sans-serif" font-size="72" font-weight="700" fill="#ffffff" letter-spacing="-0.03em">deserves a voice.</text>
+
+  <!-- Platform chips -->
+  <rect x="80" y="480" width="160" height="48" rx="12" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <circle cx="108" cy="504" r="6" fill="#6366f1"/>
+  <text x="124" y="510" font-family="Inter, sans-serif" font-size="16" font-weight="600" fill="#ffffff">BrillaPrep</text>
+
+  <rect x="260" y="480" width="200" height="48" rx="12" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <circle cx="288" cy="504" r="6" fill="#10b981"/>
+  <text x="304" y="510" font-family="Inter, sans-serif" font-size="16" font-weight="600" fill="#ffffff">TradeMetricsPro</text>
+
+  <!-- Subtitle -->
+  <text x="80" y="580" font-family="Inter, sans-serif" font-size="20" fill="#71717a">A partnership proposal for Lynx Group & ACN</text>
+</svg>
