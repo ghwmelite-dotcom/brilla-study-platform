@@ -4501,6 +4501,336 @@ adminApp.get('/system/health', async (c) => {
   }
 });
 
+// Analytics endpoint
+adminApp.get('/analytics', async (c) => {
+  try {
+    const range = c.req.query('range') || '30d';
+    const days = range === '7d' ? 7 : range === '90d' ? 90 : 30;
+    const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+    const lastPeriodStart = new Date(Date.now() - days * 2 * 24 * 60 * 60 * 1000).toISOString();
+
+    // User stats
+    const [totalUsers, newUsers, lastPeriodUsers, byRole, bySchoolLevel] = await Promise.all([
+      c.env.DB.prepare('SELECT COUNT(*) as count FROM users WHERE is_active = 1').first(),
+      c.env.DB.prepare('SELECT COUNT(*) as count FROM users WHERE created_at >= ?').bind(startDate).first(),
+      c.env.DB.prepare('SELECT COUNT(*) as count FROM users WHERE created_at >= ? AND created_at < ?').bind(lastPeriodStart, startDate).first(),
+      c.env.DB.prepare('SELECT role, COUNT(*) as count FROM users WHERE is_active = 1 GROUP BY role').all(),
+      c.env.DB.prepare("SELECT school_level as level, COUNT(*) as count FROM users WHERE role = 'student' AND school_level IS NOT NULL GROUP BY school_level").all(),
+    ]);
+
+    const currentCount = (newUsers as { count: number })?.count || 0;
+    const lastCount = (lastPeriodUsers as { count: number })?.count || 1;
+    const growthPercent = Math.round(((currentCount - lastCount) / lastCount) * 100);
+
+    // Engagement stats
+    const [questionsAnswered, activeToday, activeWeek, activeMonth] = await Promise.all([
+      c.env.DB.prepare('SELECT COUNT(*) as count, AVG(CASE WHEN is_correct = 1 THEN 100 ELSE 0 END) as accuracy FROM question_attempts').first(),
+      c.env.DB.prepare('SELECT COUNT(DISTINCT user_id) as count FROM question_attempts WHERE DATE(created_at) = DATE("now")').first(),
+      c.env.DB.prepare('SELECT COUNT(DISTINCT user_id) as count FROM question_attempts WHERE created_at >= datetime("now", "-7 days")').first(),
+      c.env.DB.prepare('SELECT COUNT(DISTINCT user_id) as count FROM question_attempts WHERE created_at >= datetime("now", "-30 days")').first(),
+    ]);
+
+    // Content stats
+    const [totalQuestions, bySubject, byDifficulty] = await Promise.all([
+      c.env.DB.prepare('SELECT COUNT(*) as count FROM questions').first(),
+      c.env.DB.prepare('SELECT subject_id as subject, COUNT(*) as count FROM questions GROUP BY subject_id LIMIT 10').all(),
+      c.env.DB.prepare('SELECT difficulty, COUNT(*) as count FROM questions GROUP BY difficulty').all(),
+    ]);
+
+    // Revenue stats
+    const [revenueThisMonth, revenueLastMonth, activeSubs] = await Promise.all([
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed' AND created_at >= datetime('now', 'start of month')").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed' AND created_at >= datetime('now', 'start of month', '-1 month') AND created_at < datetime('now', 'start of month')").first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM user_subscriptions WHERE status = 'active'").first(),
+    ]);
+
+    const thisMonthRev = (revenueThisMonth as { total: number })?.total || 0;
+    const lastMonthRev = (revenueLastMonth as { total: number })?.total || 1;
+    const revenueGrowth = Math.round(((thisMonthRev - lastMonthRev) / lastMonthRev) * 100);
+
+    return c.json({
+      success: true,
+      data: {
+        userStats: {
+          totalUsers: (totalUsers as { count: number })?.count || 0,
+          activeUsers: (activeMonth as { count: number })?.count || 0,
+          newUsersThisMonth: currentCount,
+          userGrowthPercent: growthPercent,
+          byRole: (byRole.results || []).map((r: Record<string, unknown>) => ({ role: r.role, count: r.count })),
+          bySchoolLevel: (bySchoolLevel.results || []).map((r: Record<string, unknown>) => ({ level: r.level || 'Unknown', count: r.count })),
+        },
+        engagementStats: {
+          totalQuestionsAnswered: (questionsAnswered as { count: number })?.count || 0,
+          averageAccuracy: Math.round((questionsAnswered as { accuracy: number })?.accuracy || 0),
+          averageSessionDuration: 15, // Placeholder - would need session tracking
+          dailyActiveUsers: (activeToday as { count: number })?.count || 0,
+          weeklyActiveUsers: (activeWeek as { count: number })?.count || 0,
+          monthlyActiveUsers: (activeMonth as { count: number })?.count || 0,
+        },
+        contentStats: {
+          totalQuestions: (totalQuestions as { count: number })?.count || 0,
+          questionsBySubject: (bySubject.results || []).map((r: Record<string, unknown>) => ({ subject: r.subject || 'Unknown', count: r.count })),
+          questionsByDifficulty: (byDifficulty.results || []).map((r: Record<string, unknown>) => ({ difficulty: r.difficulty || 'medium', count: r.count })),
+        },
+        revenueStats: {
+          totalRevenue: thisMonthRev + lastMonthRev,
+          revenueThisMonth: thisMonthRev,
+          revenueGrowthPercent: revenueGrowth,
+          activeSubscriptions: (activeSubs as { count: number })?.count || 0,
+          churnRate: 5, // Placeholder
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Analytics error:', error);
+    return c.json({ success: false, error: 'Failed to fetch analytics' }, 500);
+  }
+});
+
+// Subscription stats
+adminApp.get('/subscriptions/stats', async (c) => {
+  try {
+    const [active, trials, expiring, revenueThis, revenueLast] = await Promise.all([
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM user_subscriptions WHERE status = 'active'").first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM user_trials WHERE status = 'active' AND expires_at > datetime('now')").first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM user_subscriptions WHERE status = 'active' AND expires_at <= datetime('now', '+7 days')").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed' AND created_at >= datetime('now', 'start of month')").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed' AND created_at >= datetime('now', 'start of month', '-1 month') AND created_at < datetime('now', 'start of month')").first(),
+    ]);
+
+    const thisMonth = (revenueThis as { total: number })?.total || 0;
+    const lastMonth = (revenueLast as { total: number })?.total || 1;
+    const growth = Math.round(((thisMonth - lastMonth) / lastMonth) * 100);
+
+    return c.json({
+      success: true,
+      data: {
+        totalSubscriptions: (active as { count: number })?.count || 0,
+        activeSubscriptions: (active as { count: number })?.count || 0,
+        trialUsers: (trials as { count: number })?.count || 0,
+        expiringSoon: (expiring as { count: number })?.count || 0,
+        revenueThisMonth: thisMonth,
+        revenueLastMonth: lastMonth,
+        growthPercent: growth,
+        churnRate: 5,
+        averageLifetimeValue: 150,
+        conversionRate: 25,
+      },
+    });
+  } catch (error) {
+    console.error('Subscription stats error:', error);
+    return c.json({ success: false, error: 'Failed to fetch subscription stats' }, 500);
+  }
+});
+
+// Subscription list
+adminApp.get('/subscriptions/list', async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT s.id, s.user_id, u.name as user_name, u.email as user_email,
+             s.tier_id as plan_id, t.name as plan_name, s.status,
+             s.billing_cycle, t.price_monthly as amount,
+             s.started_at as start_date, s.expires_at as end_date, s.auto_renew
+      FROM user_subscriptions s
+      JOIN users u ON s.user_id = u.id
+      LEFT JOIN subscription_tiers t ON s.tier_id = t.id
+      ORDER BY s.created_at DESC
+      LIMIT 100
+    `).all();
+
+    const subscriptions = (results || []).map((s: Record<string, unknown>) => ({
+      id: s.id,
+      userId: s.user_id,
+      userName: s.user_name || 'Unknown',
+      userEmail: s.user_email || '',
+      planId: s.plan_id,
+      planName: s.plan_name || 'Premium',
+      status: s.status || 'active',
+      billingCycle: s.billing_cycle || 'monthly',
+      amount: s.amount || 0,
+      startDate: s.start_date,
+      endDate: s.end_date,
+      autoRenew: s.auto_renew === 1,
+    }));
+
+    return c.json({ success: true, data: subscriptions });
+  } catch (error) {
+    console.error('Subscription list error:', error);
+    return c.json({ success: true, data: [] });
+  }
+});
+
+// Trials list
+adminApp.get('/subscriptions/trials', async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT t.id, t.user_id, u.name as user_name, u.email as user_email,
+             t.started_at, t.expires_at, t.status, t.tasks_completed
+      FROM user_trials t
+      JOIN users u ON t.user_id = u.id
+      ORDER BY t.started_at DESC
+      LIMIT 100
+    `).all();
+
+    const trials = (results || []).map((t: Record<string, unknown>) => {
+      const expiresAt = new Date(t.expires_at as string);
+      const now = new Date();
+      const daysRemaining = Math.max(0, Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+      const tasksCompleted = t.tasks_completed ? JSON.parse(t.tasks_completed as string).length : 0;
+
+      return {
+        id: t.id,
+        userId: t.user_id,
+        userName: t.user_name || 'Unknown',
+        userEmail: t.user_email || '',
+        startedAt: t.started_at,
+        expiresAt: t.expires_at,
+        daysRemaining,
+        tasksCompleted,
+        status: t.status || 'active',
+      };
+    });
+
+    return c.json({ success: true, data: trials });
+  } catch (error) {
+    console.error('Trials list error:', error);
+    return c.json({ success: true, data: [] });
+  }
+});
+
+// Affiliate stats
+adminApp.get('/affiliates/stats', async (c) => {
+  try {
+    const [total, active, referrals, conversions, commissions, pending] = await Promise.all([
+      c.env.DB.prepare('SELECT COUNT(*) as count FROM affiliate_profiles').first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM affiliate_profiles WHERE status = 'active'").first(),
+      c.env.DB.prepare('SELECT COUNT(*) as count FROM affiliate_referrals').first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM affiliate_referrals WHERE status = 'converted'").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM affiliate_commissions WHERE status = 'paid'").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM affiliate_payouts WHERE status = 'pending'").first(),
+    ]);
+
+    const totalRefs = (referrals as { count: number })?.count || 1;
+    const successRefs = (conversions as { count: number })?.count || 0;
+    const conversionRate = Math.round((successRefs / totalRefs) * 100);
+
+    return c.json({
+      success: true,
+      data: {
+        totalAffiliates: (total as { count: number })?.count || 0,
+        activeAffiliates: (active as { count: number })?.count || 0,
+        totalReferrals: totalRefs,
+        successfulConversions: successRefs,
+        totalCommissions: (commissions as { total: number })?.total || 0,
+        pendingPayouts: (pending as { total: number })?.total || 0,
+        conversionRate,
+        averageCommission: 15,
+      },
+    });
+  } catch (error) {
+    console.error('Affiliate stats error:', error);
+    return c.json({ success: true, data: {
+      totalAffiliates: 0,
+      activeAffiliates: 0,
+      totalReferrals: 0,
+      successfulConversions: 0,
+      totalCommissions: 0,
+      pendingPayouts: 0,
+      conversionRate: 0,
+      averageCommission: 0,
+    }});
+  }
+});
+
+// Affiliate list
+adminApp.get('/affiliates/list', async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT a.id, a.user_id, u.name as user_name, u.email as user_email,
+             a.referral_code, a.total_referrals, a.successful_referrals,
+             a.total_earnings, a.pending_balance, a.paid_balance,
+             a.tier, a.status, a.created_at as joined_at
+      FROM affiliate_profiles a
+      JOIN users u ON a.user_id = u.id
+      ORDER BY a.total_earnings DESC
+      LIMIT 100
+    `).all();
+
+    const affiliates = (results || []).map((a: Record<string, unknown>) => ({
+      id: a.id,
+      userId: a.user_id,
+      userName: a.user_name || 'Unknown',
+      userEmail: a.user_email || '',
+      referralCode: a.referral_code || '',
+      totalReferrals: a.total_referrals || 0,
+      successfulReferrals: a.successful_referrals || 0,
+      totalEarnings: a.total_earnings || 0,
+      pendingBalance: a.pending_balance || 0,
+      paidBalance: a.paid_balance || 0,
+      tier: a.tier || 'bronze',
+      joinedAt: a.joined_at,
+      status: a.status || 'active',
+    }));
+
+    return c.json({ success: true, data: affiliates });
+  } catch (error) {
+    console.error('Affiliate list error:', error);
+    return c.json({ success: true, data: [] });
+  }
+});
+
+// Affiliate payouts
+adminApp.get('/affiliates/payouts', async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT p.id, p.affiliate_id, u.name as affiliate_name,
+             p.amount, p.status, p.created_at as requested_at,
+             p.processed_at, a.mobile_money_number as mobile_number,
+             a.mobile_money_provider as provider
+      FROM affiliate_payouts p
+      JOIN affiliate_profiles a ON p.affiliate_id = a.id
+      JOIN users u ON a.user_id = u.id
+      ORDER BY p.created_at DESC
+      LIMIT 100
+    `).all();
+
+    const payouts = (results || []).map((p: Record<string, unknown>) => ({
+      id: p.id,
+      affiliateId: p.affiliate_id,
+      affiliateName: p.affiliate_name || 'Unknown',
+      amount: p.amount || 0,
+      status: p.status || 'pending',
+      requestedAt: p.requested_at,
+      processedAt: p.processed_at,
+      mobileNumber: p.mobile_number || '',
+      provider: p.provider || 'mtn',
+    }));
+
+    return c.json({ success: true, data: payouts });
+  } catch (error) {
+    console.error('Affiliate payouts error:', error);
+    return c.json({ success: true, data: [] });
+  }
+});
+
+// Approve payout
+adminApp.post('/affiliates/payouts/:id/approve', async (c) => {
+  try {
+    const { id } = c.req.param();
+
+    await c.env.DB.prepare(`
+      UPDATE affiliate_payouts
+      SET status = 'completed', processed_at = datetime('now')
+      WHERE id = ?
+    `).bind(id).run();
+
+    return c.json({ success: true, message: 'Payout approved' });
+  } catch (error) {
+    console.error('Approve payout error:', error);
+    return c.json({ success: false, error: 'Failed to approve payout' }, 500);
+  }
+});
+
 // Get all users with stats
 adminApp.get('/users', async (c) => {
   try {

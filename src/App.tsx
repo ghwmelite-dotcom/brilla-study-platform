@@ -44,6 +44,9 @@ const AdminApprovals = lazy(() => import('@/pages/AdminApprovals'));
 const UserManagement = lazy(() => import('@/pages/UserManagement'));
 const AuditLog = lazy(() => import('@/pages/AuditLog'));
 const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
+const AdminAnalytics = lazy(() => import('@/pages/AdminAnalytics'));
+const AdminSubscriptions = lazy(() => import('@/pages/AdminSubscriptions'));
+const AdminAffiliates = lazy(() => import('@/pages/AdminAffiliates'));
 
 // Admin layout (lazy loaded)
 const AdminLayout = lazy(() => import('@/components/admin/layout/AdminLayout').then(m => ({ default: m.AdminLayout })));
@@ -803,15 +806,15 @@ function App() {
           }
         >
           <Route index element={<LazyPage><AdminDashboard /></LazyPage>} />
-          <Route path="analytics" element={<LazyPage><AdminDashboard /></LazyPage>} />
+          <Route path="analytics" element={<LazyPage><AdminAnalytics /></LazyPage>} />
           <Route path="approvals" element={<LazyPage><AdminApprovals /></LazyPage>} />
           <Route path="users" element={<LazyPage><UserManagement /></LazyPage>} />
           <Route path="content" element={<LazyPage><ContentManagementPage /></LazyPage>} />
           <Route path="moderation" element={<LazyPage><ModerationDashboard /></LazyPage>} />
           <Route path="audit" element={<LazyPage><AuditLog /></LazyPage>} />
           <Route path="settings" element={<LazyPage><SettingsPage /></LazyPage>} />
-          <Route path="subscriptions" element={<LazyPage><AdminDashboard /></LazyPage>} />
-          <Route path="affiliates" element={<LazyPage><AdminDashboard /></LazyPage>} />
+          <Route path="subscriptions" element={<LazyPage><AdminSubscriptions /></LazyPage>} />
+          <Route path="affiliates" element={<LazyPage><AdminAffiliates /></LazyPage>} />
         </Route>
       </Routes>
 

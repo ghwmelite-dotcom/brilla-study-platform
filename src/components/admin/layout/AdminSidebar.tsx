@@ -124,7 +124,8 @@ export function AdminSidebar() {
 
         {/* Content */}
         <NavGroup label="Content" icon={<BookOpen className="w-4 h-4" />} defaultOpen={isContentSection}>
-          <NavItem to="/admin/content" icon={<ScrollText className="w-4 h-4" />} label="Questions" />
+          {/* Content Management hidden until backend is implemented */}
+          {/* <NavItem to="/admin/content" icon={<ScrollText className="w-4 h-4" />} label="Questions" /> */}
           <NavItem to="/admin/moderation" icon={<MessageSquareWarning className="w-4 h-4" />} label="Moderation" />
         </NavGroup>
 
