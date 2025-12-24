@@ -14,9 +14,12 @@ import {
   ArrowRight,
   School,
   Wallet,
+  HelpCircle,
+  BookOpen,
 } from 'lucide-react';
 import { useAffiliateStore } from '@/stores/affiliateStore';
 import { useAuthStore } from '@/stores/authStore';
+import { AffiliateGuide } from '@/components/affiliate';
 
 type TabType = 'overview' | 'referrals' | 'leaderboard' | 'challenges' | 'earnings';
 
@@ -46,6 +49,7 @@ export default function Affiliate() {
   const [copied, setCopied] = useState(false);
   const [leaderboardType, setLeaderboardType] = useState<'individual' | 'school'>('individual');
   const [isJoining, setIsJoining] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -117,7 +121,17 @@ export default function Affiliate() {
               Share Brilla with your friends and classmates. Earn up to 50% commission
               on every subscription while helping others excel in their exams!
             </p>
+            <button
+              onClick={() => setShowGuide(true)}
+              className="mt-4 inline-flex items-center gap-2 text-primary hover:text-primary-dark transition-colors"
+            >
+              <BookOpen className="w-5 h-5" />
+              <span className="font-medium">View Complete Guide</span>
+            </button>
           </div>
+
+          {/* Affiliate Guide Modal */}
+          <AffiliateGuide isOpen={showGuide} onClose={() => setShowGuide(false)} />
 
           {/* Tier Cards */}
           <div className="grid md:grid-cols-5 gap-4 mb-12">
@@ -210,12 +224,28 @@ export default function Affiliate() {
   // Affiliate Dashboard
   return (
     <div className="min-h-screen bg-neutral-50 py-6 px-4">
+      {/* Affiliate Guide Modal */}
+      <AffiliateGuide
+        isOpen={showGuide}
+        onClose={() => setShowGuide(false)}
+        referralLink={profile?.referralLink}
+      />
+
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-neutral-900">Affiliate Dashboard</h1>
-            <p className="text-neutral-600">Track your referrals and earnings</p>
+          <div className="flex items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-neutral-900">Affiliate Dashboard</h1>
+              <p className="text-neutral-600">Track your referrals and earnings</p>
+            </div>
+            <button
+              onClick={() => setShowGuide(true)}
+              className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">Guide</span>
+            </button>
           </div>
 
           {/* Referral Link */}
