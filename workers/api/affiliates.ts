@@ -26,6 +26,27 @@ async function verifyJWT(token: string, secret: string): Promise<UserPayload | n
   }
 }
 
+// Rate limiting store (in-memory for single worker, use KV/Durable Objects for distributed)
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+
+// Check rate limit for an IP/key
+function checkRateLimit(key: string, maxRequests: number, windowMs: number): boolean {
+  const now = Date.now();
+  const record = rateLimitStore.get(key);
+
+  if (!record || now > record.resetAt) {
+    rateLimitStore.set(key, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+
+  if (record.count >= maxRequests) {
+    return false;
+  }
+
+  record.count++;
+  return true;
+}
+
 // Authentication middleware for protected routes
 const authMiddleware = async (c: any, next: any) => {
   const authHeader = c.req.header('Authorization');
@@ -42,20 +63,25 @@ const authMiddleware = async (c: any, next: any) => {
 
   const token = authHeader.replace('Bearer ', '');
 
-  // Handle demo tokens - use actual database IDs
+  // SECURITY: Demo tokens only allowed in development environment
   if (token.endsWith('_demo_token')) {
-    const tokenPrefix = token.replace('_demo_token', '');
-    const demoUsers: Record<string, { id: string; role: string }> = {
-      'student': { id: 'student_1766327981521', role: 'student' },
-      'teacher': { id: 'teacher_1766327981453', role: 'teacher' },
-      'admin': { id: 'admin_prod_001', role: 'admin' },
-    };
-    const demoUser = demoUsers[tokenPrefix];
-    if (demoUser) {
-      c.set('userId', demoUser.id);
-      c.set('userRole', demoUser.role);
-      return next();
+    const isDevelopment = c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev';
+    if (isDevelopment) {
+      const tokenPrefix = token.replace('_demo_token', '');
+      const demoUsers: Record<string, { id: string; role: string }> = {
+        'student': { id: 'student_1766327981521', role: 'student' },
+        'teacher': { id: 'teacher_1766327981453', role: 'teacher' },
+        'admin': { id: 'admin_prod_001', role: 'admin' },
+      };
+      const demoUser = demoUsers[tokenPrefix];
+      if (demoUser) {
+        c.set('userId', demoUser.id);
+        c.set('userRole', demoUser.role);
+        return next();
+      }
     }
+    // In production, demo tokens are rejected
+    return c.json({ success: false, error: 'Invalid token' }, 401);
   }
 
   // Verify JWT token
@@ -79,16 +105,26 @@ function generateReferralCode(name: string): string {
   return `${cleanName}${random}`;
 }
 
-// Hash IP address for privacy
-function hashIP(ip: string): string {
-  // Simple hash for demo - use proper hashing in production
-  let hash = 0;
-  for (let i = 0; i < ip.length; i++) {
-    const char = ip.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash).toString(36);
+// Secure hash IP address for privacy using SHA-256
+async function hashIP(ip: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(ip + '_brilla_affiliate_salt');
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
+}
+
+// Validate referral code format
+function isValidReferralCode(code: string): boolean {
+  // Referral codes should be 6-10 alphanumeric characters
+  return /^[A-Z0-9]{6,10}$/i.test(code);
+}
+
+// Sanitize and validate pagination parameters
+function sanitizePaginationParams(limitStr: string | undefined, offsetStr: string | undefined): { limit: number; offset: number } {
+  const limit = Math.min(Math.max(1, parseInt(limitStr || '20') || 20), 100);
+  const offset = Math.max(0, parseInt(offsetStr || '0') || 0);
+  return { limit, offset };
 }
 
 // =============================================
@@ -868,43 +904,66 @@ affiliatesApp.get('/achievements', authMiddleware, async (c) => {
   }
 });
 
-// Track referral link click (public endpoint)
+// Track referral link click (public endpoint with rate limiting)
 affiliatesApp.get('/ref/:code', async (c) => {
   try {
     const code = c.req.param('code');
 
+    // SECURITY: Validate referral code format
+    if (!code || !isValidReferralCode(code)) {
+      return c.redirect(c.env.APP_URL);
+    }
+
+    const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
+
+    // SECURITY: Rate limit click tracking (max 10 clicks per IP per minute)
+    const rateLimitKey = `click_${await hashIP(ip)}`;
+    if (!checkRateLimit(rateLimitKey, 10, 60000)) {
+      // Still redirect but don't track the click
+      return c.redirect(`${c.env.APP_URL}/register?ref=${code}`);
+    }
+
     // Get affiliate by code
     const affiliate = await c.env.DB.prepare(`
       SELECT id FROM affiliate_profiles WHERE referral_code = ? AND is_active = 1
-    `).bind(code).first();
+    `).bind(code.toUpperCase()).first();
 
     if (!affiliate) {
       // Redirect to homepage anyway
       return c.redirect(c.env.APP_URL);
     }
 
-    // Track click
-    const clickId = crypto.randomUUID();
-    const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || '';
-    const userAgent = c.req.header('user-agent') || '';
-    const referrer = c.req.header('referer') || '';
+    // SECURITY: Check for duplicate clicks from same IP in last hour
+    const ipHash = await hashIP(ip);
+    const recentClick = await c.env.DB.prepare(`
+      SELECT id FROM affiliate_clicks
+      WHERE affiliate_id = ? AND ip_hash = ?
+      AND clicked_at > datetime('now', '-1 hour')
+    `).bind(affiliate.id, ipHash).first();
 
-    await c.env.DB.prepare(`
-      INSERT INTO affiliate_clicks (id, affiliate_id, ip_hash, user_agent, referrer_url, landing_page)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).bind(
-      clickId,
-      affiliate.id,
-      hashIP(ip),
-      userAgent.substring(0, 255),
-      referrer.substring(0, 500),
-      '/register'
-    ).run();
+    // Track click only if not a duplicate
+    if (!recentClick) {
+      const clickId = crypto.randomUUID();
+      const userAgent = c.req.header('user-agent') || '';
+      const referrer = c.req.header('referer') || '';
 
-    // Update click count
-    await c.env.DB.prepare(`
-      UPDATE affiliate_profiles SET total_clicks = total_clicks + 1 WHERE id = ?
-    `).bind(affiliate.id).run();
+      await c.env.DB.prepare(`
+        INSERT INTO affiliate_clicks (id, affiliate_id, ip_hash, user_agent, referrer_url, landing_page)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).bind(
+        clickId,
+        affiliate.id,
+        ipHash,
+        userAgent.substring(0, 255),
+        referrer.substring(0, 500),
+        '/register'
+      ).run();
+
+      // Update click count
+      await c.env.DB.prepare(`
+        UPDATE affiliate_profiles SET total_clicks = total_clicks + 1 WHERE id = ?
+      `).bind(affiliate.id).run();
+    }
 
     // Redirect to register page with referral code
     return c.redirect(`${c.env.APP_URL}/register?ref=${code}`);
@@ -923,16 +982,40 @@ affiliatesApp.post('/process-referral', authMiddleware, async (c) => {
       return c.json({ success: false, error: 'Missing required fields' }, 400);
     }
 
+    // SECURITY: Validate referral code format
+    if (!isValidReferralCode(referralCode)) {
+      return c.json({ success: false, error: 'Invalid referral code format' }, 400);
+    }
+
+    // SECURITY: Validate newUserId format (should be a valid UUID or ID format)
+    if (typeof newUserId !== 'string' || newUserId.length < 10 || newUserId.length > 100) {
+      return c.json({ success: false, error: 'Invalid user ID format' }, 400);
+    }
+
     // Get affiliate by code
     const affiliate = await c.env.DB.prepare(`
-      SELECT ap.*, u.role as affiliate_role
+      SELECT ap.*, u.role as affiliate_role, u.email as affiliate_email
       FROM affiliate_profiles ap
       JOIN users u ON ap.user_id = u.id
       WHERE ap.referral_code = ? AND ap.is_active = 1
-    `).bind(referralCode).first();
+    `).bind(referralCode.toUpperCase()).first();
 
     if (!affiliate) {
       return c.json({ success: false, error: 'Invalid referral code' }, 400);
+    }
+
+    // SECURITY: Prevent self-referral
+    if (affiliate.user_id === newUserId) {
+      return c.json({ success: false, error: 'Self-referral is not allowed' }, 400);
+    }
+
+    // SECURITY: Check if new user's email matches affiliate's email (same person, different accounts)
+    const newUser = await c.env.DB.prepare(`
+      SELECT email FROM users WHERE id = ?
+    `).bind(newUserId).first();
+
+    if (newUser && newUser.email === affiliate.affiliate_email) {
+      return c.json({ success: false, error: 'Self-referral is not allowed' }, 400);
     }
 
     // Check if user already referred
@@ -961,7 +1044,7 @@ affiliatesApp.post('/process-referral', authMiddleware, async (c) => {
     // Update referred user
     await c.env.DB.prepare(`
       UPDATE users SET referred_by = ? WHERE id = ?
-    `).bind(referralCode, newUserId).run();
+    `).bind(referralCode.toUpperCase(), newUserId).run();
 
     // Award XP for referral
     await c.env.DB.prepare(`

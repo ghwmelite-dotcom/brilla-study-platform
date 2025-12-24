@@ -439,22 +439,27 @@ protectedApp.use('*', async (c, next) => {
 
   const token = authHeader.replace('Bearer ', '');
 
-  // Handle demo tokens - use actual database IDs
+  // SECURITY: Demo tokens only allowed in development environment
   if (token.endsWith('_demo_token')) {
-    // For demo mode, get the user based on token prefix
-    const tokenPrefix = token.replace('_demo_token', '');
-    const demoUsers: Record<string, { id: string; role: string }> = {
-      'student': { id: 'student_1766327981521', role: 'student' },
-      'teacher': { id: 'teacher_1766327981453', role: 'teacher' },
-      'admin': { id: 'admin_prod_001', role: 'admin' },
-    };
-    const demoUser = demoUsers[tokenPrefix];
-    if (demoUser) {
-      c.set('userId', demoUser.id);
-      c.set('userRole', demoUser.role);
-      c.set('isDemo', true); // Mark as demo user
-      return next();
+    const isDevelopment = c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev';
+    if (isDevelopment) {
+      // For demo mode, get the user based on token prefix
+      const tokenPrefix = token.replace('_demo_token', '');
+      const demoUsers: Record<string, { id: string; role: string }> = {
+        'student': { id: 'student_1766327981521', role: 'student' },
+        'teacher': { id: 'teacher_1766327981453', role: 'teacher' },
+        'admin': { id: 'admin_prod_001', role: 'admin' },
+      };
+      const demoUser = demoUsers[tokenPrefix];
+      if (demoUser) {
+        c.set('userId', demoUser.id);
+        c.set('userRole', demoUser.role);
+        c.set('isDemo', true); // Mark as demo user
+        return next();
+      }
     }
+    // In production, demo tokens are rejected
+    return c.json({ success: false, error: 'Invalid token' }, 401);
   }
 
   // Verify JWT token
@@ -4318,7 +4323,7 @@ protectedApp.put('/parents/preferences', userAuth, async (c) => {
 // ADMIN USER MANAGEMENT ENDPOINTS
 // =============================================
 
-// Middleware to verify admin role
+// Middleware to verify admin role with enhanced security
 const adminAuth = async (c: any, next: any) => {
   const authHeader = c.req.header('Authorization');
   if (!authHeader?.startsWith('Bearer ')) {
@@ -4327,17 +4332,22 @@ const adminAuth = async (c: any, next: any) => {
 
   const token = authHeader.slice(7);
 
-  // Handle demo tokens - use actual database IDs
+  // SECURITY: Demo tokens only allowed in development environment
   if (token.endsWith('_demo_token')) {
-    const tokenPrefix = token.replace('_demo_token', '');
-    if (tokenPrefix === 'admin') {
-      c.set('user', { userId: 'admin_prod_001', role: 'admin', email: 'admin@brillaprep.org' });
-      c.set('userId', 'admin_prod_001');
-      c.set('userRole', 'admin');
-      return next();
-    } else {
-      return c.json({ success: false, error: 'Admin access required' }, 403);
+    const isDevelopment = c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev';
+    if (isDevelopment) {
+      const tokenPrefix = token.replace('_demo_token', '');
+      if (tokenPrefix === 'admin') {
+        c.set('user', { userId: 'admin_prod_001', role: 'admin', email: 'admin@brillaprep.org' });
+        c.set('userId', 'admin_prod_001');
+        c.set('userRole', 'admin');
+        return next();
+      } else {
+        return c.json({ success: false, error: 'Admin access required' }, 403);
+      }
     }
+    // In production, demo tokens are rejected
+    return c.json({ success: false, error: 'Invalid token' }, 401);
   }
 
   const payload = await verifyJWT(token, c.env.JWT_SECRET);
