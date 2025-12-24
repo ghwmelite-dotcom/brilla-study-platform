@@ -16,6 +16,7 @@ declare global {
       remove: (widgetId: string) => void;
       getResponse: (widgetId: string) => string | undefined;
     };
+    onTurnstileLoad?: () => void;
   }
 }
 
@@ -50,16 +51,13 @@ export function Turnstile({
 }: TurnstileProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
-  const mountedRef = useRef(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
   // Use refs for callbacks to prevent re-renders
   const onVerifyRef = useRef(onVerify);
   const onErrorRef = useRef(onError);
   const onExpireRef = useRef(onExpire);
 
-  // Update refs when callbacks change
   useEffect(() => {
     onVerifyRef.current = onVerify;
     onErrorRef.current = onError;
@@ -67,172 +65,184 @@ export function Turnstile({
   }, [onVerify, onError, onExpire]);
 
   const renderWidget = useCallback(() => {
-    if (!containerRef.current || !window.turnstile) return;
-    if (mountedRef.current) return; // Already rendered
-
-    mountedRef.current = true;
+    if (!containerRef.current || !window.turnstile) {
+      console.log('Turnstile: Container or API not ready');
+      return;
+    }
 
     // Remove existing widget if any
     if (widgetIdRef.current) {
       try {
         window.turnstile.remove(widgetIdRef.current);
+        widgetIdRef.current = null;
       } catch {
         // Widget might already be removed
       }
     }
 
-    setIsLoading(false);
-    setHasError(false);
-
     try {
+      console.log('Turnstile: Rendering widget...');
       widgetIdRef.current = window.turnstile.render(containerRef.current, {
         sitekey: TURNSTILE_SITE_KEY,
         callback: (token: string) => {
+          console.log('Turnstile: Verified successfully');
+          setStatus('ready');
           onVerifyRef.current(token);
         },
         'error-callback': () => {
-          setHasError(true);
+          console.log('Turnstile: Error callback triggered');
+          setStatus('error');
           onErrorRef.current?.();
         },
         'expired-callback': () => {
+          console.log('Turnstile: Token expired');
           onExpireRef.current?.();
         },
         theme,
         size,
       });
+      setStatus('ready');
+      console.log('Turnstile: Widget rendered, id:', widgetIdRef.current);
     } catch (err) {
       console.error('Turnstile render error:', err);
-      setHasError(true);
+      setStatus('error');
       onErrorRef.current?.();
     }
   }, [theme, size]);
 
-  const handleRetry = () => {
-    setHasError(false);
-    setIsLoading(true);
-    mountedRef.current = false; // Allow re-render
-    renderWidget();
-  };
+  const handleRetry = useCallback(() => {
+    setStatus('loading');
+    if (widgetIdRef.current && window.turnstile) {
+      try {
+        window.turnstile.reset(widgetIdRef.current);
+      } catch {
+        renderWidget();
+      }
+    } else {
+      renderWidget();
+    }
+  }, [renderWidget]);
 
   useEffect(() => {
-    // Check if script is already loaded
+    let mounted = true;
+
+    const initTurnstile = () => {
+      if (!mounted) return;
+
+      // Give the DOM a moment to be ready
+      requestAnimationFrame(() => {
+        if (mounted && containerRef.current) {
+          renderWidget();
+        }
+      });
+    };
+
+    // Check if script is already loaded and turnstile is available
     if (window.turnstile) {
-      renderWidget();
+      initTurnstile();
       return;
     }
 
-    // Check if script is being loaded
+    // Check if script tag already exists
     const existingScript = document.querySelector(
       'script[src*="challenges.cloudflare.com/turnstile"]'
     );
 
     if (existingScript) {
-      // Wait for existing script to load
-      const checkTurnstile = setInterval(() => {
+      // Script exists, wait for it to load
+      const checkInterval = setInterval(() => {
         if (window.turnstile) {
-          clearInterval(checkTurnstile);
-          renderWidget();
+          clearInterval(checkInterval);
+          initTurnstile();
         }
-      }, 50);
+      }, 100);
 
-      // Timeout after 5 seconds
       const timeout = setTimeout(() => {
-        clearInterval(checkTurnstile);
-        if (!window.turnstile) {
-          setIsLoading(false);
-          setHasError(true);
+        clearInterval(checkInterval);
+        if (!window.turnstile && mounted) {
+          setStatus('error');
         }
-      }, 5000);
+      }, 10000);
 
       return () => {
-        clearInterval(checkTurnstile);
+        mounted = false;
+        clearInterval(checkInterval);
         clearTimeout(timeout);
       };
     }
 
-    // Load the Turnstile script with explicit render mode
+    // Load the Turnstile script
     const script = document.createElement('script');
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad';
     script.async = true;
-    script.defer = true;
 
-    let waitInterval: ReturnType<typeof setInterval> | null = null;
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
-
-    script.onload = () => {
-      // Wait for turnstile to be fully available
-      waitInterval = setInterval(() => {
-        if (window.turnstile) {
-          if (waitInterval) clearInterval(waitInterval);
-          renderWidget();
-        }
-      }, 50);
-
-      // Timeout after 5 seconds
-      timeoutId = setTimeout(() => {
-        if (waitInterval) clearInterval(waitInterval);
-        if (!window.turnstile) {
-          setIsLoading(false);
-          setHasError(true);
-          onErrorRef.current?.();
-        }
-      }, 5000);
+    // Set up the callback
+    window.onTurnstileLoad = () => {
+      console.log('Turnstile: Script loaded');
+      if (mounted) {
+        initTurnstile();
+      }
     };
 
     script.onerror = () => {
-      setIsLoading(false);
-      setHasError(true);
-      onErrorRef.current?.();
+      console.error('Turnstile: Failed to load script');
+      if (mounted) {
+        setStatus('error');
+        onErrorRef.current?.();
+      }
     };
 
     document.head.appendChild(script);
 
-    // Cleanup
     return () => {
-      if (waitInterval) clearInterval(waitInterval);
-      if (timeoutId) clearTimeout(timeoutId);
-      mountedRef.current = false;
+      mounted = false;
       if (widgetIdRef.current && window.turnstile) {
         try {
           window.turnstile.remove(widgetIdRef.current);
         } catch {
-          // Widget might already be removed
+          // Ignore
         }
       }
     };
   }, [renderWidget]);
 
-  if (isLoading) {
-    return (
-      <div className={`flex items-center justify-center py-4 ${className}`}>
-        <div className="flex items-center gap-2 text-neutral-500">
-          <ShieldCheck className="w-5 h-5 animate-pulse" />
-          <span className="text-sm">Loading security check...</span>
-        </div>
-      </div>
-    );
-  }
+  return (
+    <div className={`relative ${className}`}>
+      {/* Always render the container for Turnstile to use */}
+      <div
+        ref={containerRef}
+        className={status === 'loading' ? 'min-h-[65px]' : ''}
+      />
 
-  if (hasError) {
-    return (
-      <div className={`flex flex-col items-center gap-2 py-4 ${className}`}>
-        <div className="flex items-center gap-2 text-red-600">
-          <AlertCircle className="w-5 h-5" />
-          <span className="text-sm">Security check failed</span>
+      {/* Loading overlay */}
+      {status === 'loading' && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-neutral-900/80">
+          <div className="flex items-center gap-2 text-neutral-500">
+            <ShieldCheck className="w-5 h-5 animate-pulse" />
+            <span className="text-sm">Loading security check...</span>
+          </div>
         </div>
-        <button
-          type="button"
-          onClick={handleRetry}
-          className="flex items-center gap-1.5 text-sm text-primary hover:text-primary-dark transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Try again
-        </button>
-      </div>
-    );
-  }
+      )}
 
-  return <div ref={containerRef} className={className} />;
+      {/* Error state */}
+      {status === 'error' && (
+        <div className="flex flex-col items-center gap-2 py-4">
+          <div className="flex items-center gap-2 text-red-600">
+            <AlertCircle className="w-5 h-5" />
+            <span className="text-sm">Security check failed</span>
+          </div>
+          <button
+            type="button"
+            onClick={handleRetry}
+            className="flex items-center gap-1.5 text-sm text-primary hover:text-primary-dark transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Try again
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 // Hook for managing Turnstile token state
