@@ -18,10 +18,10 @@ interface AffiliateStats {
   activeAffiliates: number;
   totalReferrals: number;
   successfulConversions: number;
-  totalCommissions: number;
+  totalEarnings: number;
   pendingPayouts: number;
   conversionRate: number;
-  averageCommission: number;
+  earningsThisMonth: number;
 }
 
 interface Affiliate {
@@ -31,25 +31,26 @@ interface Affiliate {
   userEmail: string;
   referralCode: string;
   totalReferrals: number;
-  successfulReferrals: number;
+  conversions: number;
   totalEarnings: number;
-  pendingBalance: number;
-  paidBalance: number;
-  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
+  pendingEarnings: number;
+  tier: string;
+  tierColor: string;
   joinedAt: string;
-  status: 'active' | 'inactive' | 'suspended';
+  status: 'active' | 'inactive';
 }
 
 interface Payout {
   id: string;
   affiliateId: string;
   affiliateName: string;
+  affiliateEmail: string;
+  mobileMoneyNumber: string;
+  mobileMoneyProvider: string;
   amount: number;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: 'pending' | 'approved' | 'processing' | 'completed' | 'failed';
   requestedAt: string;
   processedAt?: string;
-  mobileNumber: string;
-  provider: string;
 }
 
 export default function AdminAffiliates() {
@@ -94,15 +95,23 @@ export default function AdminAffiliates() {
     });
   };
 
-  const getTierBadge = (tier: string) => {
-    const colors: Record<string, string> = {
-      bronze: 'bg-amber-700/20 text-amber-400',
-      silver: 'bg-slate-400/20 text-slate-300',
-      gold: 'bg-yellow-500/20 text-yellow-400',
-      platinum: 'bg-purple-500/20 text-purple-300',
+  const getTierBadge = (tier: string, _tierColor?: string) => {
+    // Map tier names to colors based on affiliate tier system
+    const tierColors: Record<string, string> = {
+      'Scout': 'bg-green-500/20 text-green-400',
+      'Champion': 'bg-blue-500/20 text-blue-400',
+      'Ambassador': 'bg-purple-500/20 text-purple-400',
+      'Legend': 'bg-amber-500/20 text-amber-400',
+      'Elite': 'bg-pink-500/20 text-pink-400',
+      // Fallback colors
+      'bronze': 'bg-amber-700/20 text-amber-400',
+      'silver': 'bg-slate-400/20 text-slate-300',
+      'gold': 'bg-yellow-500/20 text-yellow-400',
+      'platinum': 'bg-purple-500/20 text-purple-300',
     };
+    const colorClass = tierColors[tier] || 'bg-gray-500/20 text-gray-400';
     return (
-      <span className={cn('px-2 py-1 rounded-full text-xs font-medium capitalize', colors[tier])}>
+      <span className={cn('px-2 py-1 rounded-full text-xs font-medium capitalize', colorClass)}>
         {tier}
       </span>
     );
@@ -114,6 +123,7 @@ export default function AdminAffiliates() {
       inactive: 'amber',
       suspended: 'rose',
       pending: 'amber',
+      approved: 'cyan',
       processing: 'cyan',
       completed: 'emerald',
       failed: 'rose',
@@ -126,7 +136,7 @@ export default function AdminAffiliates() {
       aff.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       aff.userEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
       aff.referralCode.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTier = tierFilter === 'all' || aff.tier === tierFilter;
+    const matchesTier = tierFilter === 'all' || aff.tier.toLowerCase() === tierFilter.toLowerCase();
     return matchesSearch && matchesTier;
   });
 
@@ -202,12 +212,12 @@ export default function AdminAffiliates() {
         <AdminCard className="relative overflow-hidden">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm text-admin-text-secondary">Total Commissions</p>
+              <p className="text-sm text-admin-text-secondary">Total Earnings</p>
               <p className="text-3xl font-display font-bold text-admin-text mt-1">
-                {formatCurrency(stats?.totalCommissions || 0)}
+                {formatCurrency(stats?.totalEarnings || 0)}
               </p>
               <p className="text-xs text-admin-text-muted mt-2">
-                Avg: {formatCurrency(stats?.averageCommission || 0)}
+                This month: {formatCurrency(stats?.earningsThisMonth || 0)}
               </p>
             </div>
             <div className="p-3 rounded-xl bg-amber-500/20">
@@ -281,10 +291,11 @@ export default function AdminAffiliates() {
             className="px-3 py-2 bg-admin-bg-tertiary border border-admin-border rounded-lg text-admin-text text-sm focus:outline-none focus:ring-2 focus:ring-admin-accent-cyan"
           >
             <option value="all">All Tiers</option>
-            <option value="bronze">Bronze</option>
-            <option value="silver">Silver</option>
-            <option value="gold">Gold</option>
-            <option value="platinum">Platinum</option>
+            <option value="scout">Scout</option>
+            <option value="champion">Champion</option>
+            <option value="ambassador">Ambassador</option>
+            <option value="legend">Legend</option>
+            <option value="elite">Elite</option>
           </select>
         )}
       </div>
@@ -319,14 +330,14 @@ export default function AdminAffiliates() {
                         {aff.referralCode}
                       </code>
                     </td>
-                    <td className="px-6 py-4">{getTierBadge(aff.tier)}</td>
+                    <td className="px-6 py-4">{getTierBadge(aff.tier, aff.tierColor)}</td>
                     <td className="px-6 py-4">
-                      <p className="text-sm text-admin-text">{aff.successfulReferrals}/{aff.totalReferrals}</p>
+                      <p className="text-sm text-admin-text">{aff.conversions}/{aff.totalReferrals}</p>
                       <p className="text-xs text-admin-text-muted">converted</p>
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-sm text-admin-text">{formatCurrency(aff.totalEarnings)}</p>
-                      <p className="text-xs text-admin-text-muted">{formatCurrency(aff.pendingBalance)} pending</p>
+                      <p className="text-xs text-admin-text-muted">{formatCurrency(aff.pendingEarnings)} pending</p>
                     </td>
                     <td className="px-6 py-4">{getStatusBadge(aff.status)}</td>
                     <td className="px-6 py-4">
@@ -369,8 +380,8 @@ export default function AdminAffiliates() {
                       {formatCurrency(payout.amount)}
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm text-admin-text">{payout.mobileNumber}</p>
-                      <p className="text-xs text-admin-text-muted uppercase">{payout.provider}</p>
+                      <p className="text-sm text-admin-text">{payout.mobileMoneyNumber}</p>
+                      <p className="text-xs text-admin-text-muted uppercase">{payout.mobileMoneyProvider}</p>
                     </td>
                     <td className="px-6 py-4 text-sm text-admin-text">{formatDate(payout.requestedAt)}</td>
                     <td className="px-6 py-4">{getStatusBadge(payout.status)}</td>

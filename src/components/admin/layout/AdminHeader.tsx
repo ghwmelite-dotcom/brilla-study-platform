@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Search,
@@ -14,14 +14,22 @@ import {
 } from 'lucide-react';
 import { useAuthStore, useNotificationStore } from '@/stores';
 import { cn } from '@/utils';
+import { AdminNotificationDropdown } from './AdminNotificationDropdown';
 
 export function AdminHeader() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-  const { unreadCount, toggleNotificationPanel, isNotificationPanelOpen } = useNotificationStore();
+  const { unreadCount, toggleNotificationPanel, isNotificationPanelOpen, fetchUnreadCount, closeAllPopups } = useNotificationStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Fetch notification count on mount and periodically
+  useEffect(() => {
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 30000); // Every 30 seconds
+    return () => clearInterval(interval);
+  }, [fetchUnreadCount]);
 
   // Generate breadcrumb items from path
   const getBreadcrumbs = () => {
@@ -112,22 +120,28 @@ export function AdminHeader() {
         </div>
 
         {/* Notifications */}
-        <button
-          onClick={toggleNotificationPanel}
-          className={cn(
-            'relative p-2 rounded-lg transition-all',
-            isNotificationPanelOpen
-              ? 'bg-admin-accent-cyan/20 text-admin-accent-cyan'
-              : 'text-admin-text-secondary hover:text-admin-text hover:bg-admin-bg-tertiary'
-          )}
-        >
-          <Bell className="w-5 h-5" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center px-1 text-xs font-bold bg-admin-accent-rose text-white rounded-full">
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
-        </button>
+        <div className="relative">
+          <button
+            onClick={toggleNotificationPanel}
+            className={cn(
+              'relative p-2 rounded-lg transition-all',
+              isNotificationPanelOpen
+                ? 'bg-admin-accent-cyan/20 text-admin-accent-cyan'
+                : 'text-admin-text-secondary hover:text-admin-text hover:bg-admin-bg-tertiary'
+            )}
+          >
+            <Bell className="w-5 h-5" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center px-1 text-xs font-bold bg-admin-accent-rose text-white rounded-full">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </button>
+          <AdminNotificationDropdown
+            isOpen={isNotificationPanelOpen}
+            onClose={closeAllPopups}
+          />
+        </div>
 
         {/* Profile Dropdown */}
         <div className="relative">
