@@ -4344,6 +4344,163 @@ const adminAuth = async (c: any, next: any) => {
 const adminApp = new Hono<{ Bindings: Env }>();
 adminApp.use('*', adminAuth);
 
+// Dashboard stats
+adminApp.get('/dashboard/stats', async (c) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+    const [
+      totalUsers,
+      activeToday,
+      newThisWeek,
+      pendingApprovals,
+      activeTrials,
+      totalRevenue
+    ] = await Promise.all([
+      c.env.DB.prepare('SELECT COUNT(*) as count FROM users WHERE is_active = 1').first(),
+      c.env.DB.prepare('SELECT COUNT(*) as count FROM users WHERE DATE(last_login_at) = ?').bind(today).first(),
+      c.env.DB.prepare('SELECT COUNT(*) as count FROM users WHERE created_at >= ?').bind(weekAgo).first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM users WHERE status = 'pending'").first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM user_trials WHERE status = 'active' AND expires_at > datetime('now')").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed'").first(),
+    ]);
+
+    return c.json({
+      success: true,
+      data: {
+        totalUsers: (totalUsers as { count: number })?.count || 0,
+        activeToday: (activeToday as { count: number })?.count || 0,
+        newThisWeek: (newThisWeek as { count: number })?.count || 0,
+        pendingApprovals: (pendingApprovals as { count: number })?.count || 0,
+        trials: (activeTrials as { count: number })?.count || 0,
+        revenue: (totalRevenue as { total: number })?.total || 0,
+      },
+    });
+  } catch (error) {
+    console.error('Dashboard stats error:', error);
+    return c.json({ success: false, error: 'Failed to fetch dashboard stats' }, 500);
+  }
+});
+
+// Recent activity feed
+adminApp.get('/activity/recent', async (c) => {
+  try {
+    // Get recent logins
+    const { results: logins } = await c.env.DB.prepare(`
+      SELECT u.id, u.name, u.email, u.last_login_at as timestamp
+      FROM users u
+      WHERE u.last_login_at IS NOT NULL
+      ORDER BY u.last_login_at DESC
+      LIMIT 5
+    `).all();
+
+    // Get recent registrations
+    const { results: registrations } = await c.env.DB.prepare(`
+      SELECT id, name, email, created_at as timestamp, role
+      FROM users
+      ORDER BY created_at DESC
+      LIMIT 5
+    `).all();
+
+    // Get recent approvals
+    const { results: approvals } = await c.env.DB.prepare(`
+      SELECT id, name, email, updated_at as timestamp
+      FROM users
+      WHERE status = 'approved' AND updated_at IS NOT NULL
+      ORDER BY updated_at DESC
+      LIMIT 5
+    `).all();
+
+    // Combine and sort
+    const activities: Array<{
+      id: string;
+      type: 'registration' | 'login' | 'approval' | 'payment' | 'system';
+      message: string;
+      user?: string;
+      timestamp: string;
+    }> = [];
+
+    logins.forEach((l: Record<string, unknown>) => {
+      activities.push({
+        id: `login_${l.id}`,
+        type: 'login',
+        message: 'User login',
+        user: l.name as string || l.email as string,
+        timestamp: l.timestamp as string,
+      });
+    });
+
+    registrations.forEach((r: Record<string, unknown>) => {
+      activities.push({
+        id: `reg_${r.id}`,
+        type: 'registration',
+        message: `New ${r.role} registration`,
+        user: r.name as string || r.email as string,
+        timestamp: r.timestamp as string,
+      });
+    });
+
+    approvals.forEach((a: Record<string, unknown>) => {
+      activities.push({
+        id: `approval_${a.id}`,
+        type: 'approval',
+        message: 'User approved',
+        user: a.name as string || a.email as string,
+        timestamp: a.timestamp as string,
+      });
+    });
+
+    // Sort by timestamp descending
+    activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    return c.json({ success: true, data: activities.slice(0, 10) });
+  } catch (error) {
+    console.error('Recent activity error:', error);
+    return c.json({ success: false, error: 'Failed to fetch recent activity' }, 500);
+  }
+});
+
+// System health check
+adminApp.get('/system/health', async (c) => {
+  try {
+    // Check database
+    let databaseStatus: 'healthy' | 'degraded' | 'down' = 'healthy';
+    try {
+      await c.env.DB.prepare('SELECT 1').first();
+    } catch {
+      databaseStatus = 'down';
+    }
+
+    // Check storage (R2)
+    let storageStatus: 'healthy' | 'degraded' | 'down' = 'healthy';
+    try {
+      await c.env.LIBRARY_BUCKET.list({ limit: 1 });
+    } catch {
+      storageStatus = 'degraded';
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        database: databaseStatus,
+        api: 'healthy', // If we got here, API is healthy
+        storage: storageStatus,
+      },
+    });
+  } catch (error) {
+    console.error('System health error:', error);
+    return c.json({
+      success: true,
+      data: {
+        database: 'degraded',
+        api: 'healthy',
+        storage: 'degraded',
+      },
+    });
+  }
+});
+
 // Get all users with stats
 adminApp.get('/users', async (c) => {
   try {
