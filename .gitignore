@@ -3,7 +3,8 @@ node_modules
 .pnpm-store
 
 # Claude Code
-.claude/
+.claude/*
+!.claude/skills/
 
 # Build output
 dist
