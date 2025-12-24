@@ -439,14 +439,14 @@ protectedApp.use('*', async (c, next) => {
 
   const token = authHeader.replace('Bearer ', '');
 
-  // Handle demo tokens
+  // Handle demo tokens - use actual database IDs
   if (token.endsWith('_demo_token')) {
     // For demo mode, get the user based on token prefix
     const tokenPrefix = token.replace('_demo_token', '');
     const demoUsers: Record<string, { id: string; role: string }> = {
-      'student': { id: 'demo_student_1', role: 'student' },
-      'teacher': { id: 'demo_teacher_1', role: 'teacher' },
-      'admin': { id: 'demo_admin_1', role: 'admin' },
+      'student': { id: 'student_1766327981521', role: 'student' },
+      'teacher': { id: 'teacher_1766327981453', role: 'teacher' },
+      'admin': { id: 'admin_prod_001', role: 'admin' },
     };
     const demoUser = demoUsers[tokenPrefix];
     if (demoUser) {
@@ -4327,12 +4327,12 @@ const adminAuth = async (c: any, next: any) => {
 
   const token = authHeader.slice(7);
 
-  // Handle demo tokens
+  // Handle demo tokens - use actual database IDs
   if (token.endsWith('_demo_token')) {
     const tokenPrefix = token.replace('_demo_token', '');
     if (tokenPrefix === 'admin') {
-      c.set('user', { userId: 'demo_admin_1', role: 'admin', email: 'admin@demo.com' });
-      c.set('userId', 'demo_admin_1');
+      c.set('user', { userId: 'admin_prod_001', role: 'admin', email: 'admin@brillaprep.org' });
+      c.set('userId', 'admin_prod_001');
       c.set('userRole', 'admin');
       return next();
     } else {
