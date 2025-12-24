@@ -6165,6 +6165,427 @@ protectedApp.get('/admin/audit/user/:userId/activity', userAuth, async (c) => {
 });
 
 // =============================================
+// ADMIN SUBSCRIPTION MANAGEMENT ENDPOINTS
+// =============================================
+
+// Admin: Get subscription statistics
+protectedApp.get('/admin/subscriptions/stats', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  if (user.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  try {
+    // Get subscription stats from payment_transactions (successful payments)
+    const totalSubs = await c.env.DB.prepare(`
+      SELECT COUNT(DISTINCT user_id) as count FROM payment_transactions
+      WHERE status = 'success'
+    `).first();
+
+    // Active subscriptions (paid within last 30 days for monthly, 365 for yearly)
+    const activeSubs = await c.env.DB.prepare(`
+      SELECT COUNT(DISTINCT user_id) as count FROM payment_transactions
+      WHERE status = 'success'
+      AND (
+        (billing_cycle = 'monthly' AND created_at >= date('now', '-30 days'))
+        OR (billing_cycle = 'yearly' AND created_at >= date('now', '-365 days'))
+      )
+    `).first();
+
+    const trialUsers = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM user_trials WHERE status = 'active'
+    `).first();
+
+    // Users whose trial expires in next 7 days
+    const expiringSoon = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM user_trials
+      WHERE status = 'active'
+      AND expires_at > datetime('now')
+      AND expires_at < datetime('now', '+7 days')
+    `).first();
+
+    // Revenue stats from payment_transactions
+    const revenueThisMonth = await c.env.DB.prepare(`
+      SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions
+      WHERE status = 'success'
+      AND created_at >= date('now', 'start of month')
+    `).first();
+
+    const revenueLastMonth = await c.env.DB.prepare(`
+      SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions
+      WHERE status = 'success'
+      AND created_at >= date('now', 'start of month', '-1 month')
+      AND created_at < date('now', 'start of month')
+    `).first();
+
+    const thisMonth = (revenueThisMonth as { total: number })?.total || 0;
+    const lastMonth = (revenueLastMonth as { total: number })?.total || 0;
+    const growthPercent = lastMonth > 0 ? Math.round(((thisMonth - lastMonth) / lastMonth) * 100) : 0;
+
+    // Calculate trial conversion rate
+    const totalTrials = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM user_trials
+    `).first();
+    const convertedTrials = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM user_trials WHERE status = 'converted'
+    `).first();
+    const totalTrialCount = (totalTrials as { count: number })?.count || 0;
+    const convertedCount = (convertedTrials as { count: number })?.count || 0;
+    const conversionRate = totalTrialCount > 0 ? Math.round((convertedCount / totalTrialCount) * 100) : 0;
+
+    return c.json({
+      success: true,
+      data: {
+        totalSubscriptions: (totalSubs as { count: number })?.count || 0,
+        activeSubscriptions: (activeSubs as { count: number })?.count || 0,
+        trialUsers: (trialUsers as { count: number })?.count || 0,
+        expiringSoon: (expiringSoon as { count: number })?.count || 0,
+        revenueThisMonth: thisMonth,
+        revenueLastMonth: lastMonth,
+        growthPercent,
+        churnRate: 0,
+        averageLifetimeValue: 0,
+        conversionRate,
+      },
+    });
+  } catch (error) {
+    console.error('Admin subscription stats error:', error);
+    return c.json({ success: false, error: 'Failed to fetch subscription stats' }, 500);
+  }
+});
+
+// Admin: Get subscriptions list
+protectedApp.get('/admin/subscriptions/list', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  if (user.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  try {
+    // Get subscriptions from payment_transactions
+    const { results } = await c.env.DB.prepare(`
+      SELECT
+        pt.id,
+        pt.user_id as userId,
+        u.name as userName,
+        u.email as userEmail,
+        pt.plan_type as planId,
+        st.name as planName,
+        pt.created_at as startDate,
+        pt.billing_cycle as billingCycle,
+        pt.amount,
+        pt.status as paymentStatus,
+        CASE
+          WHEN pt.billing_cycle = 'monthly' AND pt.created_at >= date('now', '-30 days') THEN 'active'
+          WHEN pt.billing_cycle = 'yearly' AND pt.created_at >= date('now', '-365 days') THEN 'active'
+          ELSE 'expired'
+        END as status
+      FROM payment_transactions pt
+      JOIN users u ON pt.user_id = u.id
+      LEFT JOIN subscription_tiers st ON pt.plan_type = st.id
+      WHERE pt.status = 'success'
+      ORDER BY pt.created_at DESC
+      LIMIT 100
+    `).all();
+
+    const subscriptions = results.map((r: Record<string, unknown>) => {
+      // Calculate end date based on billing cycle
+      const startDate = new Date(r.startDate as string);
+      const endDate = new Date(startDate);
+      if (r.billingCycle === 'yearly') {
+        endDate.setFullYear(endDate.getFullYear() + 1);
+      } else {
+        endDate.setMonth(endDate.getMonth() + 1);
+      }
+
+      return {
+        id: r.id,
+        userId: r.userId,
+        userName: r.userName,
+        userEmail: r.userEmail,
+        planId: r.planId,
+        planName: r.planName || 'Premium',
+        status: r.status,
+        billingCycle: r.billingCycle || 'monthly',
+        amount: r.amount || 50,
+        startDate: r.startDate,
+        endDate: endDate.toISOString(),
+        autoRenew: true,
+      };
+    });
+
+    return c.json({ success: true, data: subscriptions });
+  } catch (error) {
+    console.error('Admin subscriptions list error:', error);
+    return c.json({ success: false, error: 'Failed to fetch subscriptions' }, 500);
+  }
+});
+
+// Admin: Get trials list
+protectedApp.get('/admin/subscriptions/trials', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  if (user.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT
+        ut.id,
+        ut.user_id as userId,
+        u.name as userName,
+        u.email as userEmail,
+        ut.started_at as startedAt,
+        ut.expires_at as expiresAt,
+        ut.status,
+        ut.tasks_completed as tasksCompleted
+      FROM user_trials ut
+      JOIN users u ON ut.user_id = u.id
+      ORDER BY ut.started_at DESC
+      LIMIT 100
+    `).all();
+
+    const trials = results.map((r: Record<string, unknown>) => {
+      const expiresAt = new Date(r.expiresAt as string);
+      const now = new Date();
+      const daysRemaining = Math.max(0, Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+      const tasksCompleted = JSON.parse((r.tasksCompleted as string) || '[]');
+
+      return {
+        id: r.id,
+        userId: r.userId,
+        userName: r.userName,
+        userEmail: r.userEmail,
+        startedAt: r.startedAt,
+        expiresAt: r.expiresAt,
+        daysRemaining,
+        tasksCompleted: tasksCompleted.length,
+        status: r.status,
+      };
+    });
+
+    return c.json({ success: true, data: trials });
+  } catch (error) {
+    console.error('Admin trials list error:', error);
+    return c.json({ success: false, error: 'Failed to fetch trials' }, 500);
+  }
+});
+
+// =============================================
+// ADMIN AFFILIATE MANAGEMENT ENDPOINTS
+// =============================================
+
+// Admin: Get affiliate statistics
+protectedApp.get('/admin/affiliates/stats', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  if (user.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  try {
+    const totalAffiliates = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM affiliate_profiles
+    `).first();
+
+    const activeAffiliates = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM affiliate_profiles WHERE is_active = 1
+    `).first();
+
+    const totalReferrals = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM affiliate_referrals
+    `).first();
+
+    const conversions = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM affiliate_referrals WHERE status = 'converted'
+    `).first();
+
+    const totalEarnings = await c.env.DB.prepare(`
+      SELECT COALESCE(SUM(total_earnings), 0) as total FROM affiliate_profiles
+    `).first();
+
+    const pendingPayouts = await c.env.DB.prepare(`
+      SELECT COALESCE(SUM(amount), 0) as total FROM affiliate_payouts WHERE status = 'pending'
+    `).first();
+
+    const earningsThisMonth = await c.env.DB.prepare(`
+      SELECT COALESCE(SUM(amount), 0) as total FROM affiliate_commissions
+      WHERE created_at >= date('now', 'start of month')
+    `).first();
+
+    const refs = (totalReferrals as { count: number })?.count || 0;
+    const convs = (conversions as { count: number })?.count || 0;
+    const conversionRate = refs > 0 ? Math.round((convs / refs) * 100) : 0;
+
+    return c.json({
+      success: true,
+      data: {
+        totalAffiliates: (totalAffiliates as { count: number })?.count || 0,
+        activeAffiliates: (activeAffiliates as { count: number })?.count || 0,
+        totalReferrals: refs,
+        successfulConversions: convs,
+        conversionRate,
+        totalEarnings: (totalEarnings as { total: number })?.total || 0,
+        pendingPayouts: (pendingPayouts as { total: number })?.total || 0,
+        earningsThisMonth: (earningsThisMonth as { total: number })?.total || 0,
+      },
+    });
+  } catch (error) {
+    console.error('Admin affiliate stats error:', error);
+    return c.json({ success: false, error: 'Failed to fetch affiliate stats' }, 500);
+  }
+});
+
+// Admin: Get affiliates list
+protectedApp.get('/admin/affiliates/list', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  if (user.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT
+        ap.id,
+        ap.user_id as userId,
+        u.name as userName,
+        u.email as userEmail,
+        ap.referral_code as referralCode,
+        ap.tier_id as tierId,
+        at.name as tierName,
+        at.badge_color as tierColor,
+        ap.total_referrals as totalReferrals,
+        ap.successful_conversions as successfulConversions,
+        ap.total_earnings as totalEarnings,
+        ap.pending_earnings as pendingEarnings,
+        ap.available_earnings as availableEarnings,
+        ap.is_active as isActive,
+        ap.joined_at as joinedAt
+      FROM affiliate_profiles ap
+      JOIN users u ON ap.user_id = u.id
+      LEFT JOIN affiliate_tiers at ON ap.tier_id = at.id
+      ORDER BY ap.successful_conversions DESC
+      LIMIT 100
+    `).all();
+
+    const affiliates = results.map((r: Record<string, unknown>) => ({
+      id: r.id,
+      userId: r.userId,
+      userName: r.userName,
+      userEmail: r.userEmail,
+      referralCode: r.referralCode,
+      tier: r.tierName || 'Scout',
+      tierColor: r.tierColor || '#6B7280',
+      totalReferrals: r.totalReferrals || 0,
+      conversions: r.successfulConversions || 0,
+      totalEarnings: r.totalEarnings || 0,
+      pendingEarnings: r.pendingEarnings || 0,
+      status: r.isActive ? 'active' : 'inactive',
+      joinedAt: r.joinedAt,
+    }));
+
+    return c.json({ success: true, data: affiliates });
+  } catch (error) {
+    console.error('Admin affiliates list error:', error);
+    return c.json({ success: false, error: 'Failed to fetch affiliates' }, 500);
+  }
+});
+
+// Admin: Get pending payouts
+protectedApp.get('/admin/affiliates/payouts', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  if (user.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT
+        ap.id,
+        ap.affiliate_id as affiliateId,
+        u.name as affiliateName,
+        u.email as affiliateEmail,
+        aff.mobile_money_number as mobileMoneyNumber,
+        aff.mobile_money_provider as mobileMoneyProvider,
+        ap.amount,
+        ap.status,
+        ap.requested_at as requestedAt,
+        ap.processed_at as processedAt
+      FROM affiliate_payouts ap
+      JOIN affiliate_profiles aff ON ap.affiliate_id = aff.id
+      JOIN users u ON aff.user_id = u.id
+      ORDER BY
+        CASE ap.status WHEN 'pending' THEN 0 ELSE 1 END,
+        ap.requested_at DESC
+      LIMIT 100
+    `).all();
+
+    const payouts = results.map((r: Record<string, unknown>) => ({
+      id: r.id,
+      affiliateId: r.affiliateId,
+      affiliateName: r.affiliateName,
+      affiliateEmail: r.affiliateEmail,
+      mobileMoneyNumber: r.mobileMoneyNumber || 'Not set',
+      mobileMoneyProvider: r.mobileMoneyProvider || 'MTN',
+      amount: r.amount || 0,
+      status: r.status || 'pending',
+      requestedAt: r.requestedAt,
+      processedAt: r.processedAt,
+    }));
+
+    return c.json({ success: true, data: payouts });
+  } catch (error) {
+    console.error('Admin payouts list error:', error);
+    return c.json({ success: false, error: 'Failed to fetch payouts' }, 500);
+  }
+});
+
+// Admin: Approve payout
+protectedApp.post('/admin/affiliates/payouts/:id/approve', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  if (user.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
+  try {
+    const payoutId = c.req.param('id');
+
+    // Get payout details
+    const payout = await c.env.DB.prepare(`
+      SELECT * FROM affiliate_payouts WHERE id = ? AND status = 'pending'
+    `).bind(payoutId).first();
+
+    if (!payout) {
+      return c.json({ success: false, error: 'Payout not found or already processed' }, 404);
+    }
+
+    // Update payout status
+    await c.env.DB.prepare(`
+      UPDATE affiliate_payouts
+      SET status = 'approved', processed_at = datetime('now'), processed_by = ?
+      WHERE id = ?
+    `).bind(user.userId, payoutId).run();
+
+    // Update affiliate available earnings
+    await c.env.DB.prepare(`
+      UPDATE affiliate_profiles
+      SET available_earnings = available_earnings - ?
+      WHERE id = ?
+    `).bind(payout.amount, payout.affiliate_id).run();
+
+    // Log audit
+    await c.env.DB.prepare(`
+      INSERT INTO audit_log (id, user_id, action, action_category, target_type, target_id, status, created_at)
+      VALUES (?, ?, 'approve_payout', 'financial', 'affiliate_payout', ?, 'success', datetime('now'))
+    `).bind(crypto.randomUUID(), user.userId, payoutId).run();
+
+    return c.json({ success: true, message: 'Payout approved successfully' });
+  } catch (error) {
+    console.error('Approve payout error:', error);
+    return c.json({ success: false, error: 'Failed to approve payout' }, 500);
+  }
+});
+
+// =============================================
 // TEACHER ASSESSMENT SYSTEM ENDPOINTS
 // =============================================
 
