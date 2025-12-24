@@ -29,6 +29,8 @@ import {
   Target,
   Library,
   Heart,
+  Crown,
+  Gift,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { useAuthStore, useExamStore, useChatStore, useProgressStore, useParentStore, useGradingStore } from '@/stores';
@@ -502,6 +504,40 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     >
                       <Settings className="w-5 h-5" />
                       Settings
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/pricing"
+                      onClick={onClose}
+                      className={({ isActive }) =>
+                        cn(
+                          'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                          isActive
+                            ? 'bg-accent text-white'
+                            : 'text-neutral-700 hover:bg-neutral-100'
+                        )
+                      }
+                    >
+                      <Crown className="w-5 h-5" />
+                      Premium Plans
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/affiliate"
+                      onClick={onClose}
+                      className={({ isActive }) =>
+                        cn(
+                          'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                          isActive
+                            ? 'bg-gradient-to-r from-primary to-accent text-white'
+                            : 'text-neutral-700 hover:bg-neutral-100'
+                        )
+                      }
+                    >
+                      <Gift className="w-5 h-5" />
+                      Earn Rewards
                     </NavLink>
                   </li>
                   {isTeacherOrAdmin && (

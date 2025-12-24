@@ -238,3 +238,174 @@
 ::selection {
   @apply bg-primary text-white;
 }
+
+/* ============================================
+   Admin Dark Theme Styles
+   ============================================ */
+
+/* Admin layout base */
+.admin-layout {
+  @apply min-h-screen bg-admin-bg text-admin-text;
+}
+
+/* Admin card component */
+.admin-card {
+  @apply bg-admin-bg-secondary border border-admin-border rounded-xl shadow-admin-card transition-all duration-200;
+}
+
+.admin-card-hover:hover {
+  @apply shadow-admin-card-hover border-admin-border-subtle;
+}
+
+.admin-card-glow:hover {
+  @apply shadow-glow-cyan border-admin-accent-cyan;
+}
+
+/* Admin input */
+.admin-input {
+  @apply w-full px-4 py-2.5 bg-admin-bg-tertiary border border-admin-border rounded-lg
+         text-admin-text placeholder-admin-text-muted
+         focus:outline-none focus:ring-2 focus:ring-admin-accent-cyan/50 focus:border-admin-accent-cyan
+         transition-all duration-200;
+}
+
+/* Admin button variants */
+.admin-btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200
+         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-admin-bg
+         disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.admin-btn-primary {
+  @apply bg-gradient-to-r from-admin-accent-cyan to-admin-accent-blue text-white
+         hover:shadow-glow-cyan;
+}
+
+.admin-btn-secondary {
+  @apply bg-admin-bg-tertiary text-admin-text border border-admin-border
+         hover:bg-admin-border hover:border-admin-border-subtle;
+}
+
+.admin-btn-danger {
+  @apply bg-gradient-to-r from-admin-accent-rose to-red-600 text-white
+         hover:shadow-glow-rose;
+}
+
+.admin-btn-ghost {
+  @apply text-admin-text-secondary hover:text-admin-text hover:bg-admin-bg-tertiary;
+}
+
+/* Admin badge variants */
+.admin-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.admin-badge-cyan {
+  @apply bg-cyan-500/20 text-cyan-400 border border-cyan-500/30;
+}
+
+.admin-badge-blue {
+  @apply bg-blue-500/20 text-blue-400 border border-blue-500/30;
+}
+
+.admin-badge-emerald {
+  @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30;
+}
+
+.admin-badge-amber {
+  @apply bg-amber-500/20 text-amber-400 border border-amber-500/30;
+}
+
+.admin-badge-rose {
+  @apply bg-rose-500/20 text-rose-400 border border-rose-500/30;
+}
+
+.admin-badge-purple {
+  @apply bg-purple-500/20 text-purple-400 border border-purple-500/30;
+}
+
+/* Admin gradient text */
+.admin-text-gradient {
+  @apply bg-gradient-to-r from-admin-accent-cyan to-admin-accent-blue bg-clip-text text-transparent;
+}
+
+.admin-text-gradient-purple {
+  @apply bg-gradient-to-r from-admin-accent-purple to-admin-accent-blue bg-clip-text text-transparent;
+}
+
+/* Admin gradient backgrounds */
+.admin-gradient-bg {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.admin-gradient-header {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
+
+.admin-gradient-accent {
+  background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+}
+
+/* Admin scrollbar */
+.admin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.admin-scrollbar::-webkit-scrollbar-track {
+  @apply bg-admin-bg-secondary rounded-full;
+}
+
+.admin-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-admin-border rounded-full hover:bg-admin-border-subtle;
+}
+
+/* Admin sidebar active state */
+.admin-nav-item {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-admin-text-secondary
+         hover:text-admin-text hover:bg-admin-bg-tertiary transition-all duration-200;
+}
+
+.admin-nav-item-active {
+  @apply text-admin-text bg-admin-bg-tertiary shadow-glow-cyan border-l-2 border-admin-accent-cyan;
+}
+
+/* Admin stat card animation */
+@keyframes adminPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(6, 182, 212, 0);
+  }
+}
+
+.admin-pulse {
+  animation: adminPulse 2s ease-in-out infinite;
+}
+
+/* Admin table styles */
+.admin-table {
+  @apply w-full text-sm text-admin-text;
+}
+
+.admin-table thead {
+  @apply bg-admin-bg-tertiary text-admin-text-secondary uppercase text-xs tracking-wider;
+}
+
+.admin-table th {
+  @apply px-4 py-3 text-left font-medium;
+}
+
+.admin-table tbody tr {
+  @apply border-b border-admin-border hover:bg-admin-bg-tertiary/50 transition-colors;
+}
+
+.admin-table td {
+  @apply px-4 py-3;
+}
+
+/* Admin selection styling */
+.admin-layout ::selection {
+  @apply bg-admin-accent-cyan text-admin-bg;
+}

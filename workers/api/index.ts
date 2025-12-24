@@ -223,7 +223,14 @@ function getPasswordResetEmailHTML(name: string, resetUrl: string): string {
   `;
 }
 
-function getApprovalEmailHTML(userName: string, appUrl: string): string {
+function getApprovalEmailHTML(userName: string, appUrl: string, trialStarted: boolean = false): string {
+  const trialBanner = trialStarted ? `
+        <div style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+          <p style="color: white; font-size: 18px; font-weight: 600; margin: 0 0 8px 0;">🎁 Your 14-Day Premium Trial is Active!</p>
+          <p style="color: rgba(255,255,255,0.9); font-size: 14px; margin: 0;">Enjoy full access to AI-powered essay grading, detailed feedback, and all premium features. No payment required during your trial.</p>
+        </div>
+  ` : '';
+
   return `
     <!DOCTYPE html>
     <html>
@@ -239,6 +246,7 @@ function getApprovalEmailHTML(userName: string, appUrl: string): string {
       <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
         <p style="font-size: 16px;">Hello <strong>${userName}</strong>,</p>
         <p style="font-size: 16px;">Great news! Your Brilla Study Platform account has been approved. You can now log in and start your learning journey!</p>
+        ${trialBanner}
         <div style="text-align: center; margin: 30px 0;">
           <a href="${appUrl}/login" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">Log In Now</a>
         </div>
@@ -568,7 +576,8 @@ publicApp.get('/exam-types/:slug/paper-types', async (c) => {
 publicApp.post('/auth/register', async (c) => {
   const body = await c.req.json();
   const { email, password, name, role, schoolLevel, yearGroup, schoolName, house,
-          teacherLicenseNumber, subjectsTaught, yearsExperience, qualifications } = body;
+          teacherLicenseNumber, subjectsTaught, yearsExperience, qualifications,
+          selectedTierId } = body;
 
   try {
     // Check if email already exists
@@ -589,14 +598,16 @@ publicApp.post('/auth/register', async (c) => {
     await c.env.DB.prepare(`
       INSERT INTO users (id, email, password_hash, name, role, status, email_verified,
                          school_level, year_group, school_name, house,
-                         teacher_license_number, subjects_taught, years_experience, qualifications)
-      VALUES (?, ?, ?, ?, ?, 'pending', 0, ?, ?, ?, ?, ?, ?, ?, ?)
+                         teacher_license_number, subjects_taught, years_experience, qualifications,
+                         selected_tier_id)
+      VALUES (?, ?, ?, ?, ?, 'pending', 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       id, email, passwordHash, name, userRole,
       schoolLevel || null, yearGroup || null, schoolName || null, house || null,
       teacherLicenseNumber || null,
       subjectsTaught ? JSON.stringify(subjectsTaught) : null,
-      yearsExperience || null, qualifications || null
+      yearsExperience || null, qualifications || null,
+      selectedTierId || null
     ).run();
 
     // Notify all admin users about the new registration
@@ -4436,6 +4447,39 @@ adminApp.post('/users/:id/approve', async (c) => {
       WHERE id = ?
     `).bind(adminUser.userId, userId).run();
 
+    // Check if user selected a premium tier - auto-start their 14-day trial
+    let trialStarted = false;
+    const selectedTierId = user.selected_tier_id as string | null;
+    if (selectedTierId && selectedTierId !== 'tier_free') {
+      try {
+        const trialId = `trial_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+
+        await c.env.DB.prepare(`
+          INSERT INTO user_trials (id, user_id, started_at, expires_at, status, tasks_completed)
+          VALUES (?, ?, datetime('now'), ?, 'active', '[]')
+        `).bind(trialId, userId, expiresAt).run();
+
+        trialStarted = true;
+
+        // Log the trial start
+        await logAudit({
+          db: c.env.DB,
+          userId: adminUser.userId,
+          userEmail: adminUser.email,
+          userRole: adminUser.role,
+          action: 'auto_start_trial',
+          actionCategory: 'user_management',
+          targetType: 'user',
+          targetId: userId,
+          targetDetails: `Auto-started 14-day trial for ${user.email} (selected tier: ${selectedTierId})`,
+          ...clientInfo,
+        });
+      } catch (trialError) {
+        console.error('Failed to auto-start trial:', trialError);
+      }
+    }
+
     // Log the approval action
     await logAudit({
       db: c.env.DB,
@@ -4446,7 +4490,7 @@ adminApp.post('/users/:id/approve', async (c) => {
       actionCategory: 'user_management',
       targetType: 'user',
       targetId: userId,
-      targetDetails: `Approved ${user.email} (${user.role})`,
+      targetDetails: `Approved ${user.email} (${user.role})${trialStarted ? ' - Trial started' : ''}`,
       ...clientInfo,
     });
 
@@ -4463,13 +4507,15 @@ adminApp.post('/users/:id/approve', async (c) => {
       try {
         const appUrl = c.env.APP_URL || 'https://brillaprep.org';
         const fromEmail = c.env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>';
-        const emailHtml = getApprovalEmailHTML(user.name as string, appUrl);
+        const emailHtml = getApprovalEmailHTML(user.name as string, appUrl, trialStarted);
 
         await sendEmail(
           c.env.RESEND_API_KEY,
           fromEmail,
           user.email as string,
-          'Your Brilla Account Has Been Approved! 🎉',
+          trialStarted
+            ? 'Your Brilla Account Has Been Approved + 14-Day Free Trial! 🎉'
+            : 'Your Brilla Account Has Been Approved! 🎉',
           emailHtml
         );
       } catch (emailError) {
@@ -4477,7 +4523,7 @@ adminApp.post('/users/:id/approve', async (c) => {
       }
     }
 
-    return c.json({ success: true, data: { message: 'User approved successfully' } });
+    return c.json({ success: true, data: { message: 'User approved successfully', trialStarted } });
   } catch (error) {
     return c.json({ success: false, error: 'Failed to approve user' }, 500);
   }
@@ -4777,6 +4823,238 @@ adminApp.post('/users/:id/resend-verification', async (c) => {
     return c.json({ success: true, data: { message: 'Verification email sent' } });
   } catch (error) {
     return c.json({ success: false, error: 'Failed to resend verification' }, 500);
+  }
+});
+
+// Extend user's trial period
+adminApp.post('/users/:id/extend-trial', async (c) => {
+  const userId = c.req.param('id');
+  const { days } = await c.req.json();
+  const adminUser = c.get('user') as UserPayload;
+  const clientInfo = getClientInfo(c);
+
+  if (!days || days < 1 || days > 90) {
+    return c.json({ success: false, error: 'Days must be between 1 and 90' }, 400);
+  }
+
+  try {
+    // Check if user exists
+    const user = await c.env.DB.prepare(
+      'SELECT id, email, name FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    // Check for existing trial
+    const existingTrial = await c.env.DB.prepare(
+      'SELECT id, expires_at, status FROM user_trials WHERE user_id = ?'
+    ).bind(userId).first();
+
+    let newExpiryDate: string;
+
+    if (existingTrial) {
+      // Extend existing trial
+      const currentExpiry = new Date(existingTrial.expires_at as string);
+      const now = new Date();
+
+      // If trial expired, extend from now; otherwise extend from current expiry
+      const baseDate = currentExpiry > now ? currentExpiry : now;
+      newExpiryDate = new Date(baseDate.getTime() + days * 24 * 60 * 60 * 1000).toISOString();
+
+      await c.env.DB.prepare(`
+        UPDATE user_trials SET
+          expires_at = ?,
+          status = 'active'
+        WHERE user_id = ?
+      `).bind(newExpiryDate, userId).run();
+    } else {
+      // Create new trial
+      const trialId = crypto.randomUUID();
+      newExpiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+
+      await c.env.DB.prepare(`
+        INSERT INTO user_trials (id, user_id, started_at, expires_at, status, tasks_completed)
+        VALUES (?, ?, datetime('now'), ?, 'active', '[]')
+      `).bind(trialId, userId, newExpiryDate).run();
+    }
+
+    // Also update user table trial fields
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        trial_started_at = COALESCE(trial_started_at, datetime('now')),
+        trial_expires_at = ?,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(newExpiryDate, userId).run();
+
+    // Log the action
+    await logAudit({
+      db: c.env.DB,
+      userId: adminUser.userId,
+      userEmail: adminUser.email,
+      userRole: adminUser.role,
+      action: 'extend_trial',
+      actionCategory: 'user_management',
+      targetType: 'user',
+      targetId: userId,
+      targetDetails: `Extended trial by ${days} days for ${user.email}. New expiry: ${newExpiryDate.split('T')[0]}`,
+      ...clientInfo,
+    });
+
+    return c.json({
+      success: true,
+      data: {
+        message: `Trial extended by ${days} days`,
+        newExpiryDate,
+        daysAdded: days
+      }
+    });
+  } catch (error) {
+    console.error('Extend trial error:', error);
+    return c.json({ success: false, error: 'Failed to extend trial' }, 500);
+  }
+});
+
+// Add AI grading credits to user
+adminApp.post('/users/:id/add-credits', async (c) => {
+  const userId = c.req.param('id');
+  const { credits } = await c.req.json();
+  const adminUser = c.get('user') as UserPayload;
+  const clientInfo = getClientInfo(c);
+
+  if (!credits || credits < 1 || credits > 1000) {
+    return c.json({ success: false, error: 'Credits must be between 1 and 1000' }, 400);
+  }
+
+  try {
+    // Check if user exists
+    const user = await c.env.DB.prepare(
+      'SELECT id, email, name, ai_grading_credits FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    const currentCredits = (user.ai_grading_credits as number) || 0;
+    const newCredits = currentCredits + credits;
+
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        ai_grading_credits = ?,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(newCredits, userId).run();
+
+    // Log the action
+    await logAudit({
+      db: c.env.DB,
+      userId: adminUser.userId,
+      userEmail: adminUser.email,
+      userRole: adminUser.role,
+      action: 'add_credits',
+      actionCategory: 'user_management',
+      targetType: 'user',
+      targetId: userId,
+      targetDetails: `Added ${credits} AI grading credits to ${user.email}. New total: ${newCredits}`,
+      ...clientInfo,
+    });
+
+    return c.json({
+      success: true,
+      data: {
+        message: `Added ${credits} AI grading credits`,
+        previousCredits: currentCredits,
+        creditsAdded: credits,
+        newTotal: newCredits
+      }
+    });
+  } catch (error) {
+    console.error('Add credits error:', error);
+    return c.json({ success: false, error: 'Failed to add credits' }, 500);
+  }
+});
+
+// Get user subscription/trial details (admin view)
+adminApp.get('/users/:id/subscription', async (c) => {
+  const userId = c.req.param('id');
+
+  try {
+    // Get user details
+    const user = await c.env.DB.prepare(`
+      SELECT id, email, name, role, ai_grading_credits, trial_started_at, trial_expires_at
+      FROM users WHERE id = ?
+    `).bind(userId).first();
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    // Get trial details
+    const trial = await c.env.DB.prepare(`
+      SELECT id, started_at, expires_at, status, tasks_completed, discount_percent
+      FROM user_trials WHERE user_id = ?
+    `).bind(userId).first();
+
+    // Get active subscription
+    const subscription = await c.env.DB.prepare(`
+      SELECT us.*, st.name as plan_name, st.price_monthly, st.price_yearly, st.ai_grading_quota
+      FROM user_subscriptions us
+      LEFT JOIN subscription_tiers st ON us.tier_id = st.id
+      WHERE us.user_id = ? AND us.status = 'active'
+      ORDER BY us.created_at DESC
+      LIMIT 1
+    `).bind(userId).first();
+
+    // Calculate days remaining
+    let trialDaysRemaining = 0;
+    let subscriptionDaysRemaining = 0;
+
+    if (trial && trial.status === 'active') {
+      const expiresAt = new Date(trial.expires_at as string);
+      const now = new Date();
+      trialDaysRemaining = Math.max(0, Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+    }
+
+    if (subscription) {
+      const expiresAt = new Date(subscription.expires_at as string);
+      const now = new Date();
+      subscriptionDaysRemaining = Math.max(0, Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          aiGradingCredits: user.ai_grading_credits || 0,
+        },
+        trial: trial ? {
+          id: trial.id,
+          status: trial.status,
+          startedAt: trial.started_at,
+          expiresAt: trial.expires_at,
+          daysRemaining: trialDaysRemaining,
+          tasksCompleted: JSON.parse((trial.tasks_completed as string) || '[]').length,
+        } : null,
+        subscription: subscription ? {
+          planName: subscription.plan_name,
+          status: subscription.status,
+          billingCycle: subscription.billing_cycle,
+          expiresAt: subscription.expires_at,
+          daysRemaining: subscriptionDaysRemaining,
+          aiGradingQuota: subscription.ai_grading_quota,
+        } : null,
+      }
+    });
+  } catch (error) {
+    console.error('Get user subscription error:', error);
+    return c.json({ success: false, error: 'Failed to get subscription details' }, 500);
   }
 });
 

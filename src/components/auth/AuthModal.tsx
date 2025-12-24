@@ -21,14 +21,17 @@ import {
   CheckCircle2,
   Users,
   Phone,
+  Crown,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/utils';
+import { PlanSelectionStep } from './PlanSelectionStep';
 
 type AuthMode = 'login' | 'register';
 type UserRole = 'student' | 'teacher' | 'admin' | 'parent';
 type SchoolLevel = 'jss' | 'shs';
 type RegistrationStatus = 'idle' | 'pending' | 'error';
+type RegistrationStep = 'role' | 'plan' | 'form';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -74,6 +77,8 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
         setParentInviteCode('');
         setFormErrors({});
         setSelectedRole(null);
+        setSelectedTierId(null);
+        setRegistrationStep('role');
         setRegistrationStatus('idle');
         setRegistrationMessage('');
         setShowPassword(false);
@@ -84,6 +89,8 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
   }, [isOpen, clearError]);
 
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
+  const [selectedTierId, setSelectedTierId] = useState<string | null>(null);
+  const [registrationStep, setRegistrationStep] = useState<RegistrationStep>('role');
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -133,9 +140,38 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
     setParentInviteCode('');
     setFormErrors({});
     setSelectedRole(null);
+    setSelectedTierId(null);
+    setRegistrationStep('role');
     setRegistrationStatus('idle');
     setRegistrationMessage('');
     clearError();
+  };
+
+  // Handle role selection - go to plan selection for student/teacher, form for admin/parent
+  const handleRoleSelect = (role: UserRole) => {
+    setSelectedRole(role);
+    if (role === 'student' || role === 'teacher') {
+      setRegistrationStep('plan');
+    } else {
+      // Admin and parent skip plan selection
+      setRegistrationStep('form');
+    }
+  };
+
+  // Handle going back in the registration flow
+  const handleRegistrationBack = () => {
+    if (registrationStep === 'form') {
+      if (selectedRole === 'student' || selectedRole === 'teacher') {
+        setRegistrationStep('plan');
+      } else {
+        setSelectedRole(null);
+        setRegistrationStep('role');
+      }
+    } else if (registrationStep === 'plan') {
+      setSelectedRole(null);
+      setSelectedTierId(null);
+      setRegistrationStep('role');
+    }
   };
 
   const handleModeSwitch = (newMode: AuthMode) => {
@@ -252,6 +288,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           adminCode: selectedRole === 'admin' ? adminCode : undefined,
           phoneNumber: selectedRole === 'parent' ? phoneNumber : undefined,
           inviteCode: selectedRole === 'parent' && parentInviteCode ? parentInviteCode : undefined,
+          selectedTierId: selectedTierId || undefined,
         });
 
         // Show pending approval message
@@ -323,9 +360,9 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
             <X className="w-5 h-5" />
           </button>
 
-          {mode === 'register' && selectedRole && (
+          {mode === 'register' && registrationStep !== 'role' && (
             <button
-              onClick={() => setSelectedRole(null)}
+              onClick={handleRegistrationBack}
               className="absolute top-4 left-4 p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-full transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -336,17 +373,21 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
             <h2 className="text-xl font-bold">
               {mode === 'login'
                 ? 'Welcome Back!'
-                : selectedRole
-                  ? `Register as ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`
-                  : 'Create Account'
+                : registrationStep === 'role'
+                  ? 'Create Account'
+                  : registrationStep === 'plan'
+                    ? 'Choose Your Plan'
+                    : `Register as ${selectedRole?.charAt(0).toUpperCase()}${selectedRole?.slice(1)}`
               }
             </h2>
             <p className="text-white/80 text-sm mt-1">
               {mode === 'login'
                 ? 'Sign in to continue your learning journey'
-                : selectedRole
-                  ? 'Complete your registration'
-                  : 'Choose how you want to join Brilla'
+                : registrationStep === 'role'
+                  ? 'Choose how you want to join Brilla'
+                  : registrationStep === 'plan'
+                    ? 'Select a plan that works for you'
+                    : 'Complete your registration'
               }
             </p>
           </div>
@@ -375,10 +416,17 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                     <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <span>You'll receive a notification once approved</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <span>Then you can log in and start learning!</span>
-                  </li>
+                  {selectedTierId && selectedTierId !== 'tier_free' ? (
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <span>Your 14-day free trial starts automatically upon approval</span>
+                    </li>
+                  ) : (
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <span>Then you can log in and start learning!</span>
+                    </li>
+                  )}
                 </ul>
               </div>
 
@@ -389,39 +437,47 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                 Got it, thanks!
               </button>
             </div>
-          ) : mode === 'register' && !selectedRole ? (
+          ) : mode === 'register' && registrationStep === 'role' ? (
             // Role Selection
             <div className="space-y-4">
               <p className="text-center text-neutral-600 mb-6">I am a...</p>
 
               <button
-                onClick={() => setSelectedRole('student')}
+                onClick={() => handleRoleSelect('student')}
                 className="w-full flex items-center gap-4 p-4 border-2 border-neutral-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all group"
               >
                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
                   <GraduationCap className="w-6 h-6 text-blue-600" />
                 </div>
-                <div className="text-left">
+                <div className="text-left flex-1">
                   <h3 className="font-semibold text-neutral-900">Student</h3>
                   <p className="text-sm text-neutral-500">JSS or SHS student preparing for exams</p>
+                </div>
+                <div className="text-xs text-primary font-medium flex items-center gap-1">
+                  <Crown className="w-3 h-3" />
+                  Premium available
                 </div>
               </button>
 
               <button
-                onClick={() => setSelectedRole('teacher')}
+                onClick={() => handleRoleSelect('teacher')}
                 className="w-full flex items-center gap-4 p-4 border-2 border-neutral-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all group"
               >
                 <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors">
                   <BookOpen className="w-6 h-6 text-green-600" />
                 </div>
-                <div className="text-left">
+                <div className="text-left flex-1">
                   <h3 className="font-semibold text-neutral-900">Teacher</h3>
                   <p className="text-sm text-neutral-500">Educator with GES registration</p>
+                </div>
+                <div className="text-xs text-primary font-medium flex items-center gap-1">
+                  <Crown className="w-3 h-3" />
+                  Premium available
                 </div>
               </button>
 
               <button
-                onClick={() => setSelectedRole('admin')}
+                onClick={() => handleRoleSelect('admin')}
                 className="w-full flex items-center gap-4 p-4 border-2 border-neutral-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all group"
               >
                 <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
@@ -434,7 +490,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
               </button>
 
               <button
-                onClick={() => setSelectedRole('parent')}
+                onClick={() => handleRoleSelect('parent')}
                 className="w-full flex items-center gap-4 p-4 border-2 border-neutral-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all group"
               >
                 <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center group-hover:bg-amber-200 transition-colors">
@@ -458,6 +514,15 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                 </p>
               </div>
             </div>
+          ) : mode === 'register' && registrationStep === 'plan' && selectedRole && (selectedRole === 'student' || selectedRole === 'teacher') ? (
+            // Plan Selection Step
+            <PlanSelectionStep
+              role={selectedRole}
+              selectedTierId={selectedTierId}
+              onSelectTier={setSelectedTierId}
+              onBack={handleRegistrationBack}
+              onContinue={() => setRegistrationStep('form')}
+            />
           ) : (
             // Login or Registration Form
             <form onSubmit={handleSubmit} className="space-y-4">

@@ -103,6 +103,38 @@ interface AuthState {
   // Email verification & password setup
   verifyToken: (token: string) => ManagedUser | null;
   setPassword: (token: string, password: string) => Promise<void>;
+
+  // Admin subscription management
+  extendUserTrial: (userId: string, days: number) => Promise<{ newExpiryDate: string; daysAdded: number }>;
+  addUserCredits: (userId: string, credits: number) => Promise<{ newTotal: number; creditsAdded: number }>;
+  getUserSubscriptionDetails: (userId: string) => Promise<UserSubscriptionDetails | null>;
+}
+
+// User subscription details for admin view
+export interface UserSubscriptionDetails {
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+    aiGradingCredits: number;
+  };
+  trial: {
+    id: string;
+    status: 'active' | 'expired' | 'converted';
+    startedAt: string;
+    expiresAt: string;
+    daysRemaining: number;
+    tasksCompleted: number;
+  } | null;
+  subscription: {
+    planName: string;
+    status: string;
+    billingCycle: 'monthly' | 'yearly';
+    expiresAt: string;
+    daysRemaining: number;
+    aiGradingQuota: number;
+  } | null;
 }
 
 interface RegisterData {
@@ -125,6 +157,8 @@ interface RegisterData {
   // Parent fields
   phoneNumber?: string;
   inviteCode?: string; // Optional: link to student during registration
+  // Premium tier selection (for auto-trial on approval)
+  selectedTierId?: string;
 }
 
 // Storage keys (simulating database for fallback/demo)
@@ -408,6 +442,7 @@ export const useAuthStore = create<AuthState>()(
             yearsExperience: data.yearsExperience,
             qualifications: data.qualifications,
             adminCode: data.adminCode,
+            selectedTierId: data.selectedTierId,
             registeredAt: new Date().toISOString(),
             createdAt: new Date().toISOString(),
           };
@@ -842,6 +877,77 @@ export const useAuthStore = create<AuthState>()(
           await get().loadAllUsers();
         } catch (error) {
           throw error instanceof Error ? error : new Error('Failed to resend verification email');
+        }
+      },
+
+      // Admin subscription management
+      extendUserTrial: async (userId: string, days: number) => {
+        const { user } = get();
+        if (!user || user.role !== 'admin') {
+          throw new Error('Only admins can extend user trials');
+        }
+
+        try {
+          const response = await api.post<{ newExpiryDate: string; daysAdded: number }>(
+            `/admin/users/${userId}/extend-trial`,
+            { days }
+          );
+
+          if (!response.success || !response.data) {
+            throw new Error(response.error || 'Failed to extend trial');
+          }
+
+          return {
+            newExpiryDate: response.data.newExpiryDate,
+            daysAdded: response.data.daysAdded,
+          };
+        } catch (error) {
+          throw error instanceof Error ? error : new Error('Failed to extend trial');
+        }
+      },
+
+      addUserCredits: async (userId: string, credits: number) => {
+        const { user } = get();
+        if (!user || user.role !== 'admin') {
+          throw new Error('Only admins can add credits');
+        }
+
+        try {
+          const response = await api.post<{ newTotal: number; creditsAdded: number }>(
+            `/admin/users/${userId}/add-credits`,
+            { credits }
+          );
+
+          if (!response.success || !response.data) {
+            throw new Error(response.error || 'Failed to add credits');
+          }
+
+          return {
+            newTotal: response.data.newTotal,
+            creditsAdded: response.data.creditsAdded,
+          };
+        } catch (error) {
+          throw error instanceof Error ? error : new Error('Failed to add credits');
+        }
+      },
+
+      getUserSubscriptionDetails: async (userId: string) => {
+        const { user } = get();
+        if (!user || user.role !== 'admin') {
+          throw new Error('Only admins can view subscription details');
+        }
+
+        try {
+          const response = await api.get<UserSubscriptionDetails>(`/admin/users/${userId}/subscription`);
+
+          if (!response.success || !response.data) {
+            return null;
+          }
+
+          return response.data;
+        } catch (error) {
+          console.error('Failed to get subscription details:', error);
+          return null;
         }
       },
     }),

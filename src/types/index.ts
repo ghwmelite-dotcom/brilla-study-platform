@@ -115,6 +115,9 @@ export interface PendingUserData {
   // Admin-specific
   adminCode?: string;
 
+  // Premium tier selection (for auto-trial on approval)
+  selectedTierId?: string;
+
   // Metadata
   registeredAt: string;
 }
@@ -1671,3 +1674,301 @@ export * from './counselor';
 // =============================================
 
 export * from './counselorReports';
+
+// =============================================
+// SUBSCRIPTION & PAYMENT TYPES
+// =============================================
+
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  description?: string;
+  userType: 'student' | 'teacher';
+  priceMonthly: number | null;
+  priceYearly: number | null;
+  features: string[];
+  aiGradingQuota: number;
+  isPopular?: boolean;
+  isActive: boolean;
+}
+
+export interface TrialTask {
+  id: string;
+  day: number;
+  name: string;
+  description: string;
+  xpReward: number;
+  completed: boolean;
+  available: boolean;
+  bonus?: boolean;
+  final?: boolean;
+}
+
+export interface TrialStatus {
+  id: string;
+  status: 'active' | 'expired' | 'converted';
+  startedAt: string;
+  expiresAt: string;
+  daysRemaining: number;
+  currentDay: number;
+  tasks: TrialTask[];
+  tasksCompleted: number;
+  totalTasks: number;
+  discountPercent: number;
+  bonusWeekAvailable: boolean;
+}
+
+export interface SubscriptionStatus {
+  status: 'free' | 'trial' | 'active' | 'expired';
+  isActive: boolean;
+  daysRemaining: number;
+  currentPlan: {
+    id: string;
+    name: string;
+    description?: string;
+    features: string[];
+  };
+  planName?: string;
+  billingCycle?: 'monthly' | 'yearly';
+  startedAt?: string;
+  expiresAt?: string;
+  aiGradingCredits: number;
+  aiGradingQuota: number;
+  trial: TrialStatus | null;
+}
+
+export interface PaymentTransaction {
+  id: string;
+  userId: string;
+  reference: string;
+  amount: number;
+  currency: string;
+  planId: string;
+  planType: string;
+  billingCycle: 'monthly' | 'yearly';
+  status: 'pending' | 'success' | 'failed' | 'refunded';
+  planName?: string;
+  planDescription?: string;
+  createdAt: string;
+  verifiedAt?: string;
+}
+
+export interface PaymentInitResponse {
+  authorizationUrl: string;
+  reference: string;
+  accessCode: string;
+  amount: number;
+  originalAmount: number;
+  discountPercent: number;
+}
+
+// =============================================
+// AFFILIATE MARKETING TYPES
+// =============================================
+
+export type AffiliateTierName = 'scout' | 'champion' | 'ambassador' | 'legend' | 'elite';
+
+export interface AffiliateTier {
+  id: string;
+  name: AffiliateTierName;
+  title: string;
+  minReferrals: number;
+  maxReferrals: number | null;
+  commissionRate: number;
+  badgeIcon: string;
+  badgeColor: string;
+  xpBonus: number;
+  perks: string[];
+}
+
+export interface AffiliateProfile {
+  id: string;
+  userId: string;
+  referralCode: string;
+  referralLink: string;
+  tier: AffiliateTier;
+  stats: {
+    totalReferrals: number;
+    successfulConversions: number;
+    effectiveReferrals: number;
+    totalClicks: number;
+    conversionRate: number;
+    totalEarnings: number;
+    pendingEarnings: number;
+    availableEarnings: number;
+    affiliateXP: number;
+  };
+  nextTier: {
+    id: string;
+    name: string;
+    title: string;
+    commissionRate: number;
+    badgeIcon: string;
+    minReferrals: number;
+    referralsNeeded: number;
+  } | null;
+  isTeacher: boolean;
+  teacherBonus: number;
+  mobileMoneyNumber?: string;
+  mobileMoneyProvider?: 'mtn' | 'vodafone' | 'airteltigo';
+  joinedAt: string;
+  lastReferralAt?: string;
+}
+
+export interface AffiliateReferral {
+  id: string;
+  referredUser: {
+    id: string;
+    name: string;
+    email: string;
+    role: UserRole;
+    avatarUrl?: string;
+    schoolName?: string;
+  };
+  status: 'pending' | 'trial' | 'converted' | 'churned';
+  signupAt: string;
+  convertedAt?: string;
+  commission?: {
+    amount: number;
+    status: 'pending' | 'approved' | 'paid' | 'cancelled';
+  };
+}
+
+export interface AffiliateCommission {
+  id: string;
+  referredUserName: string;
+  referredUserRole: UserRole;
+  amount: number;
+  commissionRate: number;
+  status: 'pending' | 'approved' | 'paid' | 'cancelled';
+  transaction?: {
+    planType: string;
+    billingCycle: string;
+    amount: number;
+  };
+  createdAt: string;
+  approvedAt?: string;
+  paidAt?: string;
+}
+
+export interface AffiliateChallenge {
+  id: string;
+  name: string;
+  description: string;
+  type: 'daily' | 'weekly' | 'monthly' | 'milestone' | 'seasonal';
+  requirementType: string;
+  requirementValue: number;
+  progress: number;
+  status: 'active' | 'completed' | 'claimed' | 'expired';
+  xpReward: number;
+  cashBonus: number;
+  badgeIcon?: string;
+  badgeColor?: string;
+  endsAt?: string;
+}
+
+export interface AffiliateAchievement {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  requirementType: string;
+  requirementValue: number;
+  currentProgress: number;
+  xpReward: number;
+  cashBonus: number;
+  unlocked: boolean;
+  unlockedAt?: string;
+}
+
+export interface AffiliateLeaderboardEntry {
+  rank: number;
+  affiliateId: string;
+  name: string;
+  avatarUrl?: string;
+  schoolName?: string;
+  isTeacher: boolean;
+  tier: {
+    title: string;
+    badgeIcon: string;
+    badgeColor: string;
+  };
+  conversions: number;
+  earnings: number;
+}
+
+export interface SchoolLeaderboardEntry {
+  rank: number;
+  schoolName: string;
+  totalAffiliates: number;
+  totalReferrals: number;
+  totalConversions: number;
+  totalEarnings: number;
+}
+
+export interface AffiliatePayout {
+  id: string;
+  amount: number;
+  paymentMethod: string;
+  mobileMoneyNumber?: string;
+  mobileMoneyProvider?: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  failureReason?: string;
+  requestedAt: string;
+  processedAt?: string;
+}
+
+export interface AffiliateDashboard {
+  stats: {
+    totalReferrals: number;
+    referralsThisMonth: number;
+    conversionsThisMonth: number;
+    successfulConversions: number;
+    clicksThisWeek: number;
+    totalClicks: number;
+    earningsThisMonth: number;
+    totalEarnings: number;
+    pendingEarnings: number;
+    availableEarnings: number;
+    conversionRate: number;
+  };
+  ranking: {
+    rank: number;
+    totalParticipants: number;
+    percentile: number;
+  };
+  tier: AffiliateTier | null;
+  recentReferrals: {
+    id: string;
+    name: string;
+    role: UserRole;
+    avatarUrl?: string;
+    status: string;
+    signupAt: string;
+    convertedAt?: string;
+  }[];
+  activeCampaigns: {
+    id: string;
+    name: string;
+    description: string;
+    commissionMultiplier: number;
+    bonusXPMultiplier: number;
+    endDate: string;
+  }[];
+  referralCode: string;
+  referralLink: string;
+}
+
+export interface AffiliateCampaign {
+  id: string;
+  name: string;
+  description: string;
+  campaignType: 'back_to_school' | 'exam_season' | 'holiday' | 'special';
+  commissionMultiplier: number;
+  bonusXPMultiplier: number;
+  bonusPerReferral: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  bannerImage?: string;
+}

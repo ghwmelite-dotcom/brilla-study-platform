@@ -43,6 +43,10 @@ const HelpCenter = lazy(() => import('@/pages/HelpCenter'));
 const AdminApprovals = lazy(() => import('@/pages/AdminApprovals'));
 const UserManagement = lazy(() => import('@/pages/UserManagement'));
 const AuditLog = lazy(() => import('@/pages/AuditLog'));
+const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
+
+// Admin layout (lazy loaded)
+const AdminLayout = lazy(() => import('@/components/admin/layout/AdminLayout').then(m => ({ default: m.AdminLayout })));
 const SetPasswordPage = lazy(() => import('@/pages/SetPasswordPage').then(m => ({ default: m.SetPasswordPage })));
 const ParentDashboardPage = lazy(() => import('@/pages/ParentDashboard').then(m => ({ default: m.ParentDashboardPage })));
 const ParentSettingsPage = lazy(() => import('@/pages/ParentSettings').then(m => ({ default: m.ParentSettingsPage })));
@@ -68,6 +72,9 @@ const LeaderboardPage = lazy(() => import('@/pages/Leaderboard'));
 const LibraryPage = lazy(() => import('@/pages/Library').then(m => ({ default: m.LibraryPage })));
 const CounselorPage = lazy(() => import('@/pages/Counselor').then(m => ({ default: m.CounselorPage })));
 const ModerationDashboard = lazy(() => import('@/pages/ModerationDashboard'));
+const PricingPage = lazy(() => import('@/pages/Pricing'));
+const AffiliatePage = lazy(() => import('@/pages/Affiliate'));
+const PaymentCallbackPage = lazy(() => import('@/pages/PaymentCallback'));
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -106,7 +113,9 @@ function LoginPage() {
       const creds = demoCredentials[role];
       await login(creds.email, creds.password);
       // Redirect based on role
-      if (role === 'parent') {
+      if (role === 'admin') {
+        navigate('/admin');
+      } else if (role === 'parent') {
         navigate('/parent');
       } else {
         navigate('/dashboard');
@@ -364,10 +373,20 @@ function ProfilePage() {
 
 // Home route - shows landing for guests, home for authenticated users
 function HomeRoute() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   if (!isAuthenticated) {
     return <LandingPage />;
+  }
+
+  // Redirect admins to admin dashboard
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
+  // Redirect parents to parent dashboard
+  if (user?.role === 'parent') {
+    return <Navigate to="/parent" replace />;
   }
 
   return (
@@ -597,6 +616,28 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Pricing and Subscription routes */}
+          <Route path="pricing" element={<LazyPage><PricingPage /></LazyPage>} />
+          <Route
+            path="payment/callback"
+            element={
+              <ProtectedRoute>
+                <LazyPage><PaymentCallbackPage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Affiliate routes */}
+          <Route
+            path="affiliate"
+            element={
+              <ProtectedRoute>
+                <LazyPage><AffiliatePage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="profile"
             element={
@@ -668,40 +709,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <LazyPage><ParentReportsPage /></LazyPage>
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Admin routes */}
-          <Route
-            path="admin/approvals"
-            element={
-              <ProtectedRoute>
-                <LazyPage><AdminApprovals /></LazyPage>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="admin/users"
-            element={
-              <ProtectedRoute>
-                <LazyPage><UserManagement /></LazyPage>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="admin/audit"
-            element={
-              <ProtectedRoute>
-                <LazyPage><AuditLog /></LazyPage>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="admin/moderation"
-            element={
-              <ProtectedRoute>
-                <LazyPage><ModerationDashboard /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -784,6 +791,27 @@ function App() {
 
           {/* Catch-all redirect */}
           <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+
+        {/* Admin routes with dedicated dark layout */}
+        <Route
+          path="admin"
+          element={
+            <LazyPage>
+              <AdminLayout />
+            </LazyPage>
+          }
+        >
+          <Route index element={<LazyPage><AdminDashboard /></LazyPage>} />
+          <Route path="analytics" element={<LazyPage><AdminDashboard /></LazyPage>} />
+          <Route path="approvals" element={<LazyPage><AdminApprovals /></LazyPage>} />
+          <Route path="users" element={<LazyPage><UserManagement /></LazyPage>} />
+          <Route path="content" element={<LazyPage><ContentManagementPage /></LazyPage>} />
+          <Route path="moderation" element={<LazyPage><ModerationDashboard /></LazyPage>} />
+          <Route path="audit" element={<LazyPage><AuditLog /></LazyPage>} />
+          <Route path="settings" element={<LazyPage><SettingsPage /></LazyPage>} />
+          <Route path="subscriptions" element={<LazyPage><AdminDashboard /></LazyPage>} />
+          <Route path="affiliates" element={<LazyPage><AdminDashboard /></LazyPage>} />
         </Route>
       </Routes>
 

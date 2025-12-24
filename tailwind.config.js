@@ -64,6 +64,33 @@ export default {
           800: '#1F2937',
           900: '#111827',
         },
+        // Admin dark theme colors
+        admin: {
+          bg: {
+            DEFAULT: '#0f172a',
+            secondary: '#1e293b',
+            tertiary: '#334155',
+            elevated: '#1e293b',
+          },
+          border: {
+            DEFAULT: '#334155',
+            subtle: '#475569',
+            glow: '#06b6d4',
+          },
+          text: {
+            DEFAULT: '#f1f5f9',
+            secondary: '#94a3b8',
+            muted: '#64748b',
+          },
+          accent: {
+            cyan: '#06b6d4',
+            blue: '#3b82f6',
+            purple: '#8b5cf6',
+            emerald: '#10b981',
+            amber: '#f59e0b',
+            rose: '#f43f5e',
+          },
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -99,6 +126,15 @@ export default {
       boxShadow: {
         'card': '0 2px 8px -2px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06)',
         'card-hover': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+        // Admin dark theme shadows
+        'admin-card': '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2)',
+        'admin-card-hover': '0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3)',
+        'glow-cyan': '0 0 20px rgba(6, 182, 212, 0.35)',
+        'glow-blue': '0 0 20px rgba(59, 130, 246, 0.35)',
+        'glow-purple': '0 0 20px rgba(139, 92, 246, 0.35)',
+        'glow-emerald': '0 0 20px rgba(16, 185, 129, 0.35)',
+        'glow-amber': '0 0 20px rgba(245, 158, 11, 0.35)',
+        'glow-rose': '0 0 20px rgba(244, 63, 94, 0.35)',
       },
       // Safe area utilities for iOS
       padding: {

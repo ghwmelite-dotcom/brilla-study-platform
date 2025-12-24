@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import {
   Flame,
   Star,
@@ -9,11 +9,22 @@ import {
   Award,
 } from 'lucide-react';
 import { Card, CardHeader, Button, Badge, ProgressBar, CircularProgress } from '@/components/common';
+import { TrialBanner } from '@/components/subscription';
 import { useAuthStore, useProgressStore } from '@/stores';
 import { cn } from '@/utils';
 
 export function DashboardPage() {
   const { user } = useAuthStore();
+
+  // Redirect admins to admin dashboard
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
+  // Redirect parents to parent dashboard
+  if (user?.role === 'parent') {
+    return <Navigate to="/parent" replace />;
+  }
   const {
     totalQuestionsAttempted,
     totalCorrect,
@@ -78,6 +89,9 @@ export function DashboardPage() {
           </Link>
         </div>
       </div>
+
+      {/* Trial/Subscription Banner */}
+      <TrialBanner variant="full" />
 
       {/* Stats Overview */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
