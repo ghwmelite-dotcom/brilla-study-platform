@@ -675,9 +675,9 @@ paymentsApp.post('/payout/request', async (c) => {
       return c.json({ success: false, error: 'Insufficient balance' }, 400);
     }
 
-    // Check minimum payout (10 GHS)
-    if (amount < 10) {
-      return c.json({ success: false, error: 'Minimum payout is 10 GHS' }, 400);
+    // Check minimum payout (100 GHS)
+    if (amount < 100) {
+      return c.json({ success: false, error: 'Minimum payout is 100 GHS' }, 400);
     }
 
     // Check if mobile money details are set
