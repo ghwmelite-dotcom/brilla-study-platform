@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { verify } from 'hono/jwt';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -9,6 +10,70 @@ interface Env {
   PAYSTACK_WEBHOOK_SECRET?: string;
   APP_URL: string;
 }
+
+// JWT payload type
+interface UserPayload {
+  userId: string;
+  email: string;
+  role: string;
+  exp?: number;
+}
+
+// Verify JWT token
+async function verifyJWT(token: string, secret: string): Promise<UserPayload | null> {
+  try {
+    const payload = await verify(token, secret);
+    return payload as UserPayload;
+  } catch {
+    return null;
+  }
+}
+
+// Authentication middleware for protected routes
+const authMiddleware = async (c: any, next: any) => {
+  const authHeader = c.req.header('Authorization');
+
+  // Skip auth for OPTIONS requests (CORS preflight)
+  if (c.req.method === 'OPTIONS') {
+    return next();
+  }
+
+  // Check for Authorization header
+  if (!authHeader?.startsWith('Bearer ')) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+
+  // Handle demo tokens
+  if (token.endsWith('_demo_token')) {
+    const tokenPrefix = token.replace('_demo_token', '');
+    const demoUsers: Record<string, { id: string; role: string }> = {
+      'student': { id: 'demo_student_1', role: 'student' },
+      'teacher': { id: 'demo_teacher_1', role: 'teacher' },
+      'admin': { id: 'demo_admin_1', role: 'admin' },
+    };
+    const demoUser = demoUsers[tokenPrefix];
+    if (demoUser) {
+      c.set('userId', demoUser.id);
+      c.set('userRole', demoUser.role);
+      return next();
+    }
+  }
+
+  // Verify JWT token
+  try {
+    const payload = await verifyJWT(token, c.env.JWT_SECRET);
+    if (!payload) {
+      return c.json({ success: false, error: 'Invalid token' }, 401);
+    }
+    c.set('userId', payload.userId);
+    c.set('userRole', payload.role);
+    return next();
+  } catch {
+    return c.json({ success: false, error: 'Invalid token' }, 401);
+  }
+};
 
 // Paystack API base URL
 const PAYSTACK_API = 'https://api.paystack.co';
@@ -199,7 +264,7 @@ paymentsApp.get('/plans', async (c) => {
 });
 
 // Initialize payment
-paymentsApp.post('/initialize', async (c) => {
+paymentsApp.post('/initialize', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const { planId, billingCycle } = await c.req.json();
@@ -321,7 +386,7 @@ paymentsApp.post('/initialize', async (c) => {
 });
 
 // Verify payment
-paymentsApp.get('/verify/:reference', async (c) => {
+paymentsApp.get('/verify/:reference', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const reference = c.req.param('reference');
@@ -626,7 +691,7 @@ paymentsApp.post('/webhook', async (c) => {
 });
 
 // Get user's payment history
-paymentsApp.get('/history', async (c) => {
+paymentsApp.get('/history', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const limit = parseInt(c.req.query('limit') || '20');
@@ -652,7 +717,7 @@ paymentsApp.get('/history', async (c) => {
 });
 
 // Request affiliate payout
-paymentsApp.post('/payout/request', async (c) => {
+paymentsApp.post('/payout/request', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const { amount } = await c.req.json();
@@ -793,7 +858,7 @@ paymentsApp.post('/payout/request', async (c) => {
 });
 
 // Get payout history
-paymentsApp.get('/payouts', async (c) => {
+paymentsApp.get('/payouts', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -820,7 +885,7 @@ paymentsApp.get('/payouts', async (c) => {
 });
 
 // Update mobile money details
-paymentsApp.put('/mobile-money', async (c) => {
+paymentsApp.put('/mobile-money', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const { mobileMoneyNumber, mobileMoneyProvider } = await c.req.json();

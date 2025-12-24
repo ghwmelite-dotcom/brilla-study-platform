@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { verify } from 'hono/jwt';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -6,6 +7,70 @@ interface Env {
   JWT_SECRET: string;
   APP_URL: string;
 }
+
+// JWT payload type
+interface UserPayload {
+  userId: string;
+  email: string;
+  role: string;
+  exp?: number;
+}
+
+// Verify JWT token
+async function verifyJWT(token: string, secret: string): Promise<UserPayload | null> {
+  try {
+    const payload = await verify(token, secret);
+    return payload as UserPayload;
+  } catch {
+    return null;
+  }
+}
+
+// Authentication middleware for protected routes
+const authMiddleware = async (c: any, next: any) => {
+  const authHeader = c.req.header('Authorization');
+
+  // Skip auth for OPTIONS requests (CORS preflight)
+  if (c.req.method === 'OPTIONS') {
+    return next();
+  }
+
+  // Check for Authorization header
+  if (!authHeader?.startsWith('Bearer ')) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+
+  // Handle demo tokens
+  if (token.endsWith('_demo_token')) {
+    const tokenPrefix = token.replace('_demo_token', '');
+    const demoUsers: Record<string, { id: string; role: string }> = {
+      'student': { id: 'demo_student_1', role: 'student' },
+      'teacher': { id: 'demo_teacher_1', role: 'teacher' },
+      'admin': { id: 'demo_admin_1', role: 'admin' },
+    };
+    const demoUser = demoUsers[tokenPrefix];
+    if (demoUser) {
+      c.set('userId', demoUser.id);
+      c.set('userRole', demoUser.role);
+      return next();
+    }
+  }
+
+  // Verify JWT token
+  try {
+    const payload = await verifyJWT(token, c.env.JWT_SECRET);
+    if (!payload) {
+      return c.json({ success: false, error: 'Invalid token' }, 401);
+    }
+    c.set('userId', payload.userId);
+    c.set('userRole', payload.role);
+    return next();
+  } catch {
+    return c.json({ success: false, error: 'Invalid token' }, 401);
+  }
+};
 
 // Generate unique referral code
 function generateReferralCode(name: string): string {
@@ -32,8 +97,8 @@ function hashIP(ip: string): string {
 
 export const affiliatesApp = new Hono<{ Bindings: Env }>();
 
-// Join affiliate program
-affiliatesApp.post('/join', async (c) => {
+// Join affiliate program (protected)
+affiliatesApp.post('/join', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -110,8 +175,8 @@ affiliatesApp.post('/join', async (c) => {
   }
 });
 
-// Get affiliate profile
-affiliatesApp.get('/profile', async (c) => {
+// Get affiliate profile (protected)
+affiliatesApp.get('/profile', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -207,8 +272,8 @@ affiliatesApp.get('/profile', async (c) => {
   }
 });
 
-// Get affiliate dashboard stats
-affiliatesApp.get('/dashboard', async (c) => {
+// Get affiliate dashboard stats (protected)
+affiliatesApp.get('/dashboard', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -349,8 +414,8 @@ affiliatesApp.get('/dashboard', async (c) => {
   }
 });
 
-// Get referrals list
-affiliatesApp.get('/referrals', async (c) => {
+// Get referrals list (protected)
+affiliatesApp.get('/referrals', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const status = c.req.query('status');
@@ -429,8 +494,8 @@ affiliatesApp.get('/referrals', async (c) => {
   }
 });
 
-// Get commission history
-affiliatesApp.get('/commissions', async (c) => {
+// Get commission history (protected)
+affiliatesApp.get('/commissions', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const status = c.req.query('status');
@@ -598,8 +663,8 @@ affiliatesApp.get('/leaderboard/schools', async (c) => {
   }
 });
 
-// Get affiliate challenges
-affiliatesApp.get('/challenges', async (c) => {
+// Get affiliate challenges (protected)
+affiliatesApp.get('/challenges', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -658,8 +723,8 @@ affiliatesApp.get('/challenges', async (c) => {
   }
 });
 
-// Claim challenge reward
-affiliatesApp.post('/challenges/:challengeId/claim', async (c) => {
+// Claim challenge reward (protected)
+affiliatesApp.post('/challenges/:challengeId/claim', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const challengeId = c.req.param('challengeId');
@@ -729,8 +794,8 @@ affiliatesApp.post('/challenges/:challengeId/claim', async (c) => {
   }
 });
 
-// Get affiliate achievements
-affiliatesApp.get('/achievements', async (c) => {
+// Get affiliate achievements (protected)
+affiliatesApp.get('/achievements', authMiddleware, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -849,8 +914,8 @@ affiliatesApp.get('/ref/:code', async (c) => {
   }
 });
 
-// Process referral (called during user registration)
-affiliatesApp.post('/process-referral', async (c) => {
+// Process referral (called during user registration - internal endpoint, protected)
+affiliatesApp.post('/process-referral', authMiddleware, async (c) => {
   try {
     const { referralCode, newUserId } = await c.req.json();
 
@@ -919,8 +984,8 @@ affiliatesApp.post('/process-referral', async (c) => {
   }
 });
 
-// Update referral status when user starts trial
-affiliatesApp.post('/referral/trial-started', async (c) => {
+// Update referral status when user starts trial (protected)
+affiliatesApp.post('/referral/trial-started', authMiddleware, async (c) => {
   try {
     const { userId } = await c.req.json();
 
