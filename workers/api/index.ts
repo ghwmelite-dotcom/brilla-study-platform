@@ -915,6 +915,29 @@ publicApp.post('/auth/register', async (c) => {
   // Rate limiting - check IP-based limit for registrations
   const ipRateLimit = await checkRateLimit(c.env.DB, clientIp, 'register');
   if (!ipRateLimit.allowed) {
+    // Send security alert to admins for blocked registration attempts
+    if (c.env.RESEND_API_KEY && c.env.FROM_EMAIL) {
+      const blockDurationMinutes = Math.ceil((ipRateLimit.retryAfter || 3600) / 60);
+      const alertDetails: SecurityAlertDetails = {
+        targetEmail: email || 'unknown',
+        ipAddress: clientIp,
+        attemptCount: RATE_LIMITS['register'].maxRequests,
+        blockDuration: `${blockDurationMinutes} minutes`,
+        userAgent: c.req.header('User-Agent') || undefined,
+        country: c.req.header('CF-IPCountry') || undefined
+      };
+
+      c.executionCtx.waitUntil(
+        sendSecurityAlertToAdmins(
+          c.env.DB,
+          c.env.RESEND_API_KEY,
+          c.env.FROM_EMAIL,
+          c.env.APP_URL || 'https://brillaprep.org',
+          { ...alertDetails, targetEmail: `Registration spam from IP: ${clientIp}` }
+        ).catch(err => console.error('Failed to send security alert:', err))
+      );
+    }
+
     return rateLimitResponse(c, ipRateLimit);
   }
 
