@@ -78,6 +78,8 @@ const ModerationDashboard = lazy(() => import('@/pages/ModerationDashboard'));
 const PricingPage = lazy(() => import('@/pages/Pricing'));
 const AffiliatePage = lazy(() => import('@/pages/Affiliate'));
 const PaymentCallbackPage = lazy(() => import('@/pages/PaymentCallback'));
+const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicy'));
+const TermsOfServicePage = lazy(() => import('@/pages/TermsOfService'));
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -413,6 +415,10 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/set-password" element={<LazyPage><SetPasswordPage /></LazyPage>} />
+
+        {/* Legal pages (no layout) */}
+        <Route path="/privacy" element={<LazyPage><PrivacyPolicyPage /></LazyPage>} />
+        <Route path="/terms" element={<LazyPage><TermsOfServicePage /></LazyPage>} />
 
         {/* Main app routes (with layout) */}
         <Route element={<Layout />}>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   BookOpen,
@@ -72,19 +72,38 @@ function useInView(threshold = 0.1) {
   return { ref, inView };
 }
 
-// Mouse parallax hook
+// Mouse parallax hook with throttling for performance
 function useMouseParallax(intensity = 0.02) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const lastUpdate = useRef(0);
+  const rafId = useRef<number | null>(null);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX - window.innerWidth / 2) * intensity;
-      const y = (e.clientY - window.innerHeight / 2) * intensity;
-      setPosition({ x, y });
+      const now = Date.now();
+      // Throttle to max 60fps (16ms between updates)
+      if (now - lastUpdate.current < 16) return;
+
+      // Use requestAnimationFrame for smooth updates
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+      }
+
+      rafId.current = requestAnimationFrame(() => {
+        const x = (e.clientX - window.innerWidth / 2) * intensity;
+        const y = (e.clientY - window.innerHeight / 2) * intensity;
+        setPosition({ x, y });
+        lastUpdate.current = now;
+      });
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+      }
+    };
   }, [intensity]);
 
   return position;
@@ -385,8 +404,10 @@ function LandingHeader({ onOpenAuth }: LandingHeaderProps) {
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="lg:hidden p-2 text-white/80 hover:text-white transition-colors"
+          aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isMobileMenuOpen}
         >
-          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {isMobileMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
         </button>
       </div>
 
@@ -472,8 +493,9 @@ function PromoPopup({ onOpenAuth }: { onOpenAuth: (mode: 'login' | 'register') =
           <button
             onClick={handleDismiss}
             className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            aria-label="Close promotional popup"
           >
-            <X className="w-5 h-5 text-white/70" />
+            <X className="w-5 h-5 text-white/70" aria-hidden="true" />
           </button>
 
           {/* Header with gradient */}
@@ -604,8 +626,9 @@ function PWAInstallBanner() {
         <button
           onClick={() => setIsDismissed(true)}
           className="absolute top-3 right-3 p-1 text-white/50 hover:text-white transition-colors"
+          aria-label="Dismiss install prompt"
         >
-          <X className="w-5 h-5" />
+          <X className="w-5 h-5" aria-hidden="true" />
         </button>
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0">
@@ -798,15 +821,15 @@ export function LandingPage() {
     setShowAuthModal(true);
   };
 
-  // Generate particles
-  const particles = Array.from({ length: 50 }, (_, i) => ({
+  // Generate particles (memoized to prevent recreation on every render)
+  const particles = useMemo(() => Array.from({ length: 50 }, (_, i) => ({
     id: i,
     left: `${Math.random() * 100}%`,
     top: `${Math.random() * 100}%`,
     size: Math.random() * 4 + 2,
     delay: Math.random() * 5,
     duration: Math.random() * 10 + 10,
-  }));
+  })), []);
 
   return (
     <div className="min-h-screen bg-slate-950 overflow-x-hidden">
@@ -2023,29 +2046,29 @@ export function LandingPage() {
             <div>
               <h4 className="font-semibold text-white mb-4">Exams</h4>
               <ul className="space-y-3 text-white/50">
-                <li><a href="#" className="hover:text-white transition">NSMQ Prep</a></li>
-                <li><a href="#" className="hover:text-white transition">WASSCE Prep</a></li>
-                <li><a href="#" className="hover:text-white transition">BECE Prep</a></li>
+                <li><Link to="/competition" className="hover:text-white transition">NSMQ Prep</Link></li>
+                <li><Link to="/past-papers" className="hover:text-white transition">WASSCE Prep</Link></li>
+                <li><Link to="/past-papers" className="hover:text-white transition">BECE Prep</Link></li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-semibold text-white mb-4">Support</h4>
               <ul className="space-y-3 text-white/50">
-                <li><a href="#" className="hover:text-white transition">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white transition">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition">Terms of Service</a></li>
+                <li><Link to="/help" className="hover:text-white transition">Help Center</Link></li>
+                <li><a href="mailto:support@brillaprep.org" className="hover:text-white transition">Contact Us</a></li>
+                <li><Link to="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
+                <li><Link to="/terms" className="hover:text-white transition">Terms of Service</Link></li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-white/40">
+            <p className="text-white/60">
               &copy; {new Date().getFullYear()} Brilla Prep. All rights reserved.
             </p>
-            <p className="text-white/40 flex items-center gap-1">
-              Empowering champions <Heart className="w-4 h-4 text-accent fill-accent" /> one question at a time
+            <p className="text-white/60 flex items-center gap-1">
+              Empowering champions <Heart className="w-4 h-4 text-accent fill-accent" aria-hidden="true" /> one question at a time
             </p>
           </div>
         </div>
