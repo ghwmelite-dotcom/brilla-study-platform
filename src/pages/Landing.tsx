@@ -1053,7 +1053,7 @@ export function LandingPage() {
             <span className="text-white">with </span>
             <span className="relative">
               <span className="text-gradient">Brilla Prep</span>
-              <Sparkles className="absolute -top-2 -right-8 w-6 h-6 text-secondary animate-pulse" />
+              <Sparkles className="absolute -top-2 -right-8 w-6 h-6 text-secondary animate-pulse hidden sm:block" />
             </span>
           </h1>
 
@@ -1143,26 +1143,26 @@ export function LandingPage() {
                   <Coins className="w-5 h-5" />
                 </div>
               </div>
-              <div>
-                <p className="text-white font-semibold">
+              <div className="text-center md:text-left">
+                <p className="text-white font-semibold text-sm sm:text-base">
                   <span className="text-emerald-400">{TRIAL_CONFIG.label}</span>
-                  {' '}+ Earn up to{' '}
+                  <span className="hidden sm:inline">{' '}+ Earn up to{' '}</span>
+                  <span className="block sm:hidden text-xs text-white/60 mt-0.5">+ Earn up to </span>
                   <span className="text-secondary">{AFFILIATE_CONFIG.maxCommission}% Commission</span>
-                  {' '}as an Affiliate!
                 </p>
-                <p className="text-white/60 text-sm">No credit card required. Start learning and earning today.</p>
+                <p className="text-white/60 text-xs sm:text-sm">No credit card required. Start learning today.</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
               <button
                 onClick={() => handleOpenAuth('register')}
-                className="px-6 py-3 bg-gradient-to-r from-secondary to-amber-400 rounded-xl font-semibold text-slate-900 hover:shadow-lg hover:shadow-secondary/30 transition-all whitespace-nowrap"
+                className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-secondary to-amber-400 rounded-xl font-semibold text-slate-900 hover:shadow-lg hover:shadow-secondary/30 transition-all whitespace-nowrap"
               >
                 Start Free Trial
               </button>
               <Link
                 to="/affiliate"
-                className="px-6 py-3 glass rounded-xl font-medium text-white hover:bg-white/10 transition-all whitespace-nowrap"
+                className="w-full sm:w-auto px-6 py-3 glass rounded-xl font-medium text-white hover:bg-white/10 transition-all whitespace-nowrap text-center"
               >
                 Learn More
               </Link>
@@ -2036,9 +2036,9 @@ export function LandingPage() {
       {/* Footer */}
       <footer className="relative bg-slate-950 border-t border-white/5 py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-12">
             {/* Brand */}
-            <div className="md:col-span-1">
+            <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                   <span className="text-white font-bold text-xl">B</span>
