@@ -202,41 +202,79 @@ function Card3D({ children, className }: { children: React.ReactNode; className?
   );
 }
 
-// Typewriter effect component
-function TypewriterText({ texts, className = '' }: { texts: string[]; className?: string }) {
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+// Typewriter effect component using refs to avoid closure issues
+function TypewriterText({ texts }: { texts: string[] }) {
   const [displayText, setDisplayText] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Use refs to track mutable state without triggering re-renders
+  const stateRef = useRef({
+    wordIndex: 0,
+    charIndex: 0,
+    isDeleting: false,
+    isPaused: false
+  });
 
   useEffect(() => {
-    const currentFullText = texts[currentTextIndex];
-    const timeout = isDeleting ? 50 : 100;
+    const tick = () => {
+      const state = stateRef.current;
+      const currentWord = texts[state.wordIndex];
 
-    const timer = setTimeout(() => {
-      if (!isDeleting) {
-        if (displayText.length < currentFullText.length) {
-          setDisplayText(currentFullText.slice(0, displayText.length + 1));
-        } else {
-          setTimeout(() => setIsDeleting(true), 2000);
-        }
-      } else {
-        if (displayText.length > 0) {
-          setDisplayText(displayText.slice(0, -1));
-        } else {
-          setIsDeleting(false);
-          setCurrentTextIndex((prev) => (prev + 1) % texts.length);
-        }
+      if (state.isPaused) {
+        // After pause, start deleting
+        state.isPaused = false;
+        state.isDeleting = true;
+        return 100;
       }
-    }, timeout);
 
-    return () => clearTimeout(timer);
-  }, [displayText, isDeleting, currentTextIndex, texts]);
+      if (!state.isDeleting) {
+        // Typing forward
+        state.charIndex++;
+        setDisplayText(currentWord.slice(0, state.charIndex));
+
+        if (state.charIndex >= currentWord.length) {
+          // Finished typing, pause
+          state.isPaused = true;
+          return 2000;
+        }
+        return 100;
+      } else {
+        // Deleting backward
+        state.charIndex--;
+        setDisplayText(currentWord.slice(0, state.charIndex));
+
+        if (state.charIndex <= 0) {
+          // Finished deleting, move to next word
+          state.isDeleting = false;
+          state.wordIndex = (state.wordIndex + 1) % texts.length;
+          return 500; // Small pause before next word
+        }
+        return 50;
+      }
+    };
+
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const scheduleNext = () => {
+      const delay = tick();
+      timeoutId = setTimeout(scheduleNext, delay);
+    };
+
+    // Start the animation
+    timeoutId = setTimeout(scheduleNext, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [texts]);
 
   return (
-    <span className={className}>
+    <>
       {displayText}
-      <span className="animate-blink text-secondary">|</span>
-    </span>
+      <span
+        className="animate-blink"
+        style={{ color: '#FFD700', WebkitTextFillColor: '#FFD700' }}
+      >
+        |
+      </span>
+    </>
   );
 }
 
