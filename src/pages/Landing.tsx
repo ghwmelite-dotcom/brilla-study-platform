@@ -1849,27 +1849,26 @@ export function LandingPage() {
       {/* ========================================== */}
       {/* AFFILIATE PROGRAM SECTION */}
       {/* ========================================== */}
-      <section className="relative py-32 overflow-hidden">
+      <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-pink-950/20 to-slate-950" />
         <GradientOrb className="w-[500px] h-[500px] bg-pink-500/30 -left-48 top-1/4" delay={0} />
         <GradientOrb className="w-[400px] h-[400px] bg-purple-500/30 -right-32 bottom-1/4" delay={2} />
 
         <div className="relative max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-full text-pink-400 text-sm font-medium mb-6">
-              <Coins className="w-4 h-4" />
+          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-full text-pink-400 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+              <Coins className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               Earn While You Learn
             </span>
-            <h2 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-display font-bold text-white mb-4 sm:mb-6">
               Join the{' '}
-              <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent block sm:inline">
                 Brilla Ambassador
               </span>
-              {' '}Program
+              <span className="block sm:inline">{' '}Program</span>
             </h2>
-            <p className="text-xl text-white/60 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base lg:text-xl text-white/60 max-w-3xl mx-auto">
               Share Brilla Prep with friends and earn up to {AFFILIATE_CONFIG.maxCommission}% commission on every subscription.
-              The more you share, the more you earn!
             </p>
           </div>
 
@@ -1969,16 +1968,16 @@ export function LandingPage() {
           <div className="text-center">
             <button
               onClick={() => handleOpenAuth('register')}
-              className="group relative inline-flex items-center gap-3"
+              className="group relative inline-flex items-center gap-2 sm:gap-3"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-all" />
-              <div className="relative flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-full font-semibold text-white text-lg shadow-2xl hover:shadow-purple-500/40 transition-all hover:scale-105">
-                <PartyPopper className="w-5 h-5" />
+              <div className="relative flex items-center gap-2 sm:gap-3 px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-full font-semibold text-white text-sm sm:text-base lg:text-lg shadow-2xl hover:shadow-purple-500/40 transition-all hover:scale-105">
+                <PartyPopper className="w-4 h-4 sm:w-5 sm:h-5" />
                 Start Earning Today
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </div>
             </button>
-            <p className="mt-4 text-white/50">
+            <p className="mt-3 sm:mt-4 text-white/50 text-sm sm:text-base">
               Join thousands of students and teachers earning with Brilla
             </p>
           </div>
