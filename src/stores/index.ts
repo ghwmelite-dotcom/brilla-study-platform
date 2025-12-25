@@ -26,6 +26,7 @@ export { useLibraryStore } from './libraryStore';
 export { useCounselorStore } from './counselorStore';
 export { useCounselorReportsStore } from './counselorReportsStore';
 export { useNotificationStore } from './notificationStore';
+export { useWhiteboardStore } from './whiteboardStore';
 export type { Toast, ToastType } from './toastStore';
 export type { Notification, NotificationType, StreakData, XPData } from './notificationStore';
 export type { ChatMessage as AiChatMessage, UserPersonalization } from './aiTutorStore';

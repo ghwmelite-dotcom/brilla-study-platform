@@ -212,3 +212,254 @@ export const competitionService = {
     return api.post(`/competition/${competitionId}/answer`, data);
   },
 };
+
+// Recording service types
+export interface RecordingData {
+  id: string;
+  title: string;
+  description: string | null;
+  duration: number;
+  teacherId: string;
+  teacherName?: string;
+  thumbnailUrl: string | null;
+  canvasEventsUrl: string;
+  audioUrl: string | null;
+  webcamUrl: string | null;
+  canvasWidth: number;
+  canvasHeight: number;
+  initialCanvasJSON?: string;
+  subjectId: string | null;
+  topicId: string | null;
+  isPublic: boolean;
+  viewCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecordingUploadInfo {
+  type: 'events' | 'audio' | 'webcam' | 'thumbnail';
+  uploadUrl: string;
+  publicUrl: string;
+  path: string;
+}
+
+// Recordings service functions
+export const recordingsService = {
+  // List recordings for current teacher
+  async list(params?: { status?: string; search?: string; limit?: number; offset?: number }) {
+    const queryParams = new URLSearchParams();
+    if (params?.status) queryParams.set('status', params.status);
+    if (params?.search) queryParams.set('search', params.search);
+    if (params?.limit) queryParams.set('limit', params.limit.toString());
+    if (params?.offset) queryParams.set('offset', params.offset.toString());
+
+    const query = queryParams.toString();
+    return api.get<{
+      recordings: RecordingData[];
+      total: number;
+      limit: number;
+      offset: number;
+    }>(`/recordings${query ? `?${query}` : ''}`);
+  },
+
+  // Get a specific recording
+  async get(id: string) {
+    return api.get<RecordingData>(`/recordings/${id}`);
+  },
+
+  // Get a public recording via share token
+  async getPublic(shareToken: string) {
+    return api.get<RecordingData>(`/recordings/public/${shareToken}`);
+  },
+
+  // Create a new recording
+  async create(data: {
+    title: string;
+    description?: string;
+    duration: number;
+    canvasWidth?: number;
+    canvasHeight?: number;
+    initialCanvasJSON?: string;
+    subjectId?: string;
+    topicId?: string;
+  }) {
+    return api.post<{ id: string; canvasEventsUrl: string }>('/recordings', data);
+  },
+
+  // Get upload URLs for recording assets
+  async getUploadUrls(recordingId: string, files: Array<{ type: 'events' | 'audio' | 'webcam' | 'thumbnail'; contentType: string }>) {
+    return api.post<{ uploads: RecordingUploadInfo[] }>(`/recordings/${recordingId}/upload-urls`, { files });
+  },
+
+  // Upload a file to the recording
+  async uploadFile(recordingId: string, fileType: 'events' | 'audio' | 'webcam' | 'thumbnail', file: Blob, contentType: string) {
+    const response = await fetch(`/api/recordings/upload/${recordingId}/${fileType}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': contentType,
+        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
+      },
+      body: file,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Upload failed');
+    }
+
+    return response.json();
+  },
+
+  // Update recording metadata
+  async update(id: string, data: {
+    title?: string;
+    description?: string;
+    subjectId?: string;
+    topicId?: string;
+    isPublic?: boolean;
+  }) {
+    return api.put<{ id: string }>(`/recordings/${id}`, data);
+  },
+
+  // Delete a recording
+  async delete(id: string) {
+    return api.delete<{ id: string }>(`/recordings/${id}`);
+  },
+
+  // Create a share link
+  async createShareLink(recordingId: string, options?: { expiresInDays?: number; maxViews?: number }) {
+    return api.post<{
+      id: string;
+      shareToken: string;
+      shareUrl: string;
+      expiresAt: string | null;
+      maxViews: number | null;
+    }>(`/recordings/${recordingId}/share`, options || {});
+  },
+
+  // List share links for a recording
+  async listShareLinks(recordingId: string) {
+    return api.get<{
+      shares: Array<{
+        id: string;
+        shareToken: string;
+        shareUrl: string;
+        expiresAt: string | null;
+        maxViews: number | null;
+        currentViews: number;
+        isActive: boolean;
+        createdAt: string;
+      }>;
+    }>(`/recordings/${recordingId}/shares`);
+  },
+
+  // Revoke a share link
+  async revokeShareLink(shareId: string) {
+    return api.delete<{ id: string }>(`/recordings/shares/${shareId}`);
+  },
+
+  // Get recording analytics
+  async getAnalytics(recordingId: string) {
+    return api.get<{
+      totalViews: number;
+      uniqueViewers: number;
+      completions: number;
+      avgWatchDuration: number;
+      recentViews: Array<{
+        viewerName: string;
+        viewedAt: string;
+        watchDuration: number;
+        completed: boolean;
+      }>;
+    }>(`/recordings/${recordingId}/analytics`);
+  },
+};
+
+// Whiteboard types
+export interface WhiteboardData {
+  id: string;
+  userId: string;
+  title: string;
+  description: string | null;
+  canvasJSON: string;
+  thumbnail: string | null;
+  canvasWidth: number;
+  canvasHeight: number;
+  subjectId: string | null;
+  topicId: string | null;
+  isTemplate: boolean;
+  isPublic: boolean;
+  status: 'active' | 'archived' | 'deleted';
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Whiteboards service functions
+export const whiteboardsService = {
+  // List user's whiteboards
+  async list(params?: { status?: string; search?: string; limit?: number; offset?: number }) {
+    const queryParams = new URLSearchParams();
+    if (params?.status) queryParams.set('status', params.status);
+    if (params?.search) queryParams.set('search', params.search);
+    if (params?.limit) queryParams.set('limit', params.limit.toString());
+    if (params?.offset) queryParams.set('offset', params.offset.toString());
+
+    const query = queryParams.toString();
+    return api.get<{
+      whiteboards: WhiteboardData[];
+      total: number;
+      limit: number;
+      offset: number;
+    }>(`/whiteboards${query ? `?${query}` : ''}`);
+  },
+
+  // Get a specific whiteboard
+  async get(id: string) {
+    return api.get<WhiteboardData>(`/whiteboards/${id}`);
+  },
+
+  // Get a public whiteboard
+  async getPublic(id: string) {
+    return api.get<WhiteboardData>(`/whiteboards/public/${id}`);
+  },
+
+  // Create a new whiteboard
+  async create(data: {
+    id?: string;
+    title: string;
+    description?: string;
+    canvasJSON: string;
+    thumbnail?: string;
+    canvasWidth?: number;
+    canvasHeight?: number;
+    subjectId?: string;
+    topicId?: string;
+  }) {
+    return api.post<WhiteboardData>('/whiteboards', data);
+  },
+
+  // Update a whiteboard
+  async update(id: string, data: {
+    title?: string;
+    description?: string;
+    canvasJSON?: string;
+    thumbnail?: string;
+    canvasWidth?: number;
+    canvasHeight?: number;
+    subjectId?: string;
+    topicId?: string;
+    isPublic?: boolean;
+  }) {
+    return api.put<WhiteboardData>(`/whiteboards/${id}`, data);
+  },
+
+  // Delete a whiteboard
+  async delete(id: string) {
+    return api.delete<{ id: string }>(`/whiteboards/${id}`);
+  },
+
+  // Duplicate a whiteboard
+  async duplicate(id: string) {
+    return api.post<WhiteboardData>(`/whiteboards/${id}/duplicate`);
+  },
+};

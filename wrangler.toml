@@ -19,6 +19,11 @@ FROM_EMAIL = "Brilla Study Platform <noreply@brillaprep.org>"
 binding = "LIBRARY_BUCKET"
 bucket_name = "brilla-library"
 
+# R2 Storage for Whiteboard Recordings
+[[r2_buckets]]
+binding = "RECORDINGS_BUCKET"
+bucket_name = "brilla-recordings"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "brilla-db"
@@ -44,6 +49,10 @@ database_id = "aa806d65-d3dd-4cf9-9cac-e3ddd252f937"
 [[env.production.r2_buckets]]
 binding = "LIBRARY_BUCKET"
 bucket_name = "brilla-library"
+
+[[env.production.r2_buckets]]
+binding = "RECORDINGS_BUCKET"
+bucket_name = "brilla-recordings"
 
 # Cron trigger for demo data cleanup (runs every 6 hours)
 # This cleans up expired demo user data to keep production database clean

@@ -11,6 +11,8 @@ import { moderationApp } from './moderation';
 import { paymentsApp } from './payments';
 import { subscriptionsApp } from './subscriptions';
 import { affiliatesApp } from './affiliates';
+import { recordingsApp } from './recordings';
+import { whiteboardsApp } from './whiteboards';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -24,6 +26,7 @@ interface Env {
   APP_URL?: string;
   FROM_EMAIL?: string;
   LIBRARY_BUCKET?: R2Bucket;
+  RECORDINGS_BUCKET?: R2Bucket;
   PAYSTACK_SECRET_KEY?: string;
   PAYSTACK_PUBLIC_KEY?: string;
   PAYSTACK_WEBHOOK_SECRET?: string;
@@ -927,14 +930,16 @@ publicApp.post('/auth/register', async (c) => {
         country: c.req.header('CF-IPCountry') || undefined
       };
 
+      console.log('Sending registration spam alert for IP:', clientIp);
       c.executionCtx.waitUntil(
         sendSecurityAlertToAdmins(
           c.env.DB,
           c.env.RESEND_API_KEY,
           c.env.FROM_EMAIL,
           c.env.APP_URL || 'https://brillaprep.org',
-          { ...alertDetails, targetEmail: `Registration spam from IP: ${clientIp}` }
-        ).catch(err => console.error('Failed to send security alert:', err))
+          { ...alertDetails, targetEmail: `Registration spam (IP: ${clientIp})` }
+        ).then(() => console.log('Registration spam alert sent successfully'))
+        .catch(err => console.error('Failed to send registration security alert:', err))
       );
     }
 
@@ -8823,6 +8828,10 @@ app.route('/api/subscriptions', subscriptionsApp);
 
 // Mount Affiliates routes (includes public /ref/:code endpoint)
 app.route('/api/affiliates', affiliatesApp);
+
+// Mount Recordings routes (whiteboard recordings)
+app.route('/api/recordings', recordingsApp);
+app.route('/api/whiteboards', whiteboardsApp);
 
 // Mount protected routes (must be after all protectedApp routes are defined)
 app.route('/api', protectedApp);

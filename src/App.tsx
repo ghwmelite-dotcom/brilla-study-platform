@@ -63,6 +63,9 @@ const AssessmentList = lazy(() => import('@/pages/AssessmentList'));
 const AssessmentBuilder = lazy(() => import('@/pages/AssessmentBuilder'));
 const AssessmentGrading = lazy(() => import('@/pages/AssessmentGrading'));
 const ClassManagement = lazy(() => import('@/pages/ClassManagement'));
+const WhiteboardList = lazy(() => import('@/pages/WhiteboardList'));
+const WhiteboardEditor = lazy(() => import('@/pages/WhiteboardEditor'));
+const RecordingViewer = lazy(() => import('@/pages/RecordingViewer'));
 
 // Student assessment pages (lazy loaded)
 const AssignedAssessments = lazy(() => import('@/pages/AssignedAssessments'));
@@ -768,6 +771,38 @@ function App() {
             element={
               <ProtectedRoute>
                 <LazyPage><ClassManagement /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="teacher/whiteboard"
+            element={
+              <ProtectedRoute>
+                <LazyPage><WhiteboardList /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="teacher/whiteboard/new"
+            element={
+              <ProtectedRoute>
+                <LazyPage><WhiteboardEditor /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="teacher/whiteboard/:id/edit"
+            element={
+              <ProtectedRoute>
+                <LazyPage><WhiteboardEditor /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="teacher/whiteboard/recording/:id"
+            element={
+              <ProtectedRoute>
+                <LazyPage><RecordingViewer /></LazyPage>
               </ProtectedRoute>
             }
           />

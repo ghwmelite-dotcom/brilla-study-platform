@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Loader2,
   BookOpen,
+  PenTool,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { useAssessmentStore } from '@/stores/assessmentStore';
@@ -76,6 +77,13 @@ export default function TeacherDashboard() {
       description: 'Timed assessment',
       color: 'purple',
       href: '/teacher/assessments/new?type=mock_exam',
+    },
+    {
+      icon: PenTool,
+      label: 'Whiteboard',
+      description: 'Visual teaching',
+      color: 'teal',
+      href: '/teacher/whiteboard',
     },
     {
       icon: Users,
@@ -177,7 +185,7 @@ export default function TeacherDashboard() {
         {/* Quick Actions */}
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-neutral-900 mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {quickActions.map((action) => (
               <Link
                 key={action.label}
@@ -190,6 +198,7 @@ export default function TeacherDashboard() {
                     action.color === 'blue' && 'text-blue-600',
                     action.color === 'amber' && 'text-amber-600',
                     action.color === 'purple' && 'text-purple-600',
+                    action.color === 'teal' && 'text-teal-600',
                     action.color === 'emerald' && 'text-emerald-600'
                   )}
                 />
