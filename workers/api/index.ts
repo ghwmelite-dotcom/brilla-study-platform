@@ -1249,7 +1249,8 @@ publicApp.post('/auth/login', async (c) => {
     return c.json({ success: true, data: { user, token } });
   } catch (error) {
     console.error('Login error:', error);
-    return c.json({ success: false, error: 'Login failed' }, 500);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return c.json({ success: false, error: `Login failed: ${errorMessage}` }, 500);
   }
 });
 
@@ -1493,7 +1494,6 @@ publicApp.post('/auth/setup', async (c) => {
       { email: 'admin@brillaprep.org', password: 'Admin123!', name: 'System Admin', role: 'admin' },
       { email: 'teacher@brillaprep.org', password: 'Teacher123!', name: 'Demo Teacher', role: 'teacher' },
       { email: 'student@brillaprep.org', password: 'Student123!', name: 'Demo Student', role: 'student' },
-      { email: 'parent@brillaprep.org', password: 'Parent123!', name: 'Demo Parent', role: 'parent' },
     ];
 
     for (const user of demoUsers) {
@@ -1551,7 +1551,6 @@ publicApp.post('/auth/reset-demo-passwords', async (c) => {
     const demoUsers = [
       { email: 'teacher@brillaprep.org', password: 'Teacher123!' },
       { email: 'student@brillaprep.org', password: 'Student123!' },
-      { email: 'demo_admin@brillaprep.org', password: 'Admin123!' },
     ];
 
     const results = [];
@@ -9133,7 +9132,8 @@ app.notFound((c) => {
 // Error handler
 app.onError((err, c) => {
   console.error('Error:', err);
-  return c.json({ success: false, error: 'Internal server error' }, 500);
+  const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+  return c.json({ success: false, error: `Internal server error: ${errorMessage}` }, 500);
 });
 
 // =============================================
