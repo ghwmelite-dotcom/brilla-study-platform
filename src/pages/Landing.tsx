@@ -1459,93 +1459,93 @@ export function LandingPage() {
       </section>
 
       {/* For Schools & Parents Section */}
-      <section className="relative py-32 overflow-hidden">
+      <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-slate-950" />
 
         <div className="relative max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm font-medium text-white/80 mb-6">
-              <Users className="w-4 h-4 text-secondary" />
+          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+            <span className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 glass rounded-full text-xs sm:text-sm font-medium text-white/80 mb-4 sm:mb-6">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-secondary" />
               For Everyone
             </span>
-            <h2 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-display font-bold text-white mb-4 sm:mb-6">
               Built for{' '}
-              <span className="text-gradient">Students, Teachers & Parents</span>
+              <span className="text-gradient block sm:inline">Students, Teachers & Parents</span>
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {/* Students */}
-            <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-secondary to-orange-500 flex items-center justify-center mx-auto mb-6">
-                <GraduationCap className="w-10 h-10 text-white" />
+            <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 text-center hover:bg-white/10 transition-all">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-secondary to-orange-500 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <GraduationCap className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Students</h3>
-              <p className="text-white/60 mb-6">
-                Practice with AI tutoring, compete in battles, track your progress, and access the E-Library.
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-2 sm:mb-4">Students</h3>
+              <p className="text-white/60 text-sm sm:text-base mb-4 sm:mb-6">
+                Practice with AI tutoring, compete in battles, and access the E-Library.
               </p>
-              <ul className="text-left space-y-2 text-white/70">
+              <ul className="text-left space-y-1.5 sm:space-y-2 text-white/70 text-sm sm:text-base">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-400" />
-                  Unlimited practice questions
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                  <span>Unlimited practice questions</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-400" />
-                  AI tutor & counselor access
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                  <span>AI tutor & counselor access</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-400" />
-                  Competition & leaderboards
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                  <span>Competition & leaderboards</span>
                 </li>
               </ul>
             </div>
 
             {/* Teachers */}
-            <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center mx-auto mb-6">
-                <PenTool className="w-10 h-10 text-white" />
+            <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 text-center hover:bg-white/10 transition-all">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <PenTool className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Teachers</h3>
-              <p className="text-white/60 mb-6">
-                Manage classes, create assessments, upload resources, and monitor student performance.
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-2 sm:mb-4">Teachers</h3>
+              <p className="text-white/60 text-sm sm:text-base mb-4 sm:mb-6">
+                Manage classes, create assessments, and monitor student performance.
               </p>
-              <ul className="text-left space-y-2 text-white/70">
+              <ul className="text-left space-y-1.5 sm:space-y-2 text-white/70 text-sm sm:text-base">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-400" />
-                  Class management tools
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                  <span>Class management tools</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-400" />
-                  Assessment builder
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                  <span>Assessment builder</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-400" />
-                  E-Library uploads
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                  <span>E-Library uploads</span>
                 </li>
               </ul>
             </div>
 
             {/* Parents */}
-            <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center mx-auto mb-6">
-                <Shield className="w-10 h-10 text-white" />
+            <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 text-center hover:bg-white/10 transition-all sm:col-span-2 lg:col-span-1">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <Shield className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Parents</h3>
-              <p className="text-white/60 mb-6">
-                Monitor your child's progress, receive reports, and stay connected with their learning journey.
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-2 sm:mb-4">Parents</h3>
+              <p className="text-white/60 text-sm sm:text-base mb-4 sm:mb-6">
+                Monitor your child's progress and stay connected with their learning.
               </p>
-              <ul className="text-left space-y-2 text-white/70">
+              <ul className="text-left space-y-1.5 sm:space-y-2 text-white/70 text-sm sm:text-base sm:max-w-xs sm:mx-auto lg:max-w-none">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-400" />
-                  Progress monitoring
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                  <span>Progress monitoring</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-400" />
-                  Weekly reports
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                  <span>Weekly reports</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-400" />
-                  Study time insights
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                  <span>Study time insights</span>
                 </li>
               </ul>
             </div>
