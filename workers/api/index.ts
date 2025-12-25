@@ -189,6 +189,10 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
     maxRequests: 5,
     windowMs: 60 * 60 * 1000,      // 5 attempts per hour
   },
+  'demo-reset': {
+    maxRequests: 3,
+    windowMs: 60 * 60 * 1000,      // 3 attempts per hour per IP
+  },
 };
 
 async function checkRateLimit(
@@ -717,7 +721,8 @@ function isDemoUserId(userId: string): boolean {
 }
 
 // Check if an email belongs to a demo user
-function isDemoEmail(email: string): boolean {
+function isDemoEmail(email: string | undefined | null): boolean {
+  if (!email) return false;
   if (EXCLUDED_DEMO_EMAILS.includes(email.toLowerCase())) return false;
   return DEMO_EMAIL_PATTERNS.some(pattern => email.endsWith(pattern));
 }
@@ -1093,14 +1098,17 @@ publicApp.post('/auth/login', async (c) => {
     }
   }
 
-  // Verify Turnstile token
-  if (c.env.TURNSTILE_SECRET && turnstileToken) {
-    const isValidTurnstile = await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET, clientIp);
-    if (!isValidTurnstile) {
-      return c.json({ success: false, error: 'Security verification failed. Please try again.' }, 400);
+  // Verify Turnstile token (skip for demo users to allow easy demo access)
+  const isDemo = isDemoEmail(email);
+  if (c.env.TURNSTILE_SECRET && !isDemo) {
+    if (turnstileToken) {
+      const isValidTurnstile = await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET, clientIp);
+      if (!isValidTurnstile) {
+        return c.json({ success: false, error: 'Security verification failed. Please try again.' }, 400);
+      }
+    } else {
+      return c.json({ success: false, error: 'Security verification required.' }, 400);
     }
-  } else if (c.env.TURNSTILE_SECRET && !turnstileToken) {
-    return c.json({ success: false, error: 'Security verification required.' }, 400);
   }
 
   try {
@@ -1504,6 +1512,64 @@ publicApp.post('/auth/setup', async (c) => {
   } catch (error) {
     console.error('Setup error:', error);
     return c.json({ success: false, error: 'Setup failed: ' + (error instanceof Error ? error.message : 'Unknown error') }, 500);
+  }
+});
+
+// Reset demo user passwords - Only works for demo emails (not admin@brillaprep.org)
+// This endpoint allows resetting demo passwords without authentication
+publicApp.post('/auth/reset-demo-passwords', async (c) => {
+  const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
+
+  // Rate limit this endpoint heavily
+  const ipRateLimit = await checkRateLimit(c.env.DB, clientIp, 'demo-reset');
+  if (!ipRateLimit.allowed) {
+    return rateLimitResponse(c, ipRateLimit);
+  }
+
+  try {
+    const demoUsers = [
+      { email: 'teacher@brillaprep.org', password: 'Teacher123!' },
+      { email: 'student@brillaprep.org', password: 'Student123!' },
+      { email: 'demo_admin@brillaprep.org', password: 'Admin123!' },
+    ];
+
+    const results = [];
+
+    for (const user of demoUsers) {
+      // Only allow demo emails (not admin)
+      if (!isDemoEmail(user.email)) {
+        continue;
+      }
+
+      const passwordHash = await hashPassword(user.password);
+      const existing = await c.env.DB.prepare(
+        'SELECT id FROM users WHERE email = ?'
+      ).bind(user.email).first();
+
+      if (existing) {
+        await c.env.DB.prepare(`
+          UPDATE users SET password_hash = ?, updated_at = datetime('now')
+          WHERE email = ?
+        `).bind(passwordHash, user.email).run();
+        results.push({ email: user.email, status: 'password_reset' });
+      } else {
+        // Create the demo user if it doesn't exist
+        const userId = `demo_${user.email.split('@')[0]}_${Date.now()}`;
+        const role = user.email.includes('admin') ? 'admin' :
+                     user.email.includes('teacher') ? 'teacher' : 'student';
+        const credits = role === 'admin' ? 100 : role === 'teacher' ? 50 : 10;
+        await c.env.DB.prepare(`
+          INSERT INTO users (id, email, password_hash, name, role, status, is_active, email_verified, xp_points, level, streak_days, ai_grading_credits)
+          VALUES (?, ?, ?, ?, ?, 'approved', 1, 1, 0, 1, 0, ?)
+        `).bind(userId, user.email, passwordHash, `Demo ${role.charAt(0).toUpperCase() + role.slice(1)}`, role, credits).run();
+        results.push({ email: user.email, status: 'created' });
+      }
+    }
+
+    return c.json({ success: true, data: { message: 'Demo passwords reset', results } });
+  } catch (error) {
+    console.error('Demo reset error:', error);
+    return c.json({ success: false, error: 'Reset failed' }, 500);
   }
 });
 

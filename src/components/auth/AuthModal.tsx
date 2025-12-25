@@ -319,16 +319,20 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
   };
 
   const handleDemoLogin = async (role: UserRole) => {
-    const demoCredentials: Record<UserRole, { email: string; password: string }> = {
+    const demoCredentials: Partial<Record<UserRole, { email: string; password: string }>> = {
       student: { email: 'student@brillaprep.org', password: 'Student123!' },
       teacher: { email: 'teacher@brillaprep.org', password: 'Teacher123!' },
-      admin: { email: 'admin@brillaprep.org', password: 'Admin123!' },
-      parent: { email: 'parent@brillaprep.org', password: 'Parent123!' },
+      admin: { email: 'demo_admin@brillaprep.org', password: 'Admin123!' },
     };
+
+    const creds = demoCredentials[role];
+    if (!creds) {
+      setFormErrors({ submit: 'Demo login not available for this role' });
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      const creds = demoCredentials[role];
       await login(creds.email, creds.password);
       onClose();
     } catch (err) {
@@ -976,7 +980,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     <button
                       type="button"
                       onClick={() => handleDemoLogin('student')}
@@ -1000,14 +1004,6 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                     >
                       <Shield className="w-5 h-5 text-purple-600" />
                       <span className="text-xs font-medium">Admin</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDemoLogin('parent')}
-                      className="flex flex-col items-center gap-1 p-3 border border-neutral-200 rounded-lg hover:border-amber-500 hover:bg-amber-50 transition-all"
-                    >
-                      <Users className="w-5 h-5 text-amber-600" />
-                      <span className="text-xs font-medium">Parent</span>
                     </button>
                   </div>
                 </>
