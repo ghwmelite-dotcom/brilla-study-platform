@@ -684,11 +684,15 @@ tutoringRouter.get('/sessions', authMiddleware, async (c) => {
         tdp.profile_photo_url as teacher_profile_photo_url,
         u.name as student_name,
         u.email as student_email,
-        s.name as subject_name
+        s.name as subject_name,
+        tp.status as payment_status,
+        tp.payment_reference,
+        tp.paid_at
       FROM tutoring_sessions ts
       JOIN teacher_directory_profiles tdp ON ts.teacher_profile_id = tdp.id
       JOIN users u ON ts.student_id = u.id
       JOIN subjects s ON ts.subject_id = s.id
+      LEFT JOIN tutoring_payments tp ON ts.id = tp.session_id
       ${whereClause}
       ORDER BY ts.scheduled_datetime DESC
       LIMIT ? OFFSET ?
@@ -722,6 +726,9 @@ tutoringRouter.get('/sessions', authMiddleware, async (c) => {
       sessionCost: row.session_cost,
       platformFee: row.platform_fee,
       teacherEarnings: row.teacher_earnings,
+      paymentStatus: row.payment_status || 'unpaid',
+      paymentReference: row.payment_reference,
+      paidAt: row.paid_at,
       studentReviewed: !!row.student_reviewed,
       createdAt: row.created_at,
       updatedAt: row.updated_at

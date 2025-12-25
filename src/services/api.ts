@@ -688,6 +688,52 @@ export const tutoringService = {
   async respondToReview(reviewId: string, response: string) {
     return api.post(`/tutoring/teacher/reviews/${reviewId}/respond`, { response });
   },
+
+  // Payment methods
+  async initializePayment(sessionId: string) {
+    return api.post<{
+      paymentId: string;
+      reference: string;
+      authorizationUrl?: string;
+      amount: number;
+    }>(`/tutoring/sessions/${sessionId}/pay/initialize`);
+  },
+
+  async verifyPayment(reference: string) {
+    return api.post<{
+      status: string;
+      sessionId?: string;
+      amount?: number;
+      message?: string;
+    }>('/tutoring/sessions/pay/verify', { reference });
+  },
+
+  async getPaymentStatus(sessionId: string) {
+    return api.get<{
+      paymentId?: string;
+      status: string;
+      amount?: number;
+      reference?: string;
+      paidAt?: string;
+    }>(`/tutoring/sessions/${sessionId}/payment`);
+  },
+
+  // Admin methods
+  async getPendingProfiles(page = 1, pageSize = 20) {
+    return api.get(`/tutoring/admin/pending-profiles?page=${page}&pageSize=${pageSize}`);
+  },
+
+  async approveProfile(profileId: string) {
+    return api.post(`/tutoring/admin/profiles/${profileId}/approve`);
+  },
+
+  async rejectProfile(profileId: string, reason: string) {
+    return api.post(`/tutoring/admin/profiles/${profileId}/reject`, { reason });
+  },
+
+  async getAdminStats() {
+    return api.get('/tutoring/admin/stats');
+  },
 };
 
 // Teacher Bonus service

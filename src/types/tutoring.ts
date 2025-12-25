@@ -364,6 +364,11 @@ export interface TutoringSession {
   platformFee: number;
   teacherEarnings: number;
 
+  // Payment
+  paymentStatus?: PaymentStatus;
+  paymentReference?: string;
+  paidAt?: string;
+
   // Review
   studentReviewed: boolean;
 
