@@ -223,7 +223,7 @@ function TypewriterText({ texts }: { texts: string[] }) {
         // After pause, start deleting
         state.isPaused = false;
         state.isDeleting = true;
-        return 100;
+        return 150;
       }
 
       if (!state.isDeleting) {
@@ -234,9 +234,9 @@ function TypewriterText({ texts }: { texts: string[] }) {
         if (state.charIndex >= currentWord.length) {
           // Finished typing, pause
           state.isPaused = true;
-          return 2000;
+          return 2500;
         }
-        return 100;
+        return 150; // Typing speed
       } else {
         // Deleting backward
         state.charIndex--;
@@ -248,7 +248,7 @@ function TypewriterText({ texts }: { texts: string[] }) {
           state.wordIndex = (state.wordIndex + 1) % texts.length;
           return 500; // Small pause before next word
         }
-        return 50;
+        return 80; // Deleting speed
       }
     };
 
