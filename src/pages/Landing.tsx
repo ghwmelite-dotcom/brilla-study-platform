@@ -1556,55 +1556,55 @@ export function LandingPage() {
       {/* Testimonials Section */}
       <section
         ref={testimonialsRef.ref}
-        className="relative py-32 overflow-hidden"
+        className="relative py-16 sm:py-24 lg:py-32 overflow-hidden"
       >
         <div className="absolute inset-0 bg-slate-950" />
 
         <div className="relative max-w-7xl mx-auto px-4">
           <div className={cn(
-            'text-center mb-20',
+            'text-center mb-10 sm:mb-16 lg:mb-20',
             testimonialsRef.inView ? 'animate-slide-up' : 'opacity-0'
           )}>
-            <span className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm font-medium text-white/80 mb-6">
-              <Star className="w-4 h-4 text-secondary" />
+            <span className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 glass rounded-full text-xs sm:text-sm font-medium text-white/80 mb-4 sm:mb-6">
+              <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-secondary" />
               Student Stories
             </span>
-            <h2 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 sm:mb-6">
               Loved by{' '}
               <span className="text-gradient">Students</span>
             </h2>
-            <p className="text-xl text-white/60 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl text-white/60 max-w-2xl mx-auto">
               Join thousands of students who've transformed their exam preparation.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {testimonials.map((testimonial, index) => (
               <div
                 key={testimonial.author}
                 className={cn(
-                  'relative glass rounded-2xl p-8 hover:bg-white/10 transition-all duration-300',
+                  'relative glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 hover:bg-white/10 transition-all duration-300',
                   testimonialsRef.inView ? 'animate-slide-up' : 'opacity-0'
                 )}
                 style={{ animationDelay: `${index * 0.15}s` }}
               >
                 {/* Stars */}
-                <div className="flex gap-1 mb-6">
+                <div className="flex gap-0.5 sm:gap-1 mb-4 sm:mb-6">
                   {Array.from({ length: testimonial.rating }).map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-secondary fill-secondary" />
+                    <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 text-secondary fill-secondary" />
                   ))}
                 </div>
 
-                <Quote className="w-10 h-10 text-white/10 mb-4" />
-                <p className="text-white/80 text-lg mb-8 leading-relaxed">"{testimonial.quote}"</p>
+                <Quote className="w-8 h-8 sm:w-10 sm:h-10 text-white/10 mb-3 sm:mb-4" />
+                <p className="text-white/80 text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 leading-relaxed">"{testimonial.quote}"</p>
 
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-lg">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm sm:text-lg flex-shrink-0">
                     {testimonial.avatar}
                   </div>
                   <div>
-                    <p className="font-semibold text-white">{testimonial.author}</p>
-                    <p className="text-sm text-white/50">{testimonial.role}</p>
+                    <p className="font-semibold text-white text-sm sm:text-base">{testimonial.author}</p>
+                    <p className="text-xs sm:text-sm text-white/50">{testimonial.role}</p>
                   </div>
                 </div>
               </div>
