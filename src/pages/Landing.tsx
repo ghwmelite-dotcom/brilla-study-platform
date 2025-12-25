@@ -43,6 +43,7 @@ import {
 import { cn } from '@/utils';
 import { AuthModal } from '@/components/auth';
 import {
+  SITE_CONFIG,
   TRIAL_CONFIG,
   PRICING_CONFIG,
   AFFILIATE_CONFIG,
@@ -2076,7 +2077,7 @@ export function LandingPage() {
               <h4 className="font-semibold text-white mb-4">Support</h4>
               <ul className="space-y-3 text-white/50">
                 <li><Link to="/help" className="hover:text-white transition">Help Center</Link></li>
-                <li><a href="mailto:support@brillaprep.org" className="hover:text-white transition">Contact Us</a></li>
+                <li><a href={`mailto:${SITE_CONFIG.supportEmail}`} className="hover:text-white transition cursor-pointer">Contact Us</a></li>
                 <li><Link to="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
                 <li><Link to="/terms" className="hover:text-white transition">Terms of Service</Link></li>
               </ul>
