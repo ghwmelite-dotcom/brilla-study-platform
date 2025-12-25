@@ -49,6 +49,8 @@ const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
 const AdminAnalytics = lazy(() => import('@/pages/AdminAnalytics'));
 const AdminSubscriptions = lazy(() => import('@/pages/AdminSubscriptions'));
 const AdminAffiliates = lazy(() => import('@/pages/AdminAffiliates'));
+const AdminTutoringDirectory = lazy(() => import('@/pages/admin/AdminTutoringDirectory'));
+const AdminTeacherBonuses = lazy(() => import('@/pages/admin/AdminTeacherBonuses'));
 
 // Admin layout (lazy loaded)
 const AdminLayout = lazy(() => import('@/components/admin/layout/AdminLayout').then(m => ({ default: m.AdminLayout })));
@@ -93,6 +95,7 @@ const TeacherDirectorySetup = lazy(() => import('@/pages/TeacherDirectorySetup')
 const TutoringRequests = lazy(() => import('@/pages/TutoringRequests'));
 const TutoringSessions = lazy(() => import('@/pages/TutoringSessions'));
 const TeacherTutoringDashboard = lazy(() => import('@/pages/TeacherTutoringDashboard'));
+const TeacherBonusStatus = lazy(() => import('@/pages/TeacherBonusStatus'));
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -860,6 +863,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="teacher/bonus"
+            element={
+              <ProtectedRoute>
+                <LazyPage><TeacherBonusStatus /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
 
           {/* Student assessment routes */}
           <Route
@@ -910,6 +921,8 @@ function App() {
           <Route path="settings" element={<LazyPage><SettingsPage /></LazyPage>} />
           <Route path="subscriptions" element={<LazyPage><AdminSubscriptions /></LazyPage>} />
           <Route path="affiliates" element={<LazyPage><AdminAffiliates /></LazyPage>} />
+          <Route path="tutoring" element={<LazyPage><AdminTutoringDirectory /></LazyPage>} />
+          <Route path="teacher-bonuses" element={<LazyPage><AdminTeacherBonuses /></LazyPage>} />
         </Route>
       </Routes>
 

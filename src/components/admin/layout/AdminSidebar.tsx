@@ -15,6 +15,8 @@ import {
   ChevronDown,
   ChevronRight,
   Zap,
+  GraduationCap,
+  Gift,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/utils';
@@ -92,6 +94,7 @@ export function AdminSidebar() {
   const isContentSection = location.pathname.startsWith('/admin/content') || location.pathname.startsWith('/admin/moderation');
   const isSystemSection = location.pathname.startsWith('/admin/audit') || location.pathname.startsWith('/admin/settings');
   const isRevenueSection = location.pathname.startsWith('/admin/subscriptions') || location.pathname.startsWith('/admin/affiliates');
+  const isTutoringSection = location.pathname.startsWith('/admin/tutoring') || location.pathname.startsWith('/admin/teacher-bonuses');
 
   return (
     <aside className="w-64 h-screen bg-admin-bg-secondary border-r border-admin-border flex flex-col">
@@ -139,6 +142,12 @@ export function AdminSidebar() {
         <NavGroup label="Revenue" icon={<CreditCard className="w-4 h-4" />} defaultOpen={isRevenueSection}>
           <NavItem to="/admin/subscriptions" icon={<CreditCard className="w-4 h-4" />} label="Subscriptions" />
           <NavItem to="/admin/affiliates" icon={<Users className="w-4 h-4" />} label="Affiliates" />
+        </NavGroup>
+
+        {/* Tutoring */}
+        <NavGroup label="Tutoring" icon={<GraduationCap className="w-4 h-4" />} defaultOpen={isTutoringSection}>
+          <NavItem to="/admin/tutoring" icon={<UserCheck className="w-4 h-4" />} label="Directory" />
+          <NavItem to="/admin/teacher-bonuses" icon={<Gift className="w-4 h-4" />} label="Teacher Bonuses" />
         </NavGroup>
       </nav>
 
