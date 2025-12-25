@@ -43,6 +43,7 @@ const teacherNavItems = [
   { path: '/teacher/assessments', label: 'Assessments', icon: FileText },
   { path: '/teacher/grading', label: 'Grading', icon: ClipboardCheck, badge: true },
   { path: '/teacher/classes', label: 'Classes', icon: FolderOpen },
+  { path: '/teacher/whiteboard', label: 'Whiteboard', icon: PenTool },
 ];
 
 // Parent navigation items
