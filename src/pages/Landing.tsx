@@ -1616,7 +1616,7 @@ export function LandingPage() {
       {/* ========================================== */}
       {/* FREE TRIAL SECTION */}
       {/* ========================================== */}
-      <section className="relative py-32 overflow-hidden">
+      <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-emerald-950/30 to-slate-950" />
         <GradientOrb className="w-[500px] h-[500px] bg-emerald-500/30 -left-32 top-0" delay={0} />
         <GradientOrb className="w-[400px] h-[400px] bg-cyan-500/30 -right-32 bottom-0" delay={2} />
@@ -1640,41 +1640,41 @@ export function LandingPage() {
         </div>
 
         <div className="relative max-w-6xl mx-auto px-4">
-          <div className="relative glass rounded-3xl p-8 md:p-12 overflow-hidden">
+          <div className="relative glass rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-12 overflow-hidden">
             {/* Gradient border effect */}
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 opacity-20" />
-            <div className="absolute inset-[1px] rounded-3xl bg-slate-900/95" />
+            <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 opacity-20" />
+            <div className="absolute inset-[1px] rounded-2xl sm:rounded-3xl bg-slate-900/95" />
 
-            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
+            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8 sm:gap-10 lg:gap-12">
               {/* Left side - Content */}
               <div className="flex-1 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full text-emerald-400 text-sm font-medium mb-6">
-                  <Gift className="w-4 h-4" />
+                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full text-emerald-400 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+                  <Gift className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   Limited Time Offer
                 </div>
 
-                <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-6">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-4 sm:mb-6">
                   Start Your{' '}
-                  <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent block sm:inline">
                     {TRIAL_CONFIG.label}
                   </span>
                 </h2>
 
-                <p className="text-xl text-white/70 mb-8 leading-relaxed">
+                <p className="text-sm sm:text-base lg:text-xl text-white/70 mb-6 sm:mb-8 leading-relaxed">
                   Experience all premium features absolutely free. No credit card required.
-                  Cancel anytime. Your success journey starts here!
+                  Cancel anytime.
                 </p>
 
-                <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-6 sm:mb-8">
                   {[
                     { icon: Brain, text: 'AI Tutoring' },
                     { icon: PenTool, text: 'Essay Grading' },
                     { icon: Library, text: 'Full E-Library' },
                     { icon: Trophy, text: 'Competitions' },
                   ].map((item) => (
-                    <div key={item.text} className="flex items-center gap-2 text-white/80">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                        <item.icon className="w-4 h-4 text-emerald-400" />
+                    <div key={item.text} className="flex items-center gap-1.5 sm:gap-2 text-white/80 text-xs sm:text-sm lg:text-base">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-md sm:rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                        <item.icon className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-400" />
                       </div>
                       <span>{item.text}</span>
                     </div>
@@ -1683,35 +1683,35 @@ export function LandingPage() {
 
                 <button
                   onClick={() => handleOpenAuth('register')}
-                  className="group relative inline-flex items-center gap-3"
+                  className="group relative inline-flex items-center gap-2 sm:gap-3"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-all" />
-                  <div className="relative flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full font-semibold text-white text-lg shadow-2xl shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all hover:scale-105">
-                    <Rocket className="w-5 h-5" />
+                  <div className="relative flex items-center gap-2 sm:gap-3 px-5 sm:px-6 lg:px-8 py-3 sm:py-3.5 lg:py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full font-semibold text-white text-sm sm:text-base lg:text-lg shadow-2xl shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all hover:scale-105">
+                    <Rocket className="w-4 h-4 sm:w-5 sm:h-5" />
                     Start Free Trial
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </button>
               </div>
 
               {/* Right side - Visual */}
               <div className="flex-shrink-0 relative">
-                <div className="relative w-64 h-64 md:w-80 md:h-80">
+                <div className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80">
                   {/* Rotating ring */}
                   <div className="absolute inset-0 rounded-full border-2 border-dashed border-emerald-500/30 animate-spin-slow" />
-                  <div className="absolute inset-4 rounded-full border-2 border-dashed border-cyan-500/30 animate-spin-slow" style={{ animationDirection: 'reverse' }} />
+                  <div className="absolute inset-3 sm:inset-4 rounded-full border-2 border-dashed border-cyan-500/30 animate-spin-slow" style={{ animationDirection: 'reverse' }} />
 
                   {/* Center content */}
-                  <div className="absolute inset-8 rounded-full bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 backdrop-blur-xl flex flex-col items-center justify-center">
-                    <div className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                  <div className="absolute inset-6 sm:inset-8 rounded-full bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 backdrop-blur-xl flex flex-col items-center justify-center">
+                    <div className="text-5xl sm:text-6xl md:text-7xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
                       14
                     </div>
-                    <div className="text-xl text-white/80 font-medium">Days Free</div>
-                    <div className="text-sm text-white/50 mt-1">Full Access</div>
+                    <div className="text-base sm:text-lg md:text-xl text-white/80 font-medium">Days Free</div>
+                    <div className="text-xs sm:text-sm text-white/50 mt-0.5 sm:mt-1">Full Access</div>
                   </div>
 
                   {/* Floating badges */}
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-amber-500 rounded-full text-white text-sm font-semibold shadow-lg animate-bounce">
+                  <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 px-2.5 sm:px-4 py-1 sm:py-2 bg-amber-500 rounded-full text-white text-xs sm:text-sm font-semibold shadow-lg animate-bounce whitespace-nowrap">
                     No Credit Card!
                   </div>
                 </div>
