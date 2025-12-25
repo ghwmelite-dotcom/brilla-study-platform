@@ -16,6 +16,19 @@ export interface ExamType {
   color?: string;
 }
 
+export interface UserExamPreference {
+  id: string;
+  examTypeId: string;
+  isPrimary: boolean;
+  targetYear?: number;
+  // Joined exam type data
+  name?: string;
+  slug?: ExamTypeSlug;
+  description?: string;
+  icon?: string;
+  color?: string;
+}
+
 export interface SubjectCategory {
   id: string;
   examTypeId: string;

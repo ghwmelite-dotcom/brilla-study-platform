@@ -163,6 +163,9 @@ interface RegisterData {
   selectedTierId?: string;
   // Turnstile token for bot protection
   turnstileToken?: string;
+  // Exam type preferences (for students and teachers)
+  examTypeIds?: string[];
+  primaryExamTypeId?: string;
 }
 
 // Storage keys (simulating database for fallback/demo)
@@ -185,11 +188,6 @@ const loadPendingUsersFromStorage = (): PendingUser[] => {
   } catch {
     return [];
   }
-};
-
-// Helper to save pending users to localStorage
-const savePendingUsersToStorage = (users: PendingUser[]) => {
-  localStorage.setItem(PENDING_USERS_KEY, JSON.stringify(users));
 };
 
 // Helper to load all users from localStorage
@@ -421,22 +419,12 @@ export const useAuthStore = create<AuthState>()(
       register: async (data) => {
         set({ isLoading: true, error: null });
         try {
-          // Simulate API delay
-          await new Promise(resolve => setTimeout(resolve, 800));
-
-          // Check if email already exists
-          const existingPending = loadPendingUsersFromStorage();
-          if (existingPending.some(u => u.email === data.email)) {
-            throw new Error('An account with this email already exists.');
-          }
-
-          // Create pending user
-          const newPendingUser: PendingUser = {
-            id: `pending_${Date.now()}`,
+          // Call the API to register user
+          const response = await api.post<{ success: boolean; message: string; status?: string }>('/auth/register', {
             email: data.email,
+            password: data.password,
             name: data.name,
             role: data.role,
-            status: 'pending',
             schoolLevel: data.schoolLevel,
             yearGroup: data.yearGroup,
             schoolName: data.schoolName,
@@ -447,21 +435,19 @@ export const useAuthStore = create<AuthState>()(
             qualifications: data.qualifications,
             adminCode: data.adminCode,
             selectedTierId: data.selectedTierId,
-            registeredAt: new Date().toISOString(),
-            createdAt: new Date().toISOString(),
-          };
-
-          // Save to "database" (localStorage)
-          const updatedPending = [...existingPending, newPendingUser];
-          savePendingUsersToStorage(updatedPending);
+            turnstileToken: data.turnstileToken,
+            // Include exam type preferences
+            examTypeIds: data.examTypeIds,
+            primaryExamTypeId: data.primaryExamTypeId,
+          });
 
           set({ isLoading: false });
 
-          // Return status info
+          // Return status info from API response
           return {
             success: true,
-            status: 'pending' as UserStatus,
-            message: 'Your registration is pending approval. You will be notified once an administrator reviews your application.',
+            status: (response.data?.status || 'pending') as UserStatus,
+            message: response.data?.message || 'Your registration is pending approval. You will be notified once an administrator reviews your application.',
           };
         } catch (error) {
           set({

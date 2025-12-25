@@ -88,6 +88,15 @@ export const authService = {
     name: string;
     house?: string;
     yearGroup?: number;
+    schoolLevel?: string;
+    schoolName?: string;
+    role?: string;
+    teacherLicenseNumber?: string;
+    subjectsTaught?: string[];
+    yearsExperience?: string;
+    qualifications?: string;
+    examTypeIds?: string[];
+    primaryExamTypeId?: string;
   }) {
     return api.post<{ user: unknown; token: string }>('/auth/register', data);
   },
@@ -98,6 +107,73 @@ export const authService = {
 
   async getCurrentUser() {
     return api.get('/auth/me');
+  },
+};
+
+// Exam types service functions
+export const examService = {
+  async getExamTypes() {
+    return api.get<Array<{
+      id: string;
+      name: string;
+      slug: string;
+      description?: string;
+      icon?: string;
+      color?: string;
+      display_order: number;
+    }>>('/exam-types');
+  },
+
+  async getMyExamPreferences() {
+    const response = await api.get<{
+      preferences: Array<{
+        id: string;
+        examTypeId: string;
+        isPrimary: boolean;
+        targetYear?: number;
+        name: string;
+        slug: string;
+        description?: string;
+        icon?: string;
+        color?: string;
+      }>;
+      primaryExamTypeId: string | null;
+    }>('/users/me/exam-preferences');
+
+    // Return unwrapped data - api.get already returns the data object
+    return response;
+  },
+
+  async setMyExamPreferences(data: {
+    examTypeIds: string[];
+    primaryExamTypeId: string;
+  }) {
+    return api.post<{ message: string }>('/users/me/exam-preferences', data);
+  },
+
+  // Admin endpoints
+  async getUserExamPreferences(userId: string) {
+    return api.get<{
+      preferences: Array<{
+        id: string;
+        examTypeId: string;
+        isPrimary: boolean;
+        targetYear?: number;
+        name: string;
+        slug: string;
+        description?: string;
+        icon?: string;
+        color?: string;
+      }>;
+      primaryExamTypeId: string | null;
+    }>(`/admin/users/${userId}/exam-preferences`);
+  },
+
+  async setUserExamPreferences(userId: string, data: {
+    examTypeIds: string[];
+    primaryExamTypeId: string;
+  }) {
+    return api.post<{ message: string }>(`/admin/users/${userId}/exam-preferences`, data);
   },
 };
 

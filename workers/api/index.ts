@@ -917,7 +917,7 @@ publicApp.post('/auth/register', async (c) => {
   const body = await c.req.json();
   const { email, password, name, role, schoolLevel, yearGroup, schoolName, house,
           teacherLicenseNumber, subjectsTaught, yearsExperience, qualifications,
-          selectedTierId, turnstileToken } = body;
+          selectedTierId, turnstileToken, examTypeIds, primaryExamTypeId } = body;
   const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
 
   // Rate limiting - check IP-based limit for registrations
@@ -991,6 +991,27 @@ publicApp.post('/auth/register', async (c) => {
       yearsExperience || null, qualifications || null,
       selectedTierId || null
     ).run();
+
+    // Create exam type preferences if provided
+    if (examTypeIds && Array.isArray(examTypeIds) && examTypeIds.length > 0) {
+      const actualPrimaryId = primaryExamTypeId || examTypeIds[0];
+
+      // Update primary_exam_type_id in users table
+      await c.env.DB.prepare(`
+        UPDATE users SET primary_exam_type_id = ? WHERE id = ?
+      `).bind(actualPrimaryId, id).run();
+
+      // Insert exam preferences
+      for (const examTypeId of examTypeIds) {
+        const prefId = `pref_${id}_${examTypeId}_${Date.now()}`;
+        const isPrimary = examTypeId === actualPrimaryId ? 1 : 0;
+
+        await c.env.DB.prepare(`
+          INSERT INTO user_exam_preferences (id, user_id, exam_type_id, is_primary)
+          VALUES (?, ?, ?, ?)
+        `).bind(prefId, id, examTypeId, isPrimary).run();
+      }
+    }
 
     // Notify all admin users about the new registration
     try {
@@ -1570,6 +1591,23 @@ publicApp.post('/auth/reset-demo-passwords', async (c) => {
   } catch (error) {
     console.error('Demo reset error:', error);
     return c.json({ success: false, error: 'Reset failed' }, 500);
+  }
+});
+
+// Get all active exam types
+publicApp.get('/exam-types', async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT id, name, slug, description, icon, color, display_order
+      FROM exam_types
+      WHERE is_active = 1
+      ORDER BY display_order
+    `).all();
+
+    return c.json({ success: true, data: results });
+  } catch (error) {
+    console.error('Error fetching exam types:', error);
+    return c.json({ success: false, error: 'Failed to fetch exam types' }, 500);
   }
 });
 
@@ -3989,6 +4027,96 @@ protectedApp.delete('/users/me/avatar', userAuth, async (c) => {
   }
 });
 
+// Get user's exam type preferences
+protectedApp.get('/users/me/exam-preferences', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT uep.id, uep.exam_type_id as examTypeId, uep.is_primary as isPrimary,
+             uep.target_year as targetYear,
+             et.name, et.slug, et.description, et.icon, et.color
+      FROM user_exam_preferences uep
+      JOIN exam_types et ON uep.exam_type_id = et.id
+      WHERE uep.user_id = ?
+      ORDER BY uep.is_primary DESC, et.display_order
+    `).bind(user.userId).all();
+
+    // Get primary exam type from users table
+    const userData = await c.env.DB.prepare(`
+      SELECT primary_exam_type_id FROM users WHERE id = ?
+    `).bind(user.userId).first();
+
+    return c.json({
+      success: true,
+      data: {
+        preferences: results,
+        primaryExamTypeId: userData?.primary_exam_type_id || null
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching exam preferences:', error);
+    return c.json({ success: false, error: 'Failed to fetch exam preferences' }, 500);
+  }
+});
+
+// Set/update user's exam type preferences
+protectedApp.post('/users/me/exam-preferences', userAuth, async (c) => {
+  const user = c.get('user') as UserPayload;
+  const { examTypeIds, primaryExamTypeId } = await c.req.json();
+
+  // Validate input
+  if (!examTypeIds || !Array.isArray(examTypeIds) || examTypeIds.length === 0) {
+    return c.json({ success: false, error: 'At least one exam type is required' }, 400);
+  }
+
+  if (!primaryExamTypeId || !examTypeIds.includes(primaryExamTypeId)) {
+    return c.json({ success: false, error: 'Primary exam type must be one of the selected exam types' }, 400);
+  }
+
+  try {
+    // Verify all exam types exist
+    const placeholders = examTypeIds.map(() => '?').join(',');
+    const { results: validExamTypes } = await c.env.DB.prepare(`
+      SELECT id FROM exam_types WHERE id IN (${placeholders}) AND is_active = 1
+    `).bind(...examTypeIds).all();
+
+    if (validExamTypes.length !== examTypeIds.length) {
+      return c.json({ success: false, error: 'One or more invalid exam types' }, 400);
+    }
+
+    // Delete existing preferences
+    await c.env.DB.prepare(`
+      DELETE FROM user_exam_preferences WHERE user_id = ?
+    `).bind(user.userId).run();
+
+    // Insert new preferences
+    for (const examTypeId of examTypeIds) {
+      const prefId = `pref_${user.userId}_${examTypeId}_${Date.now()}`;
+      const isPrimary = examTypeId === primaryExamTypeId ? 1 : 0;
+
+      await c.env.DB.prepare(`
+        INSERT INTO user_exam_preferences (id, user_id, exam_type_id, is_primary)
+        VALUES (?, ?, ?, ?)
+      `).bind(prefId, user.userId, examTypeId, isPrimary).run();
+    }
+
+    // Update primary_exam_type_id in users table
+    await c.env.DB.prepare(`
+      UPDATE users SET primary_exam_type_id = ?, updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(primaryExamTypeId, user.userId).run();
+
+    return c.json({
+      success: true,
+      data: { message: 'Exam preferences updated successfully' }
+    });
+  } catch (error) {
+    console.error('Error updating exam preferences:', error);
+    return c.json({ success: false, error: 'Failed to update exam preferences' }, 500);
+  }
+});
+
 // Change password
 protectedApp.post('/users/me/change-password', userAuth, async (c) => {
   const user = c.get('user') as UserPayload;
@@ -5670,6 +5798,101 @@ adminApp.post('/users/:id/reject', async (c) => {
     return c.json({ success: true, data: { message: 'User rejected' } });
   } catch (error) {
     return c.json({ success: false, error: 'Failed to reject user' }, 500);
+  }
+});
+
+// Get user's exam preferences (admin)
+adminApp.get('/users/:userId/exam-preferences', async (c) => {
+  const { userId } = c.req.param();
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT uep.id, uep.exam_type_id as examTypeId, uep.is_primary as isPrimary,
+             uep.target_year as targetYear,
+             et.name, et.slug, et.description, et.icon, et.color
+      FROM user_exam_preferences uep
+      JOIN exam_types et ON uep.exam_type_id = et.id
+      WHERE uep.user_id = ?
+      ORDER BY uep.is_primary DESC, et.display_order
+    `).bind(userId).all();
+
+    const userData = await c.env.DB.prepare(`
+      SELECT primary_exam_type_id FROM users WHERE id = ?
+    `).bind(userId).first();
+
+    return c.json({
+      success: true,
+      data: {
+        preferences: results,
+        primaryExamTypeId: userData?.primary_exam_type_id || null
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching user exam preferences:', error);
+    return c.json({ success: false, error: 'Failed to fetch exam preferences' }, 500);
+  }
+});
+
+// Set user's exam preferences (admin)
+adminApp.post('/users/:userId/exam-preferences', async (c) => {
+  const { userId } = c.req.param();
+  const { examTypeIds, primaryExamTypeId } = await c.req.json();
+
+  // Validate input
+  if (!examTypeIds || !Array.isArray(examTypeIds) || examTypeIds.length === 0) {
+    return c.json({ success: false, error: 'At least one exam type is required' }, 400);
+  }
+
+  if (!primaryExamTypeId || !examTypeIds.includes(primaryExamTypeId)) {
+    return c.json({ success: false, error: 'Primary exam type must be one of the selected exam types' }, 400);
+  }
+
+  try {
+    // Verify user exists
+    const user = await c.env.DB.prepare('SELECT id FROM users WHERE id = ?').bind(userId).first();
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    // Verify all exam types exist
+    const placeholders = examTypeIds.map(() => '?').join(',');
+    const { results: validExamTypes } = await c.env.DB.prepare(`
+      SELECT id FROM exam_types WHERE id IN (${placeholders}) AND is_active = 1
+    `).bind(...examTypeIds).all();
+
+    if (validExamTypes.length !== examTypeIds.length) {
+      return c.json({ success: false, error: 'One or more invalid exam types' }, 400);
+    }
+
+    // Delete existing preferences
+    await c.env.DB.prepare(`
+      DELETE FROM user_exam_preferences WHERE user_id = ?
+    `).bind(userId).run();
+
+    // Insert new preferences
+    for (const examTypeId of examTypeIds) {
+      const prefId = `pref_${userId}_${examTypeId}_${Date.now()}`;
+      const isPrimary = examTypeId === primaryExamTypeId ? 1 : 0;
+
+      await c.env.DB.prepare(`
+        INSERT INTO user_exam_preferences (id, user_id, exam_type_id, is_primary)
+        VALUES (?, ?, ?, ?)
+      `).bind(prefId, userId, examTypeId, isPrimary).run();
+    }
+
+    // Update primary_exam_type_id in users table
+    await c.env.DB.prepare(`
+      UPDATE users SET primary_exam_type_id = ?, updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(primaryExamTypeId, userId).run();
+
+    return c.json({
+      success: true,
+      data: { message: 'Exam preferences updated successfully' }
+    });
+  } catch (error) {
+    console.error('Error updating user exam preferences:', error);
+    return c.json({ success: false, error: 'Failed to update exam preferences' }, 500);
   }
 });
 

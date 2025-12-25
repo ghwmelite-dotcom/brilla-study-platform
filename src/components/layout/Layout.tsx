@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
@@ -6,6 +6,8 @@ import { Footer } from './Footer';
 import { MobileBottomNav } from './MobileBottomNav';
 import { AiTutor, AiButton } from '@/components/ai';
 import { ChatButton, ChatSidebar } from '@/components/chat';
+import { useAuthStore } from '@/stores/authStore';
+import { useExamPreferencesStore } from '@/stores/examPreferencesStore';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -13,6 +15,21 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { isAuthenticated, user } = useAuthStore();
+  const { loadPreferences, loadExamTypes } = useExamPreferencesStore();
+
+  // Load exam types and user preferences on mount when authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      // Load available exam types
+      loadExamTypes();
+
+      // Load user's exam preferences (students and teachers have preferences)
+      if (user.role === 'student' || user.role === 'teacher') {
+        loadPreferences();
+      }
+    }
+  }, [isAuthenticated, user?.id, loadExamTypes, loadPreferences]);
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -22,6 +22,8 @@ import {
 import { useAuthStore, type ManagedUser } from '@/stores/authStore';
 import { cn } from '@/utils';
 import type { SchoolLevel } from '@/types';
+import { ExamTypeSelector } from '@/components/auth/ExamTypeSelector';
+import { examService } from '@/services/api';
 
 interface EditUserModalProps {
   isOpen: boolean;
@@ -54,6 +56,11 @@ export function EditUserModal({ isOpen, user, onClose, onSuccess }: EditUserModa
   const [yearsExperience, setYearsExperience] = useState('');
   const [qualifications, setQualifications] = useState('');
 
+  // Exam type preferences (for students and teachers)
+  const [selectedExamTypes, setSelectedExamTypes] = useState<string[]>([]);
+  const [primaryExamType, setPrimaryExamType] = useState('');
+  const [isLoadingExamPrefs, setIsLoadingExamPrefs] = useState(false);
+
   // Populate form when user changes
   useEffect(() => {
     if (user) {
@@ -69,6 +76,27 @@ export function EditUserModal({ isOpen, user, onClose, onSuccess }: EditUserModa
       setQualifications(user.qualifications || '');
       setFormErrors({});
       setSuccessMessage('');
+
+      // Load exam preferences for students and teachers
+      if (user.role === 'student' || user.role === 'teacher') {
+        setIsLoadingExamPrefs(true);
+        examService.getUserExamPreferences(user.id)
+          .then((data) => {
+            const examTypeIds = data.preferences.map(p => p.examTypeId);
+            setSelectedExamTypes(examTypeIds);
+            setPrimaryExamType(data.primaryExamTypeId || examTypeIds[0] || '');
+          })
+          .catch((err) => {
+            console.error('Failed to load exam preferences:', err);
+            // Set defaults if loading fails
+            setSelectedExamTypes([]);
+            setPrimaryExamType('');
+          })
+          .finally(() => setIsLoadingExamPrefs(false));
+      } else {
+        setSelectedExamTypes([]);
+        setPrimaryExamType('');
+      }
     }
   }, [user]);
 
@@ -140,6 +168,15 @@ export function EditUserModal({ isOpen, user, onClose, onSuccess }: EditUserModa
       }
 
       await updateUser(user.id, updates);
+
+      // Update exam preferences for students and teachers
+      if ((user.role === 'student' || user.role === 'teacher') && selectedExamTypes.length > 0) {
+        await examService.setUserExamPreferences(user.id, {
+          examTypeIds: selectedExamTypes,
+          primaryExamTypeId: primaryExamType || selectedExamTypes[0],
+        });
+      }
+
       setSuccessMessage('User updated successfully!');
 
       setTimeout(() => {
@@ -434,6 +471,28 @@ export function EditUserModal({ isOpen, user, onClose, onSuccess }: EditUserModa
                     <option value="Yellow House">Yellow House</option>
                   </select>
                 </div>
+
+                {/* Exam Type Preferences */}
+                <div className="pt-4 border-t border-neutral-100">
+                  {isLoadingExamPrefs ? (
+                    <div className="flex items-center gap-2 text-neutral-500 text-sm">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Loading exam preferences...
+                    </div>
+                  ) : (
+                    <ExamTypeSelector
+                      schoolLevel={schoolLevel === 'jss' ? 'jhs' : 'shs'}
+                      selectedExamTypes={selectedExamTypes}
+                      primaryExamType={primaryExamType}
+                      onChange={(examTypeIds, primaryId) => {
+                        setSelectedExamTypes(examTypeIds);
+                        setPrimaryExamType(primaryId);
+                      }}
+                      allowAll={true}
+                      error={formErrors.examTypes}
+                    />
+                  )}
+                </div>
               </>
             )}
 
@@ -534,6 +593,29 @@ export function EditUserModal({ isOpen, user, onClose, onSuccess }: EditUserModa
                       className="w-full pl-10 pr-4 py-2.5 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"
                     />
                   </div>
+                </div>
+
+                {/* Exam Types Taught */}
+                <div className="pt-4 border-t border-neutral-100">
+                  {isLoadingExamPrefs ? (
+                    <div className="flex items-center gap-2 text-neutral-500 text-sm">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Loading exam preferences...
+                    </div>
+                  ) : (
+                    <ExamTypeSelector
+                      schoolLevel="shs"
+                      selectedExamTypes={selectedExamTypes}
+                      primaryExamType={primaryExamType}
+                      onChange={(examTypeIds, primaryId) => {
+                        setSelectedExamTypes(examTypeIds);
+                        setPrimaryExamType(primaryId);
+                      }}
+                      isTeacher={true}
+                      allowAll={true}
+                      error={formErrors.examTypes}
+                    />
+                  )}
                 </div>
               </>
             )}

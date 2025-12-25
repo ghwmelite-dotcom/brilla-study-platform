@@ -27,6 +27,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/utils';
 import { PlanSelectionStep } from './PlanSelectionStep';
 import { Turnstile, useTurnstile } from '@/components/common/Turnstile';
+import { ExamTypeSelector } from './ExamTypeSelector';
 
 type AuthMode = 'login' | 'register';
 type UserRole = 'student' | 'teacher' | 'admin' | 'parent';
@@ -77,6 +78,8 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
         setAdminCode('');
         setPhoneNumber('');
         setParentInviteCode('');
+        setSelectedExamTypes([]);
+        setPrimaryExamType('');
         setFormErrors({});
         setSelectedRole(null);
         setSelectedTierId(null);
@@ -125,6 +128,10 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
   const [phoneNumber, setPhoneNumber] = useState('');
   const [parentInviteCode, setParentInviteCode] = useState('');
 
+  // Exam type preferences (for students and teachers)
+  const [selectedExamTypes, setSelectedExamTypes] = useState<string[]>([]);
+  const [primaryExamType, setPrimaryExamType] = useState('');
+
   const resetForm = () => {
     setEmail('');
     setPassword('');
@@ -141,6 +148,8 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
     setAdminCode('');
     setPhoneNumber('');
     setParentInviteCode('');
+    setSelectedExamTypes([]);
+    setPrimaryExamType('');
     setFormErrors({});
     setSelectedRole(null);
     setSelectedTierId(null);
@@ -300,6 +309,13 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           inviteCode: selectedRole === 'parent' && parentInviteCode ? parentInviteCode : undefined,
           selectedTierId: selectedTierId || undefined,
           turnstileToken: turnstile.token,
+          // Include exam type preferences for students and teachers
+          examTypeIds: (selectedRole === 'student' || selectedRole === 'teacher') && selectedExamTypes.length > 0
+            ? selectedExamTypes
+            : undefined,
+          primaryExamTypeId: (selectedRole === 'student' || selectedRole === 'teacher') && primaryExamType
+            ? primaryExamType
+            : undefined,
         });
 
         // Show pending approval message
@@ -714,6 +730,20 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                         </div>
                       )}
 
+                      {/* Exam Type Selection */}
+                      {schoolLevel && (
+                        <ExamTypeSelector
+                          schoolLevel={schoolLevel === 'jss' ? 'jhs' : 'shs'}
+                          selectedExamTypes={selectedExamTypes}
+                          primaryExamType={primaryExamType}
+                          onChange={(examTypeIds, primaryId) => {
+                            setSelectedExamTypes(examTypeIds);
+                            setPrimaryExamType(primaryId);
+                          }}
+                          error={formErrors.examTypes}
+                        />
+                      )}
+
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-1">
                           School Name
@@ -861,6 +891,19 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                           />
                         </div>
                       </div>
+
+                      {/* Exam Types Taught */}
+                      <ExamTypeSelector
+                        schoolLevel="shs"
+                        selectedExamTypes={selectedExamTypes}
+                        primaryExamType={primaryExamType}
+                        onChange={(examTypeIds, primaryId) => {
+                          setSelectedExamTypes(examTypeIds);
+                          setPrimaryExamType(primaryId);
+                        }}
+                        isTeacher={true}
+                        error={formErrors.examTypes}
+                      />
                     </>
                   )}
 

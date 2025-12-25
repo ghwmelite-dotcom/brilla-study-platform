@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronDown, Trophy, GraduationCap, BookOpen, Check } from 'lucide-react';
 import { useExamStore } from '@/stores/examStore';
+import { useExamPreferencesStore } from '@/stores/examPreferencesStore';
 import type { ExamTypeSlug } from '@/types';
 
 const EXAM_CONFIG: Record<ExamTypeSlug, { name: string; shortName: string; icon: typeof Trophy; color: string; bgColor: string }> = {
@@ -27,10 +28,29 @@ const EXAM_CONFIG: Record<ExamTypeSlug, { name: string; shortName: string; icon:
   },
 };
 
+// Map exam type IDs to slugs
+const EXAM_ID_TO_SLUG: Record<string, ExamTypeSlug> = {
+  'exam_bece': 'bece',
+  'exam_wassce': 'wassce',
+  'exam_nsmq': 'nsmq',
+};
+
 export function ExamModeSwitcher() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { currentExamType, setExamType, isLoading } = useExamStore();
+  const { preferences, setActiveExamType } = useExamPreferencesStore();
+
+  // Get user's available exam type slugs from preferences
+  const userExamSlugs = preferences
+    .map(p => EXAM_ID_TO_SLUG[p.examTypeId])
+    .filter(Boolean) as ExamTypeSlug[];
+
+  // If user has preferences, filter to only show their exam types
+  // Otherwise show all exam types (for admins, new users without preferences, etc.)
+  const availableExamTypes = userExamSlugs.length > 0
+    ? userExamSlugs
+    : (Object.keys(EXAM_CONFIG) as ExamTypeSlug[]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -49,9 +69,28 @@ export function ExamModeSwitcher() {
   const handleSelect = async (examType: ExamTypeSlug) => {
     if (examType !== currentExamType) {
       await setExamType(examType);
+      // Also update the preferences store active exam type
+      const examTypeId = Object.entries(EXAM_ID_TO_SLUG).find(([_, slug]) => slug === examType)?.[0];
+      if (examTypeId) {
+        setActiveExamType(examTypeId);
+      }
     }
     setIsOpen(false);
   };
+
+  // If user only has one exam type, show as static badge (no dropdown)
+  if (availableExamTypes.length === 1) {
+    return (
+      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-neutral-200 bg-neutral-50">
+        <div className={`p-1 rounded ${currentConfig.bgColor}`}>
+          <CurrentIcon className={`w-4 h-4 ${currentConfig.color}`} />
+        </div>
+        <span className="font-medium text-sm text-neutral-700">
+          {currentConfig.shortName}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -81,14 +120,15 @@ export function ExamModeSwitcher() {
             </p>
           </div>
 
-          {Object.entries(EXAM_CONFIG).map(([slug, config]) => {
+          {availableExamTypes.map((slug) => {
+            const config = EXAM_CONFIG[slug];
             const Icon = config.icon;
             const isSelected = currentExamType === slug;
 
             return (
               <button
                 key={slug}
-                onClick={() => handleSelect(slug as ExamTypeSlug)}
+                onClick={() => handleSelect(slug)}
                 className={`
                   w-full flex items-center gap-3 px-3 py-2.5 text-left
                   hover:bg-neutral-50 transition-colors
