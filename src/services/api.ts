@@ -6,10 +6,26 @@ class ApiClient {
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
+    // Load token from localStorage on init (sync with @/lib/api)
+    this.token = localStorage.getItem('brilla_token');
   }
 
   setToken(token: string | null) {
     this.token = token;
+    // Also sync to localStorage (like @/lib/api does)
+    if (token) {
+      localStorage.setItem('brilla_token', token);
+    } else {
+      localStorage.removeItem('brilla_token');
+    }
+  }
+
+  // Get token - check localStorage if not set (for page refreshes)
+  private getToken(): string | null {
+    if (!this.token) {
+      this.token = localStorage.getItem('brilla_token');
+    }
+    return this.token;
   }
 
   private async request<T>(
@@ -23,8 +39,9 @@ class ApiClient {
       ...options.headers,
     };
 
-    if (this.token) {
-      (headers as Record<string, string>)['Authorization'] = `Bearer ${this.token}`;
+    const token = this.getToken();
+    if (token) {
+      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
     }
 
     const response = await fetch(url, {
@@ -537,5 +554,185 @@ export const whiteboardsService = {
   // Duplicate a whiteboard
   async duplicate(id: string) {
     return api.post<WhiteboardData>(`/whiteboards/${id}/duplicate`);
+  },
+};
+
+// Tutoring Marketplace service
+export const tutoringService = {
+  // Directory - Public
+  async getDirectory(params?: {
+    search?: string;
+    subjectId?: string;
+    sessionType?: string;
+    minRating?: number;
+    minRate?: number;
+    maxRate?: number;
+    sortBy?: string;
+    page?: number;
+    pageSize?: number;
+  }) {
+    const queryParams = new URLSearchParams();
+    if (params?.search) queryParams.set('search', params.search);
+    if (params?.subjectId) queryParams.set('subjectId', params.subjectId);
+    if (params?.sessionType) queryParams.set('sessionType', params.sessionType);
+    if (params?.minRating) queryParams.set('minRating', params.minRating.toString());
+    if (params?.minRate) queryParams.set('minRate', params.minRate.toString());
+    if (params?.maxRate) queryParams.set('maxRate', params.maxRate.toString());
+    if (params?.sortBy) queryParams.set('sortBy', params.sortBy);
+    if (params?.page) queryParams.set('page', params.page.toString());
+    if (params?.pageSize) queryParams.set('pageSize', params.pageSize.toString());
+    const query = queryParams.toString();
+    return api.get(`/tutoring/directory${query ? `?${query}` : ''}`);
+  },
+
+  async getTeacherProfile(id: string) {
+    return api.get(`/tutoring/directory/${id}`);
+  },
+
+  async getTeacherReviews(id: string, page = 1) {
+    return api.get(`/tutoring/directory/${id}/reviews?page=${page}`);
+  },
+
+  // Student requests
+  async createRequest(data: {
+    teacherProfileId: string;
+    subjectId: string;
+    topicDescription?: string;
+    sessionType: string;
+    proposedDatetime: string;
+    proposedDuration?: number;
+    alternativeDatetime?: string;
+    message?: string;
+  }) {
+    return api.post('/tutoring/requests', data);
+  },
+
+  async getMyRequests(status?: string) {
+    const query = status ? `?status=${status}` : '';
+    return api.get(`/tutoring/requests${query}`);
+  },
+
+  async cancelRequest(requestId: string) {
+    return api.post(`/tutoring/requests/${requestId}/cancel`);
+  },
+
+  // Sessions
+  async getMySessions(upcoming = false) {
+    const query = upcoming ? '?upcoming=true' : '';
+    return api.get(`/tutoring/sessions${query}`);
+  },
+
+  async submitReview(sessionId: string, data: {
+    rating: number;
+    title?: string;
+    reviewText?: string;
+    knowledgeRating?: number;
+    communicationRating?: number;
+    punctualityRating?: number;
+    patienceRating?: number;
+  }) {
+    return api.post(`/tutoring/sessions/${sessionId}/review`, data);
+  },
+
+  // Teacher profile
+  async getMyTeacherProfile() {
+    return api.get('/tutoring/teacher/profile');
+  },
+
+  async saveTeacherProfile(data: {
+    displayName: string;
+    bio?: string;
+    profilePhotoUrl?: string;
+    bannerImageUrl?: string;
+    tagline?: string;
+    teachingStyle?: string;
+    educationBackground?: string[];
+    subjects: Array<{ subjectId: string; subjectName: string; level: string; description?: string }>;
+    sessionTypes: string[];
+    hourlyRate: number;
+    availability?: Record<string, Array<{ start: string; end: string }>>;
+    timezone?: string;
+  }) {
+    return api.post('/tutoring/teacher/profile', data);
+  },
+
+  async submitProfileForApproval() {
+    return api.post('/tutoring/teacher/profile/submit');
+  },
+
+  // Teacher request management
+  async acceptRequest(requestId: string, data?: { response?: string; confirmedDatetime?: string; confirmedDuration?: number }) {
+    return api.post(`/tutoring/teacher/requests/${requestId}/accept`, data || {});
+  },
+
+  async declineRequest(requestId: string, reason?: string) {
+    return api.post(`/tutoring/teacher/requests/${requestId}/decline`, { reason });
+  },
+
+  // Teacher earnings
+  async getTeacherEarnings() {
+    return api.get('/tutoring/teacher/earnings');
+  },
+
+  async updatePayoutDetails(data: {
+    mobileMoneyNumber?: string;
+    mobileMoneyProvider?: string;
+    bankAccountNumber?: string;
+    bankName?: string;
+    bankAccountName?: string;
+    preferredPayoutMethod?: string;
+  }) {
+    return api.put('/tutoring/teacher/payout-details', data);
+  },
+
+  async respondToReview(reviewId: string, response: string) {
+    return api.post(`/tutoring/teacher/reviews/${reviewId}/respond`, { response });
+  },
+};
+
+// Teacher Bonus service
+export const teacherBonusService = {
+  async getMyBonusStatus() {
+    return api.get('/teacher-bonuses/my-status');
+  },
+
+  async getMyReferredStudents(year: number) {
+    return api.get(`/teacher-bonuses/my-students/${year}`);
+  },
+
+  async getBonusConfig() {
+    return api.get('/teacher-bonuses/config');
+  },
+
+  // Admin endpoints
+  async listBonuses(params?: { year?: number; status?: string; page?: number; pageSize?: number }) {
+    const queryParams = new URLSearchParams();
+    if (params?.year) queryParams.set('year', params.year.toString());
+    if (params?.status) queryParams.set('status', params.status);
+    if (params?.page) queryParams.set('page', params.page.toString());
+    if (params?.pageSize) queryParams.set('pageSize', params.pageSize.toString());
+    const query = queryParams.toString();
+    return api.get(`/teacher-bonuses/admin/list${query ? `?${query}` : ''}`);
+  },
+
+  async calculateBonuses(year?: number) {
+    return api.post('/teacher-bonuses/admin/calculate', { year });
+  },
+
+  async approveBonus(bonusId: string, notes?: string) {
+    return api.post(`/teacher-bonuses/admin/${bonusId}/approve`, { notes });
+  },
+
+  async rejectBonus(bonusId: string, reason: string) {
+    return api.post(`/teacher-bonuses/admin/${bonusId}/reject`, { reason });
+  },
+
+  async processPayout(bonusId: string) {
+    return api.post(`/teacher-bonuses/admin/${bonusId}/payout`);
+  },
+
+  async getBonusStats(year?: number) {
+    const query = year ? `?year=${year}` : '';
+    return api.get(`/teacher-bonuses/admin/stats${query}`);
   },
 };
