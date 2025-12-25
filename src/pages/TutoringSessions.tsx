@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Clock,
   CheckCircle,
@@ -12,8 +12,11 @@ import {
   AlertCircle,
   Play,
   Star,
+  CreditCard,
 } from 'lucide-react';
 import { useTutoringStore } from '@/stores/tutoringStore';
+import { tutoringService } from '@/services/api';
+import { ReviewForm } from '@/components/tutoring/ReviewForm';
 import type { TutoringSession, SessionType } from '@/types/tutoring';
 
 const sessionTypeConfig: Record<SessionType, { icon: React.ReactNode; label: string }> = {
@@ -31,7 +34,15 @@ const statusConfig: Record<string, { icon: React.ReactNode; label: string; color
   no_show: { icon: <XCircle className="w-4 h-4" />, label: 'No Show', color: 'bg-neutral-100 text-neutral-600' },
 };
 
-function SessionCard({ session, onJoin, onReview }: { session: TutoringSession; onJoin: () => void; onReview: () => void }) {
+interface SessionCardProps {
+  session: TutoringSession;
+  onJoin: () => void;
+  onReview: () => void;
+  onPay: () => void;
+  isPaymentLoading: boolean;
+}
+
+function SessionCard({ session, onJoin, onReview, onPay, isPaymentLoading }: SessionCardProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -44,7 +55,9 @@ function SessionCard({ session, onJoin, onReview }: { session: TutoringSession; 
   };
 
   const status = statusConfig[session.status] || statusConfig.scheduled;
-  const canJoin = session.status === 'scheduled' || session.status === 'in_progress';
+  const needsPayment = session.status === 'scheduled' && session.paymentStatus !== 'paid';
+  const isPaid = session.paymentStatus === 'paid';
+  const canJoin = (session.status === 'scheduled' || session.status === 'in_progress') && isPaid;
   const needsReview = session.status === 'completed' && !session.studentReviewed;
 
   // Check if session is starting soon (within 15 minutes)
@@ -71,17 +84,30 @@ function SessionCard({ session, onJoin, onReview }: { session: TutoringSession; 
             <p className="text-sm text-neutral-500">{session.subjectName}</p>
           </div>
         </div>
-        <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${status.color}`}>
-          {status.icon}
-          {status.label}
-        </span>
+        <div className="flex flex-col items-end gap-1">
+          <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${status.color}`}>
+            {status.icon}
+            {status.label}
+          </span>
+          {needsPayment && (
+            <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+              Payment Required
+            </span>
+          )}
+          {isPaid && (
+            <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium flex items-center gap-1">
+              <CheckCircle className="w-3 h-3" />
+              Paid
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2 text-sm">
         <div className="flex items-center gap-2 text-neutral-600">
           <Calendar className="w-4 h-4" />
           <span>{formatDate(session.scheduledDatetime)}</span>
-          {isStartingSoon && (
+          {isStartingSoon && isPaid && (
             <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
               Starting Soon
             </span>
@@ -100,6 +126,20 @@ function SessionCard({ session, onJoin, onReview }: { session: TutoringSession; 
           <span className="text-lg font-bold text-blue-600">GH₵{session.sessionCost.toFixed(2)}</span>
         </div>
         <div className="flex gap-2">
+          {needsPayment && (
+            <button
+              onClick={onPay}
+              disabled={isPaymentLoading}
+              className="px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-1"
+            >
+              {isPaymentLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <CreditCard className="w-4 h-4" />
+              )}
+              Pay Now
+            </button>
+          )}
           {canJoin && (
             <button
               onClick={onJoin}
@@ -126,10 +166,43 @@ function SessionCard({ session, onJoin, onReview }: { session: TutoringSession; 
 
 export default function TutoringSessions() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { mySessions, isLoadingSessions, error, loadMySessions } = useTutoringStore();
   const isLoading = isLoadingSessions;
   const [filter, setFilter] = useState<'upcoming' | 'completed' | 'all'>('upcoming');
   const [showReviewModal, setShowReviewModal] = useState<TutoringSession | null>(null);
+  const [paymentLoading, setPaymentLoading] = useState<string | null>(null);
+  const [paymentMessage, setPaymentMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Handle payment verification from Paystack redirect
+  useEffect(() => {
+    const payment = searchParams.get('payment');
+    const reference = searchParams.get('ref') || searchParams.get('reference');
+
+    if (payment === 'verify' && reference) {
+      verifyPayment(reference);
+      // Clear query params
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
+
+  const verifyPayment = async (reference: string) => {
+    try {
+      setPaymentMessage({ type: 'success', text: 'Verifying payment...' });
+      const result = await tutoringService.verifyPayment(reference);
+      if (result.status === 'paid') {
+        setPaymentMessage({ type: 'success', text: 'Payment successful! Your session is confirmed.' });
+        loadMySessions(); // Refresh sessions
+      } else {
+        setPaymentMessage({ type: 'error', text: result.message || 'Payment verification failed' });
+      }
+    } catch (err) {
+      setPaymentMessage({ type: 'error', text: err instanceof Error ? err.message : 'Payment verification failed' });
+    }
+
+    // Clear message after 5 seconds
+    setTimeout(() => setPaymentMessage(null), 5000);
+  };
 
   useEffect(() => {
     loadMySessions();
@@ -147,6 +220,26 @@ export default function TutoringSessions() {
 
   const upcomingCount = mySessions.filter((s) => s.status === 'scheduled' || s.status === 'in_progress').length;
   const completedCount = mySessions.filter((s) => s.status === 'completed').length;
+
+  const handlePaySession = async (session: TutoringSession) => {
+    setPaymentLoading(session.id);
+    setPaymentMessage(null);
+
+    try {
+      const result = await tutoringService.initializePayment(session.id);
+
+      if (result.authorizationUrl) {
+        // Redirect to Paystack
+        window.location.href = result.authorizationUrl;
+      } else {
+        setPaymentMessage({ type: 'error', text: 'Failed to initialize payment' });
+      }
+    } catch (err) {
+      setPaymentMessage({ type: 'error', text: err instanceof Error ? err.message : 'Payment failed' });
+    } finally {
+      setPaymentLoading(null);
+    }
+  };
 
   const handleJoinSession = (session: TutoringSession) => {
     // Navigate to appropriate session type
@@ -177,6 +270,22 @@ export default function TutoringSessions() {
             View Requests
           </Link>
         </div>
+
+        {/* Payment Message */}
+        {paymentMessage && (
+          <div className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
+            paymentMessage.type === 'success'
+              ? 'bg-green-50 border border-green-200 text-green-700'
+              : 'bg-red-50 border border-red-200 text-red-700'
+          }`}>
+            {paymentMessage.type === 'success' ? (
+              <CheckCircle className="w-5 h-5" />
+            ) : (
+              <AlertCircle className="w-5 h-5" />
+            )}
+            <span>{paymentMessage.text}</span>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-6">
@@ -255,31 +364,26 @@ export default function TutoringSessions() {
                 session={session}
                 onJoin={() => handleJoinSession(session)}
                 onReview={() => setShowReviewModal(session)}
+                onPay={() => handlePaySession(session)}
+                isPaymentLoading={paymentLoading === session.id}
               />
             ))}
           </div>
         )}
       </div>
 
-      {/* Review Modal - simplified for now */}
+      {/* Review Modal */}
       {showReviewModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
-            <h3 className="text-lg font-semibold mb-4">Review Your Session</h3>
-            <p className="text-neutral-600 mb-4">
-              How was your session with {showReviewModal.teacherName}?
-            </p>
-            <p className="text-sm text-neutral-500 mb-4">
-              Review feature coming soon!
-            </p>
-            <button
-              onClick={() => setShowReviewModal(null)}
-              className="w-full py-2 bg-neutral-100 text-neutral-700 rounded-lg hover:bg-neutral-200"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        <ReviewForm
+          session={showReviewModal}
+          isOpen={!!showReviewModal}
+          onClose={() => setShowReviewModal(null)}
+          onSuccess={() => {
+            loadMySessions();
+            setPaymentMessage({ type: 'success', text: 'Thank you for your review!' });
+            setTimeout(() => setPaymentMessage(null), 3000);
+          }}
+        />
       )}
     </div>
   );
