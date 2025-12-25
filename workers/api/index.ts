@@ -13,6 +13,8 @@ import { subscriptionsApp } from './subscriptions';
 import { affiliatesApp } from './affiliates';
 import { recordingsApp } from './recordings';
 import { whiteboardsApp } from './whiteboards';
+import { teacherBonusesRouter } from './teacher-bonuses';
+import { tutoringRouter } from './tutoring';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -9120,6 +9122,12 @@ app.route('/api/affiliates', affiliatesApp);
 // Mount Recordings routes (whiteboard recordings)
 app.route('/api/recordings', recordingsApp);
 app.route('/api/whiteboards', whiteboardsApp);
+
+// Mount Teacher Bonuses routes
+app.route('/api/teacher-bonuses', teacherBonusesRouter);
+
+// Mount Tutoring Marketplace routes
+app.route('/api/tutoring', tutoringRouter);
 
 // Mount protected routes (must be after all protectedApp routes are defined)
 app.route('/api', protectedApp);

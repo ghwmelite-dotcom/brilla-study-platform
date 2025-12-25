@@ -1985,3 +1985,6 @@ export interface AffiliateCampaign {
   isActive: boolean;
   bannerImage?: string;
 }
+
+// Tutoring Marketplace & Teacher Bonus Types
+export * from './tutoring';

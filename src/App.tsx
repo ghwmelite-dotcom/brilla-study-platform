@@ -32,6 +32,8 @@ const HouseCupPage = lazy(() => import('@/pages/HouseCup').then(m => ({ default:
 const AnalyticsPage = lazy(() => import('@/pages/Analytics').then(m => ({ default: m.AnalyticsPage })));
 const BattlePage = lazy(() => import('@/pages/Battle').then(m => ({ default: m.BattlePage })));
 const PastPapersPage = lazy(() => import('@/pages/PastPapers').then(m => ({ default: m.PastPapers })));
+const TakePaper = lazy(() => import('@/pages/TakePaper'));
+const PaperResults = lazy(() => import('@/pages/PaperResults'));
 const EssayPracticePage = lazy(() => import('@/pages/EssayPractice').then(m => ({ default: m.EssayPracticePage })));
 const ContentManagementPage = lazy(() => import('@/pages/ContentManagement').then(m => ({ default: m.ContentManagementPage })));
 const MockExamsPage = lazy(() => import('@/pages/MockExams').then(m => ({ default: m.MockExamsPage })));
@@ -83,6 +85,14 @@ const AffiliatePage = lazy(() => import('@/pages/Affiliate'));
 const PaymentCallbackPage = lazy(() => import('@/pages/PaymentCallback'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicy'));
 const TermsOfServicePage = lazy(() => import('@/pages/TermsOfService'));
+
+// Tutoring marketplace pages (lazy loaded)
+const TeacherDirectory = lazy(() => import('@/pages/TeacherDirectory'));
+const TeacherPublicProfile = lazy(() => import('@/pages/TeacherPublicProfile'));
+const TeacherDirectorySetup = lazy(() => import('@/pages/TeacherDirectorySetup'));
+const TutoringRequests = lazy(() => import('@/pages/TutoringRequests'));
+const TutoringSessions = lazy(() => import('@/pages/TutoringSessions'));
+const TeacherTutoringDashboard = lazy(() => import('@/pages/TeacherTutoringDashboard'));
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -551,16 +561,24 @@ function App() {
             path="past-papers/:paperId"
             element={
               <ProtectedRoute>
-                <LazyPage><PastPapersPage /></LazyPage>
+                <LazyPage><TakePaper /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="past-papers/results/:attemptId"
+            element={
+              <ProtectedRoute>
+                <LazyPage><PaperResults /></LazyPage>
               </ProtectedRoute>
             }
           />
           <Route path="mock-exams" element={<LazyPage><MockExamsPage /></LazyPage>} />
           <Route
-            path="mock-exams/:examId"
+            path="mock-exams/:paperId"
             element={
               <ProtectedRoute>
-                <LazyPage><MockExamsPage /></LazyPage>
+                <LazyPage><TakePaper /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -646,6 +664,26 @@ function App() {
             element={
               <ProtectedRoute>
                 <LazyPage><AffiliatePage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Tutoring Marketplace routes */}
+          <Route path="tutors" element={<LazyPage><TeacherDirectory /></LazyPage>} />
+          <Route path="tutors/:id" element={<LazyPage><TeacherPublicProfile /></LazyPage>} />
+          <Route
+            path="tutoring/requests"
+            element={
+              <ProtectedRoute>
+                <LazyPage><TutoringRequests /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="tutoring/sessions"
+            element={
+              <ProtectedRoute>
+                <LazyPage><TutoringSessions /></LazyPage>
               </ProtectedRoute>
             }
           />
@@ -803,6 +841,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <LazyPage><RecordingViewer /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="teacher/directory-profile"
+            element={
+              <ProtectedRoute>
+                <LazyPage><TeacherDirectorySetup /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="teacher/tutoring"
+            element={
+              <ProtectedRoute>
+                <LazyPage><TeacherTutoringDashboard /></LazyPage>
               </ProtectedRoute>
             }
           />
