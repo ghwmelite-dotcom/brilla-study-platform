@@ -39,6 +39,12 @@ import {
   Rocket,
   BadgeCheck,
   PartyPopper,
+  VideoIcon,
+  Presentation,
+  Calendar,
+  Wallet,
+  Percent,
+  Search,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { AuthModal } from '@/components/auth';
@@ -1553,6 +1559,118 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ========================================== */}
+      {/* TUTORING MARKETPLACE SECTION */}
+      {/* ========================================== */}
+      <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-cyan-950/20 to-slate-950" />
+        <GradientOrb className="w-[500px] h-[500px] bg-cyan-500/20 -right-48 top-1/4" delay={0} />
+        <GradientOrb className="w-[400px] h-[400px] bg-teal-500/20 -left-32 bottom-1/4" delay={2} />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-cyan-500/20 to-teal-500/20 border border-cyan-500/30 rounded-full text-cyan-400 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+              <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              Private Tutoring
+            </span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-display font-bold text-white mb-4 sm:mb-6">
+              Find Your{' '}
+              <span className="bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">
+                Perfect Tutor
+              </span>
+            </h2>
+            <p className="text-sm sm:text-base lg:text-xl text-white/60 max-w-3xl mx-auto">
+              Connect with expert teachers for personalized 1-on-1 tutoring sessions via video call, chat, or interactive whiteboard.
+            </p>
+          </div>
+
+          {/* Session Types */}
+          <div className="grid sm:grid-cols-3 gap-4 sm:gap-6 mb-12 sm:mb-16">
+            <Card3D>
+              <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 text-center hover:bg-white/10 transition-all h-full">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                  <VideoIcon className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Video Calls</h3>
+                <p className="text-white/60 text-sm sm:text-base">
+                  Face-to-face sessions with screen sharing for interactive learning
+                </p>
+              </div>
+            </Card3D>
+
+            <Card3D>
+              <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 text-center hover:bg-white/10 transition-all h-full">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                  <MessageCircle className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Live Chat</h3>
+                <p className="text-white/60 text-sm sm:text-base">
+                  Quick text-based tutoring for homework help and questions
+                </p>
+              </div>
+            </Card3D>
+
+            <Card3D>
+              <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 text-center hover:bg-white/10 transition-all h-full sm:col-span-1">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                  <Presentation className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Whiteboard</h3>
+                <p className="text-white/60 text-sm sm:text-base">
+                  Interactive whiteboard for math and science problem solving
+                </p>
+              </div>
+            </Card3D>
+          </div>
+
+          {/* How It Works */}
+          <div className="glass rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 mb-12 sm:mb-16">
+            <h3 className="text-xl sm:text-2xl font-bold text-white text-center mb-8 sm:mb-10">
+              How It Works
+            </h3>
+            <div className="grid sm:grid-cols-4 gap-6 sm:gap-4">
+              {[
+                { step: '1', icon: Search, title: 'Browse Tutors', desc: 'Explore verified teachers by subject and rating' },
+                { step: '2', icon: Calendar, title: 'Book Session', desc: 'Request a session at your preferred time' },
+                { step: '3', icon: VideoIcon, title: 'Learn Together', desc: 'Connect via video, chat, or whiteboard' },
+                { step: '4', icon: Star, title: 'Rate & Review', desc: 'Share feedback to help others find great tutors' },
+              ].map((item, i) => (
+                <div key={item.step} className="relative text-center">
+                  {i < 3 && (
+                    <div className="hidden sm:block absolute top-8 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-cyan-500/50 to-transparent" />
+                  )}
+                  <div className="relative z-10">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-cyan-500/20 to-teal-500/20 border-2 border-cyan-500/30 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                      <item.icon className="w-6 h-6 sm:w-7 sm:h-7 text-cyan-400" />
+                    </div>
+                    <h4 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2">{item.title}</h4>
+                    <p className="text-white/50 text-xs sm:text-sm">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center">
+            <Link
+              to="/tutors"
+              className="group relative inline-flex items-center gap-2 sm:gap-3"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-all" />
+              <div className="relative flex items-center gap-2 sm:gap-3 px-6 sm:px-8 lg:px-10 py-3 sm:py-4 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full font-semibold text-white text-sm sm:text-base lg:text-lg shadow-2xl hover:shadow-cyan-500/40 transition-all hover:scale-105">
+                <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+                Browse Tutors
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+            <p className="mt-3 sm:mt-4 text-white/50 text-sm sm:text-base">
+              Verified teachers with ratings and reviews
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials Section */}
       <section
         ref={testimonialsRef.ref}
@@ -1847,6 +1965,187 @@ export function LandingPage() {
       </section>
 
       {/* ========================================== */}
+      {/* TEACH & EARN SECTION (For Teachers) */}
+      {/* ========================================== */}
+      <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-amber-950/20 to-slate-950" />
+        <GradientOrb className="w-[500px] h-[500px] bg-amber-500/20 -left-48 top-0" delay={0} />
+        <GradientOrb className="w-[400px] h-[400px] bg-orange-500/20 -right-32 bottom-0" delay={2} />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-full text-amber-400 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+              <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              For Teachers
+            </span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-display font-bold text-white mb-4 sm:mb-6">
+              Teach & Earn{' '}
+              <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                Extra Income
+              </span>
+            </h2>
+            <p className="text-sm sm:text-base lg:text-xl text-white/60 max-w-3xl mx-auto">
+              Join Brilla's tutoring marketplace and year-end bonus program to earn while you teach.
+            </p>
+          </div>
+
+          {/* Two Earning Paths */}
+          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-16">
+            {/* Private Tutoring */}
+            <Card3D>
+              <div className="relative glass rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 h-full overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center shadow-xl">
+                      <GraduationCap className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-white">Private Tutoring</h3>
+                      <p className="text-white/50 text-sm sm:text-base">Tutoring Marketplace</p>
+                    </div>
+                  </div>
+
+                  <p className="text-white/70 text-sm sm:text-base mb-6 leading-relaxed">
+                    List your profile in our tutor directory and connect with students seeking personalized help in your subjects.
+                  </p>
+
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center gap-3 text-white/80">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                        <Percent className="w-4 h-4 text-emerald-400" />
+                      </div>
+                      <span className="text-sm sm:text-base">Keep <span className="text-emerald-400 font-semibold">85%</span> of session fees</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-white/80">
+                      <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                        <VideoIcon className="w-4 h-4 text-blue-400" />
+                      </div>
+                      <span className="text-sm sm:text-base">Video, chat, or whiteboard sessions</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-white/80">
+                      <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-4 h-4 text-purple-400" />
+                      </div>
+                      <span className="text-sm sm:text-base">Set your own schedule & rates</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-white/80">
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                        <Star className="w-4 h-4 text-amber-400" />
+                      </div>
+                      <span className="text-sm sm:text-base">Build reputation with reviews</span>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-500/10 to-teal-500/10 border border-cyan-500/20">
+                    <p className="text-center">
+                      <span className="text-2xl sm:text-3xl font-bold text-cyan-400">GHS 50-200</span>
+                      <span className="text-white/60 text-sm sm:text-base"> /hour typical</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Card3D>
+
+            {/* Year-End Bonus */}
+            <Card3D>
+              <div className="relative glass rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 h-full overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                {/* Hot badge */}
+                <div className="absolute -top-0 -right-0">
+                  <div className="px-3 py-1 bg-gradient-to-r from-rose-500 to-pink-500 rounded-bl-xl rounded-tr-2xl text-white text-xs font-semibold flex items-center gap-1">
+                    <Flame className="w-3 h-3" />
+                    NEW
+                  </div>
+                </div>
+
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-xl">
+                      <Gift className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-white">Year-End Bonus</h3>
+                      <p className="text-white/50 text-sm sm:text-base">Student Referral Program</p>
+                    </div>
+                  </div>
+
+                  <p className="text-white/70 text-sm sm:text-base mb-6 leading-relaxed">
+                    Refer your students to Brilla Prep and earn a percentage of their annual subscription payments at year-end.
+                  </p>
+
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center gap-3 text-white/80">
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                        <Trophy className="w-4 h-4 text-amber-400" />
+                      </div>
+                      <span className="text-sm sm:text-base">Earn <span className="text-amber-400 font-semibold">15-35%</span> based on referrals</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-white/80">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                        <TrendingUp className="w-4 h-4 text-emerald-400" />
+                      </div>
+                      <span className="text-sm sm:text-base">Higher tier = higher bonus rate</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-white/80">
+                      <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                        <Users className="w-4 h-4 text-blue-400" />
+                      </div>
+                      <span className="text-sm sm:text-base">5+ active students to qualify</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-white/80">
+                      <div className="w-8 h-8 rounded-lg bg-rose-500/20 flex items-center justify-center flex-shrink-0">
+                        <DollarSign className="w-4 h-4 text-rose-400" />
+                      </div>
+                      <span className="text-sm sm:text-base">Paid via Mobile Money</span>
+                    </div>
+                  </div>
+
+                  {/* Tier preview */}
+                  <div className="p-4 rounded-xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+                    <div className="grid grid-cols-5 gap-1 sm:gap-2 text-center">
+                      {[
+                        { refs: '5-10', rate: '15%' },
+                        { refs: '11-20', rate: '20%' },
+                        { refs: '21-35', rate: '25%' },
+                        { refs: '36-50', rate: '30%' },
+                        { refs: '51+', rate: '35%' },
+                      ].map((tier) => (
+                        <div key={tier.refs}>
+                          <div className="text-amber-400 font-bold text-xs sm:text-sm">{tier.rate}</div>
+                          <div className="text-white/40 text-[10px] sm:text-xs">{tier.refs}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card3D>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center">
+            <button
+              onClick={() => handleOpenAuth('register')}
+              className="group relative inline-flex items-center gap-2 sm:gap-3"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-all" />
+              <div className="relative flex items-center gap-2 sm:gap-3 px-6 sm:px-8 lg:px-10 py-3 sm:py-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full font-semibold text-white text-sm sm:text-base lg:text-lg shadow-2xl hover:shadow-amber-500/40 transition-all hover:scale-105">
+                <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5" />
+                Join as Teacher
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </button>
+            <p className="mt-3 sm:mt-4 text-white/50 text-sm sm:text-base">
+              Start earning today with Brilla's teacher programs
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================== */}
       {/* AFFILIATE PROGRAM SECTION */}
       {/* ========================================== */}
       <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
@@ -2057,16 +2356,17 @@ export function LandingPage() {
                 <li><Link to="/topics" className="hover:text-white transition">Topics</Link></li>
                 <li><Link to="/practice" className="hover:text-white transition">Practice</Link></li>
                 <li><Link to="/past-papers" className="hover:text-white transition">Past Papers</Link></li>
-                <li><Link to="/leaderboard" className="hover:text-white transition">Leaderboard</Link></li>
+                <li><Link to="/tutors" className="hover:text-white transition">Find a Tutor</Link></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold text-white text-sm sm:text-base mb-3 sm:mb-4">Exams</h4>
+              <h4 className="font-semibold text-white text-sm sm:text-base mb-3 sm:mb-4">Exams & More</h4>
               <ul className="space-y-2 sm:space-y-3 text-white/50 text-sm sm:text-base">
                 <li><Link to="/competition" className="hover:text-white transition">NSMQ Prep</Link></li>
                 <li><Link to="/past-papers" className="hover:text-white transition">WASSCE Prep</Link></li>
                 <li><Link to="/past-papers" className="hover:text-white transition">BECE Prep</Link></li>
+                <li><Link to="/affiliate" className="hover:text-white transition">Earn as Affiliate</Link></li>
               </ul>
             </div>
 
