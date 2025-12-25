@@ -2032,29 +2032,29 @@ export function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative bg-slate-950 border-t border-white/5 py-16">
+      <footer className="relative bg-slate-950 border-t border-white/5 py-10 sm:py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-12 mb-8 sm:mb-12">
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">B</span>
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-lg sm:text-xl">B</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-display font-bold text-2xl text-white leading-tight">Brilla Prep</span>
-                  <span className="text-[10px] text-white/50 tracking-wider">Prepare. Excel. Succeed.</span>
+                  <span className="font-display font-bold text-xl sm:text-2xl text-white leading-tight">Brilla Prep</span>
+                  <span className="text-[9px] sm:text-[10px] text-white/50 tracking-wider">Prepare. Excel. Succeed.</span>
                 </div>
               </div>
-              <p className="text-white/50 leading-relaxed">
+              <p className="text-white/50 text-sm sm:text-base leading-relaxed">
                 Ace your BECE, WASSCE, and NSMQ. Master Mathematics, Physics, Chemistry, and Biology with confidence.
               </p>
             </div>
 
             {/* Links */}
             <div>
-              <h4 className="font-semibold text-white mb-4">Platform</h4>
-              <ul className="space-y-3 text-white/50">
+              <h4 className="font-semibold text-white text-sm sm:text-base mb-3 sm:mb-4">Platform</h4>
+              <ul className="space-y-2 sm:space-y-3 text-white/50 text-sm sm:text-base">
                 <li><Link to="/topics" className="hover:text-white transition">Topics</Link></li>
                 <li><Link to="/practice" className="hover:text-white transition">Practice</Link></li>
                 <li><Link to="/past-papers" className="hover:text-white transition">Past Papers</Link></li>
@@ -2063,8 +2063,8 @@ export function LandingPage() {
             </div>
 
             <div>
-              <h4 className="font-semibold text-white mb-4">Exams</h4>
-              <ul className="space-y-3 text-white/50">
+              <h4 className="font-semibold text-white text-sm sm:text-base mb-3 sm:mb-4">Exams</h4>
+              <ul className="space-y-2 sm:space-y-3 text-white/50 text-sm sm:text-base">
                 <li><Link to="/competition" className="hover:text-white transition">NSMQ Prep</Link></li>
                 <li><Link to="/past-papers" className="hover:text-white transition">WASSCE Prep</Link></li>
                 <li><Link to="/past-papers" className="hover:text-white transition">BECE Prep</Link></li>
@@ -2072,8 +2072,8 @@ export function LandingPage() {
             </div>
 
             <div>
-              <h4 className="font-semibold text-white mb-4">Support</h4>
-              <ul className="space-y-3 text-white/50">
+              <h4 className="font-semibold text-white text-sm sm:text-base mb-3 sm:mb-4">Support</h4>
+              <ul className="space-y-2 sm:space-y-3 text-white/50 text-sm sm:text-base">
                 <li><Link to="/help" className="hover:text-white transition">Help Center</Link></li>
                 <li><a href={`mailto:${SITE_CONFIG.supportEmail}`} className="hover:text-white transition cursor-pointer">Contact Us</a></li>
                 <li><Link to="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
@@ -2082,12 +2082,12 @@ export function LandingPage() {
             </div>
           </div>
 
-          <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-white/60">
+          <div className="border-t border-white/5 pt-6 sm:pt-8 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
+            <p className="text-white/60 text-xs sm:text-sm text-center md:text-left">
               &copy; {new Date().getFullYear()} Brilla Prep. All rights reserved.
             </p>
-            <p className="text-white/60 flex items-center gap-1">
-              Empowering champions <Heart className="w-4 h-4 text-accent fill-accent" aria-hidden="true" /> one question at a time
+            <p className="text-white/60 text-xs sm:text-sm flex items-center gap-1">
+              Empowering champions <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent fill-accent" aria-hidden="true" /> one question at a time
             </p>
           </div>
         </div>
