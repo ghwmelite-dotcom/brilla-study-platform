@@ -37,13 +37,17 @@ import { useAuthStore, useExamStore, useChatStore, useProgressStore, useParentSt
 import { SubjectNavigation } from '@/components/subjects';
 import { ExamModeSwitcher } from '@/components/exam';
 
-// Teacher navigation items
+// Teacher navigation items - Main
 const teacherNavItems = [
   { path: '/teacher', label: 'Teacher Dashboard', icon: LayoutDashboard },
+  { path: '/teacher/classes', label: 'My Classes', icon: FolderOpen },
+];
+
+// Teacher navigation items - Teaching Tools (for tutoring students)
+const teachingToolsItems = [
+  { path: '/teacher/whiteboard', label: 'Whiteboard', icon: PenTool },
   { path: '/teacher/assessments', label: 'Assessments', icon: FileText },
   { path: '/teacher/grading', label: 'Grading', icon: ClipboardCheck, badge: true },
-  { path: '/teacher/classes', label: 'Classes', icon: FolderOpen },
-  { path: '/teacher/whiteboard', label: 'Whiteboard', icon: PenTool },
 ];
 
 // Parent navigation items
@@ -560,7 +564,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           Content Manager
                         </NavLink>
                       </li>
-                      {/* Teacher Navigation */}
+                      {/* Teacher Main Navigation */}
                       {teacherNavItems.map((item) => (
                         <li key={item.path}>
                           <NavLink
@@ -577,16 +581,50 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           >
                             <item.icon className="w-5 h-5" />
                             <span className="flex-1">{item.label}</span>
-                            {item.badge && gradingPendingCount > 0 && (
-                              <span className="min-w-[20px] h-5 px-1.5 bg-amber-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                                {gradingPendingCount > 99 ? '99+' : gradingPendingCount}
-                              </span>
-                            )}
                           </NavLink>
                         </li>
                       ))}
                     </>
                   )}
+
+                  {/* Teaching Tools Section - For tutoring students */}
+                  {isTeacherOrAdmin && (
+                    <li className="pt-4 border-t border-neutral-200 mt-4">
+                      <div className="px-3 pb-2">
+                        <h3 className="text-xs font-semibold text-teal-600 uppercase tracking-wider flex items-center gap-2">
+                          <GraduationCap className="w-4 h-4" />
+                          Teaching Tools
+                        </h3>
+                      </div>
+                      <ul className="space-y-1">
+                        {teachingToolsItems.map((item) => (
+                          <li key={item.path}>
+                            <NavLink
+                              to={item.path}
+                              onClick={onClose}
+                              className={({ isActive }) =>
+                                cn(
+                                  'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                                  isActive
+                                    ? 'bg-teal-600 text-white'
+                                    : 'text-neutral-700 hover:bg-teal-50 hover:text-teal-700'
+                                )
+                              }
+                            >
+                              <item.icon className="w-5 h-5" />
+                              <span className="flex-1">{item.label}</span>
+                              {item.badge && gradingPendingCount > 0 && (
+                                <span className="min-w-[20px] h-5 px-1.5 bg-amber-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                                  {gradingPendingCount > 99 ? '99+' : gradingPendingCount}
+                                </span>
+                              )}
+                            </NavLink>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  )}
+
                   {isAdmin && (
                     <>
                       <li>
