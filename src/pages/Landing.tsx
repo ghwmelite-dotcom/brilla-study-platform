@@ -1724,21 +1724,21 @@ export function LandingPage() {
       {/* ========================================== */}
       {/* PRICING PREVIEW SECTION */}
       {/* ========================================== */}
-      <section className="relative py-32 overflow-hidden">
+      <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-slate-950" />
         <GradientOrb className="w-[400px] h-[400px] bg-purple-500/20 -right-32 top-1/4" delay={1} />
 
         <div className="relative max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm font-medium text-white/80 mb-6">
-              <Crown className="w-4 h-4 text-secondary" />
+          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 glass rounded-full text-xs sm:text-sm font-medium text-white/80 mb-4 sm:mb-6">
+              <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-secondary" />
               Simple Pricing
             </span>
-            <h2 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-display font-bold text-white mb-4 sm:mb-6">
               Affordable Plans for{' '}
-              <span className="text-gradient">Everyone</span>
+              <span className="text-gradient block sm:inline">Everyone</span>
             </h2>
-            <p className="text-xl text-white/60 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base lg:text-xl text-white/60 max-w-2xl mx-auto">
               Start free, upgrade when ready. Plans designed for Ghanaian students and teachers.
             </p>
           </div>
@@ -1834,13 +1834,13 @@ export function LandingPage() {
             </div>
           </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-8 sm:mt-10 lg:mt-12">
             <Link
               to="/pricing"
-              className="inline-flex items-center gap-2 text-secondary hover:text-secondary/80 font-medium transition-colors"
+              className="inline-flex items-center gap-1.5 sm:gap-2 text-secondary hover:text-secondary/80 font-medium text-sm sm:text-base transition-colors"
             >
               View full pricing details
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </Link>
           </div>
         </div>
