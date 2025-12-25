@@ -12,6 +12,9 @@ import {
   Loader2,
   BookOpen,
   PenTool,
+  Gift,
+  Video,
+  UserCheck,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { useAssessmentStore } from '@/stores/assessmentStore';
@@ -347,6 +350,54 @@ export default function TeacherDashboard() {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Tutoring & Earnings */}
+        <div className="mt-8 bg-white rounded-xl border border-neutral-200">
+          <div className="p-4 border-b border-neutral-100">
+            <h2 className="font-semibold text-neutral-900">Tutoring & Earnings</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-neutral-100">
+            <Link
+              to="/teacher/tutoring"
+              className="flex items-center gap-4 p-4 hover:bg-neutral-50 transition-colors"
+            >
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Video className="w-5 h-5 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-neutral-900">Tutoring Dashboard</p>
+                <p className="text-sm text-neutral-500">Manage sessions & requests</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-neutral-400" />
+            </Link>
+            <Link
+              to="/teacher/directory-profile"
+              className="flex items-center gap-4 p-4 hover:bg-neutral-50 transition-colors"
+            >
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <UserCheck className="w-5 h-5 text-purple-600" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-neutral-900">Directory Profile</p>
+                <p className="text-sm text-neutral-500">Get listed as a tutor</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-neutral-400" />
+            </Link>
+            <Link
+              to="/teacher/bonus"
+              className="flex items-center gap-4 p-4 hover:bg-neutral-50 transition-colors"
+            >
+              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                <Gift className="w-5 h-5 text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-neutral-900">Year-End Bonus</p>
+                <p className="text-sm text-neutral-500">Earn from referrals</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-neutral-400" />
+            </Link>
           </div>
         </div>
 
