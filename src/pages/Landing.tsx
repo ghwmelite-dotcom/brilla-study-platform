@@ -42,10 +42,44 @@ import {
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { AuthModal } from '@/components/auth';
+import {
+  TRIAL_CONFIG,
+  PRICING_CONFIG,
+  AFFILIATE_CONFIG,
+  ANIMATION_CONFIG,
+  formatRefRange,
+  formatCommissionRate,
+} from '@/config/landing';
 
 // ============================================
 // HOOKS
 // ============================================
+
+// Consolidated scroll state hook - single listener for all scroll-dependent state
+function useScrollState() {
+  const [state, setState] = useState({
+    isHeaderScrolled: false,  // scrollY > 50
+    showFloatingCTA: false,   // scrollY > 500
+  });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setState({
+        isHeaderScrolled: scrollY > 50,
+        showFloatingCTA: scrollY > 500,
+      });
+    };
+
+    // Initial check
+    handleScroll();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return state;
+}
 
 // Intersection observer hook for scroll animations
 function useInView(threshold = 0.1) {
@@ -238,6 +272,8 @@ function TypewriterText({ texts }: { texts: string[] }) {
       const state = stateRef.current;
       const currentWord = texts[state.wordIndex];
 
+      const { typewriter } = ANIMATION_CONFIG;
+
       if (state.isPaused) {
         // After pause, start deleting
         state.isPaused = false;
@@ -253,10 +289,11 @@ function TypewriterText({ texts }: { texts: string[] }) {
         if (state.charIndex >= currentWord.length) {
           // Finished typing, pause to let user read
           state.isPaused = true;
-          return 3000;
+          return typewriter.pauseAfterWord;
         }
         // Human-like typing speed with slight variation
-        return 180 + Math.random() * 80; // 180-260ms per character
+        const { min, max } = typewriter.typingSpeed;
+        return min + Math.random() * (max - min);
       } else {
         // Deleting backward
         state.charIndex--;
@@ -266,9 +303,9 @@ function TypewriterText({ texts }: { texts: string[] }) {
           // Finished deleting, move to next word
           state.isDeleting = false;
           state.wordIndex = (state.wordIndex + 1) % texts.length;
-          return 600; // Pause before next word
+          return typewriter.pauseBeforeNextWord;
         }
-        return 100; // Deleting speed
+        return typewriter.deletingSpeed;
       }
     };
 
@@ -325,20 +362,12 @@ function StatItem({ stat, index, inView }: { stat: typeof stats[0]; index: numbe
 // Landing Header Component
 interface LandingHeaderProps {
   onOpenAuth: (mode: 'login' | 'register') => void;
+  isScrolled: boolean;
 }
 
-function LandingHeader({ onOpenAuth }: LandingHeaderProps) {
-  const [isScrolled, setIsScrolled] = useState(false);
+function LandingHeader({ onOpenAuth, isScrolled }: LandingHeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isInstallable, install } = usePWAInstall();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <header
@@ -518,7 +547,7 @@ function PromoPopup({ onOpenAuth }: { onOpenAuth: (mode: 'login' | 'register') =
               </div>
               <div className="text-left">
                 <p className="text-white/80 text-sm font-medium">Limited Time</p>
-                <p className="text-white text-2xl font-bold">14 Days FREE!</p>
+                <p className="text-white text-2xl font-bold">{TRIAL_CONFIG.shortLabel}</p>
               </div>
             </div>
           </div>
@@ -569,7 +598,7 @@ function PromoPopup({ onOpenAuth }: { onOpenAuth: (mode: 'login' | 'register') =
               <div className="flex items-center justify-center gap-2 text-sm">
                 <Coins className="w-4 h-4 text-amber-400" />
                 <span className="text-white/60">
-                  Earn up to <span className="text-amber-400 font-semibold">50% commission</span> as an affiliate!
+                  Earn up to <span className="text-amber-400 font-semibold">{AFFILIATE_CONFIG.maxCommission}% commission</span> as an affiliate!
                 </span>
               </div>
             </div>
@@ -581,19 +610,12 @@ function PromoPopup({ onOpenAuth }: { onOpenAuth: (mode: 'login' | 'register') =
 }
 
 // Floating CTA Button (appears after scrolling)
-function FloatingCTA({ onOpenAuth }: { onOpenAuth: (mode: 'login' | 'register') => void }) {
-  const [isVisible, setIsVisible] = useState(false);
+interface FloatingCTAProps {
+  onOpenAuth: (mode: 'login' | 'register') => void;
+  isVisible: boolean;
+}
 
-  useEffect(() => {
-    const handleScroll = () => {
-      // Show after scrolling past 500px
-      setIsVisible(window.scrollY > 500);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
+function FloatingCTA({ onOpenAuth, isVisible }: FloatingCTAProps) {
   if (!isVisible) return null;
 
   return (
@@ -605,7 +627,7 @@ function FloatingCTA({ onOpenAuth }: { onOpenAuth: (mode: 'login' | 'register') 
         <div className="absolute inset-0 bg-gradient-to-r from-secondary to-pink-500 rounded-full blur-lg opacity-60 group-hover:opacity-80 transition-all" />
         <div className="relative flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-secondary via-pink-500 to-purple-500 rounded-full font-semibold text-white shadow-2xl hover:scale-105 transition-all">
           <Sparkles className="w-5 h-5" />
-          <span>Start 14-Day Free Trial</span>
+          <span>Start {TRIAL_CONFIG.label}</span>
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </div>
       </button>
@@ -805,6 +827,7 @@ const testimonials = [
 
 export function LandingPage() {
   const mousePosition = useMouseParallax(0.02);
+  const scrollState = useScrollState();
   const heroRef = useInView(0.1);
   const statsRef = useInView(0.3);
   const modesRef = useInView(0.2);
@@ -822,14 +845,17 @@ export function LandingPage() {
   };
 
   // Generate particles (memoized to prevent recreation on every render)
-  const particles = useMemo(() => Array.from({ length: 50 }, (_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    top: `${Math.random() * 100}%`,
-    size: Math.random() * 4 + 2,
-    delay: Math.random() * 5,
-    duration: Math.random() * 10 + 10,
-  })), []);
+  const particles = useMemo(() => {
+    const { count, sizeRange, durationRange } = ANIMATION_CONFIG.particles;
+    return Array.from({ length: count }, (_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      size: Math.random() * (sizeRange.max - sizeRange.min) + sizeRange.min,
+      delay: Math.random() * 5,
+      duration: Math.random() * (durationRange.max - durationRange.min) + durationRange.min,
+    }));
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-950 overflow-x-hidden">
@@ -911,7 +937,7 @@ export function LandingPage() {
       `}</style>
 
       {/* Header */}
-      <LandingHeader onOpenAuth={handleOpenAuth} />
+      <LandingHeader onOpenAuth={handleOpenAuth} isScrolled={scrollState.isHeaderScrolled} />
 
       {/* Auth Modal */}
       <AuthModal
@@ -1118,9 +1144,9 @@ export function LandingPage() {
               </div>
               <div>
                 <p className="text-white font-semibold">
-                  <span className="text-emerald-400">14-Day Free Trial</span>
+                  <span className="text-emerald-400">{TRIAL_CONFIG.label}</span>
                   {' '}+ Earn up to{' '}
-                  <span className="text-secondary">50% Commission</span>
+                  <span className="text-secondary">{AFFILIATE_CONFIG.maxCommission}% Commission</span>
                   {' '}as an Affiliate!
                 </p>
                 <p className="text-white/60 text-sm">No credit card required. Start learning and earning today.</p>
@@ -1631,7 +1657,7 @@ export function LandingPage() {
                 <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-6">
                   Start Your{' '}
                   <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                    14-Day Free Trial
+                    {TRIAL_CONFIG.label}
                   </span>
                 </h2>
 
@@ -1727,8 +1753,8 @@ export function LandingPage() {
               <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
               <p className="text-white/50 mb-6">Get started with basics</p>
               <div className="flex items-baseline mb-8">
-                <span className="text-5xl font-bold text-white">0</span>
-                <span className="text-xl text-white/50 ml-2">GHS</span>
+                <span className="text-5xl font-bold text-white">{PRICING_CONFIG.plans.free.monthlyPrice}</span>
+                <span className="text-xl text-white/50 ml-2">{PRICING_CONFIG.currency}</span>
               </div>
               <ul className="space-y-3 mb-8">
                 {['Unlimited questions', 'Model answers', 'Basic analytics', 'Community access'].map((feature) => (
@@ -1760,10 +1786,10 @@ export function LandingPage() {
               <h3 className="text-2xl font-bold text-white mb-2">Student</h3>
               <p className="text-white/50 mb-6">Full access for students</p>
               <div className="flex items-baseline mb-2">
-                <span className="text-5xl font-bold text-white">50</span>
-                <span className="text-xl text-white/50 ml-2">GHS/mo</span>
+                <span className="text-5xl font-bold text-white">{PRICING_CONFIG.plans.student.monthlyPrice}</span>
+                <span className="text-xl text-white/50 ml-2">{PRICING_CONFIG.currency}/mo</span>
               </div>
-              <p className="text-sm text-emerald-400 mb-8">or 480 GHS/year (save 20%)</p>
+              <p className="text-sm text-emerald-400 mb-8">or {PRICING_CONFIG.plans.student.yearlyPrice} {PRICING_CONFIG.currency}/year (save {PRICING_CONFIG.plans.student.yearlyDiscount}%)</p>
               <ul className="space-y-3 mb-8">
                 {['Everything in Free', 'AI essay grading', 'Full past papers', 'Advanced analytics', 'Priority support'].map((feature) => (
                   <li key={feature} className="flex items-center gap-2 text-white/70">
@@ -1788,10 +1814,10 @@ export function LandingPage() {
               <h3 className="text-2xl font-bold text-white mb-2">Teacher</h3>
               <p className="text-white/50 mb-6">Complete teaching toolkit</p>
               <div className="flex items-baseline mb-2">
-                <span className="text-5xl font-bold text-white">75</span>
-                <span className="text-xl text-white/50 ml-2">GHS/mo</span>
+                <span className="text-5xl font-bold text-white">{PRICING_CONFIG.plans.teacher.monthlyPrice}</span>
+                <span className="text-xl text-white/50 ml-2">{PRICING_CONFIG.currency}/mo</span>
               </div>
-              <p className="text-sm text-emerald-400 mb-8">or 720 GHS/year (save 20%)</p>
+              <p className="text-sm text-emerald-400 mb-8">or {PRICING_CONFIG.plans.teacher.yearlyPrice} {PRICING_CONFIG.currency}/year (save {PRICING_CONFIG.plans.teacher.yearlyDiscount}%)</p>
               <ul className="space-y-3 mb-8">
                 {['Everything in Student', 'Class management', 'Assessment builder', 'Student analytics', 'Bulk grading'].map((feature) => (
                   <li key={feature} className="flex items-center gap-2 text-white/70">
@@ -1843,20 +1869,14 @@ export function LandingPage() {
               {' '}Program
             </h2>
             <p className="text-xl text-white/60 max-w-3xl mx-auto">
-              Share Brilla Prep with friends and earn up to 50% commission on every subscription.
+              Share Brilla Prep with friends and earn up to {AFFILIATE_CONFIG.maxCommission}% commission on every subscription.
               The more you share, the more you earn!
             </p>
           </div>
 
           {/* Commission Tiers */}
           <div className="grid md:grid-cols-5 gap-4 mb-16">
-            {[
-              { rank: 'Scout', icon: '🔰', refs: '1-5', rate: '25%', color: 'from-emerald-500 to-green-600' },
-              { rank: 'Champion', icon: '⚔️', refs: '6-15', rate: '30%', color: 'from-blue-500 to-indigo-600' },
-              { rank: 'Ambassador', icon: '🛡️', refs: '16-30', rate: '40%', color: 'from-purple-500 to-violet-600' },
-              { rank: 'Legend', icon: '👑', refs: '31-50', rate: '50%', color: 'from-amber-500 to-orange-600' },
-              { rank: 'Elite', icon: '💎', refs: '51+', rate: '50%+', color: 'from-pink-500 to-rose-600' },
-            ].map((tier, index) => (
+            {AFFILIATE_CONFIG.tiers.map((tier, index) => (
               <Card3D key={tier.rank}>
                 <div
                   className={cn(
@@ -1874,12 +1894,12 @@ export function LandingPage() {
                   <div className="relative z-10">
                     <div className="text-4xl mb-3">{tier.icon}</div>
                     <h4 className="text-lg font-bold text-white mb-1">{tier.rank}</h4>
-                    <p className="text-white/50 text-sm mb-3">{tier.refs} referrals</p>
+                    <p className="text-white/50 text-sm mb-3">{formatRefRange(tier.minRefs, tier.maxRefs)} referrals</p>
                     <div className={cn(
                       'inline-block px-4 py-2 rounded-full bg-gradient-to-r font-bold text-white',
                       tier.color
                     )}>
-                      {tier.rate}
+                      {formatCommissionRate(tier.rate, tier.bonus)}
                     </div>
                   </div>
                 </div>
@@ -2081,7 +2101,7 @@ export function LandingPage() {
       <PromoPopup onOpenAuth={handleOpenAuth} />
 
       {/* Floating CTA */}
-      <FloatingCTA onOpenAuth={handleOpenAuth} />
+      <FloatingCTA onOpenAuth={handleOpenAuth} isVisible={scrollState.showFloatingCTA} />
     </div>
   );
 }
