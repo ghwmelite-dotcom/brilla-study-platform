@@ -347,14 +347,14 @@ function StatItem({ stat, index, inView }: { stat: typeof stats[0]; index: numbe
       style={{ animationDelay: `${index * 0.1}s` }}
     >
       <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all opacity-0 group-hover:opacity-100" />
-      <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 text-center hover:border-white/20 transition-all">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 mb-4 group-hover:scale-110 transition-transform">
-          <stat.icon className="w-7 h-7 text-secondary" />
+      <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-6 text-center hover:border-white/20 transition-all h-full flex flex-col items-center justify-center">
+        <div className="inline-flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 mb-3 sm:mb-4 group-hover:scale-110 transition-transform">
+          <stat.icon className="w-5 h-5 sm:w-7 sm:h-7 text-secondary" />
         </div>
-        <div className="text-2xl md:text-3xl font-bold text-white mb-1">
+        <div className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-1 leading-tight">
           {stat.text}
         </div>
-        <div className="text-white/70 text-sm">{stat.label}</div>
+        <div className="text-white/70 text-xs sm:text-sm leading-tight">{stat.label}</div>
       </div>
     </div>
   );
@@ -1113,7 +1113,7 @@ export function LandingPage() {
         <GradientOrb className="w-[300px] h-[300px] bg-secondary/30 -right-32 bottom-0" delay={2} />
 
         <div className="relative max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {stats.map((stat, index) => (
               <StatItem
                 key={stat.label}
@@ -1196,12 +1196,12 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {examModes.map((mode, index) => (
               <Card3D key={mode.id}>
                 <div
                   className={cn(
-                    'relative h-full glass rounded-3xl p-8 overflow-hidden group cursor-pointer transition-all duration-500',
+                    'relative h-full glass rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 overflow-hidden group cursor-pointer transition-all duration-500',
                     modesRef.inView ? 'animate-slide-up' : 'opacity-0'
                   )}
                   style={{
@@ -1211,33 +1211,33 @@ export function LandingPage() {
                 >
                   {/* Gradient Border Effect */}
                   <div className={cn(
-                    'absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500',
+                    'absolute inset-0 rounded-2xl sm:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500',
                     'bg-gradient-to-r p-[1px]',
                     mode.color
                   )}>
-                    <div className="w-full h-full bg-slate-950 rounded-3xl" />
+                    <div className="w-full h-full bg-slate-950 rounded-2xl sm:rounded-3xl" />
                   </div>
 
                   {/* Content */}
                   <div className="relative z-10">
                     {/* Icon */}
                     <div className={cn(
-                      'w-20 h-20 rounded-2xl bg-gradient-to-br flex items-center justify-center mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-xl',
+                      'w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-xl sm:rounded-2xl bg-gradient-to-br flex items-center justify-center mb-4 sm:mb-6 lg:mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-xl',
                       mode.color
                     )}>
-                      <mode.icon className="w-10 h-10 text-white" />
+                      <mode.icon className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" />
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-3xl font-bold text-white mb-2">{mode.name}</h3>
-                    <p className="text-white/50 text-sm mb-4">{mode.fullName}</p>
-                    <p className="text-white/70 mb-8">{mode.description}</p>
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1 sm:mb-2">{mode.name}</h3>
+                    <p className="text-white/50 text-xs sm:text-sm mb-2 sm:mb-4">{mode.fullName}</p>
+                    <p className="text-white/70 text-sm sm:text-base mb-4 sm:mb-6 lg:mb-8 line-clamp-3">{mode.description}</p>
 
                     {/* Features */}
-                    <ul className="space-y-3 mb-8">
+                    <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 lg:mb-8">
                       {mode.features.map((feature) => (
-                        <li key={feature} className="flex items-center gap-3 text-white/80">
-                          <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
+                        <li key={feature} className="flex items-center gap-2 sm:gap-3 text-white/80 text-sm sm:text-base">
+                          <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 flex-shrink-0" />
                           <span>{feature}</span>
                         </li>
                       ))}
@@ -1247,12 +1247,12 @@ export function LandingPage() {
                     <button
                       onClick={() => handleOpenAuth('register')}
                       className={cn(
-                        'inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 group/btn',
+                        'inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-white text-sm sm:text-base bg-gradient-to-r transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 group/btn',
                         mode.color
                       )}
                     >
                       Get Started
-                      <ChevronRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover/btn:translate-x-1 transition-transform" />
                     </button>
                   </div>
                 </div>
@@ -1288,24 +1288,24 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
             {features.map((feature, index) => (
               <div
                 key={feature.title}
                 className={cn(
-                  'group glass rounded-2xl p-8 hover:bg-white/10 transition-all duration-300 cursor-pointer',
+                  'group glass rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 hover:bg-white/10 transition-all duration-300 cursor-pointer',
                   featuresRef.inView ? 'animate-slide-up' : 'opacity-0'
                 )}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className={cn(
-                  'w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all shadow-lg',
+                  'w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-lg sm:rounded-xl bg-gradient-to-br flex items-center justify-center mb-3 sm:mb-4 lg:mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all shadow-lg',
                   feature.gradient
                 )}>
-                  <feature.icon className="w-7 h-7 text-white" />
+                  <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                <p className="text-white/60 leading-relaxed">{feature.description}</p>
+                <h3 className="text-sm sm:text-base lg:text-xl font-bold text-white mb-1 sm:mb-2 lg:mb-3 leading-tight">{feature.title}</h3>
+                <p className="text-white/60 text-xs sm:text-sm lg:text-base leading-relaxed line-clamp-3">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -1333,26 +1333,26 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
             {platformCapabilities.map((category, catIndex) => (
               <div
                 key={category.category}
-                className="glass rounded-2xl p-6 hover:bg-white/10 transition-all duration-300"
+                className="glass rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 hover:bg-white/10 transition-all duration-300"
               >
-                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  {catIndex === 0 && <FileText className="w-5 h-5 text-blue-400" />}
-                  {catIndex === 1 && <Brain className="w-5 h-5 text-purple-400" />}
-                  {catIndex === 2 && <Swords className="w-5 h-5 text-amber-400" />}
-                  {catIndex === 3 && <Flame className="w-5 h-5 text-orange-400" />}
-                  {category.category}
+                <h3 className="text-sm sm:text-base lg:text-lg font-bold text-white mb-3 sm:mb-4 flex items-center gap-2">
+                  {catIndex === 0 && <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 flex-shrink-0" />}
+                  {catIndex === 1 && <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400 flex-shrink-0" />}
+                  {catIndex === 2 && <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 flex-shrink-0" />}
+                  {catIndex === 3 && <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400 flex-shrink-0" />}
+                  <span className="leading-tight">{category.category}</span>
                 </h3>
-                <ul className="space-y-3">
+                <ul className="space-y-2 sm:space-y-3">
                   {category.items.map((item) => (
-                    <li key={item.name} className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                    <li key={item.name} className="flex items-start gap-1.5 sm:gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="text-white font-medium text-sm">{item.name}</p>
-                        <p className="text-white/50 text-xs">{item.description}</p>
+                        <p className="text-white font-medium text-xs sm:text-sm leading-tight">{item.name}</p>
+                        <p className="text-white/50 text-[10px] sm:text-xs leading-tight hidden sm:block">{item.description}</p>
                       </div>
                     </li>
                   ))}
@@ -1364,48 +1364,47 @@ export function LandingPage() {
       </section>
 
       {/* E-Library & AI Counselor Highlight */}
-      <section className="relative py-32 overflow-hidden">
+      <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-primary-dark/10 to-slate-950" />
 
         <div className="relative max-w-7xl mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
             {/* E-Library Card */}
             <Card3D>
-              <div className="glass rounded-3xl p-8 h-full group cursor-pointer hover:bg-white/10 transition-all">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
-                    <Library className="w-8 h-8 text-white" />
+              <div className="glass rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 h-full group cursor-pointer hover:bg-white/10 transition-all">
+                <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform flex-shrink-0">
+                    <Library className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white">E-Library</h3>
-                    <p className="text-white/50">Digital Learning Hub</p>
+                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">E-Library</h3>
+                    <p className="text-white/50 text-xs sm:text-sm">Digital Learning Hub</p>
                   </div>
                 </div>
-                <p className="text-white/70 mb-6 leading-relaxed">
-                  Access a rich collection of educational resources including PDF textbooks, video lessons,
-                  audio lectures, and interactive content. Upload, organize, and track your learning progress.
+                <p className="text-white/70 text-sm sm:text-base mb-4 sm:mb-6 leading-relaxed">
+                  Access PDF textbooks, video lessons, audio lectures, and interactive content. Upload and track your progress.
                 </p>
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-6">
                   <div className="flex items-center gap-2 text-white/80">
-                    <FileText className="w-4 h-4 text-red-400" />
-                    <span className="text-sm">PDF Documents</span>
+                    <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-400 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm">PDF Documents</span>
                   </div>
                   <div className="flex items-center gap-2 text-white/80">
-                    <Video className="w-4 h-4 text-purple-400" />
-                    <span className="text-sm">Video Lessons</span>
+                    <Video className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-400 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm">Video Lessons</span>
                   </div>
                   <div className="flex items-center gap-2 text-white/80">
-                    <Headphones className="w-4 h-4 text-green-400" />
-                    <span className="text-sm">Audio Content</span>
+                    <Headphones className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm">Audio Content</span>
                   </div>
                   <div className="flex items-center gap-2 text-white/80">
-                    <BarChart3 className="w-4 h-4 text-amber-400" />
-                    <span className="text-sm">Progress Tracking</span>
+                    <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm">Progress Tracking</span>
                   </div>
                 </div>
                 <button
                   onClick={() => handleOpenAuth('register')}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-cyan-500 hover:shadow-lg transition-all"
+                  className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-semibold text-white text-sm sm:text-base bg-gradient-to-r from-blue-500 to-cyan-500 hover:shadow-lg transition-all"
                 >
                   Explore Library
                   <ChevronRight className="w-4 h-4" />
@@ -1415,41 +1414,40 @@ export function LandingPage() {
 
             {/* AI Counselor Card */}
             <Card3D>
-              <div className="glass rounded-3xl p-8 h-full group cursor-pointer hover:bg-white/10 transition-all">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
-                    <Heart className="w-8 h-8 text-white" />
+              <div className="glass rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 h-full group cursor-pointer hover:bg-white/10 transition-all">
+                <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform flex-shrink-0">
+                    <Heart className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white">AI Student Counselor</h3>
-                    <p className="text-white/50">Your Personal Guide</p>
+                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">AI Student Counselor</h3>
+                    <p className="text-white/50 text-xs sm:text-sm">Your Personal Guide</p>
                   </div>
                 </div>
-                <p className="text-white/70 mb-6 leading-relaxed">
-                  Get personalized support from AI counselors specialized in academics, career guidance,
-                  and student wellbeing. Available 24/7 to help you navigate your educational journey.
+                <p className="text-white/70 text-sm sm:text-base mb-4 sm:mb-6 leading-relaxed">
+                  Get personalized support from AI counselors for academics, career guidance, and wellbeing. Available 24/7.
                 </p>
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-6">
                   <div className="flex items-center gap-2 text-white/80">
-                    <GraduationCap className="w-4 h-4 text-blue-400" />
-                    <span className="text-sm">Academic Advice</span>
+                    <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm">Academic Advice</span>
                   </div>
                   <div className="flex items-center gap-2 text-white/80">
-                    <TrendingUp className="w-4 h-4 text-purple-400" />
-                    <span className="text-sm">Career Guidance</span>
+                    <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-400 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm">Career Guidance</span>
                   </div>
                   <div className="flex items-center gap-2 text-white/80">
-                    <Heart className="w-4 h-4 text-rose-400" />
-                    <span className="text-sm">Wellbeing Support</span>
+                    <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-400 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm">Wellbeing Support</span>
                   </div>
                   <div className="flex items-center gap-2 text-white/80">
-                    <MessageCircle className="w-4 h-4 text-green-400" />
-                    <span className="text-sm">24/7 Available</span>
+                    <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm">24/7 Available</span>
                   </div>
                 </div>
                 <button
                   onClick={() => handleOpenAuth('register')}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-lg transition-all"
+                  className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-semibold text-white text-sm sm:text-base bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-lg transition-all"
                 >
                   Talk to Counselor
                   <ChevronRight className="w-4 h-4" />
@@ -1745,91 +1743,91 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-5xl mx-auto">
             {/* Free Plan */}
-            <div className="glass rounded-3xl p-8 hover:bg-white/10 transition-all group">
-              <div className="w-14 h-14 rounded-2xl bg-neutral-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Zap className="w-7 h-7 text-neutral-400" />
+            <div className="glass rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 hover:bg-white/10 transition-all group">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-neutral-500/20 flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform">
+                <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-neutral-400" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
-              <p className="text-white/50 mb-6">Get started with basics</p>
-              <div className="flex items-baseline mb-8">
-                <span className="text-5xl font-bold text-white">{PRICING_CONFIG.plans.free.monthlyPrice}</span>
-                <span className="text-xl text-white/50 ml-2">{PRICING_CONFIG.currency}</span>
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">Free</h3>
+              <p className="text-white/50 text-sm sm:text-base mb-4 sm:mb-6">Get started with basics</p>
+              <div className="flex items-baseline mb-4 sm:mb-8">
+                <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">{PRICING_CONFIG.plans.free.monthlyPrice}</span>
+                <span className="text-lg sm:text-xl text-white/50 ml-2">{PRICING_CONFIG.currency}</span>
               </div>
-              <ul className="space-y-3 mb-8">
+              <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-8">
                 {['Unlimited questions', 'Model answers', 'Basic analytics', 'Community access'].map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-white/70">
-                    <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
+                  <li key={feature} className="flex items-center gap-2 text-white/70 text-sm sm:text-base">
+                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 flex-shrink-0" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
               <button
                 onClick={() => handleOpenAuth('register')}
-                className="w-full py-3 px-4 rounded-xl border border-white/20 text-white font-medium hover:bg-white/10 transition-all"
+                className="w-full py-2.5 sm:py-3 px-4 rounded-lg sm:rounded-xl border border-white/20 text-white font-medium text-sm sm:text-base hover:bg-white/10 transition-all"
               >
                 Get Started
               </button>
             </div>
 
             {/* Student Premium */}
-            <div className="relative glass rounded-3xl p-8 border-2 border-secondary/50 hover:border-secondary transition-all group">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <span className="px-4 py-1.5 bg-gradient-to-r from-secondary to-amber-400 rounded-full text-slate-900 text-sm font-semibold flex items-center gap-1">
-                  <Star className="w-4 h-4" />
+            <div className="relative glass rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 border-2 border-secondary/50 hover:border-secondary transition-all group sm:col-span-2 lg:col-span-1">
+              <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2">
+                <span className="px-3 sm:px-4 py-1 sm:py-1.5 bg-gradient-to-r from-secondary to-amber-400 rounded-full text-slate-900 text-xs sm:text-sm font-semibold flex items-center gap-1">
+                  <Star className="w-3 h-3 sm:w-4 sm:h-4" />
                   Most Popular
                 </span>
               </div>
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-secondary/30 to-amber-500/30 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Crown className="w-7 h-7 text-secondary" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-secondary/30 to-amber-500/30 flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform">
+                <Crown className="w-6 h-6 sm:w-7 sm:h-7 text-secondary" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Student</h3>
-              <p className="text-white/50 mb-6">Full access for students</p>
-              <div className="flex items-baseline mb-2">
-                <span className="text-5xl font-bold text-white">{PRICING_CONFIG.plans.student.monthlyPrice}</span>
-                <span className="text-xl text-white/50 ml-2">{PRICING_CONFIG.currency}/mo</span>
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">Student</h3>
+              <p className="text-white/50 text-sm sm:text-base mb-4 sm:mb-6">Full access for students</p>
+              <div className="flex items-baseline mb-1 sm:mb-2">
+                <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">{PRICING_CONFIG.plans.student.monthlyPrice}</span>
+                <span className="text-lg sm:text-xl text-white/50 ml-2">{PRICING_CONFIG.currency}/mo</span>
               </div>
-              <p className="text-sm text-emerald-400 mb-8">or {PRICING_CONFIG.plans.student.yearlyPrice} {PRICING_CONFIG.currency}/year (save {PRICING_CONFIG.plans.student.yearlyDiscount}%)</p>
-              <ul className="space-y-3 mb-8">
+              <p className="text-xs sm:text-sm text-emerald-400 mb-4 sm:mb-8">or {PRICING_CONFIG.plans.student.yearlyPrice} {PRICING_CONFIG.currency}/year (save {PRICING_CONFIG.plans.student.yearlyDiscount}%)</p>
+              <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-8">
                 {['Everything in Free', 'AI essay grading', 'Full past papers', 'Advanced analytics', 'Priority support'].map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-white/70">
-                    <CheckCircle2 className="w-5 h-5 text-secondary flex-shrink-0" />
+                  <li key={feature} className="flex items-center gap-2 text-white/70 text-sm sm:text-base">
+                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-secondary flex-shrink-0" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
               <button
                 onClick={() => handleOpenAuth('register')}
-                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-secondary to-amber-400 text-slate-900 font-semibold hover:shadow-lg hover:shadow-secondary/30 transition-all"
+                className="w-full py-2.5 sm:py-3 px-4 rounded-lg sm:rounded-xl bg-gradient-to-r from-secondary to-amber-400 text-slate-900 font-semibold text-sm sm:text-base hover:shadow-lg hover:shadow-secondary/30 transition-all"
               >
                 Start Free Trial
               </button>
             </div>
 
             {/* Teacher Premium */}
-            <div className="glass rounded-3xl p-8 hover:bg-white/10 transition-all group">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/30 to-indigo-500/30 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <GraduationCap className="w-7 h-7 text-blue-400" />
+            <div className="glass rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 hover:bg-white/10 transition-all group">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-500/30 to-indigo-500/30 flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform">
+                <GraduationCap className="w-6 h-6 sm:w-7 sm:h-7 text-blue-400" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Teacher</h3>
-              <p className="text-white/50 mb-6">Complete teaching toolkit</p>
-              <div className="flex items-baseline mb-2">
-                <span className="text-5xl font-bold text-white">{PRICING_CONFIG.plans.teacher.monthlyPrice}</span>
-                <span className="text-xl text-white/50 ml-2">{PRICING_CONFIG.currency}/mo</span>
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">Teacher</h3>
+              <p className="text-white/50 text-sm sm:text-base mb-4 sm:mb-6">Complete teaching toolkit</p>
+              <div className="flex items-baseline mb-1 sm:mb-2">
+                <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">{PRICING_CONFIG.plans.teacher.monthlyPrice}</span>
+                <span className="text-lg sm:text-xl text-white/50 ml-2">{PRICING_CONFIG.currency}/mo</span>
               </div>
-              <p className="text-sm text-emerald-400 mb-8">or {PRICING_CONFIG.plans.teacher.yearlyPrice} {PRICING_CONFIG.currency}/year (save {PRICING_CONFIG.plans.teacher.yearlyDiscount}%)</p>
-              <ul className="space-y-3 mb-8">
+              <p className="text-xs sm:text-sm text-emerald-400 mb-4 sm:mb-8">or {PRICING_CONFIG.plans.teacher.yearlyPrice} {PRICING_CONFIG.currency}/year (save {PRICING_CONFIG.plans.teacher.yearlyDiscount}%)</p>
+              <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-8">
                 {['Everything in Student', 'Class management', 'Assessment builder', 'Student analytics', 'Bulk grading'].map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-white/70">
-                    <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                  <li key={feature} className="flex items-center gap-2 text-white/70 text-sm sm:text-base">
+                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 flex-shrink-0" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
               <button
                 onClick={() => handleOpenAuth('register')}
-                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all"
+                className="w-full py-2.5 sm:py-3 px-4 rounded-lg sm:rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold text-sm sm:text-base hover:shadow-lg hover:shadow-blue-500/30 transition-all"
               >
                 Start Free Trial
               </button>
@@ -1876,28 +1874,28 @@ export function LandingPage() {
           </div>
 
           {/* Commission Tiers */}
-          <div className="grid md:grid-cols-5 gap-4 mb-16">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-12 sm:mb-16">
             {AFFILIATE_CONFIG.tiers.map((tier, index) => (
               <Card3D key={tier.rank}>
                 <div
                   className={cn(
-                    'relative glass rounded-2xl p-6 text-center group cursor-pointer transition-all duration-500',
-                    index === 4 && 'md:col-span-1'
+                    'relative glass rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 text-center group cursor-pointer transition-all duration-500',
+                    index === 4 && 'col-span-2 sm:col-span-1'
                   )}
                 >
                   <div className={cn(
-                    'absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br',
+                    'absolute inset-0 rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br',
                     tier.color
                   )} style={{ padding: '1px' }}>
-                    <div className="w-full h-full bg-slate-900 rounded-2xl" />
+                    <div className="w-full h-full bg-slate-900 rounded-xl sm:rounded-2xl" />
                   </div>
 
                   <div className="relative z-10">
-                    <div className="text-4xl mb-3">{tier.icon}</div>
-                    <h4 className="text-lg font-bold text-white mb-1">{tier.rank}</h4>
-                    <p className="text-white/50 text-sm mb-3">{formatRefRange(tier.minRefs, tier.maxRefs)} referrals</p>
+                    <div className="text-2xl sm:text-3xl lg:text-4xl mb-2 sm:mb-3">{tier.icon}</div>
+                    <h4 className="text-sm sm:text-base lg:text-lg font-bold text-white mb-0.5 sm:mb-1">{tier.rank}</h4>
+                    <p className="text-white/50 text-xs sm:text-sm mb-2 sm:mb-3">{formatRefRange(tier.minRefs, tier.maxRefs)} refs</p>
                     <div className={cn(
-                      'inline-block px-4 py-2 rounded-full bg-gradient-to-r font-bold text-white',
+                      'inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r font-bold text-white text-xs sm:text-sm',
                       tier.color
                     )}>
                       {formatCommissionRate(tier.rate, tier.bonus)}
@@ -1909,58 +1907,58 @@ export function LandingPage() {
           </div>
 
           {/* Benefits Grid */}
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
-            <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mx-auto mb-6">
-                <DollarSign className="w-8 h-8 text-white" />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-16">
+            <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 text-center hover:bg-white/10 transition-all">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <DollarSign className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">Instant Mobile Money</h3>
-              <p className="text-white/60">
-                Get paid directly to your MTN MoMo, Vodafone Cash, or AirtelTigo Money. Fast and hassle-free!
+              <h3 className="text-base sm:text-lg lg:text-xl font-bold text-white mb-2 sm:mb-3">Instant Mobile Money</h3>
+              <p className="text-white/60 text-sm sm:text-base">
+                Get paid directly to MTN MoMo, Vodafone Cash, or AirtelTigo Money!
               </p>
             </div>
 
-            <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center mx-auto mb-6">
-                <Trophy className="w-8 h-8 text-white" />
+            <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 text-center hover:bg-white/10 transition-all">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <Trophy className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">Leaderboards & Prizes</h3>
-              <p className="text-white/60">
-                Compete on individual and school leaderboards. Top affiliates win monthly cash prizes!
+              <h3 className="text-base sm:text-lg lg:text-xl font-bold text-white mb-2 sm:mb-3">Leaderboards & Prizes</h3>
+              <p className="text-white/60 text-sm sm:text-base">
+                Compete on leaderboards. Top affiliates win monthly cash prizes!
               </p>
             </div>
 
-            <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center mx-auto mb-6">
-                <Sparkles className="w-8 h-8 text-white" />
+            <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 text-center hover:bg-white/10 transition-all sm:col-span-2 lg:col-span-1">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">XP & Achievements</h3>
-              <p className="text-white/60">
-                Earn XP, unlock badges, complete challenges, and level up your affiliate rank!
+              <h3 className="text-base sm:text-lg lg:text-xl font-bold text-white mb-2 sm:mb-3">XP & Achievements</h3>
+              <p className="text-white/60 text-sm sm:text-base">
+                Earn XP, unlock badges, and level up your affiliate rank!
               </p>
             </div>
           </div>
 
           {/* Teacher Bonus Banner */}
-          <div className="relative glass rounded-2xl p-8 mb-12 overflow-hidden">
+          <div className="relative glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 mb-8 sm:mb-12 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-orange-500/10" />
-            <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
-                  <GraduationCap className="w-8 h-8 text-white" />
+            <div className="relative flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center flex-shrink-0">
+                  <GraduationCap className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
                 </div>
                 <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 rounded-full text-amber-400 text-sm font-medium mb-2">
-                    <BadgeCheck className="w-4 h-4" />
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 rounded-full text-amber-400 text-xs sm:text-sm font-medium mb-2">
+                    <BadgeCheck className="w-3 h-3 sm:w-4 sm:h-4" />
                     Teacher Bonus
                   </div>
-                  <h3 className="text-2xl font-bold text-white">Teachers get 1.5x faster tier progression!</h3>
-                  <p className="text-white/60">Refer students and climb the ranks 50% faster than everyone else.</p>
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">Teachers get 1.5x faster tier progression!</h3>
+                  <p className="text-white/60 text-sm sm:text-base">Refer students and climb the ranks 50% faster.</p>
                 </div>
               </div>
               <button
                 onClick={() => handleOpenAuth('register')}
-                className="flex-shrink-0 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                className="w-full sm:w-auto flex-shrink-0 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg sm:rounded-xl font-semibold text-white text-sm sm:text-base hover:shadow-lg hover:shadow-amber-500/30 transition-all"
               >
                 Join as Teacher
               </button>
