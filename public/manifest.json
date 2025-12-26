@@ -1,10 +1,10 @@
 {
-  "name": "Brilla Study Platform",
+  "name": "Brilla Prep - Excel in NSMQ, WASSCE & BECE",
   "short_name": "Brilla",
-  "description": "Ghana's #1 exam preparation platform for NSMQ, WASSCE, and BECE",
+  "description": "Ghana's #1 exam preparation platform. Master Mathematics, Physics, Chemistry, and Biology with AI-powered practice and competition simulations.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
+  "background_color": "#0a1628",
   "theme_color": "#1e3a8a",
   "orientation": "portrait-primary",
   "scope": "/",
@@ -12,16 +12,78 @@
   "categories": ["education", "productivity"],
   "icons": [
     {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/icons/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/favicon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon.svg",
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512x512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
     }
   ],
   "screenshots": [
@@ -30,14 +92,14 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Brilla Dashboard"
+      "label": "Brilla Prep Dashboard - Desktop View"
     },
     {
       "src": "/screenshots/mobile.png",
       "sizes": "750x1334",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Brilla Mobile"
+      "label": "Brilla Prep Dashboard - Mobile View"
     }
   ],
   "shortcuts": [
@@ -46,23 +108,29 @@
       "short_name": "Practice",
       "description": "Start a practice session",
       "url": "/practice",
-      "icons": [{ "src": "/icons/practice-icon.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/practice-icon.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Dashboard",
       "short_name": "Dashboard",
       "description": "View your dashboard",
       "url": "/dashboard",
-      "icons": [{ "src": "/icons/dashboard-icon.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/dashboard-icon.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Past Papers",
       "short_name": "Papers",
       "description": "Browse past papers",
       "url": "/past-papers",
-      "icons": [{ "src": "/icons/papers-icon.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/papers-icon.png", "sizes": "96x96", "type": "image/png" }]
     }
   ],
   "related_applications": [],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
 }
