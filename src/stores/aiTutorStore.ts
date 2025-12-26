@@ -2,6 +2,15 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { getApiUrl, getAuthHeaders } from '../utils/api';
 
+export interface FileAttachment {
+  id: string;
+  name: string;
+  type: string; // MIME type
+  size: number;
+  url: string; // R2 public URL or data URL for preview
+  thumbnailUrl?: string;
+}
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
@@ -10,6 +19,7 @@ export interface ChatMessage {
   isNew?: boolean;
   messageType?: 'chat' | 'explanation' | 'hint' | 'step_by_step';
   questionId?: string;
+  attachments?: FileAttachment[];
 }
 
 export interface UserPersonalization {
@@ -54,7 +64,7 @@ interface AiTutorState {
   // Actions
   openChat: (context?: string, examType?: string, subjectId?: string, topicId?: string) => void;
   closeChat: () => void;
-  sendMessage: (message: string, userId: string, userName?: string) => Promise<void>;
+  sendMessage: (message: string, userId: string, userName?: string, files?: File[]) => Promise<void>;
   explainQuestion: (questionContext: QuestionContext, userId: string) => Promise<string>;
   getHint: (questionContext: QuestionContext, hintLevel: number, userId: string) => Promise<{ hint: string; hasMoreHints: boolean }>;
   getStepByStep: (questionContext: QuestionContext, userId: string) => Promise<string>;
@@ -63,6 +73,7 @@ interface AiTutorState {
   markMessageAsOld: (messageId: string) => void;
   setUserPersonalization: (data: Partial<UserPersonalization>) => void;
   startNewConversation: () => void;
+  uploadFile: (file: File, userId: string) => Promise<FileAttachment | null>;
 }
 
 // Mock AI responses when API is unavailable
@@ -142,6 +153,45 @@ I can assist you with:
 - **Practice problems** - Work through examples together
 
 What specific topic or question would you like help with?${personalTouch}`;
+}
+
+// Mock response for file uploads when API is unavailable
+function generateMockFileResponse(file: File, userName?: string): string {
+  const greeting = userName ? `${userName}, ` : '';
+  const fileType = file.type;
+  const fileName = file.name;
+
+  if (fileType.startsWith('image/')) {
+    return `${greeting ? `Thanks for sharing that image, ${greeting}` : 'Thanks for sharing that image! '}I can see you've uploaded **${fileName}**.
+
+📸 **Image Analysis:**
+
+I can help you with:
+- **Math problems** - If this is a photo of homework or an exam question, I'll work through it step by step
+- **Diagrams** - Scientific diagrams, graphs, or charts that need explanation
+- **Handwritten notes** - Help organize or explain concepts from your notes
+- **Past papers** - Questions from WASSCE, BECE, or NSMQ
+
+What would you like me to help you understand about this image?`;
+  }
+
+  if (fileType === 'application/pdf') {
+    return `${greeting ? `Thanks for sharing that PDF, ${greeting}` : 'Thanks for sharing that document! '}I can see you've uploaded **${fileName}**.
+
+📄 **Document Received:**
+
+I can help you with:
+- **Past papers** - Work through questions and explain solutions
+- **Study materials** - Summarize key concepts
+- **Textbook pages** - Explain difficult sections
+- **Practice tests** - Review your answers
+
+What specific part of this document would you like help with?`;
+  }
+
+  return `${greeting ? `Thanks for sharing that file, ${greeting}` : 'Thanks for sharing that file! '}I've received **${fileName}**.
+
+I'll do my best to help you with the content. What would you like me to focus on?`;
 }
 
 // Mock explanation generator
@@ -287,7 +337,74 @@ export const useAiTutorStore = create<AiTutorState>()(
         }));
       },
 
-      sendMessage: async (message, userId, userName) => {
+      uploadFile: async (file, userId) => {
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const response = await fetch(getApiUrl('/api/tutor/upload'), {
+            method: 'POST',
+            headers: {
+              ...getAuthHeaders(),
+              'x-user-id': userId,
+            },
+            body: formData,
+          });
+
+          if (!response.ok) {
+            console.error('File upload failed');
+            return null;
+          }
+
+          const data = await response.json() as {
+            success: boolean;
+            data?: {
+              id: string;
+              name: string;
+              type: string;
+              size: number;
+              url: string;
+              thumbnailUrl?: string;
+            };
+          };
+
+          if (data.success && data.data) {
+            return {
+              id: data.data.id,
+              name: data.data.name,
+              type: data.data.type,
+              size: data.data.size,
+              url: data.data.url,
+              thumbnailUrl: data.data.thumbnailUrl,
+            };
+          }
+          return null;
+        } catch (error) {
+          console.error('File upload error:', error);
+          return null;
+        }
+      },
+
+      sendMessage: async (message, userId, userName, files) => {
+        // Upload files first if provided
+        let attachments: FileAttachment[] = [];
+
+        if (files && files.length > 0) {
+          set({ isLoading: true, thinkingStage: 'thinking' });
+
+          for (const file of files) {
+            // Create a local preview URL for immediate display
+            const localPreview: FileAttachment = {
+              id: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              url: URL.createObjectURL(file),
+            };
+            attachments.push(localPreview);
+          }
+        }
+
         const userMessage: ChatMessage = {
           id: `msg_${Date.now()}_user`,
           role: 'user',
@@ -295,6 +412,7 @@ export const useAiTutorStore = create<AiTutorState>()(
           timestamp: new Date(),
           isNew: false,
           messageType: 'chat',
+          attachments: attachments.length > 0 ? attachments : undefined,
         };
 
         // Mark all previous messages as old
@@ -320,6 +438,31 @@ export const useAiTutorStore = create<AiTutorState>()(
           });
 
           try {
+            // If there are files, upload them and get URLs
+            const uploadedAttachments: Array<{ url: string; type: string; name: string }> = [];
+
+            if (files && files.length > 0) {
+              for (const file of files) {
+                // Convert file to base64 for sending to API
+                const base64 = await new Promise<string>((resolve) => {
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    const result = reader.result as string;
+                    // Extract base64 data after the data URL prefix
+                    const base64Data = result.split(',')[1];
+                    resolve(base64Data);
+                  };
+                  reader.readAsDataURL(file);
+                });
+
+                uploadedAttachments.push({
+                  url: base64,
+                  type: file.type,
+                  name: file.name,
+                });
+              }
+            }
+
             const response = await fetch(getApiUrl('/api/tutor/chat'), {
               method: 'POST',
               headers: {
@@ -334,6 +477,7 @@ export const useAiTutorStore = create<AiTutorState>()(
                 examType: get().examType,
                 subjectId: get().subjectId,
                 topicId: get().topicId,
+                attachments: uploadedAttachments.length > 0 ? uploadedAttachments : undefined,
               }),
             });
 
@@ -341,7 +485,9 @@ export const useAiTutorStore = create<AiTutorState>()(
 
             if (!parsed.success || !response.ok) {
               // API unavailable or returned error - use mock response
-              assistantContent = generateMockResponse(message, displayName);
+              assistantContent = files && files.length > 0
+                ? generateMockFileResponse(files[0], displayName)
+                : generateMockResponse(message, displayName);
             } else {
               const responseData = parsed.data as {
                 success: boolean;
@@ -352,15 +498,22 @@ export const useAiTutorStore = create<AiTutorState>()(
               };
 
               if (responseData.success && responseData.data) {
-                assistantContent = responseData.data.assistantMessage?.content || generateMockResponse(message, displayName);
+                assistantContent = responseData.data.assistantMessage?.content ||
+                  (files && files.length > 0
+                    ? generateMockFileResponse(files[0], displayName)
+                    : generateMockResponse(message, displayName));
                 newConversationId = responseData.data.conversationId;
               } else {
-                assistantContent = generateMockResponse(message, displayName);
+                assistantContent = files && files.length > 0
+                  ? generateMockFileResponse(files[0], displayName)
+                  : generateMockResponse(message, displayName);
               }
             }
           } catch {
             // Network error or API unavailable - use mock response
-            assistantContent = generateMockResponse(message, displayName);
+            assistantContent = files && files.length > 0
+              ? generateMockFileResponse(files[0], userName || get().userPersonalization?.name)
+              : generateMockResponse(message, userName || get().userPersonalization?.name);
           }
 
           const messageId = `msg_${Date.now()}_assistant`;
@@ -393,7 +546,9 @@ export const useAiTutorStore = create<AiTutorState>()(
           const fallbackMessage: ChatMessage = {
             id: messageId,
             role: 'assistant',
-            content: generateMockResponse(message, displayName),
+            content: files && files.length > 0
+              ? generateMockFileResponse(files[0], displayName)
+              : generateMockResponse(message, displayName),
             timestamp: new Date(),
             isNew: true,
             messageType: 'chat',

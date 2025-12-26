@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Sparkles, User } from 'lucide-react';
+import { Sparkles, User, FileText, ExternalLink } from 'lucide-react';
 import type { ChatMessage } from '@/stores/aiTutorStore';
 
 interface AiMessageProps {
@@ -144,6 +144,65 @@ export function AiMessage({ message, isNew = false, onTypingComplete }: AiMessag
           ${!isUser && isNew ? 'shadow-sm' : ''}
         `}
       >
+        {/* File attachments */}
+        {message.attachments && message.attachments.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-2">
+            {message.attachments.map((attachment) => (
+              <div
+                key={attachment.id}
+                className={`
+                  rounded-lg overflow-hidden border
+                  ${isUser ? 'border-white/20 bg-white/10' : 'border-neutral-200 bg-white'}
+                `}
+              >
+                {attachment.type.startsWith('image/') ? (
+                  <a
+                    href={attachment.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block group"
+                  >
+                    <div className="relative">
+                      <img
+                        src={attachment.url}
+                        alt={attachment.name}
+                        className="max-w-[200px] max-h-[150px] object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                        <ExternalLink className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </div>
+                    <div className="px-2 py-1">
+                      <p className={`text-xs truncate max-w-[180px] ${isUser ? 'text-white/80' : 'text-neutral-600'}`}>
+                        {attachment.name}
+                      </p>
+                    </div>
+                  </a>
+                ) : (
+                  <a
+                    href={attachment.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 p-2 hover:bg-neutral-50 transition-colors"
+                  >
+                    <div className={`w-10 h-10 rounded flex items-center justify-center ${isUser ? 'bg-white/20' : 'bg-red-50'}`}>
+                      <FileText className={`w-5 h-5 ${isUser ? 'text-white' : 'text-red-500'}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-xs font-medium truncate max-w-[120px] ${isUser ? 'text-white' : 'text-neutral-700'}`}>
+                        {attachment.name}
+                      </p>
+                      <p className={`text-xs ${isUser ? 'text-white/60' : 'text-neutral-400'}`}>
+                        PDF Document
+                      </p>
+                    </div>
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="leading-relaxed">
           {formatContent(displayedContent)}
           {/* Typing cursor */}

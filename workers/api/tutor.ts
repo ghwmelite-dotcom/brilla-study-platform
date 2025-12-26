@@ -176,6 +176,13 @@ Question: ${question.questionText}`;
   return context;
 }
 
+// File attachment type for vision API
+interface FileAttachment {
+  url: string; // Base64 encoded data
+  type: string; // MIME type
+  name: string;
+}
+
 // Call Claude API for tutor response
 async function getTutorResponse(
   env: Env,
@@ -184,7 +191,8 @@ async function getTutorResponse(
   studentContext: StudentContext,
   messageType: MessageType,
   questionContext?: QuestionContext,
-  hintLevel?: number
+  hintLevel?: number,
+  attachments?: FileAttachment[]
 ): Promise<{ content: string; tokensUsed?: number }> {
   const apiKey = env.ANTHROPIC_API_KEY;
 
@@ -229,13 +237,76 @@ async function getTutorResponse(
       systemPrompt = TUTOR_PROMPTS.general.replace('{studentContext}', studentContextStr);
   }
 
-  // Build messages for Claude
-  const messages = conversationHistory.map(msg => ({
+  // Add vision capability instruction if there are image attachments
+  if (attachments && attachments.some(a => a.type.startsWith('image/'))) {
+    systemPrompt += `
+
+IMPORTANT: The student has shared an image with you. Please analyze the image carefully and:
+1. Describe what you see (math problem, diagram, handwritten notes, etc.)
+2. If it's a problem, work through the solution step by step
+3. If it's a diagram or concept, explain what it represents
+4. Point out any errors or areas for improvement if applicable
+5. Be encouraging and supportive in your response`;
+  }
+
+  // Build messages for Claude with vision support
+  type MessageContent = string | Array<{
+    type: 'text' | 'image';
+    text?: string;
+    source?: {
+      type: 'base64';
+      media_type: string;
+      data: string;
+    };
+  }>;
+
+  const messages: Array<{ role: 'user' | 'assistant'; content: MessageContent }> = conversationHistory.map(msg => ({
     role: msg.role === 'assistant' ? 'assistant' as const : 'user' as const,
     content: msg.content,
   }));
 
-  messages.push({ role: 'user', content: message });
+  // Build the user message content with attachments
+  if (attachments && attachments.length > 0) {
+    const contentParts: Array<{
+      type: 'text' | 'image';
+      text?: string;
+      source?: {
+        type: 'base64';
+        media_type: string;
+        data: string;
+      };
+    }> = [];
+
+    // Add image attachments first
+    for (const attachment of attachments) {
+      if (attachment.type.startsWith('image/')) {
+        contentParts.push({
+          type: 'image',
+          source: {
+            type: 'base64',
+            media_type: attachment.type,
+            data: attachment.url, // Already base64 encoded from frontend
+          },
+        });
+      } else if (attachment.type === 'application/pdf') {
+        // For PDFs, add a note (Claude can't directly read PDFs yet via API)
+        contentParts.push({
+          type: 'text',
+          text: `[PDF Document attached: ${attachment.name}. Note: Please describe what you'd like help with from this document.]`,
+        });
+      }
+    }
+
+    // Add the text message
+    contentParts.push({
+      type: 'text',
+      text: message,
+    });
+
+    messages.push({ role: 'user', content: contentParts });
+  } else {
+    messages.push({ role: 'user', content: message });
+  }
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -247,7 +318,7 @@ async function getTutorResponse(
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
+        max_tokens: 2000, // Increased for image analysis
         system: systemPrompt,
         messages,
       }),
@@ -528,10 +599,10 @@ tutorApp.post('/chat', async (c) => {
     }
 
     const body = await c.req.json();
-    const { conversationId, message, context, examType, subjectId, topicId } = body;
+    const { conversationId, message, context, examType, subjectId, topicId, attachments } = body;
 
-    if (!message?.trim()) {
-      return c.json({ success: false, error: 'Message is required' }, 400);
+    if (!message?.trim() && (!attachments || attachments.length === 0)) {
+      return c.json({ success: false, error: 'Message or attachment is required' }, 400);
     }
 
     // Get or create conversation
@@ -574,20 +645,28 @@ tutorApp.post('/chat', async (c) => {
       content: msg.content as string,
     }));
 
-    // Save user message
+    // Save user message (with attachment info if present)
     const userMessageId = `msg_${Date.now()}_user`;
+    const messageContent = message?.trim() || (attachments ? '[File attachment]' : '');
+    const attachmentInfo = attachments && attachments.length > 0
+      ? ` [Attachments: ${attachments.map((a: FileAttachment) => a.name).join(', ')}]`
+      : '';
+
     await c.env.DB.prepare(`
       INSERT INTO tutor_messages (id, conversation_id, role, content, message_type, created_at)
       VALUES (?, ?, 'user', ?, 'chat', datetime('now'))
-    `).bind(userMessageId, activeConversationId, message.trim()).run();
+    `).bind(userMessageId, activeConversationId, messageContent + attachmentInfo).run();
 
-    // Get AI response
+    // Get AI response with attachments
     const aiResponse = await getTutorResponse(
       c.env,
-      message.trim(),
+      messageContent,
       conversationHistory,
       studentContext,
-      'chat'
+      'chat',
+      undefined, // questionContext
+      undefined, // hintLevel
+      attachments as FileAttachment[] | undefined
     );
 
     // Save assistant response

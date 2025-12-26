@@ -1,8 +1,13 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { X, Send, Sparkles, BookOpen, Lightbulb, GraduationCap, FileText, PenTool, Calculator, Heart } from 'lucide-react';
+import { X, Send, Sparkles, BookOpen, Lightbulb, GraduationCap, FileText, PenTool, Calculator, Heart, Paperclip, XCircle } from 'lucide-react';
 import { useAiTutorStore, useAuthStore, useExamStore } from '@/stores';
 import { AiMessage } from './AiMessage';
 import { ThinkingIndicator } from './ThinkingIndicator';
+
+// Allowed file types
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+const ALLOWED_DOC_TYPES = ['application/pdf'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 // Exam-specific configurations
 const examConfigs = {
@@ -59,8 +64,11 @@ export function AiTutor() {
   } = useAiTutorStore();
 
   const [inputMessage, setInputMessage] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [fileError, setFileError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Get exam-specific config
   const examConfig = useMemo(() => {
@@ -90,12 +98,16 @@ export function AiTutor() {
   }, [isOpen]);
 
   const handleSend = async () => {
-    if (!inputMessage.trim() || !user || isLoading) return;
+    if ((!inputMessage.trim() && selectedFiles.length === 0) || !user || isLoading) return;
 
-    const message = inputMessage.trim();
+    const message = inputMessage.trim() || (selectedFiles.length > 0 ? 'Please analyze this file and help me understand it.' : '');
     setInputMessage('');
+    const filesToSend = [...selectedFiles];
+    setSelectedFiles([]);
+    setFileError(null);
+
     // Include exam context and user name in the message
-    await sendMessage(`[${examConfig.name} Mode] ${message}`, user.id, user.name);
+    await sendMessage(`[${examConfig.name} Mode] ${message}`, user.id, user.name, filesToSend.length > 0 ? filesToSend : undefined);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -112,6 +124,52 @@ export function AiTutor() {
 
   const handleTypingComplete = (messageId: string) => {
     markMessageAsOld(messageId);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setFileError(null);
+    const newFiles: File[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
+      // Validate file type
+      if (!ALLOWED_IMAGE_TYPES.includes(file.type) && !ALLOWED_DOC_TYPES.includes(file.type)) {
+        setFileError(`"${file.name}" is not supported. Please upload images (JPG, PNG, GIF) or PDF files.`);
+        continue;
+      }
+
+      // Validate file size
+      if (file.size > MAX_FILE_SIZE) {
+        setFileError(`"${file.name}" is too large. Maximum file size is 10MB.`);
+        continue;
+      }
+
+      newFiles.push(file);
+    }
+
+    // Limit to 3 files
+    const totalFiles = [...selectedFiles, ...newFiles].slice(0, 3);
+    setSelectedFiles(totalFiles);
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    setFileError(null);
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   // Get user's first name for personalized greeting
@@ -231,34 +289,106 @@ export function AiTutor() {
 
         {/* Input */}
         <div className="p-4 border-t border-neutral-200 bg-neutral-50/50">
+          {/* File preview */}
+          {selectedFiles.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-2">
+              {selectedFiles.map((file, index) => (
+                <div
+                  key={`${file.name}-${index}`}
+                  className="relative group flex items-center gap-2 px-3 py-2 bg-white border border-neutral-200 rounded-lg"
+                >
+                  {file.type.startsWith('image/') ? (
+                    <div className="w-8 h-8 rounded overflow-hidden bg-neutral-100 flex-shrink-0">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={file.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-8 h-8 rounded bg-red-50 flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-4 h-4 text-red-500" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-neutral-700 truncate max-w-[100px]">
+                      {file.name}
+                    </p>
+                    <p className="text-xs text-neutral-400">{formatFileSize(file.size)}</p>
+                  </div>
+                  <button
+                    onClick={() => removeFile(index)}
+                    className="p-1 hover:bg-neutral-100 rounded-full transition-colors"
+                    title="Remove file"
+                  >
+                    <XCircle className="w-4 h-4 text-neutral-400 hover:text-red-500" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* File error */}
+          {fileError && (
+            <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-xs text-red-600">{fileError}</p>
+            </div>
+          )}
+
           <div className="flex gap-2">
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
+              onChange={handleFileSelect}
+              multiple
+              className="hidden"
+            />
+
+            {/* File upload button */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isLoading || selectedFiles.length >= 3}
+              className="p-3 bg-white border border-neutral-200 text-neutral-600 rounded-xl hover:bg-neutral-50 hover:border-neutral-300 transition-all duration-200 disabled:opacity-50 disabled:hover:bg-white disabled:hover:border-neutral-200"
+              title="Upload image or PDF (max 3 files, 10MB each)"
+            >
+              <Paperclip className="w-5 h-5" />
+            </button>
+
             <input
               ref={inputRef}
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={`Ask me anything, ${firstName}...`}
+              placeholder={selectedFiles.length > 0 ? 'Add a message or send file...' : `Ask me anything, ${firstName}...`}
               disabled={isLoading}
               className="flex-1 px-4 py-3 bg-white border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 disabled:opacity-50 transition-all duration-200"
             />
             <button
               onClick={handleSend}
-              disabled={!inputMessage.trim() || isLoading}
+              disabled={(!inputMessage.trim() && selectedFiles.length === 0) || isLoading}
               className="p-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
             >
               <Send className="w-5 h-5" />
             </button>
           </div>
 
-          {messages.length > 0 && (
-            <button
-              onClick={clearMessages}
-              className="w-full mt-2 text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
-            >
-              Start fresh conversation
-            </button>
-          )}
+          {/* Helper text */}
+          <div className="flex items-center justify-between mt-2">
+            <p className="text-xs text-neutral-400">
+              📎 Upload photos of homework, diagrams, or PDFs
+            </p>
+            {messages.length > 0 && (
+              <button
+                onClick={clearMessages}
+                className="text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
+              >
+                Start fresh
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
