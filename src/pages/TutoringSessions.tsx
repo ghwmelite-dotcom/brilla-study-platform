@@ -152,7 +152,7 @@ function SessionCard({ session, onJoin, onReview, onPay, isPaymentLoading }: Ses
           {needsReview && (
             <button
               onClick={onReview}
-              className="px-3 py-1.5 bg-amber-500 text-white text-sm rounded-lg hover:bg-amber-600 flex items-center gap-1"
+              className="px-3 py-1.5 bg-amber-700 text-white text-sm rounded-lg hover:bg-amber-800 flex items-center gap-1"
             >
               <Star className="w-4 h-4" />
               Review

@@ -1169,8 +1169,9 @@ export function LandingPage() {
               <Link
                 to="/affiliate"
                 className="w-full sm:w-auto px-6 py-3 glass rounded-xl font-medium text-white hover:bg-white/10 transition-all whitespace-nowrap text-center"
+                aria-label="Learn more about our affiliate program"
               >
-                Learn More
+                Become an Affiliate
               </Link>
             </div>
           </div>
@@ -1643,7 +1644,7 @@ export function LandingPage() {
                     <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-cyan-500/20 to-teal-500/20 border-2 border-cyan-500/30 flex items-center justify-center mx-auto mb-3 sm:mb-4">
                       <item.icon className="w-6 h-6 sm:w-7 sm:h-7 text-cyan-400" />
                     </div>
-                    <h4 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2">{item.title}</h4>
+                    <h3 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2">{item.title}</h3>
                     <p className="text-white/50 text-xs sm:text-sm">{item.desc}</p>
                   </div>
                 </div>
@@ -1829,7 +1830,7 @@ export function LandingPage() {
                   </div>
 
                   {/* Floating badges */}
-                  <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 px-2.5 sm:px-4 py-1 sm:py-2 bg-amber-500 rounded-full text-white text-xs sm:text-sm font-semibold shadow-lg animate-bounce whitespace-nowrap">
+                  <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 px-2.5 sm:px-4 py-1 sm:py-2 bg-amber-700 rounded-full text-white text-xs sm:text-sm font-semibold shadow-lg animate-bounce whitespace-nowrap">
                     No Credit Card!
                   </div>
                 </div>
@@ -2190,7 +2191,7 @@ export function LandingPage() {
 
                   <div className="relative z-10">
                     <div className="text-2xl sm:text-3xl lg:text-4xl mb-2 sm:mb-3">{tier.icon}</div>
-                    <h4 className="text-sm sm:text-base lg:text-lg font-bold text-white mb-0.5 sm:mb-1">{tier.rank}</h4>
+                    <h3 className="text-sm sm:text-base lg:text-lg font-bold text-white mb-0.5 sm:mb-1">{tier.rank}</h3>
                     <p className="text-white/50 text-xs sm:text-sm mb-2 sm:mb-3">{formatRefRange(tier.minRefs, tier.maxRefs)} refs</p>
                     <div className={cn(
                       'inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r font-bold text-white text-xs sm:text-sm',
@@ -2351,7 +2352,7 @@ export function LandingPage() {
 
             {/* Links */}
             <div>
-              <h4 className="font-semibold text-white text-sm sm:text-base mb-3 sm:mb-4">Platform</h4>
+              <h3 className="font-semibold text-white text-sm sm:text-base mb-3 sm:mb-4">Platform</h3>
               <ul className="space-y-2 sm:space-y-3 text-white/50 text-sm sm:text-base">
                 <li><Link to="/topics" className="hover:text-white transition">Topics</Link></li>
                 <li><Link to="/practice" className="hover:text-white transition">Practice</Link></li>
@@ -2361,7 +2362,7 @@ export function LandingPage() {
             </div>
 
             <div>
-              <h4 className="font-semibold text-white text-sm sm:text-base mb-3 sm:mb-4">Exams & More</h4>
+              <h3 className="font-semibold text-white text-sm sm:text-base mb-3 sm:mb-4">Exams & More</h3>
               <ul className="space-y-2 sm:space-y-3 text-white/50 text-sm sm:text-base">
                 <li><Link to="/competition" className="hover:text-white transition">NSMQ Prep</Link></li>
                 <li><Link to="/past-papers" className="hover:text-white transition">WASSCE Prep</Link></li>
@@ -2371,7 +2372,7 @@ export function LandingPage() {
             </div>
 
             <div>
-              <h4 className="font-semibold text-white text-sm sm:text-base mb-3 sm:mb-4">Support</h4>
+              <h3 className="font-semibold text-white text-sm sm:text-base mb-3 sm:mb-4">Support</h3>
               <ul className="space-y-2 sm:space-y-3 text-white/50 text-sm sm:text-base">
                 <li><Link to="/help" className="hover:text-white transition">Help Center</Link></li>
                 <li><a href={`mailto:${SITE_CONFIG.supportEmail}`} className="hover:text-white transition cursor-pointer">Contact Us</a></li>

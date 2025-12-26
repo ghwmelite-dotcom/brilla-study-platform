@@ -1,0 +1,23 @@
+# Brilla Prep - robots.txt
+# https://brillaprep.org
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://brillaprep.org/sitemap.xml
+
+# Disallow admin and private areas
+Disallow: /admin
+Disallow: /api/
+Disallow: /teacher/
+Disallow: /parent/
+
+# Allow search engines to crawl all public content
+Allow: /login
+Allow: /register
+Allow: /practice
+Allow: /topics
+Allow: /competition
+Allow: /library
+Allow: /affiliate

@@ -589,7 +589,7 @@ export default function Affiliate() {
                                 : index === 1
                                 ? 'bg-neutral-400 text-white'
                                 : index === 2
-                                ? 'bg-amber-600 text-white'
+                                ? 'bg-amber-700 text-white'
                                 : 'bg-neutral-200 text-neutral-600'
                             }`}
                           >
@@ -632,7 +632,7 @@ export default function Affiliate() {
                                 : entry.rank === 2
                                 ? 'bg-neutral-400 text-white'
                                 : entry.rank === 3
-                                ? 'bg-amber-600 text-white'
+                                ? 'bg-amber-700 text-white'
                                 : 'bg-neutral-200 text-neutral-600'
                             }`}
                           >

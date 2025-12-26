@@ -13,17 +13,17 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://brilla.study/" />
+    <meta property="og:url" content="https://brillaprep.org/" />
     <meta property="og:title" content="Brilla Prep - Excel in NSMQ, WASSCE & BECE" />
     <meta property="og:description" content="Ace your BECE, WASSCE, and NSMQ. Master Mathematics, Physics, Chemistry, and Biology with confidence." />
-    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image" content="https://brillaprep.org/og-image.png" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://brilla.study/" />
+    <meta property="twitter:url" content="https://brillaprep.org/" />
     <meta property="twitter:title" content="Brilla Prep - Excel in NSMQ, WASSCE & BECE" />
     <meta property="twitter:description" content="Ace your BECE, WASSCE, and NSMQ. Master Mathematics, Physics, Chemistry, and Biology with confidence." />
-    <meta property="twitter:image" content="/og-image.png" />
+    <meta property="twitter:image" content="https://brillaprep.org/og-image.png" />
 
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#1e3a8a" />
@@ -42,13 +42,26 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- Fonts -->
+    <!-- DNS Prefetch & Preconnect for performance -->
+    <link rel="dns-prefetch" href="https://brilla-api.ghwmelite.workers.dev" />
+    <link rel="preconnect" href="https://brilla-api.ghwmelite.workers.dev" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+
+    <!-- Fonts - preconnect first, then load with swap -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+    </noscript>
 
-    <!-- KaTeX for Math -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+    <!-- KaTeX for Math - load async -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+    </noscript>
 
     <!-- Preload critical assets -->
     <link rel="preload" href="/favicon.svg" as="image" />
