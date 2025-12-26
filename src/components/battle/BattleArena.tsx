@@ -196,7 +196,8 @@ export function BattleArena({ battle, onComplete }: BattleArenaProps) {
           <div className="space-y-3">
             {currentQuestion.options.map((option, index) => {
               const isSelected = selectedAnswer === option.text;
-              const isCorrectAnswer = showResult && option.text === lastResult?.correctAnswer;
+              // Use option.isCorrect from API (pre-computed) for correct answer highlighting
+              const isCorrectAnswer = showResult && (option as { isCorrect?: boolean }).isCorrect === true;
               const isWrongAnswer = showResult && isSelected && !lastResult?.isCorrect;
 
               return (

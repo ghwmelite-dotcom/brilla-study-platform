@@ -108,6 +108,44 @@ function transformQuestionOptions(
   });
 }
 
+// Normalize answer for comparison
+// Handles cases where:
+// - User submits "A. 1/4" but correct_answer is "A"
+// - User submits "B. 5/4" but correct_answer is "B"
+// - User submits "True" but correct_answer is "true"
+// - User submits the actual value matching correct_answer directly
+function normalizeAnswerForComparison(
+  userAnswer: string,
+  correctAnswer: string
+): { userNormalized: string; correctNormalized: string } {
+  const userTrimmed = userAnswer.trim().toLowerCase();
+  const correctTrimmed = correctAnswer.trim().toLowerCase();
+
+  // If they match directly, return as-is
+  if (userTrimmed === correctTrimmed) {
+    return { userNormalized: userTrimmed, correctNormalized: correctTrimmed };
+  }
+
+  // Check if user answer starts with a letter followed by period/dot (e.g., "A. 1/4", "B. value")
+  const letterMatch = userAnswer.match(/^([A-Fa-f])\s*\.\s*/);
+  if (letterMatch) {
+    const userLetter = letterMatch[1].toUpperCase();
+    // If correct answer is a single letter, compare letters
+    if (/^[A-Fa-f]$/i.test(correctAnswer.trim())) {
+      return {
+        userNormalized: userLetter.toLowerCase(),
+        correctNormalized: correctTrimmed
+      };
+    }
+    // Otherwise, extract the value after the letter prefix and compare
+    const userValue = userAnswer.replace(/^[A-Fa-f]\s*\.\s*/, '').trim().toLowerCase();
+    return { userNormalized: userValue, correctNormalized: correctTrimmed };
+  }
+
+  // Default: compare as-is
+  return { userNormalized: userTrimmed, correctNormalized: correctTrimmed };
+}
+
 // Password hashing using Web Crypto API (PBKDF2)
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -2900,8 +2938,11 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
       return c.json({ success: false, error: 'Question not found' }, 404);
     }
 
-    const isCorrect = answer.toLowerCase().trim() ===
-                      (question.correct_answer as string).toLowerCase().trim();
+    const { userNormalized, correctNormalized } = normalizeAnswerForComparison(
+      answer,
+      question.correct_answer as string
+    );
+    const isCorrect = userNormalized === correctNormalized;
     const pointsEarned = isCorrect ? (question.points as number) : 0;
 
     // Record the attempt with demo data flags
@@ -3574,8 +3615,12 @@ protectedApp.post('/battles/:id/answer', async (c) => {
       return c.json({ success: false, error: 'Already answered this question' }, 400);
     }
 
-    // Check answer
-    const isCorrect = answer.toLowerCase().trim() === question.correct_answer.toLowerCase().trim();
+    // Check answer using normalized comparison
+    const { userNormalized, correctNormalized } = normalizeAnswerForComparison(
+      answer,
+      question.correct_answer
+    );
+    const isCorrect = userNormalized === correctNormalized;
     const pointsEarned = isCorrect ? (question.points || 3) : 0;
 
     // Record answer with demo data flags
@@ -3829,8 +3874,11 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
       const isObjective = ['multiple_choice', 'true_false'].includes(answer.question_type as string);
 
       if (isObjective) {
-        const isCorrect = (answer.answer_text as string).toLowerCase().trim() ===
-                         (answer.correct_answer as string).toLowerCase().trim();
+        const { userNormalized, correctNormalized } = normalizeAnswerForComparison(
+          answer.answer_text as string,
+          answer.correct_answer as string
+        );
+        const isCorrect = userNormalized === correctNormalized;
         const marksEarned = isCorrect ? (answer.marks as number) : 0;
 
         await c.env.DB.prepare(`
@@ -9096,7 +9144,11 @@ protectedApp.post('/student/assessments/:id/submit', async (c) => {
       let marks = 0;
 
       if (isObjective && answer && correctAnswer) {
-        isCorrect = answer.toLowerCase().trim() === (correctAnswer as string).toLowerCase().trim();
+        const { userNormalized, correctNormalized } = normalizeAnswerForComparison(
+          answer,
+          correctAnswer as string
+        );
+        isCorrect = userNormalized === correctNormalized;
         marks = isCorrect ? (qData.marks as number) : 0;
         autoScore += marks;
       }
