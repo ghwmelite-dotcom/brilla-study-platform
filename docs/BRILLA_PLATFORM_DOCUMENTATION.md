@@ -1,10 +1,10 @@
 # Brilla Study Platform
 ## Comprehensive Technical & Feature Documentation
 
-**Document Version:** 1.0
-**Date:** December 21, 2025
+**Document Version:** 2.0
+**Last Updated:** December 26, 2025
 **Prepared by:** Hodges & Co.
-**Client:** Brilla Study Platform
+**Platform:** Brilla Study Platform
 
 ---
 
@@ -15,39 +15,60 @@
 3. [Technical Architecture](#3-technical-architecture)
 4. [User Roles & Permissions](#4-user-roles--permissions)
 5. [Core Features](#5-core-features)
-6. [E-Library System](#6-e-library-system)
-7. [AI Student Counselor](#7-ai-student-counselor)
-8. [Practice & Assessment System](#8-practice--assessment-system)
-9. [Competition & Gamification](#9-competition--gamification)
-10. [Analytics & Reporting](#10-analytics--reporting)
-11. [Parent Portal](#11-parent-portal)
-12. [Teacher Dashboard](#12-teacher-dashboard)
-13. [Admin Panel](#13-admin-panel)
-14. [Database Schema](#14-database-schema)
-15. [API Reference](#15-api-reference)
-16. [Deployment & Infrastructure](#16-deployment--infrastructure)
-17. [Security Considerations](#17-security-considerations)
-18. [Future Roadmap](#18-future-roadmap)
+6. [AI Tutor System](#6-ai-tutor-system)
+7. [E-Library System](#7-e-library-system)
+8. [AI Student Counselor](#8-ai-student-counselor)
+9. [Practice & Assessment System](#9-practice--assessment-system)
+10. [Flashcard System](#10-flashcard-system)
+11. [Competition & Gamification](#11-competition--gamification)
+12. [Whiteboard & Recording System](#12-whiteboard--recording-system)
+13. [Teacher Tutoring Directory](#13-teacher-tutoring-directory)
+14. [Affiliate Program](#14-affiliate-program)
+15. [Analytics & Reporting](#15-analytics--reporting)
+16. [Parent Portal](#16-parent-portal)
+17. [Teacher Dashboard](#17-teacher-dashboard)
+18. [Admin Panel](#18-admin-panel)
+19. [Progressive Web App (PWA)](#19-progressive-web-app-pwa)
+20. [Database Schema](#20-database-schema)
+21. [API Reference](#21-api-reference)
+22. [Deployment & Infrastructure](#22-deployment--infrastructure)
+23. [Security Considerations](#23-security-considerations)
+24. [Troubleshooting Guide](#24-troubleshooting-guide)
+25. [Future Roadmap](#25-future-roadmap)
 
 ---
 
 ## 1. Executive Summary
 
-Brilla Study Platform is a comprehensive educational technology solution designed specifically for Ghanaian students preparing for national examinations including NSMQ (National Science & Maths Quiz), WASSCE (West African Senior School Certificate Examination), and BECE (Basic Education Certificate Examination).
+Brilla Study Platform is Ghana's premier educational technology solution designed for students preparing for national examinations including **NSMQ** (National Science & Maths Quiz), **WASSCE** (West African Senior School Certificate Examination), and **BECE** (Basic Education Certificate Examination).
 
-The platform combines modern web technologies with artificial intelligence to deliver personalized learning experiences, competitive practice environments, and robust progress tracking for students, teachers, and parents.
+The platform combines cutting-edge web technologies with artificial intelligence to deliver personalized learning experiences, competitive practice environments, and robust progress tracking for students, teachers, and parents.
 
 ### Key Highlights
 
-- **10,000+ Practice Questions** across all major subjects
-- **AI-Powered Tutoring** with instant explanations and personalized guidance
-- **E-Library** with multimedia educational resources (PDFs, videos, audio)
-- **AI Student Counselor** for academic, career, and wellbeing support
-- **NSMQ Competition Simulation** with all 5 rounds recreated
-- **Live 1v1 Battles** for real-time competitive practice
-- **Comprehensive Analytics** for tracking student progress
-- **Parent Portal** for monitoring children's educational journey
-- **Teacher Dashboard** for class management and assessment creation
+| Feature | Description |
+|---------|-------------|
+| **10,000+ Practice Questions** | Comprehensive question bank across all major subjects |
+| **AI-Powered Tutoring** | Instant explanations with image analysis capabilities |
+| **E-Library** | Multimedia educational resources (PDFs, videos, audio) |
+| **AI Student Counselor** | Academic, career, and wellbeing support |
+| **NSMQ Competition Simulation** | All 5 rounds faithfully recreated |
+| **Live 1v1 Battles** | Real-time competitive practice |
+| **Flashcard System** | Spaced repetition learning |
+| **Interactive Whiteboard** | Teacher recording and playback |
+| **Teacher Directory** | Find and book tutoring sessions |
+| **Affiliate Program** | Earn commissions through referrals |
+| **PWA Support** | Install on any device, works offline |
+
+### What's New in Version 2.0
+
+- **AI Tutor File Upload**: Upload images of homework for AI analysis
+- **Flashcard System**: Create and study with spaced repetition
+- **Whiteboard Recording**: Teachers can record lessons
+- **Teacher Tutoring Directory**: Find and book private tutors
+- **Affiliate Program**: Earn money through referrals
+- **PWA Enhancements**: Full offline support and device installation
+- **Loading Animations**: Beautiful animated loading screens
 
 ---
 
@@ -55,12 +76,12 @@ The platform combines modern web technologies with artificial intelligence to de
 
 ### 2.1 Target Audience
 
-| User Type | Description |
-|-----------|-------------|
-| **Students** | JHS and SHS students (ages 12-18) preparing for BECE, WASSCE, and NSMQ |
-| **Teachers** | Educators managing classes, creating assessments, and uploading resources |
-| **Parents** | Guardians monitoring their children's academic progress |
-| **Administrators** | Platform managers overseeing user management and content moderation |
+| User Type | Description | Age Range |
+|-----------|-------------|-----------|
+| **Students** | JHS and SHS students preparing for examinations | 12-18 years |
+| **Teachers** | Educators managing classes and creating content | Adults |
+| **Parents** | Guardians monitoring academic progress | Adults |
+| **Administrators** | Platform managers and content moderators | Adults |
 
 ### 2.2 Supported Examinations
 
@@ -69,25 +90,37 @@ The platform combines modern web technologies with artificial intelligence to de
 - Speed training for quick recall
 - Riddles and problem-solving challenges
 - Live 1v1 battle mode
+- Team competition format
 
 #### WASSCE (West African Senior School Certificate)
 - 50+ subject coverage
-- Past papers from 2015-2024
+- Past papers from 2015-2025
 - AI-powered essay grading
 - Theory and objective questions
+- Practical exam preparation
 
 #### BECE (Basic Education Certificate)
 - Complete JHS curriculum coverage
 - All 9 core subjects
 - Practice tests with progress tracking
+- Mock examination mode
 
 ### 2.3 Platform URLs
 
 | Environment | URL | Purpose |
-|------------|-----|---------|
+|-------------|-----|---------|
 | Production (Frontend) | https://brillaprep.org | Main user-facing application |
 | Production (API) | https://brilla-api.ghwmelite.workers.dev | Backend API services |
-| Development | localhost:5173 | Local development environment |
+| Development | localhost:5173 | Local development |
+
+### 2.4 Supported Browsers & Devices
+
+| Platform | Browsers/Requirements |
+|----------|----------------------|
+| Desktop | Chrome 90+, Firefox 88+, Safari 14+, Edge 90+ |
+| Mobile | iOS Safari 14+, Chrome Mobile, Samsung Internet |
+| Tablets | All modern tablet browsers |
+| PWA | Installable on all platforms |
 
 ---
 
@@ -98,72 +131,90 @@ The platform combines modern web technologies with artificial intelligence to de
 #### Frontend
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| React | 18.x | UI framework |
+| React | 18.x | UI framework with hooks |
 | TypeScript | 5.x | Type-safe JavaScript |
 | Vite | 5.x | Build tool and dev server |
 | Tailwind CSS | 3.x | Utility-first styling |
-| Zustand | 4.x | State management |
+| Zustand | 4.x | Lightweight state management |
 | React Router | 6.x | Client-side routing |
-| Lucide React | - | Icon library |
+| Lucide React | Latest | Modern icon library |
+| Recharts | Latest | Data visualization |
+| KaTeX | Latest | Mathematical notation |
 
 #### Backend
 | Technology | Purpose |
 |------------|---------|
-| Cloudflare Workers | Serverless compute |
-| Hono | Web framework for Workers |
-| Cloudflare D1 | SQLite database |
+| Cloudflare Workers | Serverless compute (global edge) |
+| Hono | Lightweight web framework |
+| Cloudflare D1 | SQLite database (distributed) |
 | Cloudflare R2 | Object storage for files |
-| JWT | Authentication tokens |
+| JWT | Stateless authentication |
 
 #### AI Integration
 | Provider | Model | Use Case |
 |----------|-------|----------|
-| Anthropic | Haiku | AI Tutor, Essay Grading, Counselor |
+| Anthropic | Claude Sonnet 4 | AI Tutor with vision |
+| Anthropic | Claude Sonnet 4 | Essay Grading |
+| Anthropic | Claude Sonnet 4 | AI Counselor |
 
 ### 3.2 Project Structure
 
 ```
 brilla-study-platform/
 ├── src/
-│   ├── components/         # Reusable UI components
-│   │   ├── auth/           # Authentication components
-│   │   ├── common/         # Shared components (Button, Modal, etc.)
-│   │   ├── counselor/      # AI Counselor components
-│   │   ├── dashboard/      # Dashboard widgets
-│   │   ├── layout/         # Layout components (Sidebar, Header)
-│   │   ├── library/        # E-Library components
-│   │   └── practice/       # Practice session components
-│   ├── pages/              # Route page components
-│   ├── stores/             # Zustand state stores
-│   ├── types/              # TypeScript type definitions
-│   ├── utils/              # Utility functions
-│   └── data/               # Static data and constants
+│   ├── components/           # Reusable UI components
+│   │   ├── ai/              # AI Tutor components
+│   │   ├── auth/            # Authentication components
+│   │   ├── chat/            # Peer chat components
+│   │   ├── common/          # Shared components
+│   │   ├── counselor/       # AI Counselor components
+│   │   ├── dashboard/       # Dashboard widgets
+│   │   ├── layout/          # Layout components
+│   │   ├── library/         # E-Library components
+│   │   ├── practice/        # Practice components
+│   │   └── whiteboard/      # Whiteboard components
+│   ├── pages/               # Route page components
+│   ├── stores/              # Zustand state stores
+│   ├── hooks/               # Custom React hooks
+│   ├── types/               # TypeScript definitions
+│   ├── utils/               # Utility functions
+│   └── data/                # Static data & constants
 ├── workers/
-│   └── api/                # Cloudflare Workers API
-│       ├── index.ts        # Main API router
-│       ├── library.ts      # E-Library endpoints
-│       └── counselor.ts    # AI Counselor endpoints
+│   └── api/                 # Cloudflare Workers API
+│       ├── index.ts         # Main API router
+│       ├── tutor.ts         # AI Tutor endpoints
+│       ├── library.ts       # E-Library endpoints
+│       ├── counselor.ts     # AI Counselor endpoints
+│       ├── flashcards.ts    # Flashcard endpoints
+│       ├── recordings.ts    # Recording endpoints
+│       ├── tutoring.ts      # Tutoring directory
+│       └── affiliate.ts     # Affiliate system
 ├── database/
-│   └── migrations/         # D1 database migrations
-├── public/                 # Static assets
+│   └── migrations/          # D1 database migrations
+├── public/
+│   ├── icons/              # PWA icons
+│   ├── splash/             # iOS splash screens
+│   └── screenshots/        # PWA screenshots
+├── scripts/                # Build and utility scripts
 └── docs/                   # Documentation
 ```
 
 ### 3.3 State Management
 
-The platform uses Zustand for state management with the following stores:
-
 | Store | Purpose |
 |-------|---------|
-| `authStore` | User authentication and session management |
-| `practiceStore` | Practice session state and question management |
-| `libraryStore` | E-Library resources and collections |
+| `authStore` | User authentication and sessions |
+| `aiTutorStore` | AI Tutor chat and file uploads |
+| `practiceStore` | Practice session management |
+| `flashcardStore` | Flashcard decks and reviews |
+| `libraryStore` | E-Library resources |
 | `counselorStore` | AI Counselor conversations |
-| `aiTutorStore` | AI Tutor chat and explanations |
+| `whiteboardStore` | Whiteboard and recordings |
+| `tutoringStore` | Tutoring sessions |
+| `affiliateStore` | Affiliate program data |
 | `questStore` | Daily quests and achievements |
 | `battleStore` | 1v1 battle state |
-| `subjectStore` | Subject and topic data |
-| `leaderboardStore` | Rankings and leaderboard data |
+| `chatStore` | Peer messaging |
 
 ---
 
@@ -173,25 +224,35 @@ The platform uses Zustand for state management with the following stores:
 
 #### Student
 - Access practice questions and assessments
-- Use AI Tutor and AI Counselor
+- Use AI Tutor with file upload capability
+- Use AI Counselor for guidance
 - Browse and download E-Library resources
+- Create and study flashcards
 - Participate in competitions and battles
 - Track personal progress and analytics
 - Complete daily quests and earn XP
+- Book tutoring sessions
+- Participate in affiliate program
 
 #### Teacher
 - All student permissions
 - Create and manage classes
 - Build custom assessments
 - Upload resources to E-Library
+- Create and share flashcard decks
+- Use whiteboard with recording
+- List in tutoring directory
 - View student performance reports
 - Grade essay submissions
+- Earn through tutoring and referrals
 
 #### Parent
 - View linked children's progress
 - Access performance reports
 - Monitor study activity and streaks
-- Receive notifications about child's performance
+- Receive notifications
+- Manage subscription settings
+- Participate in affiliate program
 
 #### Administrator
 - All teacher permissions
@@ -199,20 +260,25 @@ The platform uses Zustand for state management with the following stores:
 - Content moderation
 - System analytics and audit logs
 - Platform configuration
+- Affiliate payout management
+- Teacher verification
 
 ### 4.2 Permission Matrix
 
 | Feature | Student | Teacher | Parent | Admin |
 |---------|:-------:|:-------:|:------:|:-----:|
 | Practice Questions | ✓ | ✓ | - | ✓ |
-| AI Tutor | ✓ | ✓ | - | ✓ |
+| AI Tutor (with file upload) | ✓ | ✓ | - | ✓ |
 | AI Counselor | ✓ | ✓ | - | ✓ |
 | E-Library (View) | ✓ | ✓ | - | ✓ |
 | E-Library (Upload) | - | ✓ | - | ✓ |
-| E-Library (Delete Own) | - | ✓ | - | ✓ |
-| E-Library (Delete Any) | - | - | - | ✓ |
+| Flashcards (Create) | ✓ | ✓ | - | ✓ |
+| Flashcards (Public) | - | ✓ | - | ✓ |
+| Whiteboard Recording | - | ✓ | - | ✓ |
+| Tutoring Directory | View | List & Manage | - | Manage |
 | Create Assessments | - | ✓ | - | ✓ |
 | View Child Progress | - | - | ✓ | - |
+| Affiliate Program | ✓ | ✓ | ✓ | ✓ |
 | User Management | - | - | - | ✓ |
 | Audit Logs | - | - | - | ✓ |
 
@@ -226,164 +292,244 @@ The platform uses Zustand for state management with the following stores:
 1. User selects role (Student, Teacher, Parent)
 2. Provides email, password, and profile information
 3. Students/Teachers select school and grade level
-4. Account created with email verification (optional)
-5. Teachers/Students require admin approval
+4. Teachers can set up tutoring profile
+5. Account created (email verification optional)
+6. Teachers require admin approval
 
 #### Login Methods
-- Email and password
-- Persistent sessions with JWT tokens
+- Email and password authentication
+- Persistent sessions with JWT tokens (7-day expiry)
 - Automatic session refresh
+- "Remember me" functionality
 
-#### Security Features
-- Password hashing with bcrypt
-- JWT token expiration (7 days)
-- Role-based access control
-- Account suspension capability
+#### Password Management
+- Secure password reset via email
+- Password strength requirements
+- bcrypt hashing with salt
 
 ### 5.2 Dashboard
 
 Each user role has a customized dashboard:
 
 #### Student Dashboard
-- XP and level progress
-- Current streak status
-- Daily quest progress
-- Quick access to practice
-- Recent activity feed
-- Upcoming assessments
+| Widget | Description |
+|--------|-------------|
+| XP Progress | Current level and XP to next level |
+| Streak Status | Current streak with flame animation |
+| Daily Quests | Progress on today's challenges |
+| Quick Practice | One-click access to practice modes |
+| Recent Activity | Timeline of recent actions |
+| Upcoming Assessments | Scheduled tests and deadlines |
+| Leaderboard Position | Current ranking |
 
 #### Teacher Dashboard
-- Class overview
-- Pending assignments to grade
-- Student performance summary
-- Quick actions for common tasks
+| Widget | Description |
+|--------|-------------|
+| Class Overview | Student count and activity |
+| Pending Grading | Assessments awaiting review |
+| Tutoring Requests | Pending session bookings |
+| Performance Summary | Class analytics |
+| Quick Actions | Common task shortcuts |
 
 #### Parent Dashboard
-- Children's progress overview
-- Recent activity timeline
-- Performance trends
-- Study time statistics
+| Widget | Description |
+|--------|-------------|
+| Children Overview | All linked children's status |
+| Activity Timeline | Recent study activities |
+| Performance Trends | Weekly/monthly progress |
+| Study Time | Hours studied this week |
+| Alerts | Important notifications |
 
 ### 5.3 Subject & Topic System
 
-The platform organizes content into a hierarchical structure:
+The platform organizes content hierarchically:
 
 ```
-Subject (e.g., Mathematics)
-└── Topic (e.g., Algebra)
-    └── Questions (Multiple types)
+Exam Type (NSMQ, WASSCE, BECE)
+└── Subject (e.g., Mathematics)
+    └── Topic (e.g., Algebra)
+        └── Subtopic (e.g., Linear Equations)
+            └── Questions (Multiple types)
 ```
 
-#### Supported Subjects
-- Mathematics
+#### Supported Subjects (50+)
+
+**Core Subjects:**
+- Mathematics (Core & Elective)
 - English Language
 - Integrated Science
 - Social Studies
-- French
-- ICT
+
+**Sciences:**
 - Physics
 - Chemistry
 - Biology
+
+**Languages:**
+- French
+- Literature in English
+- Ghanaian Languages (Akan, Ga, Ewe)
+
+**Humanities:**
 - Geography
 - History
 - Economics
-- And 40+ more subjects
+- Government
+- Religious Studies
+
+**Vocational/Technical:**
+- ICT
+- Business Management
+- Accounting
+- And more...
 
 ### 5.4 Question Types
 
-| Type | Description | Supported Exams |
-|------|-------------|-----------------|
-| Multiple Choice | 4 options, single correct answer | All |
-| True/False | Binary choice questions | All |
-| Fill in the Blank | Text input for missing words | All |
-| Short Answer | Brief text responses | WASSCE, BECE |
-| Essay | Long-form written responses with AI grading | WASSCE |
-| Speed Round | Time-limited questions (NSMQ style) | NSMQ |
-| Riddle | Word puzzles and brain teasers | NSMQ |
+| Type | Description | Scoring | Exams |
+|------|-------------|---------|-------|
+| Multiple Choice | 4 options, single answer | Auto-graded | All |
+| True/False | Binary choice | Auto-graded | All |
+| Fill in the Blank | Text input | Auto-graded | All |
+| Short Answer | Brief response | Auto-graded | WASSCE, BECE |
+| Essay | Long-form writing | AI + Manual | WASSCE |
+| Speed Round | Time-limited (10s) | Auto-graded | NSMQ |
+| Riddle | Word puzzles | Auto-graded | NSMQ |
+| Problem of the Day | Multi-step | Partial credit | NSMQ |
 
 ---
 
-## 6. E-Library System
+## 6. AI Tutor System
 
 ### 6.1 Overview
 
-The E-Library is a comprehensive digital resource management system allowing teachers and administrators to upload, organize, and share educational materials with students.
+The AI Tutor is powered by Claude Sonnet 4 and provides personalized tutoring assistance with advanced capabilities including image analysis for homework help.
 
-### 6.2 Supported Resource Types
+### 6.2 Features
+
+| Feature | Description |
+|---------|-------------|
+| Natural Conversation | Chat-based interface with typing animations |
+| Image Analysis | Upload photos of homework for AI analysis |
+| Step-by-Step Solutions | Detailed problem breakdowns |
+| Concept Explanations | Clear explanations with examples |
+| Hints System | Progressive hints (Level 1-3) |
+| Exam-Specific Mode | NSMQ, WASSCE, or BECE context |
+| Personalization | Uses student name and performance data |
+| Quick Actions | Pre-defined prompts for common questions |
+
+### 6.3 File Upload Feature
+
+Students can upload files for AI analysis:
+
+| File Type | Extensions | Max Size | Use Cases |
+|-----------|------------|----------|-----------|
+| Images | JPG, PNG, GIF, WebP | 10 MB | Homework photos, diagrams, handwriting |
+| Documents | PDF | 10 MB | Past papers, textbook pages |
+
+**Upload Process:**
+1. Click the 📎 paperclip button
+2. Select up to 3 files
+3. Preview files before sending
+4. Add optional message
+5. AI analyzes and responds
+
+**What AI Can Analyze:**
+- Handwritten math problems
+- Science diagrams and graphs
+- Chemistry equations
+- Physics circuit diagrams
+- Biology diagrams
+- Past paper questions
+- Textbook pages
+
+### 6.4 Conversation Modes
+
+| Mode | System Prompt | Use Case |
+|------|---------------|----------|
+| General | Open-ended tutoring | Any question |
+| Explanation | Explain a concept | After answering wrong |
+| Hint | Progressive guidance | Stuck on a question |
+| Step-by-Step | Detailed solution | Complex problems |
+
+### 6.5 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/tutor/chat` | Send message with optional attachments |
+| POST | `/api/tutor/explain` | Get question explanation |
+| POST | `/api/tutor/hint` | Get progressive hint |
+| POST | `/api/tutor/step-by-step` | Get step-by-step solution |
+| GET | `/api/tutor/conversations` | List conversations |
+| GET | `/api/tutor/conversations/:id` | Get conversation |
+| POST | `/api/tutor/feedback` | Rate response helpfulness |
+
+---
+
+## 7. E-Library System
+
+### 7.1 Overview
+
+The E-Library is a comprehensive digital resource management system for educational materials.
+
+### 7.2 Supported Resource Types
 
 | Type | Extensions | Max Size | Features |
 |------|------------|----------|----------|
 | PDF | .pdf | 50 MB | In-browser viewing, progress tracking |
-| Video | .mp4, .webm, .mov | 500 MB | Streaming playback, progress tracking |
-| Audio | .mp3, .wav, .m4a | 100 MB | Audio player with controls |
+| Video | .mp4, .webm, .mov | 500 MB | Streaming playback, chapters |
+| Audio | .mp3, .wav, .m4a | 100 MB | Audio player with speed control |
 | Document | .doc, .docx, .txt | 20 MB | Download only |
 | Interactive | .html, .zip | 50 MB | Embedded iframe |
 | Link | URL | - | External resource linking |
 
-### 6.3 Resource Management
+### 7.3 Resource Management
 
 #### Upload Process
 1. Select resource type
 2. Drag and drop or browse for file
-3. Enter metadata (title, description, subject, tags)
-4. Set access level (Free, Basic, Premium)
-5. Configure downloadable option
-6. Optional: Mark as featured
-7. Submit for processing
+3. Enter metadata:
+   - Title (required)
+   - Description
+   - Subject association
+   - Topic association
+   - School level (JHS, SHS, Both)
+   - Access level (Free, Basic, Premium)
+   - Tags (comma-separated)
+4. Configure options:
+   - Downloadable toggle
+   - Featured toggle
+5. Submit for processing
 
-#### Resource Metadata
-- Title (required)
-- Description
-- Resource type
-- Subject association
-- Topic association
-- School level (JHS, SHS, Both)
-- Access level
-- Tags (comma-separated)
-- Featured flag
-- Downloadable flag
+### 7.4 Collections
 
-### 6.4 Collections
-
-Users can organize resources into personal collections:
+Users can organize resources:
 - Create named collections
 - Add resources to multiple collections
-- Reorder resources within collections
+- Reorder resources
 - Share public collections
+- Collaborate on collections
 
-### 6.5 Features
+### 7.5 Features
 
 | Feature | Description |
 |---------|-------------|
-| Search | Full-text search across titles, descriptions, and tags |
-| Filtering | Filter by type, subject, school level, access level |
-| Sorting | Sort by newest, popular, rating, or title |
-| Progress Tracking | Track viewing/reading progress per resource |
-| Ratings & Reviews | 5-star rating system with optional reviews |
-| View/Download Counts | Analytics on resource popularity |
-| Bookmarking | Save resources for quick access |
-
-### 6.6 API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/library/resources` | List/search resources |
-| GET | `/api/library/resources/:id` | Get resource details |
-| GET | `/api/library/featured` | Get featured resources |
-| POST | `/api/library/upload` | Upload new resource |
-| PUT | `/api/library/resources/:id` | Update resource |
-| DELETE | `/api/library/resources/:id` | Delete resource |
-| GET | `/api/library/files/*` | Serve file from R2 |
+| Full-text Search | Search titles, descriptions, and tags |
+| Advanced Filtering | Filter by type, subject, level, access |
+| Smart Sorting | Newest, popular, rating, alphabetical |
+| Progress Tracking | Track viewing/reading progress |
+| Ratings & Reviews | 5-star system with comments |
+| Bookmarking | Save for quick access |
+| Download Tracking | Analytics on downloads |
 
 ---
 
-## 7. AI Student Counselor
+## 8. AI Student Counselor
 
-### 7.1 Overview
+### 8.1 Overview
 
-The AI Student Counselor provides personalized support to students across three specialized domains: academic guidance, career counseling, and wellbeing support.
+AI-powered guidance across three specialized domains.
 
-### 7.2 Counselor Types
+### 8.2 Counselor Types
 
 #### Academic Counselor
 - Study strategy recommendations
@@ -402,160 +548,186 @@ The AI Student Counselor provides personalized support to students across three 
 #### Wellbeing Counselor
 - Stress management techniques
 - Study-life balance guidance
-- Motivation and confidence building
-- Anxiety and pressure coping
-- Mental health resources (referral when appropriate)
+- Motivation and confidence
+- Anxiety coping strategies
+- Professional referrals when needed
 
-### 7.3 Features
-
-| Feature | Description |
-|---------|-------------|
-| Conversation History | Persistent chat history across sessions |
-| Context Awareness | Uses student's performance data for personalized advice |
-| Resource Suggestions | Recommends relevant E-Library materials |
-| Typing Animation | Natural message delivery experience |
-| Feedback System | Rate message helpfulness |
-| Quick Actions | Pre-defined prompts for common questions |
-
-### 7.4 Safety Measures
+### 8.3 Safety Measures
 
 - Sentiment detection for concerning messages
-- Escalation protocols for crisis situations
+- Automatic escalation protocols
 - Professional referral recommendations
-- Conversation flagging for admin review
-
-### 7.5 API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/counselor/conversations` | List user's conversations |
-| POST | `/api/counselor/conversations` | Start new conversation |
-| GET | `/api/counselor/conversations/:id` | Get conversation with messages |
-| POST | `/api/counselor/chat` | Send message and get AI response |
-| DELETE | `/api/counselor/conversations/:id` | Archive conversation |
+- Conversation flagging for review
+- Crisis resource provision
 
 ---
 
-## 8. Practice & Assessment System
+## 9. Practice & Assessment System
 
-### 8.1 Practice Modes
+### 9.1 Practice Modes
 
-#### Topic Practice
+#### Topic Drill
 - Select subject and topic
-- Unlimited practice questions
-- Immediate feedback with explanations
-- AI Tutor available for help
+- Choose difficulty level
+- Set question count
+- Immediate feedback
+- AI Tutor available
 
-#### Timed Practice
-- Configurable time limits
-- Question count selection
-- Performance scoring
-- Speed metrics tracking
+#### Speed Race
+- NSMQ-style rapid questions
+- 10-second timer
+- First-correct scoring
+- Leaderboard ranking
 
-#### Mock Exams
-- Full exam simulation
+#### Flashcard Mode
+- Study flashcard decks
+- Spaced repetition
+- Self-rating system
+- Progress tracking
+
+### 9.2 Mock Exams
+
+Full examination simulation:
 - Realistic timing
 - Question paper format
+- All question types
 - Comprehensive results
+- Performance analysis
 
-#### Past Papers
-- WASSCE papers (2015-2024)
-- BECE papers
+### 9.3 Past Papers
+
+Available papers:
+- WASSCE (2015-2025)
+- BECE (2015-2025)
+- NSMQ regional qualifiers
 - Original marking schemes
 - AI essay grading
 
-### 8.2 Assessment Builder
+### 9.4 AI Essay Grading
 
-Teachers can create custom assessments with:
-- Multiple question types
-- Time limits
-- Randomized question order
-- Scheduled availability
-- Class/group assignment
-- Grading rubrics
-
-### 8.3 AI-Powered Essay Grading
-
-For essay-type questions:
-1. Student submits essay response
-2. AI analyzes content, structure, grammar
-3. Provides score based on rubric
-4. Generates detailed feedback
+Process:
+1. Student submits essay
+2. AI analyzes:
+   - Content accuracy
+   - Structure and organization
+   - Grammar and spelling
+   - Argument quality
+3. Generates score based on rubric
+4. Provides detailed feedback
 5. Suggests improvements
-
-### 8.4 Progress Tracking
-
-| Metric | Description |
-|--------|-------------|
-| Accuracy | Percentage of correct answers |
-| Speed | Average time per question |
-| Streak | Consecutive days of practice |
-| XP | Experience points earned |
-| Level | Current proficiency level |
-| Topics Mastered | Topics with >80% accuracy |
 
 ---
 
-## 9. Competition & Gamification
+## 10. Flashcard System
 
-### 9.1 NSMQ Competition Mode
+### 10.1 Overview
 
-Full simulation of the National Science & Maths Quiz:
+Spaced repetition learning system for effective memorization.
 
-#### Round 1: Fundamental
-- Basic recall questions
-- 30 seconds per question
+### 10.2 Features
+
+| Feature | Description |
+|---------|-------------|
+| Create Decks | Organize cards by subject/topic |
+| Card Types | Text, image, formula (LaTeX) |
+| Spaced Repetition | Optimized review schedule |
+| Self-Rating | Rate difficulty (1-5) |
+| Progress Tracking | Mastery percentage |
+| Public Decks | Browse community decks |
+| Import/Export | Share deck files |
+
+### 10.3 Review Process
+
+1. Card front shown
+2. User recalls answer
+3. Reveal back of card
+4. Self-rate difficulty:
+   - 1: Again (show soon)
+   - 2: Hard (show later today)
+   - 3: Good (show in a few days)
+   - 4: Easy (show in a week+)
+5. Algorithm schedules next review
+
+### 10.4 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/flashcards/decks` | List user's decks |
+| POST | `/api/flashcards/decks` | Create new deck |
+| GET | `/api/flashcards/decks/:id` | Get deck with cards |
+| GET | `/api/flashcards/due` | Get cards due for review |
+| POST | `/api/flashcards/:id/review` | Submit review rating |
+| GET | `/api/flashcards/public` | Browse public decks |
+
+---
+
+## 11. Competition & Gamification
+
+### 11.1 NSMQ Competition Mode
+
+Full simulation of all 5 rounds:
+
+#### Round 1: Fundamentals
+- 16 questions
+- 30 seconds each
+- Basic recall
 - Individual scoring
 
 #### Round 2: Speed Race
-- First to answer correctly wins
-- 10 seconds time limit
-- Bonus points for speed
+- 12 questions
+- First correct wins
+- 10 seconds limit
+- Bonus for speed
 
 #### Round 3: Problem of the Day
-- Complex multi-step problem
-- Extended time allowed
+- 1 complex problem
+- Extended time (5 minutes)
+- Up to 10 points
 - Partial credit available
 
 #### Round 4: True or False
 - Rapid-fire format
-- 15 seconds per question
-- Penalty for wrong answers
+- 15 seconds each
+- +2/-2 points
+- Strategy important
 
 #### Round 5: Riddles
-- Word puzzles and brain teasers
+- Word puzzles
+- 3 clues per riddle
+- 5-3 points based on clue number
 - Lateral thinking required
-- Point multipliers
 
-### 9.2 Live 1v1 Battles
+### 11.2 Live 1v1 Battles
 
 Real-time competitive mode:
-- Matchmaking by skill level
+- Skill-based matchmaking
 - Synchronized questions
 - Live score updates
-- Victory/defeat animations
+- Victory animations
 - XP rewards
+- Battle history
 
-### 9.3 House System
+### 11.3 House System
 
-School-based team competition:
+School team competition:
 - Join your school house
-- Contribute to house points
-- Weekly house rankings
+- Contribute points
+- Weekly rankings
 - House Cup championship
+- Special house events
 
-### 9.4 Leaderboards
+### 11.4 Leaderboards
 
-| Leaderboard | Scope | Ranking Criteria |
-|-------------|-------|------------------|
+| Leaderboard | Scope | Criteria |
+|-------------|-------|----------|
 | National | All users | Total XP |
 | School | Same school | Weekly XP |
 | Subject | Per subject | Accuracy + XP |
-| Battle | Battle participants | Win rate |
+| Battle | Battle mode | Win rate |
+| Weekly | All users | This week's XP |
 
-### 9.5 Gamification Elements
+### 11.5 XP System
 
-#### XP System
 | Action | XP Reward |
 |--------|-----------|
 | Answer correctly | 10 XP |
@@ -563,307 +735,489 @@ School-based team competition:
 | Daily streak | 25 XP |
 | Win battle | 100 XP |
 | Complete quest | Variable |
+| First time correct | Bonus 5 XP |
 
-#### Achievements
-- First Steps: Complete first practice
-- Streak Master: 30-day streak
-- Battle Champion: Win 50 battles
-- Subject Expert: Master all topics in a subject
-- Speed Demon: Answer 100 questions under 5 seconds
+### 11.6 Achievements
 
-#### Daily Quests
-- Practice X questions
-- Complete X topics
-- Achieve X% accuracy
-- Win X battles
-- Use AI Tutor
+- **First Steps**: Complete first practice session
+- **Streak Master**: Maintain 30-day streak
+- **Battle Champion**: Win 50 battles
+- **Subject Expert**: Master all topics in a subject
+- **Speed Demon**: Answer 100 questions under 5 seconds
+- **Social Butterfly**: Add 10 friends
+- **Helpful Hand**: Get 50 upvotes on forum posts
+- **Flashcard Guru**: Review 1000 cards
 
 ---
 
-## 10. Analytics & Reporting
+## 12. Whiteboard & Recording System
 
-### 10.1 Student Analytics
+### 12.1 Overview
+
+Interactive whiteboard for teachers with recording capability.
+
+### 12.2 Features
+
+| Feature | Description |
+|---------|-------------|
+| Drawing Tools | Pen, highlighter, shapes, text |
+| Colors | Full color palette |
+| Undo/Redo | Complete action history |
+| Pages | Multiple whiteboard pages |
+| Recording | Record teaching sessions |
+| Playback | Students watch recordings |
+| Cloud Storage | Recordings saved to R2 |
+| Sharing | Share with classes or publicly |
+
+### 12.3 Recording Process
+
+1. Teacher creates new whiteboard
+2. Clicks "Start Recording"
+3. All actions captured in real-time
+4. Teacher explains using audio (optional)
+5. Clicks "Stop Recording"
+6. Recording saved and processed
+7. Students can access and playback
+
+### 12.4 Playback Features
+
+- Play/pause controls
+- Speed adjustment (0.5x - 2x)
+- Seek to any point
+- Full-screen mode
+- Download option (teachers)
+
+---
+
+## 13. Teacher Tutoring Directory
+
+### 13.1 Overview
+
+Marketplace connecting students with verified tutors.
+
+### 13.2 For Teachers
+
+#### Profile Setup
+- Professional bio
+- Teaching subjects
+- Qualifications
+- Experience years
+- Hourly rate
+- Availability schedule
+- Teaching style
+
+#### Management
+- Accept/decline requests
+- Schedule sessions
+- Conduct sessions
+- Track earnings
+- Receive reviews
+
+### 13.3 For Students
+
+#### Finding Tutors
+- Browse directory
+- Filter by subject, price, rating
+- View teacher profiles
+- Check availability
+- Read reviews
+
+#### Booking Process
+1. Select teacher
+2. Choose subject/topic
+3. Pick available slot
+4. Write session goals
+5. Submit request
+6. Wait for acceptance
+7. Attend session
+
+### 13.4 Session Types
+
+| Type | Description | Duration |
+|------|-------------|----------|
+| One-on-One | Private session | 30-120 min |
+| Group Session | Multiple students | 60-120 min |
+| Quick Help | Brief questions | 15-30 min |
+
+---
+
+## 14. Affiliate Program
+
+### 14.1 Overview
+
+Earn commissions by referring new users to Brilla Prep.
+
+### 14.2 How It Works
+
+1. **Get Your Link**: Unique referral code/link
+2. **Share**: Send to friends, post on social media
+3. **Track**: Monitor clicks and signups
+4. **Earn**: Receive commission on paid subscriptions
+
+### 14.3 Commission Structure
+
+| Action | Commission |
+|--------|------------|
+| Free Signup | GHS 0 (tracked) |
+| Basic Subscription | 15% of payment |
+| Premium Subscription | 20% of payment |
+| Recurring (Monthly) | 10% ongoing |
+
+### 14.4 Payout
+
+- Minimum payout: GHS 50
+- Payment methods: Mobile Money, Bank Transfer
+- Payout schedule: Monthly (1st of month)
+- Dashboard for tracking earnings
+
+### 14.5 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/affiliate/stats` | Get referral statistics |
+| GET | `/api/affiliate/referrals` | List referred users |
+| GET | `/api/affiliate/earnings` | View earnings history |
+| POST | `/api/affiliate/withdraw` | Request payout |
+
+---
+
+## 15. Analytics & Reporting
+
+### 15.1 Student Analytics
 
 #### Performance Dashboard
-- Overall accuracy trend graph
+- Overall accuracy trend
 - Subject-by-subject breakdown
-- Strength and weakness analysis
+- Strength/weakness analysis
 - Time spent studying
-- Comparison to peers (percentile)
+- Peer comparison (percentile)
 
-#### Progress Reports
-- Weekly summary emails
+#### Exportable Reports
+- Weekly summaries
 - Monthly detailed reports
-- Exportable PDF reports
+- PDF export
+- Share with parents
 
-### 10.2 Teacher Analytics
+### 15.2 Teacher Analytics
 
 #### Class Performance
-- Class average scores
-- Individual student progress
+- Class averages
+- Individual progress
 - Topic coverage heatmap
-- Assessment results analysis
+- Assessment analysis
 
-#### Resource Engagement
-- View counts per resource
-- Download statistics
-- Student completion rates
+#### Engagement Metrics
+- Resource views
+- Session attendance
+- Question attempts
+- Completion rates
 
-### 10.3 Admin Analytics
+### 15.3 Admin Analytics
 
 #### Platform Metrics
-- Daily/weekly/monthly active users
-- Question attempt volume
-- Popular subjects and topics
-- User growth trends
+- DAU/WAU/MAU
+- Question attempts
+- Popular content
+- Revenue tracking
 
-#### Audit Logs
-- User actions tracking
-- Content modifications
-- System changes
+#### Audit System
+- User actions
+- Content changes
 - Security events
+- Data export
 
 ---
 
-## 11. Parent Portal
+## 16. Parent Portal
 
-### 11.1 Features
+### 16.1 Features
 
 #### Child Linking
-- Request link to child's account
-- Child approves connection
-- Multiple children support
+- Request link via child's email
+- Child approves in-app
+- Support for multiple children
 
 #### Progress Monitoring
 - Real-time activity feed
-- Practice session summaries
+- Session summaries
 - Assessment results
 - Streak status
+- XP and level
 
-#### Reports
+#### Reports & Notifications
 - Weekly email summaries
-- Performance trend charts
-- Study time analysis
-- Subject-wise breakdown
-
-#### Notifications
-- Low activity alerts
+- Performance alerts
 - Achievement celebrations
-- Assessment reminders
-- Streak at-risk warnings
+- Study time reminders
 
-### 11.2 Settings
+### 16.2 Settings
 
 - Notification preferences
 - Report frequency
 - Privacy controls
-- Child account management
+- Child account oversight
 
 ---
 
-## 12. Teacher Dashboard
+## 17. Teacher Dashboard
 
-### 12.1 Class Management
+### 17.1 Class Management
 
 #### Create Classes
 - Class name and description
-- Grade level selection
+- Grade level
 - Subject assignment
-- Enrollment settings
+- Enrollment settings (code, open, invite)
 
 #### Student Management
 - View enrolled students
 - Add/remove students
-- Assign groups within class
-- View individual performance
+- Assign groups
+- Track individual progress
 
-### 12.2 Assessment Tools
+### 17.2 Assessment Tools
 
 #### Assessment Builder
 - Question bank access
 - Custom question creation
-- Multiple assessment types
-- Scheduling options
+- Multiple types
+- Time limits
+- Scheduling
+- Auto-grading + manual review
 
-#### Grading
-- Auto-graded objectives
-- Manual essay grading
-- AI-assisted essay scoring
-- Feedback templates
+### 17.3 Content Creation
 
-### 12.3 Content Upload
-
-#### E-Library Contributions
-- Upload educational resources
-- Organize by subject/topic
-- Set access permissions
-- Track engagement
+- Upload to E-Library
+- Create flashcard decks
+- Record whiteboard lessons
+- Share with classes
 
 ---
 
-## 13. Admin Panel
+## 18. Admin Panel
 
-### 13.1 User Management
+### 18.1 User Management
 
-#### User Operations
 - View all users
 - Search and filter
-- Edit user details
-- Change user roles
-- Suspend/activate accounts
+- Edit profiles
+- Change roles
+- Suspend/activate
 - Delete accounts
+- Bulk actions
 
-#### Approval Workflow
-- Pending teacher approvals
-- Pending student approvals
-- Bulk approval actions
+### 18.2 Content Management
 
-### 13.2 Content Management
+- Question CRUD
+- CSV import
+- Quality review
+- Resource moderation
+- Featured curation
 
-#### Question Management
-- Add/edit/delete questions
-- Import questions (CSV)
-- Question quality review
-- Tag management
+### 18.3 System Settings
 
-#### Resource Moderation
-- Review flagged content
-- Approve/reject uploads
-- Featured content curation
-
-### 13.3 System Settings
-
-#### Platform Configuration
 - Feature toggles
 - Rate limits
-- Notification settings
+- Email templates
 - Maintenance mode
 
-#### Analytics Access
-- Full platform analytics
-- Export capabilities
-- Custom report generation
+### 18.4 Financial
 
-### 13.4 Audit System
-
-- Complete action logging
-- User activity trails
-- Security event monitoring
-- Data export for compliance
+- Subscription management
+- Affiliate payouts
+- Revenue reports
+- Teacher payments
 
 ---
 
-## 14. Database Schema
+## 19. Progressive Web App (PWA)
 
-### 14.1 Core Tables
+### 19.1 Overview
 
-#### users
+Brilla Prep is a fully-featured Progressive Web App, installable on any device.
+
+### 19.2 Installation
+
+#### Android (Chrome)
+1. Visit brillaprep.org
+2. Tap "Add to Home Screen" prompt
+3. Or: Menu → "Install app"
+4. Confirm installation
+5. App appears on home screen
+
+#### iOS (Safari)
+1. Visit brillaprep.org
+2. Tap Share button
+3. Select "Add to Home Screen"
+4. Confirm with "Add"
+5. App appears on home screen
+
+#### Desktop (Chrome/Edge)
+1. Visit brillaprep.org
+2. Click install icon in address bar
+3. Or: Menu → "Install Brilla Prep"
+4. Confirm installation
+5. App opens in own window
+
+### 19.3 Features
+
+| Feature | Description |
+|---------|-------------|
+| Offline Support | Core features work offline |
+| Push Notifications | Quest reminders, streak alerts |
+| Background Sync | Sync data when online |
+| App-like Experience | Full-screen, no browser UI |
+| Auto-Update | Always latest version |
+| Shortcuts | Quick access to Practice, Dashboard |
+
+### 19.4 Splash Screens
+
+Custom splash screens for all devices:
+- iPhone SE through iPhone 15 Pro Max
+- All iPad models
+- Android devices
+- Desktop browsers
+
+---
+
+## 20. Database Schema
+
+### 20.1 Core Tables
+
 ```sql
+-- Users table
 CREATE TABLE users (
     id TEXT PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     name TEXT NOT NULL,
-    role TEXT CHECK (role IN ('student', 'teacher', 'admin')),
+    role TEXT CHECK (role IN ('student', 'teacher', 'parent', 'admin')),
     school TEXT,
-    grade_level TEXT,
+    school_level TEXT,
+    year_group TEXT,
     house TEXT,
     xp INTEGER DEFAULT 0,
     level INTEGER DEFAULT 1,
     streak_days INTEGER DEFAULT 0,
     longest_streak INTEGER DEFAULT 0,
     last_practice_date TEXT,
+    referral_code TEXT UNIQUE,
+    referred_by TEXT,
     is_verified INTEGER DEFAULT 0,
     is_approved INTEGER DEFAULT 0,
     created_at TEXT DEFAULT (datetime('now'))
 );
-```
 
-#### library_resources
-```sql
-CREATE TABLE library_resources (
+-- Flashcard tables
+CREATE TABLE flashcard_decks (
     id TEXT PRIMARY KEY,
-    title TEXT NOT NULL,
+    user_id TEXT REFERENCES users(id),
+    name TEXT NOT NULL,
     description TEXT,
-    resource_type TEXT NOT NULL,
-    content_url TEXT NOT NULL,
-    thumbnail_url TEXT,
-    file_size INTEGER,
-    duration INTEGER,
     subject_id TEXT,
     topic_id TEXT,
-    school_level TEXT,
-    access_level TEXT DEFAULT 'free',
-    tags TEXT,
-    uploaded_by TEXT NOT NULL,
-    is_featured INTEGER DEFAULT 0,
-    is_active INTEGER DEFAULT 1,
-    is_downloadable INTEGER DEFAULT 1,
-    views INTEGER DEFAULT 0,
-    downloads INTEGER DEFAULT 0,
+    is_public INTEGER DEFAULT 0,
+    card_count INTEGER DEFAULT 0,
     created_at TEXT DEFAULT (datetime('now'))
 );
-```
 
-#### counselor_conversations
-```sql
-CREATE TABLE counselor_conversations (
+CREATE TABLE flashcards (
     id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    counselor_type TEXT NOT NULL,
-    title TEXT,
-    status TEXT DEFAULT 'active',
-    message_count INTEGER DEFAULT 0,
-    last_message_at TEXT,
+    deck_id TEXT REFERENCES flashcard_decks(id),
+    front TEXT NOT NULL,
+    back TEXT NOT NULL,
+    image_url TEXT,
+    ease_factor REAL DEFAULT 2.5,
+    interval INTEGER DEFAULT 1,
+    next_review_at TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Whiteboard recordings
+CREATE TABLE whiteboard_recordings (
+    id TEXT PRIMARY KEY,
+    user_id TEXT REFERENCES users(id),
+    title TEXT NOT NULL,
+    description TEXT,
+    subject_id TEXT,
+    topic_id TEXT,
+    duration INTEGER,
+    recording_url TEXT,
+    thumbnail_url TEXT,
+    is_public INTEGER DEFAULT 0,
+    views INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Affiliate system
+CREATE TABLE affiliate_referrals (
+    id TEXT PRIMARY KEY,
+    referrer_id TEXT REFERENCES users(id),
+    referred_id TEXT REFERENCES users(id),
+    status TEXT DEFAULT 'pending',
+    commission_earned REAL DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE TABLE affiliate_payouts (
+    id TEXT PRIMARY KEY,
+    user_id TEXT REFERENCES users(id),
+    amount REAL NOT NULL,
+    payment_method TEXT,
+    payment_details TEXT,
+    status TEXT DEFAULT 'pending',
+    processed_at TEXT,
     created_at TEXT DEFAULT (datetime('now'))
 );
 ```
 
-### 14.2 Migration History
+### 20.2 Migration History
 
-| Migration | Description |
-|-----------|-------------|
-| 001 | User verification system |
-| 002 | Parent system |
-| 003 | Audit logging |
-| 004 | Assessment system |
-| 005 | Quests system |
-| 006 | Streak protection |
-| 007 | Reminders system |
-| 008 | E-Library system |
-| 009 | AI Counselor |
-| 010 | Counselor reports |
-| 011 | Downloadable field |
+| # | Migration | Description |
+|---|-----------|-------------|
+| 001 | User verification | Email verification system |
+| 002 | Parent system | Parent-child linking |
+| 003 | Audit logging | Action tracking |
+| 004 | Assessments | Teacher assessments |
+| 005 | Quests | Daily quest system |
+| 006 | Streak protection | Streak freeze feature |
+| 007 | Reminders | Study reminders |
+| 008 | E-Library | Resource management |
+| 009 | AI Counselor | Counselor conversations |
+| 010 | Counselor reports | Report generation |
+| ... | ... | ... |
+| 025 | Whiteboard recordings | Recording system |
+| 026 | Whiteboards | Whiteboard management |
+| 027+ | Ongoing | New features |
 
 ---
 
-## 15. API Reference
+## 21. API Reference
 
-### 15.1 Authentication
+### 21.1 Authentication
 
-#### Register
-```
+```http
 POST /api/auth/register
 Content-Type: application/json
 
 {
   "email": "student@example.com",
-  "password": "securepassword",
-  "name": "John Doe",
+  "password": "securepassword123",
+  "name": "Kofi Mensah",
   "role": "student",
   "school": "Presec Legon",
-  "gradeLevel": "SHS 2"
+  "schoolLevel": "shs",
+  "yearGroup": "2"
 }
 ```
 
-#### Login
-```
+```http
 POST /api/auth/login
 Content-Type: application/json
 
 {
   "email": "student@example.com",
-  "password": "securepassword"
+  "password": "securepassword123"
 }
 
 Response:
@@ -871,21 +1225,21 @@ Response:
   "success": true,
   "data": {
     "user": { ... },
-    "token": "jwt-token-here"
+    "token": "eyJhbGciOiJIUzI1NiIs..."
   }
 }
 ```
 
-### 15.2 Protected Routes
+### 21.2 Protected Routes
 
-All protected routes require:
-```
+All authenticated routes require:
+```http
 Authorization: Bearer <jwt-token>
 ```
 
-### 15.3 Response Format
+### 21.3 Response Format
 
-Success:
+**Success:**
 ```json
 {
   "success": true,
@@ -899,7 +1253,7 @@ Success:
 }
 ```
 
-Error:
+**Error:**
 ```json
 {
   "success": false,
@@ -907,11 +1261,23 @@ Error:
 }
 ```
 
+### 21.4 Key Endpoints
+
+| Category | Endpoints |
+|----------|-----------|
+| Auth | `/auth/register`, `/auth/login`, `/auth/me` |
+| Practice | `/questions`, `/practice/sessions`, `/practice/submit` |
+| AI Tutor | `/tutor/chat`, `/tutor/explain`, `/tutor/hint` |
+| Flashcards | `/flashcards/decks`, `/flashcards/due`, `/flashcards/review` |
+| Library | `/library/resources`, `/library/upload`, `/library/collections` |
+| Battles | `/battles/create`, `/battles/join`, `/battles/submit` |
+| Analytics | `/analytics/user`, `/analytics/progress` |
+
 ---
 
-## 16. Deployment & Infrastructure
+## 22. Deployment & Infrastructure
 
-### 16.1 Cloudflare Services
+### 22.1 Cloudflare Services
 
 | Service | Resource | Purpose |
 |---------|----------|---------|
@@ -920,101 +1286,134 @@ Error:
 | D1 | brilla-db | SQLite database |
 | R2 | brilla-library | File storage |
 
-### 16.2 Environment Variables
-
-#### Frontend (Cloudflare Pages)
-| Variable | Description |
-|----------|-------------|
-| VITE_API_URL | Backend API URL |
-
-#### Backend (Cloudflare Workers)
-| Variable | Description |
-|----------|-------------|
-| ENVIRONMENT | production/development |
-| JWT_SECRET | JWT signing secret |
-| ANTHROPIC_API_KEY | AI API key |
-| AI_PROVIDER | AI service provider |
-| AI_MODEL | AI model identifier |
-
-### 16.3 Deployment Process
+### 22.2 Environment Variables
 
 #### Frontend
-```bash
-npm run build
-npx wrangler pages deploy dist --project-name=brilla-study-platform
-```
+| Variable | Description |
+|----------|-------------|
+| `VITE_API_URL` | Backend API URL |
 
 #### Backend
-```bash
-npx wrangler deploy
-```
+| Variable | Description |
+|----------|-------------|
+| `ENVIRONMENT` | production/development |
+| `JWT_SECRET` | JWT signing secret |
+| `ANTHROPIC_API_KEY` | Claude API key |
 
-#### Database Migrations
+### 22.3 Deployment Commands
+
 ```bash
+# Build frontend
+npm run build
+
+# Deploy frontend
+npx wrangler pages deploy dist --project-name=brilla-study-platform
+
+# Deploy backend
+npx wrangler deploy
+
+# Run database migration
 npx wrangler d1 execute brilla-db --remote --file=database/migrations/XXX.sql
 ```
 
 ---
 
-## 17. Security Considerations
+## 23. Security Considerations
 
-### 17.1 Authentication Security
-- Passwords hashed with bcrypt (salt rounds: 10)
+### 23.1 Authentication Security
+- Passwords hashed with bcrypt (10 rounds)
 - JWT tokens with 7-day expiration
-- Secure HTTP-only cookies option
 - Rate limiting on auth endpoints
+- Account lockout after failed attempts
 
-### 17.2 Data Protection
-- HTTPS enforced in production
+### 23.2 Data Protection
+- HTTPS enforced
 - Input validation on all endpoints
-- SQL injection prevention via parameterized queries
-- XSS protection through React's built-in escaping
+- SQL injection prevention (parameterized queries)
+- XSS protection (React escaping)
+- CORS configuration
 
-### 17.3 Access Control
-- Role-based permission system
+### 23.3 Access Control
+- Role-based permissions
 - Resource ownership verification
-- Admin approval for sensitive roles
-- Audit logging for accountability
+- Admin approval workflows
+- Complete audit logging
 
-### 17.4 File Security
-- File type validation on upload
-- Size limits per resource type
-- Virus scanning (recommended)
-- Secure signed URLs for downloads
+### 23.4 File Security
+- Type validation on upload
+- Size limits enforced
+- Secure signed URLs
+- Content-Type verification
 
 ---
 
-## 18. Future Roadmap
+## 24. Troubleshooting Guide
 
-### Phase 1: Enhanced AI Features
-- Voice-based AI tutoring
-- Handwriting recognition for math
-- Personalized study plan generation
-- Predictive performance analytics
+### 24.1 Common Issues
 
-### Phase 2: Social Features
+#### "Login Failed"
+- Verify email and password
+- Check if account is approved
+- Clear browser cache
+- Try password reset
+
+#### "AI Tutor Not Responding"
+- Check internet connection
+- Refresh the page
+- Try again in a few minutes
+- File may be too large (max 10MB)
+
+#### "PWA Not Installing"
+- Ensure HTTPS connection
+- Use supported browser
+- Check browser settings
+- Try clearing cache
+
+#### "Practice Not Loading"
+- Check internet connection
+- Verify subscription status
+- Clear cache and refresh
+- Contact support if persists
+
+### 24.2 Contact Support
+
+- **Email**: support@brillaprep.org
+- **In-App**: Help Center → Contact Us
+- **Response Time**: Within 24 hours
+
+---
+
+## 25. Future Roadmap
+
+### Phase 1: Enhanced AI (Q1 2026)
+- Voice-based tutoring
+- Handwriting recognition
+- Personalized study plans
+- Predictive analytics
+
+### Phase 2: Social Features (Q2 2026)
 - Study groups
 - Peer tutoring
 - Discussion forums
-- Collaborative note-taking
+- Collaborative notes
 
-### Phase 3: Mobile Applications
-- Native iOS application
-- Native Android application
-- Offline mode support
+### Phase 3: Mobile Apps (Q3 2026)
+- Native iOS app
+- Native Android app
+- Full offline mode
 - Push notifications
 
-### Phase 4: Institutional Features
-- School dashboard
-- District-level analytics
-- Curriculum alignment tools
-- LMS integration (Canvas, Moodle)
+### Phase 4: Institutional (Q4 2026)
+- School dashboards
+- District analytics
+- LMS integration
+- Curriculum alignment
 
-### Phase 5: Content Expansion
-- More past papers
-- Video explanations for all topics
+### Phase 5: Content Expansion (2027)
+- Video explanations
 - Interactive simulations
-- Augmented reality labs
+- AR/VR labs
+- More past papers
 
 ---
 
@@ -1022,30 +1421,58 @@ npx wrangler d1 execute brilla-db --remote --file=database/migrations/XXX.sql
 
 | Term | Definition |
 |------|------------|
-| XP | Experience Points earned through platform activities |
+| XP | Experience Points earned through activities |
 | Streak | Consecutive days of practice |
 | House | School-based team for competition |
-| Quest | Daily or weekly challenge with rewards |
-| Battle | Real-time 1v1 competitive practice session |
-| Mock Exam | Full simulation of actual examination |
-| AI Tutor | Intelligent assistant for explanations |
-| AI Counselor | Virtual advisor for academic/career/wellbeing |
+| Quest | Daily or weekly challenge |
+| Battle | Real-time 1v1 competitive practice |
+| Mock Exam | Full examination simulation |
+| AI Tutor | Intelligent tutoring assistant |
+| AI Counselor | Virtual advisor |
+| PWA | Progressive Web App |
+| Spaced Repetition | Learning technique for memorization |
 
 ---
 
-## Appendix B: Contact & Support
+## Appendix B: Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Enter` | Submit answer / Send message |
+| `Esc` | Close modal / Cancel |
+| `Ctrl/Cmd + K` | Open quick search |
+| `Space` | Flip flashcard |
+| `1-5` | Rate flashcard difficulty |
+
+---
+
+## Appendix C: API Rate Limits
+
+| Endpoint | Limit |
+|----------|-------|
+| Auth | 10 requests/minute |
+| AI Tutor | 30 requests/minute |
+| Questions | 100 requests/minute |
+| File Upload | 10 requests/minute |
+| General | 200 requests/minute |
+
+---
+
+## Appendix D: Contact & Support
 
 **Technical Support:**
-For platform issues, contact the development team at Hodges & Co.
+support@brillaprep.org
 
-**Content Inquiries:**
-For questions about educational content, contact platform administrators.
+**Business Inquiries:**
+business@brillaprep.org
 
 **Security Reports:**
-For security vulnerabilities, report through responsible disclosure channels.
+security@brillaprep.org
 
 ---
 
-*This document is proprietary to Brilla Study Platform and Hodges & Co. Unauthorized distribution is prohibited.*
+*This document is proprietary to Brilla Study Platform. Unauthorized distribution is prohibited.*
 
+**Document Version:** 2.0
+**Last Updated:** December 26, 2025
 **Document End**
