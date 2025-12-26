@@ -46,6 +46,68 @@ interface UserPayload extends JWTPayload {
 // UTILITY FUNCTIONS
 // =============================================
 
+// Transform question options from string array to QuestionOption objects
+// Input: ["A. 2", "B. 3", "C. 4", "D. 10"] with correctAnswer "B"
+// Output: [{ id: "A", text: "A. 2", isCorrect: false }, { id: "B", text: "B. 3", isCorrect: true }, ...]
+function transformQuestionOptions(
+  options: unknown,
+  correctAnswer: string | null | undefined
+): Array<{ id: string; text: string; isCorrect: boolean }> | null {
+  if (!options) return null;
+
+  // Parse if it's a string
+  let optionsArray: unknown[];
+  if (typeof options === 'string') {
+    try {
+      optionsArray = JSON.parse(options);
+    } catch {
+      return null;
+    }
+  } else if (Array.isArray(options)) {
+    optionsArray = options;
+  } else {
+    return null;
+  }
+
+  // If already in correct format (array of objects with id/text), return as-is
+  if (optionsArray.length > 0 && typeof optionsArray[0] === 'object' && optionsArray[0] !== null) {
+    const firstOption = optionsArray[0] as Record<string, unknown>;
+    if ('id' in firstOption && 'text' in firstOption) {
+      return optionsArray as Array<{ id: string; text: string; isCorrect: boolean }>;
+    }
+  }
+
+  // Transform string array to object array
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  return optionsArray.map((option, index) => {
+    const optionText = String(option);
+    const letterId = letters[index] || String.fromCharCode(65 + index);
+
+    // Determine if this option is correct
+    // correctAnswer might be:
+    // 1. Just the letter (e.g., "B")
+    // 2. The full text (e.g., "B. 3")
+    // 3. The option value itself (e.g., "True" for true_false questions)
+    let isCorrect = false;
+    if (correctAnswer) {
+      const trimmedAnswer = correctAnswer.trim();
+      const answerLetter = trimmedAnswer.charAt(0).toUpperCase();
+      // Check if answer matches the letter ID
+      isCorrect = letterId === answerLetter;
+      // Also check if the option text matches the correct answer (for true_false, etc.)
+      if (!isCorrect && optionText.toLowerCase() === trimmedAnswer.toLowerCase()) {
+        isCorrect = true;
+      }
+    }
+
+    return {
+      id: letterId,
+      text: optionText,
+      isCorrect,
+    };
+  });
+}
+
 // Password hashing using Web Crypto API (PBKDF2)
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -1770,10 +1832,10 @@ publicApp.get('/questions', async (c) => {
     const stmt = c.env.DB.prepare(query).bind(...params);
     const { results } = await stmt.all();
 
-    // Parse options JSON
+    // Parse and transform options to proper format
     const questions = results.map((q: Record<string, unknown>) => ({
       ...q,
-      options: q.options ? JSON.parse(q.options as string) : null,
+      options: transformQuestionOptions(q.options, q.correct_answer as string),
     }));
 
     return c.json({ success: true, data: questions });
@@ -1798,7 +1860,7 @@ publicApp.get('/questions/:id', async (c) => {
       success: true,
       data: {
         ...question,
-        options: question.options ? JSON.parse(question.options as string) : null,
+        options: transformQuestionOptions(question.options, question.correct_answer as string),
       },
     });
   } catch (error) {
@@ -2556,10 +2618,10 @@ publicApp.get('/papers/:id', async (c) => {
       ORDER BY q.section, q.question_number
     `).bind(id).all();
 
-    // Parse options for each question
+    // Parse and transform options to proper format
     const parsedQuestions = questions.map((q: Record<string, unknown>) => ({
       ...q,
-      options: q.options ? JSON.parse(q.options as string) : null,
+      options: transformQuestionOptions(q.options, q.correct_answer as string),
     }));
 
     return c.json({
@@ -3376,10 +3438,10 @@ protectedApp.post('/battles', async (c) => {
 
     const { results: questions } = await c.env.DB.prepare(questionsQuery).bind(...params).all();
 
-    // Parse options for each question
+    // Parse and transform options to proper format
     const parsedQuestions = questions.map((q: Record<string, unknown>) => ({
       ...q,
-      options: q.options ? JSON.parse(q.options as string) : null,
+      options: transformQuestionOptions(q.options, q.correct_answer as string),
     }));
 
     const battleId = `battle_${Date.now()}`;
@@ -8446,7 +8508,7 @@ protectedApp.get('/assessments/:id', async (c) => {
             id: q.question_id,
             questionText: q.question_text,
             questionType: q.question_type,
-            options: q.options ? JSON.parse(q.options as string) : null,
+            options: transformQuestionOptions(q.options, q.correct_answer as string),
             correctAnswer: q.correct_answer,
             explanation: q.explanation,
           } : undefined,
@@ -9549,7 +9611,7 @@ protectedApp.get('/questions/bank', async (c) => {
           id: q.id,
           questionText: q.question_text,
           questionType: q.question_type,
-          options: q.options ? JSON.parse(q.options as string) : null,
+          options: transformQuestionOptions(q.options, q.correct_answer as string),
           correctAnswer: q.correct_answer,
           explanation: q.explanation,
           difficulty: q.difficulty,
