@@ -2920,6 +2920,68 @@ publicApp.get('/battles/:id', async (c) => {
   }
 });
 
+// =====================
+// PUBLIC FLASHCARD ENDPOINTS (must be before mount)
+// =====================
+
+// Get flashcards for a specific deck (public endpoint for practice)
+publicApp.get('/flashcards/decks/:id/cards', async (c) => {
+  const deckId = c.req.param('id');
+
+  try {
+    const deck = await c.env.DB.prepare(`
+      SELECT * FROM flashcard_decks WHERE id = ? AND is_public = 1
+    `).bind(deckId).first();
+
+    if (!deck) {
+      return c.json({ success: false, error: 'Deck not found or not public' }, 404);
+    }
+
+    const { results: cards } = await c.env.DB.prepare(`
+      SELECT id, front, back, image_url, hint, difficulty
+      FROM flashcards WHERE deck_id = ?
+      ORDER BY RANDOM()
+    `).bind(deckId).all();
+
+    return c.json({ cards: cards || [] });
+  } catch (error) {
+    console.error('Failed to fetch cards:', error);
+    return c.json({ success: false, error: 'Failed to fetch cards' }, 500);
+  }
+});
+
+// Get all public flashcard decks (for browsing)
+publicApp.get('/flashcards/public', async (c) => {
+  const subjectId = c.req.query('subject');
+  const limit = parseInt(c.req.query('limit') || '20');
+
+  try {
+    let query = `
+      SELECT fd.*, COUNT(f.id) as card_count
+      FROM flashcard_decks fd
+      LEFT JOIN flashcards f ON f.deck_id = fd.id
+      WHERE fd.is_public = 1
+    `;
+    const params: (string | number)[] = [];
+
+    if (subjectId) {
+      query += ` AND fd.subject_id = ?`;
+      params.push(subjectId);
+    }
+
+    // Order by card_count DESC to prioritize decks with cards
+    query += ` GROUP BY fd.id ORDER BY card_count DESC, fd.created_at DESC LIMIT ?`;
+    params.push(limit);
+
+    const { results } = await c.env.DB.prepare(query).bind(...params).all();
+
+    return c.json(results || []);
+  } catch (error) {
+    console.error('Failed to fetch public decks:', error);
+    return c.json({ success: false, error: 'Failed to fetch decks' }, 500);
+  }
+});
+
 // Mount public routes
 app.route('/api', publicApp);
 
@@ -3320,63 +3382,6 @@ protectedApp.post('/flashcards/:id/review', async (c) => {
   } catch (error) {
     console.error('Failed to save review:', error);
     return c.json({ success: false, error: 'Failed to save review' }, 500);
-  }
-});
-
-// Get flashcards for a specific deck (public endpoint for practice)
-publicApp.get('/flashcards/decks/:id/cards', async (c) => {
-  const deckId = c.req.param('id');
-
-  try {
-    const deck = await c.env.DB.prepare(`
-      SELECT * FROM flashcard_decks WHERE id = ? AND is_public = 1
-    `).bind(deckId).first();
-
-    if (!deck) {
-      return c.json({ success: false, error: 'Deck not found or not public' }, 404);
-    }
-
-    const { results: cards } = await c.env.DB.prepare(`
-      SELECT id, front, back, image_url, hint, difficulty
-      FROM flashcards WHERE deck_id = ?
-      ORDER BY RANDOM()
-    `).bind(deckId).all();
-
-    return c.json(cards || []);
-  } catch (error) {
-    console.error('Failed to fetch cards:', error);
-    return c.json({ success: false, error: 'Failed to fetch cards' }, 500);
-  }
-});
-
-// Get all public flashcard decks (for browsing)
-publicApp.get('/flashcards/public', async (c) => {
-  const subjectId = c.req.query('subject');
-  const limit = parseInt(c.req.query('limit') || '20');
-
-  try {
-    let query = `
-      SELECT fd.*, COUNT(f.id) as card_count
-      FROM flashcard_decks fd
-      LEFT JOIN flashcards f ON f.deck_id = fd.id
-      WHERE fd.is_public = 1
-    `;
-    const params: (string | number)[] = [];
-
-    if (subjectId) {
-      query += ` AND fd.subject_id = ?`;
-      params.push(subjectId);
-    }
-
-    query += ` GROUP BY fd.id ORDER BY fd.created_at DESC LIMIT ?`;
-    params.push(limit);
-
-    const { results } = await c.env.DB.prepare(query).bind(...params).all();
-
-    return c.json(results || []);
-  } catch (error) {
-    console.error('Failed to fetch public decks:', error);
-    return c.json({ success: false, error: 'Failed to fetch decks' }, 500);
   }
 });
 
