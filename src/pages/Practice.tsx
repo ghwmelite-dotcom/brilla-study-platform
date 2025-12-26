@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import {
   Zap,
@@ -15,107 +15,70 @@ import {
   Trophy,
   ClipboardList,
   Swords,
+  Loader2,
+  AlertTriangle,
 } from 'lucide-react';
 import { Card, Button, Badge, Select } from '@/components/common';
 import { TopicDrill, SpeedRace, Flashcard } from '@/components/practice';
 import { useExamStore } from '@/stores';
 import { cn } from '@/utils';
+import { api } from '@/services/api';
 import type { Question } from '@/types';
 
-// Sample questions for practice
-const sampleQuestions: Question[] = [
-  {
-    id: 'q1',
-    topicId: 'quadratic',
-    subjectId: 'mathematics',
-    questionText: 'Solve for x: x² - 5x + 6 = 0',
-    questionType: 'direct_answer',
-    roundType: 'round_one',
-    correctAnswer: 'x = 2 or x = 3',
-    explanation: 'Factoring: (x-2)(x-3) = 0, so x = 2 or x = 3',
-    difficulty: 'easy',
-    points: 3,
-    marks: 3,
-    timeLimit: 30,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'q2',
-    topicId: 'mechanics',
-    subjectId: 'physics',
-    questionText: 'A car accelerates from rest at 2 m/s² for 5 seconds. What is its final velocity?',
-    questionType: 'direct_answer',
-    roundType: 'round_one',
-    correctAnswer: '10 m/s',
-    explanation: 'Using v = u + at: v = 0 + (2)(5) = 10 m/s',
-    difficulty: 'easy',
-    points: 3,
-    marks: 3,
-    timeLimit: 30,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'q3',
-    topicId: 'stoichiometry',
-    subjectId: 'chemistry',
-    questionText: 'What is the molar mass of H₂SO₄?',
-    questionType: 'direct_answer',
-    roundType: 'round_one',
-    correctAnswer: '98 g/mol',
-    explanation: 'H₂SO₄: 2(1) + 32 + 4(16) = 2 + 32 + 64 = 98 g/mol',
-    difficulty: 'easy',
-    points: 3,
-    marks: 3,
-    timeLimit: 30,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'q4',
-    topicId: 'cells',
-    subjectId: 'biology',
-    questionText: 'What organelle is responsible for ATP production in eukaryotic cells?',
-    questionType: 'direct_answer',
-    roundType: 'round_one',
-    correctAnswer: 'Mitochondria',
-    explanation: 'Mitochondria are the powerhouse of the cell, producing ATP through cellular respiration',
-    difficulty: 'easy',
-    points: 3,
-    marks: 3,
-    timeLimit: 30,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'q5',
-    topicId: 'trigonometry',
-    subjectId: 'mathematics',
-    questionText: 'If sin θ = 3/5, what is cos θ? (θ is acute)',
-    questionType: 'direct_answer',
-    roundType: 'round_one',
-    correctAnswer: '4/5',
-    explanation: 'Using sin²θ + cos²θ = 1: cos²θ = 1 - 9/25 = 16/25, so cos θ = 4/5',
-    difficulty: 'medium',
-    points: 3,
-    marks: 3,
-    timeLimit: 30,
-    createdAt: new Date().toISOString(),
-  },
-];
+// Transform snake_case API response to camelCase Question type
+interface ApiQuestion {
+  id: string;
+  topic_id: string | null;
+  subject_id: string;
+  question_text: string;
+  question_type: string;
+  round_type: string;
+  options: unknown[] | null;
+  correct_answer: string;
+  explanation: string | null;
+  difficulty: string;
+  points: number;
+  marks: number;
+  time_limit: number;
+  image_url: string | null;
+}
 
-const speedQuestions: Question[] = [
-  { ...sampleQuestions[0], roundType: 'speed_race', timeLimit: 10 },
-  { ...sampleQuestions[1], roundType: 'speed_race', timeLimit: 10 },
-  { ...sampleQuestions[2], roundType: 'speed_race', timeLimit: 10 },
-  { ...sampleQuestions[3], roundType: 'speed_race', timeLimit: 10 },
-  { ...sampleQuestions[4], roundType: 'speed_race', timeLimit: 10 },
-];
+const transformQuestion = (q: ApiQuestion): Question => ({
+  id: q.id,
+  topicId: q.topic_id || '',
+  subjectId: q.subject_id,
+  questionText: q.question_text,
+  questionType: q.question_type as Question['questionType'],
+  roundType: q.round_type as Question['roundType'],
+  options: q.options as Question['options'],
+  correctAnswer: q.correct_answer,
+  explanation: q.explanation || undefined,
+  difficulty: q.difficulty as Question['difficulty'],
+  points: q.points,
+  marks: q.marks,
+  timeLimit: q.time_limit,
+  imageUrl: q.image_url || undefined,
+  createdAt: new Date().toISOString(),
+});
 
-const flashcards = [
-  { id: '1', front: 'What is the quadratic formula?', back: 'x = (-b ± √(b²-4ac)) / 2a', category: 'Algebra' },
-  { id: '2', front: 'What is Newton\'s Second Law?', back: 'F = ma', category: 'Mechanics' },
-  { id: '3', front: 'What is the ideal gas law?', back: 'PV = nRT', category: 'Chemistry' },
-  { id: '4', front: 'What is the energy equation?', back: 'E = mc²', category: 'Physics' },
-  { id: '5', front: 'What is Avogadro\'s number?', back: '6.02 × 10²³', category: 'Chemistry' },
-];
+
+// Flashcard API types
+interface ApiFlashcard {
+  id: string;
+  front: string;
+  back: string;
+  hint?: string;
+  difficulty: number;
+}
+
+interface ApiFlashcardDeck {
+  id: string;
+  name: string;
+  description?: string;
+  subject_id?: string;
+  card_count: number;
+  cards?: ApiFlashcard[];
+}
 
 type PracticeMode = 'drill' | 'speed' | 'flashcard' | null;
 
@@ -239,6 +202,62 @@ export function PracticePage() {
   const [questionCount, setQuestionCount] = useState(10);
   const [isSessionActive, setIsSessionActive] = useState(false);
 
+  // Speed race state
+  const [speedQuestions, setSpeedQuestions] = useState<Question[]>([]);
+  const [speedLoading, setSpeedLoading] = useState(false);
+  const [speedError, setSpeedError] = useState<string | null>(null);
+
+  // Topic drill state
+  const [drillQuestions, setDrillQuestions] = useState<Question[]>([]);
+  const [drillLoading, setDrillLoading] = useState(false);
+  const [drillError, setDrillError] = useState<string | null>(null);
+
+  // Recent sessions state
+  interface RecentSession {
+    id: string;
+    mode: string;
+    subject_id: string | null;
+    topic_id: string | null;
+    questions_count: number;
+    correct_count: number;
+    total_time: number;
+    score: number;
+    created_at: string;
+  }
+  const [recentSessions, setRecentSessions] = useState<RecentSession[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
+
+  // Flashcard state
+  const [flashcards, setFlashcards] = useState<Array<{ id: string; front: string; back: string; category: string }>>([]);
+  const [flashcardLoading, setFlashcardLoading] = useState(false);
+  const [flashcardError, setFlashcardError] = useState<string | null>(null);
+  const [flashcardDeckName, setFlashcardDeckName] = useState('Formula Review');
+
+  // Fetch recent sessions on mount
+  useEffect(() => {
+    const fetchRecentSessions = async () => {
+      setSessionsLoading(true);
+      try {
+        const data = await api.get('/practice/sessions?limit=5') as RecentSession[];
+        if (data && Array.isArray(data)) {
+          setRecentSessions(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch recent sessions:', err);
+      } finally {
+        setSessionsLoading(false);
+      }
+    };
+    fetchRecentSessions();
+  }, []);
+
+  // Auto-start speed mode if navigated with ?mode=speed
+  useEffect(() => {
+    if (initialMode === 'speed' && !isSessionActive) {
+      handleStartSession('speed');
+    }
+  }, [initialMode]);
+
   // Get exam-specific features
   const currentExamFeatures = examFeatures[currentExamType] || [];
 
@@ -248,8 +267,136 @@ export function PracticePage() {
     ...examSubjects.slice(0, 6).map((s) => ({ value: s.slug, label: s.name })),
   ];
 
-  const handleStartSession = (mode: PracticeMode) => {
+  // Fetch speed race questions from API
+  const fetchSpeedQuestions = async () => {
+    setSpeedLoading(true);
+    setSpeedError(null);
+    try {
+      let url = `/questions?round=speed_race&limit=${questionCount}`;
+      if (selectedSubject !== 'all') {
+        url += `&subject=${selectedSubject}`;
+      }
+      if (selectedDifficulty !== 'all') {
+        url += `&difficulty=${selectedDifficulty}`;
+      }
+      const data = await api.get(url) as ApiQuestion[];
+      if (data && Array.isArray(data) && data.length > 0) {
+        // Transform snake_case to camelCase
+        const transformedQuestions = data.map(transformQuestion);
+        setSpeedQuestions(transformedQuestions);
+      } else {
+        setSpeedError('No speed race questions available. Try different filters.');
+      }
+    } catch (err) {
+      console.error('Failed to fetch speed race questions:', err);
+      setSpeedError('Failed to load questions. Please try again.');
+    } finally {
+      setSpeedLoading(false);
+    }
+  };
+
+  // Fetch topic drill questions from API
+  const fetchDrillQuestions = async () => {
+    setDrillLoading(true);
+    setDrillError(null);
+    try {
+      let url = `/questions?limit=${questionCount}`;
+      if (selectedSubject !== 'all') {
+        // Map subject slug to subject_id format
+        const subjectIdMap: Record<string, string> = {
+          mathematics: 'subj_math',
+          physics: 'subj_physics',
+          chemistry: 'subj_chemistry',
+          biology: 'subj_biology',
+        };
+        const subjectId = subjectIdMap[selectedSubject] || selectedSubject;
+        url += `&subject=${subjectId}`;
+      }
+      if (selectedDifficulty !== 'all') {
+        url += `&difficulty=${selectedDifficulty}`;
+      }
+      const data = await api.get(url) as ApiQuestion[];
+      if (data && Array.isArray(data) && data.length > 0) {
+        const transformedQuestions = data.map(transformQuestion);
+        setDrillQuestions(transformedQuestions);
+      } else {
+        setDrillError('No questions available for these filters. Try different settings.');
+      }
+    } catch (err) {
+      console.error('Failed to fetch drill questions:', err);
+      setDrillError('Failed to load questions. Please try again.');
+    } finally {
+      setDrillLoading(false);
+    }
+  };
+
+  // Fetch flashcards from API
+  const fetchFlashcards = async () => {
+    setFlashcardLoading(true);
+    setFlashcardError(null);
+    try {
+      // Fetch public flashcard decks
+      const decks = await api.get('/flashcards/public') as ApiFlashcardDeck[];
+
+      if (decks && Array.isArray(decks) && decks.length > 0) {
+        // Get the first deck with cards or a random deck
+        let selectedDeck = decks.find(d => d.card_count > 0);
+
+        // If subject is selected, try to find a matching deck
+        if (selectedSubject !== 'all') {
+          const subjectIdMap: Record<string, string> = {
+            mathematics: 'subj_math',
+            physics: 'subj_physics',
+            chemistry: 'subj_chemistry',
+            biology: 'subj_biology',
+          };
+          const subjectId = subjectIdMap[selectedSubject];
+          const matchingDeck = decks.find(d => d.subject_id === subjectId && d.card_count > 0);
+          if (matchingDeck) {
+            selectedDeck = matchingDeck;
+          }
+        }
+
+        if (selectedDeck) {
+          // Fetch the deck with cards
+          const deckWithCards = await api.get(`/flashcards/decks/${selectedDeck.id}/cards`) as { cards: ApiFlashcard[] };
+
+          if (deckWithCards && deckWithCards.cards && deckWithCards.cards.length > 0) {
+            // Transform to the format expected by Flashcard component
+            const transformedCards = deckWithCards.cards.map(card => ({
+              id: card.id,
+              front: card.front,
+              back: card.back,
+              category: selectedDeck!.name.replace(' - Key Concepts', '').replace(' Formulas', ''),
+            }));
+            setFlashcards(transformedCards);
+            setFlashcardDeckName(selectedDeck.name);
+          } else {
+            setFlashcardError('No flashcards available in this deck.');
+          }
+        } else {
+          setFlashcardError('No flashcard decks available.');
+        }
+      } else {
+        setFlashcardError('No flashcard decks available. Check back later!');
+      }
+    } catch (err) {
+      console.error('Failed to fetch flashcards:', err);
+      setFlashcardError('Failed to load flashcards. Please try again.');
+    } finally {
+      setFlashcardLoading(false);
+    }
+  };
+
+  const handleStartSession = async (mode: PracticeMode) => {
     setActiveMode(mode);
+    if (mode === 'speed') {
+      await fetchSpeedQuestions();
+    } else if (mode === 'drill') {
+      await fetchDrillQuestions();
+    } else if (mode === 'flashcard') {
+      await fetchFlashcards();
+    }
     setIsSessionActive(true);
   };
 
@@ -262,10 +409,50 @@ export function PracticePage() {
   if (isSessionActive && activeMode) {
     switch (activeMode) {
       case 'drill':
+        if (drillLoading) {
+          return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+              <Loader2 className="w-12 h-12 text-primary animate-spin" />
+              <p className="text-neutral-600">Loading practice questions...</p>
+            </div>
+          );
+        }
+        if (drillError) {
+          return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+              <AlertTriangle className="w-12 h-12 text-amber-500" />
+              <p className="text-neutral-600">{drillError}</p>
+              <div className="flex gap-4">
+                <Button variant="outline" onClick={handleEndSession}>
+                  Back to Practice
+                </Button>
+                <Button onClick={fetchDrillQuestions}>
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          );
+        }
+        if (drillQuestions.length === 0) {
+          return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+              <AlertTriangle className="w-12 h-12 text-amber-500" />
+              <p className="text-neutral-600">No questions loaded. Please try again.</p>
+              <div className="flex gap-4">
+                <Button variant="outline" onClick={handleEndSession}>
+                  Back to Practice
+                </Button>
+                <Button onClick={fetchDrillQuestions}>
+                  Reload Questions
+                </Button>
+              </div>
+            </div>
+          );
+        }
         return (
           <TopicDrill
-            questions={sampleQuestions.slice(0, questionCount)}
-            topicName="Mixed Topics"
+            questions={drillQuestions}
+            topicName={selectedSubject !== 'all' ? subjectOptions.find(s => s.value === selectedSubject)?.label || 'Mixed Topics' : 'Mixed Topics'}
             onComplete={(results) => {
               console.log('Drill complete:', results);
             }}
@@ -273,9 +460,49 @@ export function PracticePage() {
           />
         );
       case 'speed':
+        if (speedLoading) {
+          return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+              <Loader2 className="w-12 h-12 text-primary animate-spin" />
+              <p className="text-neutral-600">Loading speed race questions...</p>
+            </div>
+          );
+        }
+        if (speedError) {
+          return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+              <AlertTriangle className="w-12 h-12 text-amber-500" />
+              <p className="text-neutral-600">{speedError}</p>
+              <div className="flex gap-4">
+                <Button variant="outline" onClick={handleEndSession}>
+                  Back to Practice
+                </Button>
+                <Button onClick={fetchSpeedQuestions}>
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          );
+        }
+        if (speedQuestions.length === 0) {
+          return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+              <AlertTriangle className="w-12 h-12 text-amber-500" />
+              <p className="text-neutral-600">No questions loaded. Please try again.</p>
+              <div className="flex gap-4">
+                <Button variant="outline" onClick={handleEndSession}>
+                  Back to Practice
+                </Button>
+                <Button onClick={fetchSpeedQuestions}>
+                  Reload Questions
+                </Button>
+              </div>
+            </div>
+          );
+        }
         return (
           <SpeedRace
-            questions={speedQuestions.slice(0, questionCount)}
+            questions={speedQuestions}
             onComplete={(results) => {
               console.log('Speed race complete:', results);
             }}
@@ -283,6 +510,46 @@ export function PracticePage() {
           />
         );
       case 'flashcard':
+        if (flashcardLoading) {
+          return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+              <Loader2 className="w-12 h-12 text-primary animate-spin" />
+              <p className="text-neutral-600">Loading flashcards...</p>
+            </div>
+          );
+        }
+        if (flashcardError) {
+          return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+              <AlertTriangle className="w-12 h-12 text-amber-500" />
+              <p className="text-neutral-600">{flashcardError}</p>
+              <div className="flex gap-4">
+                <Button variant="outline" onClick={handleEndSession}>
+                  Back to Practice
+                </Button>
+                <Button onClick={fetchFlashcards}>
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          );
+        }
+        if (flashcards.length === 0) {
+          return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+              <BookOpen className="w-12 h-12 text-neutral-400" />
+              <p className="text-neutral-600">No flashcards loaded. Please try again.</p>
+              <div className="flex gap-4">
+                <Button variant="outline" onClick={handleEndSession}>
+                  Back to Practice
+                </Button>
+                <Button onClick={fetchFlashcards}>
+                  Reload Flashcards
+                </Button>
+              </div>
+            </div>
+          );
+        }
         return (
           <div className="space-y-4">
             <Button variant="ghost" onClick={handleEndSession}>
@@ -290,7 +557,7 @@ export function PracticePage() {
             </Button>
             <Flashcard
               cards={flashcards}
-              title="Formula Review"
+              title={flashcardDeckName}
               onComplete={(results) => {
                 console.log('Flashcard session complete:', results);
               }}
@@ -449,36 +716,76 @@ export function PracticePage() {
       <section>
         <h2 className="text-lg font-semibold text-neutral-900 mb-4">Recent Sessions</h2>
         <Card className="divide-y divide-neutral-100">
-          {[
-            { type: 'drill', topic: 'Quadratic Equations', score: '8/10', time: '2 hours ago' },
-            { type: 'speed', topic: 'Speed Race', score: '45 pts', time: '5 hours ago' },
-            { type: 'flashcard', topic: 'Formula Review', score: '12/15', time: 'Yesterday' },
-          ].map((session, index) => (
-            <div key={index} className="flex items-center justify-between p-4">
-              <div className="flex items-center gap-3">
-                <div className={cn(
-                  'p-2 rounded-lg',
-                  session.type === 'drill' && 'bg-blue-100',
-                  session.type === 'speed' && 'bg-yellow-100',
-                  session.type === 'flashcard' && 'bg-green-100'
-                )}>
-                  {session.type === 'drill' && <Target className="w-4 h-4 text-blue-500" />}
-                  {session.type === 'speed' && <Zap className="w-4 h-4 text-yellow-500" />}
-                  {session.type === 'flashcard' && <BookOpen className="w-4 h-4 text-green-500" />}
-                </div>
-                <div>
-                  <p className="font-medium text-neutral-900">{session.topic}</p>
-                  <p className="text-xs text-neutral-500">{session.time}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <Badge variant="primary">{session.score}</Badge>
-                <Button variant="ghost" size="sm">
-                  Retry
-                </Button>
-              </div>
+          {sessionsLoading ? (
+            <div className="flex items-center justify-center p-8">
+              <Loader2 className="w-6 h-6 text-primary animate-spin" />
             </div>
-          ))}
+          ) : recentSessions.length === 0 ? (
+            <div className="text-center p-8 text-neutral-500">
+              <p>No practice sessions yet. Start practicing to see your history!</p>
+            </div>
+          ) : (
+            recentSessions.map((session) => {
+              const modeType = session.mode === 'topic_drill' ? 'drill' :
+                               session.mode === 'speed_race' ? 'speed' :
+                               session.mode === 'flashcard' ? 'flashcard' : 'drill';
+              const topicName = session.mode === 'speed_race' ? 'Speed Race' :
+                               session.mode === 'flashcard' ? 'Flashcard Review' :
+                               'Topic Drill';
+              const scoreDisplay = session.mode === 'speed_race'
+                ? `${session.score} pts`
+                : `${session.correct_count}/${session.questions_count}`;
+
+              // Format time ago
+              const timeAgo = (() => {
+                const now = new Date();
+                const created = new Date(session.created_at);
+                const diffMs = now.getTime() - created.getTime();
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMs / 3600000);
+                const diffDays = Math.floor(diffMs / 86400000);
+
+                if (diffMins < 60) return `${diffMins} min ago`;
+                if (diffHours < 24) return `${diffHours} hours ago`;
+                if (diffDays === 1) return 'Yesterday';
+                return `${diffDays} days ago`;
+              })();
+
+              return (
+                <div key={session.id} className="flex items-center justify-between p-4">
+                  <div className="flex items-center gap-3">
+                    <div className={cn(
+                      'p-2 rounded-lg',
+                      modeType === 'drill' && 'bg-blue-100',
+                      modeType === 'speed' && 'bg-yellow-100',
+                      modeType === 'flashcard' && 'bg-green-100'
+                    )}>
+                      {modeType === 'drill' && <Target className="w-4 h-4 text-blue-500" />}
+                      {modeType === 'speed' && <Zap className="w-4 h-4 text-yellow-500" />}
+                      {modeType === 'flashcard' && <BookOpen className="w-4 h-4 text-green-500" />}
+                    </div>
+                    <div>
+                      <p className="font-medium text-neutral-900">{topicName}</p>
+                      <p className="text-xs text-neutral-500">{timeAgo}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Badge variant="primary">{scoreDisplay}</Badge>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setActiveMode(modeType as PracticeMode);
+                        handleStartSession(modeType as PracticeMode);
+                      }}
+                    >
+                      Retry
+                    </Button>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </Card>
       </section>
     </div>

@@ -1032,201 +1032,81 @@ export const beceQuestions: SampleQuestion[] = [
 ];
 
 // =============================================
-// PAST PAPERS
+// PAST PAPERS - Only includes papers that exist in the database
 // =============================================
 
 export const pastPapers: Partial<PastPaper>[] = [
   // =============================================
   // WASSCE Past Papers - Core Mathematics
   // =============================================
-  // 2024
   { id: 'pp_wassce_math_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_core_math', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 90, isComplete: true },
-  { id: 'pp_wassce_math_2024_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_core_math', paperTypeId: 'paper_wassce_2', year: 2024, month: 'May-June', totalQuestions: 13, totalMarks: 100, timeAllowed: 180, isComplete: true },
-  // 2023
   { id: 'pp_wassce_math_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_core_math', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 90, isComplete: true },
-  { id: 'pp_wassce_math_2023_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_core_math', paperTypeId: 'paper_wassce_2', year: 2023, month: 'May-June', totalQuestions: 13, totalMarks: 100, timeAllowed: 180, isComplete: true },
-  // 2022
-  { id: 'pp_wassce_math_2022_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_core_math', paperTypeId: 'paper_wassce_1', year: 2022, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 90, isComplete: true },
-  { id: 'pp_wassce_math_2022_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_core_math', paperTypeId: 'paper_wassce_2', year: 2022, month: 'May-June', totalQuestions: 13, totalMarks: 100, timeAllowed: 180, isComplete: true },
-  // 2021
-  { id: 'pp_wassce_math_2021_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_core_math', paperTypeId: 'paper_wassce_1', year: 2021, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 90, isComplete: true },
-  { id: 'pp_wassce_math_2021_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_core_math', paperTypeId: 'paper_wassce_2', year: 2021, month: 'May-June', totalQuestions: 13, totalMarks: 100, timeAllowed: 180, isComplete: true },
-  // 2020
-  { id: 'pp_wassce_math_2020_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_core_math', paperTypeId: 'paper_wassce_1', year: 2020, month: 'August', totalQuestions: 50, totalMarks: 50, timeAllowed: 90, isComplete: true },
 
   // =============================================
   // WASSCE Past Papers - English Language
   // =============================================
-  // 2024
   { id: 'pp_wassce_eng_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_english', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 80, totalMarks: 80, timeAllowed: 60, isComplete: true },
-  { id: 'pp_wassce_eng_2024_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_english', paperTypeId: 'paper_wassce_2', year: 2024, month: 'May-June', totalQuestions: 5, totalMarks: 100, timeAllowed: 150, isComplete: true },
-  // 2023
   { id: 'pp_wassce_eng_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_english', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 80, totalMarks: 80, timeAllowed: 60, isComplete: true },
-  { id: 'pp_wassce_eng_2023_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_english', paperTypeId: 'paper_wassce_2', year: 2023, month: 'May-June', totalQuestions: 5, totalMarks: 100, timeAllowed: 150, isComplete: true },
-  // 2022
-  { id: 'pp_wassce_eng_2022_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_english', paperTypeId: 'paper_wassce_1', year: 2022, month: 'May-June', totalQuestions: 80, totalMarks: 80, timeAllowed: 60, isComplete: true },
-  { id: 'pp_wassce_eng_2022_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_english', paperTypeId: 'paper_wassce_2', year: 2022, month: 'May-June', totalQuestions: 5, totalMarks: 100, timeAllowed: 150, isComplete: true },
-  // 2021
-  { id: 'pp_wassce_eng_2021_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_english', paperTypeId: 'paper_wassce_1', year: 2021, month: 'May-June', totalQuestions: 80, totalMarks: 80, timeAllowed: 60, isComplete: true },
 
   // =============================================
   // WASSCE Past Papers - Integrated Science
   // =============================================
-  // 2024
   { id: 'pp_wassce_sci_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_int_science', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
-  { id: 'pp_wassce_sci_2024_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_int_science', paperTypeId: 'paper_wassce_2', year: 2024, month: 'May-June', totalQuestions: 6, totalMarks: 60, timeAllowed: 120, isComplete: true },
-  // 2023
   { id: 'pp_wassce_sci_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_int_science', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
-  { id: 'pp_wassce_sci_2023_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_int_science', paperTypeId: 'paper_wassce_2', year: 2023, month: 'May-June', totalQuestions: 6, totalMarks: 60, timeAllowed: 120, isComplete: true },
-  // 2022
-  { id: 'pp_wassce_sci_2022_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_int_science', paperTypeId: 'paper_wassce_1', year: 2022, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
-  // 2021
-  { id: 'pp_wassce_sci_2021_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_int_science', paperTypeId: 'paper_wassce_1', year: 2021, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
 
   // =============================================
   // WASSCE Past Papers - Social Studies
   // =============================================
-  // 2024
   { id: 'pp_wassce_soc_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_social', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
-  { id: 'pp_wassce_soc_2024_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_social', paperTypeId: 'paper_wassce_2', year: 2024, month: 'May-June', totalQuestions: 4, totalMarks: 50, timeAllowed: 120, isComplete: true },
-  // 2023
   { id: 'pp_wassce_soc_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_social', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
-  { id: 'pp_wassce_soc_2023_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_social', paperTypeId: 'paper_wassce_2', year: 2023, month: 'May-June', totalQuestions: 4, totalMarks: 50, timeAllowed: 120, isComplete: true },
-  // 2022
-  { id: 'pp_wassce_soc_2022_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_social', paperTypeId: 'paper_wassce_1', year: 2022, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
 
   // =============================================
   // WASSCE Past Papers - Physics (Elective)
   // =============================================
-  // 2024
   { id: 'pp_wassce_phy_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_physics', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
-  { id: 'pp_wassce_phy_2024_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_physics', paperTypeId: 'paper_wassce_2', year: 2024, month: 'May-June', totalQuestions: 10, totalMarks: 80, timeAllowed: 180, isComplete: true },
-  // 2023
   { id: 'pp_wassce_phy_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_physics', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
-  { id: 'pp_wassce_phy_2023_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_physics', paperTypeId: 'paper_wassce_2', year: 2023, month: 'May-June', totalQuestions: 10, totalMarks: 80, timeAllowed: 180, isComplete: true },
-  // 2022
-  { id: 'pp_wassce_phy_2022_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_physics', paperTypeId: 'paper_wassce_1', year: 2022, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
 
   // =============================================
   // WASSCE Past Papers - Chemistry (Elective)
   // =============================================
-  // 2024
   { id: 'pp_wassce_chem_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_chemistry', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
-  { id: 'pp_wassce_chem_2024_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_chemistry', paperTypeId: 'paper_wassce_2', year: 2024, month: 'May-June', totalQuestions: 8, totalMarks: 100, timeAllowed: 180, isComplete: true },
-  // 2023
   { id: 'pp_wassce_chem_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_chemistry', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
-  { id: 'pp_wassce_chem_2023_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_chemistry', paperTypeId: 'paper_wassce_2', year: 2023, month: 'May-June', totalQuestions: 8, totalMarks: 100, timeAllowed: 180, isComplete: true },
 
   // =============================================
   // WASSCE Past Papers - Biology (Elective)
   // =============================================
-  // 2024
   { id: 'pp_wassce_bio_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_biology', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 50, isComplete: true },
-  { id: 'pp_wassce_bio_2024_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_biology', paperTypeId: 'paper_wassce_2', year: 2024, month: 'May-June', totalQuestions: 8, totalMarks: 100, timeAllowed: 180, isComplete: true },
-  // 2023
   { id: 'pp_wassce_bio_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_biology', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 50, isComplete: true },
-  { id: 'pp_wassce_bio_2023_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_biology', paperTypeId: 'paper_wassce_2', year: 2023, month: 'May-June', totalQuestions: 8, totalMarks: 100, timeAllowed: 180, isComplete: true },
 
   // =============================================
   // WASSCE Past Papers - Elective Mathematics
   // =============================================
-  // 2024
   { id: 'pp_wassce_emath_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_elective_math', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 40, totalMarks: 40, timeAllowed: 60, isComplete: true },
-  { id: 'pp_wassce_emath_2024_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_elective_math', paperTypeId: 'paper_wassce_2', year: 2024, month: 'May-June', totalQuestions: 14, totalMarks: 100, timeAllowed: 180, isComplete: true },
-  // 2023
   { id: 'pp_wassce_emath_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_elective_math', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 40, totalMarks: 40, timeAllowed: 60, isComplete: true },
-  { id: 'pp_wassce_emath_2023_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_elective_math', paperTypeId: 'paper_wassce_2', year: 2023, month: 'May-June', totalQuestions: 14, totalMarks: 100, timeAllowed: 180, isComplete: true },
-
-  // =============================================
-  // WASSCE Past Papers - Economics
-  // =============================================
-  // 2024
-  { id: 'paper_wassce_economics_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_economics', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
-  { id: 'paper_wassce_economics_2024_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_economics', paperTypeId: 'paper_wassce_2', year: 2024, month: 'May-June', totalQuestions: 6, totalMarks: 80, timeAllowed: 180, isComplete: true },
-  // 2023
-  { id: 'paper_wassce_economics_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_economics', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
-
-  // =============================================
-  // WASSCE Past Papers - Government
-  // =============================================
-  // 2024
-  { id: 'paper_wassce_government_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_government', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
-  { id: 'paper_wassce_government_2024_2', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_government', paperTypeId: 'paper_wassce_2', year: 2024, month: 'May-June', totalQuestions: 5, totalMarks: 80, timeAllowed: 180, isComplete: true },
 
   // =============================================
   // BECE Past Papers - Mathematics
   // =============================================
-  // 2024
   { id: 'pp_bece_math_2024_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_math', paperTypeId: 'paper_bece_1', year: 2024, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 60, isComplete: true },
-  { id: 'pp_bece_math_2024_2', examTypeId: 'exam_bece', subjectId: 'subj_bece_math', paperTypeId: 'paper_bece_2', year: 2024, month: 'June', totalQuestions: 5, totalMarks: 60, timeAllowed: 90, isComplete: true },
-  // 2023
   { id: 'pp_bece_math_2023_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_math', paperTypeId: 'paper_bece_1', year: 2023, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 60, isComplete: true },
-  { id: 'pp_bece_math_2023_2', examTypeId: 'exam_bece', subjectId: 'subj_bece_math', paperTypeId: 'paper_bece_2', year: 2023, month: 'June', totalQuestions: 5, totalMarks: 60, timeAllowed: 90, isComplete: true },
-  // 2022
-  { id: 'pp_bece_math_2022_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_math', paperTypeId: 'paper_bece_1', year: 2022, month: 'November', totalQuestions: 40, totalMarks: 40, timeAllowed: 60, isComplete: true },
-  { id: 'pp_bece_math_2022_2', examTypeId: 'exam_bece', subjectId: 'subj_bece_math', paperTypeId: 'paper_bece_2', year: 2022, month: 'November', totalQuestions: 5, totalMarks: 60, timeAllowed: 90, isComplete: true },
-  // 2021
-  { id: 'pp_bece_math_2021_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_math', paperTypeId: 'paper_bece_1', year: 2021, month: 'November', totalQuestions: 40, totalMarks: 40, timeAllowed: 60, isComplete: true },
 
   // =============================================
   // BECE Past Papers - English Language
   // =============================================
-  // 2024
   { id: 'pp_bece_eng_2024_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_english', paperTypeId: 'paper_bece_1', year: 2024, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
-  { id: 'pp_bece_eng_2024_2', examTypeId: 'exam_bece', subjectId: 'subj_bece_english', paperTypeId: 'paper_bece_2', year: 2024, month: 'June', totalQuestions: 4, totalMarks: 60, timeAllowed: 120, isComplete: true },
-  // 2023
   { id: 'pp_bece_eng_2023_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_english', paperTypeId: 'paper_bece_1', year: 2023, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
-  { id: 'pp_bece_eng_2023_2', examTypeId: 'exam_bece', subjectId: 'subj_bece_english', paperTypeId: 'paper_bece_2', year: 2023, month: 'June', totalQuestions: 4, totalMarks: 60, timeAllowed: 120, isComplete: true },
-  // 2022
-  { id: 'pp_bece_eng_2022_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_english', paperTypeId: 'paper_bece_1', year: 2022, month: 'November', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
 
   // =============================================
   // BECE Past Papers - Integrated Science
   // =============================================
-  // 2024
   { id: 'pp_bece_sci_2024_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_science', paperTypeId: 'paper_bece_1', year: 2024, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
-  { id: 'pp_bece_sci_2024_2', examTypeId: 'exam_bece', subjectId: 'subj_bece_science', paperTypeId: 'paper_bece_2', year: 2024, month: 'June', totalQuestions: 5, totalMarks: 60, timeAllowed: 90, isComplete: true },
-  // 2023
   { id: 'pp_bece_sci_2023_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_science', paperTypeId: 'paper_bece_1', year: 2023, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
-  { id: 'pp_bece_sci_2023_2', examTypeId: 'exam_bece', subjectId: 'subj_bece_science', paperTypeId: 'paper_bece_2', year: 2023, month: 'June', totalQuestions: 5, totalMarks: 60, timeAllowed: 90, isComplete: true },
-  // 2022
-  { id: 'pp_bece_sci_2022_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_science', paperTypeId: 'paper_bece_1', year: 2022, month: 'November', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
 
   // =============================================
   // BECE Past Papers - Social Studies
   // =============================================
-  // 2024
   { id: 'pp_bece_soc_2024_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_social', paperTypeId: 'paper_bece_1', year: 2024, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
-  { id: 'pp_bece_soc_2024_2', examTypeId: 'exam_bece', subjectId: 'subj_bece_social', paperTypeId: 'paper_bece_2', year: 2024, month: 'June', totalQuestions: 4, totalMarks: 60, timeAllowed: 90, isComplete: true },
-  // 2023
   { id: 'pp_bece_soc_2023_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_social', paperTypeId: 'paper_bece_1', year: 2023, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
-  // 2022
-  { id: 'pp_bece_soc_2022_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_social', paperTypeId: 'paper_bece_1', year: 2022, month: 'November', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
-
-  // =============================================
-  // BECE Past Papers - RME
-  // =============================================
-  // 2024
-  { id: 'pp_bece_rme_2024_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_rme', paperTypeId: 'paper_bece_1', year: 2024, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
-  { id: 'pp_bece_rme_2024_2', examTypeId: 'exam_bece', subjectId: 'subj_bece_rme', paperTypeId: 'paper_bece_2', year: 2024, month: 'June', totalQuestions: 4, totalMarks: 60, timeAllowed: 75, isComplete: true },
-  // 2023
-  { id: 'pp_bece_rme_2023_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_rme', paperTypeId: 'paper_bece_1', year: 2023, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
-
-  // =============================================
-  // BECE Past Papers - ICT
-  // =============================================
-  // 2024
-  { id: 'pp_bece_ict_2024_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_ict', paperTypeId: 'paper_bece_1', year: 2024, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
-  // 2023
-  { id: 'pp_bece_ict_2023_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_ict', paperTypeId: 'paper_bece_1', year: 2023, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
-
-  // =============================================
-  // BECE Past Papers - BDT
-  // =============================================
-  // 2024
-  { id: 'pp_bece_bdt_2024_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_bdt', paperTypeId: 'paper_bece_1', year: 2024, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
-  // 2023
-  { id: 'pp_bece_bdt_2023_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_bdt', paperTypeId: 'paper_bece_1', year: 2023, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
 ];
 
 // =============================================

@@ -1675,15 +1675,21 @@ publicApp.get('/topics', async (c) => {
   const subjectId = c.req.query('subject');
 
   try {
-    let query = 'SELECT * FROM topics';
+    // Query with question count
+    let query = `
+      SELECT t.*,
+             COUNT(q.id) as question_count
+      FROM topics t
+      LEFT JOIN questions q ON q.topic_id = t.id
+    `;
     const params: string[] = [];
 
     if (subjectId) {
-      query += ' WHERE subject_id = ?';
+      query += ' WHERE t.subject_id = ?';
       params.push(subjectId);
     }
 
-    query += ' ORDER BY display_order';
+    query += ' GROUP BY t.id ORDER BY t.display_order';
 
     const stmt = params.length > 0
       ? c.env.DB.prepare(query).bind(...params)
@@ -1691,10 +1697,11 @@ publicApp.get('/topics', async (c) => {
 
     const { results } = await stmt.all();
 
-    // Parse key_formulas JSON
+    // Parse key_formulas JSON and include question count
     const topics = results.map((t: Record<string, unknown>) => ({
       ...t,
       keyFormulas: t.key_formulas ? JSON.parse(t.key_formulas as string) : [],
+      questionCount: t.question_count || 0,
     }));
 
     return c.json({ success: true, data: topics });
@@ -2891,6 +2898,382 @@ protectedApp.get('/progress', async (c) => {
     });
   } catch (error) {
     return c.json({ success: false, error: 'Failed to fetch progress' }, 500);
+  }
+});
+
+// Get user's practice sessions history
+protectedApp.get('/practice/sessions', async (c) => {
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  const limit = parseInt(c.req.query('limit') || '10');
+  const offset = parseInt(c.req.query('offset') || '0');
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT id, mode, subject_id, topic_id, questions_count, correct_count,
+             total_time, score, created_at, completed_at
+      FROM practice_sessions
+      WHERE user_id = ?
+      ORDER BY created_at DESC
+      LIMIT ? OFFSET ?
+    `).bind(userId, limit, offset).all();
+
+    return c.json(results || []);
+  } catch (error) {
+    console.error('Failed to fetch practice sessions:', error);
+    return c.json({ success: false, error: 'Failed to fetch practice sessions' }, 500);
+  }
+});
+
+// Create/save a practice session
+protectedApp.post('/practice/sessions', async (c) => {
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  const { mode, subjectId, topicId, questionsCount, correctCount, totalTime, score } = await c.req.json();
+
+  try {
+    const id = `ps_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const demoFlags = getDemoDataFlags(userId);
+
+    await c.env.DB.prepare(`
+      INSERT INTO practice_sessions (id, user_id, mode, subject_id, topic_id, questions_count, correct_count, total_time, score, completed_at, is_demo_data, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, ?)
+    `).bind(id, userId, mode, subjectId || null, topicId || null, questionsCount, correctCount, totalTime, score, demoFlags.is_demo_data, demoFlags.expires_at).run();
+
+    return c.json({ success: true, data: { id } });
+  } catch (error) {
+    console.error('Failed to create practice session:', error);
+    return c.json({ success: false, error: 'Failed to save practice session' }, 500);
+  }
+});
+
+// Get user analytics data
+protectedApp.get('/analytics/user', async (c) => {
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  try {
+    // Get user basic stats
+    const user = await c.env.DB.prepare(`
+      SELECT xp_points, level, streak_days, longest_streak FROM users WHERE id = ?
+    `).bind(userId).first();
+
+    // Get weekly progress (last 7 days)
+    const { results: weeklyData } = await c.env.DB.prepare(`
+      SELECT
+        date(created_at) as date,
+        COUNT(*) as questions_attempted,
+        SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correct_answers
+      FROM question_attempts
+      WHERE user_id = ? AND created_at >= date('now', '-7 days')
+      GROUP BY date(created_at)
+      ORDER BY date ASC
+    `).bind(userId).all();
+
+    // Get subject performance
+    const { results: subjectData } = await c.env.DB.prepare(`
+      SELECT
+        q.subject_id,
+        COUNT(*) as total_attempted,
+        SUM(CASE WHEN qa.is_correct = 1 THEN 1 ELSE 0 END) as correct,
+        AVG(qa.time_taken) as avg_time
+      FROM question_attempts qa
+      JOIN questions q ON qa.question_id = q.id
+      WHERE qa.user_id = ?
+      GROUP BY q.subject_id
+    `).bind(userId).all();
+
+    // Get topic mastery
+    const { results: topicMastery } = await c.env.DB.prepare(`
+      SELECT topic_id, mastery_level, questions_attempted, questions_correct
+      FROM user_progress
+      WHERE user_id = ?
+      ORDER BY mastery_level DESC
+      LIMIT 10
+    `).bind(userId).all();
+
+    // Get recent practice sessions
+    const { results: recentSessions } = await c.env.DB.prepare(`
+      SELECT mode, questions_count, correct_count, score, created_at
+      FROM practice_sessions
+      WHERE user_id = ?
+      ORDER BY created_at DESC
+      LIMIT 5
+    `).bind(userId).all();
+
+    // Calculate strengths and weaknesses
+    const subjectPerformance = (subjectData || []).map((s: Record<string, unknown>) => ({
+      subjectId: s.subject_id,
+      accuracy: s.total_attempted ? Math.round(((s.correct as number) / (s.total_attempted as number)) * 100) : 0,
+      totalAttempted: s.total_attempted,
+      avgTime: s.avg_time ? Math.round(s.avg_time as number) : 0,
+    }));
+
+    const sorted = [...subjectPerformance].sort((a, b) => b.accuracy - a.accuracy);
+    const strengths = sorted.slice(0, 2).map(s => s.subjectId);
+    const weaknesses = sorted.slice(-2).map(s => s.subjectId);
+
+    return c.json({
+      success: true,
+      data: {
+        xp: user?.xp_points || 0,
+        level: user?.level || 1,
+        streak: user?.streak_days || 0,
+        longestStreak: user?.longest_streak || 0,
+        weeklyProgress: weeklyData || [],
+        subjectPerformance,
+        topicMastery: topicMastery || [],
+        recentSessions: recentSessions || [],
+        strengths,
+        weaknesses,
+      }
+    });
+  } catch (error) {
+    console.error('Failed to fetch analytics:', error);
+    return c.json({ success: false, error: 'Failed to fetch analytics' }, 500);
+  }
+});
+
+// =====================
+// FLASHCARD ENDPOINTS
+// =====================
+
+// Get flashcard decks (user's + public)
+protectedApp.get('/flashcards/decks', async (c) => {
+  const userId = getUserId(c);
+  const subjectId = c.req.query('subject');
+
+  try {
+    let query = `
+      SELECT fd.*, COUNT(f.id) as actual_card_count
+      FROM flashcard_decks fd
+      LEFT JOIN flashcards f ON f.deck_id = fd.id
+      WHERE (fd.user_id = ? OR fd.is_public = 1)
+    `;
+    const params: (string | null)[] = [userId || null];
+
+    if (subjectId) {
+      query += ` AND fd.subject_id = ?`;
+      params.push(subjectId);
+    }
+
+    query += ` GROUP BY fd.id ORDER BY fd.created_at DESC`;
+
+    const { results } = await c.env.DB.prepare(query).bind(...params).all();
+
+    return c.json(results || []);
+  } catch (error) {
+    console.error('Failed to fetch flashcard decks:', error);
+    return c.json({ success: false, error: 'Failed to fetch decks' }, 500);
+  }
+});
+
+// Get single deck with cards
+protectedApp.get('/flashcards/decks/:id', async (c) => {
+  const deckId = c.req.param('id');
+
+  try {
+    const deck = await c.env.DB.prepare(`
+      SELECT * FROM flashcard_decks WHERE id = ?
+    `).bind(deckId).first();
+
+    if (!deck) {
+      return c.json({ success: false, error: 'Deck not found' }, 404);
+    }
+
+    const { results: cards } = await c.env.DB.prepare(`
+      SELECT * FROM flashcards WHERE deck_id = ? ORDER BY created_at ASC
+    `).bind(deckId).all();
+
+    return c.json({
+      ...deck,
+      cards: cards || [],
+    });
+  } catch (error) {
+    console.error('Failed to fetch deck:', error);
+    return c.json({ success: false, error: 'Failed to fetch deck' }, 500);
+  }
+});
+
+// Get cards due for review (spaced repetition)
+protectedApp.get('/flashcards/due', async (c) => {
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  const limit = parseInt(c.req.query('limit') || '20');
+
+  try {
+    // Get cards that are due for review or haven't been reviewed yet
+    const { results } = await c.env.DB.prepare(`
+      SELECT f.*, fd.name as deck_name, fd.subject_id,
+             COALESCE(fr.next_review_at, datetime('1970-01-01')) as next_review
+      FROM flashcards f
+      JOIN flashcard_decks fd ON f.deck_id = fd.id
+      LEFT JOIN (
+        SELECT flashcard_id, MAX(reviewed_at) as last_review, next_review_at
+        FROM flashcard_reviews
+        WHERE user_id = ?
+        GROUP BY flashcard_id
+      ) fr ON f.id = fr.flashcard_id
+      WHERE (fd.user_id = ? OR fd.is_public = 1)
+        AND (fr.next_review_at IS NULL OR fr.next_review_at <= datetime('now'))
+      ORDER BY COALESCE(fr.next_review_at, datetime('1970-01-01')) ASC
+      LIMIT ?
+    `).bind(userId, userId, limit).all();
+
+    return c.json(results || []);
+  } catch (error) {
+    console.error('Failed to fetch due cards:', error);
+    return c.json({ success: false, error: 'Failed to fetch due cards' }, 500);
+  }
+});
+
+// Submit flashcard review (spaced repetition)
+protectedApp.post('/flashcards/:id/review', async (c) => {
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  const cardId = c.req.param('id');
+  const { rating } = await c.req.json();
+
+  if (!rating || rating < 1 || rating > 5) {
+    return c.json({ success: false, error: 'Rating must be between 1 and 5' }, 400);
+  }
+
+  try {
+    // Get the card and its deck
+    const card = await c.env.DB.prepare(`
+      SELECT f.*, fd.id as deck_id FROM flashcards f
+      JOIN flashcard_decks fd ON f.deck_id = fd.id
+      WHERE f.id = ?
+    `).bind(cardId).first();
+
+    if (!card) {
+      return c.json({ success: false, error: 'Card not found' }, 404);
+    }
+
+    // Get last review for this card
+    const lastReview = await c.env.DB.prepare(`
+      SELECT * FROM flashcard_reviews
+      WHERE user_id = ? AND flashcard_id = ?
+      ORDER BY reviewed_at DESC LIMIT 1
+    `).bind(userId, cardId).first() as { ease_factor?: number; interval_days?: number; repetitions?: number } | null;
+
+    // SM-2 algorithm for spaced repetition
+    let easeFactor = lastReview?.ease_factor || 2.5;
+    let interval = lastReview?.interval_days || 1;
+    let repetitions = lastReview?.repetitions || 0;
+
+    if (rating >= 3) {
+      // Correct response
+      if (repetitions === 0) {
+        interval = 1;
+      } else if (repetitions === 1) {
+        interval = 6;
+      } else {
+        interval = Math.round(interval * easeFactor);
+      }
+      repetitions += 1;
+      easeFactor = Math.max(1.3, easeFactor + 0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02));
+    } else {
+      // Incorrect response - reset
+      repetitions = 0;
+      interval = 1;
+    }
+
+    // Calculate next review date
+    const nextReview = new Date();
+    nextReview.setDate(nextReview.getDate() + interval);
+
+    const reviewId = `fr_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const demoFlags = getDemoDataFlags(userId);
+
+    await c.env.DB.prepare(`
+      INSERT INTO flashcard_reviews (id, user_id, flashcard_id, deck_id, ease_rating, ease_factor, interval_days, repetitions, next_review_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(reviewId, userId, cardId, card.deck_id, rating, easeFactor, interval, repetitions, nextReview.toISOString()).run();
+
+    return c.json({
+      success: true,
+      data: {
+        nextReviewAt: nextReview.toISOString(),
+        interval,
+        easeFactor,
+        repetitions,
+      },
+    });
+  } catch (error) {
+    console.error('Failed to save review:', error);
+    return c.json({ success: false, error: 'Failed to save review' }, 500);
+  }
+});
+
+// Get flashcards for a specific deck (public endpoint for practice)
+publicApp.get('/flashcards/decks/:id/cards', async (c) => {
+  const deckId = c.req.param('id');
+
+  try {
+    const deck = await c.env.DB.prepare(`
+      SELECT * FROM flashcard_decks WHERE id = ? AND is_public = 1
+    `).bind(deckId).first();
+
+    if (!deck) {
+      return c.json({ success: false, error: 'Deck not found or not public' }, 404);
+    }
+
+    const { results: cards } = await c.env.DB.prepare(`
+      SELECT id, front, back, image_url, hint, difficulty
+      FROM flashcards WHERE deck_id = ?
+      ORDER BY RANDOM()
+    `).bind(deckId).all();
+
+    return c.json(cards || []);
+  } catch (error) {
+    console.error('Failed to fetch cards:', error);
+    return c.json({ success: false, error: 'Failed to fetch cards' }, 500);
+  }
+});
+
+// Get all public flashcard decks (for browsing)
+publicApp.get('/flashcards/public', async (c) => {
+  const subjectId = c.req.query('subject');
+  const limit = parseInt(c.req.query('limit') || '20');
+
+  try {
+    let query = `
+      SELECT fd.*, COUNT(f.id) as card_count
+      FROM flashcard_decks fd
+      LEFT JOIN flashcards f ON f.deck_id = fd.id
+      WHERE fd.is_public = 1
+    `;
+    const params: (string | number)[] = [];
+
+    if (subjectId) {
+      query += ` AND fd.subject_id = ?`;
+      params.push(subjectId);
+    }
+
+    query += ` GROUP BY fd.id ORDER BY fd.created_at DESC LIMIT ?`;
+    params.push(limit);
+
+    const { results } = await c.env.DB.prepare(query).bind(...params).all();
+
+    return c.json(results || []);
+  } catch (error) {
+    console.error('Failed to fetch public decks:', error);
+    return c.json({ success: false, error: 'Failed to fetch decks' }, 500);
   }
 });
 
@@ -7401,6 +7784,148 @@ protectedApp.post('/admin/affiliates/payouts/:id/approve', async (c) => {
   } catch (error) {
     console.error('Approve payout error:', error);
     return c.json({ success: false, error: 'Failed to approve payout' }, 500);
+  }
+});
+
+// =============================================
+// ADMIN CONTENT MANAGEMENT ENDPOINTS
+// =============================================
+
+// Admin/Teacher: Get content list for management
+protectedApp.get('/admin/content', async (c) => {
+  const userRole = c.get('userRole') as string;
+  if (userRole !== 'admin' && userRole !== 'teacher') {
+    return c.json({ success: false, error: 'Teacher or admin access required' }, 403);
+  }
+
+  try {
+    const url = new URL(c.req.url);
+    const type = url.searchParams.get('type') || 'all';
+    const status = url.searchParams.get('status') || 'all';
+    const search = url.searchParams.get('search') || '';
+    const limit = parseInt(url.searchParams.get('limit') || '50');
+
+    // Aggregate content from multiple tables
+    const contentItems: Array<Record<string, unknown>> = [];
+
+    // Fetch topics
+    if (type === 'all' || type === 'topic') {
+      const { results: topics } = await c.env.DB.prepare(`
+        SELECT
+          t.id,
+          t.name as title,
+          'topic' as type,
+          s.name as subject,
+          'NSMQ' as examType,
+          'published' as status,
+          t.created_at as createdAt,
+          t.created_at as updatedAt,
+          'System' as author,
+          0 as views
+        FROM topics t
+        LEFT JOIN subjects s ON t.subject_id = s.id
+        WHERE (? = '' OR t.name LIKE '%' || ? || '%')
+        ORDER BY t.created_at DESC
+        LIMIT ?
+      `).bind(search, search, limit).all();
+      contentItems.push(...topics);
+    }
+
+    // Fetch questions count by subject
+    if (type === 'all' || type === 'question') {
+      const { results: questionSets } = await c.env.DB.prepare(`
+        SELECT
+          'qs_' || s.id as id,
+          s.name || ' Question Bank' as title,
+          'question' as type,
+          s.name as subject,
+          'NSMQ' as examType,
+          'published' as status,
+          datetime('now') as createdAt,
+          datetime('now') as updatedAt,
+          'System' as author,
+          COUNT(q.id) as views
+        FROM subjects s
+        LEFT JOIN questions q ON q.subject_id = s.id
+        GROUP BY s.id, s.name
+        ORDER BY COUNT(q.id) DESC
+      `).all();
+      contentItems.push(...questionSets);
+    }
+
+    // Fetch papers
+    if (type === 'all' || type === 'paper') {
+      const { results: papers } = await c.env.DB.prepare(`
+        SELECT
+          p.id,
+          p.name as title,
+          'paper' as type,
+          s.name as subject,
+          UPPER(p.exam_type) as examType,
+          CASE WHEN p.is_published = 1 THEN 'published' ELSE 'draft' END as status,
+          p.created_at as createdAt,
+          p.created_at as updatedAt,
+          'Admin' as author,
+          0 as views
+        FROM papers p
+        LEFT JOIN subjects s ON p.subject_id = s.id
+        WHERE (? = '' OR p.name LIKE '%' || ? || '%')
+        ORDER BY p.created_at DESC
+        LIMIT ?
+      `).bind(search, search, limit).all();
+      contentItems.push(...papers);
+    }
+
+    // Fetch essay questions
+    if (type === 'all' || type === 'essay') {
+      const { results: essays } = await c.env.DB.prepare(`
+        SELECT
+          eq.id,
+          SUBSTR(eq.question_text, 1, 50) || '...' as title,
+          'essay' as type,
+          s.name as subject,
+          UPPER(eq.exam_type) as examType,
+          CASE WHEN eq.ai_grading_enabled = 1 THEN 'published' ELSE 'draft' END as status,
+          eq.created_at as createdAt,
+          eq.created_at as updatedAt,
+          'System' as author,
+          0 as views
+        FROM essay_questions eq
+        LEFT JOIN subjects s ON eq.subject_id = s.id
+        WHERE (? = '' OR eq.question_text LIKE '%' || ? || '%')
+        ORDER BY eq.created_at DESC
+        LIMIT ?
+      `).bind(search, search, limit).all();
+      contentItems.push(...essays);
+    }
+
+    // Filter by status if specified
+    let filteredContent = contentItems;
+    if (status !== 'all') {
+      filteredContent = contentItems.filter(item => item.status === status);
+    }
+
+    // Sort by updatedAt descending
+    filteredContent.sort((a, b) =>
+      new Date(b.updatedAt as string).getTime() - new Date(a.updatedAt as string).getTime()
+    );
+
+    // Calculate stats
+    const stats = {
+      total: filteredContent.length,
+      published: filteredContent.filter(c => c.status === 'published').length,
+      drafts: filteredContent.filter(c => c.status === 'draft').length,
+      views: filteredContent.reduce((sum, c) => sum + (Number(c.views) || 0), 0),
+    };
+
+    return c.json({
+      success: true,
+      data: filteredContent.slice(0, limit),
+      stats,
+    });
+  } catch (error) {
+    console.error('Admin content list error:', error);
+    return c.json({ success: false, error: 'Failed to fetch content' }, 500);
   }
 });
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Upload,
   FileText,
@@ -14,10 +14,12 @@ import {
   BookOpen,
   FileQuestion,
   Layers,
+  Loader2,
 } from 'lucide-react';
 import { Card, Button, Badge } from '@/components/common';
 import { useAuthStore } from '@/stores';
 import { cn } from '@/utils';
+import { api } from '@/services/api';
 
 // Types
 interface ContentItem {
@@ -33,56 +35,17 @@ interface ContentItem {
   views?: number;
 }
 
-// Sample content data
-const sampleContent: ContentItem[] = [
-  {
-    id: '1',
-    title: 'Introduction to Quadratic Equations',
-    type: 'topic',
-    subject: 'Mathematics',
-    examType: 'WASSCE',
-    status: 'published',
-    createdAt: '2024-01-15',
-    updatedAt: '2024-01-20',
-    author: 'Mr. Osei',
-    views: 245,
-  },
-  {
-    id: '2',
-    title: 'Physics Paper 2 - 2023',
-    type: 'paper',
-    subject: 'Physics',
-    examType: 'WASSCE',
-    status: 'published',
-    createdAt: '2024-01-10',
-    updatedAt: '2024-01-10',
-    author: 'Admin',
-    views: 532,
-  },
-  {
-    id: '3',
-    title: 'Essay: Climate Change Impact',
-    type: 'essay',
-    subject: 'Geography',
-    examType: 'WASSCE',
-    status: 'draft',
-    createdAt: '2024-01-18',
-    updatedAt: '2024-01-19',
-    author: 'Ms. Mensah',
-  },
-  {
-    id: '4',
-    title: 'Cell Biology Quiz Set',
-    type: 'question',
-    subject: 'Biology',
-    examType: 'BECE',
-    status: 'published',
-    createdAt: '2024-01-12',
-    updatedAt: '2024-01-14',
-    author: 'Dr. Asante',
-    views: 189,
-  },
-];
+// API response type
+interface ContentApiResponse {
+  success: boolean;
+  data: ContentItem[];
+  stats: {
+    total: number;
+    published: number;
+    drafts: number;
+    views: number;
+  };
+}
 
 type ContentType = 'all' | 'topic' | 'question' | 'essay' | 'paper' | 'resource';
 type StatusFilter = 'all' | 'draft' | 'published' | 'archived';
@@ -276,8 +239,53 @@ export function ContentManagementPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
+  // Content state
+  const [content, setContent] = useState<ContentItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState({
+    total: 0,
+    published: 0,
+    drafts: 0,
+    views: 0,
+  });
+
   // Check if user is admin or teacher
   const canManageContent = user?.role === 'admin' || user?.role === 'teacher';
+
+  // Fetch content on mount and when filters change
+  useEffect(() => {
+    if (!canManageContent) return;
+
+    const fetchContent = async () => {
+      setIsLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (typeFilter !== 'all') params.set('type', typeFilter);
+        if (statusFilter !== 'all') params.set('status', statusFilter);
+        if (searchQuery) params.set('search', searchQuery);
+
+        const response = await api.get(`/admin/content?${params.toString()}`) as ContentApiResponse;
+
+        if (response && response.data) {
+          setContent(response.data);
+          setStats(response.stats || {
+            total: response.data.length,
+            published: response.data.filter(c => c.status === 'published').length,
+            drafts: response.data.filter(c => c.status === 'draft').length,
+            views: response.data.reduce((sum, c) => sum + (c.views || 0), 0),
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch content:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Debounce search
+    const timeoutId = setTimeout(fetchContent, searchQuery ? 300 : 0);
+    return () => clearTimeout(timeoutId);
+  }, [typeFilter, statusFilter, searchQuery, canManageContent]);
 
   if (!canManageContent) {
     return (
@@ -293,24 +301,8 @@ export function ContentManagementPage() {
     );
   }
 
-  // Filter content
-  const filteredContent = sampleContent.filter((item) => {
-    const matchesSearch =
-      searchQuery === '' ||
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.subject.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = typeFilter === 'all' || item.type === typeFilter;
-    const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
-    return matchesSearch && matchesType && matchesStatus;
-  });
-
-  // Stats
-  const stats = {
-    total: sampleContent.length,
-    published: sampleContent.filter((c) => c.status === 'published').length,
-    drafts: sampleContent.filter((c) => c.status === 'draft').length,
-    views: sampleContent.reduce((sum, c) => sum + (c.views || 0), 0),
-  };
+  // Filter is done server-side now, but we can do client-side filtering for immediate feedback
+  const filteredContent = content;
 
   return (
     <div className="space-y-6">
@@ -420,6 +412,11 @@ export function ContentManagementPage() {
 
       {/* Content List */}
       <Card className="overflow-hidden">
+        {isLoading ? (
+          <div className="flex items-center justify-center p-12">
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          </div>
+        ) : (
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
@@ -482,18 +479,19 @@ export function ContentManagementPage() {
               ))}
             </tbody>
           </table>
-        </div>
 
-        {filteredContent.length === 0 && (
-          <div className="p-12 text-center">
-            <FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">No content found</h3>
-            <p className="text-slate-500 mb-4">Try adjusting your search or filter criteria.</p>
-            <Button variant="primary" onClick={() => setIsUploadModalOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Content
-            </Button>
-          </div>
+          {filteredContent.length === 0 && (
+            <div className="p-12 text-center">
+              <FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">No content found</h3>
+              <p className="text-slate-500 mb-4">Try adjusting your search or filter criteria.</p>
+              <Button variant="primary" onClick={() => setIsUploadModalOpen(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Content
+              </Button>
+            </div>
+          )}
+        </div>
         )}
       </Card>
 

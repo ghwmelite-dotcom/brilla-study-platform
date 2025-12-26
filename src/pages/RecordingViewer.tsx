@@ -13,32 +13,53 @@ import {
 } from 'lucide-react';
 import { RecordingPlayer } from '@/components/whiteboard';
 import type { WhiteboardRecording } from '@/types/whiteboard';
+import { api } from '@/services/api';
 
-// Mock function to fetch recording - replace with actual API call
+// Fetch recording from API
 async function fetchRecording(id: string): Promise<WhiteboardRecording | null> {
-  // TODO: Replace with actual API call
-  // For now, return mock data for testing
-  const mockRecording: WhiteboardRecording = {
-    id,
-    title: 'Sample Lesson Recording',
-    description: 'This is a sample recording for testing the playback functionality.',
-    duration: 120000, // 2 minutes
-    teacherId: 'teacher_001',
-    teacherName: 'Mr. Johnson',
-    canvasEventsUrl: '/api/recordings/' + id + '/events.json',
-    audioUrl: '/api/recordings/' + id + '/audio.webm',
-    webcamUrl: '/api/recordings/' + id + '/webcam.webm',
-    thumbnailUrl: '/api/recordings/' + id + '/thumbnail.png',
-    canvasWidth: 1200,
-    canvasHeight: 800,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
+  try {
+    const response = await api.get(`/recordings/${id}`) as {
+      id: string;
+      title: string;
+      description?: string;
+      duration: number;
+      teacher_id: string;
+      teacher_name?: string;
+      canvas_events_url?: string;
+      audio_url?: string;
+      webcam_url?: string;
+      thumbnail_url?: string;
+      canvas_width: number;
+      canvas_height: number;
+      created_at: string;
+      updated_at: string;
+    };
 
-  // Simulate loading delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+    if (!response || !response.id) {
+      return null;
+    }
 
-  return mockRecording;
+    // Transform snake_case to camelCase
+    return {
+      id: response.id,
+      title: response.title,
+      description: response.description || '',
+      duration: response.duration,
+      teacherId: response.teacher_id,
+      teacherName: response.teacher_name,
+      canvasEventsUrl: response.canvas_events_url || '',
+      audioUrl: response.audio_url,
+      webcamUrl: response.webcam_url,
+      thumbnailUrl: response.thumbnail_url,
+      canvasWidth: response.canvas_width,
+      canvasHeight: response.canvas_height,
+      createdAt: response.created_at,
+      updatedAt: response.updated_at,
+    };
+  } catch (error) {
+    console.error('Failed to fetch recording:', error);
+    return null;
+  }
 }
 
 export default function RecordingViewer() {

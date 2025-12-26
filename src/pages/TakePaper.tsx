@@ -40,12 +40,6 @@ interface PaperDetails {
   questions: PaperQuestion[];
 }
 
-interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
 export default function TakePaper() {
   const { paperId } = useParams<{ paperId: string }>();
   const navigate = useNavigate();
@@ -83,10 +77,11 @@ export default function TakePaper() {
     const fetchPaper = async () => {
       try {
         setIsLoading(true);
-        const response = await api.get(`/papers/${paperId}`) as ApiResponse<PaperDetails>;
-        if (response.success && response.data) {
-          setPaper(response.data);
-          setTimeRemaining(response.data.time_allowed * 60);
+        // api.get returns unwrapped data directly
+        const paper = await api.get(`/papers/${paperId}`) as PaperDetails;
+        if (paper && paper.id) {
+          setPaper(paper);
+          setTimeRemaining(paper.time_allowed * 60);
         } else {
           setError('Paper not found');
         }
@@ -105,13 +100,14 @@ export default function TakePaper() {
     if (!paperId || !user) return;
 
     try {
-      const response = await api.post(`/papers/${paperId}/attempt`, { userId: user.id }) as ApiResponse<{ attemptId: string }>;
-      if (response.success && response.data) {
-        setAttemptId(response.data.attemptId);
+      // api.post returns unwrapped data directly
+      const result = await api.post(`/papers/${paperId}/attempt`, { userId: user.id }) as { attemptId: string };
+      if (result && result.attemptId) {
+        setAttemptId(result.attemptId);
         setShowStartConfirm(false);
         setIsTimerRunning(true);
       } else {
-        setError(response.error || 'Failed to start attempt');
+        setError('Failed to start attempt');
       }
     } catch (err) {
       setError('Failed to start attempt');
@@ -203,16 +199,12 @@ export default function TakePaper() {
 
     try {
       const timeUsed = paper ? paper.time_allowed * 60 - timeRemaining : 0;
-      const response = await api.post(`/papers/attempts/${attemptId}/submit`, {
+      // api.post returns unwrapped data directly
+      await api.post(`/papers/attempts/${attemptId}/submit`, {
         userId: user.id,
         timeUsed,
-      }) as ApiResponse<unknown>;
-
-      if (response.success) {
-        navigate(`/past-papers/results/${attemptId}`);
-      } else {
-        setError('Failed to submit paper');
-      }
+      });
+      navigate(`/past-papers/results/${attemptId}`);
     } catch (err) {
       setError('Failed to submit paper');
     } finally {

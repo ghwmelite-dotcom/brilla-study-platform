@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ClipboardList,
@@ -14,105 +14,96 @@ import {
   Timer,
   BookOpen,
   Star,
+  Loader2,
 } from 'lucide-react';
 import { Button, Card, Badge } from '@/components/common';
 import { useExamStore } from '@/stores';
 import { cn } from '@/utils';
+import { api } from '@/services/api';
 
 // Mock exam configurations per exam type
+// Each exam ID maps to an actual paper ID in the database for Paper 1 (objectives)
 const mockExamConfigs = {
   wassce: {
     title: 'WASSCE Mock Exams',
     description: 'Full-length timed practice exams following WAEC format',
     exams: [
       {
-        id: 'mock_wassce_core_math',
+        id: 'pp_wassce_math_2024_1', // Maps to actual database paper
         name: 'Core Mathematics',
         subject: 'Core Mathematics',
         papers: [
-          { type: 'Paper 1', questions: 50, duration: 90, marks: 50, format: 'Objectives' },
-          { type: 'Paper 2', questions: 13, duration: 180, marks: 100, format: 'Essay/Theory' },
+          { type: 'Paper 1', questions: 50, duration: 90, marks: 50, format: 'Objectives', paperId: 'pp_wassce_math_2024_1' },
         ],
         difficulty: 'Standard',
         color: '#8B5CF6',
       },
       {
-        id: 'mock_wassce_english',
+        id: 'pp_wassce_eng_2024_1',
         name: 'English Language',
         subject: 'English Language',
         papers: [
-          { type: 'Paper 1', questions: 80, duration: 60, marks: 80, format: 'Objectives' },
-          { type: 'Paper 2', questions: 5, duration: 150, marks: 100, format: 'Essay' },
-          { type: 'Paper 3', questions: 60, duration: 60, marks: 60, format: 'Test of Orals' },
+          { type: 'Paper 1', questions: 80, duration: 60, marks: 80, format: 'Objectives', paperId: 'pp_wassce_eng_2024_1' },
         ],
         difficulty: 'Standard',
         color: '#3B82F6',
       },
       {
-        id: 'mock_wassce_int_science',
+        id: 'pp_wassce_sci_2024_1',
         name: 'Integrated Science',
         subject: 'Integrated Science',
         papers: [
-          { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives' },
-          { type: 'Paper 2', questions: 6, duration: 120, marks: 60, format: 'Essay' },
+          { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives', paperId: 'pp_wassce_sci_2024_1' },
         ],
         difficulty: 'Standard',
         color: '#10B981',
       },
       {
-        id: 'mock_wassce_social',
+        id: 'pp_wassce_soc_2024_1',
         name: 'Social Studies',
         subject: 'Social Studies',
         papers: [
-          { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives' },
-          { type: 'Paper 2', questions: 4, duration: 120, marks: 50, format: 'Essay' },
+          { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives', paperId: 'pp_wassce_soc_2024_1' },
         ],
         difficulty: 'Standard',
         color: '#F59E0B',
       },
       {
-        id: 'mock_wassce_physics',
+        id: 'pp_wassce_phy_2024_1',
         name: 'Physics',
         subject: 'Physics',
         papers: [
-          { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives' },
-          { type: 'Paper 2', questions: 10, duration: 180, marks: 80, format: 'Essay/Structured' },
-          { type: 'Paper 3', questions: 4, duration: 180, marks: 50, format: 'Practical' },
+          { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives', paperId: 'pp_wassce_phy_2024_1' },
         ],
         difficulty: 'Advanced',
         color: '#8B5CF6',
       },
       {
-        id: 'mock_wassce_chemistry',
+        id: 'pp_wassce_chem_2024_1',
         name: 'Chemistry',
         subject: 'Chemistry',
         papers: [
-          { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives' },
-          { type: 'Paper 2', questions: 8, duration: 180, marks: 100, format: 'Essay/Structured' },
-          { type: 'Paper 3', questions: 3, duration: 180, marks: 50, format: 'Practical' },
+          { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives', paperId: 'pp_wassce_chem_2024_1' },
         ],
         difficulty: 'Advanced',
         color: '#10B981',
       },
       {
-        id: 'mock_wassce_biology',
+        id: 'pp_wassce_bio_2024_1',
         name: 'Biology',
         subject: 'Biology',
         papers: [
-          { type: 'Paper 1', questions: 50, duration: 50, marks: 50, format: 'Objectives' },
-          { type: 'Paper 2', questions: 8, duration: 180, marks: 100, format: 'Essay/Structured' },
-          { type: 'Paper 3', questions: 4, duration: 180, marks: 50, format: 'Practical' },
+          { type: 'Paper 1', questions: 50, duration: 50, marks: 50, format: 'Objectives', paperId: 'pp_wassce_bio_2024_1' },
         ],
         difficulty: 'Advanced',
         color: '#22C55E',
       },
       {
-        id: 'mock_wassce_elective_math',
+        id: 'pp_wassce_emath_2024_1',
         name: 'Elective Mathematics',
         subject: 'Elective Mathematics',
         papers: [
-          { type: 'Paper 1', questions: 50, duration: 90, marks: 50, format: 'Objectives' },
-          { type: 'Paper 2', questions: 10, duration: 180, marks: 100, format: 'Essay/Structured' },
+          { type: 'Paper 1', questions: 40, duration: 60, marks: 40, format: 'Objectives', paperId: 'pp_wassce_emath_2024_1' },
         ],
         difficulty: 'Advanced',
         color: '#6366F1',
@@ -124,70 +115,44 @@ const mockExamConfigs = {
     description: 'Full-length timed practice exams following BECE format',
     exams: [
       {
-        id: 'mock_bece_math',
+        id: 'pp_bece_math_2024_1',
         name: 'Mathematics',
         subject: 'Mathematics',
         papers: [
-          { type: 'Paper 1', questions: 40, duration: 60, marks: 40, format: 'Objectives' },
-          { type: 'Paper 2', questions: 5, duration: 90, marks: 60, format: 'Essay' },
+          { type: 'Paper 1', questions: 40, duration: 60, marks: 40, format: 'Objectives', paperId: 'pp_bece_math_2024_1' },
         ],
         difficulty: 'Standard',
         color: '#8B5CF6',
       },
       {
-        id: 'mock_bece_english',
+        id: 'pp_bece_eng_2024_1',
         name: 'English Language',
         subject: 'English Language',
         papers: [
-          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Objectives' },
-          { type: 'Paper 2', questions: 4, duration: 120, marks: 60, format: 'Essay/Composition' },
+          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Objectives', paperId: 'pp_bece_eng_2024_1' },
         ],
         difficulty: 'Standard',
         color: '#3B82F6',
       },
       {
-        id: 'mock_bece_science',
+        id: 'pp_bece_sci_2024_1',
         name: 'Integrated Science',
         subject: 'Integrated Science',
         papers: [
-          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Objectives' },
-          { type: 'Paper 2', questions: 5, duration: 90, marks: 60, format: 'Essay' },
+          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Objectives', paperId: 'pp_bece_sci_2024_1' },
         ],
         difficulty: 'Standard',
         color: '#10B981',
       },
       {
-        id: 'mock_bece_social',
+        id: 'pp_bece_soc_2024_1',
         name: 'Social Studies',
         subject: 'Social Studies',
         papers: [
-          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Objectives' },
-          { type: 'Paper 2', questions: 4, duration: 90, marks: 60, format: 'Essay' },
+          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Objectives', paperId: 'pp_bece_soc_2024_1' },
         ],
         difficulty: 'Standard',
         color: '#F59E0B',
-      },
-      {
-        id: 'mock_bece_rme',
-        name: 'RME',
-        subject: 'Religious & Moral Education',
-        papers: [
-          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Objectives' },
-          { type: 'Paper 2', questions: 4, duration: 75, marks: 60, format: 'Essay' },
-        ],
-        difficulty: 'Standard',
-        color: '#A855F7',
-      },
-      {
-        id: 'mock_bece_ict',
-        name: 'ICT',
-        subject: 'Information & Communication Technology',
-        papers: [
-          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Objectives' },
-          { type: 'Paper 2', questions: 3, duration: 60, marks: 60, format: 'Practical' },
-        ],
-        difficulty: 'Standard',
-        color: '#06B6D4',
       },
     ],
   },
@@ -196,55 +161,41 @@ const mockExamConfigs = {
     description: 'Simulated NSMQ rounds and competition practice',
     exams: [
       {
-        id: 'mock_nsmq_full',
-        name: 'Full Competition Simulation',
-        subject: 'All Subjects',
-        papers: [
-          { type: 'Round 1', questions: 15, duration: 30, marks: 45, format: 'Fundamentals' },
-          { type: 'Round 2', questions: 20, duration: 20, marks: 60, format: 'Speed Race' },
-          { type: 'Round 3', questions: 4, duration: 30, marks: 40, format: 'Problem of the Day' },
-          { type: 'Round 4', questions: 12, duration: 12, marks: 24, format: 'True/False' },
-          { type: 'Round 5', questions: 4, duration: 20, marks: 20, format: 'Riddles' },
-        ],
-        difficulty: 'Competition',
-        color: '#FFD700',
-      },
-      {
-        id: 'mock_nsmq_math',
+        id: 'pp_wassce_math_2024_1',
         name: 'Mathematics Focus',
         subject: 'Mathematics',
         papers: [
-          { type: 'Mixed', questions: 30, duration: 45, marks: 90, format: 'All Rounds' },
+          { type: 'Practice', questions: 50, duration: 90, marks: 50, format: 'Mixed Questions', paperId: 'pp_wassce_math_2024_1' },
         ],
         difficulty: 'Advanced',
         color: '#8B5CF6',
       },
       {
-        id: 'mock_nsmq_physics',
+        id: 'pp_wassce_phy_2024_1',
         name: 'Physics Focus',
         subject: 'Physics',
         papers: [
-          { type: 'Mixed', questions: 30, duration: 45, marks: 90, format: 'All Rounds' },
+          { type: 'Practice', questions: 50, duration: 60, marks: 50, format: 'Mixed Questions', paperId: 'pp_wassce_phy_2024_1' },
         ],
         difficulty: 'Advanced',
         color: '#3B82F6',
       },
       {
-        id: 'mock_nsmq_chemistry',
+        id: 'pp_wassce_chem_2024_1',
         name: 'Chemistry Focus',
         subject: 'Chemistry',
         papers: [
-          { type: 'Mixed', questions: 30, duration: 45, marks: 90, format: 'All Rounds' },
+          { type: 'Practice', questions: 50, duration: 60, marks: 50, format: 'Mixed Questions', paperId: 'pp_wassce_chem_2024_1' },
         ],
         difficulty: 'Advanced',
         color: '#10B981',
       },
       {
-        id: 'mock_nsmq_biology',
+        id: 'pp_wassce_bio_2024_1',
         name: 'Biology Focus',
         subject: 'Biology',
         papers: [
-          { type: 'Mixed', questions: 30, duration: 45, marks: 90, format: 'All Rounds' },
+          { type: 'Practice', questions: 50, duration: 50, marks: 50, format: 'Mixed Questions', paperId: 'pp_wassce_bio_2024_1' },
         ],
         difficulty: 'Advanced',
         color: '#22C55E',
@@ -253,8 +204,8 @@ const mockExamConfigs = {
   },
 };
 
-// User's exam history - will be populated from API/store with real data
-const mockExamHistory: {
+// Exam history type
+interface ExamHistoryItem {
   id: string;
   examId: string;
   examName: string;
@@ -264,7 +215,7 @@ const mockExamHistory: {
   percentage: number;
   completedAt: string;
   duration: number;
-}[] = [];
+}
 
 type TabType = 'available' | 'history' | 'scheduled';
 
@@ -273,6 +224,53 @@ export function MockExamsPage() {
   const { currentExamType } = useExamStore();
   const [activeTab, setActiveTab] = useState<TabType>('available');
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
+  const [examHistory, setExamHistory] = useState<ExamHistoryItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+
+  // Fetch exam history on mount
+  useEffect(() => {
+    const fetchExamHistory = async () => {
+      setHistoryLoading(true);
+      try {
+        // Fetch paper attempts from API
+        const data = await api.get('/papers/attempts?limit=20') as Array<{
+          id: string;
+          paper_id: string;
+          status: string;
+          total_score: number;
+          max_score: number;
+          percentage: number;
+          time_used: number;
+          submitted_at: string;
+          paper?: { title: string; paper_type: string };
+        }>;
+
+        if (data && Array.isArray(data)) {
+          // Transform API response to our format
+          const history: ExamHistoryItem[] = data
+            .filter(attempt => attempt.status === 'submitted' || attempt.status === 'graded')
+            .map(attempt => ({
+              id: attempt.id,
+              examId: attempt.paper_id,
+              examName: attempt.paper?.title || 'Mock Exam',
+              paper: attempt.paper?.paper_type || 'Paper 1',
+              score: attempt.total_score || 0,
+              maxScore: attempt.max_score || 100,
+              percentage: attempt.percentage || 0,
+              completedAt: attempt.submitted_at,
+              duration: attempt.time_used || 0,
+            }));
+          setExamHistory(history);
+        }
+      } catch (err) {
+        console.error('Failed to fetch exam history:', err);
+      } finally {
+        setHistoryLoading(false);
+      }
+    };
+
+    fetchExamHistory();
+  }, []);
 
   const config = mockExamConfigs[currentExamType];
 
@@ -293,9 +291,9 @@ export function MockExamsPage() {
     return papers.reduce((sum, p) => sum + p.marks, 0);
   };
 
-  const handleStartExam = (examId: string, paperType?: string) => {
-    // Navigate to exam session (you would implement this page)
-    navigate(`/mock-exams/${examId}${paperType ? `?paper=${encodeURIComponent(paperType)}` : ''}`);
+  const handleStartExam = (paperId: string) => {
+    // Navigate to exam session using the actual paper ID from the database
+    navigate(`/mock-exams/${paperId}`);
   };
 
   return (
@@ -358,7 +356,7 @@ export function MockExamsPage() {
                   <Trophy className="w-5 h-5 text-amber-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-neutral-900">{mockExamHistory.length}</p>
+                  <p className="text-2xl font-bold text-neutral-900">{examHistory.length}</p>
                   <p className="text-sm text-neutral-500">Completed</p>
                 </div>
               </div>
@@ -370,8 +368,8 @@ export function MockExamsPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-neutral-900">
-                    {mockExamHistory.length > 0
-                      ? Math.round(mockExamHistory.reduce((s, h) => s + h.percentage, 0) / mockExamHistory.length)
+                    {examHistory.length > 0
+                      ? Math.round(examHistory.reduce((s, h) => s + h.percentage, 0) / examHistory.length)
                       : 0}%
                   </p>
                   <p className="text-sm text-neutral-500">Avg Score</p>
@@ -385,7 +383,7 @@ export function MockExamsPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-neutral-900">
-                    {mockExamHistory.length > 0 ? Math.max(...mockExamHistory.map(h => h.percentage)) : 0}%
+                    {examHistory.length > 0 ? Math.round(Math.max(...examHistory.map(h => h.percentage))) : 0}%
                   </p>
                   <p className="text-sm text-neutral-500">Best Score</p>
                 </div>
@@ -462,7 +460,7 @@ export function MockExamsPage() {
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleStartExam(exam.id, paper.type);
+                              handleStartExam((paper as { paperId?: string }).paperId || exam.id);
                             }}
                           >
                             <Play className="w-4 h-4 mr-1" />
@@ -494,7 +492,11 @@ export function MockExamsPage() {
       {/* History Tab */}
       {activeTab === 'history' && (
         <div className="space-y-4">
-          {mockExamHistory.length === 0 ? (
+          {historyLoading ? (
+            <div className="flex items-center justify-center p-12">
+              <Loader2 className="w-8 h-8 text-primary animate-spin" />
+            </div>
+          ) : examHistory.length === 0 ? (
             <Card className="p-12 text-center">
               <Clock className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-neutral-700 mb-2">No exam history yet</h3>
@@ -504,7 +506,7 @@ export function MockExamsPage() {
               </Button>
             </Card>
           ) : (
-            mockExamHistory.map((attempt) => (
+            examHistory.map((attempt) => (
               <Card key={attempt.id} className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -529,7 +531,7 @@ export function MockExamsPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-neutral-900">{attempt.percentage}%</p>
+                    <p className="text-2xl font-bold text-neutral-900">{Math.round(attempt.percentage)}%</p>
                     <p className="text-sm text-neutral-500">
                       {attempt.score}/{attempt.maxScore} marks
                     </p>

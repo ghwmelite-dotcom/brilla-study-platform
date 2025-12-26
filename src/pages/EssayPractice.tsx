@@ -7,14 +7,16 @@ import {
   Clock,
   ArrowLeft,
   Loader2,
-  History,
   Filter,
   Search,
+  History,
+  CheckCircle,
 } from 'lucide-react';
 import { Card, Button, Badge } from '@/components/common';
 import { EssayEditor, EssayQuestion, EssayFeedback, ModelAnswer } from '@/components/essay';
 import { useEssayStore } from '@/stores';
 import { essayQuestions as dataEssayQuestions } from '@/data';
+import { api } from '@/services/api';
 import type { EssayQuestion as EssayQuestionType } from '@/types';
 
 // Transform data essay questions to match the component format
@@ -32,7 +34,18 @@ const sampleQuestions: EssayQuestionType[] = dataEssayQuestions.map((eq) => ({
   modelAnswer: eq.modelAnswer,
 }));
 
-type ViewMode = 'browse' | 'write' | 'results';
+type ViewMode = 'browse' | 'write' | 'results' | 'history';
+
+interface EssayAttempt {
+  id: string;
+  questionId: string;
+  questionText: string;
+  subject: string;
+  submittedAt: string;
+  score: number | null;
+  maxScore: number;
+  status: 'pending' | 'graded';
+}
 
 export function EssayPracticePage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -40,6 +53,10 @@ export function EssayPracticePage() {
   const [selectedQuestion, setSelectedQuestion] = useState<EssayQuestionType | null>(null);
   const [subjectFilter, setSubjectFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // History state
+  const [essayHistory, setEssayHistory] = useState<EssayAttempt[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   const {
     currentDraft,
@@ -53,6 +70,43 @@ export function EssayPracticePage() {
     clearCurrentSession,
     error,
   } = useEssayStore();
+
+  // Fetch essay history when viewing history
+  const fetchEssayHistory = async () => {
+    setHistoryLoading(true);
+    try {
+      const response = await api.get('/essays/attempts?limit=20') as Array<{
+        id: string;
+        essay_question_id: string;
+        submitted_at: string;
+        score: number | null;
+        grading_status: string;
+        essay_question?: {
+          question_text: string;
+          marks: number;
+          subject_id: string;
+        };
+      }>;
+
+      if (response && Array.isArray(response)) {
+        const history: EssayAttempt[] = response.map(attempt => ({
+          id: attempt.id,
+          questionId: attempt.essay_question_id,
+          questionText: attempt.essay_question?.question_text?.slice(0, 100) + '...' || 'Essay Question',
+          subject: attempt.essay_question?.subject_id?.replace('subj_', '').replace(/_/g, ' ') || 'General',
+          submittedAt: attempt.submitted_at,
+          score: attempt.score,
+          maxScore: attempt.essay_question?.marks || 20,
+          status: attempt.grading_status === 'graded' ? 'graded' : 'pending',
+        }));
+        setEssayHistory(history);
+      }
+    } catch (err) {
+      console.error('Failed to fetch essay history:', err);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
 
   // Handle question selection from URL
   useEffect(() => {
@@ -124,7 +178,13 @@ export function EssayPracticePage() {
               Practice writing essays and get AI-powered feedback
             </p>
           </div>
-          <Button variant="outline">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setViewMode('history');
+              fetchEssayHistory();
+            }}
+          >
             <History className="w-4 h-4 mr-2" />
             View History
           </Button>
@@ -275,43 +335,6 @@ export function EssayPracticePage() {
 
   // Results View
   if (viewMode === 'results' && selectedQuestion) {
-    // Get criteria from marking scheme
-    const schemeCriteria = selectedQuestion.markingScheme &&
-      (Array.isArray(selectedQuestion.markingScheme)
-        ? selectedQuestion.markingScheme
-        : selectedQuestion.markingScheme.criteria) || [];
-
-    // Create mock feedback for demo
-    const mockFeedback = {
-      overallScore: 18,
-      overallFeedback:
-        'Your essay demonstrates a good understanding of the topic with clear arguments. The structure is logical and the writing is generally clear. Consider adding more specific examples and improving the conclusion.',
-      criteriaScores: schemeCriteria.map((c) => ({
-        criterionName: c.name,
-        score: Math.floor((c.maxScore || 0) * 0.7 + Math.random() * (c.maxScore || 0) * 0.2),
-        maxScore: c.maxScore || 0,
-        feedback: `Good effort on ${c.name.toLowerCase()}. Consider elaborating more on key points.`,
-      })),
-      strengths: [
-        'Clear introduction that sets up the topic well',
-        'Good use of transitional phrases',
-        'Demonstrates understanding of the subject matter',
-      ],
-      areasForImprovement: [
-        'Add more specific examples to support arguments',
-        'Strengthen the conclusion with a call to action',
-        'Consider addressing potential counterarguments',
-      ],
-      grammarErrors: [
-        {
-          text: 'there',
-          suggestion: 'their',
-          type: 'grammar' as const,
-          position: { start: 45, end: 50 },
-        },
-      ],
-    };
-
     return (
       <div className="space-y-6">
         {/* Header */}
@@ -334,34 +357,145 @@ export function EssayPracticePage() {
           </Card>
         )}
 
+        {/* Waiting for Results */}
+        {!isGrading && !gradingResult && (
+          <Card className="p-12 text-center">
+            <Clock className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Grading In Progress</h3>
+            <p className="text-slate-500 mb-4">
+              Your essay has been submitted and is being graded. This may take a moment.
+            </p>
+            <p className="text-sm text-slate-400">
+              You can view the model answer below while waiting.
+            </p>
+          </Card>
+        )}
+
         {/* Results */}
-        {!isGrading && (
-          <>
-            <EssayFeedback
-              feedback={gradingResult || mockFeedback}
-              totalMarks={selectedQuestion.marks}
-            />
+        {!isGrading && gradingResult && (
+          <EssayFeedback
+            feedback={gradingResult}
+            totalMarks={selectedQuestion.marks}
+          />
+        )}
 
-            {selectedQuestion.modelAnswer && (
-              <ModelAnswer modelAnswer={selectedQuestion.modelAnswer} />
-            )}
+        {/* Model Answer - Always show */}
+        {selectedQuestion.modelAnswer && (
+          <ModelAnswer modelAnswer={selectedQuestion.modelAnswer} />
+        )}
 
-            {/* Actions */}
-            <div className="flex items-center justify-center gap-4">
-              <Button variant="outline" onClick={handleBack}>
-                Try Another Essay
-              </Button>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setViewMode('write');
-                  clearCurrentSession();
-                }}
-              >
-                Retry This Essay
-              </Button>
-            </div>
-          </>
+        {/* Actions */}
+        <div className="flex items-center justify-center gap-4">
+          <Button variant="outline" onClick={handleBack}>
+            Try Another Essay
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setViewMode('write');
+              clearCurrentSession();
+            }}
+          >
+            Retry This Essay
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // History View
+  if (viewMode === 'history') {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" onClick={() => setViewMode('browse')}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Essays
+          </Button>
+          <div className="flex-1">
+            <h1 className="text-xl font-display font-bold text-slate-900">Essay History</h1>
+            <p className="text-slate-500">View your past essay submissions and scores</p>
+          </div>
+        </div>
+
+        {/* History List */}
+        {historyLoading ? (
+          <Card className="p-12 text-center">
+            <Loader2 className="w-12 h-12 text-primary mx-auto mb-4 animate-spin" />
+            <p className="text-slate-500">Loading your essay history...</p>
+          </Card>
+        ) : essayHistory.length === 0 ? (
+          <Card className="p-12 text-center">
+            <FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">No essays yet</h3>
+            <p className="text-slate-500 mb-4">
+              You haven't submitted any essays yet. Start practicing to build your history!
+            </p>
+            <Button variant="primary" onClick={() => setViewMode('browse')}>
+              Browse Essays
+            </Button>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {essayHistory.map((attempt) => {
+              const date = new Date(attempt.submittedAt);
+              const formattedDate = date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              });
+
+              return (
+                <Card key={attempt.id} className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="secondary" className="capitalize">
+                          {attempt.subject}
+                        </Badge>
+                        <Badge
+                          variant={attempt.status === 'graded' ? 'success' : 'warning'}
+                        >
+                          {attempt.status === 'graded' ? (
+                            <>
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Graded
+                            </>
+                          ) : (
+                            <>
+                              <Clock className="w-3 h-3 mr-1" />
+                              Pending
+                            </>
+                          )}
+                        </Badge>
+                      </div>
+                      <p className="text-slate-800 line-clamp-2 mb-2">
+                        {attempt.questionText}
+                      </p>
+                      <p className="text-sm text-slate-500">
+                        Submitted on {formattedDate}
+                      </p>
+                    </div>
+                    <div className="text-right ml-4">
+                      {attempt.status === 'graded' && attempt.score !== null ? (
+                        <div>
+                          <p className="text-2xl font-bold text-slate-900">
+                            {attempt.score}/{attempt.maxScore}
+                          </p>
+                          <p className="text-sm text-slate-500">
+                            {Math.round((attempt.score / attempt.maxScore) * 100)}%
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-slate-400">-</p>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
         )}
       </div>
     );

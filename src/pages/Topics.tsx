@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   Calculator,
@@ -11,9 +11,11 @@ import {
   Layers,
   Search,
   Filter,
+  Loader2,
 } from 'lucide-react';
 import { Card, Button, Badge, Input, ProgressBar } from '@/components/common';
 import { cn } from '@/utils';
+import { api } from '@/services/api';
 
 // Topic structure - mastery and questionCount will be populated from API based on user progress
 const subjectsData = {
@@ -116,10 +118,53 @@ const subjectsData = {
 
 const subjects = Object.values(subjectsData);
 
+// API Topic type
+interface ApiTopic {
+  id: string;
+  subject_id: string;
+  parent_id: string | null;
+  name: string;
+  slug: string;
+  description: string;
+  questionCount: number;
+}
+
 export function TopicsPage() {
   const { subjectSlug } = useParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
+  const [apiTopics, setApiTopics] = useState<ApiTopic[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [masteryFilter, setMasteryFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
+
+  // Fetch topics from API
+  useEffect(() => {
+    const fetchTopics = async () => {
+      setLoading(true);
+      try {
+        // Map slug to subject_id
+        const subjectIdMap: Record<string, string> = {
+          mathematics: 'subj_math',
+          physics: 'subj_physics',
+          chemistry: 'subj_chemistry',
+          biology: 'subj_biology',
+        };
+
+        const subjectId = subjectSlug ? subjectIdMap[subjectSlug] : null;
+        const url = subjectId ? `/topics?subject=${subjectId}` : '/topics';
+        const data = await api.get(url) as ApiTopic[];
+        if (Array.isArray(data)) {
+          setApiTopics(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch topics:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTopics();
+  }, [subjectSlug]);
 
   // If viewing a specific subject
   if (subjectSlug) {
@@ -130,7 +175,33 @@ export function TopicsPage() {
     }
 
     const SubjectIcon = subject.icon;
-    const filteredTopics = subject.topics.filter((t) =>
+
+    // Merge static topics with API data for question counts
+    // Only show parent topics (parent_id is null)
+    const parentApiTopics = apiTopics.filter(t => t.parent_id === null);
+    const childApiTopics = apiTopics.filter(t => t.parent_id !== null);
+
+    const mergedTopics = parentApiTopics.length > 0
+      ? parentApiTopics.map(apiTopic => {
+          // Find children (subtopics) for this topic
+          const children = childApiTopics.filter(c => c.parent_id === apiTopic.id);
+          return {
+            id: apiTopic.slug || apiTopic.id,
+            name: apiTopic.name,
+            description: apiTopic.description,
+            questionCount: apiTopic.questionCount,
+            mastery: 0, // TODO: fetch from user progress
+            subtopics: children.map(child => ({
+              id: child.slug || child.id,
+              name: child.name,
+              questionCount: child.questionCount,
+              mastery: 0,
+            })),
+          };
+        })
+      : subject.topics;
+
+    const filteredTopics = mergedTopics.filter((t) =>
       t.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -164,6 +235,11 @@ export function TopicsPage() {
         />
 
         {/* Topics List */}
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : (
         <div className="space-y-4">
           {filteredTopics.map((topic) => (
             <Card key={topic.id} className="overflow-hidden">
@@ -253,6 +329,7 @@ export function TopicsPage() {
             </Card>
           ))}
         </div>
+        )}
       </div>
     );
   }
@@ -275,19 +352,94 @@ export function TopicsPage() {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="flex-1 max-w-md"
         />
-        <Button variant="outline" leftIcon={<Filter className="w-4 h-4" />}>
-          Filter
-        </Button>
+        <div className="relative">
+          <Button
+            variant="outline"
+            leftIcon={<Filter className="w-4 h-4" />}
+            onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+          >
+            Filter
+            {masteryFilter !== 'all' && (
+              <Badge variant="primary" className="ml-2">1</Badge>
+            )}
+          </Button>
+
+          {showFilterDropdown && (
+            <>
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setShowFilterDropdown(false)}
+              />
+              <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-neutral-200 z-20 p-4">
+                <h4 className="font-medium text-neutral-900 mb-3">Filter by Mastery</h4>
+                <div className="space-y-2">
+                  {[
+                    { value: 'all', label: 'All Topics' },
+                    { value: 'low', label: 'Low (0-30%)' },
+                    { value: 'medium', label: 'Medium (31-70%)' },
+                    { value: 'high', label: 'High (71-100%)' },
+                  ].map((option) => (
+                    <label
+                      key={option.value}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="mastery"
+                        value={option.value}
+                        checked={masteryFilter === option.value}
+                        onChange={(e) => {
+                          setMasteryFilter(e.target.value as typeof masteryFilter);
+                          setShowFilterDropdown(false);
+                        }}
+                        className="text-primary focus:ring-primary"
+                      />
+                      <span className="text-sm text-neutral-700">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+                {masteryFilter !== 'all' && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-3 w-full"
+                    onClick={() => {
+                      setMasteryFilter('all');
+                      setShowFilterDropdown(false);
+                    }}
+                  >
+                    Clear Filter
+                  </Button>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Subjects Grid */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {subjects.map((subject) => {
           const SubjectIcon = subject.icon;
-          const totalQuestions = subject.topics.reduce((sum, t) => sum + t.questionCount, 0);
-          const avgMastery = Math.round(
-            subject.topics.reduce((sum, t) => sum + t.mastery, 0) / subject.topics.length
-          );
+          // Map subject id to subject_id format
+          const subjectIdMap: Record<string, string> = {
+            mathematics: 'subj_math',
+            physics: 'subj_physics',
+            chemistry: 'subj_chemistry',
+            biology: 'subj_biology',
+          };
+          const subjectApiId = subjectIdMap[subject.id];
+
+          // Get topics for this subject from API
+          const subjectApiTopics = apiTopics.filter(t => t.subject_id === subjectApiId);
+          const topicCount = subjectApiTopics.filter(t => t.parent_id === null).length || subject.topics.length;
+          const totalQuestions = subjectApiTopics.reduce((sum, t) => sum + (t.questionCount || 0), 0);
+          const avgMastery = 0; // TODO: fetch from user progress
 
           return (
             <Link key={subject.id} to={`/topics/${subject.id}`}>
@@ -298,7 +450,7 @@ export function TopicsPage() {
                     <div className={cn('p-3 rounded-xl text-white', subject.color)}>
                       <SubjectIcon className="w-6 h-6" />
                     </div>
-                    <Badge variant="neutral">{subject.topics.length} topics</Badge>
+                    <Badge variant="neutral">{topicCount} topics</Badge>
                   </div>
                   <h2 className="text-xl font-semibold text-neutral-900 mb-2">{subject.name}</h2>
                   <p className="text-neutral-500 text-sm mb-4">{subject.description}</p>
@@ -327,6 +479,7 @@ export function TopicsPage() {
           );
         })}
       </div>
+      )}
     </div>
   );
 }

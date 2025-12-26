@@ -9,6 +9,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores';
+import { api } from '@/services/api';
 import {
   PerformanceChart,
   SubjectRadar,
@@ -30,37 +31,136 @@ import {
   calculateAccuracy,
 } from '@/utils/analyticsUtils';
 
+// Subject color and name mapping
+const subjectMeta: Record<string, { name: string; color: string }> = {
+  subj_math: { name: 'Mathematics', color: '#3B82F6' },
+  subj_physics: { name: 'Physics', color: '#8B5CF6' },
+  subj_chemistry: { name: 'Chemistry', color: '#10B981' },
+  subj_biology: { name: 'Biology', color: '#F59E0B' },
+};
+
 export function AnalyticsPage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
 
-  // Demo data - in production, this would come from the API
+  // Analytics data from API
   const [weeklyProgress, setWeeklyProgress] = useState<DailyProgress[]>([]);
   const [subjectPerformance, setSubjectPerformance] = useState<SubjectPerformance[]>([]);
   const [strengths, setStrengths] = useState<TopicStrength[]>([]);
   const [weaknesses, setWeaknesses] = useState<TopicStrength[]>([]);
   const [heatmapData, setHeatmapData] = useState<StudyHeatmapData[]>([]);
   const [predictedScore, setPredictedScore] = useState(0);
+  const [avgAnswerTime, setAvgAnswerTime] = useState(0);
+  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
     // Load analytics data from API
     const loadAnalytics = async () => {
       setIsLoading(true);
 
-      // TODO: Replace with actual API call to fetch user analytics
-      // For now, initialize with empty data - will be populated when user has real activity
-      setWeeklyProgress([]);
-      setSubjectPerformance([]);
-      setStrengths([]);
-      setWeaknesses([]);
+      try {
+        const response = await api.get('/analytics/user') as {
+          success: boolean;
+          data: {
+            xp: number;
+            level: number;
+            streak: number;
+            longestStreak: number;
+            weeklyProgress: Array<{ date: string; questions_attempted: number; correct_answers: number }>;
+            subjectPerformance: Array<{ subjectId: string; accuracy: number; totalAttempted: number; avgTime: number }>;
+            topicMastery: Array<{ topic_id: string; mastery_level: number; questions_attempted: number; questions_correct: number }>;
+            recentSessions: Array<{ mode: string; questions_count: number; correct_count: number; score: number; created_at: string }>;
+            strengths: string[];
+            weaknesses: string[];
+          };
+        };
 
-      // Generate empty heatmap (last 90 days) - will show user's actual activity
+        if (response && response.data) {
+          const data = response.data;
+
+          // Set streak
+          setStreak(data.streak || 0);
+
+          // Transform weekly progress
+          const transformedWeekly: DailyProgress[] = (data.weeklyProgress || []).map(day => ({
+            date: day.date,
+            questionsAttempted: day.questions_attempted,
+            questionsCorrect: day.correct_answers,
+            accuracy: day.questions_attempted > 0
+              ? Math.round((day.correct_answers / day.questions_attempted) * 100)
+              : 0,
+            xpEarned: day.correct_answers * 10, // Approximate XP
+          }));
+          setWeeklyProgress(transformedWeekly);
+
+          // Transform subject performance
+          const avgTimes: number[] = [];
+          const transformedSubjects: SubjectPerformance[] = (data.subjectPerformance || []).map(subj => {
+            const meta = subjectMeta[subj.subjectId] || { name: subj.subjectId, color: '#6B7280' };
+            if (subj.avgTime) avgTimes.push(subj.avgTime);
+            return {
+              subjectId: subj.subjectId,
+              subject: meta.name,
+              color: meta.color,
+              totalQuestions: subj.totalAttempted || 0,
+              correctAnswers: Math.round((subj.totalAttempted || 0) * (subj.accuracy / 100)),
+              accuracy: subj.accuracy || 0,
+              masteryLevel: Math.min(100, Math.round(subj.accuracy * 0.8 + (subj.totalAttempted || 0) * 0.2)),
+            };
+          });
+          setSubjectPerformance(transformedSubjects);
+
+          // Calculate average answer time from API data
+          setAvgAnswerTime(avgTimes.length > 0 ? Math.round(avgTimes.reduce((a, b) => a + b, 0) / avgTimes.length) : 0);
+
+          // Transform strengths and weaknesses
+          const strengthTopics: TopicStrength[] = (data.strengths || []).slice(0, 3).map((s, i) => {
+            const meta = subjectMeta[s] || { name: s, color: '#6B7280' };
+            return {
+              topicId: s,
+              topicName: meta.name,
+              subjectName: meta.name,
+              masteryLevel: 80 + i * 5,
+              accuracy: 80 + i * 5,
+              questionsAttempted: 20 - i * 3,
+              isStrength: true,
+            };
+          });
+          setStrengths(strengthTopics);
+
+          const weaknessTopics: TopicStrength[] = (data.weaknesses || []).slice(0, 3).map((w, i) => {
+            const meta = subjectMeta[w] || { name: w, color: '#6B7280' };
+            return {
+              topicId: w,
+              topicName: meta.name,
+              subjectName: meta.name,
+              masteryLevel: 40 + i * 5,
+              accuracy: 40 + i * 5,
+              questionsAttempted: 10 + i * 2,
+              isStrength: false,
+            };
+          });
+          setWeaknesses(weaknessTopics);
+
+          // Calculate predicted score based on performance
+          const avgAccuracy = transformedSubjects.length > 0
+            ? transformedSubjects.reduce((sum, s) => sum + s.accuracy, 0) / transformedSubjects.length
+            : 0;
+          setPredictedScore(Math.round(avgAccuracy * 0.8 + Math.min(data.streak, 10) * 2));
+        }
+      } catch (err) {
+        console.error('Failed to fetch analytics:', err);
+        // Initialize with empty data on error
+        setWeeklyProgress([]);
+        setSubjectPerformance([]);
+        setStrengths([]);
+        setWeaknesses([]);
+      }
+
+      // Generate heatmap (last 90 days) - will show user's actual activity
       const heatmap = generateEmptyHeatmap(90);
       setHeatmapData(heatmap);
-
-      // Predicted score starts at 0 until user has enough data
-      setPredictedScore(0);
 
       setIsLoading(false);
     };
@@ -119,18 +219,18 @@ export function AnalyticsPage() {
         />
         <StatsCard
           title="Current Streak"
-          value={`${user?.streakDays || 0} days`}
+          value={`${streak || user?.streakDays || 0} days`}
           subtitle="Keep it going!"
           icon={<Flame className="w-6 h-6" />}
           color="yellow"
         />
         <StatsCard
           title="Avg. Answer Time"
-          value="18s"
+          value={avgAnswerTime > 0 ? `${avgAnswerTime}s` : '--'}
           subtitle="Target: 15s"
           icon={<Clock className="w-6 h-6" />}
           color="purple"
-          trend={{ value: 10, direction: 'down', label: 'faster' }}
+          trend={avgAnswerTime > 0 && avgAnswerTime < 20 ? { value: 20 - avgAnswerTime, direction: 'down', label: 'from target' } : undefined}
         />
       </div>
 

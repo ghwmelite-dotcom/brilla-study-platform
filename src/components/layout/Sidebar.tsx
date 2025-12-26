@@ -75,7 +75,7 @@ const examSpecificItems = {
   nsmq: [
     { path: '/battle', label: '1v1 Battle', icon: Swords, auth: true },
     { path: '/competition', label: 'Competition Sim', icon: Trophy },
-    { path: '/speed-quiz', label: 'Speed Quiz', icon: Zap },
+    { path: '/practice?mode=speed', label: 'Speed Quiz', icon: Zap },
   ],
   wassce: [
     { path: '/past-papers', label: 'Past Papers', icon: FileText },

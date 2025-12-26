@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Trophy,
   Play,
@@ -10,10 +10,12 @@ import {
   CheckCircle,
   Lightbulb,
   ArrowRight,
+  Loader2,
 } from 'lucide-react';
 import { Card, Button, Badge, Input } from '@/components/common';
 import { Scoreboard, RoundDisplay, RoundSelector, RoundProgress } from '@/components/competition';
 import { cn } from '@/utils';
+import { api } from '@/services/api';
 
 type CompetitionView = 'home' | 'setup' | 'round' | 'results';
 
@@ -87,11 +89,76 @@ const roundInfo = [
   },
 ];
 
+// Competition history type
+interface CompetitionHistoryItem {
+  id: string;
+  date: string;
+  winner: string;
+  score: string;
+  position: string;
+}
+
 export function CompetitionPage() {
   const [view, setView] = useState<CompetitionView>('home');
   const [schools, setSchools] = useState(defaultSchools);
   const [currentRound, setCurrentRound] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [selectedPracticeRound, setSelectedPracticeRound] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
+  const [competitionHistory, setCompetitionHistory] = useState<CompetitionHistoryItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [showRulesModal, setShowRulesModal] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Fetch competition/battle history on mount
+  useEffect(() => {
+    const fetchCompetitionHistory = async () => {
+      setHistoryLoading(true);
+      try {
+        const data = await api.get('/battles/history?limit=10') as Array<{
+          id: string;
+          status: string;
+          winner_id: string | null;
+          your_score: number;
+          opponent_score: number;
+          created_at: string;
+          opponent?: { name: string };
+        }>;
+
+        if (data && Array.isArray(data)) {
+          const history: CompetitionHistoryItem[] = data
+            .filter(battle => battle.status === 'completed')
+            .map(battle => {
+              const isWinner = battle.winner_id !== null;
+              const score = battle.your_score || 0;
+              const position = isWinner ? '1st' : '2nd';
+
+              // Format time ago
+              const created = new Date(battle.created_at);
+              const now = new Date();
+              const diffDays = Math.floor((now.getTime() - created.getTime()) / 86400000);
+              const date = diffDays === 0 ? 'Today' :
+                          diffDays === 1 ? 'Yesterday' :
+                          diffDays < 7 ? `${diffDays} days ago` :
+                          `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`;
+
+              return {
+                id: battle.id,
+                date,
+                winner: battle.opponent?.name || 'Opponent',
+                score: `${score} pts`,
+                position,
+              };
+            });
+          setCompetitionHistory(history);
+        }
+      } catch (err) {
+        console.error('Failed to fetch competition history:', err);
+      } finally {
+        setHistoryLoading(false);
+      }
+    };
+
+    fetchCompetitionHistory();
+  }, []);
 
   const handleStartFullSimulation = () => {
     setSchools(defaultSchools.map((s) => ({ ...s, score: 0 })));
@@ -234,13 +301,29 @@ export function CompetitionPage() {
             <Card className="p-4">
               <h4 className="font-medium text-neutral-900 mb-3">Quick Actions</h4>
               <div className="space-y-2">
-                <Button variant="ghost" fullWidth size="sm">
-                  Pause Competition
+                <Button
+                  variant="ghost"
+                  fullWidth
+                  size="sm"
+                  onClick={() => setIsPaused(!isPaused)}
+                >
+                  {isPaused ? 'Resume Competition' : 'Pause Competition'}
                 </Button>
-                <Button variant="ghost" fullWidth size="sm">
+                <Button
+                  variant="ghost"
+                  fullWidth
+                  size="sm"
+                  onClick={() => setShowRulesModal(true)}
+                >
                   View Rules
                 </Button>
-                <Button variant="ghost" fullWidth size="sm" className="text-red-600">
+                <Button
+                  variant="ghost"
+                  fullWidth
+                  size="sm"
+                  className="text-red-600"
+                  onClick={() => setView('home')}
+                >
                   End Competition
                 </Button>
               </div>
@@ -364,28 +447,76 @@ export function CompetitionPage() {
       <section className="max-w-4xl mx-auto">
         <h2 className="text-xl font-semibold text-neutral-900 mb-4">Recent Competitions</h2>
         <Card className="divide-y divide-neutral-100">
-          {[
-            { date: '2 days ago', winner: 'St John\'s Grammar', score: '68 pts', position: '1st' },
-            { date: '1 week ago', winner: 'Presec Legon', score: '45 pts', position: '2nd' },
-            { date: '2 weeks ago', winner: 'St John\'s Grammar', score: '72 pts', position: '1st' },
-          ].map((comp, index) => (
-            <div key={index} className="flex items-center justify-between p-4">
-              <div>
-                <p className="font-medium text-neutral-900">{comp.winner}</p>
-                <p className="text-sm text-neutral-500">{comp.date}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Badge variant="primary">{comp.score}</Badge>
-                <Badge
-                  variant={comp.position === '1st' ? 'success' : 'neutral'}
-                >
-                  {comp.position}
-                </Badge>
-              </div>
+          {historyLoading ? (
+            <div className="flex items-center justify-center p-8">
+              <Loader2 className="w-6 h-6 text-primary animate-spin" />
             </div>
-          ))}
+          ) : competitionHistory.length === 0 ? (
+            <div className="text-center p-8 text-neutral-500">
+              <p>No competition history yet. Start a competition to see your results here!</p>
+            </div>
+          ) : (
+            competitionHistory.map((comp) => (
+              <div key={comp.id} className="flex items-center justify-between p-4">
+                <div>
+                  <p className="font-medium text-neutral-900">{comp.winner}</p>
+                  <p className="text-sm text-neutral-500">{comp.date}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Badge variant="primary">{comp.score}</Badge>
+                  <Badge
+                    variant={comp.position === '1st' ? 'success' : 'neutral'}
+                  >
+                    {comp.position}
+                  </Badge>
+                </div>
+              </div>
+            ))
+          )}
         </Card>
       </section>
+
+      {/* Rules Modal */}
+      {showRulesModal && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={() => setShowRulesModal(false)}
+          />
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-white rounded-xl shadow-xl z-50 max-h-[80vh] overflow-y-auto">
+            <div className="p-6 border-b border-neutral-100">
+              <h2 className="text-xl font-semibold text-neutral-900">NSMQ Competition Rules</h2>
+              <p className="text-neutral-500 text-sm">Official National Science & Maths Quiz rules</p>
+            </div>
+            <div className="p-6 space-y-6">
+              {roundInfo.map((round) => (
+                <div key={round.number} className="border-l-4 pl-4" style={{ borderColor: round.color.replace('bg-', '#').replace('-500', '') }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold', round.color)}>
+                      {round.number}
+                    </div>
+                    <h3 className="font-semibold text-neutral-900">{round.name}</h3>
+                  </div>
+                  <p className="text-neutral-600 mb-2">{round.description}</p>
+                  <ul className="space-y-1">
+                    {round.details.map((detail, idx) => (
+                      <li key={idx} className="text-sm text-neutral-500 flex items-start gap-2">
+                        <span className="w-1.5 h-1.5 bg-neutral-400 rounded-full mt-1.5 flex-shrink-0" />
+                        {detail}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+            <div className="p-6 border-t border-neutral-100 flex justify-end">
+              <Button onClick={() => setShowRulesModal(false)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
