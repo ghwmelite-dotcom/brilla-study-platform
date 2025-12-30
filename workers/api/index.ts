@@ -3770,9 +3770,17 @@ protectedApp.post('/papers/:id/attempt', async (c) => {
       return c.json({ success: false, error: 'Paper not found' }, 404);
     }
 
-    // Check for existing in-progress attempt
+    // Auto-abandon stale attempts older than 24 hours for this user
+    await c.env.DB.prepare(`
+      UPDATE paper_attempts
+      SET status = 'abandoned'
+      WHERE user_id = ? AND status = 'in_progress'
+      AND datetime(started_at) < datetime('now', '-24 hours')
+    `).bind(userId).run();
+
+    // Check for existing in-progress attempt (only recent ones now)
     const existing = await c.env.DB.prepare(`
-      SELECT id FROM paper_attempts
+      SELECT id, started_at FROM paper_attempts
       WHERE user_id = ? AND paper_id = ? AND status = 'in_progress'
     `).bind(userId, paperId).first();
 
@@ -3799,7 +3807,28 @@ protectedApp.post('/papers/:id/attempt', async (c) => {
       },
     });
   } catch (error) {
-    return c.json({ success: false, error: 'Failed to start paper attempt' }, 500);
+    console.error('Paper attempt error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return c.json({ success: false, error: `Failed to start paper attempt: ${errorMessage}` }, 500);
+  }
+});
+
+// Abandon existing paper attempt
+protectedApp.post('/papers/:id/abandon', async (c) => {
+  const paperId = c.req.param('id');
+  const { userId } = await c.req.json();
+
+  try {
+    await c.env.DB.prepare(`
+      UPDATE paper_attempts
+      SET status = 'abandoned'
+      WHERE user_id = ? AND paper_id = ? AND status = 'in_progress'
+    `).bind(userId, paperId).run();
+
+    return c.json({ success: true, message: 'Attempt abandoned' });
+  } catch (error) {
+    console.error('Abandon attempt error:', error);
+    return c.json({ success: false, error: 'Failed to abandon attempt' }, 500);
   }
 });
 
@@ -9871,6 +9900,19 @@ export default {
       console.log('Rate limit cleanup complete');
     } catch (error) {
       console.error('Rate limit cleanup failed:', error);
+    }
+
+    // Clean up stale paper attempts (older than 48 hours)
+    try {
+      const stalePaperAttempts = await env.DB.prepare(`
+        UPDATE paper_attempts
+        SET status = 'abandoned'
+        WHERE status = 'in_progress'
+        AND datetime(started_at) < datetime('now', '-48 hours')
+      `).run();
+      console.log(`Stale paper attempts cleanup: ${stalePaperAttempts.meta.changes} attempts abandoned`);
+    } catch (error) {
+      console.error('Paper attempts cleanup failed:', error);
     }
   },
 };

@@ -1,9 +1,43 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, HelpCircle } from 'lucide-react';
+import { CheckCircle, XCircle, HelpCircle, List, ToggleLeft, Keyboard, Lightbulb, Brain } from 'lucide-react';
 import type { Question } from '@/types';
 import { Card, Button, Timer, Badge, DifficultyBadge } from '@/components/common';
 import { cn } from '@/utils';
 import { MathText } from './MathText';
+
+// Question type display configuration using platform colors (Ghana national colors)
+const QUESTION_TYPE_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string; inputLabel: string }> = {
+  multiple_choice: {
+    label: 'Multiple Choice',
+    icon: List,
+    color: 'bg-primary-100 text-primary-dark border-primary-200',
+    inputLabel: 'Select an answer below',
+  },
+  true_false: {
+    label: 'True or False',
+    icon: ToggleLeft,
+    color: 'bg-secondary-100 text-secondary-700 border-secondary-300',
+    inputLabel: 'Choose True or False',
+  },
+  direct_answer: {
+    label: 'Type Answer',
+    icon: Keyboard,
+    color: 'bg-accent-100 text-accent-dark border-accent-200',
+    inputLabel: 'Type your answer in the box below',
+  },
+  problem: {
+    label: 'Problem Solving',
+    icon: Brain,
+    color: 'bg-primary-50 text-primary border-primary-100',
+    inputLabel: 'Solve and type your answer below',
+  },
+  riddle: {
+    label: 'Riddle',
+    icon: Lightbulb,
+    color: 'bg-secondary-50 text-secondary-800 border-secondary-200',
+    inputLabel: 'Think carefully and type your answer',
+  },
+};
 
 interface QuestionCardProps {
   question: Question;
@@ -57,13 +91,30 @@ export function QuestionCard({
     <Card className={cn('p-6', className)}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {questionNumber && totalQuestions && (
             <Badge variant="neutral">
               {questionNumber} / {totalQuestions}
             </Badge>
           )}
           <DifficultyBadge difficulty={question.difficulty} />
+          {/* Question Type Badge */}
+          {(() => {
+            const config = QUESTION_TYPE_CONFIG[question.questionType];
+            if (config) {
+              const IconComponent = config.icon;
+              return (
+                <span className={cn(
+                  'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border',
+                  config.color
+                )}>
+                  <IconComponent className="w-3.5 h-3.5" />
+                  {config.label}
+                </span>
+              );
+            }
+            return null;
+          })()}
         </div>
 
         {showTimer && onTimerTick && (
@@ -95,6 +146,13 @@ export function QuestionCard({
 
       {/* Answer Section */}
       <div className="space-y-4">
+        {/* Input Label */}
+        {!isAnswerRevealed && QUESTION_TYPE_CONFIG[question.questionType] && (
+          <p className="text-sm font-medium text-neutral-600">
+            {QUESTION_TYPE_CONFIG[question.questionType].inputLabel}
+          </p>
+        )}
+
         {/* Multiple Choice */}
         {question.questionType === 'multiple_choice' && question.options && (
           <MultipleChoiceOptions

@@ -107,14 +107,14 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, #0a1628 0%, #1e3a8a 50%, #0d2447 100%);
+        background: linear-gradient(135deg, #002B19 0%, #004D2C 50%, #006B3F 100%);
         overflow: hidden;
       ">
         <!-- Animated background gradient -->
         <div style="
           position: absolute;
           inset: -50%;
-          background: conic-gradient(from 0deg, #6366f1, #10b981, #6366f1);
+          background: conic-gradient(from 0deg, #006B3F, #FCD116, #CE1126, #006B3F);
           opacity: 0.15;
           animation: bgSpin 20s linear infinite;
           filter: blur(60px);
@@ -129,7 +129,7 @@
             left: 10%;
             top: 20%;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 107, 63, 0.35) 0%, transparent 70%);
             filter: blur(30px);
             animation: float 5s ease-in-out infinite;
           "></div>
@@ -140,7 +140,7 @@
             right: 15%;
             top: 30%;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(252, 209, 22, 0.3) 0%, transparent 70%);
             filter: blur(30px);
             animation: float 6s ease-in-out infinite 1s;
           "></div>
@@ -151,7 +151,7 @@
             left: 30%;
             bottom: 20%;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(206, 17, 38, 0.25) 0%, transparent 70%);
             filter: blur(30px);
             animation: float 7s ease-in-out infinite 0.5s;
           "></div>
@@ -161,12 +161,12 @@
         <div style="position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center;">
           <!-- Orbital animation container -->
           <div style="position: relative; width: 180px; height: 180px;">
-            <!-- Outer orbital ring -->
+            <!-- Outer orbital ring - Primary Green -->
             <div style="
               position: absolute;
               inset: 0;
               border-radius: 50%;
-              border: 2px solid rgba(16, 185, 129, 0.2);
+              border: 2px solid rgba(0, 107, 63, 0.3);
               animation: spin 8s linear infinite;
             ">
               <div style="
@@ -177,17 +177,17 @@
                 width: 10px;
                 height: 10px;
                 border-radius: 50%;
-                background: #10b981;
-                box-shadow: 0 0 15px rgba(16, 185, 129, 0.8);
+                background: #00A86B;
+                box-shadow: 0 0 15px rgba(0, 168, 107, 0.8);
               "></div>
             </div>
 
-            <!-- Middle orbital ring -->
+            <!-- Middle orbital ring - Secondary Gold -->
             <div style="
               position: absolute;
               inset: 16px;
               border-radius: 50%;
-              border: 2px solid rgba(99, 102, 241, 0.25);
+              border: 2px solid rgba(252, 209, 22, 0.35);
               animation: spin 6s linear infinite reverse;
             ">
               <div style="
@@ -198,8 +198,8 @@
                 width: 8px;
                 height: 8px;
                 border-radius: 50%;
-                background: #818cf8;
-                box-shadow: 0 0 12px rgba(129, 140, 248, 0.8);
+                background: #FCD116;
+                box-shadow: 0 0 12px rgba(252, 209, 22, 0.8);
               "></div>
               <div style="
                 position: absolute;
@@ -209,17 +209,17 @@
                 width: 8px;
                 height: 8px;
                 border-radius: 50%;
-                background: #22d3ee;
-                box-shadow: 0 0 12px rgba(34, 211, 238, 0.8);
+                background: #FFE066;
+                box-shadow: 0 0 12px rgba(255, 224, 102, 0.8);
               "></div>
             </div>
 
-            <!-- Inner orbital ring -->
+            <!-- Inner orbital ring - Accent Red -->
             <div style="
               position: absolute;
               inset: 32px;
               border-radius: 50%;
-              border: 1px solid rgba(255, 255, 255, 0.15);
+              border: 1px solid rgba(206, 17, 38, 0.3);
               animation: spin 4s linear infinite;
             ">
               <div style="
@@ -230,8 +230,8 @@
                 width: 6px;
                 height: 6px;
                 border-radius: 50%;
-                background: #fbbf24;
-                box-shadow: 0 0 10px rgba(251, 191, 36, 0.8);
+                background: #FF4D5E;
+                box-shadow: 0 0 10px rgba(255, 77, 94, 0.8);
               "></div>
             </div>
 
@@ -240,7 +240,7 @@
               position: absolute;
               inset: 40px;
               border-radius: 50%;
-              background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(16, 185, 129, 0.3));
+              background: linear-gradient(135deg, rgba(0, 107, 63, 0.3), rgba(252, 209, 22, 0.3));
               filter: blur(15px);
               animation: pulse 2s ease-in-out infinite;
             "></div>
@@ -250,11 +250,11 @@
               position: absolute;
               inset: 48px;
               border-radius: 50%;
-              background: linear-gradient(135deg, #0f172a, #1e293b);
+              background: linear-gradient(135deg, #004D2C, #006B3F);
               display: flex;
               align-items: center;
               justify-content: center;
-              border: 1px solid rgba(255, 255, 255, 0.1);
+              border: 1px solid rgba(252, 209, 22, 0.2);
               box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             ">
               <!-- B Logo -->
@@ -262,7 +262,7 @@
                 font-family: 'Poppins', sans-serif;
                 font-size: 48px;
                 font-weight: 700;
-                background: linear-gradient(135deg, #fff, #a7f3d0, #10b981);
+                background: linear-gradient(135deg, #FCD116, #FFE066, #fff);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
@@ -286,12 +286,12 @@
           <!-- Brand text with wave effect -->
           <div style="margin-top: 32px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
             <div style="display: flex; gap: 2px;">
-              <span style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.9); text-shadow: 0 0 20px rgba(16, 185, 129, 0.5); animation: wave 1.5s ease-in-out infinite;">B</span>
-              <span style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.9); text-shadow: 0 0 20px rgba(16, 185, 129, 0.5); animation: wave 1.5s ease-in-out infinite 0.1s;">R</span>
-              <span style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.9); text-shadow: 0 0 20px rgba(16, 185, 129, 0.5); animation: wave 1.5s ease-in-out infinite 0.2s;">I</span>
-              <span style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.9); text-shadow: 0 0 20px rgba(16, 185, 129, 0.5); animation: wave 1.5s ease-in-out infinite 0.3s;">L</span>
-              <span style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.9); text-shadow: 0 0 20px rgba(16, 185, 129, 0.5); animation: wave 1.5s ease-in-out infinite 0.4s;">L</span>
-              <span style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.9); text-shadow: 0 0 20px rgba(16, 185, 129, 0.5); animation: wave 1.5s ease-in-out infinite 0.5s;">A</span>
+              <span style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: #FCD116; text-shadow: 0 0 20px rgba(252, 209, 22, 0.6); animation: wave 1.5s ease-in-out infinite;">B</span>
+              <span style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: #FCD116; text-shadow: 0 0 20px rgba(252, 209, 22, 0.6); animation: wave 1.5s ease-in-out infinite 0.1s;">R</span>
+              <span style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: #FCD116; text-shadow: 0 0 20px rgba(252, 209, 22, 0.6); animation: wave 1.5s ease-in-out infinite 0.2s;">I</span>
+              <span style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: #FCD116; text-shadow: 0 0 20px rgba(252, 209, 22, 0.6); animation: wave 1.5s ease-in-out infinite 0.3s;">L</span>
+              <span style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: #FCD116; text-shadow: 0 0 20px rgba(252, 209, 22, 0.6); animation: wave 1.5s ease-in-out infinite 0.4s;">L</span>
+              <span style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: #FCD116; text-shadow: 0 0 20px rgba(252, 209, 22, 0.6); animation: wave 1.5s ease-in-out infinite 0.5s;">A</span>
             </div>
 
             <!-- Loading bar -->
@@ -299,7 +299,7 @@
               <div style="
                 height: 100%;
                 width: 100%;
-                background: linear-gradient(90deg, #10b981, #22d3ee, #6366f1);
+                background: linear-gradient(90deg, #00A86B, #FCD116, #FF4D5E);
                 border-radius: 9999px;
                 animation: loadingBar 2s ease-in-out infinite;
               "></div>
@@ -316,9 +316,9 @@
           <svg viewBox="0 0 1440 120" preserveAspectRatio="none" style="width: 100%; height: 100%;">
             <defs>
               <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.4" />
-                <stop offset="50%" style="stop-color:#6366f1;stop-opacity:0.4" />
-                <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.4" />
+                <stop offset="0%" style="stop-color:#00A86B;stop-opacity:0.5" />
+                <stop offset="50%" style="stop-color:#FCD116;stop-opacity:0.5" />
+                <stop offset="100%" style="stop-color:#CE1126;stop-opacity:0.4" />
               </linearGradient>
             </defs>
             <path fill="url(#waveGrad)" d="M0,64 C288,96 576,32 864,64 C1152,96 1296,32 1440,64 L1440,120 L0,120 Z">

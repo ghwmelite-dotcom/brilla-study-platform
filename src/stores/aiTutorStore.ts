@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { getApiUrl, getAuthHeaders } from '../utils/api';
+import { extractTextFromPDF, isPDFFile } from '../utils/pdfExtractor';
 
 export interface FileAttachment {
   id: string;
@@ -440,26 +441,62 @@ export const useAiTutorStore = create<AiTutorState>()(
           try {
             // If there are files, upload them and get URLs
             const uploadedAttachments: Array<{ url: string; type: string; name: string }> = [];
+            let pdfContent: string | undefined;
 
             if (files && files.length > 0) {
               for (const file of files) {
-                // Convert file to base64 for sending to API
-                const base64 = await new Promise<string>((resolve) => {
-                  const reader = new FileReader();
-                  reader.onloadend = () => {
-                    const result = reader.result as string;
-                    // Extract base64 data after the data URL prefix
-                    const base64Data = result.split(',')[1];
-                    resolve(base64Data);
-                  };
-                  reader.readAsDataURL(file);
-                });
+                // Handle PDF files - extract text content or render for OCR
+                if (isPDFFile(file)) {
+                  set({ thinkingStage: 'thinking' }); // Show thinking while extracting PDF
+                  const extraction = await extractTextFromPDF(file);
+                  if (extraction.success) {
+                    pdfContent = extraction.text;
 
-                uploadedAttachments.push({
-                  url: base64,
-                  type: file.type,
-                  name: file.name,
-                });
+                    // If this is a scanned PDF, add page images for OCR
+                    if (extraction.isScanned && extraction.pageImages) {
+                      for (const pageImage of extraction.pageImages) {
+                        uploadedAttachments.push({
+                          url: pageImage.base64,
+                          type: 'image/jpeg',
+                          name: `${file.name} - Page ${pageImage.pageNum}`,
+                        });
+                      }
+                    }
+
+                    // Still add PDF attachment info for display purposes
+                    uploadedAttachments.push({
+                      url: '', // No base64 needed for PDF itself
+                      type: file.type,
+                      name: file.name,
+                    });
+                  } else {
+                    // PDF extraction failed - add note
+                    uploadedAttachments.push({
+                      url: '',
+                      type: file.type,
+                      name: file.name,
+                    });
+                    console.warn('PDF extraction failed:', extraction.error);
+                  }
+                } else {
+                  // Convert non-PDF files (images, etc.) to base64 for sending to API
+                  const base64 = await new Promise<string>((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      const result = reader.result as string;
+                      // Extract base64 data after the data URL prefix
+                      const base64Data = result.split(',')[1];
+                      resolve(base64Data);
+                    };
+                    reader.readAsDataURL(file);
+                  });
+
+                  uploadedAttachments.push({
+                    url: base64,
+                    type: file.type,
+                    name: file.name,
+                  });
+                }
               }
             }
 
@@ -478,6 +515,7 @@ export const useAiTutorStore = create<AiTutorState>()(
                 subjectId: get().subjectId,
                 topicId: get().topicId,
                 attachments: uploadedAttachments.length > 0 ? uploadedAttachments : undefined,
+                pdfContent, // Include extracted PDF text
               }),
             });
 

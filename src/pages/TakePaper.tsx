@@ -107,10 +107,33 @@ export default function TakePaper() {
         setShowStartConfirm(false);
         setIsTimerRunning(true);
       } else {
-        setError('Failed to start attempt');
+        setError('Failed to start attempt - no attempt ID returned');
       }
     } catch (err) {
-      setError('Failed to start attempt');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      // Check if it's an existing attempt error and offer to resume
+      if (errorMessage.includes('ongoing attempt')) {
+        const resume = window.confirm('You have an ongoing attempt for this paper. Would you like to abandon it and start fresh?');
+        if (resume) {
+          // Abandon existing attempt and try again
+          try {
+            await api.post(`/papers/${paperId}/abandon`, { userId: user.id });
+            // Retry starting the attempt
+            const retryResult = await api.post(`/papers/${paperId}/attempt`, { userId: user.id }) as { attemptId: string };
+            if (retryResult && retryResult.attemptId) {
+              setAttemptId(retryResult.attemptId);
+              setShowStartConfirm(false);
+              setIsTimerRunning(true);
+              return;
+            }
+          } catch (retryErr) {
+            setError('Failed to restart attempt. Please try again.');
+            return;
+          }
+        }
+        return;
+      }
+      setError(`Failed to start attempt: ${errorMessage}`);
     }
   };
 

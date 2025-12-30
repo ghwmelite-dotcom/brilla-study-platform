@@ -1,5 +1,6 @@
 export * from './scoring';
 export * from './formatters';
+export * from './pdfExtractor';
 
 /**
  * Classnames utility for conditional classes

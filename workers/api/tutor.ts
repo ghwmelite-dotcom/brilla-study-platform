@@ -6,7 +6,8 @@ import { getDemoDataFlags, isDemoUserId } from './demoUtils';
 interface Env {
   DB: D1Database;
   JWT_SECRET: string;
-  ANTHROPIC_API_KEY?: string;
+  AI: Ai;  // Cloudflare Workers AI binding
+  AI_MODEL?: string;
 }
 
 // Types
@@ -183,7 +184,72 @@ interface FileAttachment {
   name: string;
 }
 
-// Call Claude API for tutor response
+// Analyze image using Cloudflare Vision AI (for images and OCR)
+async function analyzeImageWithVision(
+  env: Env,
+  imageBase64: string,
+  mimeType: string,
+  prompt: string
+): Promise<string> {
+  try {
+    // Format the image data for the vision model
+    const imageData = imageBase64.startsWith('data:')
+      ? imageBase64
+      : `data:${mimeType};base64,${imageBase64}`;
+
+    const result = await env.AI.run('@cf/meta/llama-3.2-11b-vision-instruct' as BaseAiTextGenerationModels, {
+      messages: [
+        { role: 'system', content: 'You are an expert educational assistant helping students understand images, diagrams, and documents. Provide clear, detailed explanations suitable for secondary school students.' },
+        { role: 'user', content: prompt }
+      ],
+      image: imageData,
+      max_tokens: 4096,  // Increased for detailed OCR and image analysis
+    });
+
+    if (typeof result === 'object' && result !== null && 'response' in result) {
+      return (result as { response: string }).response;
+    }
+    return String(result);
+  } catch (error) {
+    console.error('Vision AI error:', error);
+    return '';
+  }
+}
+
+// Process images and get descriptions/OCR text
+async function processImagesWithVision(
+  env: Env,
+  attachments: FileAttachment[]
+): Promise<string> {
+  const imageAnalyses: string[] = [];
+
+  for (const attachment of attachments) {
+    if (attachment.type.startsWith('image/') && attachment.url) {
+      // Analyze the image
+      const analysis = await analyzeImageWithVision(
+        env,
+        attachment.url,
+        attachment.type,
+        `Please analyze this image in detail. If it contains:
+- Text or handwriting: Transcribe all visible text accurately (OCR)
+- Math problems or equations: Identify and describe them clearly
+- Diagrams or charts: Explain what they represent
+- Scientific content: Describe the concepts shown
+- Any educational content: Explain it clearly
+
+Provide a comprehensive analysis that will help a student understand this image.`
+      );
+
+      if (analysis) {
+        imageAnalyses.push(`[Analysis of image "${attachment.name}"]\n${analysis}`);
+      }
+    }
+  }
+
+  return imageAnalyses.join('\n\n');
+}
+
+// Call Cloudflare Workers AI for tutor response
 async function getTutorResponse(
   env: Env,
   message: string,
@@ -194,9 +260,9 @@ async function getTutorResponse(
   hintLevel?: number,
   attachments?: FileAttachment[]
 ): Promise<{ content: string; tokensUsed?: number }> {
-  const apiKey = env.ANTHROPIC_API_KEY;
-
-  if (!apiKey) {
+  // Check if AI binding is available
+  if (!env.AI) {
+    console.error('Workers AI binding not available');
     return getMockResponse(message, messageType, questionContext);
   }
 
@@ -237,110 +303,71 @@ async function getTutorResponse(
       systemPrompt = TUTOR_PROMPTS.general.replace('{studentContext}', studentContextStr);
   }
 
-  // Add vision capability instruction if there are image attachments
-  if (attachments && attachments.some(a => a.type.startsWith('image/'))) {
-    systemPrompt += `
+  // Build messages for Workers AI
+  const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+    { role: 'system', content: systemPrompt }
+  ];
 
-IMPORTANT: The student has shared an image with you. Please analyze the image carefully and:
-1. Describe what you see (math problem, diagram, handwritten notes, etc.)
-2. If it's a problem, work through the solution step by step
-3. If it's a diagram or concept, explain what it represents
-4. Point out any errors or areas for improvement if applicable
-5. Be encouraging and supportive in your response`;
+  // Add conversation history
+  for (const msg of conversationHistory) {
+    messages.push({
+      role: msg.role === 'assistant' ? 'assistant' : 'user',
+      content: msg.content,
+    });
   }
 
-  // Build messages for Claude with vision support
-  type MessageContent = string | Array<{
-    type: 'text' | 'image';
-    text?: string;
-    source?: {
-      type: 'base64';
-      media_type: string;
-      data: string;
-    };
-  }>;
-
-  const messages: Array<{ role: 'user' | 'assistant'; content: MessageContent }> = conversationHistory.map(msg => ({
-    role: msg.role === 'assistant' ? 'assistant' as const : 'user' as const,
-    content: msg.content,
-  }));
-
-  // Build the user message content with attachments
+  // Build the user message with attachment context
+  let userMessage = message;
   if (attachments && attachments.length > 0) {
-    const contentParts: Array<{
-      type: 'text' | 'image';
-      text?: string;
-      source?: {
-        type: 'base64';
-        media_type: string;
-        data: string;
-      };
-    }> = [];
-
-    // Add image attachments first
-    for (const attachment of attachments) {
-      if (attachment.type.startsWith('image/')) {
-        contentParts.push({
-          type: 'image',
-          source: {
-            type: 'base64',
-            media_type: attachment.type,
-            data: attachment.url, // Already base64 encoded from frontend
-          },
-        });
-      } else if (attachment.type === 'application/pdf') {
-        // For PDFs, add a note (Claude can't directly read PDFs yet via API)
-        contentParts.push({
-          type: 'text',
-          text: `[PDF Document attached: ${attachment.name}. Note: Please describe what you'd like help with from this document.]`,
-        });
+    // Process images with vision AI for analysis/OCR
+    const imageAttachments = attachments.filter(a => a.type.startsWith('image/') && a.url);
+    if (imageAttachments.length > 0) {
+      const imageAnalysis = await processImagesWithVision(env, imageAttachments);
+      if (imageAnalysis) {
+        userMessage = `${imageAnalysis}\n\n---\nUser's question about the above:\n${message}`;
       }
     }
 
-    // Add the text message
-    contentParts.push({
-      type: 'text',
-      text: message,
-    });
-
-    messages.push({ role: 'user', content: contentParts });
-  } else {
-    messages.push({ role: 'user', content: message });
+    // Handle other attachment types
+    const otherAttachments = attachments.filter(a => !a.type.startsWith('image/'));
+    if (otherAttachments.length > 0) {
+      const attachmentDescriptions: string[] = [];
+      for (const attachment of otherAttachments) {
+        if (attachment.type === 'application/pdf') {
+          attachmentDescriptions.push(`[PDF Document attached: ${attachment.name}]`);
+        }
+      }
+      if (attachmentDescriptions.length > 0 && !userMessage.includes('---')) {
+        userMessage = attachmentDescriptions.join('\n') + '\n\n' + message;
+      }
+    }
   }
 
+  messages.push({ role: 'user', content: userMessage });
+
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2000, // Increased for image analysis
-        system: systemPrompt,
-        messages,
-      }),
+    // Use the configured model or default to Llama 3.3 70B
+    const model = env.AI_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+
+    const result = await env.AI.run(model as BaseAiTextGenerationModels, {
+      messages,
+      max_tokens: 8192,  // High limit for comprehensive, detailed explanations
+      temperature: 0.7,  // Balanced creativity for educational content
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Claude API error:', errorText);
-      throw new Error(`Claude API error: ${response.status}`);
+    // Handle the response - Workers AI returns { response: string } for text generation
+    const content = typeof result === 'object' && result !== null && 'response' in result
+      ? (result as { response: string }).response
+      : String(result);
+
+    if (!content || content.trim() === '') {
+      console.error('Empty response from Workers AI');
+      return getMockResponse(message, messageType, questionContext);
     }
 
-    const data = await response.json() as {
-      content: Array<{ type: string; text?: string }>;
-      usage?: { input_tokens: number; output_tokens: number };
-    };
-
-    const content = data.content[0]?.type === 'text' ? data.content[0].text || '' : '';
-    const tokensUsed = data.usage ? data.usage.input_tokens + data.usage.output_tokens : undefined;
-
-    return { content, tokensUsed };
+    return { content };
   } catch (error) {
-    console.error('Error calling Claude API:', error);
+    console.error('Error calling Workers AI:', error);
     return getMockResponse(message, messageType, questionContext);
   }
 }
@@ -599,9 +626,9 @@ tutorApp.post('/chat', async (c) => {
     }
 
     const body = await c.req.json();
-    const { conversationId, message, context, examType, subjectId, topicId, attachments } = body;
+    const { conversationId, message, context, examType, subjectId, topicId, attachments, pdfContent } = body;
 
-    if (!message?.trim() && (!attachments || attachments.length === 0)) {
+    if (!message?.trim() && (!attachments || attachments.length === 0) && !pdfContent) {
       return c.json({ success: false, error: 'Message or attachment is required' }, 400);
     }
 
@@ -647,20 +674,29 @@ tutorApp.post('/chat', async (c) => {
 
     // Save user message (with attachment info if present)
     const userMessageId = `msg_${Date.now()}_user`;
-    const messageContent = message?.trim() || (attachments ? '[File attachment]' : '');
+    const originalMessage = message?.trim() || (attachments ? '[File attachment]' : '');
+
+    // Build message content for AI (include PDF content if extracted)
+    let messageContentForAI = originalMessage;
+    if (pdfContent) {
+      messageContentForAI = `${pdfContent}\n\n---\nUser's question about the above document:\n${originalMessage}`;
+    }
+
     const attachmentInfo = attachments && attachments.length > 0
       ? ` [Attachments: ${attachments.map((a: FileAttachment) => a.name).join(', ')}]`
       : '';
+    const pdfInfo = pdfContent ? ' [PDF content extracted and sent to AI]' : '';
 
+    // Store only the original message in DB (not the full PDF content to avoid bloat)
     await c.env.DB.prepare(`
       INSERT INTO tutor_messages (id, conversation_id, role, content, message_type, created_at)
       VALUES (?, ?, 'user', ?, 'chat', datetime('now'))
-    `).bind(userMessageId, activeConversationId, messageContent + attachmentInfo).run();
+    `).bind(userMessageId, activeConversationId, originalMessage + attachmentInfo + pdfInfo).run();
 
-    // Get AI response with attachments
+    // Get AI response with attachments (use messageContentForAI which includes PDF content)
     const aiResponse = await getTutorResponse(
       c.env,
-      messageContent,
+      messageContentForAI,
       conversationHistory,
       studentContext,
       'chat',

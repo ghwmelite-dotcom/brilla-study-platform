@@ -36,11 +36,11 @@ export function LoadingScreen({
   return (
     <div
       className={`${containerClasses} flex items-center justify-center overflow-hidden transition-opacity duration-500 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
-      style={{ background: 'linear-gradient(135deg, #0a1628 0%, #1e3a8a 50%, #0d2447 100%)' }}
+      style={{ background: 'linear-gradient(135deg, #002B19 0%, #004D2C 50%, #006B3F 100%)' }}
     >
       {/* Animated gradient background */}
       <div className="absolute inset-0 opacity-30">
-        <div className="absolute inset-0 bg-gradient-conic from-indigo-500 via-emerald-500 to-indigo-500 animate-spin-slow blur-3xl"
+        <div className="absolute inset-0 bg-gradient-conic from-primary via-secondary to-accent animate-spin-slow blur-3xl"
              style={{ animationDuration: '20s' }} />
       </div>
 
@@ -55,9 +55,11 @@ export function LoadingScreen({
               height: `${80 + i * 40}px`,
               left: `${10 + i * 15}%`,
               top: `${20 + (i % 3) * 25}%`,
-              background: i % 2 === 0
-                ? 'radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, transparent 70%)'
-                : 'radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%)',
+              background: i % 3 === 0
+                ? 'radial-gradient(circle, rgba(0, 107, 63, 0.4) 0%, transparent 70%)' // Primary green
+                : i % 3 === 1
+                ? 'radial-gradient(circle, rgba(252, 209, 22, 0.35) 0%, transparent 70%)' // Secondary gold
+                : 'radial-gradient(circle, rgba(206, 17, 38, 0.3) 0%, transparent 70%)', // Accent red
               animationDelay: `${i * 0.5}s`,
               animationDuration: `${4 + i}s`,
             }}
@@ -69,40 +71,40 @@ export function LoadingScreen({
       <div className="relative z-10 flex flex-col items-center">
         {/* Orbital rings */}
         <div className="relative w-48 h-48 sm:w-56 sm:h-56">
-          {/* Outer ring */}
-          <div className="absolute inset-0 rounded-full border-2 border-emerald-500/20 animate-spin-slow"
+          {/* Outer ring - Primary Green */}
+          <div className="absolute inset-0 rounded-full border-2 border-primary/30 animate-spin-slow"
                style={{ animationDuration: '8s' }}>
-            <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50" />
+            <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary-light shadow-lg" style={{ boxShadow: '0 0 12px rgba(0, 168, 107, 0.6)' }} />
           </div>
 
-          {/* Middle ring */}
-          <div className="absolute inset-4 rounded-full border-2 border-indigo-400/30 animate-spin-slow"
+          {/* Middle ring - Secondary Gold */}
+          <div className="absolute inset-4 rounded-full border-2 border-secondary/40 animate-spin-slow"
                style={{ animationDuration: '6s', animationDirection: 'reverse' }}>
-            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-indigo-400 shadow-lg shadow-indigo-400/50" />
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-cyan-400 shadow-lg shadow-cyan-400/50" />
+            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-secondary shadow-lg" style={{ boxShadow: '0 0 10px rgba(252, 209, 22, 0.6)' }} />
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-secondary-light shadow-lg" style={{ boxShadow: '0 0 10px rgba(255, 224, 102, 0.6)' }} />
           </div>
 
-          {/* Inner ring */}
-          <div className="absolute inset-8 rounded-full border border-white/20 animate-spin-slow"
+          {/* Inner ring - Accent Red */}
+          <div className="absolute inset-8 rounded-full border border-accent/30 animate-spin-slow"
                style={{ animationDuration: '4s' }}>
-            <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-yellow-400 shadow-lg shadow-yellow-400/50" />
+            <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-accent-light shadow-lg" style={{ boxShadow: '0 0 10px rgba(255, 77, 94, 0.6)' }} />
           </div>
 
           {/* Pulsing center glow */}
-          <div className="absolute inset-12 rounded-full bg-gradient-to-br from-indigo-600 to-emerald-600 opacity-20 animate-pulse blur-xl" />
+          <div className="absolute inset-12 rounded-full bg-gradient-to-br from-primary to-secondary opacity-25 animate-pulse blur-xl" />
 
           {/* Central logo container */}
-          <div className="absolute inset-12 rounded-full bg-gradient-to-br from-slate-900 to-slate-800 shadow-2xl flex items-center justify-center border border-white/10">
+          <div className="absolute inset-12 rounded-full bg-gradient-to-br from-primary-dark to-primary shadow-2xl flex items-center justify-center border border-secondary/20">
             {/* Animated B logo */}
             <div className="relative">
               <span
-                className="text-5xl sm:text-6xl font-bold bg-gradient-to-br from-white via-emerald-200 to-emerald-400 bg-clip-text text-transparent animate-pulse"
+                className="text-5xl sm:text-6xl font-bold bg-gradient-to-br from-secondary via-secondary-light to-white bg-clip-text text-transparent animate-pulse"
                 style={{ fontFamily: 'Poppins, sans-serif', animationDuration: '2s' }}
               >
                 B
               </span>
               {/* Shimmer effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 animate-shimmer" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/40 to-transparent -skew-x-12 animate-shimmer" />
             </div>
           </div>
 
@@ -127,11 +129,11 @@ export function LoadingScreen({
             {'BRILLA'.split('').map((letter, i) => (
               <span
                 key={i}
-                className="text-lg sm:text-xl font-bold text-white/90 animate-wave"
+                className="text-lg sm:text-xl font-bold text-secondary animate-wave"
                 style={{
                   fontFamily: 'Poppins, sans-serif',
                   animationDelay: `${i * 0.1}s`,
-                  textShadow: '0 0 20px rgba(16, 185, 129, 0.5)',
+                  textShadow: '0 0 20px rgba(252, 209, 22, 0.6)',
                 }}
               >
                 {letter}
@@ -147,7 +149,7 @@ export function LoadingScreen({
 
           {/* Animated loading bar */}
           <div className="w-48 h-1 mt-2 rounded-full bg-white/10 overflow-hidden">
-            <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400 animate-loading-bar" />
+            <div className="h-full rounded-full bg-gradient-to-r from-primary-light via-secondary to-accent-light animate-loading-bar" />
           </div>
         </div>
       </div>
@@ -162,9 +164,9 @@ export function LoadingScreen({
           />
           <defs>
             <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
-              <stop offset="50%" stopColor="#6366f1" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#10b981" stopOpacity="0.3" />
+              <stop offset="0%" stopColor="#00A86B" stopOpacity="0.4" />
+              <stop offset="50%" stopColor="#FCD116" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#CE1126" stopOpacity="0.3" />
             </linearGradient>
           </defs>
         </svg>
@@ -225,16 +227,16 @@ export function PageLoader() {
       <div className="relative">
         {/* Orbital loader */}
         <div className="w-16 h-16 relative">
-          {/* Outer ring */}
-          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-500 border-r-emerald-500/50 animate-spin" />
+          {/* Outer ring - Primary Green */}
+          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary border-r-primary/50 animate-spin" />
 
-          {/* Inner ring */}
-          <div className="absolute inset-2 rounded-full border-2 border-transparent border-b-indigo-500 border-l-indigo-500/50 animate-spin"
+          {/* Inner ring - Secondary Gold */}
+          <div className="absolute inset-2 rounded-full border-2 border-transparent border-b-secondary border-l-secondary/50 animate-spin"
                style={{ animationDirection: 'reverse', animationDuration: '0.8s' }} />
 
           {/* Center dot */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-3 h-3 rounded-full bg-gradient-to-br from-emerald-400 to-indigo-500 animate-pulse" />
+            <div className="w-3 h-3 rounded-full bg-gradient-to-br from-primary-light to-secondary animate-pulse" />
           </div>
         </div>
 
@@ -242,7 +244,7 @@ export function PageLoader() {
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-1.5 h-1.5 rounded-full bg-emerald-400/60"
+            className={`absolute w-1.5 h-1.5 rounded-full ${i % 2 === 0 ? 'bg-primary/60' : 'bg-secondary/60'}`}
             style={{
               left: `${50 + 35 * Math.cos((i * 90 * Math.PI) / 180)}%`,
               top: `${50 + 35 * Math.sin((i * 90 * Math.PI) / 180)}%`,
