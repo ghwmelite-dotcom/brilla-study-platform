@@ -34,16 +34,16 @@ export function ChatSidebar() {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/30 z-40 lg:hidden"
+        className="fixed inset-0 bg-black/30 z-[55] lg:hidden"
         onClick={closeChat}
       />
 
       {/* Chat panel */}
       <div
         className={cn(
-          'fixed z-50 bg-white shadow-2xl flex flex-col',
-          // Mobile: full screen from top with margin
-          'inset-x-0 bottom-0 top-4 rounded-t-xl',
+          'fixed z-[60] bg-white shadow-2xl flex flex-col',
+          // Mobile: full screen
+          'inset-x-0 bottom-0 top-0',
           // Desktop: fixed panel on left
           'sm:inset-auto sm:left-4 sm:bottom-4 sm:top-auto',
           'sm:w-[400px] sm:h-[min(700px,calc(100vh-2rem))] sm:rounded-xl',
@@ -51,7 +51,7 @@ export function ChatSidebar() {
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-neutral-200 bg-gradient-to-r from-secondary to-accent rounded-t-xl shrink-0">
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-neutral-200 bg-gradient-to-r from-secondary to-accent sm:rounded-t-xl shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center">
               <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-white" />

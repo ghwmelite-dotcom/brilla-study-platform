@@ -222,9 +222,9 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
 
     const setupEraserMode = (canvas: fabric.Canvas) => {
       canvas.on('mouse:down', (opt) => {
-        const target = canvas.findTarget(opt.e);
+        const target = canvas.findTarget(opt.e) as unknown as fabric.FabricObject | undefined;
         if (target && !target.data?.isGrid) {
-          canvas.remove(target as unknown as fabric.FabricObject);
+          canvas.remove(target);
           addToHistory(JSON.stringify(canvas.toJSON()));
           onObjectModified?.();
         }

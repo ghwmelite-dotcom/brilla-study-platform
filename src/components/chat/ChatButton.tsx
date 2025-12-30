@@ -13,7 +13,7 @@ export function ChatButton() {
     <button
       onClick={toggleChat}
       className={cn(
-        'fixed bottom-6 left-4 sm:left-6 z-30',
+        'fixed bottom-20 left-4 lg:bottom-6 lg:left-6 z-[60]',
         'w-14 h-14 rounded-full',
         'bg-gradient-to-br from-secondary to-accent',
         'shadow-lg hover:shadow-xl',

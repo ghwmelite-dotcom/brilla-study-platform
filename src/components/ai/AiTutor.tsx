@@ -181,14 +181,14 @@ export function AiTutor() {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/30 z-40 lg:hidden"
+        className="fixed inset-0 bg-black/30 z-[55] lg:hidden"
         onClick={closeChat}
       />
 
       {/* Chat panel */}
-      <div className="fixed inset-x-0 bottom-0 top-4 sm:top-auto sm:inset-x-auto sm:bottom-4 sm:right-4 sm:left-auto w-full sm:w-96 sm:h-[min(600px,calc(100vh-2rem))] bg-white rounded-t-xl sm:rounded-xl shadow-2xl z-50 flex flex-col max-h-[100dvh] sm:max-h-none overflow-hidden">
+      <div className="fixed inset-x-0 bottom-0 top-0 sm:top-auto sm:inset-x-auto sm:bottom-4 sm:right-4 sm:left-auto w-full sm:w-96 sm:h-[min(600px,calc(100vh-2rem))] bg-white sm:rounded-xl shadow-2xl z-[60] flex flex-col max-h-[100dvh] sm:max-h-none overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-neutral-200 bg-gradient-to-r from-primary to-accent rounded-t-xl shrink-0">
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-neutral-200 bg-gradient-to-r from-primary to-accent sm:rounded-t-xl shrink-0">
           <div className="flex items-center gap-3">
             <div className="relative">
               <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center">

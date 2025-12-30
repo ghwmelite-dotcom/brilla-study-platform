@@ -14,7 +14,7 @@ export function AiButton({ context }: AiButtonProps) {
   return (
     <button
       onClick={() => openChat(context)}
-      className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-30 group"
+      className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-[60] group"
       title="Ask AI Tutor"
     >
       <Sparkles className="w-6 h-6 text-white" />

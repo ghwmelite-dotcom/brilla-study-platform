@@ -133,11 +133,12 @@ export function useWhiteboardPlayer({
           try {
             const objectData = JSON.parse(event.objectJSON);
             const objects = await fabric.util.enlivenObjects([objectData]);
-            objects.forEach((obj) => {
+            objects.forEach((item) => {
+              const obj = item as fabric.FabricObject;
               if (event.objectId) {
                 obj.id = event.objectId;
               }
-              canvas.add(obj as fabric.FabricObject);
+              canvas.add(obj);
             });
             canvas.renderAll();
           } catch (err) {
