@@ -50,7 +50,7 @@ export default function WhiteboardEditor() {
   const [canvasSize, setCanvasSize] = useState({ width: 1200, height: 800 });
   const [webcamSettings, setWebcamSettings] = useState<WebcamSettings>(DEFAULT_WEBCAM_SETTINGS);
   const [fabricCanvas, setFabricCanvas] = useState<fabric.Canvas | null>(null);
-  const [_lastRecording, setLastRecording] = useState<RecordingSession | null>(null);
+  const [, setLastRecording] = useState<RecordingSession | null>(null);
 
   // Recording hook
   const {

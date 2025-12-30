@@ -8,6 +8,14 @@ import type {
 } from '@/types/whiteboard';
 import { DEFAULT_WEBCAM_SETTINGS } from '@/types/whiteboard';
 
+// Extend FabricObject to include custom properties
+declare module 'fabric' {
+  interface FabricObject {
+    id?: string;
+    data?: { isGrid?: boolean };
+  }
+}
+
 interface UseWhiteboardRecorderOptions {
   canvas: fabric.Canvas | null;
   enableAudio?: boolean;
@@ -164,40 +172,40 @@ export function useWhiteboardRecorder({
 
     const handleObjectAdded = (e: { target?: fabric.FabricObject }) => {
       const target = e.target;
-      if (target && !(target as any).data?.isGrid) {
-        addCanvasEvent('add', JSON.stringify(target.toJSON()), (target as any).id);
+      if (target && !target.data?.isGrid) {
+        addCanvasEvent('add', JSON.stringify(target.toJSON()), target.id);
       }
     };
 
     const handleObjectModified = (e: { target?: fabric.FabricObject }) => {
       const target = e.target;
-      if (target && !(target as any).data?.isGrid) {
-        addCanvasEvent('modify', JSON.stringify(target.toJSON()), (target as any).id);
+      if (target && !target.data?.isGrid) {
+        addCanvasEvent('modify', JSON.stringify(target.toJSON()), target.id);
       }
     };
 
     const handleObjectRemoved = (e: { target?: fabric.FabricObject }) => {
       const target = e.target;
-      if (target && !(target as any).data?.isGrid) {
-        addCanvasEvent('remove', undefined, (target as any).id);
+      if (target && !target.data?.isGrid) {
+        addCanvasEvent('remove', undefined, target.id);
       }
     };
 
-    const handlePathCreated = (e: any) => {
+    const handlePathCreated = (e: { path?: fabric.FabricObject }) => {
       if (e.path) {
         addCanvasEvent('path', JSON.stringify(e.path.toJSON()));
       }
     };
 
-    canvas.on('object:added', handleObjectAdded as any);
-    canvas.on('object:modified', handleObjectModified as any);
-    canvas.on('object:removed', handleObjectRemoved as any);
+    canvas.on('object:added', handleObjectAdded);
+    canvas.on('object:modified', handleObjectModified);
+    canvas.on('object:removed', handleObjectRemoved);
     canvas.on('path:created', handlePathCreated);
 
     return () => {
-      canvas.off('object:added', handleObjectAdded as any);
-      canvas.off('object:modified', handleObjectModified as any);
-      canvas.off('object:removed', handleObjectRemoved as any);
+      canvas.off('object:added', handleObjectAdded);
+      canvas.off('object:modified', handleObjectModified);
+      canvas.off('object:removed', handleObjectRemoved);
       canvas.off('path:created', handlePathCreated);
     };
   }, [canvas, recordingState, addCanvasEvent]);

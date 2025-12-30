@@ -7,6 +7,13 @@ import type {
   WhiteboardRecording,
 } from '@/types/whiteboard';
 
+// Extend FabricObject to include custom id property
+declare module 'fabric' {
+  interface FabricObject {
+    id?: string;
+  }
+}
+
 interface UseWhiteboardPlayerOptions {
   canvas: fabric.Canvas | null;
   recording: WhiteboardRecording | null;
@@ -128,7 +135,7 @@ export function useWhiteboardPlayer({
             const objects = await fabric.util.enlivenObjects([objectData]);
             objects.forEach((obj) => {
               if (event.objectId) {
-                (obj as any).id = event.objectId;
+                obj.id = event.objectId;
               }
               canvas.add(obj as fabric.FabricObject);
             });
@@ -141,7 +148,7 @@ export function useWhiteboardPlayer({
 
       case 'modify':
         if (event.objectJSON && event.objectId) {
-          const existingObj = canvas.getObjects().find((obj) => (obj as any).id === event.objectId);
+          const existingObj = canvas.getObjects().find((obj) => obj.id === event.objectId);
           if (existingObj) {
             try {
               const newProps = JSON.parse(event.objectJSON);
@@ -157,7 +164,7 @@ export function useWhiteboardPlayer({
 
       case 'remove':
         if (event.objectId) {
-          const objToRemove = canvas.getObjects().find((obj) => (obj as any).id === event.objectId);
+          const objToRemove = canvas.getObjects().find((obj) => obj.id === event.objectId);
           if (objToRemove) {
             canvas.remove(objToRemove);
             canvas.renderAll();

@@ -85,7 +85,7 @@ export default function TakePaper() {
         } else {
           setError('Paper not found');
         }
-      } catch (err) {
+      } catch {
         setError('Failed to load paper');
       } finally {
         setIsLoading(false);
@@ -126,7 +126,7 @@ export default function TakePaper() {
               setIsTimerRunning(true);
               return;
             }
-          } catch (retryErr) {
+          } catch {
             setError('Failed to restart attempt. Please try again.');
             return;
           }
@@ -228,7 +228,7 @@ export default function TakePaper() {
         timeUsed,
       });
       navigate(`/past-papers/results/${attemptId}`);
-    } catch (err) {
+    } catch {
       setError('Failed to submit paper');
     } finally {
       setIsSubmitting(false);

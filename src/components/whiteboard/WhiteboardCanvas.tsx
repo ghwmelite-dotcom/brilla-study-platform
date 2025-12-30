@@ -176,7 +176,7 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
       if (!canvas) return;
 
       // Remove existing grid
-      const existingGrid = canvas.getObjects().filter((obj) => (obj as any).data?.isGrid);
+      const existingGrid = canvas.getObjects().filter((obj) => obj.data?.isGrid);
       existingGrid.forEach((obj) => canvas.remove(obj));
 
       if (showGrid) {
@@ -197,7 +197,7 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
           selectable: false,
           evented: false,
         });
-        (line as any).data = { isGrid: true };
+        line.data = { isGrid: true };
         gridLines.push(line);
       }
 
@@ -209,7 +209,7 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
           selectable: false,
           evented: false,
         });
-        (line as any).data = { isGrid: true };
+        line.data = { isGrid: true };
         gridLines.push(line);
       }
 
@@ -223,7 +223,7 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
     const setupEraserMode = (canvas: fabric.Canvas) => {
       canvas.on('mouse:down', (opt) => {
         const target = canvas.findTarget(opt.e);
-        if (target && !(target as any).data?.isGrid) {
+        if (target && !target.data?.isGrid) {
           canvas.remove(target as unknown as fabric.FabricObject);
           addToHistory(JSON.stringify(canvas.toJSON()));
           onObjectModified?.();
@@ -290,7 +290,7 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
         const startY = shapeStartPoint.current.y;
 
         switch (tool) {
-          case 'rectangle':
+          case 'rectangle': {
             const rect = currentShape.current as fabric.Rect;
             const rectWidth = Math.abs(pointer.x - startX);
             const rectHeight = Math.abs(pointer.y - startY);
@@ -301,8 +301,9 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
               height: rectHeight,
             });
             break;
+          }
 
-          case 'circle':
+          case 'circle': {
             const ellipse = currentShape.current as fabric.Ellipse;
             const rx = Math.abs(pointer.x - startX) / 2;
             const ry = Math.abs(pointer.y - startY) / 2;
@@ -313,15 +314,17 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
               ry,
             });
             break;
+          }
 
           case 'line':
-          case 'arrow':
+          case 'arrow': {
             const line = currentShape.current as fabric.Line;
             line.set({
               x2: pointer.x,
               y2: pointer.y,
             });
             break;
+          }
         }
 
         canvas.renderAll();
@@ -422,7 +425,7 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
 
         // Filter out grid lines from JSON
         const json = canvas.toJSON();
-        json.objects = json.objects?.filter((obj: any) => !(obj as any).data?.isGrid) || [];
+        json.objects = json.objects?.filter((obj: { data?: { isGrid?: boolean } }) => !obj.data?.isGrid) || [];
         return JSON.stringify(json);
       },
 
@@ -449,7 +452,7 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
         if (!canvas) return '';
 
         // Temporarily hide grid for export
-        const gridObjects = canvas.getObjects().filter((obj) => (obj as any).data?.isGrid);
+        const gridObjects = canvas.getObjects().filter((obj) => obj.data?.isGrid);
         gridObjects.forEach((obj) => (obj.visible = false));
 
         const dataURL = canvas.toDataURL({
@@ -470,7 +473,7 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
         if (!canvas) return;
 
         // Keep grid lines, remove everything else
-        const nonGridObjects = canvas.getObjects().filter((obj) => !(obj as any).data?.isGrid);
+        const nonGridObjects = canvas.getObjects().filter((obj) => !obj.data?.isGrid);
         nonGridObjects.forEach((obj) => canvas.remove(obj));
 
         addToHistory(JSON.stringify(canvas.toJSON()));
@@ -510,7 +513,7 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
           const activeObjects = canvas.getActiveObjects();
           if (activeObjects.length > 0) {
             activeObjects.forEach((obj) => {
-              if (!(obj as any).data?.isGrid) {
+              if (!obj.data?.isGrid) {
                 canvas.remove(obj);
               }
             });
@@ -523,7 +526,7 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
         // Ctrl+A: Select all
         if (e.ctrlKey && e.key === 'a') {
           e.preventDefault();
-          const objects = canvas.getObjects().filter((obj) => !(obj as any).data?.isGrid);
+          const objects = canvas.getObjects().filter((obj) => !obj.data?.isGrid);
           const selection = new fabric.ActiveSelection(objects, { canvas });
           canvas.setActiveObject(selection);
           canvas.renderAll();

@@ -388,7 +388,7 @@ export const useAiTutorStore = create<AiTutorState>()(
 
       sendMessage: async (message, userId, userName, files) => {
         // Upload files first if provided
-        let attachments: FileAttachment[] = [];
+        const attachments: FileAttachment[] = [];
 
         if (files && files.length > 0) {
           set({ isLoading: true, thinkingStage: 'thinking' });

@@ -73,7 +73,7 @@ export default function PaperResults() {
         } else {
           setError('Results not found');
         }
-      } catch (err) {
+      } catch {
         setError('Failed to load results');
       } finally {
         setIsLoading(false);
