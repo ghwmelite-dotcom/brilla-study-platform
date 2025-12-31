@@ -13,20 +13,14 @@ import {
 } from 'lucide-react';
 import { Button, Card } from '@/components/common';
 import { useExamStore } from '@/stores/examStore';
-import { pastPapers as localPastPapers } from '@/data';
+import { pastPapers as localPastPapers, subjects } from '@/data';
 import type { PastPaper } from '@/types';
 
-// Subject metadata for display
-const subjectMeta: Record<string, { name: string; color: string }> = {
-  'subj_wassce_core_math': { name: 'Core Mathematics', color: '#8B5CF6' },
-  'subj_wassce_english': { name: 'English Language', color: '#3B82F6' },
-  'subj_wassce_int_science': { name: 'Integrated Science', color: '#10B981' },
-  'subj_wassce_social': { name: 'Social Studies', color: '#F59E0B' },
-  'subj_bece_math': { name: 'Mathematics', color: '#8B5CF6' },
-  'subj_bece_english': { name: 'English Language', color: '#3B82F6' },
-  'subj_bece_science': { name: 'Integrated Science', color: '#10B981' },
-  'subj_bece_social': { name: 'Social Studies', color: '#F59E0B' },
-};
+// Build subject metadata dynamically from subjects data
+const subjectMeta: Record<string, { name: string; color: string }> = {};
+subjects.forEach(subject => {
+  subjectMeta[subject.id] = { name: subject.name, color: subject.color };
+});
 
 // Paper type names
 const paperTypeMeta: Record<string, string> = {
