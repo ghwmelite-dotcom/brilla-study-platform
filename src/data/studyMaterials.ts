@@ -1085,6 +1085,42 @@ export const pastPapers: Partial<PastPaper>[] = [
   { id: 'pp_wassce_emath_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_elective_math', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 40, totalMarks: 40, timeAllowed: 60, isComplete: true },
 
   // =============================================
+  // WASSCE Past Papers - Economics (Business)
+  // =============================================
+  { id: 'pp_wassce_eco_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_economics', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
+  { id: 'pp_wassce_eco_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_economics', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
+
+  // =============================================
+  // WASSCE Past Papers - Government (Arts)
+  // =============================================
+  { id: 'pp_wassce_gov_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_government', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
+  { id: 'pp_wassce_gov_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_government', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
+
+  // =============================================
+  // WASSCE Past Papers - Geography (Arts)
+  // =============================================
+  { id: 'pp_wassce_geo_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_geography', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
+  { id: 'pp_wassce_geo_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_geography', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
+
+  // =============================================
+  // WASSCE Past Papers - Literature in English (Arts)
+  // =============================================
+  { id: 'pp_wassce_lit_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_literature', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
+  { id: 'pp_wassce_lit_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_literature', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
+
+  // =============================================
+  // WASSCE Past Papers - Financial Accounting (Business)
+  // =============================================
+  { id: 'pp_wassce_acc_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_accounting', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
+  { id: 'pp_wassce_acc_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_accounting', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
+
+  // =============================================
+  // WASSCE Past Papers - Christian Religious Studies
+  // =============================================
+  { id: 'pp_wassce_crs_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_crs', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
+  { id: 'pp_wassce_crs_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_crs', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 50, totalMarks: 50, timeAllowed: 60, isComplete: true },
+
+  // =============================================
   // BECE Past Papers - Mathematics
   // =============================================
   { id: 'pp_bece_math_2024_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_math', paperTypeId: 'paper_bece_1', year: 2024, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 60, isComplete: true },
@@ -1107,6 +1143,30 @@ export const pastPapers: Partial<PastPaper>[] = [
   // =============================================
   { id: 'pp_bece_soc_2024_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_social', paperTypeId: 'paper_bece_1', year: 2024, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
   { id: 'pp_bece_soc_2023_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_social', paperTypeId: 'paper_bece_1', year: 2023, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
+
+  // =============================================
+  // BECE Past Papers - RME (Religious and Moral Education)
+  // =============================================
+  { id: 'pp_bece_rme_2024_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_rme', paperTypeId: 'paper_bece_1', year: 2024, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
+  { id: 'pp_bece_rme_2023_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_rme', paperTypeId: 'paper_bece_1', year: 2023, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
+
+  // =============================================
+  // BECE Past Papers - ICT (Information and Communication Technology)
+  // =============================================
+  { id: 'pp_bece_ict_2024_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_ict', paperTypeId: 'paper_bece_1', year: 2024, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
+  { id: 'pp_bece_ict_2023_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_ict', paperTypeId: 'paper_bece_1', year: 2023, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
+
+  // =============================================
+  // BECE Past Papers - French
+  // =============================================
+  { id: 'pp_bece_french_2024_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_french', paperTypeId: 'paper_bece_1', year: 2024, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
+  { id: 'pp_bece_french_2023_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_french', paperTypeId: 'paper_bece_1', year: 2023, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
+
+  // =============================================
+  // BECE Past Papers - BDT (Basic Design and Technology)
+  // =============================================
+  { id: 'pp_bece_bdt_2024_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_bdt', paperTypeId: 'paper_bece_1', year: 2024, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
+  { id: 'pp_bece_bdt_2023_1', examTypeId: 'exam_bece', subjectId: 'subj_bece_bdt', paperTypeId: 'paper_bece_1', year: 2023, month: 'June', totalQuestions: 40, totalMarks: 40, timeAllowed: 45, isComplete: true },
 ];
 
 // =============================================
