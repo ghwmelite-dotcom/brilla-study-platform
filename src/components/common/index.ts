@@ -7,3 +7,4 @@ export { Input, Textarea, Select } from './Input';
 export { ProgressBar, CircularProgress, MasteryProgress } from './Progress';
 export { VoiceInput } from './VoiceInput';
 export { LoadingScreen, PageLoader } from './LoadingScreen';
+export { ThemeToggle } from './ThemeToggle';

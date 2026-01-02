@@ -8,6 +8,7 @@ import { AiTutor, AiButton } from '@/components/ai';
 import { ChatButton, ChatSidebar } from '@/components/chat';
 import { useAuthStore } from '@/stores/authStore';
 import { useExamPreferencesStore } from '@/stores/examPreferencesStore';
+import { useThemeStore } from '@/stores/themeStore';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -17,6 +18,13 @@ export function Layout({ children }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isAuthenticated, user } = useAuthStore();
   const { loadPreferences, loadExamTypes } = useExamPreferencesStore();
+  const { setTheme, theme } = useThemeStore();
+
+  // Initialize theme on mount
+  useEffect(() => {
+    // Re-apply the theme to ensure it's synced
+    setTheme(theme);
+  }, []);
 
   // Load exam types and user preferences on mount when authenticated
   useEffect(() => {
@@ -32,7 +40,7 @@ export function Layout({ children }: LayoutProps) {
   }, [isAuthenticated, user?.id, loadExamTypes, loadPreferences]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-slate-900 transition-colors duration-300">
       <Header
         onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)}
         isSidebarOpen={isSidebarOpen}

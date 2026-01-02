@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuthStore, useNotificationStore } from '@/stores';
-import { Button } from '@/components/common';
+import { Button, ThemeToggle } from '@/components/common';
 import { ExamModeSwitcher } from '@/components/exam';
 import { StreakPopup, XPPopup, NotificationDropdown } from '@/components/header';
 import { formatNumber } from '@/utils';
@@ -70,14 +70,14 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-neutral-200">
+    <header className="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-neutral-200 dark:border-slate-700 transition-colors duration-300">
       <div className="flex items-center justify-between h-16 px-4 lg:px-6">
         {/* Left section */}
         <div className="flex items-center gap-4">
           {/* Mobile menu button */}
           <button
             onClick={onMenuToggle}
-            className="lg:hidden p-2 rounded-lg text-neutral-600 hover:bg-neutral-100"
+            className="lg:hidden p-2 rounded-lg text-neutral-600 dark:text-slate-400 hover:bg-neutral-100 dark:hover:bg-slate-800"
             aria-label={isSidebarOpen ? 'Close menu' : 'Open menu'}
           >
             {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -88,13 +88,13 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
             <div className="w-8 h-8 rounded-lg bg-gradient-ghana flex items-center justify-center">
               <span className="text-white font-bold text-lg">B</span>
             </div>
-            <span className="hidden sm:block font-display font-bold text-xl text-neutral-900">
+            <span className="hidden sm:block font-display font-bold text-xl text-neutral-900 dark:text-white">
               Brilla Prep
             </span>
           </Link>
 
           {/* Page title (mobile) */}
-          <span className="lg:hidden font-semibold text-neutral-900">{getPageTitle()}</span>
+          <span className="lg:hidden font-semibold text-neutral-900 dark:text-white">{getPageTitle()}</span>
 
           {/* Exam Mode Switcher */}
           <div className="hidden lg:block">
@@ -105,21 +105,25 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
         {/* Center section - Search */}
         <div className="hidden md:flex flex-1 max-w-md mx-4">
           <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 dark:text-slate-500" />
             <input
               type="text"
               placeholder="Search topics, questions..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-200 bg-neutral-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-200 dark:border-slate-600 bg-neutral-50 dark:bg-slate-800 text-neutral-900 dark:text-slate-100 placeholder:text-neutral-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-700 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
         </div>
 
         {/* Right section */}
         <div className="flex items-center gap-2">
+          {/* Theme Toggle */}
+          <ThemeToggle variant="switch" className="hidden sm:flex" />
+          <ThemeToggle variant="icon" className="sm:hidden" />
+
           {/* Mobile search button */}
           <button
             onClick={() => setIsSearchOpen(!isSearchOpen)}
-            className="md:hidden p-2 rounded-lg text-neutral-600 hover:bg-neutral-100"
+            className="md:hidden p-2 rounded-lg text-neutral-600 dark:text-slate-400 hover:bg-neutral-100 dark:hover:bg-slate-800"
             aria-label="Search"
           >
             <Search className="w-5 h-5" />
@@ -208,7 +212,7 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
               <div className="relative">
                 <button
                   onClick={handleProfileToggle}
-                  className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-neutral-100"
+                  className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-slate-800"
                 >
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center overflow-hidden">
                     {user.avatarUrl ? (
@@ -223,7 +227,7 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
                       </span>
                     )}
                   </div>
-                  <ChevronDown className="w-4 h-4 text-neutral-500 hidden sm:block" />
+                  <ChevronDown className="w-4 h-4 text-neutral-500 dark:text-slate-400 hidden sm:block" />
                 </button>
 
                 {/* Dropdown menu */}
@@ -233,15 +237,15 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
                       className="fixed inset-0 z-10"
                       onClick={() => setIsProfileOpen(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-neutral-200 z-20 py-2">
-                      <div className="px-4 py-2 border-b border-neutral-100">
-                        <p className="font-medium text-neutral-900">{user.name}</p>
-                        <p className="text-sm text-neutral-500">{user.email}</p>
-                        <p className="text-xs text-primary mt-1">Level {user.level}</p>
+                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-neutral-200 dark:border-slate-700 z-20 py-2">
+                      <div className="px-4 py-2 border-b border-neutral-100 dark:border-slate-700">
+                        <p className="font-medium text-neutral-900 dark:text-white">{user.name}</p>
+                        <p className="text-sm text-neutral-500 dark:text-slate-400">{user.email}</p>
+                        <p className="text-xs text-primary dark:text-primary-light mt-1">Level {user.level}</p>
                       </div>
                       <Link
                         to="/profile"
-                        className="flex items-center gap-2 px-4 py-2 text-neutral-700 hover:bg-neutral-50"
+                        className="flex items-center gap-2 px-4 py-2 text-neutral-700 dark:text-slate-300 hover:bg-neutral-50 dark:hover:bg-slate-700"
                         onClick={() => setIsProfileOpen(false)}
                       >
                         <User className="w-4 h-4" />
@@ -249,19 +253,19 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
                       </Link>
                       <Link
                         to="/settings"
-                        className="flex items-center gap-2 px-4 py-2 text-neutral-700 hover:bg-neutral-50"
+                        className="flex items-center gap-2 px-4 py-2 text-neutral-700 dark:text-slate-300 hover:bg-neutral-50 dark:hover:bg-slate-700"
                         onClick={() => setIsProfileOpen(false)}
                       >
                         <Settings className="w-4 h-4" />
                         Settings
                       </Link>
-                      <hr className="my-2 border-neutral-100" />
+                      <hr className="my-2 border-neutral-100 dark:border-slate-700" />
                       <button
                         onClick={() => {
                           logout();
                           setIsProfileOpen(false);
                         }}
-                        className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 w-full"
+                        className="flex items-center gap-2 px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 w-full"
                       >
                         <LogOut className="w-4 h-4" />
                         Logout
@@ -290,11 +294,11 @@ export function Header({ onMenuToggle, isSidebarOpen }: HeaderProps) {
       {isSearchOpen && (
         <div className="md:hidden px-4 pb-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 dark:text-slate-500" />
             <input
               type="text"
               placeholder="Search topics, questions..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-200 bg-neutral-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-200 dark:border-slate-600 bg-neutral-50 dark:bg-slate-800 text-neutral-900 dark:text-slate-100 placeholder:text-neutral-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-700 focus:border-primary focus:ring-2 focus:ring-primary/20"
               autoFocus
             />
           </div>

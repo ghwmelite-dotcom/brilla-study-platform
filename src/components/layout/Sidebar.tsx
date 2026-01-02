@@ -194,7 +194,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed top-16 left-0 bottom-0 w-64 bg-white border-r border-neutral-200 z-40 overflow-y-auto',
+          'fixed top-16 left-0 bottom-0 w-64 bg-white dark:bg-slate-900 border-r border-neutral-200 dark:border-slate-700 z-40 overflow-y-auto transition-colors duration-300',
           'transform transition-transform duration-200 ease-in-out',
           'lg:translate-x-0 lg:static lg:h-[calc(100vh-4rem)]',
           isOpen ? 'translate-x-0' : '-translate-x-full'
@@ -294,7 +294,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           {/* Main Navigation */}
           <div>
-            <h3 className="px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
+            <h3 className="px-3 text-xs font-semibold text-neutral-500 dark:text-slate-500 uppercase tracking-wider mb-2">
               General
             </h3>
             <ul className="space-y-1">
@@ -311,7 +311,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
                           isActive
                             ? 'bg-primary text-white'
-                            : 'text-neutral-700 hover:bg-neutral-100'
+                            : 'text-neutral-700 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-800'
                         )
                       }
                     >
@@ -327,7 +327,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           {/* Exam-Specific Features */}
           {examItems.length > 0 && (
             <div>
-              <h3 className="px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
+              <h3 className="px-3 text-xs font-semibold text-neutral-500 dark:text-slate-500 uppercase tracking-wider mb-2">
                 {currentExamType.toUpperCase()} Features
               </h3>
               <ul className="space-y-1">
@@ -344,7 +344,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                             'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
                             isActive
                               ? cn('bg-gradient-to-r text-white', examInfo.color)
-                              : 'text-neutral-700 hover:bg-neutral-100'
+                              : 'text-neutral-700 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-800'
                           )
                         }
                       >
@@ -360,7 +360,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           {/* Learning Resources */}
           <div>
-            <h3 className="px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
+            <h3 className="px-3 text-xs font-semibold text-neutral-500 dark:text-slate-500 uppercase tracking-wider mb-2">
               Resources
             </h3>
             <ul className="space-y-1">
@@ -379,7 +379,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                             ? item.path === '/counselor'
                               ? 'bg-green-600 text-white'
                               : 'bg-primary text-white'
-                            : 'text-neutral-700 hover:bg-neutral-100'
+                            : 'text-neutral-700 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-800'
                         )
                       }
                     >
@@ -394,7 +394,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           {/* Community Features */}
           <div>
-            <h3 className="px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
+            <h3 className="px-3 text-xs font-semibold text-neutral-500 dark:text-slate-500 uppercase tracking-wider mb-2">
               Community
             </h3>
             <ul className="space-y-1">
@@ -411,7 +411,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
                           isActive
                             ? 'bg-primary text-white'
-                            : 'text-neutral-700 hover:bg-neutral-100'
+                            : 'text-neutral-700 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-800'
                         )
                       }
                     >
@@ -431,7 +431,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                       openChat();
                       onClose();
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors text-neutral-700 hover:bg-neutral-100"
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors text-neutral-700 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-800"
                   >
                     <action.icon className="w-5 h-5" />
                     <span className="flex-1 text-left">{action.label}</span>
@@ -473,7 +473,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           )}
 
           {/* Footer Links */}
-          <div className="border-t border-neutral-200 pt-4">
+          <div className="border-t border-neutral-200 dark:border-slate-700 pt-4">
             <ul className="space-y-1">
               {isAuthenticated && (
                 <>
@@ -486,7 +486,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
                           isActive
                             ? 'bg-primary text-white'
-                            : 'text-neutral-700 hover:bg-neutral-100'
+                            : 'text-neutral-700 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-800'
                         )
                       }
                     >
@@ -503,7 +503,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
                           isActive
                             ? 'bg-primary text-white'
-                            : 'text-neutral-700 hover:bg-neutral-100'
+                            : 'text-neutral-700 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-800'
                         )
                       }
                     >
@@ -520,7 +520,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
                           isActive
                             ? 'bg-accent text-white'
-                            : 'text-neutral-700 hover:bg-neutral-100'
+                            : 'text-neutral-700 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-800'
                         )
                       }
                     >
@@ -537,7 +537,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
                           isActive
                             ? 'bg-gradient-to-r from-primary to-accent text-white'
-                            : 'text-neutral-700 hover:bg-neutral-100'
+                            : 'text-neutral-700 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-800'
                         )
                       }
                     >
@@ -696,7 +696,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                       'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
                       isActive
                         ? 'bg-primary text-white'
-                        : 'text-neutral-700 hover:bg-neutral-100'
+                        : 'text-neutral-700 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-800'
                     )
                   }
                 >
@@ -708,7 +708,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
 
           {/* Platform branding */}
-          <div className="text-center text-xs text-neutral-500 pt-4 border-t border-neutral-200">
+          <div className="text-center text-xs text-neutral-500 dark:text-slate-500 pt-4 border-t border-neutral-200 dark:border-slate-700">
             <p className="font-medium">Brilla Prep</p>
             <p>
               {currentExamType === 'nsmq' && 'NSMQ Competition Prep'}
