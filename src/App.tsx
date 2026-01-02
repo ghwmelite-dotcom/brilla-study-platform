@@ -296,8 +296,8 @@ function RegisterPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">House</label>
-            <select className="w-full px-4 py-2 rounded-lg border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20">
+            <label htmlFor="register-house" className="block text-sm font-medium text-neutral-700 mb-1">House</label>
+            <select id="register-house" className="w-full px-4 py-2 rounded-lg border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20">
               <option value="">Select house</option>
               <option value="Blue House">Blue House</option>
               <option value="Red House">Red House</option>
@@ -306,8 +306,8 @@ function RegisterPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Year Group</label>
-            <select className="w-full px-4 py-2 rounded-lg border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20">
+            <label htmlFor="register-year" className="block text-sm font-medium text-neutral-700 mb-1">Year Group</label>
+            <select id="register-year" className="w-full px-4 py-2 rounded-lg border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20">
               <option value="">Select year</option>
               <option value="1">Year 1</option>
               <option value="2">Year 2</option>
