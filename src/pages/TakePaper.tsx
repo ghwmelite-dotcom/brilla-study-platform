@@ -11,10 +11,15 @@ import {
   CheckCircle,
   X,
   BookOpen,
+  Maximize2,
+  Minimize2,
+  Volume2,
+  VolumeX,
+  FileText,
+  GraduationCap,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/services/api';
-import { ConfirmModal } from '@/components/common/Modal';
 import { cn } from '@/utils';
 
 interface PaperQuestion {
@@ -65,6 +70,9 @@ export default function TakePaper() {
   const [showTimeWarning, setShowTimeWarning] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showStartConfirm, setShowStartConfirm] = useState(true);
+  const [showQuestionPanel, setShowQuestionPanel] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   // Load paper details
   useEffect(() => {
@@ -77,7 +85,6 @@ export default function TakePaper() {
     const fetchPaper = async () => {
       try {
         setIsLoading(true);
-        // api.get returns unwrapped data directly
         const paper = await api.get(`/papers/${paperId}`) as PaperDetails;
         if (paper && paper.id) {
           setPaper(paper);
@@ -100,7 +107,6 @@ export default function TakePaper() {
     if (!paperId || !user) return;
 
     try {
-      // api.post returns unwrapped data directly
       const result = await api.post(`/papers/${paperId}/attempt`, { userId: user.id }) as { attemptId: string };
       if (result && result.attemptId) {
         setAttemptId(result.attemptId);
@@ -111,14 +117,11 @@ export default function TakePaper() {
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      // Check if it's an existing attempt error and offer to resume
       if (errorMessage.includes('ongoing attempt')) {
         const resume = window.confirm('You have an ongoing attempt for this paper. Would you like to abandon it and start fresh?');
         if (resume) {
-          // Abandon existing attempt and try again
           try {
             await api.post(`/papers/${paperId}/abandon`, { userId: user.id });
-            // Retry starting the attempt
             const retryResult = await api.post(`/papers/${paperId}/attempt`, { userId: user.id }) as { attemptId: string };
             if (retryResult && retryResult.attemptId) {
               setAttemptId(retryResult.attemptId);
@@ -153,8 +156,12 @@ export default function TakePaper() {
     if (timeRemaining === 300 && !timerWarningShown) {
       setShowTimeWarning(true);
       setTimerWarningShown(true);
+      if (soundEnabled) {
+        const audio = new Audio('/sounds/warning.mp3');
+        audio.play().catch(() => {});
+      }
     }
-  }, [timeRemaining, timerWarningShown]);
+  }, [timeRemaining, timerWarningShown, soundEnabled]);
 
   // Auto-submit when time runs out
   useEffect(() => {
@@ -162,6 +169,31 @@ export default function TakePaper() {
       handleSubmit();
     }
   }, [timeRemaining, isTimerRunning]);
+
+  // Prevent accidental navigation
+  useEffect(() => {
+    if (!showStartConfirm) {
+      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        e.preventDefault();
+        e.returnValue = '';
+      };
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }
+  }, [showStartConfirm]);
+
+  // Fullscreen handling
+  const toggleFullscreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => {
+        setIsFullscreen(true);
+      }).catch(() => {});
+    } else {
+      document.exitFullscreen().then(() => {
+        setIsFullscreen(false);
+      }).catch(() => {});
+    }
+  }, []);
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -171,7 +203,7 @@ export default function TakePaper() {
     if (hours > 0) {
       return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   const currentQuestion = paper?.questions[currentQuestionIndex];
@@ -183,7 +215,6 @@ export default function TakePaper() {
       setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
       setAnsweredQuestions((prev) => new Set(prev).add(currentQuestion.id));
 
-      // Save to server
       setIsSaving(true);
       try {
         await api.put(`/papers/attempts/${attemptId}/answer`, {
@@ -222,7 +253,6 @@ export default function TakePaper() {
 
     try {
       const timeUsed = paper ? paper.time_allowed * 60 - timeRemaining : 0;
-      // api.post returns unwrapped data directly
       await api.post(`/papers/attempts/${attemptId}/submit`, {
         userId: user.id,
         timeUsed,
@@ -271,13 +301,17 @@ export default function TakePaper() {
         : 0,
   };
 
+  const isTimeWarning = timeRemaining <= 300 && timeRemaining > 60;
+  const isTimeCritical = timeRemaining <= 60;
+  const isLastQuestion = paper ? currentQuestionIndex >= paper.questions.length - 1 : false;
+
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+      <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mx-auto mb-4" />
-          <p className="text-neutral-600">Loading paper...</p>
+          <Loader2 className="w-12 h-12 text-purple-500 animate-spin mx-auto mb-4" />
+          <p className="text-white/70">Loading paper...</p>
         </div>
       </div>
     );
@@ -286,14 +320,16 @@ export default function TakePaper() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl p-8 max-w-md text-center">
-          <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-neutral-900 mb-2">Error</h2>
-          <p className="text-neutral-600 mb-6">{error}</p>
+      <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+        <div className="bg-slate-800 rounded-2xl p-8 max-w-md text-center border border-white/10">
+          <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle className="w-8 h-8 text-red-400" />
+          </div>
+          <h2 className="text-xl font-semibold text-white mb-2">Error</h2>
+          <p className="text-white/60 mb-6">{error}</p>
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-medium hover:from-purple-700 hover:to-indigo-700"
           >
             Go Back
           </button>
@@ -305,16 +341,18 @@ export default function TakePaper() {
   // No paper found
   if (!paper || paper.questions.length === 0) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl p-8 max-w-md text-center">
-          <BookOpen className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-neutral-900 mb-2">No Questions Available</h2>
-          <p className="text-neutral-600 mb-6">
+      <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+        <div className="bg-slate-800 rounded-2xl p-8 max-w-md text-center border border-white/10">
+          <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <BookOpen className="w-8 h-8 text-white/30" />
+          </div>
+          <h2 className="text-xl font-semibold text-white mb-2">No Questions Available</h2>
+          <p className="text-white/60 mb-6">
             This paper doesn't have any questions yet. Please check back later.
           </p>
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-medium"
           >
             Go Back
           </button>
@@ -326,42 +364,51 @@ export default function TakePaper() {
   // Start confirmation modal
   if (showStartConfirm) {
     return (
-      <div className="min-h-screen bg-neutral-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-8">
+      <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 25% 25%, white 1px, transparent 1px),
+                             radial-gradient(circle at 75% 75%, white 1px, transparent 1px)`,
+            backgroundSize: '50px 50px',
+          }} />
+        </div>
+
+        <div className="relative bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl max-w-lg w-full p-8 border border-white/10 animate-in zoom-in-95 duration-300">
           <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="w-8 h-8 text-indigo-600" />
+            <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <GraduationCap className="w-10 h-10 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-neutral-900 mb-2">{paper.subject_name}</h2>
-            <p className="text-neutral-600">
+            <h2 className="text-2xl font-bold text-white mb-2">{paper.subject_name}</h2>
+            <p className="text-white/60">
               {paper.paper_type_name} - {paper.year}
             </p>
           </div>
 
-          <div className="bg-neutral-50 rounded-xl p-4 mb-6 space-y-3">
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 mb-6 space-y-3 border border-white/10">
             <div className="flex justify-between text-sm">
-              <span className="text-neutral-500">Questions</span>
-              <span className="font-medium text-neutral-900">{paper.total_questions}</span>
+              <span className="text-white/50">Questions</span>
+              <span className="font-medium text-white">{paper.total_questions}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-neutral-500">Total Marks</span>
-              <span className="font-medium text-neutral-900">{paper.total_marks}</span>
+              <span className="text-white/50">Total Marks</span>
+              <span className="font-medium text-white">{paper.total_marks}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-neutral-500">Time Allowed</span>
-              <span className="font-medium text-neutral-900">{paper.time_allowed} minutes</span>
+              <span className="text-white/50">Time Allowed</span>
+              <span className="font-medium text-white">{paper.time_allowed} minutes</span>
             </div>
           </div>
 
           {paper.instructions && (
             <div className="mb-6">
-              <h3 className="font-medium text-neutral-900 mb-2">Instructions</h3>
-              <p className="text-sm text-neutral-600">{paper.instructions}</p>
+              <h3 className="font-medium text-white mb-2">Instructions</h3>
+              <p className="text-sm text-white/60">{paper.instructions}</p>
             </div>
           )}
 
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
-            <p className="text-sm text-amber-800">
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 mb-6">
+            <p className="text-sm text-amber-300">
               <strong>Important:</strong> Once you start, the timer will begin. Make sure you have a
               stable internet connection and enough time to complete the paper.
             </p>
@@ -370,13 +417,13 @@ export default function TakePaper() {
           <div className="flex gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="flex-1 py-3 px-4 border border-neutral-300 text-neutral-700 rounded-xl hover:bg-neutral-50 font-medium"
+              className="flex-1 py-3.5 px-4 bg-white/5 text-white rounded-xl hover:bg-white/10 font-medium transition-colors border border-white/10"
             >
               Cancel
             </button>
             <button
               onClick={startAttempt}
-              className="flex-1 py-3 px-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-medium"
+              className="flex-1 py-3.5 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-medium transition-all shadow-lg hover:shadow-xl hover:scale-[1.02]"
             >
               Start Paper
             </button>
@@ -387,314 +434,477 @@ export default function TakePaper() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-100 flex flex-col">
+    <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col overflow-hidden">
+      {/* Background pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 25% 25%, white 1px, transparent 1px),
+                           radial-gradient(circle at 75% 75%, white 1px, transparent 1px)`,
+          backgroundSize: '50px 50px',
+        }} />
+      </div>
+
       {/* Header */}
-      <header className="bg-white border-b border-neutral-200 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-3">
+      <header className="relative z-10 bg-black/20 backdrop-blur-xl border-b border-white/10">
+        <div className="px-4 lg:px-6 py-3">
           <div className="flex items-center justify-between">
+            {/* Left: Exit & Title */}
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setShowExitConfirm(true)}
-                className="p-2 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-lg"
+                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all group"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
               </button>
-              <div>
-                <h1 className="font-semibold text-neutral-900 line-clamp-1">
-                  {paper.subject_name} - {paper.paper_type_name}
-                </h1>
-                <p className="text-sm text-neutral-500">
-                  Question {currentQuestionIndex + 1} of {paper.questions.length}
-                </p>
+
+              <div className="hidden sm:block">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600">
+                    <FileText className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="font-semibold text-white text-sm lg:text-base line-clamp-1">
+                      {paper.subject_name}
+                    </h1>
+                    <p className="text-xs text-white/50">{paper.paper_type_name} - {paper.year}</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Timer */}
-            {timeRemaining > 0 && (
-              <div
-                className={cn(
-                  'flex items-center gap-2 px-4 py-2 rounded-lg font-mono font-medium',
-                  timeRemaining <= 300
-                    ? 'bg-red-100 text-red-700'
-                    : 'bg-neutral-100 text-neutral-700'
-                )}
-              >
-                <Clock className="w-4 h-4" />
-                {formatTime(timeRemaining)}
+            {/* Center: Progress */}
+            <div className="flex-1 max-w-md mx-4 hidden md:block">
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-white/50 whitespace-nowrap">
+                  {progress.answered}/{progress.total}
+                </span>
+                <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-purple-500 to-indigo-500"
+                    style={{ width: `${progress.percentage}%` }}
+                  />
+                </div>
+                <span className="text-xs text-white/50 whitespace-nowrap">
+                  {progress.percentage}%
+                </span>
               </div>
-            )}
+            </div>
 
-            {/* Saving indicator */}
-            {isSaving && (
-              <span className="text-sm text-neutral-500 flex items-center gap-1">
-                <Loader2 className="w-3 h-3 animate-spin" />
-                Saving...
-              </span>
-            )}
+            {/* Right: Timer & Controls */}
+            <div className="flex items-center gap-2 lg:gap-3">
+              {/* Timer */}
+              {timeRemaining > 0 && (
+                <div
+                  className={cn(
+                    'flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl font-mono font-bold text-sm lg:text-base transition-all',
+                    isTimeCritical
+                      ? 'bg-red-500/20 text-red-400 animate-pulse'
+                      : isTimeWarning
+                        ? 'bg-amber-500/20 text-amber-400'
+                        : 'bg-white/10 text-white'
+                  )}
+                >
+                  <Clock className="w-4 h-4" />
+                  <span>{formatTime(timeRemaining)}</span>
+                </div>
+              )}
+
+              {/* Saving indicator */}
+              {isSaving && (
+                <span className="text-xs text-white/50 flex items-center gap-1">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Saving
+                </span>
+              )}
+
+              {/* Control buttons */}
+              <div className="hidden lg:flex items-center gap-1">
+                <button
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all"
+                  title={soundEnabled ? 'Mute' : 'Unmute'}
+                >
+                  {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                </button>
+                <button
+                  onClick={toggleFullscreen}
+                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all"
+                  title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+                >
+                  {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {/* Submit button */}
+              <button
+                onClick={() => setShowSubmitConfirm(true)}
+                disabled={isSubmitting}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-105"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+                <span className="hidden sm:inline">Submit</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="h-1 bg-neutral-200">
+        {/* Mobile progress bar */}
+        <div className="md:hidden h-1 bg-white/10">
           <div
-            className="h-full bg-indigo-500 transition-all"
+            className="h-full transition-all duration-500 bg-gradient-to-r from-purple-500 to-indigo-500"
             style={{ width: `${progress.percentage}%` }}
           />
         </div>
       </header>
 
-      <div className="flex-1 flex">
-        {/* Main Content */}
-        <main className="flex-1 p-4 md:p-8">
-          <div className="max-w-3xl mx-auto">
-            {/* Question Card */}
-            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-              {/* Question Header */}
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-medium text-indigo-600">
-                  Question {currentQuestionIndex + 1}
-                  {currentQuestion?.section && ` (Section ${currentQuestion.section})`}
+      {/* Main Content */}
+      <main className="relative z-10 flex-1 flex overflow-hidden">
+        {/* Question content */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="min-h-full p-4 lg:p-8">
+            <div className="max-w-4xl mx-auto">
+              {/* Question indicator - mobile */}
+              <div className="md:hidden mb-4 flex items-center justify-between">
+                <span className="text-white/70 text-sm">
+                  Question {currentQuestionIndex + 1} of {paper.questions.length}
                 </span>
-                <span className="text-sm text-neutral-500">
-                  {currentQuestion?.marks || 1} mark{(currentQuestion?.marks || 1) !== 1 ? 's' : ''}
-                </span>
+                <button
+                  onClick={() => setShowQuestionPanel(true)}
+                  className="px-3 py-1.5 rounded-lg bg-white/10 text-white text-sm"
+                >
+                  View All
+                </button>
               </div>
 
-              {/* Question Text */}
-              <p className="text-lg text-neutral-900 mb-6 leading-relaxed whitespace-pre-wrap">
-                {currentQuestion?.question_text}
-              </p>
-
-              {/* Answer Options */}
-              {currentQuestion?.question_type === 'multiple_choice' && currentQuestion.options && (
-                <div className="space-y-3">
-                  {currentQuestion.options.map((option, index) => (
-                    <button
-                      key={option.id || index}
-                      onClick={() => handleAnswerChange(option.text)}
-                      className={cn(
-                        'w-full flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all',
-                        answers[currentQuestion.id] === option.text
-                          ? 'border-indigo-500 bg-indigo-50'
-                          : 'border-neutral-200 hover:border-neutral-300'
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0',
-                          answers[currentQuestion.id] === option.text
-                            ? 'bg-indigo-500 text-white'
-                            : 'bg-neutral-100 text-neutral-600'
-                        )}
-                      >
-                        {String.fromCharCode(65 + index)}
-                      </span>
-                      <span className="flex-1">{option.text}</span>
-                      {answers[currentQuestion.id] === option.text && (
-                        <CheckCircle className="w-5 h-5 text-indigo-500 flex-shrink-0" />
-                      )}
-                    </button>
-                  ))}
+              {/* Main content card */}
+              <div className="bg-white/[0.03] backdrop-blur-sm rounded-2xl lg:rounded-3xl border border-white/10 overflow-hidden p-6 lg:p-8">
+                {/* Question Header */}
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-white/50">
+                      Question {currentQuestionIndex + 1}
+                      {currentQuestion?.section && ` (Section ${currentQuestion.section})`}
+                    </span>
+                  </div>
+                  <span className="text-sm text-white/50">
+                    {currentQuestion?.marks || 1} mark{(currentQuestion?.marks || 1) !== 1 ? 's' : ''}
+                  </span>
                 </div>
-              )}
 
-              {currentQuestion?.question_type === 'true_false' && (
-                <div className="flex gap-4">
-                  {['True', 'False'].map((option) => (
-                    <button
-                      key={option}
-                      onClick={() => handleAnswerChange(option.toLowerCase())}
-                      className={cn(
-                        'flex-1 py-4 rounded-xl border-2 font-medium transition-all',
-                        answers[currentQuestion.id] === option.toLowerCase()
-                          ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                          : 'border-neutral-200 hover:border-neutral-300'
-                      )}
-                    >
-                      {option}
-                    </button>
-                  ))}
+                {/* Question Text */}
+                <div className="mb-8">
+                  <p className="text-lg lg:text-xl text-white leading-relaxed whitespace-pre-wrap">
+                    {currentQuestion?.question_text}
+                  </p>
                 </div>
-              )}
 
-              {currentQuestion?.question_type === 'short_answer' && (
-                <input
-                  type="text"
-                  value={answers[currentQuestion.id] || ''}
-                  onChange={(e) => handleAnswerChange(e.target.value)}
-                  placeholder="Type your answer here..."
-                  className="w-full px-4 py-3 border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                />
-              )}
+                {/* Answer Options - Multiple Choice */}
+                {currentQuestion?.question_type === 'multiple_choice' && currentQuestion.options && (
+                  <div className="space-y-3">
+                    {currentQuestion.options.map((option, index) => {
+                      const isSelected = answers[currentQuestion.id] === option.text;
+                      const letterIndex = String.fromCharCode(65 + index);
 
-              {currentQuestion?.question_type === 'essay' && (
-                <textarea
-                  value={answers[currentQuestion.id] || ''}
-                  onChange={(e) => handleAnswerChange(e.target.value)}
-                  placeholder="Write your answer here..."
-                  rows={8}
-                  className="w-full px-4 py-3 border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none"
-                />
-              )}
-            </div>
-
-            {/* Navigation */}
-            <div className="flex items-center justify-between">
-              <button
-                onClick={previousQuestion}
-                disabled={currentQuestionIndex === 0}
-                className={cn(
-                  'flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors',
-                  currentQuestionIndex === 0
-                    ? 'text-neutral-400 cursor-not-allowed'
-                    : 'text-neutral-700 hover:bg-white'
+                      return (
+                        <button
+                          key={option.id || index}
+                          onClick={() => handleAnswerChange(option.text)}
+                          className={cn(
+                            'w-full flex items-center gap-4 p-4 lg:p-5 rounded-2xl border-2 text-left transition-all group',
+                            !isSelected && 'border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.05]',
+                            isSelected && 'border-purple-500/50 bg-purple-500/10'
+                          )}
+                        >
+                          <span
+                            className={cn(
+                              'w-10 h-10 rounded-xl flex items-center justify-center font-semibold text-sm transition-all shrink-0',
+                              !isSelected && 'bg-white/10 text-white/70 group-hover:bg-white/20',
+                              isSelected && 'bg-purple-500 text-white'
+                            )}
+                          >
+                            {letterIndex}
+                          </span>
+                          <span className={cn(
+                            'flex-1 text-base lg:text-lg',
+                            !isSelected && 'text-white/80',
+                            isSelected && 'text-white'
+                          )}>
+                            {option.text}
+                          </span>
+                          {isSelected && (
+                            <CheckCircle className="w-6 h-6 text-purple-400 shrink-0" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 )}
-              >
-                <ChevronLeft className="w-5 h-5" />
-                Previous
-              </button>
 
-              <button
-                onClick={handleMarkForReview}
-                className={cn(
-                  'flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors',
-                  currentQuestion && markedForReview.has(currentQuestion.id)
-                    ? 'bg-amber-100 text-amber-700'
-                    : 'text-neutral-600 hover:bg-white'
+                {/* True/False */}
+                {currentQuestion?.question_type === 'true_false' && (
+                  <div className="flex gap-4">
+                    {['True', 'False'].map((option) => {
+                      const isSelected = answers[currentQuestion.id] === option.toLowerCase();
+
+                      return (
+                        <button
+                          key={option}
+                          onClick={() => handleAnswerChange(option.toLowerCase())}
+                          className={cn(
+                            'flex-1 py-5 rounded-2xl font-semibold text-lg border-2 transition-all',
+                            !isSelected && 'border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20 hover:bg-white/[0.05]',
+                            isSelected && 'border-purple-500/50 bg-purple-500/10 text-purple-400'
+                          )}
+                        >
+                          {option}
+                        </button>
+                      );
+                    })}
+                  </div>
                 )}
-              >
-                <Flag className="w-4 h-4" />
-                {currentQuestion && markedForReview.has(currentQuestion.id) ? 'Marked' : 'Mark for Review'}
-              </button>
 
-              {currentQuestionIndex < paper.questions.length - 1 ? (
-                <button
-                  onClick={nextQuestion}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
-                >
-                  Next
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              ) : (
-                <button
-                  onClick={() => setShowSubmitConfirm(true)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
-                >
-                  <Send className="w-4 h-4" />
-                  Submit
-                </button>
-              )}
+                {/* Short Answer */}
+                {currentQuestion?.question_type === 'short_answer' && (
+                  <input
+                    type="text"
+                    value={answers[currentQuestion.id] || ''}
+                    onChange={(e) => handleAnswerChange(e.target.value)}
+                    placeholder="Type your answer here..."
+                    className="w-full px-5 py-4 rounded-2xl border-2 bg-white/[0.02] text-white text-lg placeholder:text-white/30 focus:outline-none border-white/10 focus:border-purple-500/50 focus:bg-white/[0.05] transition-all"
+                  />
+                )}
+
+                {/* Essay */}
+                {currentQuestion?.question_type === 'essay' && (
+                  <textarea
+                    value={answers[currentQuestion.id] || ''}
+                    onChange={(e) => handleAnswerChange(e.target.value)}
+                    placeholder="Write your answer here..."
+                    rows={8}
+                    className="w-full px-5 py-4 rounded-2xl border-2 bg-white/[0.02] text-white text-base placeholder:text-white/30 focus:outline-none border-white/10 focus:border-purple-500/50 focus:bg-white/[0.05] transition-all resize-none"
+                  />
+                )}
+              </div>
             </div>
           </div>
-        </main>
+        </div>
 
-        {/* Question Navigator Sidebar */}
-        <aside className="hidden lg:block w-72 bg-white border-l border-neutral-200 p-4">
-          <h3 className="font-semibold text-neutral-900 mb-4">Questions</h3>
+        {/* Question Navigator Sidebar - Desktop */}
+        <aside className="hidden lg:flex w-72 xl:w-80 bg-black/20 backdrop-blur-xl border-l border-white/10 flex-col">
+          <div className="p-4 border-b border-white/10">
+            <h3 className="font-semibold text-white text-sm">Question Navigator</h3>
+            <p className="text-xs text-white/50 mt-1">
+              {progress.answered} of {progress.total} answered
+            </p>
+          </div>
 
-          <div className="grid grid-cols-5 gap-2 mb-6">
-            {paper.questions.map((q, index) => {
-              const status = getQuestionStatus(q);
-              return (
-                <button
-                  key={q.id}
-                  onClick={() => goToQuestion(index)}
-                  className={cn(
-                    'w-10 h-10 rounded-lg font-medium text-sm transition-colors',
-                    index === currentQuestionIndex && 'ring-2 ring-indigo-500',
-                    status === 'answered' && 'bg-green-100 text-green-700',
-                    status === 'review' && 'bg-amber-100 text-amber-700',
-                    status === 'unanswered' && 'bg-neutral-100 text-neutral-600'
-                  )}
-                >
-                  {index + 1}
-                </button>
-              );
-            })}
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="grid grid-cols-5 gap-2">
+              {paper.questions.map((q, index) => {
+                const status = getQuestionStatus(q);
+                const isCurrent = index === currentQuestionIndex;
+
+                return (
+                  <button
+                    key={q.id}
+                    onClick={() => goToQuestion(index)}
+                    className={cn(
+                      'aspect-square rounded-xl font-medium text-sm transition-all relative',
+                      isCurrent && 'ring-2 ring-white ring-offset-2 ring-offset-slate-900',
+                      status === 'answered' && !isCurrent && 'bg-emerald-500/20 text-emerald-400',
+                      status === 'review' && 'bg-amber-500/20 text-amber-400',
+                      status === 'unanswered' && !isCurrent && 'bg-white/5 text-white/50 hover:bg-white/10',
+                      isCurrent && 'bg-white text-slate-900'
+                    )}
+                  >
+                    {index + 1}
+                    {status === 'review' && (
+                      <Flag className="absolute -top-1 -right-1 w-3 h-3 text-amber-400" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Legend */}
-          <div className="space-y-2 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-green-100 rounded" />
-              <span className="text-neutral-600">Answered</span>
+          <div className="p-4 border-t border-white/10 space-y-2">
+            <div className="flex items-center gap-2 text-xs">
+              <div className="w-4 h-4 rounded bg-emerald-500/20" />
+              <span className="text-white/70">Answered</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-amber-100 rounded" />
-              <span className="text-neutral-600">Marked for review</span>
+            <div className="flex items-center gap-2 text-xs">
+              <div className="w-4 h-4 rounded bg-amber-500/20" />
+              <span className="text-white/70">Marked for Review</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-neutral-100 rounded" />
-              <span className="text-neutral-600">Not answered</span>
-            </div>
-          </div>
-
-          {/* Progress */}
-          <div className="mt-6 pt-6 border-t border-neutral-200">
-            <p className="text-sm text-neutral-600 mb-2">
-              Progress: {progress.answered}/{progress.total} answered
-            </p>
-            <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-indigo-500 transition-all"
-                style={{ width: `${progress.percentage}%` }}
-              />
+            <div className="flex items-center gap-2 text-xs">
+              <div className="w-4 h-4 rounded bg-white/5" />
+              <span className="text-white/70">Not Answered</span>
             </div>
           </div>
-
-          {/* Submit Button */}
-          <button
-            onClick={() => setShowSubmitConfirm(true)}
-            disabled={isSubmitting}
-            className="w-full mt-6 flex items-center justify-center gap-2 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium disabled:opacity-50"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              <>
-                <Send className="w-4 h-4" />
-                Submit Paper
-              </>
-            )}
-          </button>
         </aside>
-      </div>
+      </main>
+
+      {/* Bottom Navigation Bar */}
+      <footer className="relative z-10 bg-black/20 backdrop-blur-xl border-t border-white/10">
+        <div className="px-4 lg:px-6 py-3">
+          <div className="flex items-center justify-between max-w-4xl mx-auto">
+            {/* Previous */}
+            <button
+              onClick={previousQuestion}
+              disabled={currentQuestionIndex === 0}
+              className={cn(
+                'flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all',
+                currentQuestionIndex === 0
+                  ? 'text-white/30 cursor-not-allowed'
+                  : 'text-white bg-white/5 hover:bg-white/10'
+              )}
+            >
+              <ChevronLeft className="w-5 h-5" />
+              <span className="hidden sm:inline">Previous</span>
+            </button>
+
+            {/* Mark for Review */}
+            <button
+              onClick={handleMarkForReview}
+              className={cn(
+                'flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all',
+                currentQuestion && markedForReview.has(currentQuestion.id)
+                  ? 'bg-amber-500/20 text-amber-400'
+                  : 'text-white/70 bg-white/5 hover:bg-white/10'
+              )}
+            >
+              <Flag className="w-4 h-4" />
+              <span className="hidden sm:inline">
+                {currentQuestion && markedForReview.has(currentQuestion.id) ? 'Marked' : 'Mark'}
+              </span>
+            </button>
+
+            {/* Next / Finish */}
+            <button
+              onClick={isLastQuestion ? () => setShowSubmitConfirm(true) : nextQuestion}
+              className={cn(
+                'flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all',
+                'bg-gradient-to-r text-white shadow-lg hover:shadow-xl hover:scale-105',
+                isLastQuestion ? 'from-emerald-500 to-teal-500' : 'from-purple-600 to-indigo-600'
+              )}
+            >
+              <span>{isLastQuestion ? 'Finish' : 'Next'}</span>
+              {isLastQuestion ? (
+                <CheckCircle className="w-5 h-5" />
+              ) : (
+                <ChevronRight className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+        </div>
+      </footer>
+
+      {/* Exit Confirmation Modal */}
+      {showExitConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowExitConfirm(false)} />
+          <div className="relative bg-slate-800 rounded-2xl shadow-2xl p-6 max-w-md w-full border border-white/10 animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-8 h-8 text-red-400" />
+            </div>
+            <h3 className="text-xl font-bold text-white text-center mb-2">
+              Exit Paper?
+            </h3>
+            <p className="text-white/60 text-center mb-6">
+              Your progress will be lost. Are you sure you want to exit?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowExitConfirm(false)}
+                className="flex-1 py-3 rounded-xl bg-white/5 text-white font-medium hover:bg-white/10 transition-colors"
+              >
+                Continue
+              </button>
+              <button
+                onClick={handleExit}
+                className="flex-1 py-3 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 transition-colors"
+              >
+                Exit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Submit Confirmation Modal */}
-      <ConfirmModal
-        isOpen={showSubmitConfirm}
-        onClose={() => setShowSubmitConfirm(false)}
-        onConfirm={handleSubmit}
-        title="Submit Paper?"
-        message={
-          progress.answered < progress.total
-            ? `You have ${progress.total - progress.answered} unanswered questions. Are you sure you want to submit?`
-            : 'Are you sure you want to submit? You cannot change your answers after submission.'
-        }
-        confirmText="Submit"
-        isLoading={isSubmitting}
-      />
+      {showSubmitConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowSubmitConfirm(false)} />
+          <div className="relative bg-slate-800 rounded-2xl shadow-2xl p-6 max-w-md w-full border border-white/10 animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Send className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-white text-center mb-2">
+              Submit Paper?
+            </h3>
+            <p className="text-white/60 text-center mb-4">
+              {progress.answered < progress.total
+                ? `You have ${progress.total - progress.answered} unanswered questions.`
+                : 'You have answered all questions.'}
+            </p>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="bg-white/5 rounded-xl p-3 text-center">
+                <p className="text-2xl font-bold text-white">{progress.answered}</p>
+                <p className="text-xs text-white/50">Answered</p>
+              </div>
+              <div className="bg-white/5 rounded-xl p-3 text-center">
+                <p className="text-2xl font-bold text-white">{progress.total - progress.answered}</p>
+                <p className="text-xs text-white/50">Unanswered</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowSubmitConfirm(false)}
+                className="flex-1 py-3 rounded-xl bg-white/5 text-white font-medium hover:bg-white/10 transition-colors"
+              >
+                Review
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 font-medium transition-colors flex items-center justify-center gap-2 text-white"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>Submit</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Time Warning Modal */}
       {showTimeWarning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50" />
-          <div className="relative bg-white rounded-xl shadow-xl p-6 max-w-sm w-full text-center">
-            <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Clock className="w-8 h-8 text-amber-600" />
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="relative bg-slate-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full border border-amber-500/20 animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Clock className="w-8 h-8 text-amber-400 animate-pulse" />
             </div>
-            <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+            <h3 className="text-xl font-bold text-white text-center mb-2">
               5 Minutes Remaining
             </h3>
-            <p className="text-neutral-600 mb-6">
+            <p className="text-white/60 text-center mb-6">
               You have 5 minutes left to complete and submit your paper.
             </p>
             <button
               onClick={() => setShowTimeWarning(false)}
-              className="w-full py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+              className="w-full py-3 rounded-xl bg-amber-500 text-white font-medium hover:bg-amber-600 transition-colors"
             >
               Continue
             </button>
@@ -702,16 +912,41 @@ export default function TakePaper() {
         </div>
       )}
 
-      {/* Exit Confirmation */}
-      <ConfirmModal
-        isOpen={showExitConfirm}
-        onClose={() => setShowExitConfirm(false)}
-        onConfirm={handleExit}
-        title="Exit Paper?"
-        message="Your progress will be lost. Are you sure you want to exit?"
-        confirmText="Exit"
-        variant="danger"
-      />
+      {/* Mobile Question Panel */}
+      {showQuestionPanel && (
+        <div className="fixed inset-0 z-[60] lg:hidden">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowQuestionPanel(false)} />
+          <div className="absolute inset-x-0 bottom-0 bg-slate-800 rounded-t-3xl border-t border-white/10 p-4 animate-in slide-in-from-bottom duration-300">
+            <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4" />
+            <h3 className="font-semibold text-white mb-4">Questions</h3>
+            <div className="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto pb-4">
+              {paper.questions.map((q, index) => {
+                const status = getQuestionStatus(q);
+                const isCurrent = index === currentQuestionIndex;
+
+                return (
+                  <button
+                    key={q.id}
+                    onClick={() => {
+                      goToQuestion(index);
+                      setShowQuestionPanel(false);
+                    }}
+                    className={cn(
+                      'aspect-square rounded-xl font-medium text-sm transition-all',
+                      isCurrent && 'ring-2 ring-white bg-white text-slate-900',
+                      status === 'answered' && !isCurrent && 'bg-emerald-500/20 text-emerald-400',
+                      status === 'review' && 'bg-amber-500/20 text-amber-400',
+                      status === 'unanswered' && !isCurrent && 'bg-white/5 text-white/50'
+                    )}
+                  >
+                    {index + 1}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
