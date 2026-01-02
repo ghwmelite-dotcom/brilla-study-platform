@@ -1,13 +1,14 @@
 import { MessageCircle } from 'lucide-react';
-import { useChatStore, useAuthStore } from '@/stores';
+import { useChatStore, useAuthStore, useUIStore } from '@/stores';
 import { cn } from '@/utils';
 
 export function ChatButton() {
   const { isAuthenticated } = useAuthStore();
   const { isChatOpen, toggleChat, getUnreadCount } = useChatStore();
+  const { isDistractionFreeMode } = useUIStore();
   const unreadCount = getUnreadCount();
 
-  if (!isAuthenticated || isChatOpen) return null;
+  if (!isAuthenticated || isChatOpen || isDistractionFreeMode) return null;
 
   return (
     <button

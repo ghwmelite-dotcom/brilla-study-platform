@@ -33,7 +33,7 @@ import {
   MicroscopeSimulation,
   FoodTestsSimulation,
 } from './simulations';
-import { useLabStore, useThemeStore } from '@/stores';
+import { useLabStore, useThemeStore, useUIStore } from '@/stores';
 import { cn } from '@/utils';
 import type { GradingResult } from '@/types';
 
@@ -85,6 +85,13 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
   const toggleLocalTheme = () => {
     setTheme(isDark ? 'light' : 'dark');
   };
+
+  // Set distraction-free mode
+  const { setDistractionFreeMode } = useUIStore();
+  useEffect(() => {
+    setDistractionFreeMode(true);
+    return () => setDistractionFreeMode(false);
+  }, [setDistractionFreeMode]);
 
   // Timer effect
   useEffect(() => {

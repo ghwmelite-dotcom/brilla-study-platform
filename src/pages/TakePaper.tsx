@@ -21,7 +21,7 @@ import {
   Moon,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import { useThemeStore } from '@/stores';
+import { useThemeStore, useUIStore } from '@/stores';
 import { api } from '@/services/api';
 import { cn } from '@/utils';
 
@@ -59,6 +59,13 @@ export default function TakePaper() {
   const toggleLocalTheme = () => {
     setTheme(isDark ? 'light' : 'dark');
   };
+
+  // Set distraction-free mode
+  const { setDistractionFreeMode } = useUIStore();
+  useEffect(() => {
+    setDistractionFreeMode(true);
+    return () => setDistractionFreeMode(false);
+  }, [setDistractionFreeMode]);
 
   // State
   const [paper, setPaper] = useState<PaperDetails | null>(null);

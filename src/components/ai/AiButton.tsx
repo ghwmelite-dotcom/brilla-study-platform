@@ -1,5 +1,5 @@
 import { Sparkles } from 'lucide-react';
-import { useAiTutorStore, useAuthStore } from '@/stores';
+import { useAiTutorStore, useAuthStore, useUIStore } from '@/stores';
 
 interface AiButtonProps {
   context?: string;
@@ -8,8 +8,9 @@ interface AiButtonProps {
 export function AiButton({ context }: AiButtonProps) {
   const { isAuthenticated } = useAuthStore();
   const { isOpen, openChat } = useAiTutorStore();
+  const { isDistractionFreeMode } = useUIStore();
 
-  if (!isAuthenticated || isOpen) return null;
+  if (!isAuthenticated || isOpen || isDistractionFreeMode) return null;
 
   return (
     <button

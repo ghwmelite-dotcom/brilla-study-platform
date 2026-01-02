@@ -28,6 +28,7 @@ export { useCounselorReportsStore } from './counselorReportsStore';
 export { useNotificationStore } from './notificationStore';
 export { useWhiteboardStore } from './whiteboardStore';
 export { useThemeStore } from './themeStore';
+export { useUIStore } from './uiStore';
 export type { Theme } from './themeStore';
 export type { Toast, ToastType } from './toastStore';
 export type { Notification, NotificationType, StreakData, XPData } from './notificationStore';

@@ -21,7 +21,7 @@ import {
   Moon,
 } from 'lucide-react';
 import { cn } from '@/utils';
-import { useThemeStore } from '@/stores';
+import { useThemeStore, useUIStore } from '@/stores';
 
 export interface ExamLayoutProps {
   children: ReactNode;
@@ -79,6 +79,13 @@ export function ExamLayout({
   const toggleLocalTheme = () => {
     setTheme(isDark ? 'light' : 'dark');
   };
+
+  // Set distraction-free mode
+  const { setDistractionFreeMode } = useUIStore();
+  useEffect(() => {
+    setDistractionFreeMode(true);
+    return () => setDistractionFreeMode(false);
+  }, [setDistractionFreeMode]);
 
   const answeredCount = typeof answeredQuestions === 'number'
     ? answeredQuestions
