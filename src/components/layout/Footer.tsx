@@ -26,7 +26,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold text-neutral-900 mb-3">Quick Links</h4>
+            <span className="font-semibold text-neutral-900 mb-3 block">Quick Links</span>
             <ul className="space-y-2">
               <li>
                 <Link to="/topics" className="text-sm text-neutral-600 hover:text-primary">
@@ -53,7 +53,7 @@ export function Footer() {
 
           {/* Subjects */}
           <div>
-            <h4 className="font-semibold text-neutral-900 mb-3">Subjects</h4>
+            <span className="font-semibold text-neutral-900 mb-3 block">Subjects</span>
             <ul className="space-y-2">
               <li>
                 <Link to="/topics/mathematics" className="text-sm text-neutral-600 hover:text-primary">
@@ -80,7 +80,7 @@ export function Footer() {
 
           {/* Support */}
           <div>
-            <h4 className="font-semibold text-neutral-900 mb-3">Support</h4>
+            <span className="font-semibold text-neutral-900 mb-3 block">Support</span>
             <ul className="space-y-2">
               <li>
                 <Link to="/help" className="text-sm text-neutral-600 hover:text-primary">

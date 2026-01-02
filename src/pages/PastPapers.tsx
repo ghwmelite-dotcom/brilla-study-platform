@@ -129,10 +129,11 @@ export function PastPapers() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Subject filter */}
           <div className="relative">
-            <label className="block text-xs font-medium text-neutral-500 mb-1">
+            <label htmlFor="filter-subject" className="block text-xs font-medium text-neutral-500 mb-1">
               Subject
             </label>
             <select
+              id="filter-subject"
               value={selectedSubject}
               onChange={(e) => setSelectedSubject(e.target.value)}
               className="w-full px-3 py-2 pr-8 rounded-lg border border-neutral-200 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none"
@@ -149,10 +150,11 @@ export function PastPapers() {
 
           {/* Year filter */}
           <div className="relative">
-            <label className="block text-xs font-medium text-neutral-500 mb-1">
+            <label htmlFor="filter-year" className="block text-xs font-medium text-neutral-500 mb-1">
               Year
             </label>
             <select
+              id="filter-year"
               value={selectedYear}
               onChange={(e) => setSelectedYear(e.target.value)}
               className="w-full px-3 py-2 pr-8 rounded-lg border border-neutral-200 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none"
@@ -169,10 +171,11 @@ export function PastPapers() {
 
           {/* Paper type filter */}
           <div className="relative">
-            <label className="block text-xs font-medium text-neutral-500 mb-1">
+            <label htmlFor="filter-paper-type" className="block text-xs font-medium text-neutral-500 mb-1">
               Paper Type
             </label>
             <select
+              id="filter-paper-type"
               value={selectedPaperType}
               onChange={(e) => setSelectedPaperType(e.target.value)}
               className="w-full px-3 py-2 pr-8 rounded-lg border border-neutral-200 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none"
@@ -197,9 +200,9 @@ export function PastPapers() {
       ) : papers.length === 0 ? (
         <div className="text-center py-16">
           <FileText className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-neutral-700 mb-2">
+          <h2 className="text-lg font-medium text-neutral-700 mb-2">
             No past papers found
-          </h3>
+          </h2>
           <p className="text-neutral-500">
             {hasFilters
               ? 'Try adjusting your filters'
@@ -262,9 +265,9 @@ function PaperCard({ paper, onStart }: PaperCardProps) {
         )}
       </div>
 
-      <h3 className="font-semibold text-neutral-900 mb-1">
+      <h2 className="font-semibold text-neutral-900 mb-1 text-base">
         {paper.subject_name || paper.title}
-      </h3>
+      </h2>
 
       <p className="text-sm text-neutral-600 mb-3">
         {paper.paper_type_name} - {paper.year}

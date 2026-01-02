@@ -452,7 +452,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           {/* Quick Stats (if authenticated and has progress) */}
           {isAuthenticated && totalQuestionsAttempted > 0 && (
             <div className="bg-gradient-to-br from-primary to-primary-dark rounded-xl p-4 text-white">
-              <h4 className="font-semibold mb-3">Your Progress</h4>
+              <span className="font-semibold mb-3 block">Your Progress</span>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="opacity-80">Questions</span>
