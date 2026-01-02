@@ -84,7 +84,7 @@ export function AchievementUnlockModal({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 30 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
             className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden"
           >
             {/* Close Button */}

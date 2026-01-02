@@ -81,7 +81,7 @@ export function ComebackModal({ isOpen, onClose }: ComebackModalProps) {
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e: React.MouseEvent) => e.stopPropagation()}
           className="w-full max-w-md bg-white rounded-2xl overflow-hidden shadow-2xl"
         >
           <AnimatePresence mode="wait">

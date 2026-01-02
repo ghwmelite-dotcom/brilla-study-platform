@@ -83,7 +83,7 @@ export function MysteryChestModal({
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e: React.MouseEvent) => e.stopPropagation()}
           className="w-full max-w-lg bg-white rounded-2xl overflow-hidden shadow-2xl"
         >
           {/* Header */}
