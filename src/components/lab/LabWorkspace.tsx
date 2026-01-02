@@ -23,6 +23,12 @@ import {
 } from 'lucide-react';
 import { Card, Button, Badge, ProgressBar } from '@/components/common';
 import { PhETEmbed } from './PhETEmbed';
+import {
+  TitrationSimulation,
+  QualitativeAnalysisSimulation,
+  MicroscopeSimulation,
+  FoodTestsSimulation,
+} from './simulations';
 import { useLabStore } from '@/stores';
 import { cn } from '@/utils';
 import type { GradingResult } from '@/types';
@@ -406,6 +412,22 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
                   simUrl={currentExperiment.phetSimUrl}
                   title={currentExperiment.name}
                   guidanceNotes={currentExperiment.safetyNotes}
+                />
+              ) : currentExperiment.id === 'exp_acid_base_titration' ? (
+                <TitrationSimulation
+                  onObservation={(text) => addObservation(text)}
+                />
+              ) : currentExperiment.id === 'exp_qualitative_analysis' ? (
+                <QualitativeAnalysisSimulation
+                  onObservation={(text) => addObservation(text)}
+                />
+              ) : currentExperiment.id === 'exp_microscope_use' ? (
+                <MicroscopeSimulation
+                  onObservation={(text) => addObservation(text)}
+                />
+              ) : currentExperiment.id === 'exp_food_tests' ? (
+                <FoodTestsSimulation
+                  onObservation={(text) => addObservation(text)}
                 />
               ) : (
                 <div className="h-full flex items-center justify-center">

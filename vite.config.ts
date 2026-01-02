@@ -40,8 +40,12 @@ export default defineConfig({
   },
   // Optimize dependencies pre-bundling
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', 'zustand', 'lucide-react'],
+    include: ['react', 'react-dom', 'react-router-dom', 'zustand', 'lucide-react', 'warning'],
     exclude: ['react-pdf', 'pdfjs-dist'], // Exclude heavy libs from pre-bundling
+  },
+  // Handle CommonJS modules that don't export default properly
+  ssr: {
+    noExternal: ['warning'],
   },
   server: {
     port: 3000,
