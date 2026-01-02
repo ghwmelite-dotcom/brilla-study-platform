@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { ExamLayout, ExamQuestionCard } from '@/components/exam';
 import { api } from '@/services/api';
-import { useExamStore } from '@/stores';
+import { useExamStore, useThemeStore } from '@/stores';
+import { cn } from '@/utils';
 import type { Question } from '@/types';
 
 interface ApiQuestion {
@@ -53,6 +54,8 @@ export default function ExamModePractice() {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const { currentExamType } = useExamStore();
+  const { resolvedTheme } = useThemeStore();
+  const isDark = resolvedTheme === 'dark';
 
   // Get params from URL or state
   const mode = searchParams.get('mode') || 'drill'; // drill, speed
@@ -210,10 +213,15 @@ export default function ExamModePractice() {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 z-50 bg-slate-900 flex items-center justify-center">
+      <div className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center transition-colors duration-300",
+        isDark
+          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+          : "bg-gradient-to-br from-slate-100 via-white to-slate-100"
+      )}>
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-4" />
-          <p className="text-white/70">Loading questions...</p>
+          <Loader2 className="w-12 h-12 text-purple-500 animate-spin mx-auto mb-4" />
+          <p className={isDark ? "text-white/70" : "text-slate-600"}>Loading questions...</p>
         </div>
       </div>
     );

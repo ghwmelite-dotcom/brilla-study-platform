@@ -23,8 +23,9 @@ import {
   Maximize,
   Minimize,
   LogOut,
+  Sun,
+  Moon,
 } from 'lucide-react';
-// Note: Badge and ProgressBar removed - using custom styled components
 import { PhETEmbed } from './PhETEmbed';
 import {
   TitrationSimulation,
@@ -32,7 +33,7 @@ import {
   MicroscopeSimulation,
   FoodTestsSimulation,
 } from './simulations';
-import { useLabStore } from '@/stores';
+import { useLabStore, useThemeStore } from '@/stores';
 import { cn } from '@/utils';
 import type { GradingResult } from '@/types';
 
@@ -69,6 +70,9 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
     submitExperiment,
   } = useLabStore();
 
+  const { resolvedTheme, setTheme } = useThemeStore();
+  const isDark = resolvedTheme === 'dark';
+
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [observationText, setObservationText] = useState('');
@@ -76,6 +80,11 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
   const [results, setResults] = useState<GradingResult | null>(null);
   const [showDataPanel, setShowDataPanel] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Toggle theme for distraction-free mode
+  const toggleLocalTheme = () => {
+    setTheme(isDark ? 'light' : 'dark');
+  };
 
   // Timer effect
   useEffect(() => {
@@ -118,10 +127,15 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
 
   if (!currentExperiment || !currentSession) {
     return (
-      <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+      <div className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center transition-colors duration-300",
+        isDark
+          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+          : "bg-gradient-to-br from-slate-100 via-white to-slate-100"
+      )}>
         <div className="text-center">
-          <FlaskConical className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-          <p className="text-white/70 mb-4">No active experiment session</p>
+          <FlaskConical className={cn("w-16 h-16 mx-auto mb-4", isDark ? "text-slate-600" : "text-slate-300")} />
+          <p className={cn("mb-4", isDark ? "text-white/70" : "text-slate-600")}>No active experiment session</p>
           <button
             onClick={onExit}
             className="px-6 py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors"
@@ -168,12 +182,20 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
   // Results screen
   if (showResults && results) {
     return (
-      <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-y-auto">
+      <div className={cn(
+        "fixed inset-0 z-50 overflow-y-auto transition-colors duration-300",
+        isDark
+          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+          : "bg-gradient-to-br from-slate-100 via-white to-slate-100"
+      )}>
         {/* Background pattern */}
-        <div className="absolute inset-0 opacity-5">
+        <div className={cn("absolute inset-0", isDark ? "opacity-5" : "opacity-10")}>
           <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 25% 25%, white 1px, transparent 1px),
-                             radial-gradient(circle at 75% 75%, white 1px, transparent 1px)`,
+            backgroundImage: isDark
+              ? `radial-gradient(circle at 25% 25%, white 1px, transparent 1px),
+                 radial-gradient(circle at 75% 75%, white 1px, transparent 1px)`
+              : `radial-gradient(circle at 25% 25%, #6366f1 1px, transparent 1px),
+                 radial-gradient(circle at 75% 75%, #8b5cf6 1px, transparent 1px)`,
             backgroundSize: '50px 50px',
           }} />
         </div>
@@ -192,10 +214,10 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
               )} />
             </div>
 
-            <h2 className="text-3xl font-bold text-white text-center mb-2">
+            <h2 className={cn("text-3xl font-bold text-center mb-2", isDark ? "text-white" : "text-slate-900")}>
               Experiment Complete!
             </h2>
-            <p className="text-white/60 text-center mb-8">{currentExperiment.name}</p>
+            <p className={cn("text-center mb-8", isDark ? "text-white/60" : "text-slate-500")}>{currentExperiment.name}</p>
 
             {/* Score Circle */}
             <div className="relative w-48 h-48 mx-auto mb-8">
@@ -204,7 +226,7 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
                   cx="50"
                   cy="50"
                   r="45"
-                  stroke="rgba(255,255,255,0.1)"
+                  stroke={isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}
                   strokeWidth="8"
                   fill="none"
                 />
@@ -222,26 +244,29 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-5xl font-bold text-white">{results.percentageScore}%</span>
-                <span className="text-white/50 text-sm">{results.totalScore}/{results.maxScore} marks</span>
+                <span className={cn("text-5xl font-bold", isDark ? "text-white" : "text-slate-900")}>{results.percentageScore}%</span>
+                <span className={cn("text-sm", isDark ? "text-white/50" : "text-slate-500")}>{results.totalScore}/{results.maxScore} marks</span>
               </div>
             </div>
 
             {/* Criteria Breakdown */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 mb-6">
-              <h3 className="font-semibold text-white mb-4">Performance Breakdown</h3>
+            <div className={cn(
+              "backdrop-blur-sm rounded-2xl p-6 border mb-6",
+              isDark ? "bg-white/5 border-white/10" : "bg-white/80 border-slate-200 shadow-lg"
+            )}>
+              <h3 className={cn("font-semibold mb-4", isDark ? "text-white" : "text-slate-900")}>Performance Breakdown</h3>
               <div className="space-y-3">
                 {results.criteriaScores.map((criteria) => (
                   <div key={criteria.criterionId} className="flex items-center justify-between">
-                    <span className="text-sm text-white/70">{criteria.criterionName}</span>
+                    <span className={cn("text-sm", isDark ? "text-white/70" : "text-slate-600")}>{criteria.criterionName}</span>
                     <div className="flex items-center gap-3">
-                      <div className="w-24 h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className={cn("w-24 h-2 rounded-full overflow-hidden", isDark ? "bg-white/10" : "bg-slate-200")}>
                         <div
                           className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"
                           style={{ width: `${(criteria.score / criteria.maxScore) * 100}%` }}
                         />
                       </div>
-                      <span className="text-sm font-medium text-white w-12 text-right">
+                      <span className={cn("text-sm font-medium w-12 text-right", isDark ? "text-white" : "text-slate-900")}>
                         {criteria.score}/{criteria.maxScore}
                       </span>
                     </div>
@@ -251,15 +276,18 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
             </div>
 
             {/* Feedback */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 mb-8">
-              <p className="text-white/80 mb-4">{results.feedback.overall}</p>
+            <div className={cn(
+              "backdrop-blur-sm rounded-2xl p-6 border mb-8",
+              isDark ? "bg-white/5 border-white/10" : "bg-white/80 border-slate-200 shadow-lg"
+            )}>
+              <p className={cn("mb-4", isDark ? "text-white/80" : "text-slate-700")}>{results.feedback.overall}</p>
               {results.feedback.strengths.length > 0 && (
                 <div className="mb-3">
-                  <span className="text-xs font-medium text-emerald-400 uppercase">Strengths:</span>
-                  <ul className="text-sm text-white/70 mt-1">
+                  <span className="text-xs font-medium text-emerald-500 uppercase">Strengths:</span>
+                  <ul className={cn("text-sm mt-1", isDark ? "text-white/70" : "text-slate-600")}>
                     {results.feedback.strengths.map((s, i) => (
                       <li key={i} className="flex items-start gap-2">
-                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                         {s}
                       </li>
                     ))}
@@ -268,11 +296,11 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
               )}
               {results.feedback.improvements.length > 0 && (
                 <div>
-                  <span className="text-xs font-medium text-amber-400 uppercase">Areas to improve:</span>
-                  <ul className="text-sm text-white/70 mt-1">
+                  <span className="text-xs font-medium text-amber-500 uppercase">Areas to improve:</span>
+                  <ul className={cn("text-sm mt-1", isDark ? "text-white/70" : "text-slate-600")}>
                     {results.feedback.improvements.map((s, i) => (
                       <li key={i} className="flex items-start gap-2">
-                        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                        <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                         {s}
                       </li>
                     ))}
@@ -285,7 +313,12 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
             <div className="flex gap-3 justify-center">
               <button
                 onClick={onExit}
-                className="px-6 py-3 bg-white/5 text-white rounded-xl font-medium hover:bg-white/10 transition-colors border border-white/10"
+                className={cn(
+                  "px-6 py-3 rounded-xl font-medium transition-colors border",
+                  isDark
+                    ? "bg-white/5 text-white border-white/10 hover:bg-white/10"
+                    : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 shadow-sm"
+                )}
               >
                 Exit Lab
               </button>
@@ -306,75 +339,121 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col overflow-hidden">
+    <div className={cn(
+      "fixed inset-0 z-50 flex flex-col overflow-hidden transition-colors duration-300",
+      isDark
+        ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+        : "bg-gradient-to-br from-slate-100 via-white to-slate-100"
+    )}>
       {/* Background pattern */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
+      <div className={cn("absolute inset-0 pointer-events-none", isDark ? "opacity-5" : "opacity-10")}>
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 25% 25%, white 1px, transparent 1px),
-                           radial-gradient(circle at 75% 75%, white 1px, transparent 1px)`,
+          backgroundImage: isDark
+            ? `radial-gradient(circle at 25% 25%, white 1px, transparent 1px),
+               radial-gradient(circle at 75% 75%, white 1px, transparent 1px)`
+            : `radial-gradient(circle at 25% 25%, #6366f1 1px, transparent 1px),
+               radial-gradient(circle at 75% 75%, #8b5cf6 1px, transparent 1px)`,
           backgroundSize: '50px 50px',
         }} />
       </div>
 
       {/* Top Bar */}
-      <div className="relative z-10 flex items-center justify-between px-4 py-3 bg-black/20 backdrop-blur-xl border-b border-white/10 shrink-0">
+      <div className={cn(
+        "relative z-10 flex items-center justify-between px-4 py-3 backdrop-blur-xl border-b shrink-0",
+        isDark ? "bg-black/20 border-white/10" : "bg-white/70 border-slate-200 shadow-sm"
+      )}>
         <div className="flex items-center gap-4">
           <button
             onClick={() => setShowExitConfirm(true)}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
+              isDark
+                ? "text-white/70 hover:text-white hover:bg-white/10"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            )}
           >
             <LogOut className="w-4 h-4" />
             <span className="hidden sm:inline">Exit</span>
           </button>
-          <div className="hidden sm:block h-6 w-px bg-white/20" />
+          <div className={cn("hidden sm:block h-6 w-px", isDark ? "bg-white/20" : "bg-slate-300")} />
           <div>
-            <h2 className="font-semibold text-white line-clamp-1">
+            <h2 className={cn("font-semibold line-clamp-1", isDark ? "text-white" : "text-slate-900")}>
               {currentExperiment.name}
             </h2>
             <div className="flex items-center gap-2 text-sm">
               <span className={cn(
                 'px-2 py-0.5 rounded-full text-xs font-medium',
-                mode === 'guided' ? 'bg-purple-500/20 text-purple-300' : 'bg-emerald-500/20 text-emerald-300'
+                mode === 'guided'
+                  ? isDark ? 'bg-purple-500/20 text-purple-300' : 'bg-purple-100 text-purple-700'
+                  : isDark ? 'bg-emerald-500/20 text-emerald-300' : 'bg-emerald-100 text-emerald-700'
               )}>
                 {mode === 'guided' ? 'Guided' : 'Sandbox'}
               </span>
-              <span className="text-white/50">Step {currentStepIndex + 1} of {totalSteps}</span>
+              <span className={isDark ? "text-white/50" : "text-slate-500"}>Step {currentStepIndex + 1} of {totalSteps}</span>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Timer */}
-          <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-xl border border-white/10">
-            <Clock className="w-4 h-4 text-white/50" />
-            <span className="font-mono text-white">{formatTime(timeSpent)}</span>
+          <div className={cn(
+            "flex items-center gap-2 px-3 py-2 rounded-xl border",
+            isDark ? "bg-white/5 border-white/10" : "bg-white border-slate-200 shadow-sm"
+          )}>
+            <Clock className={cn("w-4 h-4", isDark ? "text-white/50" : "text-slate-400")} />
+            <span className={cn("font-mono", isDark ? "text-white" : "text-slate-900")}>{formatTime(timeSpent)}</span>
             <button
-              className="p-1 rounded hover:bg-white/10 transition-colors"
+              className={cn(
+                "p-1 rounded transition-colors",
+                isDark ? "hover:bg-white/10" : "hover:bg-slate-100"
+              )}
               onClick={isTimerRunning ? pauseTimer : resumeTimer}
             >
               {isTimerRunning ? (
-                <Pause className="w-3 h-3 text-white/70" />
+                <Pause className={cn("w-3 h-3", isDark ? "text-white/70" : "text-slate-500")} />
               ) : (
-                <Play className="w-3 h-3 text-white/70" />
+                <Play className={cn("w-3 h-3", isDark ? "text-white/70" : "text-slate-500")} />
               )}
             </button>
           </div>
 
           {/* Progress */}
-          <div className="hidden md:flex items-center gap-2 px-3 py-2 bg-white/5 rounded-xl border border-white/10">
-            <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
+          <div className={cn(
+            "hidden md:flex items-center gap-2 px-3 py-2 rounded-xl border",
+            isDark ? "bg-white/5 border-white/10" : "bg-white border-slate-200 shadow-sm"
+          )}>
+            <div className={cn("w-20 h-2 rounded-full overflow-hidden", isDark ? "bg-white/10" : "bg-slate-200")}>
               <div
                 className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-sm text-white/70">{progressPercent}%</span>
+            <span className={cn("text-sm", isDark ? "text-white/70" : "text-slate-600")}>{progressPercent}%</span>
           </div>
+
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleLocalTheme}
+            className={cn(
+              "p-2 rounded-lg transition-colors",
+              isDark
+                ? "text-white/70 hover:text-white hover:bg-white/10"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            )}
+            title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+          >
+            {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
 
           {/* Fullscreen */}
           <button
             onClick={toggleFullscreen}
-            className="p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+            className={cn(
+              "p-2 rounded-lg transition-colors",
+              isDark
+                ? "text-white/70 hover:text-white hover:bg-white/10"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            )}
           >
             {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
           </button>
@@ -387,7 +466,9 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
               'flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all',
               completedSteps >= totalSteps || mode === 'sandbox'
                 ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700'
-                : 'bg-white/5 text-white/30 cursor-not-allowed'
+                : isDark
+                  ? 'bg-white/5 text-white/30 cursor-not-allowed'
+                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
             )}
           >
             <Send className="w-4 h-4" />
@@ -400,19 +481,26 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
       <div className="relative z-10 flex flex-1 min-h-0 overflow-hidden">
         {/* Left Panel - Procedure Guide */}
         <div className={cn(
-          'bg-black/20 backdrop-blur-xl border-r border-white/10 overflow-y-auto transition-all shrink-0 hidden md:flex flex-col',
+          'backdrop-blur-xl border-r overflow-y-auto transition-all shrink-0 hidden md:flex flex-col',
+          isDark ? 'bg-black/20 border-white/10' : 'bg-white/70 border-slate-200',
           isProcedurePanelOpen ? 'w-56 lg:w-64' : 'w-12'
         )}>
-          <div className="sticky top-0 bg-black/30 backdrop-blur-xl border-b border-white/10 z-10">
+          <div className={cn(
+            "sticky top-0 backdrop-blur-xl border-b z-10",
+            isDark ? "bg-black/30 border-white/10" : "bg-white/80 border-slate-200"
+          )}>
             <div className="flex items-center justify-between p-2">
               {isProcedurePanelOpen && (
                 <div className="flex items-center gap-1.5">
-                  <ClipboardList className="w-4 h-4 text-purple-400" />
-                  <span className="font-medium text-white text-sm">Procedure</span>
+                  <ClipboardList className="w-4 h-4 text-purple-500" />
+                  <span className={cn("font-medium text-sm", isDark ? "text-white" : "text-slate-900")}>Procedure</span>
                 </div>
               )}
               <button
-                className="p-1.5 rounded-lg hover:bg-white/10 transition-colors text-white/70"
+                className={cn(
+                  "p-1.5 rounded-lg transition-colors",
+                  isDark ? "hover:bg-white/10 text-white/70" : "hover:bg-slate-100 text-slate-600"
+                )}
                 onClick={toggleProcedurePanel}
               >
                 {isProcedurePanelOpen ? (
@@ -432,30 +520,32 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
                   className={cn(
                     'p-2 rounded-lg cursor-pointer transition-all border',
                     idx === currentStepIndex
-                      ? 'bg-purple-500/20 border-purple-500/50'
+                      ? isDark ? 'bg-purple-500/20 border-purple-500/50' : 'bg-purple-100 border-purple-300'
                       : stepCompletionStatus[idx]
-                        ? 'bg-emerald-500/10 border-emerald-500/30'
-                        : 'bg-white/5 border-transparent hover:border-white/20'
+                        ? isDark ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200'
+                        : isDark ? 'bg-white/5 border-transparent hover:border-white/20' : 'bg-slate-50 border-transparent hover:border-slate-300'
                   )}
                   onClick={() => goToStep(idx)}
                 >
                   <div className="flex items-start gap-1.5">
                     {stepCompletionStatus[idx] ? (
-                      <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                     ) : (
                       <Circle className={cn(
                         'w-4 h-4 shrink-0 mt-0.5',
-                        idx === currentStepIndex ? 'text-purple-400' : 'text-white/30'
+                        idx === currentStepIndex ? 'text-purple-500' : isDark ? 'text-white/30' : 'text-slate-400'
                       )} />
                     )}
                     <div className="flex-1 min-w-0">
                       <p className={cn(
                         'text-xs font-medium',
-                        idx === currentStepIndex ? 'text-purple-300' : 'text-white/70'
+                        idx === currentStepIndex
+                          ? isDark ? 'text-purple-300' : 'text-purple-700'
+                          : isDark ? 'text-white/70' : 'text-slate-700'
                       )}>
                         Step {step.stepNumber}
                       </p>
-                      <p className="text-xs text-white/50 line-clamp-2 mt-0.5">
+                      <p className={cn("text-xs line-clamp-2 mt-0.5", isDark ? "text-white/50" : "text-slate-500")}>
                         {step.instruction}
                       </p>
                     </div>
@@ -469,31 +559,45 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
         {/* Main Lab Area */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Current Step Instruction */}
-          <div className="mx-3 mt-3 p-4 bg-black/20 backdrop-blur-xl rounded-xl border border-white/10 shrink-0">
+          <div className={cn(
+            "mx-3 mt-3 p-4 backdrop-blur-xl rounded-xl border shrink-0",
+            isDark ? "bg-black/20 border-white/10" : "bg-white/80 border-slate-200 shadow-sm"
+          )}>
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full text-xs font-medium">
+                  <span className={cn(
+                    "px-2 py-0.5 rounded-full text-xs font-medium",
+                    isDark ? "bg-purple-500/20 text-purple-300" : "bg-purple-100 text-purple-700"
+                  )}>
                     Step {currentStep.stepNumber}
                   </span>
                   {currentStep.isCheckpoint && (
-                    <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded-full text-xs font-medium">
+                    <span className={cn(
+                      "px-2 py-0.5 rounded-full text-xs font-medium",
+                      isDark ? "bg-amber-500/20 text-amber-300" : "bg-amber-100 text-amber-700"
+                    )}>
                       {currentStep.maxMarks}m
                     </span>
                   )}
                 </div>
-                <p className="text-white">{currentStep.instruction}</p>
+                <p className={isDark ? "text-white" : "text-slate-900"}>{currentStep.instruction}</p>
                 {showHints && currentStep.hint && (
-                  <div className="mt-3 p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 flex items-start gap-2">
-                    <Lightbulb className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                    <p className="text-sm text-amber-200">{currentStep.hint}</p>
+                  <div className={cn(
+                    "mt-3 p-3 rounded-lg border flex items-start gap-2",
+                    isDark ? "bg-amber-500/10 border-amber-500/20" : "bg-amber-50 border-amber-200"
+                  )}>
+                    <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                    <p className={cn("text-sm", isDark ? "text-amber-200" : "text-amber-800")}>{currentStep.hint}</p>
                   </div>
                 )}
               </div>
               <button
                 className={cn(
                   'p-2 rounded-lg transition-colors',
-                  showHints ? 'bg-amber-500/20 text-amber-400' : 'text-white/50 hover:bg-white/10'
+                  showHints
+                    ? 'bg-amber-500/20 text-amber-500'
+                    : isDark ? 'text-white/50 hover:bg-white/10' : 'text-slate-400 hover:bg-slate-100'
                 )}
                 onClick={toggleHints}
                 title="Toggle hints"
@@ -504,7 +608,10 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
           </div>
 
           {/* Simulation Canvas */}
-          <div className="flex-1 m-3 min-h-[250px] overflow-hidden rounded-xl border border-white/10 bg-white">
+          <div className={cn(
+            "flex-1 m-3 min-h-[250px] overflow-hidden rounded-xl border bg-white",
+            isDark ? "border-white/10" : "border-slate-200 shadow-sm"
+          )}>
             {currentExperiment.simulationType === 'phet' && currentExperiment.phetSimUrl ? (
               <PhETEmbed
                 simUrl={currentExperiment.phetSimUrl}
@@ -545,15 +652,18 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
           </div>
 
           {/* Step Navigation + Data Toggle */}
-          <div className="flex items-center justify-between px-3 py-3 bg-black/20 backdrop-blur-xl border-t border-white/10 shrink-0">
+          <div className={cn(
+            "flex items-center justify-between px-3 py-3 backdrop-blur-xl border-t shrink-0",
+            isDark ? "bg-black/20 border-white/10" : "bg-white/70 border-slate-200"
+          )}>
             <button
               onClick={previousStep}
               disabled={currentStepIndex === 0}
               className={cn(
                 'flex items-center gap-1 px-3 py-2 rounded-lg font-medium transition-colors',
                 currentStepIndex === 0
-                  ? 'text-white/30 cursor-not-allowed'
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
+                  ? isDark ? 'text-white/30 cursor-not-allowed' : 'text-slate-300 cursor-not-allowed'
+                  : isDark ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               )}
             >
               <ArrowLeft className="w-4 h-4" />
@@ -562,7 +672,7 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
 
             <div className="flex items-center gap-2">
               {/* Mobile step indicator */}
-              <span className="text-xs text-white/50 md:hidden">
+              <span className={cn("text-xs md:hidden", isDark ? "text-white/50" : "text-slate-500")}>
                 {currentStepIndex + 1}/{totalSteps}
               </span>
 
@@ -572,8 +682,8 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium transition-colors',
                   showDataPanel
-                    ? 'bg-purple-500/20 text-purple-300'
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                    ? isDark ? 'bg-purple-500/20 text-purple-300' : 'bg-purple-100 text-purple-700'
+                    : isDark ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 )}
               >
                 <Table className="w-4 h-4" />
@@ -603,7 +713,7 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
               className={cn(
                 'flex items-center gap-1 px-3 py-2 rounded-lg font-medium transition-colors',
                 currentStepIndex === totalSteps - 1
-                  ? 'text-white/30 cursor-not-allowed'
+                  ? isDark ? 'text-white/30 cursor-not-allowed' : 'text-slate-300 cursor-not-allowed'
                   : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700'
               )}
             >
@@ -616,14 +726,23 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
 
       {/* Bottom Panel - Data Recording (Collapsible) */}
       {showDataPanel && (
-        <div className="relative z-10 bg-black/30 backdrop-blur-xl border-t border-white/10 shrink-0 max-h-64 overflow-hidden flex flex-col">
-          <div className="flex items-center justify-between px-4 py-2 border-b border-white/10">
+        <div className={cn(
+          "relative z-10 backdrop-blur-xl border-t shrink-0 max-h-64 overflow-hidden flex flex-col",
+          isDark ? "bg-black/30 border-white/10" : "bg-white/80 border-slate-200"
+        )}>
+          <div className={cn(
+            "flex items-center justify-between px-4 py-2 border-b",
+            isDark ? "border-white/10" : "border-slate-200"
+          )}>
             <div className="flex items-center gap-2">
-              <Table className="w-4 h-4 text-purple-400" />
-              <span className="font-medium text-white text-sm">Data Recording</span>
+              <Table className="w-4 h-4 text-purple-500" />
+              <span className={cn("font-medium text-sm", isDark ? "text-white" : "text-slate-900")}>Data Recording</span>
             </div>
             <button
-              className="p-1 rounded hover:bg-white/10 transition-colors text-white/70"
+              className={cn(
+                "p-1 rounded transition-colors",
+                isDark ? "hover:bg-white/10 text-white/70" : "hover:bg-slate-100 text-slate-600"
+              )}
               onClick={() => setShowDataPanel(false)}
             >
               <X className="w-4 h-4" />
@@ -634,29 +753,35 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Measurements */}
               <div>
-                <h4 className="text-xs font-medium text-white/70 mb-2 uppercase tracking-wide">Measurements</h4>
+                <h4 className={cn("text-xs font-medium mb-2 uppercase tracking-wide", isDark ? "text-white/70" : "text-slate-500")}>Measurements</h4>
                 {measurements.length > 0 ? (
                   <div className="space-y-1">
                     {measurements.map((m) => (
-                      <div key={m.id} className="text-xs p-2 bg-white/5 rounded-lg flex justify-between border border-white/10">
-                        <span className="font-mono text-white">{m.value} {m.unit}</span>
-                        <span className="text-white/40">Step {m.stepNumber}</span>
+                      <div key={m.id} className={cn(
+                        "text-xs p-2 rounded-lg flex justify-between border",
+                        isDark ? "bg-white/5 border-white/10" : "bg-slate-50 border-slate-200"
+                      )}>
+                        <span className={cn("font-mono", isDark ? "text-white" : "text-slate-900")}>{m.value} {m.unit}</span>
+                        <span className={isDark ? "text-white/40" : "text-slate-500"}>Step {m.stepNumber}</span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-white/40 italic">No measurements yet</p>
+                  <p className={cn("text-xs italic", isDark ? "text-white/40" : "text-slate-400")}>No measurements yet</p>
                 )}
               </div>
 
               {/* Observations */}
               <div>
-                <h4 className="text-xs font-medium text-white/70 mb-2 uppercase tracking-wide">Observations</h4>
+                <h4 className={cn("text-xs font-medium mb-2 uppercase tracking-wide", isDark ? "text-white/70" : "text-slate-500")}>Observations</h4>
                 <div className="space-y-1">
                   {observations.map((obs) => (
-                    <div key={obs.id} className="text-xs p-2 bg-white/5 rounded-lg border border-white/10">
-                      <p className="text-white/80">{obs.text}</p>
-                      <span className="text-white/40">Step {obs.stepNumber}</span>
+                    <div key={obs.id} className={cn(
+                      "text-xs p-2 rounded-lg border",
+                      isDark ? "bg-white/5 border-white/10" : "bg-slate-50 border-slate-200"
+                    )}>
+                      <p className={isDark ? "text-white/80" : "text-slate-700"}>{obs.text}</p>
+                      <span className={isDark ? "text-white/40" : "text-slate-500"}>Step {obs.stepNumber}</span>
                     </div>
                   ))}
                   <div className="flex gap-1">
@@ -665,7 +790,12 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
                       value={observationText}
                       onChange={(e) => setObservationText(e.target.value)}
                       placeholder="Add observation..."
-                      className="flex-1 text-xs px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                      className={cn(
+                        "flex-1 text-xs px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50",
+                        isDark
+                          ? "bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                          : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400"
+                      )}
                       onKeyDown={(e) => e.key === 'Enter' && handleAddObservation()}
                     />
                     <button
@@ -681,15 +811,18 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
               {/* Safety Notes */}
               {currentExperiment.safetyNotes.length > 0 && (
                 <div>
-                  <h4 className="text-xs font-medium text-white/70 mb-2 uppercase tracking-wide flex items-center gap-1">
-                    <AlertTriangle className="w-3 h-3 text-amber-400" />
+                  <h4 className={cn("text-xs font-medium mb-2 uppercase tracking-wide flex items-center gap-1", isDark ? "text-white/70" : "text-slate-500")}>
+                    <AlertTriangle className="w-3 h-3 text-amber-500" />
                     Safety Notes
                   </h4>
                   <ul className="text-xs space-y-1">
                     {currentExperiment.safetyNotes.map((note, idx) => (
-                      <li key={idx} className="flex items-start gap-1 p-2 bg-amber-500/10 rounded-lg border border-amber-500/20">
-                        <span className="text-amber-400 shrink-0">!</span>
-                        <span className="text-amber-200">{note}</span>
+                      <li key={idx} className={cn(
+                        "flex items-start gap-1 p-2 rounded-lg border",
+                        isDark ? "bg-amber-500/10 border-amber-500/20" : "bg-amber-50 border-amber-200"
+                      )}>
+                        <span className="text-amber-500 shrink-0">!</span>
+                        <span className={isDark ? "text-amber-200" : "text-amber-800"}>{note}</span>
                       </li>
                     ))}
                   </ul>
@@ -702,13 +835,19 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
 
       {/* Submit Confirmation Modal */}
       {showSubmitConfirm && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-          <div className="w-full max-w-md bg-slate-800 rounded-2xl p-6 border border-white/10 animate-in zoom-in-95 duration-200">
-            <h3 className="text-lg font-bold text-white mb-2">Submit Experiment?</h3>
-            <p className="text-white/70 mb-4">
+        <div className={cn(
+          "fixed inset-0 backdrop-blur-sm flex items-center justify-center z-[60] p-4",
+          isDark ? "bg-black/70" : "bg-slate-900/50"
+        )}>
+          <div className={cn(
+            "w-full max-w-md rounded-2xl p-6 border animate-in zoom-in-95 duration-200",
+            isDark ? "bg-slate-800 border-white/10" : "bg-white border-slate-200 shadow-xl"
+          )}>
+            <h3 className={cn("text-lg font-bold mb-2", isDark ? "text-white" : "text-slate-900")}>Submit Experiment?</h3>
+            <p className={cn("mb-4", isDark ? "text-white/70" : "text-slate-600")}>
               You have completed {completedSteps} of {totalSteps} steps.
               {completedSteps < totalSteps && (
-                <span className="text-amber-400 block mt-1">
+                <span className={cn("block mt-1", isDark ? "text-amber-400" : "text-amber-600")}>
                   Some steps are incomplete. You may lose marks.
                 </span>
               )}
@@ -716,7 +855,12 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowSubmitConfirm(false)}
-                className="px-4 py-2 bg-white/5 text-white rounded-lg hover:bg-white/10 transition-colors border border-white/10"
+                className={cn(
+                  "px-4 py-2 rounded-lg transition-colors border",
+                  isDark
+                    ? "bg-white/5 text-white border-white/10 hover:bg-white/10"
+                    : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200"
+                )}
               >
                 Continue Working
               </button>
@@ -734,16 +878,27 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
 
       {/* Exit Confirmation Modal */}
       {showExitConfirm && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-          <div className="w-full max-w-md bg-slate-800 rounded-2xl p-6 border border-white/10 animate-in zoom-in-95 duration-200">
-            <h3 className="text-lg font-bold text-white mb-2">Exit Lab?</h3>
-            <p className="text-white/70 mb-4">
+        <div className={cn(
+          "fixed inset-0 backdrop-blur-sm flex items-center justify-center z-[60] p-4",
+          isDark ? "bg-black/70" : "bg-slate-900/50"
+        )}>
+          <div className={cn(
+            "w-full max-w-md rounded-2xl p-6 border animate-in zoom-in-95 duration-200",
+            isDark ? "bg-slate-800 border-white/10" : "bg-white border-slate-200 shadow-xl"
+          )}>
+            <h3 className={cn("text-lg font-bold mb-2", isDark ? "text-white" : "text-slate-900")}>Exit Lab?</h3>
+            <p className={cn("mb-4", isDark ? "text-white/70" : "text-slate-600")}>
               Your progress will be lost if you exit now. Are you sure you want to leave?
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowExitConfirm(false)}
-                className="px-4 py-2 bg-white/5 text-white rounded-lg hover:bg-white/10 transition-colors border border-white/10"
+                className={cn(
+                  "px-4 py-2 rounded-lg transition-colors border",
+                  isDark
+                    ? "bg-white/5 text-white border-white/10 hover:bg-white/10"
+                    : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200"
+                )}
               >
                 Stay
               </button>

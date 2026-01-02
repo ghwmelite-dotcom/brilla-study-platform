@@ -17,8 +17,11 @@ import {
   VolumeX,
   FileText,
   GraduationCap,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { useThemeStore } from '@/stores';
 import { api } from '@/services/api';
 import { cn } from '@/utils';
 
@@ -49,6 +52,13 @@ export default function TakePaper() {
   const { paperId } = useParams<{ paperId: string }>();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuthStore();
+  const { resolvedTheme, setTheme } = useThemeStore();
+  const isDark = resolvedTheme === 'dark';
+
+  // Toggle theme for distraction-free mode
+  const toggleLocalTheme = () => {
+    setTheme(isDark ? 'light' : 'dark');
+  };
 
   // State
   const [paper, setPaper] = useState<PaperDetails | null>(null);
@@ -308,10 +318,15 @@ export default function TakePaper() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+      <div className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center transition-colors duration-300",
+        isDark
+          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+          : "bg-gradient-to-br from-slate-100 via-white to-slate-100"
+      )}>
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-purple-500 animate-spin mx-auto mb-4" />
-          <p className="text-white/70">Loading paper...</p>
+          <p className={isDark ? "text-white/70" : "text-slate-600"}>Loading paper...</p>
         </div>
       </div>
     );
@@ -320,13 +335,21 @@ export default function TakePaper() {
   // Error state
   if (error) {
     return (
-      <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-        <div className="bg-slate-800 rounded-2xl p-8 max-w-md text-center border border-white/10">
+      <div className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center p-4 transition-colors duration-300",
+        isDark
+          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+          : "bg-gradient-to-br from-slate-100 via-white to-slate-100"
+      )}>
+        <div className={cn(
+          "rounded-2xl p-8 max-w-md text-center border",
+          isDark ? "bg-slate-800 border-white/10" : "bg-white border-slate-200 shadow-xl"
+        )}>
           <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <AlertTriangle className="w-8 h-8 text-red-400" />
+            <AlertTriangle className="w-8 h-8 text-red-500" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">Error</h2>
-          <p className="text-white/60 mb-6">{error}</p>
+          <h2 className={cn("text-xl font-semibold mb-2", isDark ? "text-white" : "text-slate-900")}>Error</h2>
+          <p className={cn("mb-6", isDark ? "text-white/60" : "text-slate-500")}>{error}</p>
           <button
             onClick={() => navigate(-1)}
             className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-medium hover:from-purple-700 hover:to-indigo-700"
@@ -341,13 +364,24 @@ export default function TakePaper() {
   // No paper found
   if (!paper || paper.questions.length === 0) {
     return (
-      <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-        <div className="bg-slate-800 rounded-2xl p-8 max-w-md text-center border border-white/10">
-          <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <BookOpen className="w-8 h-8 text-white/30" />
+      <div className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center p-4 transition-colors duration-300",
+        isDark
+          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+          : "bg-gradient-to-br from-slate-100 via-white to-slate-100"
+      )}>
+        <div className={cn(
+          "rounded-2xl p-8 max-w-md text-center border",
+          isDark ? "bg-slate-800 border-white/10" : "bg-white border-slate-200 shadow-xl"
+        )}>
+          <div className={cn(
+            "w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4",
+            isDark ? "bg-white/5" : "bg-slate-100"
+          )}>
+            <BookOpen className={cn("w-8 h-8", isDark ? "text-white/30" : "text-slate-400")} />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">No Questions Available</h2>
-          <p className="text-white/60 mb-6">
+          <h2 className={cn("text-xl font-semibold mb-2", isDark ? "text-white" : "text-slate-900")}>No Questions Available</h2>
+          <p className={cn("mb-6", isDark ? "text-white/60" : "text-slate-500")}>
             This paper doesn't have any questions yet. Please check back later.
           </p>
           <button
@@ -364,51 +398,68 @@ export default function TakePaper() {
   // Start confirmation modal
   if (showStartConfirm) {
     return (
-      <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+      <div className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center p-4 transition-colors duration-300",
+        isDark
+          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+          : "bg-gradient-to-br from-slate-100 via-white to-slate-100"
+      )}>
         {/* Background pattern */}
-        <div className="absolute inset-0 opacity-5">
+        <div className={cn("absolute inset-0", isDark ? "opacity-5" : "opacity-10")}>
           <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 25% 25%, white 1px, transparent 1px),
-                             radial-gradient(circle at 75% 75%, white 1px, transparent 1px)`,
+            backgroundImage: isDark
+              ? `radial-gradient(circle at 25% 25%, white 1px, transparent 1px),
+                 radial-gradient(circle at 75% 75%, white 1px, transparent 1px)`
+              : `radial-gradient(circle at 25% 25%, #6366f1 1px, transparent 1px),
+                 radial-gradient(circle at 75% 75%, #8b5cf6 1px, transparent 1px)`,
             backgroundSize: '50px 50px',
           }} />
         </div>
 
-        <div className="relative bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl max-w-lg w-full p-8 border border-white/10 animate-in zoom-in-95 duration-300">
+        <div className={cn(
+          "relative backdrop-blur-xl rounded-3xl shadow-2xl max-w-lg w-full p-8 border animate-in zoom-in-95 duration-300",
+          isDark ? "bg-slate-800/80 border-white/10" : "bg-white/90 border-slate-200"
+        )}>
           <div className="text-center mb-6">
             <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
               <GraduationCap className="w-10 h-10 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">{paper.subject_name}</h2>
-            <p className="text-white/60">
+            <h2 className={cn("text-2xl font-bold mb-2", isDark ? "text-white" : "text-slate-900")}>{paper.subject_name}</h2>
+            <p className={isDark ? "text-white/60" : "text-slate-500"}>
               {paper.paper_type_name} - {paper.year}
             </p>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 mb-6 space-y-3 border border-white/10">
+          <div className={cn(
+            "backdrop-blur-sm rounded-2xl p-5 mb-6 space-y-3 border",
+            isDark ? "bg-white/5 border-white/10" : "bg-slate-50 border-slate-200"
+          )}>
             <div className="flex justify-between text-sm">
-              <span className="text-white/50">Questions</span>
-              <span className="font-medium text-white">{paper.total_questions}</span>
+              <span className={isDark ? "text-white/50" : "text-slate-500"}>Questions</span>
+              <span className={cn("font-medium", isDark ? "text-white" : "text-slate-900")}>{paper.total_questions}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-white/50">Total Marks</span>
-              <span className="font-medium text-white">{paper.total_marks}</span>
+              <span className={isDark ? "text-white/50" : "text-slate-500"}>Total Marks</span>
+              <span className={cn("font-medium", isDark ? "text-white" : "text-slate-900")}>{paper.total_marks}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-white/50">Time Allowed</span>
-              <span className="font-medium text-white">{paper.time_allowed} minutes</span>
+              <span className={isDark ? "text-white/50" : "text-slate-500"}>Time Allowed</span>
+              <span className={cn("font-medium", isDark ? "text-white" : "text-slate-900")}>{paper.time_allowed} minutes</span>
             </div>
           </div>
 
           {paper.instructions && (
             <div className="mb-6">
-              <h3 className="font-medium text-white mb-2">Instructions</h3>
-              <p className="text-sm text-white/60">{paper.instructions}</p>
+              <h3 className={cn("font-medium mb-2", isDark ? "text-white" : "text-slate-900")}>Instructions</h3>
+              <p className={cn("text-sm", isDark ? "text-white/60" : "text-slate-500")}>{paper.instructions}</p>
             </div>
           )}
 
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 mb-6">
-            <p className="text-sm text-amber-300">
+          <div className={cn(
+            "rounded-2xl p-4 mb-6 border",
+            isDark ? "bg-amber-500/10 border-amber-500/20" : "bg-amber-50 border-amber-200"
+          )}>
+            <p className={cn("text-sm", isDark ? "text-amber-300" : "text-amber-800")}>
               <strong>Important:</strong> Once you start, the timer will begin. Make sure you have a
               stable internet connection and enough time to complete the paper.
             </p>
@@ -417,7 +468,12 @@ export default function TakePaper() {
           <div className="flex gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="flex-1 py-3.5 px-4 bg-white/5 text-white rounded-xl hover:bg-white/10 font-medium transition-colors border border-white/10"
+              className={cn(
+                "flex-1 py-3.5 px-4 rounded-xl font-medium transition-colors border",
+                isDark
+                  ? "bg-white/5 text-white border-white/10 hover:bg-white/10"
+                  : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200"
+              )}
             >
               Cancel
             </button>
@@ -434,25 +490,41 @@ export default function TakePaper() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col overflow-hidden">
+    <div className={cn(
+      "fixed inset-0 z-50 flex flex-col overflow-hidden transition-colors duration-300",
+      isDark
+        ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+        : "bg-gradient-to-br from-slate-100 via-white to-slate-100"
+    )}>
       {/* Background pattern */}
-      <div className="absolute inset-0 opacity-5">
+      <div className={cn("absolute inset-0 pointer-events-none", isDark ? "opacity-5" : "opacity-10")}>
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 25% 25%, white 1px, transparent 1px),
-                           radial-gradient(circle at 75% 75%, white 1px, transparent 1px)`,
+          backgroundImage: isDark
+            ? `radial-gradient(circle at 25% 25%, white 1px, transparent 1px),
+               radial-gradient(circle at 75% 75%, white 1px, transparent 1px)`
+            : `radial-gradient(circle at 25% 25%, #6366f1 1px, transparent 1px),
+               radial-gradient(circle at 75% 75%, #8b5cf6 1px, transparent 1px)`,
           backgroundSize: '50px 50px',
         }} />
       </div>
 
       {/* Header */}
-      <header className="relative z-10 bg-black/20 backdrop-blur-xl border-b border-white/10">
+      <header className={cn(
+        "relative z-10 backdrop-blur-xl border-b",
+        isDark ? "bg-black/20 border-white/10" : "bg-white/70 border-slate-200 shadow-sm"
+      )}>
         <div className="px-4 lg:px-6 py-3">
           <div className="flex items-center justify-between">
             {/* Left: Exit & Title */}
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setShowExitConfirm(true)}
-                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all group"
+                className={cn(
+                  "p-2 rounded-xl transition-all group",
+                  isDark
+                    ? "bg-white/5 hover:bg-white/10 text-white/70 hover:text-white"
+                    : "bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900"
+                )}
               >
                 <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
               </button>
@@ -463,10 +535,10 @@ export default function TakePaper() {
                     <FileText className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <h1 className="font-semibold text-white text-sm lg:text-base line-clamp-1">
+                    <h1 className={cn("font-semibold text-sm lg:text-base line-clamp-1", isDark ? "text-white" : "text-slate-900")}>
                       {paper.subject_name}
                     </h1>
-                    <p className="text-xs text-white/50">{paper.paper_type_name} - {paper.year}</p>
+                    <p className={cn("text-xs", isDark ? "text-white/50" : "text-slate-500")}>{paper.paper_type_name} - {paper.year}</p>
                   </div>
                 </div>
               </div>
@@ -475,16 +547,16 @@ export default function TakePaper() {
             {/* Center: Progress */}
             <div className="flex-1 max-w-md mx-4 hidden md:block">
               <div className="flex items-center gap-3">
-                <span className="text-xs text-white/50 whitespace-nowrap">
+                <span className={cn("text-xs whitespace-nowrap", isDark ? "text-white/50" : "text-slate-500")}>
                   {progress.answered}/{progress.total}
                 </span>
-                <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                <div className={cn("flex-1 h-2 rounded-full overflow-hidden", isDark ? "bg-white/10" : "bg-slate-200")}>
                   <div
                     className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-purple-500 to-indigo-500"
                     style={{ width: `${progress.percentage}%` }}
                   />
                 </div>
-                <span className="text-xs text-white/50 whitespace-nowrap">
+                <span className={cn("text-xs whitespace-nowrap", isDark ? "text-white/50" : "text-slate-500")}>
                   {progress.percentage}%
                 </span>
               </div>
@@ -498,10 +570,10 @@ export default function TakePaper() {
                   className={cn(
                     'flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl font-mono font-bold text-sm lg:text-base transition-all',
                     isTimeCritical
-                      ? 'bg-red-500/20 text-red-400 animate-pulse'
+                      ? 'bg-red-500/20 text-red-500 animate-pulse'
                       : isTimeWarning
-                        ? 'bg-amber-500/20 text-amber-400'
-                        : 'bg-white/10 text-white'
+                        ? 'bg-amber-500/20 text-amber-500'
+                        : isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-900'
                   )}
                 >
                   <Clock className="w-4 h-4" />
@@ -511,24 +583,48 @@ export default function TakePaper() {
 
               {/* Saving indicator */}
               {isSaving && (
-                <span className="text-xs text-white/50 flex items-center gap-1">
+                <span className={cn("text-xs flex items-center gap-1", isDark ? "text-white/50" : "text-slate-500")}>
                   <Loader2 className="w-3 h-3 animate-spin" />
                   Saving
                 </span>
               )}
 
+              {/* Theme toggle */}
+              <button
+                onClick={toggleLocalTheme}
+                className={cn(
+                  "p-2 rounded-lg transition-all hidden lg:flex",
+                  isDark
+                    ? "bg-white/5 hover:bg-white/10 text-white/70 hover:text-white"
+                    : "bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900"
+                )}
+                title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+              >
+                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
+
               {/* Control buttons */}
               <div className="hidden lg:flex items-center gap-1">
                 <button
                   onClick={() => setSoundEnabled(!soundEnabled)}
-                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all"
+                  className={cn(
+                    "p-2 rounded-lg transition-all",
+                    isDark
+                      ? "bg-white/5 hover:bg-white/10 text-white/70 hover:text-white"
+                      : "bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900"
+                  )}
                   title={soundEnabled ? 'Mute' : 'Unmute'}
                 >
                   {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                 </button>
                 <button
                   onClick={toggleFullscreen}
-                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all"
+                  className={cn(
+                    "p-2 rounded-lg transition-all",
+                    isDark
+                      ? "bg-white/5 hover:bg-white/10 text-white/70 hover:text-white"
+                      : "bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900"
+                  )}
                   title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
                 >
                   {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -553,7 +649,7 @@ export default function TakePaper() {
         </div>
 
         {/* Mobile progress bar */}
-        <div className="md:hidden h-1 bg-white/10">
+        <div className={cn("md:hidden h-1", isDark ? "bg-white/10" : "bg-slate-200")}>
           <div
             className="h-full transition-all duration-500 bg-gradient-to-r from-purple-500 to-indigo-500"
             style={{ width: `${progress.percentage}%` }}
@@ -569,35 +665,41 @@ export default function TakePaper() {
             <div className="max-w-4xl mx-auto">
               {/* Question indicator - mobile */}
               <div className="md:hidden mb-4 flex items-center justify-between">
-                <span className="text-white/70 text-sm">
+                <span className={cn("text-sm", isDark ? "text-white/70" : "text-slate-600")}>
                   Question {currentQuestionIndex + 1} of {paper.questions.length}
                 </span>
                 <button
                   onClick={() => setShowQuestionPanel(true)}
-                  className="px-3 py-1.5 rounded-lg bg-white/10 text-white text-sm"
+                  className={cn(
+                    "px-3 py-1.5 rounded-lg text-sm",
+                    isDark ? "bg-white/10 text-white" : "bg-slate-200 text-slate-700"
+                  )}
                 >
                   View All
                 </button>
               </div>
 
               {/* Main content card */}
-              <div className="bg-white/[0.03] backdrop-blur-sm rounded-2xl lg:rounded-3xl border border-white/10 overflow-hidden p-6 lg:p-8">
+              <div className={cn(
+                "backdrop-blur-sm rounded-2xl lg:rounded-3xl border overflow-hidden p-6 lg:p-8",
+                isDark ? "bg-white/[0.03] border-white/10" : "bg-white/80 border-slate-200 shadow-lg"
+              )}>
                 {/* Question Header */}
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-white/50">
+                    <span className={cn("text-sm font-semibold", isDark ? "text-white/50" : "text-slate-500")}>
                       Question {currentQuestionIndex + 1}
                       {currentQuestion?.section && ` (Section ${currentQuestion.section})`}
                     </span>
                   </div>
-                  <span className="text-sm text-white/50">
+                  <span className={cn("text-sm", isDark ? "text-white/50" : "text-slate-500")}>
                     {currentQuestion?.marks || 1} mark{(currentQuestion?.marks || 1) !== 1 ? 's' : ''}
                   </span>
                 </div>
 
                 {/* Question Text */}
                 <div className="mb-8">
-                  <p className="text-lg lg:text-xl text-white leading-relaxed whitespace-pre-wrap">
+                  <p className={cn("text-lg lg:text-xl leading-relaxed whitespace-pre-wrap", isDark ? "text-white" : "text-slate-900")}>
                     {currentQuestion?.question_text}
                   </p>
                 </div>
@@ -615,14 +717,20 @@ export default function TakePaper() {
                           onClick={() => handleAnswerChange(option.text)}
                           className={cn(
                             'w-full flex items-center gap-4 p-4 lg:p-5 rounded-2xl border-2 text-left transition-all group',
-                            !isSelected && 'border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.05]',
-                            isSelected && 'border-purple-500/50 bg-purple-500/10'
+                            !isSelected && (isDark
+                              ? 'border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.05]'
+                              : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100'),
+                            isSelected && (isDark
+                              ? 'border-purple-500/50 bg-purple-500/10'
+                              : 'border-purple-400 bg-purple-50')
                           )}
                         >
                           <span
                             className={cn(
                               'w-10 h-10 rounded-xl flex items-center justify-center font-semibold text-sm transition-all shrink-0',
-                              !isSelected && 'bg-white/10 text-white/70 group-hover:bg-white/20',
+                              !isSelected && (isDark
+                                ? 'bg-white/10 text-white/70 group-hover:bg-white/20'
+                                : 'bg-slate-200 text-slate-600 group-hover:bg-slate-300'),
                               isSelected && 'bg-purple-500 text-white'
                             )}
                           >
@@ -630,13 +738,13 @@ export default function TakePaper() {
                           </span>
                           <span className={cn(
                             'flex-1 text-base lg:text-lg',
-                            !isSelected && 'text-white/80',
-                            isSelected && 'text-white'
+                            !isSelected && (isDark ? 'text-white/80' : 'text-slate-700'),
+                            isSelected && (isDark ? 'text-white' : 'text-slate-900')
                           )}>
                             {option.text}
                           </span>
                           {isSelected && (
-                            <CheckCircle className="w-6 h-6 text-purple-400 shrink-0" />
+                            <CheckCircle className="w-6 h-6 text-purple-500 shrink-0" />
                           )}
                         </button>
                       );
@@ -656,8 +764,12 @@ export default function TakePaper() {
                           onClick={() => handleAnswerChange(option.toLowerCase())}
                           className={cn(
                             'flex-1 py-5 rounded-2xl font-semibold text-lg border-2 transition-all',
-                            !isSelected && 'border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20 hover:bg-white/[0.05]',
-                            isSelected && 'border-purple-500/50 bg-purple-500/10 text-purple-400'
+                            !isSelected && (isDark
+                              ? 'border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20 hover:bg-white/[0.05]'
+                              : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-slate-100'),
+                            isSelected && (isDark
+                              ? 'border-purple-500/50 bg-purple-500/10 text-purple-400'
+                              : 'border-purple-400 bg-purple-50 text-purple-700')
                           )}
                         >
                           {option}
@@ -674,7 +786,12 @@ export default function TakePaper() {
                     value={answers[currentQuestion.id] || ''}
                     onChange={(e) => handleAnswerChange(e.target.value)}
                     placeholder="Type your answer here..."
-                    className="w-full px-5 py-4 rounded-2xl border-2 bg-white/[0.02] text-white text-lg placeholder:text-white/30 focus:outline-none border-white/10 focus:border-purple-500/50 focus:bg-white/[0.05] transition-all"
+                    className={cn(
+                      "w-full px-5 py-4 rounded-2xl border-2 text-lg focus:outline-none transition-all",
+                      isDark
+                        ? "bg-white/[0.02] text-white placeholder:text-white/30 border-white/10 focus:border-purple-500/50 focus:bg-white/[0.05]"
+                        : "bg-white text-slate-900 placeholder:text-slate-400 border-slate-200 focus:border-purple-400 focus:bg-white"
+                    )}
                   />
                 )}
 
@@ -685,7 +802,12 @@ export default function TakePaper() {
                     onChange={(e) => handleAnswerChange(e.target.value)}
                     placeholder="Write your answer here..."
                     rows={8}
-                    className="w-full px-5 py-4 rounded-2xl border-2 bg-white/[0.02] text-white text-base placeholder:text-white/30 focus:outline-none border-white/10 focus:border-purple-500/50 focus:bg-white/[0.05] transition-all resize-none"
+                    className={cn(
+                      "w-full px-5 py-4 rounded-2xl border-2 text-base focus:outline-none transition-all resize-none",
+                      isDark
+                        ? "bg-white/[0.02] text-white placeholder:text-white/30 border-white/10 focus:border-purple-500/50 focus:bg-white/[0.05]"
+                        : "bg-white text-slate-900 placeholder:text-slate-400 border-slate-200 focus:border-purple-400 focus:bg-white"
+                    )}
                   />
                 )}
               </div>
@@ -694,10 +816,13 @@ export default function TakePaper() {
         </div>
 
         {/* Question Navigator Sidebar - Desktop */}
-        <aside className="hidden lg:flex w-72 xl:w-80 bg-black/20 backdrop-blur-xl border-l border-white/10 flex-col">
-          <div className="p-4 border-b border-white/10">
-            <h3 className="font-semibold text-white text-sm">Question Navigator</h3>
-            <p className="text-xs text-white/50 mt-1">
+        <aside className={cn(
+          "hidden lg:flex w-72 xl:w-80 backdrop-blur-xl border-l flex-col",
+          isDark ? "bg-black/20 border-white/10" : "bg-white/70 border-slate-200"
+        )}>
+          <div className={cn("p-4 border-b", isDark ? "border-white/10" : "border-slate-200")}>
+            <h3 className={cn("font-semibold text-sm", isDark ? "text-white" : "text-slate-900")}>Question Navigator</h3>
+            <p className={cn("text-xs mt-1", isDark ? "text-white/50" : "text-slate-500")}>
               {progress.answered} of {progress.total} answered
             </p>
           </div>
@@ -714,16 +839,23 @@ export default function TakePaper() {
                     onClick={() => goToQuestion(index)}
                     className={cn(
                       'aspect-square rounded-xl font-medium text-sm transition-all relative',
-                      isCurrent && 'ring-2 ring-white ring-offset-2 ring-offset-slate-900',
-                      status === 'answered' && !isCurrent && 'bg-emerald-500/20 text-emerald-400',
-                      status === 'review' && 'bg-amber-500/20 text-amber-400',
-                      status === 'unanswered' && !isCurrent && 'bg-white/5 text-white/50 hover:bg-white/10',
-                      isCurrent && 'bg-white text-slate-900'
+                      isCurrent && (isDark
+                        ? 'ring-2 ring-white ring-offset-2 ring-offset-slate-900 bg-white text-slate-900'
+                        : 'ring-2 ring-purple-500 ring-offset-2 ring-offset-white bg-purple-500 text-white'),
+                      status === 'answered' && !isCurrent && (isDark
+                        ? 'bg-emerald-500/20 text-emerald-400'
+                        : 'bg-emerald-100 text-emerald-700'),
+                      status === 'review' && (isDark
+                        ? 'bg-amber-500/20 text-amber-400'
+                        : 'bg-amber-100 text-amber-700'),
+                      status === 'unanswered' && !isCurrent && (isDark
+                        ? 'bg-white/5 text-white/50 hover:bg-white/10'
+                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200')
                     )}
                   >
                     {index + 1}
                     {status === 'review' && (
-                      <Flag className="absolute -top-1 -right-1 w-3 h-3 text-amber-400" />
+                      <Flag className="absolute -top-1 -right-1 w-3 h-3 text-amber-500" />
                     )}
                   </button>
                 );
@@ -732,25 +864,28 @@ export default function TakePaper() {
           </div>
 
           {/* Legend */}
-          <div className="p-4 border-t border-white/10 space-y-2">
+          <div className={cn("p-4 border-t space-y-2", isDark ? "border-white/10" : "border-slate-200")}>
             <div className="flex items-center gap-2 text-xs">
-              <div className="w-4 h-4 rounded bg-emerald-500/20" />
-              <span className="text-white/70">Answered</span>
+              <div className={cn("w-4 h-4 rounded", isDark ? "bg-emerald-500/20" : "bg-emerald-100")} />
+              <span className={isDark ? "text-white/70" : "text-slate-600"}>Answered</span>
             </div>
             <div className="flex items-center gap-2 text-xs">
-              <div className="w-4 h-4 rounded bg-amber-500/20" />
-              <span className="text-white/70">Marked for Review</span>
+              <div className={cn("w-4 h-4 rounded", isDark ? "bg-amber-500/20" : "bg-amber-100")} />
+              <span className={isDark ? "text-white/70" : "text-slate-600"}>Marked for Review</span>
             </div>
             <div className="flex items-center gap-2 text-xs">
-              <div className="w-4 h-4 rounded bg-white/5" />
-              <span className="text-white/70">Not Answered</span>
+              <div className={cn("w-4 h-4 rounded", isDark ? "bg-white/5" : "bg-slate-100")} />
+              <span className={isDark ? "text-white/70" : "text-slate-600"}>Not Answered</span>
             </div>
           </div>
         </aside>
       </main>
 
       {/* Bottom Navigation Bar */}
-      <footer className="relative z-10 bg-black/20 backdrop-blur-xl border-t border-white/10">
+      <footer className={cn(
+        "relative z-10 backdrop-blur-xl border-t",
+        isDark ? "bg-black/20 border-white/10" : "bg-white/70 border-slate-200"
+      )}>
         <div className="px-4 lg:px-6 py-3">
           <div className="flex items-center justify-between max-w-4xl mx-auto">
             {/* Previous */}
@@ -760,8 +895,8 @@ export default function TakePaper() {
               className={cn(
                 'flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all',
                 currentQuestionIndex === 0
-                  ? 'text-white/30 cursor-not-allowed'
-                  : 'text-white bg-white/5 hover:bg-white/10'
+                  ? isDark ? 'text-white/30 cursor-not-allowed' : 'text-slate-300 cursor-not-allowed'
+                  : isDark ? 'text-white bg-white/5 hover:bg-white/10' : 'text-slate-700 bg-slate-100 hover:bg-slate-200'
               )}
             >
               <ChevronLeft className="w-5 h-5" />
@@ -774,8 +909,8 @@ export default function TakePaper() {
               className={cn(
                 'flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all',
                 currentQuestion && markedForReview.has(currentQuestion.id)
-                  ? 'bg-amber-500/20 text-amber-400'
-                  : 'text-white/70 bg-white/5 hover:bg-white/10'
+                  ? isDark ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'
+                  : isDark ? 'text-white/70 bg-white/5 hover:bg-white/10' : 'text-slate-600 bg-slate-100 hover:bg-slate-200'
               )}
             >
               <Flag className="w-4 h-4" />
@@ -807,21 +942,27 @@ export default function TakePaper() {
       {/* Exit Confirmation Modal */}
       {showExitConfirm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowExitConfirm(false)} />
-          <div className="relative bg-slate-800 rounded-2xl shadow-2xl p-6 max-w-md w-full border border-white/10 animate-in zoom-in-95 duration-200">
+          <div className={cn("absolute inset-0 backdrop-blur-sm", isDark ? "bg-black/60" : "bg-slate-900/50")} onClick={() => setShowExitConfirm(false)} />
+          <div className={cn(
+            "relative rounded-2xl shadow-2xl p-6 max-w-md w-full border animate-in zoom-in-95 duration-200",
+            isDark ? "bg-slate-800 border-white/10" : "bg-white border-slate-200"
+          )}>
             <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle className="w-8 h-8 text-red-400" />
+              <AlertTriangle className="w-8 h-8 text-red-500" />
             </div>
-            <h3 className="text-xl font-bold text-white text-center mb-2">
+            <h3 className={cn("text-xl font-bold text-center mb-2", isDark ? "text-white" : "text-slate-900")}>
               Exit Paper?
             </h3>
-            <p className="text-white/60 text-center mb-6">
+            <p className={cn("text-center mb-6", isDark ? "text-white/60" : "text-slate-500")}>
               Your progress will be lost. Are you sure you want to exit?
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowExitConfirm(false)}
-                className="flex-1 py-3 rounded-xl bg-white/5 text-white font-medium hover:bg-white/10 transition-colors"
+                className={cn(
+                  "flex-1 py-3 rounded-xl font-medium transition-colors",
+                  isDark ? "bg-white/5 text-white hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                )}
               >
                 Continue
               </button>
@@ -839,15 +980,18 @@ export default function TakePaper() {
       {/* Submit Confirmation Modal */}
       {showSubmitConfirm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowSubmitConfirm(false)} />
-          <div className="relative bg-slate-800 rounded-2xl shadow-2xl p-6 max-w-md w-full border border-white/10 animate-in zoom-in-95 duration-200">
+          <div className={cn("absolute inset-0 backdrop-blur-sm", isDark ? "bg-black/60" : "bg-slate-900/50")} onClick={() => setShowSubmitConfirm(false)} />
+          <div className={cn(
+            "relative rounded-2xl shadow-2xl p-6 max-w-md w-full border animate-in zoom-in-95 duration-200",
+            isDark ? "bg-slate-800 border-white/10" : "bg-white border-slate-200"
+          )}>
             <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Send className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-xl font-bold text-white text-center mb-2">
+            <h3 className={cn("text-xl font-bold text-center mb-2", isDark ? "text-white" : "text-slate-900")}>
               Submit Paper?
             </h3>
-            <p className="text-white/60 text-center mb-4">
+            <p className={cn("text-center mb-4", isDark ? "text-white/60" : "text-slate-500")}>
               {progress.answered < progress.total
                 ? `You have ${progress.total - progress.answered} unanswered questions.`
                 : 'You have answered all questions.'}
@@ -855,20 +999,23 @@ export default function TakePaper() {
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="bg-white/5 rounded-xl p-3 text-center">
-                <p className="text-2xl font-bold text-white">{progress.answered}</p>
-                <p className="text-xs text-white/50">Answered</p>
+              <div className={cn("rounded-xl p-3 text-center", isDark ? "bg-white/5" : "bg-slate-100")}>
+                <p className={cn("text-2xl font-bold", isDark ? "text-white" : "text-slate-900")}>{progress.answered}</p>
+                <p className={cn("text-xs", isDark ? "text-white/50" : "text-slate-500")}>Answered</p>
               </div>
-              <div className="bg-white/5 rounded-xl p-3 text-center">
-                <p className="text-2xl font-bold text-white">{progress.total - progress.answered}</p>
-                <p className="text-xs text-white/50">Unanswered</p>
+              <div className={cn("rounded-xl p-3 text-center", isDark ? "bg-white/5" : "bg-slate-100")}>
+                <p className={cn("text-2xl font-bold", isDark ? "text-white" : "text-slate-900")}>{progress.total - progress.answered}</p>
+                <p className={cn("text-xs", isDark ? "text-white/50" : "text-slate-500")}>Unanswered</p>
               </div>
             </div>
 
             <div className="flex gap-3">
               <button
                 onClick={() => setShowSubmitConfirm(false)}
-                className="flex-1 py-3 rounded-xl bg-white/5 text-white font-medium hover:bg-white/10 transition-colors"
+                className={cn(
+                  "flex-1 py-3 rounded-xl font-medium transition-colors",
+                  isDark ? "bg-white/5 text-white hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                )}
               >
                 Review
               </button>
@@ -891,15 +1038,18 @@ export default function TakePaper() {
       {/* Time Warning Modal */}
       {showTimeWarning && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <div className="relative bg-slate-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full border border-amber-500/20 animate-in zoom-in-95 duration-200">
+          <div className={cn("absolute inset-0 backdrop-blur-sm", isDark ? "bg-black/60" : "bg-slate-900/50")} />
+          <div className={cn(
+            "relative rounded-2xl shadow-2xl p-6 max-w-sm w-full border animate-in zoom-in-95 duration-200",
+            isDark ? "bg-slate-800 border-amber-500/20" : "bg-white border-amber-300"
+          )}>
             <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Clock className="w-8 h-8 text-amber-400 animate-pulse" />
+              <Clock className="w-8 h-8 text-amber-500 animate-pulse" />
             </div>
-            <h3 className="text-xl font-bold text-white text-center mb-2">
+            <h3 className={cn("text-xl font-bold text-center mb-2", isDark ? "text-white" : "text-slate-900")}>
               5 Minutes Remaining
             </h3>
-            <p className="text-white/60 text-center mb-6">
+            <p className={cn("text-center mb-6", isDark ? "text-white/60" : "text-slate-500")}>
               You have 5 minutes left to complete and submit your paper.
             </p>
             <button
@@ -915,10 +1065,13 @@ export default function TakePaper() {
       {/* Mobile Question Panel */}
       {showQuestionPanel && (
         <div className="fixed inset-0 z-[60] lg:hidden">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowQuestionPanel(false)} />
-          <div className="absolute inset-x-0 bottom-0 bg-slate-800 rounded-t-3xl border-t border-white/10 p-4 animate-in slide-in-from-bottom duration-300">
-            <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4" />
-            <h3 className="font-semibold text-white mb-4">Questions</h3>
+          <div className={cn("absolute inset-0 backdrop-blur-sm", isDark ? "bg-black/60" : "bg-slate-900/50")} onClick={() => setShowQuestionPanel(false)} />
+          <div className={cn(
+            "absolute inset-x-0 bottom-0 rounded-t-3xl border-t p-4 animate-in slide-in-from-bottom duration-300",
+            isDark ? "bg-slate-800 border-white/10" : "bg-white border-slate-200"
+          )}>
+            <div className={cn("w-12 h-1 rounded-full mx-auto mb-4", isDark ? "bg-white/20" : "bg-slate-300")} />
+            <h3 className={cn("font-semibold mb-4", isDark ? "text-white" : "text-slate-900")}>Questions</h3>
             <div className="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto pb-4">
               {paper.questions.map((q, index) => {
                 const status = getQuestionStatus(q);
@@ -933,10 +1086,18 @@ export default function TakePaper() {
                     }}
                     className={cn(
                       'aspect-square rounded-xl font-medium text-sm transition-all',
-                      isCurrent && 'ring-2 ring-white bg-white text-slate-900',
-                      status === 'answered' && !isCurrent && 'bg-emerald-500/20 text-emerald-400',
-                      status === 'review' && 'bg-amber-500/20 text-amber-400',
-                      status === 'unanswered' && !isCurrent && 'bg-white/5 text-white/50'
+                      isCurrent && (isDark
+                        ? 'ring-2 ring-white bg-white text-slate-900'
+                        : 'ring-2 ring-purple-500 bg-purple-500 text-white'),
+                      status === 'answered' && !isCurrent && (isDark
+                        ? 'bg-emerald-500/20 text-emerald-400'
+                        : 'bg-emerald-100 text-emerald-700'),
+                      status === 'review' && (isDark
+                        ? 'bg-amber-500/20 text-amber-400'
+                        : 'bg-amber-100 text-amber-700'),
+                      status === 'unanswered' && !isCurrent && (isDark
+                        ? 'bg-white/5 text-white/50'
+                        : 'bg-slate-100 text-slate-500')
                     )}
                   >
                     {index + 1}
