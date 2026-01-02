@@ -458,6 +458,24 @@ function App() {
           }
         />
 
+        {/* Past Papers & Mock Exams - distraction-free (no layout) */}
+        <Route
+          path="/past-papers/:paperId"
+          element={
+            <ProtectedRoute>
+              <LazyPage><TakePaper /></LazyPage>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/mock-exams/:paperId"
+          element={
+            <ProtectedRoute>
+              <LazyPage><TakePaper /></LazyPage>
+            </ProtectedRoute>
+          }
+        />
+
         {/* Main app routes (with layout) */}
         <Route element={<Layout />}>
           <Route
@@ -583,14 +601,6 @@ function App() {
           />
           <Route path="past-papers" element={<LazyPage><PastPapersPage /></LazyPage>} />
           <Route
-            path="past-papers/:paperId"
-            element={
-              <ProtectedRoute>
-                <LazyPage><TakePaper /></LazyPage>
-              </ProtectedRoute>
-            }
-          />
-          <Route
             path="past-papers/results/:attemptId"
             element={
               <ProtectedRoute>
@@ -599,14 +609,6 @@ function App() {
             }
           />
           <Route path="mock-exams" element={<LazyPage><MockExamsPage /></LazyPage>} />
-          <Route
-            path="mock-exams/:paperId"
-            element={
-              <ProtectedRoute>
-                <LazyPage><TakePaper /></LazyPage>
-              </ProtectedRoute>
-            }
-          />
           <Route path="catalog" element={<LazyPage><SubjectCatalogPage /></LazyPage>} />
           <Route
             path="virtual-lab"
