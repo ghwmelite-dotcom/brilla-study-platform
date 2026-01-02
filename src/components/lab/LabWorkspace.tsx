@@ -33,6 +33,15 @@ import {
   MicroscopeSimulation,
   FoodTestsSimulation,
   OsmosisSimulation,
+  SpecificHeatSimulation,
+  ElectrolysisSimulation,
+  ReactionRateSimulation,
+  CrystallizationSimulation,
+  GasTestsSimulation,
+  PhotosynthesisSimulation,
+  EnzymeSimulation,
+  TranspirationSimulation,
+  DissectionSimulation,
 } from './simulations';
 import { useLabStore, useThemeStore, useUIStore } from '@/stores';
 import { cn } from '@/utils';
@@ -646,9 +655,54 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
               <FoodTestsSimulation
                 onObservation={(text) => addObservation(text)}
               />
-            ) : currentExperiment.id === 'exp_osmosis_cells' ||
-                 currentExperiment.slug === 'osmosis-in-cells' ? (
+            ) : currentExperiment.id === 'exp_osmosis' ||
+                 currentExperiment.slug === 'osmosis-cells' ? (
               <OsmosisSimulation
+                onObservation={(text) => addObservation(text)}
+              />
+            ) : currentExperiment.id === 'exp_specific_heat_capacity' ||
+                 currentExperiment.slug === 'specific-heat-capacity' ? (
+              <SpecificHeatSimulation
+                onObservation={(text) => addObservation(text)}
+              />
+            ) : currentExperiment.id === 'exp_electrolysis_brine' ||
+                 currentExperiment.slug === 'electrolysis-brine' ? (
+              <ElectrolysisSimulation
+                onObservation={(text) => addObservation(text)}
+              />
+            ) : currentExperiment.id === 'exp_rate_of_reaction' ||
+                 currentExperiment.slug === 'rate-of-reaction' ? (
+              <ReactionRateSimulation
+                onObservation={(text) => addObservation(text)}
+              />
+            ) : currentExperiment.id === 'exp_crystal_preparation' ||
+                 currentExperiment.slug === 'crystal-preparation' ? (
+              <CrystallizationSimulation
+                onObservation={(text) => addObservation(text)}
+              />
+            ) : currentExperiment.id === 'exp_gas_tests' ||
+                 currentExperiment.slug === 'gas-tests' ? (
+              <GasTestsSimulation
+                onObservation={(text) => addObservation(text)}
+              />
+            ) : currentExperiment.id === 'exp_photosynthesis' ||
+                 currentExperiment.slug === 'photosynthesis' ? (
+              <PhotosynthesisSimulation
+                onObservation={(text) => addObservation(text)}
+              />
+            ) : currentExperiment.id === 'exp_enzyme_activity' ||
+                 currentExperiment.slug === 'enzyme-activity' ? (
+              <EnzymeSimulation
+                onObservation={(text) => addObservation(text)}
+              />
+            ) : currentExperiment.id === 'exp_transpiration' ||
+                 currentExperiment.slug === 'transpiration' ? (
+              <TranspirationSimulation
+                onObservation={(text) => addObservation(text)}
+              />
+            ) : currentExperiment.id === 'exp_dissection' ||
+                 currentExperiment.slug === 'virtual-dissection' ? (
+              <DissectionSimulation
                 onObservation={(text) => addObservation(text)}
               />
             ) : (
