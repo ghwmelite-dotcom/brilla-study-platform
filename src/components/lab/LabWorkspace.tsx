@@ -413,19 +413,23 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
                   title={currentExperiment.name}
                   guidanceNotes={currentExperiment.safetyNotes}
                 />
-              ) : currentExperiment.id === 'exp_acid_base_titration' ? (
+              ) : currentExperiment.id === 'exp_acid_base_titration' ||
+                   currentExperiment.slug === 'acid-base-titration' ? (
                 <TitrationSimulation
                   onObservation={(text) => addObservation(text)}
                 />
-              ) : currentExperiment.id === 'exp_qualitative_analysis' ? (
+              ) : currentExperiment.id === 'exp_qualitative_analysis' ||
+                   currentExperiment.slug === 'qualitative-analysis' ? (
                 <QualitativeAnalysisSimulation
                   onObservation={(text) => addObservation(text)}
                 />
-              ) : currentExperiment.id === 'exp_microscope_use' ? (
+              ) : currentExperiment.id === 'exp_microscope_use' ||
+                   currentExperiment.slug === 'microscope-use' ? (
                 <MicroscopeSimulation
                   onObservation={(text) => addObservation(text)}
                 />
-              ) : currentExperiment.id === 'exp_food_tests' ? (
+              ) : currentExperiment.id === 'exp_food_tests' ||
+                   currentExperiment.slug === 'food-tests' ? (
                 <FoodTestsSimulation
                   onObservation={(text) => addObservation(text)}
                 />

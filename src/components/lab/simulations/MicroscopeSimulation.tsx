@@ -62,9 +62,9 @@ export function MicroscopeSimulation({ onMeasurement, onObservation }: Microscop
   const [fineFocus, setFineFocus] = useState(50);
   const [lightIntensity, setLightIntensity] = useState(50);
   const [slidePosition, setSlidePosition] = useState({ x: 50, y: 50 });
-  const [hasSlide, setHasSlide] = useState(false);
-  const [isLightOn, setIsLightOn] = useState(false);
-  const [completedSteps, setCompletedSteps] = useState<string[]>([]);
+  const [hasSlide, setHasSlide] = useState(true); // Start with slide placed
+  const [isLightOn, setIsLightOn] = useState(true); // Start with light on
+  const [completedSteps, setCompletedSteps] = useState<string[]>(['slide', 'light']); // Mark as completed
 
   const viewRef = useRef<HTMLDivElement>(null);
 
