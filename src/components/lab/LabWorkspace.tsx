@@ -90,6 +90,7 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
   const [results, setResults] = useState<GradingResult | null>(null);
   const [showDataPanel, setShowDataPanel] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showMobileProcedure, setShowMobileProcedure] = useState(false);
 
   // Toggle theme for distraction-free mode
   const toggleLocalTheme = () => {
@@ -738,10 +739,17 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
             </button>
 
             <div className="flex items-center gap-2">
-              {/* Mobile step indicator */}
-              <span className={cn("text-xs md:hidden", isDark ? "text-white/50" : "text-slate-500")}>
-                {currentStepIndex + 1}/{totalSteps}
-              </span>
+              {/* Mobile procedure button */}
+              <button
+                onClick={() => setShowMobileProcedure(true)}
+                className={cn(
+                  "md:hidden flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium transition-colors",
+                  isDark ? "text-white/70 hover:text-white hover:bg-white/10" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                )}
+              >
+                <ClipboardList className="w-4 h-4" />
+                <span className="text-xs">{currentStepIndex + 1}/{totalSteps}</span>
+              </button>
 
               {/* Data Recording Toggle */}
               <button
@@ -975,6 +983,74 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
               >
                 Exit Lab
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Procedure Panel */}
+      {showMobileProcedure && (
+        <div className="fixed inset-0 z-[60] md:hidden">
+          <div
+            className={cn("absolute inset-0 backdrop-blur-sm", isDark ? "bg-black/60" : "bg-slate-900/50")}
+            onClick={() => setShowMobileProcedure(false)}
+          />
+          <div className={cn(
+            "absolute inset-x-0 bottom-0 rounded-t-3xl border-t p-4 animate-in slide-in-from-bottom duration-300 max-h-[70vh] overflow-hidden flex flex-col",
+            isDark ? "bg-slate-800 border-white/10" : "bg-white border-slate-200"
+          )}>
+            <div className={cn("w-12 h-1 rounded-full mx-auto mb-4", isDark ? "bg-white/20" : "bg-slate-300")} />
+            <div className="flex items-center justify-between mb-4">
+              <h3 className={cn("font-semibold flex items-center gap-2", isDark ? "text-white" : "text-slate-900")}>
+                <ClipboardList className="w-5 h-5 text-purple-500" />
+                Procedure Steps
+              </h3>
+              <span className={cn("text-sm", isDark ? "text-white/50" : "text-slate-500")}>
+                {completedSteps}/{totalSteps} complete
+              </span>
+            </div>
+            <div className="flex-1 overflow-y-auto space-y-2 pb-4">
+              {currentExperiment.procedure.map((step, idx) => (
+                <button
+                  key={step.stepNumber}
+                  onClick={() => {
+                    goToStep(idx);
+                    setShowMobileProcedure(false);
+                  }}
+                  className={cn(
+                    'w-full p-3 rounded-xl text-left transition-all border',
+                    idx === currentStepIndex
+                      ? isDark ? 'bg-purple-500/20 border-purple-500/50' : 'bg-purple-100 border-purple-300'
+                      : stepCompletionStatus[idx]
+                        ? isDark ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200'
+                        : isDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200'
+                  )}
+                >
+                  <div className="flex items-start gap-3">
+                    {stepCompletionStatus[idx] ? (
+                      <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                    ) : (
+                      <Circle className={cn(
+                        'w-5 h-5 shrink-0 mt-0.5',
+                        idx === currentStepIndex ? 'text-purple-500' : isDark ? 'text-white/30' : 'text-slate-400'
+                      )} />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className={cn(
+                        'text-sm font-medium',
+                        idx === currentStepIndex
+                          ? isDark ? 'text-purple-300' : 'text-purple-700'
+                          : isDark ? 'text-white' : 'text-slate-900'
+                      )}>
+                        Step {step.stepNumber}
+                      </p>
+                      <p className={cn("text-xs mt-0.5 line-clamp-2", isDark ? "text-white/60" : "text-slate-500")}>
+                        {step.instruction}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
         </div>

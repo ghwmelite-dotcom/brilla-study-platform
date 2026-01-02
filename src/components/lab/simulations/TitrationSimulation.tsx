@@ -258,8 +258,8 @@ export function TitrationSimulation({ onMeasurement, onObservation }: TitrationS
             <div className="w-6 h-6 bg-gradient-to-r from-gray-100 via-white to-gray-100 border-2 border-gray-300 border-b-0 mx-auto rounded-t" />
 
             {/* Flask body */}
-            <div className="relative">
-              <svg width="120" height="100" viewBox="0 0 120 100">
+            <div className="relative w-24 sm:w-28 md:w-32">
+              <svg viewBox="0 0 120 100" className="w-full h-auto">
                 {/* Flask outline */}
                 <path
                   d="M45 0 L45 20 L10 90 Q10 100 20 100 L100 100 Q110 100 110 90 L75 20 L75 0"
