@@ -1169,7 +1169,6 @@ export function LandingPage() {
               <Link
                 to="/affiliate"
                 className="w-full sm:w-auto px-6 py-3 glass rounded-xl font-medium text-white hover:bg-white/10 transition-all whitespace-nowrap text-center"
-                aria-label="Learn more about our affiliate program"
               >
                 Become an Affiliate
               </Link>
