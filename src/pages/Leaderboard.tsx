@@ -299,6 +299,7 @@ export default function Leaderboard() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate(-1)}
+              aria-label="Go back"
               className="p-2 text-neutral-600 hover:text-neutral-900 hover:bg-white rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -315,6 +316,7 @@ export default function Leaderboard() {
           <button
             onClick={() => fetchLeaderboard()}
             disabled={isLoading}
+            aria-label="Refresh leaderboard"
             className="p-2.5 text-neutral-600 hover:text-neutral-900 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
           >
             <RefreshCw className={cn('w-5 h-5', isLoading && 'animate-spin')} />
