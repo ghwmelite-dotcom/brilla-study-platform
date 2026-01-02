@@ -89,6 +89,10 @@ const TutoringSessions = lazy(() => import('@/pages/TutoringSessions'));
 const TeacherTutoringDashboard = lazy(() => import('@/pages/TeacherTutoringDashboard'));
 const TeacherBonusStatus = lazy(() => import('@/pages/TeacherBonusStatus'));
 
+// Exam mode pages (full-screen distraction-free)
+const ExamModePractice = lazy(() => import('@/pages/ExamModePractice'));
+const ExamModeResults = lazy(() => import('@/pages/ExamModeResults'));
+
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -427,6 +431,32 @@ function App() {
         {/* Legal pages (no layout) */}
         <Route path="/privacy" element={<LazyPage><PrivacyPolicyPage /></LazyPage>} />
         <Route path="/terms" element={<LazyPage><TermsOfServicePage /></LazyPage>} />
+
+        {/* Exam mode routes (full-screen, distraction-free, no layout) */}
+        <Route
+          path="/exam/practice"
+          element={
+            <ProtectedRoute>
+              <LazyPage><ExamModePractice /></LazyPage>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/exam/results"
+          element={
+            <ProtectedRoute>
+              <LazyPage><ExamModeResults /></LazyPage>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/practice/results"
+          element={
+            <ProtectedRoute>
+              <LazyPage><ExamModeResults /></LazyPage>
+            </ProtectedRoute>
+          }
+        />
 
         {/* Main app routes (with layout) */}
         <Route element={<Layout />}>

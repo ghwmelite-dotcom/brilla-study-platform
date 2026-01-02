@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import {
   Zap,
   BookOpen,
@@ -193,6 +193,7 @@ const difficulties = [
 
 export function PracticePage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const initialMode = searchParams.get('mode') as PracticeMode;
   const { currentExamType, subjects: examSubjects } = useExamStore();
 
@@ -389,12 +390,20 @@ export function PracticePage() {
   };
 
   const handleStartSession = async (mode: PracticeMode) => {
+    // For drill and speed modes, navigate to distraction-free exam mode
+    if (mode === 'drill' || mode === 'speed') {
+      const params = new URLSearchParams();
+      params.set('mode', mode);
+      if (selectedSubject !== 'all') params.set('subject', selectedSubject);
+      if (selectedDifficulty !== 'all') params.set('difficulty', selectedDifficulty);
+      params.set('count', questionCount.toString());
+      navigate(`/exam/practice?${params.toString()}`);
+      return;
+    }
+
+    // For flashcards, use inline mode
     setActiveMode(mode);
-    if (mode === 'speed') {
-      await fetchSpeedQuestions();
-    } else if (mode === 'drill') {
-      await fetchDrillQuestions();
-    } else if (mode === 'flashcard') {
+    if (mode === 'flashcard') {
       await fetchFlashcards();
     }
     setIsSessionActive(true);
@@ -698,9 +707,7 @@ export function PracticePage() {
               hoverable
               className="p-4 text-center cursor-pointer"
               onClick={() => {
-                setSelectedSubject(item.subject);
-                setActiveMode('drill');
-                setIsSessionActive(true);
+                navigate(`/exam/practice?mode=drill&subject=${item.subject}&count=${questionCount}`);
               }}
             >
               <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center text-white mx-auto mb-2', item.color)}>
