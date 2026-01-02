@@ -34,12 +34,12 @@ const typeIcons: Record<ResourceType, React.ElementType> = {
 };
 
 const typeColors: Record<ResourceType, string> = {
-  pdf: 'bg-red-100 text-red-600',
-  video: 'bg-purple-100 text-purple-600',
-  audio: 'bg-green-100 text-green-600',
-  document: 'bg-blue-100 text-blue-600',
-  interactive: 'bg-amber-100 text-amber-600',
-  link: 'bg-gray-100 text-gray-600',
+  pdf: 'bg-red-100 text-red-700',
+  video: 'bg-purple-100 text-purple-700',
+  audio: 'bg-green-100 text-green-700',
+  document: 'bg-blue-100 text-blue-700',
+  interactive: 'bg-amber-100 text-amber-700',
+  link: 'bg-gray-100 text-gray-700',
 };
 
 const typeLabels: Record<ResourceType, string> = {
@@ -100,7 +100,7 @@ export function ResourceCard({
           <Icon className="w-5 h-5" />
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-neutral-900 truncate">{resource.title}</h4>
+          <h2 className="font-medium text-neutral-900 truncate text-base">{resource.title}</h2>
           <div className="flex items-center gap-2 text-xs text-neutral-500">
             <span>{typeLabel}</span>
             {resource.subject && (
@@ -162,6 +162,7 @@ export function ResourceCard({
         {/* Bookmark Button */}
         <button
           onClick={handleBookmark}
+          aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
           className={cn(
             'absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center transition-all',
             isBookmarked
@@ -198,9 +199,9 @@ export function ResourceCard({
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="font-semibold text-neutral-900 line-clamp-2 mb-2 group-hover:text-primary transition-colors">
+        <h2 className="font-semibold text-neutral-900 line-clamp-2 mb-2 group-hover:text-primary transition-colors text-base">
           {resource.title}
-        </h3>
+        </h2>
 
         {resource.description && (
           <p className="text-sm text-neutral-500 line-clamp-2 mb-3">{resource.description}</p>

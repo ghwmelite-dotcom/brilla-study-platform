@@ -125,6 +125,7 @@ export function ResourceFilters({ className, subjects = [] }: ResourceFiltersPro
         <div className="flex items-center border border-neutral-200 rounded-lg overflow-hidden">
           <button
             onClick={() => setViewMode('grid')}
+            aria-label="Grid view"
             className={cn(
               'p-2.5 transition-colors',
               viewMode === 'grid'
@@ -136,6 +137,7 @@ export function ResourceFilters({ className, subjects = [] }: ResourceFiltersPro
           </button>
           <button
             onClick={() => setViewMode('list')}
+            aria-label="List view"
             className={cn(
               'p-2.5 transition-colors',
               viewMode === 'list'
