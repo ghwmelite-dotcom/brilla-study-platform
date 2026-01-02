@@ -145,7 +145,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+    <main className="min-h-screen flex items-center justify-center bg-neutral-50">
       <div className="max-w-md w-full p-8 bg-white rounded-xl shadow-card">
         <div className="text-center mb-8">
           <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-ghana flex items-center justify-center">
@@ -178,7 +178,7 @@ function LoginPage() {
               <div className="w-full border-t border-neutral-200"></div>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-2 bg-white text-neutral-400">or continue as</span>
+              <span className="px-2 bg-white text-neutral-600">or continue as</span>
             </div>
           </div>
 
@@ -204,7 +204,7 @@ function LoginPage() {
               type="button"
               onClick={() => handleDemoLogin('parent')}
               disabled={isLoading || isSubmitting}
-              className="py-3 px-4 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
+              className="py-3 px-4 bg-green-700 text-white rounded-lg font-medium hover:bg-green-800 active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
             >
               Parent
             </button>
@@ -222,13 +222,13 @@ function LoginPage() {
         <div className="mt-6 text-center">
           <p className="text-sm text-neutral-500">
             Don't have an account?{' '}
-            <a href="/register" className="text-primary hover:underline">
+            <a href="/register" className="text-primary underline hover:no-underline">
               Sign up
             </a>
           </p>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -268,7 +268,7 @@ function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+    <main className="min-h-screen flex items-center justify-center bg-neutral-50">
       <div className="max-w-md w-full p-8 bg-white rounded-xl shadow-card">
         <div className="text-center mb-8">
           <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-ghana flex items-center justify-center">
@@ -333,13 +333,13 @@ function RegisterPage() {
         <div className="mt-6 text-center">
           <p className="text-sm text-neutral-500">
             Already have an account?{' '}
-            <a href="/login" className="text-primary hover:underline">
+            <a href="/login" className="text-primary underline hover:no-underline">
               Sign in
             </a>
           </p>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
