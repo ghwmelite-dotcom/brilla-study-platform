@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import {
   Flame,
@@ -7,10 +8,25 @@ import {
   BookOpen,
   Brain,
   Award,
+  Gift,
+  Sparkles,
 } from 'lucide-react';
 import { Card, CardHeader, Button, Badge, ProgressBar, CircularProgress } from '@/components/common';
 import { TrialBanner } from '@/components/subscription';
-import { useAuthStore, useProgressStore } from '@/stores';
+import { QuickPlayCard, QuickPlayModal, SpeedBlitz, DailyBrainTeaser } from '@/components/quickplay';
+import { RecommendedNext, ExamReadinessGauge, StudyPlanWidget } from '@/components/learning';
+import { FriendActivityWidget } from '@/components/social';
+import { EventBanner } from '@/components/events';
+import { DailyMultiplierBanner, MysteryChestModal, LuckyWheelModal, SurpriseChallengePopup } from '@/components/rewards';
+import { StreakWarningBanner, ComebackModal, NudgeContainer } from '@/components/engagement';
+import {
+  useAuthStore,
+  useProgressStore,
+  useQuickPlayStore,
+  useEventStore,
+  useRewardStore,
+  useEngagementStore,
+} from '@/stores';
 import { cn } from '@/utils';
 
 export function DashboardPage() {
@@ -27,6 +43,53 @@ export function DashboardPage() {
     getStrengths,
     getWeaknesses,
   } = useProgressStore();
+  const { currentSession, isQuickPlayModalOpen, openQuickPlayModal, closeQuickPlayModal } = useQuickPlayStore();
+
+  // Event store
+  const { activeEvents, fetchActiveEvents } = useEventStore();
+
+  // Reward store
+  const {
+    dailyMultiplier,
+    activeChallenge,
+    fetchDailyMultiplier,
+    checkForSurpriseChallenge,
+    availableChests,
+    fetchAvailableChests,
+    luckyWheel,
+    fetchLuckyWheel,
+  } = useRewardStore();
+
+  // Engagement store
+  const {
+    engagementStatus,
+    comebackChallenge,
+    hasSeenComebackModal,
+    checkEngagementStatus,
+  } = useEngagementStore();
+
+  // Modal states
+  const [brainTeaserOpen, setBrainTeaserOpen] = useState(false);
+  const [chestModalOpen, setChestModalOpen] = useState(false);
+  const [wheelModalOpen, setWheelModalOpen] = useState(false);
+  const [comebackModalOpen, setComebackModalOpen] = useState(false);
+
+  // Fetch engagement data on mount
+  useEffect(() => {
+    fetchActiveEvents();
+    fetchDailyMultiplier();
+    checkForSurpriseChallenge();
+    fetchAvailableChests();
+    fetchLuckyWheel();
+    checkEngagementStatus();
+  }, [fetchActiveEvents, fetchDailyMultiplier, checkForSurpriseChallenge, fetchAvailableChests, fetchLuckyWheel, checkEngagementStatus]);
+
+  // Show comeback modal if applicable
+  useEffect(() => {
+    if (comebackChallenge && !hasSeenComebackModal && engagementStatus && engagementStatus.daysInactive >= 1) {
+      setComebackModalOpen(true);
+    }
+  }, [comebackChallenge, hasSeenComebackModal, engagementStatus]);
 
   // Redirect admins to admin dashboard
   if (user?.role === 'admin') {
@@ -55,6 +118,10 @@ export function DashboardPage() {
   const strengths = getStrengths();
   const weaknesses = getWeaknesses();
 
+  // Check for available rewards
+  const hasAvailableChest = availableChests.some(c => c.available);
+  const hasWheelSpin = luckyWheel?.available && luckyWheel.spinsRemaining > 0;
+
   // Define available achievements (these would come from API in production)
   const availableAchievements = [
     { id: 'first_question', icon: '🎯', name: 'First Steps', description: 'Answer your first question', requirement: 1 },
@@ -66,6 +133,21 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* Streak Warning Banner - Show when streak is at risk */}
+      {engagementStatus?.streakAtRisk && (
+        <StreakWarningBanner />
+      )}
+
+      {/* Event Banner - Show active seasonal events */}
+      {activeEvents.length > 0 && (
+        <EventBanner />
+      )}
+
+      {/* Daily Multiplier Banner */}
+      {dailyMultiplier && !dailyMultiplier.claimedAt && (
+        <DailyMultiplierBanner />
+      )}
+
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -75,6 +157,12 @@ export function DashboardPage() {
           <p className="text-neutral-500">
             Keep up the great work. You're making excellent progress!
           </p>
+          {/* Show active multiplier badge */}
+          {dailyMultiplier?.claimedAt && (
+            <div className="flex items-center gap-2 mt-2">
+              <DailyMultiplierBanner compact />
+            </div>
+          )}
         </div>
         <div className="flex gap-2">
           <Link to="/practice">
@@ -238,6 +326,9 @@ export function DashboardPage() {
             </div>
           </Card>
 
+          {/* Study Plan */}
+          <StudyPlanWidget />
+
           {/* Recent Activity */}
           <Card className="p-6">
             <CardHeader
@@ -278,6 +369,51 @@ export function DashboardPage() {
 
         {/* Right Column */}
         <div className="space-y-6">
+          {/* Quick Play Widget */}
+          <QuickPlayCard
+            onOpenModal={openQuickPlayModal}
+            onOpenBrainTeaser={() => setBrainTeaserOpen(true)}
+          />
+
+          {/* Rewards Widget - Mystery Chest & Lucky Wheel */}
+          {(hasAvailableChest || hasWheelSpin) && (
+            <Card className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+              <div className="flex items-center gap-2 mb-3">
+                <Gift className="w-5 h-5 text-purple-500" />
+                <h3 className="font-semibold text-neutral-900">Daily Rewards</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {hasAvailableChest && (
+                  <button
+                    onClick={() => setChestModalOpen(true)}
+                    className="p-3 bg-white rounded-xl border border-purple-200 hover:shadow-md transition-all text-center"
+                  >
+                    <span className="text-2xl">🎁</span>
+                    <p className="text-sm font-medium text-neutral-700 mt-1">Open Chest</p>
+                  </button>
+                )}
+                {hasWheelSpin && (
+                  <button
+                    onClick={() => setWheelModalOpen(true)}
+                    className="p-3 bg-white rounded-xl border border-purple-200 hover:shadow-md transition-all text-center"
+                  >
+                    <Sparkles className="w-6 h-6 mx-auto text-amber-500" />
+                    <p className="text-sm font-medium text-neutral-700 mt-1">Spin Wheel</p>
+                  </button>
+                )}
+              </div>
+            </Card>
+          )}
+
+          {/* Friend Activity Feed */}
+          <FriendActivityWidget />
+
+          {/* Exam Readiness */}
+          <ExamReadinessGauge examType="wassce" compact />
+
+          {/* What to Study Next */}
+          <RecommendedNext maxItems={3} />
+
           {/* Overall Progress */}
           <Card className="p-6">
             <CardHeader title="Overall Progress" />
@@ -402,6 +538,51 @@ export function DashboardPage() {
           </Card>
         </div>
       </div>
+
+      {/* Quick Play Modals */}
+      <QuickPlayModal
+        isOpen={isQuickPlayModalOpen}
+        onClose={closeQuickPlayModal}
+      />
+
+      {/* Speed Blitz Game (renders when session active) */}
+      {currentSession && <SpeedBlitz />}
+
+      {/* Daily Brain Teaser */}
+      <DailyBrainTeaser
+        isOpen={brainTeaserOpen}
+        onClose={() => setBrainTeaserOpen(false)}
+      />
+
+      {/* Mystery Chest Modal */}
+      <MysteryChestModal
+        isOpen={chestModalOpen}
+        onClose={() => setChestModalOpen(false)}
+      />
+
+      {/* Lucky Wheel Modal */}
+      <LuckyWheelModal
+        isOpen={wheelModalOpen}
+        onClose={() => setWheelModalOpen(false)}
+      />
+
+      {/* Comeback Challenge Modal */}
+      <ComebackModal
+        isOpen={comebackModalOpen}
+        onClose={() => setComebackModalOpen(false)}
+      />
+
+      {/* Surprise Challenge Popup */}
+      {activeChallenge && (
+        <SurpriseChallengePopup
+          challenge={activeChallenge}
+          onAccept={() => {}}
+          onDismiss={() => {}}
+        />
+      )}
+
+      {/* Nudge Container - Fixed position for friend nudges */}
+      <NudgeContainer />
     </div>
   );
 }
