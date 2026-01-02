@@ -32,6 +32,7 @@ import {
   QualitativeAnalysisSimulation,
   MicroscopeSimulation,
   FoodTestsSimulation,
+  OsmosisSimulation,
 } from './simulations';
 import { useLabStore, useThemeStore, useUIStore } from '@/stores';
 import { cn } from '@/utils';
@@ -643,6 +644,11 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
             ) : currentExperiment.id === 'exp_food_tests' ||
                  currentExperiment.slug === 'food-tests' ? (
               <FoodTestsSimulation
+                onObservation={(text) => addObservation(text)}
+              />
+            ) : currentExperiment.id === 'exp_osmosis_cells' ||
+                 currentExperiment.slug === 'osmosis-in-cells' ? (
+              <OsmosisSimulation
                 onObservation={(text) => addObservation(text)}
               />
             ) : (
