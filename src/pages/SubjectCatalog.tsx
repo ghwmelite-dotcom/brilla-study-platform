@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Search,
@@ -60,13 +60,28 @@ const subjectProgress: Record<string, { completed: number; total: number; master
 };
 
 export function SubjectCatalogPage() {
-  const { currentExamType, subjects, categories } = useExamStore();
+  const { currentExamType, subjects, categories, initializeExamData, fetchSubjects, fetchCategories } = useExamStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-    new Set(categories.filter(c => c.isCore).map(c => c.id))
-  );
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  // Ensure data is loaded on mount and when exam type changes
+  useEffect(() => {
+    if (subjects.length === 0 || categories.length === 0) {
+      initializeExamData();
+    }
+    fetchSubjects(currentExamType);
+    fetchCategories(currentExamType);
+  }, [currentExamType, initializeExamData, fetchSubjects, fetchCategories]);
+
+  // Set default expanded categories after categories load
+  useEffect(() => {
+    if (categories.length > 0 && expandedCategories.size === 0) {
+      const coreCategories = categories.filter(c => c.isCore).map(c => c.id);
+      setExpandedCategories(new Set(coreCategories));
+    }
+  }, [categories]);
 
   // Filter subjects
   const filteredSubjects = useMemo(() => {
