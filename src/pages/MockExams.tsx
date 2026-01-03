@@ -248,7 +248,7 @@ export function MockExamsPage() {
         if (data && Array.isArray(data)) {
           // Transform API response to our format
           const history: ExamHistoryItem[] = data
-            .filter(attempt => attempt.status === 'submitted' || attempt.status === 'graded')
+            .filter(attempt => attempt.status === 'completed' || attempt.status === 'graded')
             .map(attempt => ({
               id: attempt.id,
               examId: attempt.paper_id,

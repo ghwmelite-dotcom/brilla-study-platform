@@ -3760,6 +3760,68 @@ protectedApp.get('/battles/history', async (c) => {
 // PAPER ATTEMPT ENDPOINTS (Timed Practice)
 // =============================================
 
+// Get user's paper attempts history
+protectedApp.get('/papers/attempts', async (c) => {
+  const userId = c.req.query('userId') || c.get('userId');
+  const limit = parseInt(c.req.query('limit') || '20');
+  const status = c.req.query('status'); // Optional filter: completed, abandoned, in_progress
+
+  try {
+    let query = `
+      SELECT
+        pa.id,
+        pa.paper_id,
+        pa.status,
+        pa.time_allowed,
+        pa.time_used,
+        pa.total_score,
+        pa.percentage_score as percentage,
+        pa.started_at,
+        pa.submitted_at,
+        pp.title as paper_title,
+        pp.total_marks as max_score,
+        pt.name as paper_type
+      FROM paper_attempts pa
+      JOIN past_papers pp ON pa.paper_id = pp.id
+      LEFT JOIN paper_types pt ON pp.paper_type_id = pt.id
+      WHERE pa.user_id = ?
+    `;
+    const params: (string | number)[] = [userId];
+
+    if (status) {
+      query += ` AND pa.status = ?`;
+      params.push(status);
+    }
+
+    query += ` ORDER BY pa.started_at DESC LIMIT ?`;
+    params.push(limit);
+
+    const attempts = await c.env.DB.prepare(query).bind(...params).all();
+
+    // Transform to expected format
+    const data = attempts.results.map((attempt: Record<string, unknown>) => ({
+      id: attempt.id,
+      paper_id: attempt.paper_id,
+      status: attempt.status,
+      total_score: attempt.total_score || 0,
+      max_score: attempt.max_score || 100,
+      percentage: attempt.percentage || 0,
+      time_used: attempt.time_used || 0,
+      submitted_at: attempt.submitted_at,
+      started_at: attempt.started_at,
+      paper: {
+        title: attempt.paper_title,
+        paper_type: attempt.paper_type || 'Paper 1',
+      },
+    }));
+
+    return c.json(data);
+  } catch (error) {
+    console.error('Failed to fetch paper attempts:', error);
+    return c.json({ success: false, error: 'Failed to fetch paper attempts' }, 500);
+  }
+});
+
 // Start a paper attempt
 protectedApp.post('/papers/:id/attempt', async (c) => {
   const paperId = c.req.param('id');
