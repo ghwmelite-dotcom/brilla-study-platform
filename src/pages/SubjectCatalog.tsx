@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Search,
   Filter,
@@ -12,10 +12,13 @@ import {
   Star,
   TrendingUp,
   CheckCircle2,
+  Lock,
 } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { Card, Badge, Button } from '@/components/common';
-import { useExamStore } from '@/stores';
+import { DailyUsageIndicator, PremiumSubjectBadge } from '@/components/subscription';
+import { useExamStore, useUsageStore } from '@/stores';
+import { isCoreSubject } from '@/config';
 import { cn } from '@/utils';
 import type { Subject } from '@/types';
 
@@ -55,11 +58,27 @@ function getIconComponent(iconName: string): React.ComponentType<{ className?: s
 const subjectProgress: Record<string, { completed: number; total: number; mastery: number }> = {};
 
 export function SubjectCatalogPage() {
+  const navigate = useNavigate();
   const { currentExamType, subjects, categories, initializeExamData, fetchSubjects, fetchCategories } = useExamStore();
+  const { dailyUsage, fetchDailyUsage } = useUsageStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  // Check if user has premium access
+  const isPremiumUser = dailyUsage?.isUnlimited || dailyUsage?.isPremium || false;
+
+  // Check if a subject is locked for the current user
+  const isSubjectLocked = (subjectSlug: string): boolean => {
+    if (isPremiumUser) return false;
+    return !isCoreSubject(currentExamType, subjectSlug);
+  };
+
+  // Fetch usage data on mount
+  useEffect(() => {
+    fetchDailyUsage();
+  }, [fetchDailyUsage]);
 
   // Ensure data is loaded on mount and when exam type changes
   useEffect(() => {
@@ -133,20 +152,26 @@ export function SubjectCatalogPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
+      {/* Header with Usage Indicator */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 rounded-xl bg-indigo-100">
-            <GraduationCap className="w-6 h-6 text-indigo-600" />
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-xl bg-indigo-100">
+              <GraduationCap className="w-6 h-6 text-indigo-600" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-neutral-900">
+                {currentExamType.toUpperCase()} Subject Catalog
+              </h1>
+              <p className="text-neutral-600">
+                {subjects.length} subjects across {categories.length} categories
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-neutral-900">
-              {currentExamType.toUpperCase()} Subject Catalog
-            </h1>
-            <p className="text-neutral-600">
-              {subjects.length} subjects across {categories.length} categories
-            </p>
-          </div>
+          {/* Daily usage indicator for non-premium users */}
+          {dailyUsage && !dailyUsage.isUnlimited && (
+            <DailyUsageIndicator variant="compact" />
+          )}
         </div>
       </div>
 
@@ -315,6 +340,8 @@ export function SubjectCatalogPage() {
                         subject={subject}
                         progress={getProgress(subject.id)}
                         viewMode={viewMode}
+                        isLocked={isSubjectLocked(subject.slug)}
+                        onLockedClick={() => navigate('/pricing')}
                       />
                     ))}
                   </div>
@@ -335,6 +362,8 @@ export function SubjectCatalogPage() {
               subject={subject}
               progress={getProgress(subject.id)}
               viewMode={viewMode}
+              isLocked={isSubjectLocked(subject.slug)}
+              onLockedClick={() => navigate('/pricing')}
             />
           ))}
         </div>
@@ -363,24 +392,36 @@ interface SubjectCardProps {
   subject: Subject;
   progress: { completed: number; total: number; mastery: number };
   viewMode: 'grid' | 'list';
+  isLocked?: boolean;
+  onLockedClick?: () => void;
 }
 
-function SubjectCard({ subject, progress, viewMode }: SubjectCardProps) {
+function SubjectCard({ subject, progress, viewMode, isLocked = false, onLockedClick }: SubjectCardProps) {
   const IconComponent = getIconComponent(subject.icon);
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (isLocked && onLockedClick) {
+      e.preventDefault();
+      onLockedClick();
+    }
+  };
 
   if (viewMode === 'list') {
     return (
-      <Link to={`/topics/${subject.slug}`}>
-        <Card className="p-4 hover:shadow-md transition-shadow">
+      <Link to={isLocked ? '#' : `/topics/${subject.slug}`} onClick={handleClick}>
+        <Card className={cn('p-4 hover:shadow-md transition-shadow relative', isLocked && 'opacity-80')}>
           <div className="flex items-center gap-4">
             <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+              className={cn('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0', isLocked && 'grayscale')}
               style={{ backgroundColor: `${subject.color}20` }}
             >
               <IconComponent className="w-6 h-6" style={{ color: subject.color }} />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-neutral-900">{subject.name}</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-neutral-900">{subject.name}</h3>
+                {isLocked && <PremiumSubjectBadge size="sm" />}
+              </div>
               <p className="text-sm text-neutral-500 truncate">{subject.description}</p>
             </div>
             <div className="flex items-center gap-6 flex-shrink-0">
@@ -392,23 +433,29 @@ function SubjectCard({ subject, progress, viewMode }: SubjectCardProps) {
                   {subject.questionCount || 0} questions
                 </p>
               </div>
-              <div className="w-24">
-                <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="text-neutral-500">Mastery</span>
-                  <span className="font-medium">{progress.mastery}%</span>
+              {!isLocked && (
+                <div className="w-24">
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <span className="text-neutral-500">Mastery</span>
+                    <span className="font-medium">{progress.mastery}%</span>
+                  </div>
+                  <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
+                    <div
+                      className={cn(
+                        'h-full rounded-full transition-all',
+                        progress.mastery >= 70 ? 'bg-emerald-500' :
+                        progress.mastery >= 40 ? 'bg-amber-500' : 'bg-neutral-300'
+                      )}
+                      style={{ width: `${progress.mastery}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
-                  <div
-                    className={cn(
-                      'h-full rounded-full transition-all',
-                      progress.mastery >= 70 ? 'bg-emerald-500' :
-                      progress.mastery >= 40 ? 'bg-amber-500' : 'bg-neutral-300'
-                    )}
-                    style={{ width: `${progress.mastery}%` }}
-                  />
-                </div>
-              </div>
-              <ChevronRight className="w-5 h-5 text-neutral-400" />
+              )}
+              {isLocked ? (
+                <Lock className="w-5 h-5 text-amber-500" />
+              ) : (
+                <ChevronRight className="w-5 h-5 text-neutral-400" />
+              )}
             </div>
           </div>
         </Card>
@@ -417,21 +464,23 @@ function SubjectCard({ subject, progress, viewMode }: SubjectCardProps) {
   }
 
   return (
-    <Link to={`/topics/${subject.slug}`}>
-      <Card className="p-5 hover:shadow-md transition-shadow h-full">
+    <Link to={isLocked ? '#' : `/topics/${subject.slug}`} onClick={handleClick}>
+      <Card className={cn('p-5 hover:shadow-md transition-shadow h-full relative overflow-hidden', isLocked && 'opacity-90')}>
         <div className="flex items-start justify-between mb-4">
           <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center"
+            className={cn('w-12 h-12 rounded-xl flex items-center justify-center', isLocked && 'grayscale')}
             style={{ backgroundColor: `${subject.color}20` }}
           >
             <IconComponent className="w-6 h-6" style={{ color: subject.color }} />
           </div>
-          {progress.mastery >= 70 && (
+          {isLocked ? (
+            <PremiumSubjectBadge size="sm" />
+          ) : progress.mastery >= 70 ? (
             <Badge variant="success" className="text-xs">
               <CheckCircle2 className="w-3 h-3 mr-1" />
               Mastered
             </Badge>
-          )}
+          ) : null}
         </div>
 
         <h3 className="font-semibold text-neutral-900 mb-1">{subject.name}</h3>
@@ -451,22 +500,34 @@ function SubjectCard({ subject, progress, viewMode }: SubjectCardProps) {
         </div>
 
         {/* Progress bar */}
-        <div>
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="text-neutral-500">Mastery</span>
-            <span className="font-medium text-neutral-700">{progress.mastery}%</span>
+        {!isLocked && (
+          <div>
+            <div className="flex items-center justify-between text-xs mb-1">
+              <span className="text-neutral-500">Mastery</span>
+              <span className="font-medium text-neutral-700">{progress.mastery}%</span>
+            </div>
+            <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
+              <div
+                className={cn(
+                  'h-full rounded-full transition-all',
+                  progress.mastery >= 70 ? 'bg-emerald-500' :
+                  progress.mastery >= 40 ? 'bg-amber-500' : 'bg-neutral-300'
+                )}
+                style={{ width: `${progress.mastery}%` }}
+              />
+            </div>
           </div>
-          <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
-            <div
-              className={cn(
-                'h-full rounded-full transition-all',
-                progress.mastery >= 70 ? 'bg-emerald-500' :
-                progress.mastery >= 40 ? 'bg-amber-500' : 'bg-neutral-300'
-              )}
-              style={{ width: `${progress.mastery}%` }}
-            />
+        )}
+
+        {/* Premium overlay for locked subjects */}
+        {isLocked && (
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex flex-col items-center justify-end pb-4 rounded-xl">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-500 text-white rounded-full shadow-lg text-sm">
+              <Lock className="w-3.5 h-3.5" />
+              <span className="font-medium">Upgrade</span>
+            </div>
           </div>
-        </div>
+        )}
       </Card>
     </Link>
   );

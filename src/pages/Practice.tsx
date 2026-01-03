@@ -17,8 +17,9 @@ import {
 } from 'lucide-react';
 import { Card, Button, Badge, Select } from '@/components/common';
 import { TopicDrill, SpeedRace, Flashcard } from '@/components/practice';
-import { useExamStore } from '@/stores';
-import { getExamConfig } from '@/config';
+import { DailyUsageIndicator, LimitReachedModal } from '@/components/subscription';
+import { useExamStore, useUsageStore } from '@/stores';
+import { getExamConfig, isCoreSubject } from '@/config';
 import { cn } from '@/utils';
 import { api } from '@/services/api';
 import type { Question } from '@/types';
@@ -195,6 +196,7 @@ export function PracticePage() {
   const initialMode = searchParams.get('mode') as PracticeMode;
   const initialTopic = searchParams.get('topic');
   const { currentExamType, subjects: examSubjects } = useExamStore();
+  const { dailyUsage, fetchDailyUsage, checkLimitReached } = useUsageStore();
   const examConfig = getExamConfig(currentExamType);
 
   const [activeMode, setActiveMode] = useState<PracticeMode>(initialMode);
@@ -203,6 +205,28 @@ export function PracticePage() {
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [questionCount, setQuestionCount] = useState(10);
   const [isSessionActive, setIsSessionActive] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
+
+  // Check if user has premium access
+  const isPremiumUser = dailyUsage?.isUnlimited || dailyUsage?.isPremium || false;
+
+  // Check if a subject is locked for the current user
+  const isSubjectLocked = (subjectSlug: string): boolean => {
+    if (isPremiumUser) return false;
+    return !isCoreSubject(currentExamType, subjectSlug);
+  };
+
+  // Fetch usage data on mount
+  useEffect(() => {
+    fetchDailyUsage();
+  }, [fetchDailyUsage]);
+
+  // Check if limit reached on mount
+  useEffect(() => {
+    if (dailyUsage && checkLimitReached()) {
+      setShowLimitModal(true);
+    }
+  }, [dailyUsage, checkLimitReached]);
 
   // Speed race state
   const [speedQuestions, setSpeedQuestions] = useState<Question[]>([]);
@@ -268,10 +292,14 @@ export function PracticePage() {
   // Get exam-specific features
   const currentExamFeatures = examFeatures[currentExamType] || [];
 
-  // Build subject options from exam store
+  // Build subject options from exam store (with lock indicators for premium subjects)
   const subjectOptions = [
     { value: 'all', label: 'All Subjects' },
-    ...examSubjects.map((s) => ({ value: s.slug, label: s.name })),
+    ...examSubjects.map((s) => ({
+      value: s.slug,
+      label: isSubjectLocked(s.slug) ? `🔒 ${s.name}` : s.name,
+      disabled: isSubjectLocked(s.slug),
+    })),
   ];
 
   // Fetch speed race questions from API
@@ -386,6 +414,18 @@ export function PracticePage() {
   };
 
   const handleStartSession = async (mode: PracticeMode) => {
+    // Check if daily limit is reached
+    if (checkLimitReached()) {
+      setShowLimitModal(true);
+      return;
+    }
+
+    // Check if selected subject is locked
+    if (selectedSubject !== 'all' && isSubjectLocked(selectedSubject)) {
+      navigate('/pricing');
+      return;
+    }
+
     // For drill and speed modes, navigate to distraction-free exam mode
     if (mode === 'drill' || mode === 'speed') {
       const params = new URLSearchParams();
@@ -575,11 +615,24 @@ export function PracticePage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-display font-bold text-neutral-900">Practice Mode</h1>
-        <p className="text-neutral-500">Choose your practice style and start training</p>
+      {/* Header with Usage Indicator */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-display font-bold text-neutral-900">Practice Mode</h1>
+          <p className="text-neutral-500">Choose your practice style and start training</p>
+        </div>
+        {/* Daily usage indicator for non-premium users */}
+        {dailyUsage && !dailyUsage.isUnlimited && (
+          <DailyUsageIndicator variant="full" className="hidden md:block w-64" />
+        )}
       </div>
+
+      {/* Mobile usage indicator */}
+      {dailyUsage && !dailyUsage.isUnlimited && (
+        <div className="md:hidden">
+          <DailyUsageIndicator variant="full" />
+        </div>
+      )}
 
       {/* Exam-Specific Features */}
       {currentExamFeatures.length > 0 && (
@@ -790,6 +843,12 @@ export function PracticePage() {
           )}
         </Card>
       </section>
+
+      {/* Limit reached modal */}
+      <LimitReachedModal
+        isOpen={showLimitModal}
+        onClose={() => setShowLimitModal(false)}
+      />
     </div>
   );
 }

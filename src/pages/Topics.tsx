@@ -9,11 +9,15 @@ import {
   Search,
   Filter,
   Loader2,
+  Lock,
 } from 'lucide-react';
 import { Card, Button, Badge, Input, ProgressBar } from '@/components/common';
+import { PremiumSubjectBadge } from '@/components/subscription';
+import { DailyUsageIndicator } from '@/components/subscription';
 import { cn } from '@/utils';
 import { api } from '@/services/api';
-import { useExamStore } from '@/stores';
+import { useExamStore, useUsageStore } from '@/stores';
+import { isCoreSubject } from '@/config';
 
 // Icon mapping helper
 function getIconComponent(iconName: string): React.ComponentType<{ className?: string }> {
@@ -87,13 +91,28 @@ interface ApiTopic {
 export function TopicsPage() {
   const { subjectSlug } = useParams();
   const navigate = useNavigate();
-  const { subjects, initializeExamData } = useExamStore();
+  const { subjects, initializeExamData, currentExamType } = useExamStore();
+  const { dailyUsage, fetchDailyUsage } = useUsageStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
   const [apiTopics, setApiTopics] = useState<ApiTopic[]>([]);
   const [loading, setLoading] = useState(false);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [masteryFilter, setMasteryFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
+
+  // Check if user has premium access
+  const isPremiumUser = dailyUsage?.isUnlimited || dailyUsage?.isPremium || false;
+
+  // Fetch usage data on mount
+  useEffect(() => {
+    fetchDailyUsage();
+  }, [fetchDailyUsage]);
+
+  // Check if a subject is locked for the current user
+  const isSubjectLocked = (subjectSlug: string): boolean => {
+    if (isPremiumUser) return false;
+    return !isCoreSubject(currentExamType, subjectSlug);
+  };
 
   // Ensure subjects are loaded
   useEffect(() => {
@@ -335,16 +354,30 @@ export function TopicsPage() {
   }
 
   // Get current exam type for display
-  const { currentExamType } = useExamStore();
   const examTypeLabel = currentExamType.toUpperCase();
+
+  // Handle click on locked subject
+  const handleSubjectClick = (subject: typeof subjects[0], isLocked: boolean) => {
+    if (isLocked) {
+      navigate('/pricing');
+    } else {
+      navigate(`/topics/${subject.slug}`);
+    }
+  };
 
   // Main subjects view
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-display font-bold text-neutral-900">Topic Library</h1>
-        <p className="text-neutral-500">Browse and study topics across all {examTypeLabel} subjects</p>
+      {/* Header with Usage Indicator */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-display font-bold text-neutral-900">Topic Library</h1>
+          <p className="text-neutral-500">Browse and study topics across all {examTypeLabel} subjects</p>
+        </div>
+        {/* Daily usage indicator for non-premium users */}
+        {dailyUsage && !dailyUsage.isUnlimited && (
+          <DailyUsageIndicator variant="compact" />
+        )}
       </div>
 
       {/* Search and Filter */}
@@ -431,6 +464,7 @@ export function TopicsPage() {
         {subjects.map((subject) => {
           const SubjectIcon = getIconComponent(subject.icon);
           const colorClass = getColorClass(subject.color);
+          const locked = isSubjectLocked(subject.slug);
 
           // Get topics for this subject from API
           const subjectApiTopics = apiTopics.filter(t => t.subject_id === subject.id);
@@ -439,15 +473,22 @@ export function TopicsPage() {
           const avgMastery = 0; // TODO: fetch from user progress
 
           return (
-            <Link key={subject.id} to={`/topics/${subject.slug}`}>
-              <Card hoverable className="h-full">
+            <div
+              key={subject.id}
+              onClick={() => handleSubjectClick(subject, locked)}
+              className="cursor-pointer"
+            >
+              <Card hoverable className={cn('h-full relative overflow-hidden', locked && 'opacity-90')}>
                 <div className={cn('h-2 rounded-t-xl', colorClass)} />
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
-                    <div className={cn('p-3 rounded-xl text-white', colorClass)}>
+                    <div className={cn('p-3 rounded-xl text-white', colorClass, locked && 'grayscale')}>
                       <SubjectIcon className="w-6 h-6" />
                     </div>
-                    <Badge variant="neutral">{topicCount} topics</Badge>
+                    <div className="flex items-center gap-2">
+                      {locked && <PremiumSubjectBadge size="sm" />}
+                      <Badge variant="neutral">{topicCount} topics</Badge>
+                    </div>
                   </div>
                   <h2 className="text-xl font-semibold text-neutral-900 mb-2">{subject.name}</h2>
                   <p className="text-neutral-500 text-sm mb-4 line-clamp-2">{subject.description || 'Explore topics and practice questions'}</p>
@@ -471,8 +512,18 @@ export function TopicsPage() {
                     className="mt-2"
                   />
                 </div>
+
+                {/* Premium overlay for locked subjects */}
+                {locked && (
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex flex-col items-center justify-end pb-6 rounded-xl">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-full shadow-lg">
+                      <Lock className="w-4 h-4" />
+                      <span className="text-sm font-medium">Upgrade to Access</span>
+                    </div>
+                  </div>
+                )}
               </Card>
-            </Link>
+            </div>
           );
         })}
       </div>
