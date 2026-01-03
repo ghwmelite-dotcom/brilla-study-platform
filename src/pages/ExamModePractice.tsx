@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { ExamLayout, ExamQuestionCard } from '@/components/exam';
+import { DailyUsageIndicator, LimitReachedModal } from '@/components/subscription';
 import { api } from '@/services/api';
-import { useExamStore, useThemeStore } from '@/stores';
+import { useExamStore, useThemeStore, useUsageStore } from '@/stores';
 import { cn } from '@/utils';
 import type { Question } from '@/types';
 
@@ -57,6 +58,15 @@ export default function ExamModePractice() {
   const { resolvedTheme } = useThemeStore();
   const isDark = resolvedTheme === 'dark';
 
+  // Freemium usage tracking
+  const {
+    dailyUsage,
+    fetchDailyUsage,
+    setUsageFromResponse,
+    checkLimitReached,
+  } = useUsageStore();
+  const [showLimitModal, setShowLimitModal] = useState(false);
+
   // Get params from URL or state
   const mode = searchParams.get('mode') || 'drill'; // drill, speed
   const topic = searchParams.get('topic') || '';
@@ -77,6 +87,18 @@ export default function ExamModePractice() {
   const [error, setError] = useState<string | null>(null);
   const [startTime] = useState(Date.now());
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
+
+  // Fetch daily usage on mount
+  useEffect(() => {
+    fetchDailyUsage();
+  }, [fetchDailyUsage]);
+
+  // Check if limit is already reached before starting
+  useEffect(() => {
+    if (dailyUsage && checkLimitReached()) {
+      setShowLimitModal(true);
+    }
+  }, [dailyUsage, checkLimitReached]);
 
   // Fetch questions if not passed
   useEffect(() => {
@@ -123,25 +145,92 @@ export default function ExamModePractice() {
   const currentQuestion = questions[currentIndex];
   const totalQuestions = questions.length;
 
-  const handleAnswerSelect = useCallback((answer: string) => {
+  const handleAnswerSelect = useCallback(async (answer: string) => {
     if (!currentQuestion || showFeedback) return;
 
+    // Check if limit already reached
+    if (checkLimitReached()) {
+      setShowLimitModal(true);
+      return;
+    }
+
     const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
-    const isCorrect = answer.toLowerCase().trim() === currentQuestion.correctAnswer.toLowerCase().trim();
 
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: answer }));
     setAnsweredSet((prev) => new Set([...prev, currentQuestion.id]));
 
-    setResults((prev) => [
-      ...prev.filter(r => r.questionId !== currentQuestion.id),
-      { questionId: currentQuestion.id, isCorrect, answer, timeTaken }
-    ]);
+    try {
+      // Submit answer to API (tracks usage for freemium)
+      const response = await api.post(`/questions/${currentQuestion.id}/attempt`, {
+        answer,
+        userId: 'user_demo', // Will be replaced by auth
+      }) as {
+        success: boolean;
+        data?: {
+          isCorrect: boolean;
+          correctAnswer: string;
+          explanation: string;
+          pointsEarned: number;
+          usage?: {
+            used: number;
+            limit: number;
+            remaining: number;
+            isUnlimited: boolean;
+            showUpgradePrompt: boolean;
+          };
+        };
+        code?: string;
+        error?: string;
+      };
 
-    // For drill mode, show immediate feedback
-    if (mode === 'drill') {
-      setShowFeedback(true);
+      if (!response.success && response.code === 'LIMIT_REACHED') {
+        // Daily limit reached
+        setShowLimitModal(true);
+        return;
+      }
+
+      if (response.success && response.data) {
+        const { isCorrect, usage } = response.data;
+
+        // Update local usage from API response
+        if (usage) {
+          setUsageFromResponse(usage);
+
+          // Show warning toast when approaching limit
+          if (usage.showUpgradePrompt && !usage.isUnlimited) {
+            // Could show a toast here
+          }
+
+          // Show modal if limit reached
+          if (usage.remaining <= 0 && !usage.isUnlimited) {
+            setShowLimitModal(true);
+          }
+        }
+
+        setResults((prev) => [
+          ...prev.filter(r => r.questionId !== currentQuestion.id),
+          { questionId: currentQuestion.id, isCorrect, answer, timeTaken }
+        ]);
+
+        // For drill mode, show immediate feedback
+        if (mode === 'drill') {
+          setShowFeedback(true);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to submit answer:', error);
+      // Fallback: still record result locally
+      const isCorrect = answer.toLowerCase().trim() === currentQuestion.correctAnswer.toLowerCase().trim();
+      setResults((prev) => [
+        ...prev.filter(r => r.questionId !== currentQuestion.id),
+        { questionId: currentQuestion.id, isCorrect, answer, timeTaken }
+      ]);
+
+      if (mode === 'drill') {
+        setShowFeedback(true);
+      }
     }
-  }, [currentQuestion, questionStartTime, showFeedback, mode]);
+  }, [currentQuestion, questionStartTime, showFeedback, mode, checkLimitReached, setUsageFromResponse]);
 
   const handleNext = useCallback(() => {
     if (currentIndex < totalQuestions - 1) {
@@ -353,6 +442,25 @@ export default function ExamModePractice() {
         explanation={currentQuestion.explanation}
         timeLimit={mode === 'speed' ? currentQuestion.timeLimit || 10 : undefined}
         onTimeUp={mode === 'speed' ? handleNext : undefined}
+      />
+
+      {/* Daily usage indicator (for free users) */}
+      {dailyUsage && !dailyUsage.isUnlimited && (
+        <div className="fixed bottom-4 right-4 z-40">
+          <DailyUsageIndicator variant="compact" />
+        </div>
+      )}
+
+      {/* Limit reached modal */}
+      <LimitReachedModal
+        isOpen={showLimitModal}
+        onClose={() => {
+          setShowLimitModal(false);
+          // If limit reached, navigate back to practice selection
+          if (checkLimitReached()) {
+            navigate('/practice');
+          }
+        }}
       />
     </ExamLayout>
   );

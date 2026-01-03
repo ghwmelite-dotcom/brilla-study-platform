@@ -50,3 +50,5 @@ export type { Theme } from './themeStore';
 export type { Toast, ToastType } from './toastStore';
 export type { Notification, NotificationType, StreakData, XPData } from './notificationStore';
 export type { ChatMessage as AiChatMessage, UserPersonalization } from './aiTutorStore';
+export { useUsageStore } from './usageStore';
+export type { DailyUsage } from './usageStore';

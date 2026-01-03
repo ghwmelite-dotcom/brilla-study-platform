@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { verify } from 'hono/jwt';
+import { DAILY_QUESTION_LIMIT, CORE_SUBJECTS } from './usage-limits';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -575,12 +576,23 @@ subscriptionsApp.get('/features', async (c) => {
     // Privileged roles, subscribers, or trial users have premium features
     const hasAccess = isPrivilegedRole || isSubscribed || isTrial;
 
+    // Check if user has unlimited questions (premium or privileged)
+    const hasUnlimitedQuestions = hasAccess;
+
     const features = {
-      unlimitedQuestions: true, // Everyone
+      // Freemium limits
+      unlimitedQuestions: hasUnlimitedQuestions,
+      dailyQuestionLimit: hasUnlimitedQuestions ? -1 : DAILY_QUESTION_LIMIT,
+      coreSubjectsOnly: !hasAccess, // Free users can only access core subjects
+      allSubjects: hasAccess, // Premium users can access all subjects
+      coreSubjectsList: CORE_SUBJECTS, // List of core subjects per exam type
+
+      // Existing features
       aiGrading: hasAccess,
       detailedFeedback: hasAccess,
       progressTracking: hasAccess,
-      pastPapers: hasAccess,
+      pastPapers: true, // Available for all, but counts toward daily limit for free users
+      mockExams: true, // Available for all, but counts toward daily limit for free users
       advancedAnalytics: isPrivilegedRole || isSubscribed, // Privileged roles or paid
       prioritySupport: isPrivilegedRole || isSubscribed,
       aiGradingQuota: hasAccess ? (user.ai_grading_quota || -1) : 0,
@@ -592,6 +604,7 @@ subscriptionsApp.get('/features', async (c) => {
         isSubscribed,
         isTrial,
         hasAccess,
+        isPremium: hasAccess,
         features,
       },
     });

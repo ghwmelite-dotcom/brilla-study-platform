@@ -24,6 +24,16 @@ import { cosmeticsApp } from './cosmetics';
 import { rewardsApp } from './rewards';
 import { engagementApp } from './engagement';
 import { friendsApp } from './friends';
+import {
+  getDailyUsage,
+  checkCanAnswer,
+  incrementUsage,
+  isCoreSubject,
+  getCoreSubjects,
+  canAccessSubject,
+  DAILY_QUESTION_LIMIT,
+  CORE_SUBJECTS,
+} from './usage-limits';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -3070,12 +3080,57 @@ publicApp.get('/flashcards/public', async (c) => {
 // Mount public routes
 app.route('/api', publicApp);
 
+// Get daily usage info for freemium limits
+protectedApp.get('/usage/daily', async (c) => {
+  const user = c.get('user') as UserPayload;
+  const userId = user?.userId || c.req.query('userId') || 'user_demo';
+
+  try {
+    const usage = await getDailyUsage(userId, c.env.DB);
+    return c.json({
+      success: true,
+      data: usage,
+    });
+  } catch (error) {
+    console.error('Failed to get daily usage:', error);
+    return c.json({ success: false, error: 'Failed to get usage info' }, 500);
+  }
+});
+
+// Get core subjects for an exam type (freemium feature)
+protectedApp.get('/usage/core-subjects/:examType', async (c) => {
+  const examType = c.req.param('examType');
+  const coreSubjects = getCoreSubjects(examType);
+  return c.json({
+    success: true,
+    data: {
+      examType,
+      coreSubjects,
+    },
+  });
+});
+
 // Submit answer
 protectedApp.post('/questions/:id/attempt', async (c) => {
   const questionId = c.req.param('id');
   const { answer, userId } = await c.req.json();
 
   try {
+    // Check daily usage limit before processing
+    const usageCheck = await checkCanAnswer(userId, c.env.DB);
+    if (!usageCheck.allowed) {
+      const usage = await getDailyUsage(userId, c.env.DB);
+      return c.json({
+        success: false,
+        error: 'Daily question limit reached',
+        code: 'LIMIT_REACHED',
+        data: {
+          usage,
+          message: `You've used all ${DAILY_QUESTION_LIMIT} questions for today. Upgrade for unlimited practice!`,
+        },
+      }, 403);
+    }
+
     // Get the question
     const question = await c.env.DB.prepare(`
       SELECT * FROM questions WHERE id = ?
@@ -3092,6 +3147,9 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
     const isCorrect = userNormalized === correctNormalized;
     const pointsEarned = isCorrect ? (question.points as number) : 0;
 
+    // Increment usage count for non-premium users
+    const usageResult = await incrementUsage(userId, c.env.DB);
+
     // Record the attempt with demo data flags
     const attemptId = `attempt_${Date.now()}`;
     const demoFlags = getDemoDataFlags(userId);
@@ -3100,6 +3158,10 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(attemptId, userId, questionId, answer, isCorrect ? 1 : 0, 0, pointsEarned, demoFlags.is_demo_data, demoFlags.expires_at).run();
 
+    // Get updated usage info
+    const usage = await getDailyUsage(userId, c.env.DB);
+    const showUpgradePrompt = !usage.isUnlimited && usage.remaining <= 3;
+
     return c.json({
       success: true,
       data: {
@@ -3107,9 +3169,17 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
         correctAnswer: question.correct_answer,
         explanation: question.explanation,
         pointsEarned,
+        usage: {
+          used: usage.used,
+          limit: usage.limit,
+          remaining: usage.remaining,
+          isUnlimited: usage.isUnlimited,
+          showUpgradePrompt,
+        },
       },
     });
   } catch (error) {
+    console.error('Failed to submit answer:', error);
     return c.json({ success: false, error: 'Failed to submit answer' }, 500);
   }
 });
