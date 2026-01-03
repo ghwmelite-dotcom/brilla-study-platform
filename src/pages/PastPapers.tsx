@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FileText,
@@ -13,83 +13,95 @@ import {
 } from 'lucide-react';
 import { Button, Card } from '@/components/common';
 import { useExamStore } from '@/stores/examStore';
-import { pastPapers as localPastPapers, subjects } from '@/data';
-import type { PastPaper } from '@/types';
+import { api } from '@/services/api';
 
-// Build subject metadata dynamically from subjects data
-const subjectMeta: Record<string, { name: string; color: string }> = {};
-subjects.forEach(subject => {
-  subjectMeta[subject.id] = { name: subject.name, color: subject.color };
-});
-
-// Paper type names
-const paperTypeMeta: Record<string, string> = {
-  'paper_wassce_1': 'Paper 1 - Objectives',
-  'paper_wassce_2': 'Paper 2 - Theory/Essay',
-  'paper_wassce_3': 'Paper 3 - Practical',
-  'paper_bece_1': 'Paper 1 - Objectives',
-  'paper_bece_2': 'Paper 2 - Essay',
-};
+// API response types
+interface ApiPaper {
+  id: string;
+  exam_type_id: string;
+  subject_id: string;
+  paper_type_id: string;
+  year: number;
+  month?: string;
+  series?: string;
+  title: string;
+  description?: string;
+  total_questions: number;
+  total_marks: number;
+  time_allowed: number;
+  instructions?: string;
+  is_complete: number;
+  is_premium: number;
+  subject_name: string;
+  subject_slug: string;
+  subject_icon?: string;
+  subject_color: string;
+  paper_type_name: string;
+  paper_type_slug: string;
+  question_format: string;
+  exam_type_name: string;
+  exam_type_slug: string;
+}
 
 export function PastPapers() {
   const navigate = useNavigate();
   const { currentExamType, subjects, paperTypes, fetchSubjects, fetchPaperTypes } = useExamStore();
 
-  const [papers, setPapers] = useState<PastPaper[]>([]);
+  const [papers, setPapers] = useState<ApiPaper[]>([]);
   const [years, setYears] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [, setError] = useState<string | null>(null);
 
   // Filters
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<string>('');
   const [selectedPaperType, setSelectedPaperType] = useState<string>('');
 
-  // Get papers from local data based on exam type
-  const getLocalPapers = useMemo(() => {
-    const examTypeId = currentExamType === 'wassce' ? 'exam_wassce' :
-                       currentExamType === 'bece' ? 'exam_bece' : 'exam_nsmq';
-
-    return localPastPapers
-      .filter(p => p.examTypeId === examTypeId)
-      .map(p => ({
-        ...p,
-        id: p.id || '',
-        subject_name: subjectMeta[p.subjectId || '']?.name || 'Unknown Subject',
-        subject_color: subjectMeta[p.subjectId || '']?.color || '#6B7280',
-        paper_type_name: paperTypeMeta[p.paperTypeId || ''] || 'Paper',
-        title: `${subjectMeta[p.subjectId || '']?.name || 'Subject'} ${p.year}`,
-      })) as (PastPaper & { subject_name: string; subject_color: string; paper_type_name: string })[];
-  }, [currentExamType]);
-
+  // Fetch papers from API
   useEffect(() => {
+    const fetchPapers = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        // Build query params
+        const params = new URLSearchParams();
+        params.set('exam_type', currentExamType);
+        params.set('limit', '100');
+        if (selectedSubject) params.set('subject', selectedSubject);
+        if (selectedYear) params.set('year', selectedYear);
+
+        const response = await api.get(`/papers?${params.toString()}`) as { success: boolean; data: ApiPaper[] };
+
+        if (response.success && response.data) {
+          setPapers(response.data);
+        } else {
+          setPapers([]);
+        }
+      } catch (err) {
+        console.error('Failed to fetch papers:', err);
+        setError('Failed to load past papers');
+        setPapers([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const fetchYears = async () => {
+      try {
+        const response = await api.get(`/papers/years?exam_type=${currentExamType}`) as { success: boolean; data: number[] };
+        if (response.success && response.data) {
+          setYears(response.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch years:', err);
+      }
+    };
+
     fetchSubjects(currentExamType);
     fetchPaperTypes(currentExamType);
-
-    // Set available years from local data
-    const availableYears = [...new Set(getLocalPapers.map(p => p.year))].sort((a, b) => (b || 0) - (a || 0));
-    setYears(availableYears.filter((y): y is number => y !== undefined));
-
-    // Use local data
-    setPapers(getLocalPapers);
-    setIsLoading(false);
-  }, [currentExamType, getLocalPapers]);
-
-  // Apply filters to local data
-  useEffect(() => {
-    let filtered = getLocalPapers;
-
-    if (selectedSubject) {
-      filtered = filtered.filter(p => p.subjectId?.includes(selectedSubject));
-    }
-    if (selectedYear) {
-      filtered = filtered.filter(p => p.year === parseInt(selectedYear));
-    }
-    if (selectedPaperType) {
-      filtered = filtered.filter(p => p.paperTypeId?.includes(selectedPaperType));
-    }
-
-    setPapers(filtered);
-  }, [selectedSubject, selectedYear, selectedPaperType, getLocalPapers]);
+    fetchPapers();
+    fetchYears();
+  }, [currentExamType, selectedSubject, selectedYear, fetchSubjects, fetchPaperTypes]);
 
   const clearFilters = () => {
     setSelectedSubject('');
@@ -225,12 +237,7 @@ export function PastPapers() {
 }
 
 interface PaperCardProps {
-  paper: PastPaper & {
-    subject_name?: string;
-    subject_color?: string;
-    paper_type_name?: string;
-    question_format?: string;
-  };
+  paper: ApiPaper;
   onStart: () => void;
 }
 
@@ -257,7 +264,7 @@ function PaperCard({ paper, onStart }: PaperCardProps) {
             style={{ color: paper.subject_color }}
           />
         </div>
-        {paper.isComplete && (
+        {paper.is_complete === 1 && (
           <span className="flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
             <CheckCircle2 className="w-3 h-3" />
             Complete
@@ -276,11 +283,11 @@ function PaperCard({ paper, onStart }: PaperCardProps) {
       <div className="flex items-center gap-4 text-xs text-neutral-500 mb-4">
         <span className="flex items-center gap-1">
           <FileText className="w-3.5 h-3.5" />
-          {paper.totalQuestions} questions
+          {paper.total_questions} questions
         </span>
         <span className="flex items-center gap-1">
           <Clock className="w-3.5 h-3.5" />
-          {formatDuration(paper.timeAllowed)}
+          {formatDuration(paper.time_allowed)}
         </span>
       </div>
 

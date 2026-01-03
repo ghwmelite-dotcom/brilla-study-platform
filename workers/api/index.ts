@@ -2633,6 +2633,45 @@ publicApp.get('/papers', async (c) => {
   }
 });
 
+// Get available years for a subject (must be before /papers/:id)
+publicApp.get('/papers/years', async (c) => {
+  const examType = c.req.query('exam_type');
+  const subject = c.req.query('subject');
+
+  try {
+    let query = `
+      SELECT DISTINCT pp.year
+      FROM past_papers pp
+      JOIN exam_types et ON pp.exam_type_id = et.id
+      JOIN subjects s ON pp.subject_id = s.id
+      WHERE 1=1
+    `;
+    const params: string[] = [];
+
+    if (examType) {
+      query += ' AND et.slug = ?';
+      params.push(examType);
+    }
+    if (subject) {
+      query += ' AND s.slug = ?';
+      params.push(subject);
+    }
+
+    query += ' ORDER BY pp.year DESC';
+
+    const stmt = params.length > 0
+      ? c.env.DB.prepare(query).bind(...params)
+      : c.env.DB.prepare(query);
+
+    const { results } = await stmt.all();
+    const years = results.map((r: Record<string, unknown>) => r.year);
+
+    return c.json({ success: true, data: years });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch years' }, 500);
+  }
+});
+
 // Get single past paper with questions
 publicApp.get('/papers/:id', async (c) => {
   const id = c.req.param('id');
@@ -2679,45 +2718,6 @@ publicApp.get('/papers/:id', async (c) => {
     });
   } catch (error) {
     return c.json({ success: false, error: 'Failed to fetch paper' }, 500);
-  }
-});
-
-// Get available years for a subject
-publicApp.get('/papers/years', async (c) => {
-  const examType = c.req.query('exam_type');
-  const subject = c.req.query('subject');
-
-  try {
-    let query = `
-      SELECT DISTINCT pp.year
-      FROM past_papers pp
-      JOIN exam_types et ON pp.exam_type_id = et.id
-      JOIN subjects s ON pp.subject_id = s.id
-      WHERE 1=1
-    `;
-    const params: string[] = [];
-
-    if (examType) {
-      query += ' AND et.slug = ?';
-      params.push(examType);
-    }
-    if (subject) {
-      query += ' AND s.slug = ?';
-      params.push(subject);
-    }
-
-    query += ' ORDER BY pp.year DESC';
-
-    const stmt = params.length > 0
-      ? c.env.DB.prepare(query).bind(...params)
-      : c.env.DB.prepare(query);
-
-    const { results } = await stmt.all();
-    const years = results.map((r: Record<string, unknown>) => r.year);
-
-    return c.json({ success: true, data: years });
-  } catch (error) {
-    return c.json({ success: false, error: 'Failed to fetch years' }, 500);
   }
 });
 
