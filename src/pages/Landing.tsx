@@ -1318,6 +1318,184 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ========================================== */}
+      {/* FREEMIUM COMPARISON SECTION */}
+      {/* ========================================== */}
+      <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-violet-950/20 to-slate-950" />
+        <GradientOrb className="w-[500px] h-[500px] bg-violet-500/20 -left-48 top-0" delay={0} />
+        <GradientOrb className="w-[400px] h-[400px] bg-cyan-500/20 -right-32 bottom-0" delay={2} />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 glass rounded-full text-xs sm:text-sm font-medium text-white/80 mb-4 sm:mb-6">
+              <Gift className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
+              Start Learning for Free
+            </span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-display font-bold text-white mb-4 sm:mb-6">
+              Free Forever,{' '}
+              <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">Upgrade Anytime</span>
+            </h2>
+            <p className="text-sm sm:text-base lg:text-xl text-white/60 max-w-3xl mx-auto">
+              Practice every day with our free tier. Unlock unlimited access and premium subjects when you're ready.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-5xl mx-auto">
+            {/* Free Tier Card */}
+            <div className="relative glass rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 overflow-hidden group hover:bg-white/5 transition-all duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-bl-full" />
+
+              <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                  <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">Free Tier</h3>
+                  <p className="text-white/50 text-xs sm:text-sm">No credit card required</p>
+                </div>
+              </div>
+
+              <div className="flex items-baseline gap-2 mb-4 sm:mb-6">
+                <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">GHS 0</span>
+                <span className="text-white/40 text-sm sm:text-base">/forever</span>
+              </div>
+
+              <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="text-white font-medium text-sm sm:text-base">10 Questions Daily</p>
+                    <p className="text-white/50 text-xs sm:text-sm">Resets every midnight</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="text-white font-medium text-sm sm:text-base">4 Core Subjects</p>
+                    <p className="text-white/50 text-xs sm:text-sm">Math, English, Science, Social Studies</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="text-white font-medium text-sm sm:text-base">Full E-Library Access</p>
+                    <p className="text-white/50 text-xs sm:text-sm">PDFs, videos, audio lessons</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="text-white font-medium text-sm sm:text-base">Community & Leaderboards</p>
+                    <p className="text-white/50 text-xs sm:text-sm">Compete with other students</p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => handleOpenAuth('register')}
+                className="w-full py-3 sm:py-3.5 px-4 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 rounded-xl text-emerald-400 font-semibold text-sm sm:text-base transition-all hover:scale-[1.02]"
+              >
+                Start Free Today
+              </button>
+            </div>
+
+            {/* Premium Tier Card */}
+            <div className="relative glass rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 overflow-hidden group hover:bg-white/5 transition-all duration-300 border border-purple-500/30">
+              {/* Popular badge */}
+              <div className="absolute -top-px left-1/2 -translate-x-1/2">
+                <div className="px-4 py-1.5 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-b-xl text-white text-xs font-bold shadow-lg">
+                  MOST POPULAR
+                </div>
+              </div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-500/10 to-transparent rounded-bl-full" />
+
+              <div className="flex items-center gap-3 mb-4 sm:mb-6 mt-2">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-purple-500/30 to-cyan-500/30 flex items-center justify-center">
+                  <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">Premium</h3>
+                  <p className="text-white/50 text-xs sm:text-sm">Unlimited everything</p>
+                </div>
+              </div>
+
+              <div className="flex items-baseline gap-2 mb-4 sm:mb-6">
+                <span className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">GHS 30</span>
+                <span className="text-white/40 text-sm sm:text-base">/month</span>
+              </div>
+
+              <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500/30 to-cyan-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                  </div>
+                  <div>
+                    <p className="text-white font-medium text-sm sm:text-base">Unlimited Questions</p>
+                    <p className="text-white/50 text-xs sm:text-sm">Practice as much as you want</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500/30 to-cyan-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                  </div>
+                  <div>
+                    <p className="text-white font-medium text-sm sm:text-base">All 9+ Subjects</p>
+                    <p className="text-white/50 text-xs sm:text-sm">Physics, Chemistry, Biology & more</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500/30 to-cyan-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                  </div>
+                  <div>
+                    <p className="text-white font-medium text-sm sm:text-base">AI Essay Grading</p>
+                    <p className="text-white/50 text-xs sm:text-sm">Instant feedback on essays</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500/30 to-cyan-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                  </div>
+                  <div>
+                    <p className="text-white font-medium text-sm sm:text-base">Priority AI Tutoring</p>
+                    <p className="text-white/50 text-xs sm:text-sm">Faster responses, deeper explanations</p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => handleOpenAuth('register')}
+                className="group relative w-full py-3 sm:py-3.5 px-4 overflow-hidden rounded-xl font-semibold text-sm sm:text-base transition-all hover:scale-[1.02]"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-cyan-500" />
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative text-white flex items-center justify-center gap-2">
+                  Start 14-Day Free Trial
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Bottom note */}
+          <div className="mt-8 sm:mt-10 lg:mt-12 text-center">
+            <p className="text-white/50 text-xs sm:text-sm flex items-center justify-center gap-2 flex-wrap">
+              <Shield className="w-4 h-4 text-emerald-400" />
+              <span>14-day free trial • Cancel anytime • No hidden fees</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Platform Capabilities Section */}
       <section className="relative py-32 overflow-hidden">
         <div className="absolute inset-0 bg-slate-950" />
@@ -1864,28 +2042,28 @@ export function LandingPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-5xl mx-auto">
             {/* Free Plan */}
             <div className="glass rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 hover:bg-white/10 transition-all group">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-neutral-500/20 flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform">
-                <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-neutral-400" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-emerald-500/20 flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform">
+                <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-400" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">Free</h3>
-              <p className="text-white/50 text-sm sm:text-base mb-4 sm:mb-6">Get started with basics</p>
+              <p className="text-white/50 text-sm sm:text-base mb-4 sm:mb-6">Practice daily, forever free</p>
               <div className="flex items-baseline mb-4 sm:mb-8">
                 <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">{PRICING_CONFIG.plans.free.monthlyPrice}</span>
                 <span className="text-lg sm:text-xl text-white/50 ml-2">{PRICING_CONFIG.currency}</span>
               </div>
               <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-8">
-                {['Unlimited questions', 'Model answers', 'Basic analytics', 'Community access'].map((feature) => (
+                {['10 questions daily', '4 core subjects', 'Full E-Library', 'Community access'].map((feature) => (
                   <li key={feature} className="flex items-center gap-2 text-white/70 text-sm sm:text-base">
-                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 flex-shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 flex-shrink-0" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
               <button
                 onClick={() => handleOpenAuth('register')}
-                className="w-full py-2.5 sm:py-3 px-4 rounded-lg sm:rounded-xl border border-white/20 text-white font-medium text-sm sm:text-base hover:bg-white/10 transition-all"
+                className="w-full py-2.5 sm:py-3 px-4 rounded-lg sm:rounded-xl border border-emerald-500/30 text-emerald-400 font-medium text-sm sm:text-base hover:bg-emerald-500/10 transition-all"
               >
-                Get Started
+                Start Free
               </button>
             </div>
 
@@ -1908,7 +2086,7 @@ export function LandingPage() {
               </div>
               <p className="text-xs sm:text-sm text-emerald-400 mb-4 sm:mb-8">or {PRICING_CONFIG.plans.student.yearlyPrice} {PRICING_CONFIG.currency}/year (save {PRICING_CONFIG.plans.student.yearlyDiscount}%)</p>
               <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-8">
-                {['Everything in Free', 'AI essay grading', 'Full past papers', 'Advanced analytics', 'Priority support'].map((feature) => (
+                {['Unlimited questions', 'All 9+ subjects', 'AI essay grading', 'Priority AI tutoring', 'Advanced analytics'].map((feature) => (
                   <li key={feature} className="flex items-center gap-2 text-white/70 text-sm sm:text-base">
                     <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-secondary flex-shrink-0" />
                     <span>{feature}</span>
