@@ -74,6 +74,7 @@ export default function ExamModePractice() {
   const [isLoading, setIsLoading] = useState(!passedQuestions);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [startTime] = useState(Date.now());
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
 
@@ -83,6 +84,7 @@ export default function ExamModePractice() {
 
     const fetchQuestions = async () => {
       setIsLoading(true);
+      setError(null);
       try {
         let url = `/questions?limit=${count}`;
         if (mode === 'speed') {
@@ -98,15 +100,18 @@ export default function ExamModePractice() {
           url += `&difficulty=${difficulty}`;
         }
 
+        console.log('Fetching questions from:', url);
         const data = await api.get(url) as ApiQuestion[];
+        console.log('API response:', data);
+
         if (data && Array.isArray(data) && data.length > 0) {
           setQuestions(data.map(transformQuestion));
         } else {
-          navigate('/practice', { replace: true });
+          setError(`No questions found for this topic. URL: ${url}, Response: ${JSON.stringify(data)}`);
         }
-      } catch (error) {
-        console.error('Failed to load questions:', error);
-        navigate('/practice', { replace: true });
+      } catch (err) {
+        console.error('Failed to load questions:', err);
+        setError(`Failed to load questions: ${err instanceof Error ? err.message : 'Unknown error'}`);
       } finally {
         setIsLoading(false);
       }
@@ -226,13 +231,71 @@ export default function ExamModePractice() {
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-purple-500 animate-spin mx-auto mb-4" />
           <p className={isDark ? "text-white/70" : "text-slate-600"}>Loading questions...</p>
+          <p className={cn("text-sm mt-2", isDark ? "text-white/50" : "text-slate-400")}>
+            Topic: {topic || 'all'} | Mode: {mode}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center transition-colors duration-300",
+        isDark
+          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+          : "bg-gradient-to-br from-slate-100 via-white to-slate-100"
+      )}>
+        <div className="text-center max-w-md p-6">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className={cn("text-xl font-bold mb-2", isDark ? "text-white" : "text-slate-900")}>
+            Error Loading Questions
+          </h2>
+          <p className={cn("mb-4 text-sm", isDark ? "text-white/70" : "text-slate-600")}>
+            {error}
+          </p>
+          <div className="flex gap-2 justify-center">
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+            >
+              Retry
+            </button>
+            <button
+              onClick={() => navigate('/practice')}
+              className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700"
+            >
+              Go Back
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   if (!currentQuestion) {
-    return null;
+    return (
+      <div className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center transition-colors duration-300",
+        isDark
+          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+          : "bg-gradient-to-br from-slate-100 via-white to-slate-100"
+      )}>
+        <div className="text-center">
+          <p className={isDark ? "text-white/70" : "text-slate-600"}>No questions available</p>
+          <p className={cn("text-sm mt-2", isDark ? "text-white/50" : "text-slate-400")}>
+            Topic: {topic || 'none'} | Questions loaded: {questions.length}
+          </p>
+          <button
+            onClick={() => navigate('/practice')}
+            className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // Map question ID to index-based ID for the layout
