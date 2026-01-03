@@ -272,7 +272,7 @@ export function PracticePage() {
   // Build subject options from exam store
   const subjectOptions = [
     { value: 'all', label: 'All Subjects' },
-    ...examSubjects.slice(0, 6).map((s) => ({ value: s.slug, label: s.name })),
+    ...examSubjects.map((s) => ({ value: s.slug, label: s.name })),
   ];
 
   // Fetch speed race questions from API
