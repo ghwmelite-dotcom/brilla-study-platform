@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   GraduationCap,
+  Trophy,
+  BookOpen,
   TrendingUp,
   TrendingDown,
   Minus,
@@ -13,12 +15,29 @@ import {
 import { cn } from '@/utils';
 import { Card, CircularProgress } from '@/components/common';
 import { useLearningPathStore, type SubjectReadiness } from '@/stores/learningPathStore';
+import type { ExamTypeSlug } from '@/types';
 
 interface ExamReadinessGaugeProps {
-  examType?: string;
+  examType?: ExamTypeSlug;
   className?: string;
   compact?: boolean;
 }
+
+// Exam-specific styling
+const examStyles: Record<ExamTypeSlug, { gradient: string; icon: typeof GraduationCap }> = {
+  nsmq: {
+    gradient: 'from-amber-500 to-orange-600',
+    icon: Trophy,
+  },
+  wassce: {
+    gradient: 'from-indigo-500 to-purple-600',
+    icon: GraduationCap,
+  },
+  bece: {
+    gradient: 'from-emerald-500 to-teal-600',
+    icon: BookOpen,
+  },
+};
 
 export function ExamReadinessGauge({ examType = 'wassce', className, compact = false }: ExamReadinessGaugeProps) {
   const { examReadiness, isLoading, calculateExamReadiness } = useLearningPathStore();
@@ -77,14 +96,17 @@ export function ExamReadinessGauge({ examType = 'wassce', className, compact = f
     );
   }
 
+  const style = examStyles[examType] || examStyles.wassce;
+  const ExamIcon = style.icon;
+
   return (
     <Card className={cn('overflow-hidden', className)}>
       {/* Header */}
-      <div className="p-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+      <div className={cn('p-4 bg-gradient-to-r text-white', style.gradient)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-              <GraduationCap className="w-5 h-5" />
+              <ExamIcon className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-bold">{examReadiness.examName} Readiness</h3>

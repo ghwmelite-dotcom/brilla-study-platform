@@ -27,10 +27,14 @@ import {
   useRewardStore,
   useEngagementStore,
 } from '@/stores';
+import { useExamStore } from '@/stores/examStore';
+import { getExamConfig } from '@/config';
 import { cn } from '@/utils';
 
 export function DashboardPage() {
   const { user } = useAuthStore();
+  const { currentExamType } = useExamStore();
+  const examConfig = getExamConfig(currentExamType);
   const {
     totalQuestionsAttempted,
     totalCorrect,
@@ -190,7 +194,7 @@ export function DashboardPage() {
             </div>
             <div>
               <p className="text-2xl font-bold text-neutral-900">{currentStreak}</p>
-              <p className="text-xs text-neutral-500">Day Streak</p>
+              <p className="text-xs text-neutral-500">{examConfig.statsLabels.streak}</p>
             </div>
           </div>
           <p className="text-xs text-neutral-400 mt-2">Best: {longestStreak} days</p>
@@ -203,7 +207,7 @@ export function DashboardPage() {
             </div>
             <div>
               <p className="text-2xl font-bold text-neutral-900">{overallAccuracy || 0}%</p>
-              <p className="text-xs text-neutral-500">Accuracy</p>
+              <p className="text-xs text-neutral-500">{examConfig.statsLabels.accuracy}</p>
             </div>
           </div>
           <p className="text-xs text-neutral-400 mt-2">{totalCorrect}/{totalQuestionsAttempted} correct</p>
@@ -216,7 +220,7 @@ export function DashboardPage() {
             </div>
             <div>
               <p className="text-2xl font-bold text-neutral-900">{totalXP || user.xpPoints}</p>
-              <p className="text-xs text-neutral-500">Total XP</p>
+              <p className="text-xs text-neutral-500">{examConfig.statsLabels.xp}</p>
             </div>
           </div>
           <ProgressBar value={xpPercentage} size="sm" variant="secondary" className="mt-2" />
@@ -409,7 +413,7 @@ export function DashboardPage() {
           <FriendActivityWidget />
 
           {/* Exam Readiness */}
-          <ExamReadinessGauge examType="wassce" compact />
+          <ExamReadinessGauge examType={currentExamType} compact />
 
           {/* What to Study Next */}
           <RecommendedNext maxItems={3} />
