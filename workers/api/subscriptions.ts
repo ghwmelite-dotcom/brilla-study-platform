@@ -535,6 +535,10 @@ subscriptionsApp.post('/cancel', async (c) => {
 subscriptionsApp.get('/features', async (c) => {
   try {
     const userId = c.get('userId') as string;
+    const userRole = c.get('userRole') as string;
+
+    // Admins and teachers get full access automatically
+    const isPrivilegedRole = userRole === 'admin' || userRole === 'teacher';
 
     const user = await c.env.DB.prepare(`
       SELECT
@@ -568,8 +572,8 @@ subscriptionsApp.get('/features', async (c) => {
       isTrial = trialExpires > now;
     }
 
-    // If subscribed or on trial, user has premium features
-    const hasAccess = isSubscribed || isTrial;
+    // Privileged roles, subscribers, or trial users have premium features
+    const hasAccess = isPrivilegedRole || isSubscribed || isTrial;
 
     const features = {
       unlimitedQuestions: true, // Everyone
@@ -577,8 +581,8 @@ subscriptionsApp.get('/features', async (c) => {
       detailedFeedback: hasAccess,
       progressTracking: hasAccess,
       pastPapers: hasAccess,
-      advancedAnalytics: isSubscribed, // Only for paid
-      prioritySupport: isSubscribed,
+      advancedAnalytics: isPrivilegedRole || isSubscribed, // Privileged roles or paid
+      prioritySupport: isPrivilegedRole || isSubscribed,
       aiGradingQuota: hasAccess ? (user.ai_grading_quota || -1) : 0,
     };
 
