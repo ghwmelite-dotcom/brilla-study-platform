@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { useEventStore, type SeasonalEvent } from '@/stores/eventStore';
+import { useExamStore } from '@/stores/examStore';
 
 interface EventBannerProps {
   onEventClick?: (event: SeasonalEvent) => void;
@@ -19,12 +20,15 @@ interface EventBannerProps {
 
 export function EventBanner({ onEventClick, className }: EventBannerProps) {
   const { activeEvents, fetchActiveEvents, getTimeRemaining, getCurrentXPMultiplier } = useEventStore();
+  const { currentExamType } = useExamStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDismissed, setIsDismissed] = useState(false);
 
+  // Re-fetch events when exam type changes
   useEffect(() => {
     fetchActiveEvents();
-  }, [fetchActiveEvents]);
+    setCurrentIndex(0); // Reset to first event when exam type changes
+  }, [fetchActiveEvents, currentExamType]);
 
   // Auto-rotate events
   useEffect(() => {
@@ -172,10 +176,12 @@ export function EventBanner({ onEventClick, className }: EventBannerProps) {
 // Compact version for mobile or sidebar
 export function CompactEventBanner({ onEventClick }: EventBannerProps) {
   const { activeEvents, fetchActiveEvents, getCurrentXPMultiplier } = useEventStore();
+  const { currentExamType } = useExamStore();
 
+  // Re-fetch events when exam type changes
   useEffect(() => {
     fetchActiveEvents();
-  }, [fetchActiveEvents]);
+  }, [fetchActiveEvents, currentExamType]);
 
   if (activeEvents.length === 0) return null;
 

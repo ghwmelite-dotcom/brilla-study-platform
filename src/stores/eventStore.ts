@@ -1,8 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { api } from '@/lib/api';
+import { useExamStore } from './examStore';
+import type { ExamTypeSlug } from '@/types';
 
-export type EventTheme = 'wassce_prep' | 'bece_prep' | 'house_cup' | 'subject_week' | 'holiday' | 'special';
+export type EventTheme = 'wassce_prep' | 'bece_prep' | 'nsmq_prep' | 'house_cup' | 'subject_week' | 'holiday' | 'special';
 export type TournamentType = 'bracket' | 'leaderboard' | 'team';
 export type TournamentStatus = 'upcoming' | 'registration' | 'active' | 'completed';
 
@@ -129,17 +131,79 @@ interface EventState {
   getCurrentXPMultiplier: () => number;
 }
 
-// Mock data for demo
-function generateMockEvents(): SeasonalEvent[] {
+// Mock data for demo - generates exam-appropriate events
+function generateMockEvents(examType: ExamTypeSlug): SeasonalEvent[] {
   const now = new Date();
   const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
   const monthFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-  return [
-    {
+  // Generate exam-specific countdown event
+  const examEvents: Record<ExamTypeSlug, SeasonalEvent> = {
+    bece: {
+      id: 'bece_countdown_2026',
+      name: 'BECE Prep Challenge 2026',
+      description: 'Get ready for your BECE exams! Complete quests and earn 2x XP on all activities!',
+      theme: 'bece_prep',
+      startDate: now.toISOString(),
+      endDate: monthFromNow.toISOString(),
+      xpMultiplier: 2,
+      accentColor: '#3B82F6',
+      isActive: true,
+      bannerImageUrl: undefined,
+      rewards: [
+        { id: 'bece_badge', type: 'badge', value: 'bece_champion', name: 'BECE Champion Badge', rarity: 'epic' },
+        { id: 'bece_xp', type: 'xp', value: 3000, name: '3000 Bonus XP' },
+        { id: 'bece_protection', type: 'protection', value: 5, name: '5 Streak Protections', rarity: 'rare' },
+      ],
+      quests: [
+        {
+          id: 'bece_q1',
+          name: 'Number Cruncher',
+          description: 'Answer 50 Mathematics questions',
+          requirement: { type: 'questions_answered', value: 50, subjectId: 'mathematics' },
+          reward: { id: 'r1', type: 'xp', value: 300, name: '300 XP' },
+          progress: 45,
+          isCompleted: false,
+        },
+        {
+          id: 'bece_q2',
+          name: 'Science Explorer',
+          description: 'Achieve 70% accuracy in Integrated Science',
+          requirement: { type: 'accuracy', value: 70, subjectId: 'integrated_science' },
+          reward: { id: 'r2', type: 'xp', value: 250, name: '250 XP' },
+          progress: 75,
+          isCompleted: false,
+        },
+        {
+          id: 'bece_q3',
+          name: 'Consistent Learner',
+          description: 'Maintain a 7-day study streak',
+          requirement: { type: 'streak', value: 7 },
+          reward: { id: 'r3', type: 'protection', value: 2, name: '2 Streak Protections' },
+          progress: 50,
+          isCompleted: false,
+        },
+        {
+          id: 'bece_q4',
+          name: 'Subject Star',
+          description: 'Practice all 4 core BECE subjects',
+          requirement: { type: 'subjects_practiced', value: 4 },
+          reward: { id: 'r4', type: 'badge', value: 'subject_star', name: 'Subject Star Badge', rarity: 'rare' },
+          progress: 60,
+          isCompleted: false,
+        },
+      ],
+      userProgress: {
+        questsCompleted: 0,
+        totalQuests: 4,
+        xpEarned: 800,
+        rewardsClaimed: [],
+      },
+    },
+    wassce: {
       id: 'wassce_countdown_2026',
       name: 'WASSCE Countdown 2026',
-      description: 'Prepare for your exams with special quests and 2x XP on all activities!',
+      description: 'Prepare for your WASSCE exams with special quests and 2x XP on all activities!',
       theme: 'wassce_prep',
       startDate: now.toISOString(),
       endDate: monthFromNow.toISOString(),
@@ -197,48 +261,113 @@ function generateMockEvents(): SeasonalEvent[] {
         rewardsClaimed: [],
       },
     },
-    {
-      id: 'house_cup_january',
-      name: 'House Cup: January Finals',
-      description: 'Compete for your house to win exclusive rewards and glory!',
-      theme: 'house_cup',
+    nsmq: {
+      id: 'nsmq_training_2026',
+      name: 'NSMQ Training Camp 2026',
+      description: 'Sharpen your quiz skills! Speed drills, science challenges, and 2x XP await!',
+      theme: 'nsmq_prep',
       startDate: now.toISOString(),
-      endDate: weekFromNow.toISOString(),
-      xpMultiplier: 1.5,
-      accentColor: '#8B5CF6',
+      endDate: monthFromNow.toISOString(),
+      xpMultiplier: 2,
+      accentColor: '#F59E0B',
       isActive: true,
+      bannerImageUrl: undefined,
       rewards: [
-        { id: 'house_trophy', type: 'cosmetic', value: 'house_trophy', name: 'House Trophy Avatar Frame', rarity: 'legendary' },
-        { id: 'house_xp', type: 'xp', value: 2000, name: '2000 Bonus XP' },
+        { id: 'nsmq_badge', type: 'badge', value: 'nsmq_champion', name: 'Quiz Champion Badge', rarity: 'epic' },
+        { id: 'nsmq_xp', type: 'xp', value: 5000, name: '5000 Bonus XP' },
+        { id: 'nsmq_title', type: 'title', value: 'Speed Demon', name: 'Speed Demon Title', rarity: 'legendary' },
       ],
       quests: [
         {
-          id: 'house_q1',
-          name: 'House Representative',
-          description: 'Win 10 battles for your house',
-          requirement: { type: 'battles_won', value: 10 },
-          reward: { id: 'hr1', type: 'xp', value: 500, name: '500 House XP' },
+          id: 'nsmq_q1',
+          name: 'Speed Solver',
+          description: 'Answer 50 questions in under 10 seconds each',
+          requirement: { type: 'questions_answered', value: 50 },
+          reward: { id: 'r1', type: 'xp', value: 500, name: '500 XP' },
           progress: 30,
           isCompleted: false,
         },
         {
-          id: 'house_q2',
-          name: 'Knowledge Contributor',
-          description: 'Answer 50 questions correctly',
-          requirement: { type: 'questions_answered', value: 50 },
-          reward: { id: 'hr2', type: 'xp', value: 250, name: '250 House XP' },
-          progress: 80,
+          id: 'nsmq_q2',
+          name: 'Science Ace',
+          description: 'Achieve 90% accuracy in Science subjects',
+          requirement: { type: 'accuracy', value: 90, subjectId: 'science' },
+          reward: { id: 'r2', type: 'xp', value: 400, name: '400 XP' },
+          progress: 65,
+          isCompleted: false,
+        },
+        {
+          id: 'nsmq_q3',
+          name: 'Battle Victor',
+          description: 'Win 15 quiz battles',
+          requirement: { type: 'battles_won', value: 15 },
+          reward: { id: 'r3', type: 'badge', value: 'battle_master', name: 'Battle Master Badge', rarity: 'epic' },
+          progress: 40,
+          isCompleted: false,
+        },
+        {
+          id: 'nsmq_q4',
+          name: 'Well Rounded',
+          description: 'Practice Math, Physics, Chemistry, and Biology',
+          requirement: { type: 'subjects_practiced', value: 4 },
+          reward: { id: 'r4', type: 'xp', value: 300, name: '300 XP' },
+          progress: 75,
           isCompleted: false,
         },
       ],
       userProgress: {
         questsCompleted: 0,
-        totalQuests: 2,
-        xpEarned: 750,
+        totalQuests: 4,
+        xpEarned: 1500,
         rewardsClaimed: [],
       },
     },
-  ];
+  };
+
+  // House Cup event (shared across all exam types)
+  const houseCupEvent: SeasonalEvent = {
+    id: 'house_cup_january',
+    name: 'House Cup: January Finals',
+    description: 'Compete for your house to win exclusive rewards and glory!',
+    theme: 'house_cup',
+    startDate: now.toISOString(),
+    endDate: weekFromNow.toISOString(),
+    xpMultiplier: 1.5,
+    accentColor: '#8B5CF6',
+    isActive: true,
+    rewards: [
+      { id: 'house_trophy', type: 'cosmetic', value: 'house_trophy', name: 'House Trophy Avatar Frame', rarity: 'legendary' },
+      { id: 'house_xp', type: 'xp', value: 2000, name: '2000 Bonus XP' },
+    ],
+    quests: [
+      {
+        id: 'house_q1',
+        name: 'House Representative',
+        description: 'Win 10 battles for your house',
+        requirement: { type: 'battles_won', value: 10 },
+        reward: { id: 'hr1', type: 'xp', value: 500, name: '500 House XP' },
+        progress: 30,
+        isCompleted: false,
+      },
+      {
+        id: 'house_q2',
+        name: 'Knowledge Contributor',
+        description: 'Answer 50 questions correctly',
+        requirement: { type: 'questions_answered', value: 50 },
+        reward: { id: 'hr2', type: 'xp', value: 250, name: '250 House XP' },
+        progress: 80,
+        isCompleted: false,
+      },
+    ],
+    userProgress: {
+      questsCompleted: 0,
+      totalQuests: 2,
+      xpEarned: 750,
+      rewardsClaimed: [],
+    },
+  };
+
+  return [examEvents[examType], houseCupEvent];
 }
 
 function generateMockTournaments(): Tournament[] {
@@ -313,20 +442,44 @@ export const useEventStore = create<EventState>()(
       fetchActiveEvents: async () => {
         set({ isLoading: true, error: null });
 
+        // Get current exam type
+        const examStore = useExamStore.getState();
+        const currentExamType = examStore.currentExamType;
+
         try {
           const response = await api.get<{ events: SeasonalEvent[] }>('/events/active');
 
-          if (response.success && response.data) {
+          if (response.success && response.data && response.data.events.length > 0) {
             const now = new Date();
-            const events = response.data.events;
-            set({
-              activeEvents: events.filter(e => new Date(e.endDate) > now),
-              upcomingEvents: events.filter(e => new Date(e.startDate) > now),
-              isLoading: false,
-            });
+            // Filter API events to only show relevant ones for current exam type
+            const examThemeMap: Record<string, string[]> = {
+              bece: ['bece_prep', 'house_cup', 'subject_week', 'holiday', 'special'],
+              wassce: ['wassce_prep', 'house_cup', 'subject_week', 'holiday', 'special'],
+              nsmq: ['nsmq_prep', 'house_cup', 'subject_week', 'holiday', 'special'],
+            };
+            const allowedThemes = examThemeMap[currentExamType] || examThemeMap.wassce;
+            const filteredEvents = response.data.events.filter(
+              e => allowedThemes.includes(e.theme) && new Date(e.endDate) > now
+            );
+
+            // If no relevant events from API, use mock data
+            if (filteredEvents.length === 0) {
+              const mockEvents = generateMockEvents(currentExamType);
+              set({
+                activeEvents: mockEvents.filter(e => e.isActive),
+                upcomingEvents: [],
+                isLoading: false,
+              });
+            } else {
+              set({
+                activeEvents: filteredEvents,
+                upcomingEvents: response.data.events.filter(e => new Date(e.startDate) > now),
+                isLoading: false,
+              });
+            }
           } else {
-            // Use mock data
-            const mockEvents = generateMockEvents();
+            // Use mock data with current exam type
+            const mockEvents = generateMockEvents(currentExamType);
             set({
               activeEvents: mockEvents.filter(e => e.isActive),
               upcomingEvents: [],
@@ -334,8 +487,8 @@ export const useEventStore = create<EventState>()(
             });
           }
         } catch (error) {
-          // Use mock data on error
-          const mockEvents = generateMockEvents();
+          // Use mock data on error with current exam type
+          const mockEvents = generateMockEvents(currentExamType);
           set({
             activeEvents: mockEvents.filter(e => e.isActive),
             upcomingEvents: [],

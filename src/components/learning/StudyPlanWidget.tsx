@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -13,6 +13,7 @@ import {
 import { cn } from '@/utils';
 import { Card, Button } from '@/components/common';
 import { useLearningPathStore, type RecommendationPriority } from '@/stores/learningPathStore';
+import { useExamStore } from '@/stores/examStore';
 
 const priorityColors: Record<RecommendationPriority, string> = {
   critical: 'bg-red-500',
@@ -38,12 +39,20 @@ interface StudyPlanWidgetProps {
 
 export function StudyPlanWidget({ className, showWeekView = false }: StudyPlanWidgetProps) {
   const { studyPlan, isLoading, generateStudyPlan, markTopicComplete } = useLearningPathStore();
+  const { currentExamType } = useExamStore();
+  const previousExamType = useRef(currentExamType);
 
+  // Generate study plan on mount or when exam type changes
   useEffect(() => {
-    if (studyPlan.length === 0) {
+    // Always regenerate when exam type changes
+    if (previousExamType.current !== currentExamType) {
+      previousExamType.current = currentExamType;
+      generateStudyPlan();
+    } else if (studyPlan.length === 0) {
+      // Generate on initial mount if no plan exists
       generateStudyPlan();
     }
-  }, [studyPlan.length, generateStudyPlan]);
+  }, [studyPlan.length, generateStudyPlan, currentExamType]);
 
   const today = new Date().toISOString().split('T')[0];
   const todayPlan = studyPlan.find((p) => p.date === today);

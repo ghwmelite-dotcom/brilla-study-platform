@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { useProgressStore } from './progressStore';
+import { useExamStore } from './examStore';
+import type { ExamTypeSlug } from '@/types';
 
 // Types
 export type RecommendationPriority = 'critical' | 'high' | 'medium' | 'low';
@@ -105,10 +107,68 @@ interface LearningPathState {
   clearError: () => void;
 }
 
-// Subject data (would come from API in production)
-const SUBJECTS: Record<string, { name: string; topics: { id: string; name: string; weight: number }[] }> = {
+// Subject data by exam type
+type SubjectData = Record<string, { name: string; topics: { id: string; name: string; weight: number }[] }>;
+
+// BECE subjects - Junior High School level (Grades 7-9)
+const BECE_SUBJECTS: SubjectData = {
   mathematics: {
     name: 'Mathematics',
+    topics: [
+      { id: 'number_operations', name: 'Number Operations', weight: 20 },
+      { id: 'fractions_decimals', name: 'Fractions & Decimals', weight: 20 },
+      { id: 'basic_algebra', name: 'Basic Algebra', weight: 15 },
+      { id: 'geometry_shapes', name: 'Shapes & Geometry', weight: 15 },
+      { id: 'measurement', name: 'Measurement', weight: 15 },
+      { id: 'data_handling', name: 'Data Handling', weight: 15 },
+    ],
+  },
+  english: {
+    name: 'English Language',
+    topics: [
+      { id: 'reading_comprehension', name: 'Reading Comprehension', weight: 25 },
+      { id: 'grammar_usage', name: 'Grammar & Usage', weight: 25 },
+      { id: 'composition', name: 'Composition Writing', weight: 20 },
+      { id: 'vocabulary_spelling', name: 'Vocabulary & Spelling', weight: 15 },
+      { id: 'summary_writing', name: 'Summary Writing', weight: 15 },
+    ],
+  },
+  integrated_science: {
+    name: 'Integrated Science',
+    topics: [
+      { id: 'living_things', name: 'Living Things', weight: 20 },
+      { id: 'matter_energy', name: 'Matter & Energy', weight: 20 },
+      { id: 'human_body', name: 'Human Body', weight: 20 },
+      { id: 'environment', name: 'Environment', weight: 20 },
+      { id: 'simple_machines', name: 'Simple Machines', weight: 20 },
+    ],
+  },
+  social_studies: {
+    name: 'Social Studies',
+    topics: [
+      { id: 'ghana_history', name: 'History of Ghana', weight: 25 },
+      { id: 'government', name: 'Government & Civics', weight: 20 },
+      { id: 'geography', name: 'Geography', weight: 20 },
+      { id: 'environment_society', name: 'Environment & Society', weight: 20 },
+      { id: 'culture', name: 'Culture & Identity', weight: 15 },
+    ],
+  },
+  ict: {
+    name: 'ICT',
+    topics: [
+      { id: 'computer_basics', name: 'Computer Basics', weight: 25 },
+      { id: 'word_processing', name: 'Word Processing', weight: 20 },
+      { id: 'spreadsheets', name: 'Spreadsheets', weight: 20 },
+      { id: 'internet_basics', name: 'Internet Basics', weight: 20 },
+      { id: 'digital_safety', name: 'Digital Safety', weight: 15 },
+    ],
+  },
+};
+
+// WASSCE subjects - Senior High School level
+const WASSCE_SUBJECTS: SubjectData = {
+  mathematics: {
+    name: 'Core Mathematics',
     topics: [
       { id: 'algebra', name: 'Algebra', weight: 20 },
       { id: 'geometry', name: 'Geometry', weight: 15 },
@@ -152,7 +212,7 @@ const SUBJECTS: Record<string, { name: string; topics: { id: string; name: strin
     ],
   },
   english: {
-    name: 'English',
+    name: 'English Language',
     topics: [
       { id: 'comprehension', name: 'Comprehension', weight: 25 },
       { id: 'grammar', name: 'Grammar', weight: 20 },
@@ -162,6 +222,66 @@ const SUBJECTS: Record<string, { name: string; topics: { id: string; name: strin
     ],
   },
 };
+
+// NSMQ subjects - Science and Mathematics focus
+const NSMQ_SUBJECTS: SubjectData = {
+  mathematics: {
+    name: 'Mathematics',
+    topics: [
+      { id: 'algebra', name: 'Algebra', weight: 20 },
+      { id: 'calculus', name: 'Calculus', weight: 20 },
+      { id: 'geometry', name: 'Geometry', weight: 15 },
+      { id: 'trigonometry', name: 'Trigonometry', weight: 15 },
+      { id: 'number_theory', name: 'Number Theory', weight: 15 },
+      { id: 'combinatorics', name: 'Combinatorics', weight: 15 },
+    ],
+  },
+  physics: {
+    name: 'Physics',
+    topics: [
+      { id: 'mechanics', name: 'Mechanics', weight: 25 },
+      { id: 'waves_optics', name: 'Waves & Optics', weight: 20 },
+      { id: 'electricity_magnetism', name: 'Electricity & Magnetism', weight: 20 },
+      { id: 'thermodynamics', name: 'Thermodynamics', weight: 15 },
+      { id: 'modern_physics', name: 'Modern Physics', weight: 20 },
+    ],
+  },
+  chemistry: {
+    name: 'Chemistry',
+    topics: [
+      { id: 'atomic_structure', name: 'Atomic Structure', weight: 15 },
+      { id: 'bonding', name: 'Chemical Bonding', weight: 15 },
+      { id: 'organic', name: 'Organic Chemistry', weight: 25 },
+      { id: 'reactions', name: 'Chemical Reactions', weight: 20 },
+      { id: 'equilibrium', name: 'Chemical Equilibrium', weight: 15 },
+      { id: 'electrochemistry', name: 'Electrochemistry', weight: 10 },
+    ],
+  },
+  biology: {
+    name: 'Biology',
+    topics: [
+      { id: 'cell_biology', name: 'Cell Biology', weight: 20 },
+      { id: 'genetics', name: 'Genetics', weight: 25 },
+      { id: 'biochemistry', name: 'Biochemistry', weight: 20 },
+      { id: 'human_physiology', name: 'Human Physiology', weight: 20 },
+      { id: 'ecology', name: 'Ecology', weight: 15 },
+    ],
+  },
+};
+
+// Get subjects for current exam type
+function getSubjectsForExam(examType: ExamTypeSlug): SubjectData {
+  switch (examType) {
+    case 'bece':
+      return BECE_SUBJECTS;
+    case 'wassce':
+      return WASSCE_SUBJECTS;
+    case 'nsmq':
+      return NSMQ_SUBJECTS;
+    default:
+      return WASSCE_SUBJECTS;
+  }
+}
 
 // Helper function to get priority based on mastery
 const getPriority = (mastery: number, examWeight: number): RecommendationPriority => {
@@ -220,6 +340,10 @@ export const useLearningPathStore = create<LearningPathState>()(
           // Get progress data
           const progressStore = useProgressStore.getState();
           const { topicProgress } = progressStore;
+
+          // Get current exam type
+          const examStore = useExamStore.getState();
+          const SUBJECTS = getSubjectsForExam(examStore.currentExamType);
 
           const recommendations: RecommendedTopic[] = [];
 
@@ -299,6 +423,9 @@ export const useLearningPathStore = create<LearningPathState>()(
           const progressStore = useProgressStore.getState();
           const { topicProgress } = progressStore;
 
+          // Get subjects for the specified exam type
+          const SUBJECTS = getSubjectsForExam(examType as ExamTypeSlug);
+
           const subjectReadiness: SubjectReadiness[] = [];
           let totalReadiness = 0;
           let totalWeight = 0;
@@ -375,12 +502,8 @@ export const useLearningPathStore = create<LearningPathState>()(
         set({ isLoading: true, error: null });
 
         try {
-          const { recommendedTopics } = get();
-
-          // If no recommendations, generate them first
-          if (recommendedTopics.length === 0) {
-            await get().generateRecommendations();
-          }
+          // Always regenerate recommendations to ensure they match current exam type
+          await get().generateRecommendations();
 
           const topics = get().recommendedTopics;
           const days: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[] =

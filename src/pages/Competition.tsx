@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Trophy,
   Play,
@@ -11,11 +12,16 @@ import {
   Lightbulb,
   ArrowRight,
   Loader2,
+  FileText,
+  GraduationCap,
+  BookOpen,
 } from 'lucide-react';
 import { Card, Button, Badge, Input } from '@/components/common';
 import { Scoreboard, RoundDisplay, RoundSelector, RoundProgress } from '@/components/competition';
 import { cn } from '@/utils';
 import { api } from '@/services/api';
+import { useExamStore } from '@/stores/examStore';
+import { getExamConfig } from '@/config';
 
 type CompetitionView = 'home' | 'setup' | 'round' | 'results';
 
@@ -99,6 +105,11 @@ interface CompetitionHistoryItem {
 }
 
 export function CompetitionPage() {
+  const navigate = useNavigate();
+  const { currentExamType } = useExamStore();
+  const examConfig = getExamConfig(currentExamType);
+  const isNSMQ = currentExamType === 'nsmq';
+
   const [view, setView] = useState<CompetitionView>('home');
   const [schools, setSchools] = useState(defaultSchools);
   const [currentRound, setCurrentRound] = useState<1 | 2 | 3 | 4 | 5>(1);
@@ -334,17 +345,145 @@ export function CompetitionPage() {
     );
   }
 
-  // Home view
+  // For WASSCE/BECE - show Mock Exam view instead of competition
+  if (!isNSMQ) {
+    return (
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="text-center">
+          <div className={cn(
+            "w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center",
+            currentExamType === 'wassce' ? 'bg-gradient-to-br from-indigo-500 to-purple-600' : 'bg-gradient-to-br from-emerald-500 to-teal-600'
+          )}>
+            {currentExamType === 'wassce' ? (
+              <GraduationCap className="w-8 h-8 text-white" />
+            ) : (
+              <BookOpen className="w-8 h-8 text-white" />
+            )}
+          </div>
+          <h1 className="text-3xl font-display font-bold text-neutral-900">
+            {examConfig.competitionLabel}
+          </h1>
+          <p className="text-neutral-500 max-w-lg mx-auto">
+            {examConfig.competitionDescription}
+          </p>
+        </div>
+
+        {/* Mock Exam Options */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <Card className="p-6 border-2 border-primary bg-primary-50">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-primary rounded-xl">
+                <FileText className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-neutral-900">Full Mock Exam</h3>
+                <p className="text-sm text-neutral-500">Complete {examConfig.shortName} simulation</p>
+              </div>
+            </div>
+            <p className="text-neutral-600 mb-4">
+              Take a full-length {examConfig.shortName} mock exam with realistic timing and conditions.
+              Get your predicted score at the end.
+            </p>
+            <div className="flex items-center gap-2 text-sm text-neutral-500 mb-4">
+              <Clock className="w-4 h-4" />
+              <span>{currentExamType === 'wassce' ? '2-3 hours per paper' : '1-2 hours'}</span>
+              <FileText className="w-4 h-4 ml-4" />
+              <span>All subjects</span>
+            </div>
+            <Button fullWidth onClick={() => navigate('/mock-exams')}>
+              <Play className="w-4 h-4 mr-2" />
+              Start Mock Exam
+            </Button>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-secondary rounded-xl">
+                <Target className="w-6 h-6 text-neutral-900" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-neutral-900">Past Papers</h3>
+                <p className="text-sm text-neutral-500">Practice with real questions</p>
+              </div>
+            </div>
+            <p className="text-neutral-600 mb-4">
+              Practice with actual {examConfig.shortName} past questions from previous years.
+              See detailed solutions and explanations.
+            </p>
+            <div className="flex items-center gap-2 text-sm text-neutral-500 mb-4">
+              <Clock className="w-4 h-4" />
+              <span>Flexible timing</span>
+              <FileText className="w-4 h-4 ml-4" />
+              <span>Multiple years</span>
+            </div>
+            <Button variant="secondary" fullWidth onClick={() => navigate('/past-papers')}>
+              Browse Past Papers
+            </Button>
+          </Card>
+        </div>
+
+        {/* Quick Practice */}
+        <section className="max-w-4xl mx-auto">
+          <h2 className="text-xl font-semibold text-neutral-900 mb-4 text-center">Quick Practice by Subject</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {['Mathematics', 'English', 'Science', 'Social Studies'].map((subject) => (
+              <Card
+                key={subject}
+                hoverable
+                className="p-4 text-center cursor-pointer"
+                onClick={() => navigate(`/practice?subject=${subject.toLowerCase().replace(' ', '-')}`)}
+              >
+                <div className="w-12 h-12 rounded-xl bg-primary-50 flex items-center justify-center mx-auto mb-3">
+                  <BookOpen className="w-6 h-6 text-primary" />
+                </div>
+                <p className="font-medium text-neutral-900">{subject}</p>
+                <p className="text-xs text-neutral-500">Practice now</p>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        {/* Recent Activity */}
+        <section className="max-w-4xl mx-auto">
+          <h2 className="text-xl font-semibold text-neutral-900 mb-4">Recent Practice Sessions</h2>
+          <Card className="divide-y divide-neutral-100">
+            {historyLoading ? (
+              <div className="flex items-center justify-center p-8">
+                <Loader2 className="w-6 h-6 text-primary animate-spin" />
+              </div>
+            ) : competitionHistory.length === 0 ? (
+              <div className="text-center p-8 text-neutral-500">
+                <p>No practice history yet. Start a mock exam or practice session!</p>
+              </div>
+            ) : (
+              competitionHistory.map((comp) => (
+                <div key={comp.id} className="flex items-center justify-between p-4">
+                  <div>
+                    <p className="font-medium text-neutral-900">{comp.winner}</p>
+                    <p className="text-sm text-neutral-500">{comp.date}</p>
+                  </div>
+                  <Badge variant="primary">{comp.score}</Badge>
+                </div>
+              ))
+            )}
+          </Card>
+        </section>
+      </div>
+    );
+  }
+
+  // NSMQ Home view - Original competition format
   return (
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-ghana flex items-center justify-center">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
           <Trophy className="w-8 h-8 text-white" />
         </div>
-        <h1 className="text-3xl font-display font-bold text-neutral-900">Competition Mode</h1>
+        <h1 className="text-3xl font-display font-bold text-neutral-900">NSMQ Competition Mode</h1>
         <p className="text-neutral-500 max-w-lg mx-auto">
-          Experience the full NSMQ format with all 5 rounds, or practice specific rounds
+          Experience the full National Science & Maths Quiz format with all 5 rounds
         </p>
       </div>
 

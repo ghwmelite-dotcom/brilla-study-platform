@@ -180,7 +180,8 @@ export function DailyMultiplierBanner({
             {!isClaimed && (
               <Button
                 onClick={handleClaim}
-                className="bg-white text-neutral-900 hover:bg-white/90"
+                variant="secondary"
+                className="!bg-white !text-neutral-900 hover:!bg-white/90 shadow-lg"
               >
                 Claim Now
                 <ChevronRight className="w-4 h-4 ml-1" />

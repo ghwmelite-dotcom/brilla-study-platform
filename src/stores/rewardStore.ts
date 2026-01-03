@@ -93,6 +93,7 @@ interface RewardState {
   spinLuckyWheel: () => Promise<ChestReward | null>;
   checkForSurpriseChallenge: () => Promise<void>;
   completeSurpriseChallenge: () => Promise<ChestReward | null>;
+  dismissSurpriseChallenge: () => void;
   addChestProgress: (amount: number) => void;
   clearError: () => void;
 }
@@ -536,6 +537,10 @@ export const useRewardStore = create<RewardState>()(
           set({ activeChallenge: null });
           return null;
         }
+      },
+
+      dismissSurpriseChallenge: () => {
+        set({ activeChallenge: null });
       },
 
       addChestProgress: (amount) => {

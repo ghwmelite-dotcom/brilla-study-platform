@@ -4,7 +4,6 @@ import {
   Flame,
   Star,
   Target,
-  Trophy,
   BookOpen,
   Brain,
   Award,
@@ -19,6 +18,7 @@ import { FriendActivityWidget } from '@/components/social';
 import { EventBanner } from '@/components/events';
 import { DailyMultiplierBanner, MysteryChestModal, LuckyWheelModal, SurpriseChallengePopup } from '@/components/rewards';
 import { StreakWarningBanner, ComebackModal, NudgeContainer } from '@/components/engagement';
+import { DashboardHero, ExamFlyers, DailyTip, FeaturedStats } from '@/components/dashboard';
 import {
   useAuthStore,
   useProgressStore,
@@ -58,6 +58,7 @@ export function DashboardPage() {
     activeChallenge,
     fetchDailyMultiplier,
     checkForSurpriseChallenge,
+    dismissSurpriseChallenge,
     availableChests,
     fetchAvailableChests,
     luckyWheel,
@@ -152,38 +153,21 @@ export function DashboardPage() {
         <DailyMultiplierBanner />
       )}
 
-      {/* Welcome Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-display font-bold text-neutral-900">
-            Welcome back, {user.name.split(' ')[0]}! 👋
-          </h1>
-          <p className="text-neutral-500">
-            Keep up the great work. You're making excellent progress!
-          </p>
-          {/* Show active multiplier badge */}
-          {dailyMultiplier?.claimedAt && (
-            <div className="flex items-center gap-2 mt-2">
-              <DailyMultiplierBanner compact />
-            </div>
-          )}
+      {/* Exam-Specific Dashboard Hero */}
+      <DashboardHero />
+
+      {/* Show active multiplier badge if claimed */}
+      {dailyMultiplier?.claimedAt && (
+        <div className="flex items-center gap-2">
+          <DailyMultiplierBanner compact />
         </div>
-        <div className="flex gap-2">
-          <Link to="/practice">
-            <Button leftIcon={<Brain className="w-4 h-4" />}>
-              Practice Now
-            </Button>
-          </Link>
-          <Link to="/competition">
-            <Button variant="outline" leftIcon={<Trophy className="w-4 h-4" />}>
-              Competition
-            </Button>
-          </Link>
-        </div>
-      </div>
+      )}
 
       {/* Trial/Subscription Banner */}
       <TrialBanner variant="full" />
+
+      {/* Daily Tip */}
+      <DailyTip />
 
       {/* Stats Overview */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -238,6 +222,9 @@ export function DashboardPage() {
           </div>
         </Card>
       </div>
+
+      {/* Exam-Specific Promotional Flyers */}
+      <ExamFlyers />
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -415,6 +402,9 @@ export function DashboardPage() {
           {/* Exam Readiness */}
           <ExamReadinessGauge examType={currentExamType} compact />
 
+          {/* Exam-Specific Featured Stats */}
+          <FeaturedStats />
+
           {/* What to Study Next */}
           <RecommendedNext maxItems={3} />
 
@@ -580,8 +570,8 @@ export function DashboardPage() {
       {activeChallenge && (
         <SurpriseChallengePopup
           challenge={activeChallenge}
-          onAccept={() => {}}
-          onDismiss={() => {}}
+          onAccept={dismissSurpriseChallenge}
+          onDismiss={dismissSurpriseChallenge}
         />
       )}
 
