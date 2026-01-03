@@ -2905,7 +2905,7 @@ publicApp.get('/battles/history', async (c) => {
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.replace('Bearer ', '');
     try {
-      const payload = await verifyToken(token, c.env.JWT_SECRET);
+      const payload = await verifyJWT(token, c.env.JWT_SECRET);
       if (payload) {
         userId = payload.userId;
       }
