@@ -520,92 +520,117 @@ function PromoPopup({ onOpenAuth }: { onOpenAuth: (mode: 'login' | 'register') =
       />
 
       {/* Popup */}
-      <div className="relative w-full max-w-lg animate-scale-in">
+      <div className="relative w-full max-w-md sm:max-w-lg animate-scale-in">
         {/* Glow effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-secondary via-pink-500 to-purple-500 rounded-3xl blur-2xl opacity-30 animate-pulse-glow" />
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 via-cyan-500 to-purple-500 rounded-3xl blur-2xl opacity-30 animate-pulse-glow" />
 
         <div className="relative bg-slate-900 rounded-3xl overflow-hidden border border-white/10">
           {/* Close button */}
           <button
             onClick={handleDismiss}
-            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 p-1.5 sm:p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             aria-label="Close promotional popup"
           >
-            <X className="w-5 h-5 text-white/70" aria-hidden="true" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5 text-white/70" aria-hidden="true" />
           </button>
 
-          {/* Header with gradient */}
-          <div className="relative h-32 bg-gradient-to-r from-secondary via-pink-500 to-purple-500 flex items-center justify-center overflow-hidden">
+          {/* Header with split gradient */}
+          <div className="relative h-24 sm:h-28 bg-gradient-to-r from-emerald-500 via-cyan-500 to-purple-500 flex items-center justify-center overflow-hidden">
             {/* Animated particles */}
-            {[...Array(10)].map((_, i) => (
+            {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="absolute w-2 h-2 rounded-full bg-white/30 animate-float"
+                className="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white/30 animate-float"
                 style={{
-                  left: `${10 + i * 10}%`,
-                  top: `${20 + (i % 3) * 20}%`,
+                  left: `${10 + i * 12}%`,
+                  top: `${20 + (i % 3) * 25}%`,
                   animationDelay: `${i * 0.3}s`,
                 }}
               />
             ))}
-            <div className="relative flex items-center gap-3">
-              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                <Gift className="w-8 h-8 text-white" />
-              </div>
-              <div className="text-left">
-                <p className="text-white/80 text-sm font-medium">Limited Time</p>
-                <p className="text-white text-2xl font-bold">{TRIAL_CONFIG.shortLabel}</p>
-              </div>
+            <div className="relative text-center">
+              <p className="text-white/90 text-xs sm:text-sm font-medium mb-0.5 sm:mb-1">Start Learning Today</p>
+              <p className="text-white text-xl sm:text-2xl font-bold">Free Forever + Premium Trial</p>
             </div>
           </div>
 
           {/* Content */}
-          <div className="p-6">
-            <h3 className="text-2xl font-bold text-white text-center mb-2">
-              Start Your Free Trial Today
-            </h3>
-            <p className="text-white/60 text-center mb-6">
-              Get full access to all premium features. No credit card needed!
-            </p>
-
-            {/* Features */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              {[
-                { icon: Brain, text: 'AI Tutoring', color: 'text-purple-400' },
-                { icon: PenTool, text: 'Essay Grading', color: 'text-pink-400' },
-                { icon: Trophy, text: 'Competitions', color: 'text-amber-400' },
-                { icon: Library, text: 'E-Library', color: 'text-blue-400' },
-              ].map((item) => (
-                <div key={item.text} className="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-2">
-                  <item.icon className={`w-4 h-4 ${item.color}`} />
-                  <span className="text-white/80 text-sm">{item.text}</span>
+          <div className="p-4 sm:p-6">
+            {/* Two-column comparison */}
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-5">
+              {/* Free Column */}
+              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-2.5 sm:p-3">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                    <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-400" />
+                  </div>
+                  <span className="text-emerald-400 font-bold text-xs sm:text-sm">FREE</span>
                 </div>
-              ))}
+                <ul className="space-y-1 sm:space-y-1.5">
+                  {['10 questions/day', '4 core subjects', 'Full E-Library', 'Community'].map((item) => (
+                    <li key={item} className="flex items-center gap-1 sm:gap-1.5 text-white/70 text-[10px] sm:text-xs">
+                      <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-400 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Premium Column */}
+              <div className="bg-gradient-to-br from-purple-500/10 to-cyan-500/10 border border-purple-500/20 rounded-xl p-2.5 sm:p-3 relative">
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2">
+                  <span className="px-1.5 sm:px-2 py-0.5 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full text-white text-[8px] sm:text-[10px] font-bold">
+                    7 DAYS FREE
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3 mt-1">
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                    <Crown className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400" />
+                  </div>
+                  <span className="text-purple-400 font-bold text-xs sm:text-sm">PREMIUM</span>
+                </div>
+                <ul className="space-y-1 sm:space-y-1.5">
+                  {['Unlimited questions', 'All 9+ subjects', 'AI Essay Grading', 'Priority AI'].map((item) => (
+                    <li key={item} className="flex items-center gap-1 sm:gap-1.5 text-white/70 text-[10px] sm:text-xs">
+                      <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-purple-400 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
             {/* CTA Buttons */}
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-2.5">
               <button
                 onClick={() => { handleDismiss(); onOpenAuth('register'); }}
-                className="w-full py-4 bg-gradient-to-r from-secondary via-pink-500 to-purple-500 rounded-xl font-semibold text-white text-lg hover:shadow-lg hover:shadow-secondary/30 transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-xl font-semibold text-white text-sm sm:text-base hover:shadow-lg hover:shadow-purple-500/30 transition-all flex items-center justify-center gap-2 group"
               >
-                <Rocket className="w-5 h-5" />
-                Start Free Trial
+                <Rocket className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-0.5 transition-transform" />
+                Start 7-Day Premium Trial
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+              <button
+                onClick={() => { handleDismiss(); onOpenAuth('register'); }}
+                className="w-full py-2.5 sm:py-3 border border-emerald-500/30 text-emerald-400 rounded-xl font-medium text-xs sm:text-sm hover:bg-emerald-500/10 transition-all flex items-center justify-center gap-1.5 sm:gap-2"
+              >
+                <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                Or Start Free Forever
               </button>
               <button
                 onClick={handleDismiss}
-                className="w-full py-3 text-white/50 hover:text-white/70 transition-colors text-sm"
+                className="w-full py-2 text-white/40 hover:text-white/60 transition-colors text-xs sm:text-sm"
               >
                 Maybe later
               </button>
             </div>
 
             {/* Affiliate teaser */}
-            <div className="mt-6 pt-4 border-t border-white/10">
-              <div className="flex items-center justify-center gap-2 text-sm">
-                <Coins className="w-4 h-4 text-amber-400" />
-                <span className="text-white/60">
-                  Earn up to <span className="text-amber-400 font-semibold">{AFFILIATE_CONFIG.maxCommission}% commission</span> as an affiliate!
+            <div className="mt-4 sm:mt-5 pt-3 sm:pt-4 border-t border-white/10">
+              <div className="flex items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
+                <Coins className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400" />
+                <span className="text-white/50">
+                  Earn up to <span className="text-amber-400 font-semibold">{AFFILIATE_CONFIG.maxCommission}%</span> as an affiliate!
                 </span>
               </div>
             </div>
@@ -1479,7 +1504,7 @@ export function LandingPage() {
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-cyan-500" />
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <span className="relative text-white flex items-center justify-center gap-2">
-                  Start 14-Day Free Trial
+                  Start 7-Day Free Trial
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
               </button>
@@ -1490,7 +1515,7 @@ export function LandingPage() {
           <div className="mt-8 sm:mt-10 lg:mt-12 text-center">
             <p className="text-white/50 text-xs sm:text-sm flex items-center justify-center gap-2 flex-wrap">
               <Shield className="w-4 h-4 text-emerald-400" />
-              <span>14-day free trial • Cancel anytime • No hidden fees</span>
+              <span>7-day free trial • Cancel anytime • No hidden fees</span>
             </p>
           </div>
         </div>
@@ -2000,7 +2025,7 @@ export function LandingPage() {
                   {/* Center content */}
                   <div className="absolute inset-6 sm:inset-8 rounded-full bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 backdrop-blur-xl flex flex-col items-center justify-center">
                     <div className="text-5xl sm:text-6xl md:text-7xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                      14
+                      7
                     </div>
                     <div className="text-base sm:text-lg md:text-xl text-white/80 font-medium">Days Free</div>
                     <div className="text-xs sm:text-sm text-white/50 mt-0.5 sm:mt-1">Full Access</div>

@@ -8,9 +8,9 @@ export const SITE_CONFIG = {
 };
 
 export const TRIAL_CONFIG = {
-  days: 14,
-  label: '14-Day Free Trial',
-  shortLabel: '14 Days FREE!',
+  days: 7,
+  label: '7-Day Free Trial',
+  shortLabel: '7 Days FREE!',
 };
 
 export const PRICING_CONFIG = {
