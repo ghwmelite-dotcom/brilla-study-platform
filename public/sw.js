@@ -1,5 +1,5 @@
 // Brilla Study Platform - Service Worker
-const CACHE_NAME = 'brilla-v2';
+const CACHE_NAME = 'brilla-v3';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache immediately on install

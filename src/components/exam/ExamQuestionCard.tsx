@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle, HelpCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/utils';
+import { useThemeStore } from '@/stores';
 
 export interface QuestionOption {
   id: string;
@@ -45,6 +46,8 @@ export function ExamQuestionCard({
 }: ExamQuestionCardProps) {
   const [localTimeRemaining, setLocalTimeRemaining] = useState(timeLimit || 0);
   const [imageLoading, setImageLoading] = useState(!!imageUrl);
+  const { resolvedTheme } = useThemeStore();
+  const isDark = resolvedTheme === 'dark';
 
   // Per-question timer
   useEffect(() => {
@@ -77,7 +80,7 @@ export function ExamQuestionCard({
       {/* Question Header */}
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-center gap-3">
-          <span className="text-sm font-semibold text-white/50">
+          <span className={cn("text-sm font-semibold", isDark ? "text-white/50" : "text-slate-500")}>
             Question {questionNumber}
           </span>
           {difficulty && (
@@ -97,12 +100,12 @@ export function ExamQuestionCard({
                 ? 'bg-red-500/20 text-red-400 animate-pulse'
                 : localTimeRemaining <= 30
                   ? 'bg-amber-500/20 text-amber-400'
-                  : 'bg-white/5 text-white/70'
+                  : isDark ? 'bg-white/5 text-white/70' : 'bg-slate-100 text-slate-700'
             )}>
               {localTimeRemaining}s
             </span>
           )}
-          <span className="text-sm text-white/50">
+          <span className={cn("text-sm", isDark ? "text-white/50" : "text-slate-500")}>
             {marks} mark{marks !== 1 ? 's' : ''}
           </span>
         </div>
@@ -130,7 +133,7 @@ export function ExamQuestionCard({
 
       {/* Question Text */}
       <div className="mb-8">
-        <p className="text-lg lg:text-xl text-white leading-relaxed">
+        <p className={cn("text-lg lg:text-xl leading-relaxed", isDark ? "text-white" : "text-slate-900")}>
           {questionText}
         </p>
       </div>
@@ -151,7 +154,9 @@ export function ExamQuestionCard({
                 disabled={showFeedback}
                 className={cn(
                   'w-full flex items-center gap-4 p-4 lg:p-5 rounded-2xl border-2 text-left transition-all group',
-                  !showFeedback && !isSelected && 'border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.05]',
+                  !showFeedback && !isSelected && (isDark
+                    ? 'border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.05]'
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'),
                   !showFeedback && isSelected && 'border-blue-500/50 bg-blue-500/10',
                   showCorrect && 'border-emerald-500/50 bg-emerald-500/10',
                   showWrong && 'border-red-500/50 bg-red-500/10'
@@ -161,7 +166,9 @@ export function ExamQuestionCard({
                 <span
                   className={cn(
                     'w-10 h-10 rounded-xl flex items-center justify-center font-semibold text-sm transition-all shrink-0',
-                    !showFeedback && !isSelected && 'bg-white/10 text-white/70 group-hover:bg-white/20',
+                    !showFeedback && !isSelected && (isDark
+                      ? 'bg-white/10 text-white/70 group-hover:bg-white/20'
+                      : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'),
                     !showFeedback && isSelected && 'bg-blue-500 text-white',
                     showCorrect && 'bg-emerald-500 text-white',
                     showWrong && 'bg-red-500 text-white'
@@ -174,10 +181,10 @@ export function ExamQuestionCard({
                 {/* Option text */}
                 <span className={cn(
                   'flex-1 text-base lg:text-lg',
-                  !showFeedback && !isSelected && 'text-white/80',
-                  !showFeedback && isSelected && 'text-white',
-                  showCorrect && 'text-emerald-300',
-                  showWrong && 'text-red-300'
+                  !showFeedback && !isSelected && (isDark ? 'text-white/80' : 'text-slate-700'),
+                  !showFeedback && isSelected && (isDark ? 'text-white' : 'text-blue-700'),
+                  showCorrect && (isDark ? 'text-emerald-300' : 'text-emerald-700'),
+                  showWrong && (isDark ? 'text-red-300' : 'text-red-700')
                 )}>
                   {option.text}
                 </span>
@@ -212,10 +219,12 @@ export function ExamQuestionCard({
                 disabled={showFeedback}
                 className={cn(
                   'flex-1 py-5 rounded-2xl font-semibold text-lg border-2 transition-all',
-                  !showFeedback && !isSelected && 'border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20 hover:bg-white/[0.05]',
-                  !showFeedback && isSelected && 'border-blue-500/50 bg-blue-500/10 text-blue-400',
-                  showCorrect && 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400',
-                  showWrong && 'border-red-500/50 bg-red-500/10 text-red-400'
+                  !showFeedback && !isSelected && (isDark
+                    ? 'border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20 hover:bg-white/[0.05]'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'),
+                  !showFeedback && isSelected && (isDark ? 'border-blue-500/50 bg-blue-500/10 text-blue-400' : 'border-blue-500 bg-blue-50 text-blue-700'),
+                  showCorrect && (isDark ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400' : 'border-emerald-500 bg-emerald-50 text-emerald-700'),
+                  showWrong && (isDark ? 'border-red-500/50 bg-red-500/10 text-red-400' : 'border-red-500 bg-red-50 text-red-700')
                 )}
               >
                 {option}
@@ -235,9 +244,14 @@ export function ExamQuestionCard({
             disabled={showFeedback}
             placeholder="Type your answer here..."
             className={cn(
-              'w-full px-5 py-4 rounded-2xl border-2 bg-white/[0.02] text-white text-lg',
-              'placeholder:text-white/30 focus:outline-none transition-all',
-              !showFeedback && 'border-white/10 focus:border-blue-500/50 focus:bg-white/[0.05]',
+              'w-full px-5 py-4 rounded-2xl border-2 text-lg',
+              isDark
+                ? 'bg-white/[0.02] text-white placeholder:text-white/30'
+                : 'bg-white text-slate-900 placeholder:text-slate-400',
+              'focus:outline-none transition-all',
+              !showFeedback && (isDark
+                ? 'border-white/10 focus:border-blue-500/50 focus:bg-white/[0.05]'
+                : 'border-slate-200 focus:border-blue-500 focus:bg-slate-50'),
               showFeedback && isCorrect && 'border-emerald-500/50 bg-emerald-500/10',
               showFeedback && !isCorrect && 'border-red-500/50 bg-red-500/10'
             )}
@@ -262,9 +276,14 @@ export function ExamQuestionCard({
           placeholder="Write your essay answer here..."
           rows={8}
           className={cn(
-            'w-full px-5 py-4 rounded-2xl border-2 bg-white/[0.02] text-white text-base',
-            'placeholder:text-white/30 focus:outline-none transition-all resize-none',
-            !showFeedback && 'border-white/10 focus:border-blue-500/50 focus:bg-white/[0.05]'
+            'w-full px-5 py-4 rounded-2xl border-2 text-base',
+            isDark
+              ? 'bg-white/[0.02] text-white placeholder:text-white/30'
+              : 'bg-white text-slate-900 placeholder:text-slate-400',
+            'focus:outline-none transition-all resize-none',
+            !showFeedback && (isDark
+              ? 'border-white/10 focus:border-blue-500/50 focus:bg-white/[0.05]'
+              : 'border-slate-200 focus:border-blue-500 focus:bg-slate-50')
           )}
         />
       )}
@@ -283,16 +302,16 @@ export function ExamQuestionCard({
               isCorrect ? 'text-emerald-400' : 'text-amber-400'
             )} />
             <div>
-              <p className="font-medium text-white mb-1">
+              <p className={cn("font-medium mb-1", isDark ? "text-white" : "text-slate-900")}>
                 {isCorrect ? 'Correct!' : 'Explanation'}
               </p>
-              <p className="text-white/70 text-sm leading-relaxed">
+              <p className={cn("text-sm leading-relaxed", isDark ? "text-white/70" : "text-slate-600")}>
                 {explanation}
               </p>
               {!isCorrect && correctAnswer && (
                 <p className="mt-2 text-sm">
-                  <span className="text-white/50">Correct answer: </span>
-                  <span className="text-emerald-400 font-medium">{correctAnswer}</span>
+                  <span className={isDark ? "text-white/50" : "text-slate-500"}>Correct answer: </span>
+                  <span className="text-emerald-500 font-medium">{correctAnswer}</span>
                 </p>
               )}
             </div>
