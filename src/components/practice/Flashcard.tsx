@@ -4,6 +4,7 @@ import type { Topic } from '@/types';
 import { Card, Button, Badge } from '@/components/common';
 import { MathText } from '@/components/questions';
 import { cn, shuffleArray } from '@/utils';
+import { useThemeStore } from '@/stores';
 
 interface FlashcardItem {
   id: string;
@@ -25,6 +26,8 @@ export function Flashcard({ cards, title, onComplete }: FlashcardProps) {
   const [unknownCards, setUnknownCards] = useState<Set<string>>(new Set());
   const [cardOrder, setCardOrder] = useState(cards);
   const [isComplete, setIsComplete] = useState(false);
+  const { resolvedTheme } = useThemeStore();
+  const isDark = resolvedTheme === 'dark';
 
   const currentCard = cardOrder[currentIndex];
   const progress = ((knownCards.size + unknownCards.size) / cards.length) * 100;
@@ -83,18 +86,18 @@ export function Flashcard({ cards, title, onComplete }: FlashcardProps) {
   if (isComplete) {
     return (
       <Card className="p-8 text-center max-w-md mx-auto">
-        <h2 className="text-2xl font-bold text-neutral-900 mb-4">
+        <h2 className={cn("text-2xl font-bold mb-4", isDark ? "text-white" : "text-neutral-900")}>
           Session Complete!
         </h2>
 
         <div className="grid grid-cols-2 gap-4 my-6">
-          <div className="p-4 bg-green-50 rounded-lg">
-            <p className="text-sm text-green-600">Got it</p>
-            <p className="text-3xl font-bold text-green-700">{knownCards.size}</p>
+          <div className={cn("p-4 rounded-lg", isDark ? "bg-green-500/20" : "bg-green-50")}>
+            <p className={cn("text-sm", isDark ? "text-green-400" : "text-green-600")}>Got it</p>
+            <p className={cn("text-3xl font-bold", isDark ? "text-green-300" : "text-green-700")}>{knownCards.size}</p>
           </div>
-          <div className="p-4 bg-red-50 rounded-lg">
-            <p className="text-sm text-red-600">Need Review</p>
-            <p className="text-3xl font-bold text-red-700">{unknownCards.size}</p>
+          <div className={cn("p-4 rounded-lg", isDark ? "bg-red-500/20" : "bg-red-50")}>
+            <p className={cn("text-sm", isDark ? "text-red-400" : "text-red-600")}>Need Review</p>
+            <p className={cn("text-3xl font-bold", isDark ? "text-red-300" : "text-red-700")}>{unknownCards.size}</p>
           </div>
         </div>
 
@@ -117,8 +120,8 @@ export function Flashcard({ cards, title, onComplete }: FlashcardProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          {title && <h2 className="font-semibold text-neutral-900">{title}</h2>}
-          <p className="text-sm text-neutral-500">
+          {title && <h2 className={cn("font-semibold", isDark ? "text-white" : "text-neutral-900")}>{title}</h2>}
+          <p className={cn("text-sm", isDark ? "text-slate-400" : "text-neutral-500")}>
             Card {currentIndex + 1} of {cardOrder.length}
           </p>
         </div>
@@ -132,7 +135,7 @@ export function Flashcard({ cards, title, onComplete }: FlashcardProps) {
       </div>
 
       {/* Progress bar */}
-      <div className="w-full bg-neutral-200 rounded-full h-2">
+      <div className={cn("w-full rounded-full h-2", isDark ? "bg-slate-700" : "bg-neutral-200")}>
         <div
           className="bg-primary h-2 rounded-full transition-all"
           style={{ width: `${progress}%` }}
@@ -162,10 +165,10 @@ export function Flashcard({ cards, title, onComplete }: FlashcardProps) {
                 {currentCard.category}
               </Badge>
             )}
-            <p className="text-xl font-medium text-neutral-900 text-center">
+            <p className={cn("text-xl font-medium text-center", isDark ? "text-white" : "text-neutral-900")}>
               <MathText text={currentCard.front} />
             </p>
-            <p className="mt-4 text-sm text-neutral-400">
+            <p className={cn("mt-4 text-sm", isDark ? "text-slate-500" : "text-neutral-400")}>
               Click to reveal answer
             </p>
           </Card>
@@ -177,7 +180,7 @@ export function Flashcard({ cards, title, onComplete }: FlashcardProps) {
               !isFlipped && 'invisible'
             )}
           >
-            <p className="text-xl font-medium text-primary text-center">
+            <p className={cn("text-xl font-medium text-center", isDark ? "text-primary-light" : "text-primary")}>
               <MathText text={currentCard.back} />
             </p>
           </Card>
