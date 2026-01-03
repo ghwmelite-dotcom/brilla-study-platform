@@ -2896,6 +2896,82 @@ publicApp.get('/battles/available', async (c) => {
   }
 });
 
+// Get battle history (must be before /battles/:id)
+publicApp.get('/battles/history', async (c) => {
+  // Get userId from auth header if present
+  const authHeader = c.req.header('Authorization');
+  let userId: string | null = null;
+
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.replace('Bearer ', '');
+    try {
+      const payload = await verifyToken(token, c.env.JWT_SECRET);
+      if (payload) {
+        userId = payload.userId;
+      }
+    } catch {
+      // Token invalid, continue without userId
+    }
+  }
+
+  // Also check query param as fallback
+  if (!userId) {
+    userId = c.req.query('userId') || null;
+  }
+
+  if (!userId) {
+    return c.json({ success: false, error: 'Authentication required' }, 401);
+  }
+
+  const limit = parseInt(c.req.query('limit') || '20');
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT b.*,
+        c.name as challenger_name, c.avatar_url as challenger_avatar,
+        o.name as opponent_name, o.avatar_url as opponent_avatar,
+        s.name as subject_name,
+        CASE
+          WHEN b.challenger_id = ? THEN b.challenger_score
+          ELSE b.opponent_score
+        END as your_score,
+        CASE
+          WHEN b.challenger_id = ? THEN b.opponent_score
+          ELSE b.challenger_score
+        END as opponent_score,
+        CASE
+          WHEN b.challenger_id = ? THEN o.name
+          ELSE c.name
+        END as opponent_name_display
+      FROM battles b
+      JOIN users c ON b.challenger_id = c.id
+      LEFT JOIN users o ON b.opponent_id = o.id
+      LEFT JOIN subjects s ON b.subject_id = s.id
+      WHERE b.challenger_id = ? OR b.opponent_id = ?
+      ORDER BY b.created_at DESC
+      LIMIT ?
+    `).bind(userId, userId, userId, userId, userId, limit).all();
+
+    // Format results for the frontend
+    const formattedResults = results.map((battle: Record<string, unknown>) => ({
+      id: battle.id,
+      status: battle.status,
+      winner_id: battle.winner_id,
+      your_score: battle.your_score,
+      opponent_score: battle.opponent_score,
+      created_at: battle.created_at,
+      opponent: {
+        name: battle.opponent_name_display || 'Opponent',
+      },
+    }));
+
+    return c.json(formattedResults);
+  } catch (error) {
+    console.error('Failed to fetch battle history:', error);
+    return c.json({ success: false, error: 'Failed to fetch battle history' }, 500);
+  }
+});
+
 // Get battle by ID
 publicApp.get('/battles/:id', async (c) => {
   const id = c.req.param('id');
