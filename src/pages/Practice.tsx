@@ -5,10 +5,6 @@ import {
   BookOpen,
   Target,
   ArrowRight,
-  Calculator,
-  Atom,
-  FlaskConical,
-  Dna,
   Settings,
   FileText,
   PenTool,
@@ -17,10 +13,12 @@ import {
   Swords,
   Loader2,
   AlertTriangle,
+  FlaskConical,
 } from 'lucide-react';
 import { Card, Button, Badge, Select } from '@/components/common';
 import { TopicDrill, SpeedRace, Flashcard } from '@/components/practice';
 import { useExamStore } from '@/stores';
+import { getExamConfig } from '@/config';
 import { cn } from '@/utils';
 import { api } from '@/services/api';
 import type { Question } from '@/types';
@@ -197,6 +195,7 @@ export function PracticePage() {
   const initialMode = searchParams.get('mode') as PracticeMode;
   const initialTopic = searchParams.get('topic');
   const { currentExamType, subjects: examSubjects } = useExamStore();
+  const examConfig = getExamConfig(currentExamType);
 
   const [activeMode, setActiveMode] = useState<PracticeMode>(initialMode);
   const [selectedSubject, setSelectedSubject] = useState('all');
@@ -310,14 +309,9 @@ export function PracticePage() {
     try {
       let url = `/questions?limit=${questionCount}`;
       if (selectedSubject !== 'all') {
-        // Map subject slug to subject_id format
-        const subjectIdMap: Record<string, string> = {
-          mathematics: 'subj_math',
-          physics: 'subj_physics',
-          chemistry: 'subj_chemistry',
-          biology: 'subj_biology',
-        };
-        const subjectId = subjectIdMap[selectedSubject] || selectedSubject;
+        // Find subject ID from exam subjects, or use the slug directly
+        const subject = examSubjects.find(s => s.slug === selectedSubject);
+        const subjectId = subject?.id || selectedSubject;
         url += `&subject=${subjectId}`;
       }
       if (selectedDifficulty !== 'all') {
@@ -352,13 +346,8 @@ export function PracticePage() {
 
         // If subject is selected, try to find a matching deck
         if (selectedSubject !== 'all') {
-          const subjectIdMap: Record<string, string> = {
-            mathematics: 'subj_math',
-            physics: 'subj_physics',
-            chemistry: 'subj_chemistry',
-            biology: 'subj_biology',
-          };
-          const subjectId = subjectIdMap[selectedSubject];
+          const subject = examSubjects.find(s => s.slug === selectedSubject);
+          const subjectId = subject?.id || selectedSubject;
           const matchingDeck = decks.find(d => d.subject_id === subjectId && d.card_count > 0);
           if (matchingDeck) {
             selectedDeck = matchingDeck;
@@ -704,26 +693,24 @@ export function PracticePage() {
       <section>
         <h2 className="text-lg font-semibold text-neutral-900 mb-4">Quick Start</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { subject: 'mathematics', icon: Calculator, color: 'bg-blue-500', label: 'Math Drill' },
-            { subject: 'physics', icon: Atom, color: 'bg-purple-500', label: 'Physics Drill' },
-            { subject: 'chemistry', icon: FlaskConical, color: 'bg-green-500', label: 'Chemistry Drill' },
-            { subject: 'biology', icon: Dna, color: 'bg-amber-500', label: 'Biology Drill' },
-          ].map((item) => (
-            <Card
-              key={item.subject}
-              hoverable
-              className="p-4 text-center cursor-pointer"
-              onClick={() => {
-                navigate(`/exam/practice?mode=drill&subject=${item.subject}&count=${questionCount}`);
-              }}
-            >
-              <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center text-white mx-auto mb-2', item.color)}>
-                <item.icon className="w-5 h-5" />
-              </div>
-              <p className="text-sm font-medium text-neutral-900">{item.label}</p>
-            </Card>
-          ))}
+          {examConfig.quickStartSubjects.map((item) => {
+            const ItemIcon = item.icon;
+            return (
+              <Card
+                key={item.slug}
+                hoverable
+                className="p-4 text-center cursor-pointer"
+                onClick={() => {
+                  navigate(`/exam/practice?mode=drill&subject=${item.slug}&count=${questionCount}`);
+                }}
+              >
+                <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center text-white mx-auto mb-2', item.color)}>
+                  <ItemIcon className="w-5 h-5" />
+                </div>
+                <p className="text-sm font-medium text-neutral-900">{item.label}</p>
+              </Card>
+            );
+          })}
         </div>
       </section>
 

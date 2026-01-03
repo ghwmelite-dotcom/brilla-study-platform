@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Target,
@@ -8,7 +8,7 @@ import {
   BookOpen,
   BarChart3,
 } from 'lucide-react';
-import { useAuthStore } from '@/stores';
+import { useAuthStore, useExamStore } from '@/stores';
 import { api } from '@/services/api';
 import {
   PerformanceChart,
@@ -31,17 +31,41 @@ import {
   calculateAccuracy,
 } from '@/utils/analyticsUtils';
 
-// Subject color and name mapping
-const subjectMeta: Record<string, { name: string; color: string }> = {
-  subj_math: { name: 'Mathematics', color: '#3B82F6' },
-  subj_physics: { name: 'Physics', color: '#8B5CF6' },
-  subj_chemistry: { name: 'Chemistry', color: '#10B981' },
-  subj_biology: { name: 'Biology', color: '#F59E0B' },
-};
+// Default colors for subjects without specific colors
+const subjectColors = [
+  '#3B82F6', // blue
+  '#8B5CF6', // purple
+  '#10B981', // emerald
+  '#F59E0B', // amber
+  '#EF4444', // red
+  '#06B6D4', // cyan
+  '#EC4899', // pink
+  '#84CC16', // lime
+  '#6366F1', // indigo
+  '#14B8A6', // teal
+];
 
 export function AnalyticsPage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { subjects: examSubjects } = useExamStore();
+
+  // Build subject metadata dynamically from exam store
+  const subjectMeta = useMemo(() => {
+    const meta: Record<string, { name: string; color: string }> = {};
+    examSubjects.forEach((subject, index) => {
+      meta[subject.id] = {
+        name: subject.name,
+        color: subjectColors[index % subjectColors.length],
+      };
+      // Also map by slug for flexibility
+      meta[subject.slug] = {
+        name: subject.name,
+        color: subjectColors[index % subjectColors.length],
+      };
+    });
+    return meta;
+  }, [examSubjects]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Analytics data from API

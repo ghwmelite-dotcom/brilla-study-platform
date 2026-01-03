@@ -50,14 +50,9 @@ function getIconComponent(iconName: string): React.ComponentType<{ className?: s
   return iconMap[iconName] || Icons.BookOpen;
 }
 
-// Mock progress data
-const subjectProgress: Record<string, { completed: number; total: number; mastery: number }> = {
-  'subj_wassce_core_math': { completed: 45, total: 200, mastery: 68 },
-  'subj_wassce_english': { completed: 30, total: 150, mastery: 55 },
-  'subj_wassce_int_science': { completed: 25, total: 180, mastery: 42 },
-  'subj_wassce_physics': { completed: 60, total: 180, mastery: 75 },
-  'subj_wassce_chemistry': { completed: 40, total: 200, mastery: 58 },
-};
+// Subject progress will be fetched from API in production
+// For now, return default empty progress for all subjects
+const subjectProgress: Record<string, { completed: number; total: number; mastery: number }> = {};
 
 export function SubjectCatalogPage() {
   const { currentExamType, subjects, categories, initializeExamData, fetchSubjects, fetchCategories } = useExamStore();

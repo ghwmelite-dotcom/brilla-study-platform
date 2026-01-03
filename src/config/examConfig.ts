@@ -14,6 +14,12 @@ import {
   Users,
   FileText,
   PenTool,
+  Calculator,
+  Atom,
+  FlaskConical,
+  Dna,
+  Globe,
+  Languages,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -125,6 +131,14 @@ export interface ExamConfig {
       color: string;
     }[];
   };
+
+  // Quick start subjects for practice page
+  quickStartSubjects: {
+    slug: string;
+    label: string;
+    icon: LucideIcon;
+    color: string;
+  }[];
 }
 
 export const examConfigs: Record<ExamTypeSlug, ExamConfig> = {
@@ -314,6 +328,14 @@ export const examConfigs: Record<ExamTypeSlug, ExamConfig> = {
         { label: 'Win Rate', value: '--', icon: Target, color: 'text-red-500' },
       ],
     },
+
+    // Quick start subjects for practice
+    quickStartSubjects: [
+      { slug: 'mathematics', label: 'Math Drill', icon: Calculator, color: 'bg-blue-500' },
+      { slug: 'physics', label: 'Physics Drill', icon: Atom, color: 'bg-purple-500' },
+      { slug: 'chemistry', label: 'Chemistry Drill', icon: FlaskConical, color: 'bg-green-500' },
+      { slug: 'biology', label: 'Biology Drill', icon: Dna, color: 'bg-amber-500' },
+    ],
   },
 
   wassce: {
@@ -502,6 +524,14 @@ export const examConfigs: Record<ExamTypeSlug, ExamConfig> = {
         { label: 'Predicted', value: '--', icon: Target, color: 'text-blue-500' },
       ],
     },
+
+    // Quick start subjects for practice
+    quickStartSubjects: [
+      { slug: 'core-mathematics', label: 'Math Drill', icon: Calculator, color: 'bg-blue-500' },
+      { slug: 'english-language', label: 'English Drill', icon: Languages, color: 'bg-purple-500' },
+      { slug: 'physics', label: 'Physics Drill', icon: Atom, color: 'bg-indigo-500' },
+      { slug: 'chemistry', label: 'Chemistry Drill', icon: FlaskConical, color: 'bg-green-500' },
+    ],
   },
 
   bece: {
@@ -690,6 +720,14 @@ export const examConfigs: Record<ExamTypeSlug, ExamConfig> = {
         { label: 'Best Score', value: '--', icon: Target, color: 'text-green-500' },
       ],
     },
+
+    // Quick start subjects for practice - BECE specific
+    quickStartSubjects: [
+      { slug: 'mathematics', label: 'Math Drill', icon: Calculator, color: 'bg-blue-500' },
+      { slug: 'english', label: 'English Drill', icon: Languages, color: 'bg-purple-500' },
+      { slug: 'integrated-science', label: 'Science Drill', icon: FlaskConical, color: 'bg-green-500' },
+      { slug: 'social-studies', label: 'Social Studies', icon: Globe, color: 'bg-amber-500' },
+    ],
   },
 };
 
