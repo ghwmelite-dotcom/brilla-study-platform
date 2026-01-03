@@ -195,10 +195,12 @@ export function PracticePage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const initialMode = searchParams.get('mode') as PracticeMode;
+  const initialTopic = searchParams.get('topic');
   const { currentExamType, subjects: examSubjects } = useExamStore();
 
   const [activeMode, setActiveMode] = useState<PracticeMode>(initialMode);
   const [selectedSubject, setSelectedSubject] = useState('all');
+  const [selectedTopic] = useState(initialTopic || '');
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [questionCount, setQuestionCount] = useState(10);
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -253,11 +255,15 @@ export function PracticePage() {
   }, []);
 
   // Auto-start speed mode if navigated with ?mode=speed
+  // Or auto-start drill mode if navigated with ?topic=...
   useEffect(() => {
     if (initialMode === 'speed' && !isSessionActive) {
       handleStartSession('speed');
+    } else if (initialTopic && !isSessionActive) {
+      // Auto-start drill mode when topic is specified
+      handleStartSession('drill');
     }
-  }, [initialMode]);
+  }, [initialMode, initialTopic]);
 
   // Get exam-specific features
   const currentExamFeatures = examFeatures[currentExamType] || [];
@@ -394,6 +400,7 @@ export function PracticePage() {
     if (mode === 'drill' || mode === 'speed') {
       const params = new URLSearchParams();
       params.set('mode', mode);
+      if (selectedTopic) params.set('topic', selectedTopic);
       if (selectedSubject !== 'all') params.set('subject', selectedSubject);
       if (selectedDifficulty !== 'all') params.set('difficulty', selectedDifficulty);
       params.set('count', questionCount.toString());

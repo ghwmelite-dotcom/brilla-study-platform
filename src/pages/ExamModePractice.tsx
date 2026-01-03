@@ -59,6 +59,7 @@ export default function ExamModePractice() {
 
   // Get params from URL or state
   const mode = searchParams.get('mode') || 'drill'; // drill, speed
+  const topic = searchParams.get('topic') || '';
   const subject = searchParams.get('subject') || 'all';
   const difficulty = searchParams.get('difficulty') || 'all';
   const count = parseInt(searchParams.get('count') || '10', 10);
@@ -87,6 +88,9 @@ export default function ExamModePractice() {
         if (mode === 'speed') {
           url += '&round=speed_race';
         }
+        if (topic) {
+          url += `&topic=${topic}`;
+        }
         if (subject !== 'all') {
           url += `&subject=${subject}`;
         }
@@ -109,7 +113,7 @@ export default function ExamModePractice() {
     };
 
     fetchQuestions();
-  }, [passedQuestions, mode, subject, difficulty, count, navigate]);
+  }, [passedQuestions, mode, topic, subject, difficulty, count, navigate]);
 
   const currentQuestion = questions[currentIndex];
   const totalQuestions = questions.length;
