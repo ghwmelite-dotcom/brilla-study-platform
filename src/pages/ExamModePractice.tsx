@@ -161,9 +161,9 @@ export default function ExamModePractice() {
 
     try {
       // Submit answer to API (tracks usage for freemium)
+      // Note: userId is taken from JWT on the server side
       const response = await api.post(`/questions/${currentQuestion.id}/attempt`, {
         answer,
-        userId: 'user_demo', // Will be replaced by auth
       }) as {
         success: boolean;
         data?: {

@@ -3082,8 +3082,8 @@ app.route('/api', publicApp);
 
 // Get daily usage info for freemium limits
 protectedApp.get('/usage/daily', async (c) => {
-  const user = c.get('user') as UserPayload;
-  const userId = user?.userId || c.req.query('userId') || 'user_demo';
+  // Get userId from JWT context (set by auth middleware)
+  const userId = c.get('userId') as string || c.req.query('userId') || 'user_demo';
 
   try {
     const usage = await getDailyUsage(userId, c.env.DB);
@@ -3113,7 +3113,10 @@ protectedApp.get('/usage/core-subjects/:examType', async (c) => {
 // Submit answer
 protectedApp.post('/questions/:id/attempt', async (c) => {
   const questionId = c.req.param('id');
-  const { answer, userId } = await c.req.json();
+  const { answer } = await c.req.json();
+
+  // Get userId from JWT context (set by auth middleware)
+  const userId = c.get('userId') as string || 'user_demo';
 
   try {
     // Check daily usage limit before processing
