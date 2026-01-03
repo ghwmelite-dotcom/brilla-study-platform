@@ -15,6 +15,14 @@ import { recordingsApp } from './recordings';
 import { whiteboardsApp } from './whiteboards';
 import { teacherBonusesRouter } from './teacher-bonuses';
 import { tutoringRouter } from './tutoring';
+import { quickPlayApp } from './quickplay';
+import { learningPathApp } from './learningpath';
+import { activityFeedApp } from './activityfeed';
+import { eventsApp } from './events';
+import { teamBattlesApp } from './teambattles';
+import { cosmeticsApp } from './cosmetics';
+import { rewardsApp } from './rewards';
+import { engagementApp } from './engagement';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -9801,6 +9809,16 @@ app.route('/api/teacher-bonuses', teacherBonusesRouter);
 
 // Mount Tutoring Marketplace routes
 app.route('/api/tutoring', tutoringRouter);
+
+// Mount Engagement Feature routes
+app.route('/api/quickplay', quickPlayApp);
+app.route('/api/learning', learningPathApp);
+app.route('/api/activity', activityFeedApp);
+app.route('/api/events', eventsApp);
+app.route('/api/team-battles', teamBattlesApp);
+app.route('/api/cosmetics', cosmeticsApp);
+app.route('/api/rewards', rewardsApp);
+app.route('/api/engagement', engagementApp);
 
 // Mount protected routes (must be after all protectedApp routes are defined)
 app.route('/api', protectedApp);

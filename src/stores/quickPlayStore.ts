@@ -293,11 +293,38 @@ export const useQuickPlayStore = create<QuickPlayState>()(
         set({ isLoading: true, error: null });
 
         try {
-          // In production, this would be an API call
+          // Try API first
+          const token = localStorage.getItem('brilla_token');
+          if (token) {
+            const response = await fetch('/api/quickplay/daily-challenge', {
+              headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (response.ok) {
+              const data = await response.json();
+              if (data.success && data.data?.challenge) {
+                const apiChallenge = data.data.challenge;
+                set({
+                  dailyChallenge: {
+                    id: apiChallenge.id,
+                    date: apiChallenge.date,
+                    question: apiChallenge.question || generateDailyBrainTeaser().question,
+                    hints: apiChallenge.hints || ['Think carefully...', 'Consider all options...'],
+                    hintsUsed: 0,
+                    completed: apiChallenge.completed || false,
+                  },
+                  isLoading: false,
+                });
+                return;
+              }
+            }
+          }
+          // Fallback to mock data
           const challenge = generateDailyBrainTeaser();
           set({ dailyChallenge: challenge, isLoading: false });
         } catch (error) {
-          set({ error: 'Failed to fetch daily challenge', isLoading: false });
+          // Fallback to mock data on error
+          const challenge = generateDailyBrainTeaser();
+          set({ dailyChallenge: challenge, isLoading: false });
         }
       },
 
@@ -311,11 +338,47 @@ export const useQuickPlayStore = create<QuickPlayState>()(
             throw new Error('Invalid game type');
           }
 
-          // Generate questions (would be API call in production)
-          const questions = generateDemoQuestions(gameConfig.questionCount, subjectId);
+          let questions = generateDemoQuestions(gameConfig.questionCount, subjectId);
+          let sessionId = `session_${Date.now()}`;
+
+          // Try API first
+          const token = localStorage.getItem('brilla_token');
+          if (token) {
+            try {
+              const response = await fetch('/api/quickplay/start', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ gameType, subjectId }),
+              });
+              if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.data) {
+                  sessionId = data.data.sessionId;
+                  // multiplier is available in data.data.multiplier if needed
+                  if (data.data.questions?.length > 0) {
+                    questions = data.data.questions.map((q: any) => ({
+                      id: q.id,
+                      text: q.questionText,
+                      options: q.options?.map((o: any) => typeof o === 'string' ? o : o.text) || [],
+                      correctAnswer: q.options?.find((o: any) => o.isCorrect)?.text || q.correctAnswer || '',
+                      explanation: q.explanation || '',
+                      subjectId: q.subjectId || subjectId || '',
+                      topicId: q.topicId || '',
+                      difficulty: q.difficulty || 'medium',
+                    }));
+                  }
+                }
+              }
+            } catch (apiError) {
+              console.log('Using mock questions as fallback');
+            }
+          }
 
           const session: QuickPlaySession = {
-            id: `session_${Date.now()}`,
+            id: sessionId,
             gameType,
             subjectId,
             questions,
