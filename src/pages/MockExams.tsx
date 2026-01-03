@@ -108,6 +108,66 @@ const mockExamConfigs = {
         difficulty: 'Advanced',
         color: '#6366F1',
       },
+      {
+        id: 'pp_wassce_eco_2024_1',
+        name: 'Economics',
+        subject: 'Economics',
+        papers: [
+          { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives', paperId: 'pp_wassce_eco_2024_1' },
+        ],
+        difficulty: 'Standard',
+        color: '#10B981',
+      },
+      {
+        id: 'pp_wassce_gov_2024_1',
+        name: 'Government',
+        subject: 'Government',
+        papers: [
+          { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives', paperId: 'pp_wassce_gov_2024_1' },
+        ],
+        difficulty: 'Standard',
+        color: '#3B82F6',
+      },
+      {
+        id: 'pp_wassce_geo_2024_1',
+        name: 'Geography',
+        subject: 'Geography',
+        papers: [
+          { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives', paperId: 'pp_wassce_geo_2024_1' },
+        ],
+        difficulty: 'Standard',
+        color: '#F97316',
+      },
+      {
+        id: 'pp_wassce_lit_2024_1',
+        name: 'Literature in English',
+        subject: 'Literature in English',
+        papers: [
+          { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives', paperId: 'pp_wassce_lit_2024_1' },
+        ],
+        difficulty: 'Standard',
+        color: '#A855F7',
+      },
+      {
+        id: 'pp_wassce_acc_2024_1',
+        name: 'Financial Accounting',
+        subject: 'Financial Accounting',
+        papers: [
+          { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives', paperId: 'pp_wassce_acc_2024_1' },
+        ],
+        difficulty: 'Advanced',
+        color: '#14B8A6',
+      },
+      {
+        id: 'pp_wassce_crs_2024_1',
+        name: 'Christian Religious Studies',
+        subject: 'CRS',
+        papers: [
+          { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives', paperId: 'pp_wassce_crs_2024_1' },
+        ],
+        difficulty: 'Standard',
+        color: '#EC4899',
+      },
     ],
   },
   bece: {
@@ -153,6 +213,46 @@ const mockExamConfigs = {
         ],
         difficulty: 'Standard',
         color: '#F59E0B',
+      },
+      {
+        id: 'pp_bece_rme_2024_1',
+        name: 'Religious & Moral Education',
+        subject: 'RME',
+        papers: [
+          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Objectives', paperId: 'pp_bece_rme_2024_1' },
+        ],
+        difficulty: 'Standard',
+        color: '#EC4899',
+      },
+      {
+        id: 'pp_bece_ict_2024_1',
+        name: 'ICT',
+        subject: 'ICT',
+        papers: [
+          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Objectives', paperId: 'pp_bece_ict_2024_1' },
+        ],
+        difficulty: 'Standard',
+        color: '#6366F1',
+      },
+      {
+        id: 'pp_bece_french_2024_1',
+        name: 'French',
+        subject: 'French',
+        papers: [
+          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Objectives', paperId: 'pp_bece_french_2024_1' },
+        ],
+        difficulty: 'Standard',
+        color: '#F59E0B',
+      },
+      {
+        id: 'pp_bece_bdt_2024_1',
+        name: 'Basic Design & Technology',
+        subject: 'BDT',
+        papers: [
+          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Objectives', paperId: 'pp_bece_bdt_2024_1' },
+        ],
+        difficulty: 'Standard',
+        color: '#8B5CF6',
       },
     ],
   },
