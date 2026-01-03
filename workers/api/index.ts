@@ -23,6 +23,7 @@ import { teamBattlesApp } from './teambattles';
 import { cosmeticsApp } from './cosmetics';
 import { rewardsApp } from './rewards';
 import { engagementApp } from './engagement';
+import { friendsApp } from './friends';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -9881,6 +9882,7 @@ app.route('/api/team-battles', teamBattlesApp);
 app.route('/api/cosmetics', cosmeticsApp);
 app.route('/api/rewards', rewardsApp);
 app.route('/api/engagement', engagementApp);
+app.route('/api/friends', friendsApp);
 
 // Mount protected routes (must be after all protectedApp routes are defined)
 app.route('/api', protectedApp);
