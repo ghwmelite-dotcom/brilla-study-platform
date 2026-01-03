@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import * as Icons from 'lucide-react';
 import {
-  Calculator,
-  Atom,
-  FlaskConical,
-  Dna,
   ChevronRight,
   BookOpen,
   Brain,
@@ -16,107 +13,65 @@ import {
 import { Card, Button, Badge, Input, ProgressBar } from '@/components/common';
 import { cn } from '@/utils';
 import { api } from '@/services/api';
+import { useExamStore } from '@/stores';
 
-// Topic structure - mastery and questionCount will be populated from API based on user progress
-const subjectsData = {
-  mathematics: {
-    id: 'mathematics',
-    name: 'Mathematics',
-    icon: Calculator,
-    color: 'bg-blue-500',
-    description: 'Master mathematical concepts from algebra to calculus',
-    topics: [
-      {
-        id: 'algebra',
-        name: 'Algebra',
-        description: 'Fundamental algebraic concepts and operations',
-        questionCount: 0,
-        mastery: 0,
-        subtopics: [
-          { id: 'quadratic', name: 'Quadratic Equations', questionCount: 0, mastery: 0 },
-          { id: 'linear', name: 'Linear Equations', questionCount: 0, mastery: 0 },
-          { id: 'polynomials', name: 'Polynomials', questionCount: 0, mastery: 0 },
-        ],
-      },
-      {
-        id: 'geometry',
-        name: 'Geometry',
-        description: 'Study of shapes, sizes, and properties of space',
-        questionCount: 0,
-        mastery: 0,
-        subtopics: [],
-      },
-      {
-        id: 'trigonometry',
-        name: 'Trigonometry',
-        description: 'Study of triangles and trigonometric functions',
-        questionCount: 0,
-        mastery: 0,
-        subtopics: [],
-      },
-      {
-        id: 'calculus',
-        name: 'Calculus',
-        description: 'Study of rates of change and accumulation',
-        questionCount: 0,
-        mastery: 0,
-        subtopics: [],
-      },
-      {
-        id: 'statistics',
-        name: 'Statistics & Probability',
-        description: 'Analysis of data and chance',
-        questionCount: 0,
-        mastery: 0,
-        subtopics: [],
-      },
-    ],
-  },
-  physics: {
-    id: 'physics',
-    name: 'Physics',
-    icon: Atom,
-    color: 'bg-purple-500',
-    description: 'Explore the fundamental laws of the universe',
-    topics: [
-      { id: 'mechanics', name: 'Mechanics', description: 'Study of motion and forces', questionCount: 0, mastery: 0, subtopics: [] },
-      { id: 'electricity', name: 'Electricity & Magnetism', description: 'Electric charges and magnetic fields', questionCount: 0, mastery: 0, subtopics: [] },
-      { id: 'waves', name: 'Waves & Optics', description: 'Wave motion and light', questionCount: 0, mastery: 0, subtopics: [] },
-      { id: 'thermodynamics', name: 'Thermodynamics', description: 'Heat and energy transfer', questionCount: 0, mastery: 0, subtopics: [] },
-      { id: 'modern', name: 'Modern Physics', description: 'Quantum mechanics and relativity', questionCount: 0, mastery: 0, subtopics: [] },
-    ],
-  },
-  chemistry: {
-    id: 'chemistry',
-    name: 'Chemistry',
-    icon: FlaskConical,
-    color: 'bg-green-500',
-    description: 'Discover the science of matter and its interactions',
-    topics: [
-      { id: 'atomic', name: 'Atomic Structure', description: 'Structure of atoms and electron configuration', questionCount: 0, mastery: 0, subtopics: [] },
-      { id: 'bonding', name: 'Chemical Bonding', description: 'How atoms combine to form compounds', questionCount: 0, mastery: 0, subtopics: [] },
-      { id: 'stoichiometry', name: 'Stoichiometry', description: 'Quantitative relationships in reactions', questionCount: 0, mastery: 0, subtopics: [] },
-      { id: 'equilibrium', name: 'Chemical Equilibrium', description: 'Balance in reversible reactions', questionCount: 0, mastery: 0, subtopics: [] },
-      { id: 'organic', name: 'Organic Chemistry', description: 'Chemistry of carbon compounds', questionCount: 0, mastery: 0, subtopics: [] },
-    ],
-  },
-  biology: {
-    id: 'biology',
-    name: 'Biology',
-    icon: Dna,
-    color: 'bg-amber-500',
-    description: 'Study life and living organisms',
-    topics: [
-      { id: 'cells', name: 'Cell Biology', description: 'Structure and function of cells', questionCount: 0, mastery: 0, subtopics: [] },
-      { id: 'genetics', name: 'Genetics', description: 'Study of heredity and variation', questionCount: 0, mastery: 0, subtopics: [] },
-      { id: 'ecology', name: 'Ecology', description: 'Organisms and their environment', questionCount: 0, mastery: 0, subtopics: [] },
-      { id: 'physiology', name: 'Human Physiology', description: 'Functions of the human body', questionCount: 0, mastery: 0, subtopics: [] },
-      { id: 'biochemistry', name: 'Biochemistry', description: 'Chemical processes in living organisms', questionCount: 0, mastery: 0, subtopics: [] },
-    ],
-  },
-};
+// Icon mapping helper
+function getIconComponent(iconName: string): React.ComponentType<{ className?: string }> {
+  const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+    Calculator: Icons.Calculator,
+    Atom: Icons.Atom,
+    FlaskConical: Icons.FlaskConical,
+    Leaf: Icons.Leaf,
+    BookOpen: Icons.BookOpen,
+    Languages: Icons.Languages,
+    Beaker: Icons.Beaker,
+    Users: Icons.Users,
+    TrendingUp: Icons.TrendingUp,
+    Briefcase: Icons.Briefcase,
+    Receipt: Icons.Receipt,
+    PiggyBank: Icons.PiggyBank,
+    Landmark: Icons.Landmark,
+    Globe: Icons.Globe,
+    Globe2: Icons.Globe2,
+    Clock: Icons.Clock,
+    Church: Icons.Church,
+    Monitor: Icons.Monitor,
+    Ruler: Icons.Ruler,
+    UtensilsCrossed: Icons.UtensilsCrossed,
+    Hammer: Icons.Hammer,
+    MessageCircle: Icons.MessageCircle,
+    Heart: Icons.Heart,
+    Sigma: Icons.Sigma,
+    Dna: Icons.Dna,
+  };
+  return iconMap[iconName] || Icons.BookOpen;
+}
 
-const subjects = Object.values(subjectsData);
+// Color mapping helper - convert hex to Tailwind bg class
+function getColorClass(hexColor: string): string {
+  const colorMap: Record<string, string> = {
+    '#3B82F6': 'bg-blue-500',
+    '#8B5CF6': 'bg-purple-500',
+    '#10B981': 'bg-emerald-500',
+    '#F59E0B': 'bg-amber-500',
+    '#EF4444': 'bg-red-500',
+    '#06B6D4': 'bg-cyan-500',
+    '#84CC16': 'bg-lime-500',
+    '#F97316': 'bg-orange-500',
+    '#EC4899': 'bg-pink-500',
+    '#0EA5E9': 'bg-sky-500',
+    '#A855F7': 'bg-violet-500',
+    '#DC2626': 'bg-red-600',
+    '#78716C': 'bg-stone-500',
+    '#0891B2': 'bg-cyan-600',
+    '#7C3AED': 'bg-purple-600',
+    '#475569': 'bg-slate-600',
+    '#EA580C': 'bg-orange-600',
+    '#2563EB': 'bg-blue-600',
+    '#059669': 'bg-emerald-600',
+  };
+  return colorMap[hexColor] || 'bg-primary';
+}
 
 // API Topic type
 interface ApiTopic {
@@ -131,6 +86,7 @@ interface ApiTopic {
 
 export function TopicsPage() {
   const { subjectSlug } = useParams();
+  const { subjects, initializeExamData } = useExamStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
   const [apiTopics, setApiTopics] = useState<ApiTopic[]>([]);
@@ -138,20 +94,29 @@ export function TopicsPage() {
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [masteryFilter, setMasteryFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
 
+  // Ensure subjects are loaded
+  useEffect(() => {
+    if (subjects.length === 0) {
+      initializeExamData();
+    }
+  }, [subjects.length, initializeExamData]);
+
+  // Find current subject from store
+  const currentSubject = subjectSlug
+    ? subjects.find(s => s.slug === subjectSlug)
+    : null;
+
   // Fetch topics from API
   useEffect(() => {
     const fetchTopics = async () => {
+      if (!currentSubject && subjectSlug) {
+        // Subject not found yet, wait for store to load
+        return;
+      }
+
       setLoading(true);
       try {
-        // Map slug to subject_id
-        const subjectIdMap: Record<string, string> = {
-          mathematics: 'subj_math',
-          physics: 'subj_physics',
-          chemistry: 'subj_chemistry',
-          biology: 'subj_biology',
-        };
-
-        const subjectId = subjectSlug ? subjectIdMap[subjectSlug] : null;
+        const subjectId = currentSubject?.id;
         const url = subjectId ? `/topics?subject=${subjectId}` : '/topics';
         const data = await api.get(url) as ApiTopic[];
         if (Array.isArray(data)) {
@@ -164,42 +129,58 @@ export function TopicsPage() {
       }
     };
     fetchTopics();
-  }, [subjectSlug]);
+  }, [subjectSlug, currentSubject]);
 
   // If viewing a specific subject
   if (subjectSlug) {
-    const subject = subjectsData[subjectSlug as keyof typeof subjectsData];
-
-    if (!subject) {
-      return <div className="text-center py-12 text-neutral-500">Subject not found</div>;
+    // Show loading while subjects are being fetched
+    if (subjects.length === 0) {
+      return (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      );
     }
 
-    const SubjectIcon = subject.icon;
+    if (!currentSubject) {
+      return (
+        <div className="text-center py-12">
+          <BookOpen className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
+          <p className="text-neutral-500">Subject not found</p>
+          <p className="text-sm text-neutral-400 mt-2">
+            The subject "{subjectSlug}" could not be found.
+          </p>
+          <Link to="/subjects" className="mt-4 inline-block">
+            <Button variant="outline">Browse All Subjects</Button>
+          </Link>
+        </div>
+      );
+    }
 
-    // Merge static topics with API data for question counts
-    // Only show parent topics (parent_id is null)
+    const SubjectIcon = getIconComponent(currentSubject.icon);
+    const colorClass = getColorClass(currentSubject.color);
+
+    // Build topics from API data
     const parentApiTopics = apiTopics.filter(t => t.parent_id === null);
     const childApiTopics = apiTopics.filter(t => t.parent_id !== null);
 
-    const mergedTopics = parentApiTopics.length > 0
-      ? parentApiTopics.map(apiTopic => {
-          // Find children (subtopics) for this topic
-          const children = childApiTopics.filter(c => c.parent_id === apiTopic.id);
-          return {
-            id: apiTopic.slug || apiTopic.id,
-            name: apiTopic.name,
-            description: apiTopic.description,
-            questionCount: apiTopic.questionCount,
-            mastery: 0, // TODO: fetch from user progress
-            subtopics: children.map(child => ({
-              id: child.slug || child.id,
-              name: child.name,
-              questionCount: child.questionCount,
-              mastery: 0,
-            })),
-          };
-        })
-      : subject.topics;
+    const mergedTopics = parentApiTopics.map(apiTopic => {
+      // Find children (subtopics) for this topic
+      const children = childApiTopics.filter(c => c.parent_id === apiTopic.id);
+      return {
+        id: apiTopic.slug || apiTopic.id,
+        name: apiTopic.name,
+        description: apiTopic.description || '',
+        questionCount: apiTopic.questionCount || 0,
+        mastery: 0, // TODO: fetch from user progress
+        subtopics: children.map(child => ({
+          id: child.slug || child.id,
+          name: child.name,
+          questionCount: child.questionCount || 0,
+          mastery: 0,
+        })),
+      };
+    });
 
     const filteredTopics = mergedTopics.filter((t) =>
       t.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -210,15 +191,15 @@ export function TopicsPage() {
         {/* Subject Header */}
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className={cn('p-4 rounded-xl text-white', subject.color)}>
+            <div className={cn('p-4 rounded-xl text-white', colorClass)}>
               <SubjectIcon className="w-8 h-8" />
             </div>
             <div>
-              <h1 className="text-2xl font-display font-bold text-neutral-900">{subject.name}</h1>
-              <p className="text-neutral-500">{subject.description}</p>
+              <h1 className="text-2xl font-display font-bold text-neutral-900">{currentSubject.name}</h1>
+              <p className="text-neutral-500">{currentSubject.description || 'Explore topics and practice questions'}</p>
             </div>
           </div>
-          <Link to="/practice" state={{ subject: subject.id }}>
+          <Link to="/practice" state={{ subject: currentSubject.id }}>
             <Button leftIcon={<Brain className="w-4 h-4" />}>
               Practice All
             </Button>
@@ -293,7 +274,7 @@ export function TopicsPage() {
                         Flashcards
                       </Button>
                     </Link>
-                    <Link to={`/topics/${subject.id}/${topic.id}`}>
+                    <Link to={`/topics/${currentSubject.slug}/${topic.id}`}>
                       <Button size="sm" variant="ghost">
                         View Theory
                       </Button>
@@ -334,13 +315,17 @@ export function TopicsPage() {
     );
   }
 
+  // Get current exam type for display
+  const { currentExamType } = useExamStore();
+  const examTypeLabel = currentExamType.toUpperCase();
+
   // Main subjects view
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-display font-bold text-neutral-900">Topic Library</h1>
-        <p className="text-neutral-500">Browse and study topics across all NSMQ subjects</p>
+        <p className="text-neutral-500">Browse and study topics across all {examTypeLabel} subjects</p>
       </div>
 
       {/* Search and Filter */}
@@ -418,42 +403,35 @@ export function TopicsPage() {
       </div>
 
       {/* Subjects Grid */}
-      {loading ? (
+      {loading || subjects.length === 0 ? (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       ) : (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {subjects.map((subject) => {
-          const SubjectIcon = subject.icon;
-          // Map subject id to subject_id format
-          const subjectIdMap: Record<string, string> = {
-            mathematics: 'subj_math',
-            physics: 'subj_physics',
-            chemistry: 'subj_chemistry',
-            biology: 'subj_biology',
-          };
-          const subjectApiId = subjectIdMap[subject.id];
+          const SubjectIcon = getIconComponent(subject.icon);
+          const colorClass = getColorClass(subject.color);
 
           // Get topics for this subject from API
-          const subjectApiTopics = apiTopics.filter(t => t.subject_id === subjectApiId);
-          const topicCount = subjectApiTopics.filter(t => t.parent_id === null).length || subject.topics.length;
-          const totalQuestions = subjectApiTopics.reduce((sum, t) => sum + (t.questionCount || 0), 0);
+          const subjectApiTopics = apiTopics.filter(t => t.subject_id === subject.id);
+          const topicCount = subjectApiTopics.filter(t => t.parent_id === null).length || subject.topicCount || 0;
+          const totalQuestions = subjectApiTopics.reduce((sum, t) => sum + (t.questionCount || 0), 0) || subject.questionCount || 0;
           const avgMastery = 0; // TODO: fetch from user progress
 
           return (
-            <Link key={subject.id} to={`/topics/${subject.id}`}>
+            <Link key={subject.id} to={`/topics/${subject.slug}`}>
               <Card hoverable className="h-full">
-                <div className={cn('h-2 rounded-t-xl', subject.color)} />
+                <div className={cn('h-2 rounded-t-xl', colorClass)} />
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
-                    <div className={cn('p-3 rounded-xl text-white', subject.color)}>
+                    <div className={cn('p-3 rounded-xl text-white', colorClass)}>
                       <SubjectIcon className="w-6 h-6" />
                     </div>
                     <Badge variant="neutral">{topicCount} topics</Badge>
                   </div>
                   <h2 className="text-xl font-semibold text-neutral-900 mb-2">{subject.name}</h2>
-                  <p className="text-neutral-500 text-sm mb-4">{subject.description}</p>
+                  <p className="text-neutral-500 text-sm mb-4 line-clamp-2">{subject.description || 'Explore topics and practice questions'}</p>
 
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-neutral-500">{totalQuestions} questions</span>
