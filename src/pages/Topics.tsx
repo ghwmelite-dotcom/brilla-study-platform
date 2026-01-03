@@ -270,7 +270,7 @@ export function TopicsPage() {
                       leftIcon={<Brain className="w-4 h-4" />}
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/practice?topic=${topic.id}`);
+                        navigate(`/exam/practice?mode=drill&topic=${topic.id}&count=10`);
                       }}
                     >
                       Practice Drill
