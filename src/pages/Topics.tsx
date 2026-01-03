@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import * as Icons from 'lucide-react';
 import {
   ChevronRight,
@@ -86,6 +86,7 @@ interface ApiTopic {
 
 export function TopicsPage() {
   const { subjectSlug } = useParams();
+  const navigate = useNavigate();
   const { subjects, initializeExamData } = useExamStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
@@ -264,21 +265,37 @@ export function TopicsPage() {
               {expandedTopic === topic.id && (
                 <div className="border-t border-neutral-100 p-4 bg-neutral-50">
                   <div className="flex flex-wrap gap-2 mb-4">
-                    <Link to={`/practice?topic=${topic.id}`}>
-                      <Button size="sm" leftIcon={<Brain className="w-4 h-4" />}>
-                        Practice Drill
-                      </Button>
-                    </Link>
-                    <Link to={`/practice?topic=${topic.id}&mode=flashcard`}>
-                      <Button size="sm" variant="outline" leftIcon={<BookOpen className="w-4 h-4" />}>
-                        Flashcards
-                      </Button>
-                    </Link>
-                    <Link to={`/topics/${currentSubject.slug}/${topic.id}`}>
-                      <Button size="sm" variant="ghost">
-                        View Theory
-                      </Button>
-                    </Link>
+                    <Button
+                      size="sm"
+                      leftIcon={<Brain className="w-4 h-4" />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/practice?topic=${topic.id}`);
+                      }}
+                    >
+                      Practice Drill
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      leftIcon={<BookOpen className="w-4 h-4" />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/practice?topic=${topic.id}&mode=flashcard`);
+                      }}
+                    >
+                      Flashcards
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/topics/${currentSubject?.slug}/${topic.id}`);
+                      }}
+                    >
+                      View Theory
+                    </Button>
                   </div>
 
                   {topic.subtopics && topic.subtopics.length > 0 && (
