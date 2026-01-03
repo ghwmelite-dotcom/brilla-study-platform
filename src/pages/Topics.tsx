@@ -169,13 +169,15 @@ export function TopicsPage() {
       // Find children (subtopics) for this topic
       const children = childApiTopics.filter(c => c.parent_id === apiTopic.id);
       return {
-        id: apiTopic.slug || apiTopic.id,
+        id: apiTopic.id,  // Use actual topic ID for API queries
+        slug: apiTopic.slug,
         name: apiTopic.name,
         description: apiTopic.description || '',
         questionCount: apiTopic.questionCount || 0,
         mastery: 0, // TODO: fetch from user progress
         subtopics: children.map(child => ({
-          id: child.slug || child.id,
+          id: child.id,  // Use actual topic ID for API queries
+          slug: child.slug,
           name: child.name,
           questionCount: child.questionCount || 0,
           mastery: 0,
