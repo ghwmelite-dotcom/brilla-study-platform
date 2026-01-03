@@ -254,16 +254,17 @@ export function PracticePage() {
     fetchRecentSessions();
   }, []);
 
-  // Auto-start speed mode if navigated with ?mode=speed
-  // Or auto-start drill mode if navigated with ?topic=...
+  // Auto-start drill mode if navigated with ?topic=...
+  // Navigate directly to exam practice mode with the topic
   useEffect(() => {
-    if (initialMode === 'speed' && !isSessionActive) {
-      handleStartSession('speed');
-    } else if (initialTopic && !isSessionActive) {
-      // Auto-start drill mode when topic is specified
-      handleStartSession('drill');
+    if (initialTopic) {
+      const params = new URLSearchParams();
+      params.set('mode', 'drill');
+      params.set('topic', initialTopic);
+      params.set('count', '10');
+      navigate(`/exam/practice?${params.toString()}`, { replace: true });
     }
-  }, [initialMode, initialTopic]);
+  }, [initialTopic, navigate]);
 
   // Get exam-specific features
   const currentExamFeatures = examFeatures[currentExamType] || [];
