@@ -6,6 +6,7 @@ import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/gu
 import { ToastContainer } from '@/components/toast';
 import { PageLoader } from '@/components/common';
 import { GoogleSignInButton } from '@/components/auth';
+import { SplashScreen } from '@/components/SplashScreen';
 
 // Wrapper for lazy-loaded components
 function LazyPage({ children }: { children: React.ReactNode }) {
@@ -341,8 +342,26 @@ function HomeRoute() {
 
 // Main App component
 function App() {
+  const [showSplash, setShowSplash] = useState(() => {
+    // Only show splash once per session
+    const hasSeenSplash = sessionStorage.getItem('brilla_splash_shown');
+    return !hasSeenSplash;
+  });
+
+  const handleSplashComplete = () => {
+    sessionStorage.setItem('brilla_splash_shown', 'true');
+    setShowSplash(false);
+  };
+
   return (
-    <BrowserRouter>
+    <>
+      {showSplash && (
+        <SplashScreen
+          onComplete={handleSplashComplete}
+          duration={3500}
+        />
+      )}
+      <BrowserRouter>
       <Routes>
         {/* Landing page for guests, home for authenticated (no nested layout) */}
         <Route path="/" element={<HomeRoute />} />
@@ -883,6 +902,7 @@ function App() {
       {/* Global Toast Notifications */}
       <ToastContainer />
     </BrowserRouter>
+    </>
   );
 }
 
