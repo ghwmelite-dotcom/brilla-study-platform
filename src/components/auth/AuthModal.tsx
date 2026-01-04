@@ -474,28 +474,6 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           ) : mode === 'register' && registrationStep === 'role' ? (
             // Role Selection
             <div className="space-y-4">
-              {/* Quick Google Sign-up Option */}
-              <div className="mb-4">
-                <GoogleSignInButton
-                  mode="register"
-                  role="student"
-                  onError={(error) => setFormErrors({ submit: error })}
-                  disabled={isLoading}
-                />
-                <p className="text-xs text-center text-neutral-500 mt-2">
-                  Quick signup as a student with Google
-                </p>
-              </div>
-
-              <div className="relative my-4">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-neutral-200" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-3 bg-white text-neutral-500">or select your role</span>
-                </div>
-              </div>
-
               <p className="text-center text-neutral-600 mb-4">I am a...</p>
 
               <button
@@ -589,7 +567,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                 </div>
               )}
 
-              {/* Google Sign-In Button */}
+              {/* Google Sign-In/Sign-Up Button */}
               {mode === 'login' && (
                 <>
                   <GoogleSignInButton
@@ -603,6 +581,26 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                     </div>
                     <div className="relative flex justify-center text-sm">
                       <span className="px-3 bg-white text-neutral-500">or continue with email</span>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Google Sign-Up for Registration (after role selection) */}
+              {mode === 'register' && selectedRole && selectedRole !== 'admin' && (
+                <>
+                  <GoogleSignInButton
+                    mode="register"
+                    role={selectedRole}
+                    onError={(error) => setFormErrors({ submit: error })}
+                    disabled={isLoading}
+                  />
+                  <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-neutral-200" />
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-3 bg-white text-neutral-500">or register with email</span>
                     </div>
                   </div>
                 </>
