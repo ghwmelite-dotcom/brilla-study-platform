@@ -131,17 +131,8 @@ oauthApp.post('/google/init', async (c) => {
 
   const redirectUri = c.env.GOOGLE_REDIRECT_URI || 'https://brillaprep.org/oauth/callback';
 
-  // Verify Turnstile for register intent
-  if (intent === 'register' && c.env.TURNSTILE_SECRET) {
-    if (!turnstileToken) {
-      return c.json({ success: false, error: 'Security verification required' }, 400);
-    }
-    const ip = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For');
-    const isValid = await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET, ip || undefined);
-    if (!isValid) {
-      return c.json({ success: false, error: 'Security verification failed' }, 400);
-    }
-  }
+  // Note: Turnstile verification is skipped for OAuth flows
+  // Google already verifies the user is human through their own security measures
 
   // Generate PKCE parameters
   const codeVerifier = generateCodeVerifier();
