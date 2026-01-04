@@ -1621,6 +1621,87 @@ publicApp.post('/auth/reset-password', async (c) => {
   }
 });
 
+// Test notification endpoint - for testing email delivery
+// Requires JWT_SECRET as adminKey for security
+publicApp.post('/auth/test-notification', async (c) => {
+  const { adminKey } = await c.req.json();
+
+  if (adminKey !== c.env.JWT_SECRET) {
+    return c.json({ success: false, error: 'Invalid admin key' }, 401);
+  }
+
+  if (!c.env.RESEND_API_KEY) {
+    return c.json({ success: false, error: 'Email service not configured' }, 500);
+  }
+
+  try {
+    const appUrl = c.env.APP_URL || 'https://brillaprep.org';
+    const fromEmail = c.env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>';
+
+    // Get admin emails
+    const { results: admins } = await c.env.DB.prepare(
+      "SELECT email FROM users WHERE role = 'admin' AND status = 'approved' AND is_active = 1"
+    ).all();
+    const adminEmails = (admins || []).map((a: { email: string }) => a.email);
+
+    // Get additional notification emails
+    const additionalEmails = getAdditionalNotificationEmails(c.env);
+    const allRecipients = [...new Set([...adminEmails, ...additionalEmails])];
+
+    if (allRecipients.length === 0) {
+      return c.json({ success: false, error: 'No notification recipients configured' }, 400);
+    }
+
+    const testEmailHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="utf-8"></head>
+      <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+          <h1 style="color: white; margin: 0;">🧪 Test Notification</h1>
+        </div>
+        <div style="background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px;">
+          <p style="font-size: 16px; color: #374151;">This is a test notification from Brilla Study Platform.</p>
+          <p style="font-size: 14px; color: #6b7280;">
+            <strong>Timestamp:</strong> ${new Date().toISOString()}<br>
+            <strong>Recipients:</strong> ${allRecipients.join(', ')}
+          </p>
+          <p style="font-size: 14px; color: #10b981;">✅ If you received this email, notifications are working correctly!</p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Send to all recipients
+    const results: { email: string; success: boolean; error?: string }[] = [];
+    for (const recipientEmail of allRecipients) {
+      try {
+        await sendEmail(
+          c.env.RESEND_API_KEY,
+          fromEmail,
+          recipientEmail,
+          '🧪 Test Notification - Brilla Study Platform',
+          testEmailHtml
+        );
+        results.push({ email: recipientEmail, success: true });
+      } catch (error) {
+        results.push({ email: recipientEmail, success: false, error: String(error) });
+      }
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        message: 'Test notifications sent',
+        recipients: results
+      }
+    });
+  } catch (error) {
+    console.error('Test notification error:', error);
+    return c.json({ success: false, error: 'Failed to send test notification' }, 500);
+  }
+});
+
 // Setup endpoint - Initialize demo users with passwords
 // This should only be called once during initial setup
 publicApp.post('/auth/setup', async (c) => {
@@ -6900,6 +6981,83 @@ adminApp.post('/users/:id/resend-verification', async (c) => {
     return c.json({ success: true, data: { message: 'Verification email sent' } });
   } catch (error) {
     return c.json({ success: false, error: 'Failed to resend verification' }, 500);
+  }
+});
+
+// Test notification email delivery (admin only)
+adminApp.post('/test-notification', async (c) => {
+  const adminUser = c.get('user') as UserPayload;
+
+  if (!c.env.RESEND_API_KEY) {
+    return c.json({ success: false, error: 'Email service not configured' }, 500);
+  }
+
+  try {
+    const appUrl = c.env.APP_URL || 'https://brillaprep.org';
+    const fromEmail = c.env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>';
+
+    // Get admin emails
+    const { results: admins } = await c.env.DB.prepare(
+      "SELECT email FROM users WHERE role = 'admin' AND status = 'approved' AND is_active = 1"
+    ).all();
+    const adminEmails = (admins || []).map((a: { email: string }) => a.email);
+
+    // Get additional notification emails
+    const additionalEmails = getAdditionalNotificationEmails(c.env);
+    const allRecipients = [...new Set([...adminEmails, ...additionalEmails])];
+
+    if (allRecipients.length === 0) {
+      return c.json({ success: false, error: 'No notification recipients configured' }, 400);
+    }
+
+    const testEmailHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="utf-8"></head>
+      <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+          <h1 style="color: white; margin: 0;">🧪 Test Notification</h1>
+        </div>
+        <div style="background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px;">
+          <p style="font-size: 16px; color: #374151;">This is a test notification from Brilla Study Platform.</p>
+          <p style="font-size: 14px; color: #6b7280;">
+            <strong>Triggered by:</strong> ${adminUser.email}<br>
+            <strong>Timestamp:</strong> ${new Date().toISOString()}<br>
+            <strong>Recipients:</strong> ${allRecipients.join(', ')}
+          </p>
+          <p style="font-size: 14px; color: #10b981;">✅ If you received this email, notifications are working correctly!</p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Send to all recipients
+    const results: { email: string; success: boolean; error?: string }[] = [];
+    for (const recipientEmail of allRecipients) {
+      try {
+        await sendEmail(
+          c.env.RESEND_API_KEY,
+          fromEmail,
+          recipientEmail,
+          '🧪 Test Notification - Brilla Study Platform',
+          testEmailHtml
+        );
+        results.push({ email: recipientEmail, success: true });
+      } catch (error) {
+        results.push({ email: recipientEmail, success: false, error: String(error) });
+      }
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        message: 'Test notifications sent',
+        recipients: results
+      }
+    });
+  } catch (error) {
+    console.error('Test notification error:', error);
+    return c.json({ success: false, error: 'Failed to send test notification' }, 500);
   }
 });
 
