@@ -56,6 +56,7 @@ interface Env {
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
   GOOGLE_REDIRECT_URI?: string;
+  NOTIFICATION_EMAILS?: string; // Comma-separated list of additional emails to receive all site notifications
 }
 
 // User type for JWT payload
@@ -749,13 +750,22 @@ function getSecurityAlertEmailHTML(details: SecurityAlertDetails, appUrl: string
   `;
 }
 
-// Send security alert to all admins
+// Get all notification recipient emails (admins + configured additional emails)
+function getAdditionalNotificationEmails(env: Env): string[] {
+  if (!env.NOTIFICATION_EMAILS) return [];
+  return env.NOTIFICATION_EMAILS.split(',')
+    .map(email => email.trim())
+    .filter(email => email.length > 0 && email.includes('@'));
+}
+
+// Send security alert to all admins and additional notification recipients
 async function sendSecurityAlertToAdmins(
   db: D1Database,
   resendApiKey: string,
   fromEmail: string,
   appUrl: string,
-  details: SecurityAlertDetails
+  details: SecurityAlertDetails,
+  additionalEmails: string[] = []
 ): Promise<void> {
   try {
     // Get all admin emails
@@ -763,21 +773,25 @@ async function sendSecurityAlertToAdmins(
       "SELECT email FROM users WHERE role = 'admin' AND status = 'approved' AND is_active = 1"
     ).all();
 
-    if (!admins || admins.length === 0) {
-      console.log('No admin emails found for security alert');
+    // Combine admin emails with additional notification emails
+    const adminEmails = (admins || []).map((a: { email: string }) => a.email);
+    const allRecipients = [...new Set([...adminEmails, ...additionalEmails])]; // Dedupe
+
+    if (allRecipients.length === 0) {
+      console.log('No notification recipients found for security alert');
       return;
     }
 
     const emailHtml = getSecurityAlertEmailHTML(details, appUrl);
     const subject = `🚨 Security Alert: Blocked Login Attempts for ${details.targetEmail}`;
 
-    // Send to all admins
-    for (const admin of admins as { email: string }[]) {
+    // Send to all recipients
+    for (const recipientEmail of allRecipients) {
       try {
-        await sendEmail(resendApiKey, fromEmail, admin.email, subject, emailHtml);
-        console.log(`Security alert sent to ${admin.email}`);
+        await sendEmail(resendApiKey, fromEmail, recipientEmail, subject, emailHtml);
+        console.log(`Security alert sent to ${recipientEmail}`);
       } catch (error) {
-        console.error(`Failed to send security alert to ${admin.email}:`, error);
+        console.error(`Failed to send security alert to ${recipientEmail}:`, error);
       }
     }
   } catch (error) {
@@ -1061,13 +1075,15 @@ publicApp.post('/auth/register', async (c) => {
       };
 
       console.log('Sending registration spam alert for IP:', clientIp);
+      const additionalEmails = getAdditionalNotificationEmails(c.env);
       c.executionCtx.waitUntil(
         sendSecurityAlertToAdmins(
           c.env.DB,
           c.env.RESEND_API_KEY,
           c.env.FROM_EMAIL,
           c.env.APP_URL || 'https://brillaprep.org',
-          { ...alertDetails, targetEmail: `Registration spam (IP: ${clientIp})` }
+          { ...alertDetails, targetEmail: `Registration spam (IP: ${clientIp})` },
+          additionalEmails
         ).then(() => console.log('Registration spam alert sent successfully'))
         .catch(err => console.error('Failed to send registration security alert:', err))
       );
@@ -1164,23 +1180,26 @@ publicApp.post('/auth/register', async (c) => {
         );
       }
 
-      // Send email notification to admins
-      if (c.env.RESEND_API_KEY && admins.length > 0) {
+      // Send email notification to admins and additional notification recipients
+      if (c.env.RESEND_API_KEY) {
         const appUrl = c.env.APP_URL || 'https://brillaprep.org';
         const fromEmail = c.env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>';
         const adminEmails = (admins as { email: string }[]).map(a => a.email);
+        const additionalEmails = getAdditionalNotificationEmails(c.env);
+        const allRecipients = [...new Set([...adminEmails, ...additionalEmails])]; // Dedupe
 
-        // Send to all admins
-        const emailHtml = getNewRegistrationEmailHTML(name, email, roleLabel, appUrl);
+        if (allRecipients.length > 0) {
+          const emailHtml = getNewRegistrationEmailHTML(name, email, roleLabel, appUrl);
 
-        for (const adminEmail of adminEmails) {
-          await sendEmail(
-            c.env.RESEND_API_KEY,
-            fromEmail,
-            adminEmail,
-            `New ${roleLabel} Registration Awaiting Approval`,
-            emailHtml
-          );
+          for (const recipientEmail of allRecipients) {
+            await sendEmail(
+              c.env.RESEND_API_KEY,
+              fromEmail,
+              recipientEmail,
+              `New ${roleLabel} Registration Awaiting Approval`,
+              emailHtml
+            );
+          }
         }
       }
     } catch (notifyError) {
@@ -1229,13 +1248,15 @@ publicApp.post('/auth/login', async (c) => {
         };
 
         // Send alert in background using waitUntil to keep worker alive
+        const additionalEmails = getAdditionalNotificationEmails(c.env);
         c.executionCtx.waitUntil(
           sendSecurityAlertToAdmins(
             c.env.DB,
             c.env.RESEND_API_KEY,
             c.env.FROM_EMAIL,
             c.env.APP_URL || 'https://brillaprep.org',
-            alertDetails
+            alertDetails,
+            additionalEmails
           ).catch(err => console.error('Failed to send security alert:', err))
         );
       }

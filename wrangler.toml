@@ -9,6 +9,7 @@ AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 APP_URL = "https://brillaprep.org"
 FROM_EMAIL = "Brilla Study Platform <noreply@brillaprep.org>"
 GOOGLE_REDIRECT_URI = "https://brillaprep.org/oauth/callback"
+NOTIFICATION_EMAILS = "brillaprepgh@gmail.com"
 
 # IMPORTANT: Set these secrets using wrangler:
 # wrangler secret put JWT_SECRET           (generate a secure random string)
@@ -47,6 +48,7 @@ AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 APP_URL = "https://brillaprep.org"
 FROM_EMAIL = "Brilla Study Platform <noreply@brillaprep.org>"
 GOOGLE_REDIRECT_URI = "https://brillaprep.org/oauth/callback"
+NOTIFICATION_EMAILS = "brillaprepgh@gmail.com"
 
 [env.production.ai]
 binding = "AI"
