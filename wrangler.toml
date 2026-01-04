@@ -8,10 +8,13 @@ AI_PROVIDER = "workers-ai"
 AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 APP_URL = "https://brillaprep.org"
 FROM_EMAIL = "Brilla Study Platform <noreply@brillaprep.org>"
+GOOGLE_REDIRECT_URI = "https://brillaprep.org/oauth/callback"
 
 # IMPORTANT: Set these secrets using wrangler:
-# wrangler secret put JWT_SECRET        (generate a secure random string)
-# wrangler secret put RESEND_API_KEY    (your Resend API key for emails)
+# wrangler secret put JWT_SECRET           (generate a secure random string)
+# wrangler secret put RESEND_API_KEY       (your Resend API key for emails)
+# wrangler secret put GOOGLE_CLIENT_ID     (from Google Cloud Console)
+# wrangler secret put GOOGLE_CLIENT_SECRET (from Google Cloud Console)
 
 # Workers AI binding - no API key needed!
 [ai]
@@ -43,6 +46,7 @@ AI_PROVIDER = "workers-ai"
 AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 APP_URL = "https://brillaprep.org"
 FROM_EMAIL = "Brilla Study Platform <noreply@brillaprep.org>"
+GOOGLE_REDIRECT_URI = "https://brillaprep.org/oauth/callback"
 
 [env.production.ai]
 binding = "AI"

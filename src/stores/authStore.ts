@@ -106,6 +106,22 @@ interface AuthState {
   verifyToken: (token: string) => ManagedUser | null;
   setPassword: (token: string, password: string) => Promise<void>;
 
+  // OAuth actions
+  initiateGoogleAuth: (
+    intent: 'login' | 'register',
+    role?: 'student' | 'teacher' | 'admin' | 'parent',
+    registrationData?: Record<string, unknown>,
+    turnstileToken?: string
+  ) => Promise<void>;
+  completeGoogleAuth: (code: string, state: string) => Promise<{
+    success: boolean;
+    error?: string;
+    code?: string;
+    isNewUser?: boolean;
+  }>;
+  getLinkedProviders: () => Promise<{ hasPassword: boolean; providers: Array<{ provider: string; email: string }> }>;
+  unlinkGoogle: () => Promise<void>;
+
   // Admin subscription management
   extendUserTrial: (userId: string, days: number) => Promise<{ newExpiryDate: string; daysAdded: number }>;
   addUserCredits: (userId: string, credits: number) => Promise<{ newTotal: number; creditsAdded: number }>;
@@ -867,6 +883,132 @@ export const useAuthStore = create<AuthState>()(
           await get().loadAllUsers();
         } catch (error) {
           throw error instanceof Error ? error : new Error('Failed to resend verification email');
+        }
+      },
+
+      // OAuth actions
+      initiateGoogleAuth: async (intent, role, registrationData, turnstileToken) => {
+        try {
+          const response = await api.post<{ authUrl: string; state: string }>('/auth/oauth/google/init', {
+            intent,
+            role,
+            registrationData,
+            turnstileToken,
+          });
+
+          if (response.success && response.data) {
+            // Store state in sessionStorage for verification on callback
+            sessionStorage.setItem('oauth_state', response.data.state);
+            // Redirect to Google
+            window.location.href = response.data.authUrl;
+          } else {
+            throw new Error(response.error || 'Failed to initiate Google authentication');
+          }
+        } catch (error) {
+          console.error('OAuth init error:', error);
+          throw error;
+        }
+      },
+
+      completeGoogleAuth: async (code, state) => {
+        try {
+          interface OAuthCallbackResponse {
+            user: {
+              id: string;
+              email: string;
+              name: string;
+              role: string;
+              status: string;
+              house?: string;
+              yearGroup?: number;
+              schoolLevel?: string;
+              schoolName?: string;
+              xpPoints?: number;
+              level?: number;
+              streakDays?: number;
+              aiGradingCredits?: number;
+            };
+            token: string;
+            isNewUser: boolean;
+          }
+          const response = await api.post<OAuthCallbackResponse>('/auth/oauth/google/callback', { code, state });
+
+          if (response.success && response.data) {
+            const { user: apiUser, token, isNewUser } = response.data;
+
+            // Map API user to local user format
+            const user: ManagedUser = {
+              id: apiUser.id,
+              email: apiUser.email,
+              name: apiUser.name,
+              role: apiUser.role as UserRole,
+              status: apiUser.status as UserStatus,
+              house: apiUser.house || undefined,
+              yearGroup: apiUser.yearGroup || undefined,
+              schoolLevel: apiUser.schoolLevel as SchoolLevel | undefined,
+              schoolName: apiUser.schoolName || undefined,
+              xpPoints: apiUser.xpPoints || 0,
+              level: apiUser.level || 1,
+              streakDays: apiUser.streakDays || 0,
+              aiGradingCredits: apiUser.aiGradingCredits || 0,
+              emailVerified: true,
+              isActive: true,
+              passwordSet: false, // Google users may not have password
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+
+            // Update store
+            set({
+              user,
+              token,
+              isAuthenticated: true,
+              isLoading: false,
+              error: null,
+            });
+
+            // Set token in API client
+            api.setToken(token);
+
+            return { success: true, isNewUser };
+          } else {
+            // Error response may include a code from API
+            const errorResponse = response as { error?: string; code?: string };
+            return {
+              success: false,
+              error: errorResponse.error || 'Authentication failed',
+              code: errorResponse.code,
+            };
+          }
+        } catch (error) {
+          console.error('OAuth callback error:', error);
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Authentication failed',
+          };
+        }
+      },
+
+      getLinkedProviders: async () => {
+        try {
+          const response = await api.get<{ hasPassword: boolean; providers: { provider: string; email: string }[] }>('/auth/oauth/providers');
+          if (response.success && response.data) {
+            return response.data;
+          }
+          return { hasPassword: true, providers: [] };
+        } catch {
+          return { hasPassword: true, providers: [] };
+        }
+      },
+
+      unlinkGoogle: async () => {
+        try {
+          const response = await api.delete('/auth/oauth/unlink/google');
+          if (!response.success) {
+            throw new Error(response.error || 'Failed to unlink Google account');
+          }
+        } catch (error) {
+          throw error instanceof Error ? error : new Error('Failed to unlink Google account');
         }
       },
 

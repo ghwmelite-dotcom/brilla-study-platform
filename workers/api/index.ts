@@ -24,6 +24,7 @@ import { cosmeticsApp } from './cosmetics';
 import { rewardsApp } from './rewards';
 import { engagementApp } from './engagement';
 import { friendsApp } from './friends';
+import { oauthApp } from './oauth';
 import {
   getDailyUsage,
   checkCanAnswer,
@@ -52,6 +53,9 @@ interface Env {
   PAYSTACK_PUBLIC_KEY?: string;
   PAYSTACK_WEBHOOK_SECRET?: string;
   TURNSTILE_SECRET?: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
+  GOOGLE_REDIRECT_URI?: string;
 }
 
 // User type for JWT payload
@@ -10032,6 +10036,9 @@ app.route('/api/cosmetics', cosmeticsApp);
 app.route('/api/rewards', rewardsApp);
 app.route('/api/engagement', engagementApp);
 app.route('/api/friends', friendsApp);
+
+// Mount OAuth routes (public with internal auth handling)
+app.route('/api/auth/oauth', oauthApp);
 
 // Mount protected routes (must be after all protectedApp routes are defined)
 app.route('/api', protectedApp);

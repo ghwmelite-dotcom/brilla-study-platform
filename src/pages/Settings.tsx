@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -19,6 +19,8 @@ import {
   Type,
   Camera,
   Trash2,
+  Link,
+  Unlink,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/lib/api';
@@ -62,6 +64,16 @@ export default function Settings() {
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
+  // Connected accounts state
+  const [linkedProviders, setLinkedProviders] = useState<Array<{ provider: string; email: string }>>([]);
+  const [hasPassword, setHasPassword] = useState(true);
+  const [accountsLoading, setAccountsLoading] = useState(false);
+  const [linkingGoogle, setLinkingGoogle] = useState(false);
+  const [unlinkingGoogle, setUnlinkingGoogle] = useState(false);
+  const [accountsError, setAccountsError] = useState<string | null>(null);
+  const [accountsSuccess, setAccountsSuccess] = useState<string | null>(null);
+  const { getLinkedProviders, unlinkGoogle, initiateGoogleAuth } = useAuthStore();
+
   // Notification preferences
   const [notifications, setNotifications] = useState({
     emailUpdates: true,
@@ -91,6 +103,55 @@ export default function Settings() {
   });
   const [appearanceSaving, setAppearanceSaving] = useState(false);
   const [appearanceSuccess, setAppearanceSuccess] = useState(false);
+
+  // Load connected accounts when password tab is active
+  useEffect(() => {
+    if (activeTab === 'password') {
+      loadConnectedAccounts();
+    }
+  }, [activeTab]);
+
+  const loadConnectedAccounts = async () => {
+    setAccountsLoading(true);
+    try {
+      const result = await getLinkedProviders();
+      setLinkedProviders(result.providers);
+      setHasPassword(result.hasPassword);
+    } catch (error) {
+      console.error('Failed to load connected accounts:', error);
+    } finally {
+      setAccountsLoading(false);
+    }
+  };
+
+  const handleLinkGoogle = async () => {
+    setLinkingGoogle(true);
+    setAccountsError(null);
+    try {
+      // This will redirect to Google, so we store a flag to show success on return
+      sessionStorage.setItem('linking_google', 'true');
+      await initiateGoogleAuth('login', undefined, undefined, undefined);
+      // Note: User will be redirected, so this won't execute
+    } catch (error) {
+      setAccountsError(error instanceof Error ? error.message : 'Failed to link Google account');
+      setLinkingGoogle(false);
+    }
+  };
+
+  const handleUnlinkGoogle = async () => {
+    setUnlinkingGoogle(true);
+    setAccountsError(null);
+    try {
+      await unlinkGoogle();
+      setAccountsSuccess('Google account unlinked successfully');
+      await loadConnectedAccounts();
+      setTimeout(() => setAccountsSuccess(null), 3000);
+    } catch (error) {
+      setAccountsError(error instanceof Error ? error.message : 'Failed to unlink Google account');
+    } finally {
+      setUnlinkingGoogle(false);
+    }
+  };
 
   const tabs = [
     { id: 'profile' as const, label: 'Profile', icon: User },
@@ -636,6 +697,96 @@ export default function Settings() {
                       )}
                       Change Password
                     </button>
+                  </div>
+
+                  {/* Connected Accounts Section */}
+                  <div className="pt-8 mt-8 border-t border-neutral-200">
+                    <div className="mb-4">
+                      <h2 className="text-lg font-semibold text-neutral-900 mb-1">Connected Accounts</h2>
+                      <p className="text-sm text-neutral-500">Link external accounts for easier sign-in</p>
+                    </div>
+
+                    {accountsError && (
+                      <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4" />
+                        {accountsError}
+                      </div>
+                    )}
+
+                    {accountsSuccess && (
+                      <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm flex items-center gap-2">
+                        <Check className="w-4 h-4" />
+                        {accountsSuccess}
+                      </div>
+                    )}
+
+                    {accountsLoading ? (
+                      <div className="flex items-center justify-center py-6">
+                        <Loader2 className="w-6 h-6 animate-spin text-neutral-400" />
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {/* Google Account */}
+                        <div className="flex items-center justify-between p-4 border border-neutral-200 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-white border border-neutral-200 rounded-lg flex items-center justify-center">
+                              <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="font-medium text-neutral-900">Google</p>
+                              {linkedProviders.some(p => p.provider === 'google') ? (
+                                <p className="text-sm text-neutral-500">
+                                  {linkedProviders.find(p => p.provider === 'google')?.email}
+                                </p>
+                              ) : (
+                                <p className="text-sm text-neutral-500">Not connected</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {linkedProviders.some(p => p.provider === 'google') ? (
+                            <button
+                              onClick={handleUnlinkGoogle}
+                              disabled={unlinkingGoogle || (!hasPassword && linkedProviders.length === 1)}
+                              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              title={!hasPassword && linkedProviders.length === 1 ? 'Set a password before unlinking' : undefined}
+                            >
+                              {unlinkingGoogle ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Unlink className="w-4 h-4" />
+                              )}
+                              Unlink
+                            </button>
+                          ) : (
+                            <button
+                              onClick={handleLinkGoogle}
+                              disabled={linkingGoogle}
+                              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors disabled:opacity-50"
+                            >
+                              {linkingGoogle ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Link className="w-4 h-4" />
+                              )}
+                              Link Account
+                            </button>
+                          )}
+                        </div>
+
+                        {!hasPassword && (
+                          <p className="text-xs text-amber-600 flex items-center gap-1 mt-2">
+                            <AlertTriangle className="w-3 h-3" />
+                            Set a password above to enable unlinking your Google account
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

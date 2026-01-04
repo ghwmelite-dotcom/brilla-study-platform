@@ -28,6 +28,7 @@ import { cn } from '@/utils';
 import { PlanSelectionStep } from './PlanSelectionStep';
 import { Turnstile, useTurnstile } from '@/components/common/Turnstile';
 import { ExamTypeSelector } from './ExamTypeSelector';
+import { GoogleSignInButton } from './GoogleSignInButton';
 
 type AuthMode = 'login' | 'register';
 type UserRole = 'student' | 'teacher' | 'admin' | 'parent';
@@ -473,7 +474,29 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           ) : mode === 'register' && registrationStep === 'role' ? (
             // Role Selection
             <div className="space-y-4">
-              <p className="text-center text-neutral-600 mb-6">I am a...</p>
+              {/* Quick Google Sign-up Option */}
+              <div className="mb-4">
+                <GoogleSignInButton
+                  mode="register"
+                  role="student"
+                  onError={(error) => setFormErrors({ submit: error })}
+                  disabled={isLoading}
+                />
+                <p className="text-xs text-center text-neutral-500 mt-2">
+                  Quick signup as a student with Google
+                </p>
+              </div>
+
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-neutral-200" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-3 bg-white text-neutral-500">or select your role</span>
+                </div>
+              </div>
+
+              <p className="text-center text-neutral-600 mb-4">I am a...</p>
 
               <button
                 onClick={() => handleRoleSelect('student')}
@@ -564,6 +587,25 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   {formErrors.submit}
                 </div>
+              )}
+
+              {/* Google Sign-In Button */}
+              {mode === 'login' && (
+                <>
+                  <GoogleSignInButton
+                    mode="login"
+                    onError={(error) => setFormErrors({ submit: error })}
+                    disabled={isLoading}
+                  />
+                  <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-neutral-200" />
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-3 bg-white text-neutral-500">or continue with email</span>
+                    </div>
+                  </div>
+                </>
               )}
 
               {mode === 'register' && (

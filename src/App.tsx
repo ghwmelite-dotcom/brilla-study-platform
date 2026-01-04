@@ -93,6 +93,9 @@ const TeacherBonusStatus = lazy(() => import('@/pages/TeacherBonusStatus'));
 const ExamModePractice = lazy(() => import('@/pages/ExamModePractice'));
 const ExamModeResults = lazy(() => import('@/pages/ExamModeResults'));
 
+// OAuth callback page
+const OAuthCallback = lazy(() => import('@/pages/OAuthCallback'));
+
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -427,6 +430,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/set-password" element={<LazyPage><SetPasswordPage /></LazyPage>} />
+        <Route path="/oauth/callback" element={<LazyPage><OAuthCallback /></LazyPage>} />
 
         {/* Legal pages (no layout) */}
         <Route path="/privacy" element={<LazyPage><PrivacyPolicyPage /></LazyPage>} />
