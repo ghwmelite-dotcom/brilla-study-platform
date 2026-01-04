@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores';
 import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/guide';
 import { ToastContainer } from '@/components/toast';
 import { PageLoader } from '@/components/common';
+import { GoogleSignInButton } from '@/components/auth';
 
 // Wrapper for lazy-loaded components
 function LazyPage({ children }: { children: React.ReactNode }) {
@@ -164,6 +165,24 @@ function LoginPage() {
           </div>
         )}
 
+        {/* Google Sign-In */}
+        <div className="mb-6">
+          <GoogleSignInButton
+            mode="login"
+            onError={(err) => console.error('Google login error:', err)}
+            disabled={isLoading || isSubmitting}
+          />
+        </div>
+
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-neutral-200"></div>
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="px-2 bg-white text-neutral-500">or use demo accounts</span>
+          </div>
+        </div>
+
         {/* Demo login buttons */}
         <div className="space-y-4">
           {/* Admin - Primary button */}
@@ -235,9 +254,8 @@ function LoginPage() {
   );
 }
 
-// Register Page (placeholder)
+// Register Page - Redirects to landing page with registration modal
 function RegisterPage() {
-  const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
 
   // Redirect if already authenticated
@@ -245,105 +263,8 @@ function RegisterPage() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const handleDemoRegister = () => {
-    useAuthStore.setState({
-      user: {
-        id: `user_${Date.now()}`,
-        email: 'new@stjohns.edu.gh',
-        name: 'New Student',
-        role: 'student',
-        status: 'approved',
-        house: 'Red House',
-        yearGroup: 2,
-        xpPoints: 0,
-        level: 1,
-        streakDays: 0,
-        aiGradingCredits: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      token: `new_token_${Date.now()}`,
-      isAuthenticated: true,
-    });
-
-    // Redirect to dashboard after registration
-    navigate('/dashboard');
-  };
-
-  return (
-    <main className="min-h-screen flex items-center justify-center bg-neutral-50">
-      <div className="max-w-md w-full p-8 bg-white rounded-xl shadow-card">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-ghana flex items-center justify-center">
-            <span className="text-white font-bold text-2xl">B</span>
-          </div>
-          <h1 className="text-2xl font-display font-bold text-neutral-900">Create Account</h1>
-          <p className="text-neutral-500">Join the NSMQ training platform</p>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Full Name</label>
-            <input
-              type="text"
-              className="w-full px-4 py-2 rounded-lg border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
-              placeholder="John Doe"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Email</label>
-            <input
-              type="email"
-              className="w-full px-4 py-2 rounded-lg border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
-              placeholder="student@stjohns.edu.gh"
-            />
-          </div>
-          <div>
-            <label htmlFor="register-house" className="block text-sm font-medium text-neutral-700 mb-1">House</label>
-            <select id="register-house" className="w-full px-4 py-2 rounded-lg border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20">
-              <option value="">Select house</option>
-              <option value="Blue House">Blue House</option>
-              <option value="Red House">Red House</option>
-              <option value="Green House">Green House</option>
-              <option value="Yellow House">Yellow House</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="register-year" className="block text-sm font-medium text-neutral-700 mb-1">Year Group</label>
-            <select id="register-year" className="w-full px-4 py-2 rounded-lg border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20">
-              <option value="">Select year</option>
-              <option value="1">Year 1</option>
-              <option value="2">Year 2</option>
-              <option value="3">Year 3</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1">Password</label>
-            <input
-              type="password"
-              className="w-full px-4 py-2 rounded-lg border border-neutral-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
-              placeholder="••••••••"
-            />
-          </div>
-          <button
-            onClick={handleDemoRegister}
-            className="w-full py-2 px-4 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors"
-          >
-            Create Account (Demo)
-          </button>
-        </div>
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-neutral-500">
-            Already have an account?{' '}
-            <a href="/login" className="text-primary underline hover:no-underline">
-              Sign in
-            </a>
-          </p>
-        </div>
-      </div>
-    </main>
-  );
+  // Redirect to landing page with register modal
+  return <Navigate to="/?register=true" replace />;
 }
 
 // Profile Page (placeholder)
