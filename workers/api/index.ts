@@ -785,13 +785,16 @@ async function sendSecurityAlertToAdmins(
     const emailHtml = getSecurityAlertEmailHTML(details, appUrl);
     const subject = `🚨 Security Alert: Blocked Login Attempts for ${details.targetEmail}`;
 
-    // Send to all recipients
-    for (const recipientEmail of allRecipients) {
+    // Send to all recipients with delay to avoid Resend rate limit (2 req/sec)
+    for (let i = 0; i < allRecipients.length; i++) {
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 600));
+      }
       try {
-        await sendEmail(resendApiKey, fromEmail, recipientEmail, subject, emailHtml);
-        console.log(`Security alert sent to ${recipientEmail}`);
+        await sendEmail(resendApiKey, fromEmail, allRecipients[i], subject, emailHtml);
+        console.log(`Security alert sent to ${allRecipients[i]}`);
       } catch (error) {
-        console.error(`Failed to send security alert to ${recipientEmail}:`, error);
+        console.error(`Failed to send security alert to ${allRecipients[i]}:`, error);
       }
     }
   } catch (error) {
@@ -1191,11 +1194,15 @@ publicApp.post('/auth/register', async (c) => {
         if (allRecipients.length > 0) {
           const emailHtml = getNewRegistrationEmailHTML(name, email, roleLabel, appUrl);
 
-          for (const recipientEmail of allRecipients) {
+          // Add delay between emails to avoid Resend rate limit (2 req/sec)
+          for (let i = 0; i < allRecipients.length; i++) {
+            if (i > 0) {
+              await new Promise(resolve => setTimeout(resolve, 600));
+            }
             await sendEmail(
               c.env.RESEND_API_KEY,
               fromEmail,
-              recipientEmail,
+              allRecipients[i],
               `New ${roleLabel} Registration Awaiting Approval`,
               emailHtml
             );
@@ -1672,18 +1679,35 @@ publicApp.post('/auth/test-notification', async (c) => {
       </html>
     `;
 
-    // Send to all recipients
-    const results: { email: string; success: boolean; error?: string }[] = [];
-    for (const recipientEmail of allRecipients) {
+    // Send to all recipients with detailed Resend API response
+    // Add delay between requests to avoid Resend rate limit (2 req/sec)
+    const results: { email: string; success: boolean; error?: string; resendResponse?: unknown }[] = [];
+    for (let i = 0; i < allRecipients.length; i++) {
+      const recipientEmail = allRecipients[i];
+      // Add 600ms delay between emails to stay under rate limit
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 600));
+      }
       try {
-        await sendEmail(
-          c.env.RESEND_API_KEY,
-          fromEmail,
-          recipientEmail,
-          '🧪 Test Notification - Brilla Study Platform',
-          testEmailHtml
-        );
-        results.push({ email: recipientEmail, success: true });
+        const response = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${c.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: fromEmail,
+            to: [recipientEmail],
+            subject: '🧪 Test Notification - Brilla Study Platform',
+            html: testEmailHtml,
+          }),
+        });
+        const resendData = await response.json();
+        results.push({
+          email: recipientEmail,
+          success: response.ok,
+          resendResponse: resendData
+        });
       } catch (error) {
         results.push({ email: recipientEmail, success: false, error: String(error) });
       }
@@ -1693,7 +1717,8 @@ publicApp.post('/auth/test-notification', async (c) => {
       success: true,
       data: {
         message: 'Test notifications sent',
-        recipients: results
+        recipients: results,
+        fromEmail: fromEmail
       }
     });
   } catch (error) {
