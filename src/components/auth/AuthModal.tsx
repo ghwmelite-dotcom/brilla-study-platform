@@ -34,7 +34,7 @@ type AuthMode = 'login' | 'register';
 type UserRole = 'student' | 'teacher' | 'admin' | 'parent';
 type SchoolLevel = 'jss' | 'shs';
 type RegistrationStatus = 'idle' | 'pending' | 'error';
-type RegistrationStep = 'role' | 'plan' | 'form';
+type RegistrationStep = 'role' | 'schoolLevel' | 'plan' | 'form';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -160,15 +160,23 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
     clearError();
   };
 
-  // Handle role selection - go to plan selection for student/teacher, form for admin/parent
+  // Handle role selection - students go to school level, teachers to plan, admin/parent to form
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role);
-    if (role === 'student' || role === 'teacher') {
+    if (role === 'student') {
+      setRegistrationStep('schoolLevel');
+    } else if (role === 'teacher') {
       setRegistrationStep('plan');
     } else {
       // Admin and parent skip plan selection
       setRegistrationStep('form');
     }
+  };
+
+  // Handle school level selection for students
+  const handleSchoolLevelSelect = (level: SchoolLevel) => {
+    setSchoolLevel(level);
+    setRegistrationStep('plan');
   };
 
   // Handle going back in the registration flow
@@ -181,8 +189,19 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
         setRegistrationStep('role');
       }
     } else if (registrationStep === 'plan') {
+      if (selectedRole === 'student') {
+        // Students go back to school level selection
+        setSelectedTierId(null);
+        setRegistrationStep('schoolLevel');
+      } else {
+        // Teachers go back to role selection
+        setSelectedRole(null);
+        setSelectedTierId(null);
+        setRegistrationStep('role');
+      }
+    } else if (registrationStep === 'schoolLevel') {
       setSelectedRole(null);
-      setSelectedTierId(null);
+      setSchoolLevel('');
       setRegistrationStep('role');
     }
   };
@@ -548,6 +567,60 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                 </p>
               </div>
             </div>
+          ) : mode === 'register' && registrationStep === 'schoolLevel' && selectedRole === 'student' ? (
+            // School Level Selection for Students
+            <div className="space-y-4">
+              <button
+                onClick={handleRegistrationBack}
+                className="flex items-center gap-2 text-neutral-600 hover:text-neutral-900 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back</span>
+              </button>
+
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-semibold text-neutral-900">What's your school level?</h3>
+                <p className="text-sm text-neutral-500 mt-1">This helps us show you the right content</p>
+              </div>
+
+              <button
+                onClick={() => handleSchoolLevelSelect('jss')}
+                className="w-full flex items-center gap-4 p-4 border-2 border-neutral-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group"
+              >
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                  <School className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="text-left flex-1">
+                  <h3 className="font-semibold text-neutral-900">Junior High School (JHS)</h3>
+                  <p className="text-sm text-neutral-500">JHS 1, JHS 2, or JHS 3 student</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleSchoolLevelSelect('shs')}
+                className="w-full flex items-center gap-4 p-4 border-2 border-neutral-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all group"
+              >
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                  <GraduationCap className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="text-left flex-1">
+                  <h3 className="font-semibold text-neutral-900">Senior High School (SHS)</h3>
+                  <p className="text-sm text-neutral-500">SHS 1, SHS 2, or SHS 3 student</p>
+                </div>
+              </button>
+
+              <div className="pt-4 text-center">
+                <p className="text-neutral-600 text-sm">
+                  Already have an account?{' '}
+                  <button
+                    onClick={() => handleModeSwitch('login')}
+                    className="text-primary font-medium hover:underline"
+                  >
+                    Sign In
+                  </button>
+                </p>
+              </div>
+            </div>
           ) : mode === 'register' && registrationStep === 'plan' && selectedRole && (selectedRole === 'student' || selectedRole === 'teacher') ? (
             // Plan Selection Step
             <PlanSelectionStep
@@ -592,6 +665,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                   <GoogleSignInButton
                     mode="register"
                     role={selectedRole}
+                    registrationData={selectedRole === 'student' && schoolLevel ? { schoolLevel } : undefined}
                     onError={(error) => setFormErrors({ submit: error })}
                     disabled={isLoading}
                   />
