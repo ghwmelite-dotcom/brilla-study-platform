@@ -90,6 +90,35 @@ async function generateJWT(payload: UserPayload, secret: string): Promise<string
   );
 }
 
+// Generate a random password hash for OAuth users
+// This is a placeholder that the user cannot know or use
+async function generateRandomPasswordHash(): Promise<string> {
+  const randomPassword = crypto.randomUUID() + crypto.randomUUID();
+  const encoder = new TextEncoder();
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(randomPassword),
+    'PBKDF2',
+    false,
+    ['deriveBits']
+  );
+  const derivedBits = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 100000,
+      hash: 'SHA-256'
+    },
+    keyMaterial,
+    256
+  );
+  const hashArray = new Uint8Array(derivedBits);
+  const hashHex = Array.from(hashArray).map(b => b.toString(16).padStart(2, '0')).join('');
+  const saltHex = Array.from(salt).map(b => b.toString(16).padStart(2, '0')).join('');
+  return `${saltHex}:${hashHex}`;
+}
+
 // Verify Turnstile token
 async function verifyTurnstile(token: string, secret: string, ip?: string): Promise<boolean> {
   try {
@@ -383,6 +412,10 @@ oauthApp.post('/google/callback', async (c) => {
     // Google users are auto-approved
     const status = 'approved';
 
+    // Generate a random password hash (user cannot know this password)
+    // This satisfies the NOT NULL constraint while keeping the account OAuth-only
+    const randomPasswordHash = await generateRandomPasswordHash();
+
     await c.env.DB.prepare(`
       INSERT INTO users (
         id, email, name, role, status, password_hash,
@@ -390,13 +423,14 @@ oauthApp.post('/google/callback', async (c) => {
         teacher_license_number, subjects_taught, years_experience, qualifications,
         subscription_tier_id, primary_exam_type_id,
         email_verified, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
     `).bind(
       userId,
       googleUser.email,
       googleUser.name,
       userRole,
       status,
+      randomPasswordHash,
       schoolLevel,
       yearGroup,
       schoolName,
