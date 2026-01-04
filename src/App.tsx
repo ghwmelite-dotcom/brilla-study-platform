@@ -340,16 +340,38 @@ function HomeRoute() {
   );
 }
 
+// Check if running as installed PWA
+function isPWA(): boolean {
+  return window.matchMedia('(display-mode: standalone)').matches ||
+         (window.navigator as Navigator & { standalone?: boolean }).standalone === true ||
+         document.referrer.includes('android-app://');
+}
+
 // Main App component
 function App() {
   const [showSplash, setShowSplash] = useState(() => {
-    // Only show splash once per session
-    const hasSeenSplash = sessionStorage.getItem('brilla_splash_shown');
-    return !hasSeenSplash;
+    // For PWA: Show splash on each launch (once per hour to avoid annoyance on quick re-opens)
+    // For browser: Show once per session
+    if (isPWA()) {
+      const lastSplashTime = localStorage.getItem('brilla_splash_time');
+      if (lastSplashTime) {
+        const hoursSinceLastSplash = (Date.now() - parseInt(lastSplashTime)) / (1000 * 60 * 60);
+        return hoursSinceLastSplash >= 1; // Show splash if more than 1 hour since last
+      }
+      return true; // First time - show splash
+    } else {
+      // Browser: once per session
+      const hasSeenSplash = sessionStorage.getItem('brilla_splash_shown');
+      return !hasSeenSplash;
+    }
   });
 
   const handleSplashComplete = () => {
-    sessionStorage.setItem('brilla_splash_shown', 'true');
+    if (isPWA()) {
+      localStorage.setItem('brilla_splash_time', Date.now().toString());
+    } else {
+      sessionStorage.setItem('brilla_splash_shown', 'true');
+    }
     setShowSplash(false);
   };
 
