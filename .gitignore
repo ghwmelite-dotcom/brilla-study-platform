@@ -43,3 +43,12 @@ coverage
 *.tsbuildinfo
 vite.config.d.ts
 vite.config.js
+
+# Past question PDFs (stored separately)
+Past Questions/
+
+# Lighthouse reports and parsers
+lh-*.json
+lighthouse-report.json
+parse-*.cjs
+nul
