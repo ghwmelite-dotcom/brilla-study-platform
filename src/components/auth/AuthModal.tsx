@@ -475,14 +475,25 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
             // Role Selection
             <div className="space-y-4">
               {/* Quick Google Sign-up Option */}
-              <div className="mb-4">
+              <div className="mb-4 space-y-3">
+                {/* Turnstile for Google sign-up */}
+                <div className="flex justify-center">
+                  <Turnstile
+                    onVerify={turnstile.handleVerify}
+                    onError={turnstile.handleError}
+                    onExpire={turnstile.handleExpire}
+                    theme="light"
+                    size="compact"
+                  />
+                </div>
                 <GoogleSignInButton
                   mode="register"
                   role="student"
                   onError={(error) => setFormErrors({ submit: error })}
-                  disabled={isLoading}
+                  disabled={isLoading || !turnstile.isVerified}
+                  turnstileToken={turnstile.token || undefined}
                 />
-                <p className="text-xs text-center text-neutral-500 mt-2">
+                <p className="text-xs text-center text-neutral-500">
                   Quick signup as a student with Google
                 </p>
               </div>
