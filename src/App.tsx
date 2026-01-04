@@ -375,15 +375,18 @@ function App() {
     setShowSplash(false);
   };
 
+  // Show only splash screen until complete - prevents PageLoader from rendering behind it
+  if (showSplash) {
+    return (
+      <SplashScreen
+        onComplete={handleSplashComplete}
+        duration={3500}
+      />
+    );
+  }
+
   return (
-    <>
-      {showSplash && (
-        <SplashScreen
-          onComplete={handleSplashComplete}
-          duration={3500}
-        />
-      )}
-      <BrowserRouter>
+    <BrowserRouter>
       <Routes>
         {/* Landing page for guests, home for authenticated (no nested layout) */}
         <Route path="/" element={<HomeRoute />} />
@@ -924,7 +927,6 @@ function App() {
       {/* Global Toast Notifications */}
       <ToastContainer />
     </BrowserRouter>
-    </>
   );
 }
 
