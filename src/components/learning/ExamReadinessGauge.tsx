@@ -15,7 +15,8 @@ import {
 import { cn } from '@/utils';
 import { Card, CircularProgress } from '@/components/common';
 import { useLearningPathStore, type SubjectReadiness } from '@/stores/learningPathStore';
-import type { ExamTypeSlug } from '@/types';
+import type { ExamTypeSlug, GhanaExamTypeSlug } from '@/types';
+import { isGhanaExam } from '@/types';
 
 interface ExamReadinessGaugeProps {
   examType?: ExamTypeSlug;
@@ -23,8 +24,8 @@ interface ExamReadinessGaugeProps {
   compact?: boolean;
 }
 
-// Exam-specific styling
-const examStyles: Record<ExamTypeSlug, { gradient: string; icon: typeof GraduationCap }> = {
+// Exam-specific styling (for Ghana exams)
+const examStyles: Record<GhanaExamTypeSlug, { gradient: string; icon: typeof GraduationCap }> = {
   nsmq: {
     gradient: 'from-amber-500 to-orange-600',
     icon: Trophy,
@@ -37,6 +38,18 @@ const examStyles: Record<ExamTypeSlug, { gradient: string; icon: typeof Graduati
     gradient: 'from-emerald-500 to-teal-600',
     icon: BookOpen,
   },
+};
+
+// Get styles for an exam type with fallback for international exams
+const getExamStyles = (examType: ExamTypeSlug) => {
+  if (isGhanaExam(examType)) {
+    return examStyles[examType];
+  }
+  // Default styles for international exams
+  return {
+    gradient: 'from-blue-500 to-indigo-600',
+    icon: GraduationCap,
+  };
 };
 
 export function ExamReadinessGauge({ examType = 'wassce', className, compact = false }: ExamReadinessGaugeProps) {
@@ -96,7 +109,7 @@ export function ExamReadinessGauge({ examType = 'wassce', className, compact = f
     );
   }
 
-  const style = examStyles[examType] || examStyles.wassce;
+  const style = getExamStyles(examType);
   const ExamIcon = style.icon;
 
   return (

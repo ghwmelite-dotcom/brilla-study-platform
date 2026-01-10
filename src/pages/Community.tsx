@@ -17,6 +17,8 @@ import {
 import { useChatStore, useExamStore } from '@/stores';
 import { cn } from '@/utils';
 import { ChatCreateRoom } from '@/components/chat';
+import type { GhanaExamTypeSlug, ExamTypeSlug } from '@/types';
+import { isGhanaExam } from '@/types';
 
 interface OnlineUser {
   id: string;
@@ -157,10 +159,18 @@ export function CommunityPage() {
     openChat();
   };
 
-  const examColors = {
+  const examColors: Record<GhanaExamTypeSlug, string> = {
     nsmq: 'from-amber-500 to-orange-600',
     wassce: 'from-indigo-500 to-purple-600',
     bece: 'from-emerald-500 to-teal-600',
+  };
+
+  // Get color for current exam type with fallback for international exams
+  const getExamColor = (examType: ExamTypeSlug) => {
+    if (isGhanaExam(examType)) {
+      return examColors[examType];
+    }
+    return 'from-blue-500 to-indigo-600';
   };
 
   return (
@@ -244,7 +254,7 @@ export function CommunityPage() {
           <div className="bg-white rounded-xl shadow-card overflow-hidden">
             <div className={cn(
               'px-5 py-4 bg-gradient-to-r text-white',
-              examColors[currentExamType]
+              getExamColor(currentExamType)
             )}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">

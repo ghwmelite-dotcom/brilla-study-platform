@@ -1,4 +1,5 @@
 import type { FeatureGuide, OnboardingStep, TourConfig, GuideCategory } from '@/types/guide';
+import type { GhanaExamTypeSlug } from '@/types';
 
 // Category metadata
 export const guideCategories: Record<GuideCategory, { label: string; description: string; icon: string }> = {
@@ -812,7 +813,7 @@ export const featureTours: TourConfig[] = [
 ];
 
 // Get guides filtered by exam type
-export function getGuidesForExam(examType: 'wassce' | 'bece' | 'nsmq'): FeatureGuide[] {
+export function getGuidesForExam(examType: GhanaExamTypeSlug): FeatureGuide[] {
   return featureGuides.filter(
     (guide) => guide.examTypes.includes('all') || guide.examTypes.includes(examType)
   );
@@ -824,7 +825,7 @@ export function getGuidesByCategory(category: GuideCategory): FeatureGuide[] {
 }
 
 // Search guides
-export function searchGuides(query: string, examType?: 'wassce' | 'bece' | 'nsmq'): FeatureGuide[] {
+export function searchGuides(query: string, examType?: GhanaExamTypeSlug): FeatureGuide[] {
   const lowerQuery = query.toLowerCase();
   return featureGuides.filter((guide) => {
     const matchesQuery =

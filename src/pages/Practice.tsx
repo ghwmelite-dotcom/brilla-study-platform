@@ -22,7 +22,9 @@ import { useExamStore, useUsageStore } from '@/stores';
 import { getExamConfig, isCoreSubject } from '@/config';
 import { cn } from '@/utils';
 import { api } from '@/services/api';
-import type { Question } from '@/types';
+import type { Question, GhanaExamTypeSlug } from '@/types';
+import { isGhanaExam } from '@/types';
+import type { LucideIcon } from 'lucide-react';
 
 // Transform snake_case API response to camelCase Question type
 interface ApiQuestion {
@@ -109,8 +111,17 @@ const basePracticeModes = [
   },
 ];
 
+// Exam feature type
+interface ExamFeature {
+  name: string;
+  description: string;
+  icon: LucideIcon;
+  color: string;
+  path: string;
+}
+
 // Exam-specific practice features (shown as links)
-const examFeatures = {
+const examFeatures: Record<GhanaExamTypeSlug, ExamFeature[]> = {
   nsmq: [
     {
       name: '1v1 Battle',
@@ -290,7 +301,9 @@ export function PracticePage() {
   }, [initialTopic, navigate]);
 
   // Get exam-specific features
-  const currentExamFeatures = examFeatures[currentExamType] || [];
+  const currentExamFeatures = isGhanaExam(currentExamType)
+    ? examFeatures[currentExamType]
+    : [];
 
   // Build subject options from exam store (with lock indicators for premium subjects)
   const subjectOptions = [

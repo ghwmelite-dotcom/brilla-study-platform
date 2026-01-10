@@ -1,7 +1,8 @@
 // Exam-specific configuration for dynamic dashboard and home page content
 // This ensures each exam mode displays relevant, contextual information
 
-import type { ExamTypeSlug } from '@/types';
+import type { ExamTypeSlug, GhanaExamTypeSlug } from '@/types';
+import { isGhanaExam } from '@/types';
 import {
   Trophy,
   GraduationCap,
@@ -141,7 +142,9 @@ export interface ExamConfig {
   }[];
 }
 
-export const examConfigs: Record<ExamTypeSlug, ExamConfig> = {
+// Configuration for Ghana-specific exams (NSMQ, WASSCE, BECE)
+// International exams (O/A Levels) use the exam board system with dynamic configuration
+export const examConfigs: Record<GhanaExamTypeSlug, ExamConfig> = {
   nsmq: {
     // Branding
     name: 'National Science & Maths Quiz',
@@ -731,15 +734,24 @@ export const examConfigs: Record<ExamTypeSlug, ExamConfig> = {
   },
 };
 
-// Helper function to get config for current exam type
+// Get config for exam type (returns wassce config as fallback for international exams)
 export function getExamConfig(examType: ExamTypeSlug): ExamConfig {
-  return examConfigs[examType];
+  if (isGhanaExam(examType)) {
+    return examConfigs[examType];
+  }
+  // International exams use WASSCE config as a fallback
+  // TODO: Create dedicated configs for international exams
+  return examConfigs.wassce;
 }
 
 // Get gradient class for exam type
 export function getExamGradient(examType: ExamTypeSlug): string {
-  const config = examConfigs[examType];
-  return `${config.gradientFrom} ${config.gradientTo}`;
+  if (isGhanaExam(examType)) {
+    const config = examConfigs[examType];
+    return `${config.gradientFrom} ${config.gradientTo}`;
+  }
+  // Default gradient for international exams
+  return 'from-blue-600 to-indigo-700';
 }
 
 // Get icon for exam type
@@ -751,6 +763,13 @@ export function getExamIcon(examType: ExamTypeSlug): LucideIcon {
       return GraduationCap;
     case 'bece':
       return BookOpen;
+    case 'igcse':
+    case 'cambridge-as':
+    case 'cambridge-a-level':
+    case 'edexcel-igcse':
+    case 'edexcel-as':
+    case 'edexcel-a-level':
+      return Globe;
     default:
       return BookOpen;
   }

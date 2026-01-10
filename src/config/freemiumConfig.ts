@@ -3,13 +3,14 @@
  * Defines daily limits and core subjects for free users
  */
 
-import type { ExamTypeSlug } from '@/types';
+import type { ExamTypeSlug, GhanaExamTypeSlug } from '@/types';
 
 // Daily question limit for free users
 export const DAILY_QUESTION_LIMIT = 10;
 
 // Core subjects per exam type - free users can only access these
-export const CORE_SUBJECTS: Record<ExamTypeSlug, string[]> = {
+// Note: International exams (O/A Levels) use the exam board system for subject management
+export const CORE_SUBJECTS: Record<GhanaExamTypeSlug, string[]> = {
   bece: ['mathematics', 'english', 'integrated-science', 'social-studies'],
   wassce: ['core-mathematics', 'english-language', 'integrated-science', 'social-studies'],
   nsmq: ['mathematics', 'physics', 'chemistry', 'biology'], // All are core for NSMQ
@@ -19,6 +20,9 @@ export const CORE_SUBJECTS: Record<ExamTypeSlug, string[]> = {
  * Check if a subject is a core subject for an exam type
  */
 export function isCoreSubject(examType: ExamTypeSlug, subjectSlug: string): boolean {
+  // International exams (O/A Levels) don't use core subject restrictions
+  if (!isGhanaExamType(examType)) return true;
+
   const coreSubjects = CORE_SUBJECTS[examType];
   if (!coreSubjects) return true; // If exam type unknown, allow all
   return coreSubjects.some(core =>
@@ -31,7 +35,15 @@ export function isCoreSubject(examType: ExamTypeSlug, subjectSlug: string): bool
  * Get list of core subject slugs for an exam type
  */
 export function getCoreSubjects(examType: ExamTypeSlug): string[] {
+  if (!isGhanaExamType(examType)) return [];
   return CORE_SUBJECTS[examType] || [];
+}
+
+/**
+ * Type guard for Ghana exam types
+ */
+function isGhanaExamType(examType: ExamTypeSlug): examType is GhanaExamTypeSlug {
+  return ['nsmq', 'wassce', 'bece'].includes(examType);
 }
 
 /**

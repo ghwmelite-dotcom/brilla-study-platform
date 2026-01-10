@@ -45,6 +45,7 @@ import { useExamStore } from '@/stores';
 import { useGuideStore } from '@/stores/guideStore';
 import { featureGuides, guideCategories, searchGuides, getGuidesForExam } from '@/data/guides';
 import type { FeatureGuide, GuideCategory } from '@/types/guide';
+import { isGhanaExam } from '@/types';
 
 const iconMap: Record<string, React.ElementType> = {
   LayoutDashboard,
@@ -234,10 +235,12 @@ export default function HelpCenter() {
 
   // Filter guides based on search, category, and exam type
   const filteredGuides = useMemo(() => {
-    let guides = getGuidesForExam(currentExamType);
+    // Only show exam-specific guides for Ghana exams, show all for international exams
+    const examType = isGhanaExam(currentExamType) ? currentExamType : 'wassce';
+    let guides = getGuidesForExam(examType);
 
     if (searchQuery) {
-      guides = searchGuides(searchQuery, currentExamType);
+      guides = searchGuides(searchQuery, examType);
     }
 
     if (selectedCategory) {

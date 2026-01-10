@@ -1,16 +1,33 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { X, Send, Sparkles, BookOpen, Lightbulb, GraduationCap, FileText, PenTool, Calculator, Heart, Paperclip, XCircle } from 'lucide-react';
+import { X, Send, Sparkles, BookOpen, Lightbulb, GraduationCap, FileText, PenTool, Calculator, Heart, Paperclip, XCircle, type LucideIcon } from 'lucide-react';
 import { useAiTutorStore, useAuthStore, useExamStore } from '@/stores';
 import { AiMessage } from './AiMessage';
 import { ThinkingIndicator } from './ThinkingIndicator';
+import type { GhanaExamTypeSlug } from '@/types';
+import { isGhanaExam } from '@/types';
 
 // Allowed file types
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 const ALLOWED_DOC_TYPES = ['application/pdf'];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-// Exam-specific configurations
-const examConfigs = {
+// Quick action type
+interface QuickAction {
+  label: string;
+  icon: LucideIcon;
+  prompt: string;
+}
+
+// Exam config type
+interface ExamConfigItem {
+  name: string;
+  subtitle: string;
+  welcomeMessage: string;
+  quickActions: QuickAction[];
+}
+
+// Exam-specific configurations (for Ghana exams)
+const examConfigs: Record<GhanaExamTypeSlug, ExamConfigItem> = {
   nsmq: {
     name: 'NSMQ',
     subtitle: 'Science & Maths Quiz prep',
@@ -71,8 +88,12 @@ export function AiTutor() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Get exam-specific config
-  const examConfig = useMemo(() => {
-    return examConfigs[currentExamType] || examConfigs.nsmq;
+  const examConfig = useMemo((): ExamConfigItem => {
+    if (isGhanaExam(currentExamType)) {
+      return examConfigs[currentExamType];
+    }
+    // Default to NSMQ config for international exams
+    return examConfigs.nsmq;
   }, [currentExamType]);
 
   // Initialize user personalization when component mounts or user changes

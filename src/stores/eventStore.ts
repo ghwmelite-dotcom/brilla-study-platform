@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { api } from '@/lib/api';
 import { useExamStore } from './examStore';
-import type { ExamTypeSlug } from '@/types';
+import type { GhanaExamTypeSlug, ExamTypeSlug } from '@/types';
+import { isGhanaExam } from '@/types';
 
 export type EventTheme = 'wassce_prep' | 'bece_prep' | 'nsmq_prep' | 'house_cup' | 'subject_week' | 'holiday' | 'special';
 export type TournamentType = 'bracket' | 'leaderboard' | 'team';
@@ -131,14 +132,24 @@ interface EventState {
   getCurrentXPMultiplier: () => number;
 }
 
+// Helper to get mock events for any exam type
+function getMockEventsForExamType(examType: ExamTypeSlug): SeasonalEvent[] {
+  // Only generate mock events for Ghana exams
+  if (isGhanaExam(examType)) {
+    return generateMockEvents(examType);
+  }
+  // Return empty array for international exams (they use the exam board system)
+  return [];
+}
+
 // Mock data for demo - generates exam-appropriate events
-function generateMockEvents(examType: ExamTypeSlug): SeasonalEvent[] {
+function generateMockEvents(examType: GhanaExamTypeSlug): SeasonalEvent[] {
   const now = new Date();
   const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
   const monthFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-  // Generate exam-specific countdown event
-  const examEvents: Record<ExamTypeSlug, SeasonalEvent> = {
+  // Generate exam-specific countdown event (for Ghana exams)
+  const examEvents: Record<GhanaExamTypeSlug, SeasonalEvent> = {
     bece: {
       id: 'bece_countdown_2026',
       name: 'BECE Prep Challenge 2026',
@@ -464,7 +475,7 @@ export const useEventStore = create<EventState>()(
 
             // If no relevant events from API, use mock data
             if (filteredEvents.length === 0) {
-              const mockEvents = generateMockEvents(currentExamType);
+              const mockEvents = getMockEventsForExamType(currentExamType);
               set({
                 activeEvents: mockEvents.filter(e => e.isActive),
                 upcomingEvents: [],
@@ -479,7 +490,7 @@ export const useEventStore = create<EventState>()(
             }
           } else {
             // Use mock data with current exam type
-            const mockEvents = generateMockEvents(currentExamType);
+            const mockEvents = getMockEventsForExamType(currentExamType);
             set({
               activeEvents: mockEvents.filter(e => e.isActive),
               upcomingEvents: [],
@@ -488,7 +499,7 @@ export const useEventStore = create<EventState>()(
           }
         } catch (error) {
           // Use mock data on error with current exam type
-          const mockEvents = generateMockEvents(currentExamType);
+          const mockEvents = getMockEventsForExamType(currentExamType);
           set({
             activeEvents: mockEvents.filter(e => e.isActive),
             upcomingEvents: [],

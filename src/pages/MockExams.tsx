@@ -20,10 +20,39 @@ import { Button, Card, Badge } from '@/components/common';
 import { useExamStore } from '@/stores';
 import { cn } from '@/utils';
 import { api } from '@/services/api';
+import type { GhanaExamTypeSlug } from '@/types';
+import { isGhanaExam } from '@/types';
+
+// Mock exam paper type
+interface MockExamPaper {
+  type: string;
+  questions: number;
+  duration: number;
+  marks: number;
+  format: string;
+  paperId: string;
+}
+
+// Mock exam type
+interface MockExam {
+  id: string;
+  name: string;
+  subject: string;
+  papers: MockExamPaper[];
+  difficulty: string;
+  color: string;
+}
+
+// Mock exam config type
+interface MockExamConfig {
+  title: string;
+  description: string;
+  exams: MockExam[];
+}
 
 // Mock exam configurations per exam type
 // Each exam ID maps to an actual paper ID in the database for Paper 1 (objectives)
-const mockExamConfigs = {
+const mockExamConfigs: Record<GhanaExamTypeSlug, MockExamConfig> = {
   wassce: {
     title: 'WASSCE Mock Exams',
     description: 'Full-length timed practice exams following WAEC format',
@@ -372,7 +401,10 @@ export function MockExamsPage() {
     fetchExamHistory();
   }, []);
 
-  const config = mockExamConfigs[currentExamType];
+  // Get config for current exam type, default to wassce for international exams
+  const config = isGhanaExam(currentExamType)
+    ? mockExamConfigs[currentExamType]
+    : mockExamConfigs.wassce;
 
   const formatDuration = (minutes: number) => {
     if (minutes >= 60) {

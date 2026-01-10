@@ -2,9 +2,20 @@ import { useState, useEffect, useRef } from 'react';
 import { ChevronDown, Trophy, GraduationCap, BookOpen, Check } from 'lucide-react';
 import { useExamStore } from '@/stores/examStore';
 import { useExamPreferencesStore } from '@/stores/examPreferencesStore';
-import type { ExamTypeSlug } from '@/types';
+import type { ExamTypeSlug, GhanaExamTypeSlug } from '@/types';
+import { isGhanaExam } from '@/types';
 
-const EXAM_CONFIG: Record<ExamTypeSlug, { name: string; shortName: string; icon: typeof Trophy; color: string; bgColor: string }> = {
+// Exam config interface
+interface ExamConfigItem {
+  name: string;
+  shortName: string;
+  icon: typeof Trophy;
+  color: string;
+  bgColor: string;
+}
+
+// Ghana exam types for the mode switcher (international exams use a separate system)
+const EXAM_CONFIG: Record<GhanaExamTypeSlug, ExamConfigItem> = {
   nsmq: {
     name: 'National Science & Maths Quiz',
     shortName: 'NSMQ',
@@ -28,11 +39,20 @@ const EXAM_CONFIG: Record<ExamTypeSlug, { name: string; shortName: string; icon:
   },
 };
 
-// Map exam type IDs to slugs
-const EXAM_ID_TO_SLUG: Record<string, ExamTypeSlug> = {
+// Map exam type IDs to slugs (only Ghana exams)
+const EXAM_ID_TO_SLUG: Record<string, GhanaExamTypeSlug> = {
   'exam_bece': 'bece',
   'exam_wassce': 'wassce',
   'exam_nsmq': 'nsmq',
+};
+
+// Get config for an exam type with fallback
+const getExamSwitcherConfig = (examType: ExamTypeSlug): ExamConfigItem => {
+  if (isGhanaExam(examType)) {
+    return EXAM_CONFIG[examType];
+  }
+  // Default to NSMQ config for international exams (they don't use this switcher)
+  return EXAM_CONFIG.nsmq;
 };
 
 export function ExamModeSwitcher() {
@@ -63,7 +83,7 @@ export function ExamModeSwitcher() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const currentConfig = EXAM_CONFIG[currentExamType];
+  const currentConfig = getExamSwitcherConfig(currentExamType);
   const CurrentIcon = currentConfig.icon;
 
   const handleSelect = async (examType: ExamTypeSlug) => {
@@ -121,7 +141,7 @@ export function ExamModeSwitcher() {
           </div>
 
           {availableExamTypes.map((slug) => {
-            const config = EXAM_CONFIG[slug];
+            const config = getExamSwitcherConfig(slug);
             const Icon = config.icon;
             const isSelected = currentExamType === slug;
 
