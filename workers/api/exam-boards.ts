@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { verify } from 'hono/jwt';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -18,6 +19,32 @@ type Variables = {
 };
 
 export const examBoardsApp = new Hono<{ Bindings: Env; Variables: Variables }>();
+
+// JWT Authentication middleware for /user/* routes
+examBoardsApp.use('/user/*', async (c, next) => {
+  const authHeader = c.req.header('Authorization');
+
+  // Skip auth for OPTIONS requests (CORS preflight)
+  if (c.req.method === 'OPTIONS') {
+    return next();
+  }
+
+  // Check for Authorization header
+  if (!authHeader?.startsWith('Bearer ')) {
+    return c.json({ success: false, error: 'Unauthorized - No token provided' }, 401);
+  }
+
+  const token = authHeader.substring(7);
+
+  try {
+    const payload = await verify(token, c.env.JWT_SECRET) as UserPayload;
+    c.set('user', payload);
+    return next();
+  } catch (error) {
+    console.error('JWT verification failed:', error);
+    return c.json({ success: false, error: 'Invalid or expired token' }, 401);
+  }
+});
 
 // =============================================
 // PUBLIC ENDPOINTS (No auth required)
