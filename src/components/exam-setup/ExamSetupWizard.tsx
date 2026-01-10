@@ -237,7 +237,8 @@ export default function ExamSetupWizard() {
     }
 
     completeSetup();
-    navigate('/dashboard');
+    // Redirect to personalized O/A Level dashboard
+    navigate('/oa-level');
   };
 
   // Render step indicator
