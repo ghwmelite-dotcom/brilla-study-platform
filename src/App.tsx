@@ -98,6 +98,9 @@ const ExamModeResults = lazy(() => import('@/pages/ExamModeResults'));
 // OAuth callback page
 const OAuthCallback = lazy(() => import('@/pages/OAuthCallback'));
 
+// Exam setup wizard (O-Level / A-Level)
+const ExamSetup = lazy(() => import('@/pages/ExamSetup'));
+
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -642,6 +645,9 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* O-Level / A-Level Exam Setup */}
+          <Route path="exam-setup" element={<LazyPage><ExamSetup /></LazyPage>} />
 
           {/* Pricing and Subscription routes */}
           <Route path="pricing" element={<LazyPage><PricingPage /></LazyPage>} />

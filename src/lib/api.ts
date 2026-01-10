@@ -1,6 +1,8 @@
 // API Client for Brilla Study Platform
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787/api';
+// In development, use relative /api path to go through Vite proxy
+// In production, use the configured VITE_API_URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 interface ApiResponse<T = unknown> {
   success: boolean;
@@ -45,12 +47,16 @@ class ApiClient {
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      const url = `${this.baseUrl}${endpoint}`;
+      console.log('[API] Fetching:', url);
+      const response = await fetch(url, {
         ...options,
         headers,
       });
 
+      console.log('[API] Response status:', response.status, response.statusText);
       const data = await response.json();
+      console.log('[API] Response data:', data);
       return data as ApiResponse<T>;
     } catch (error) {
       console.error('API request failed:', error);

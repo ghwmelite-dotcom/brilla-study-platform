@@ -25,6 +25,7 @@ import { rewardsApp } from './rewards';
 import { engagementApp } from './engagement';
 import { friendsApp } from './friends';
 import { oauthApp } from './oauth';
+import { examBoardsApp } from './exam-boards';
 import {
   getDailyUsage,
   checkCanAnswer,
@@ -893,6 +894,9 @@ const app = new Hono<{ Bindings: Env }>();
 
 // Middleware
 app.use('*', cors());
+
+// Mount exam boards routes FIRST (O-Level / A-Level system) - must be before other /api routes
+app.route('/api/exam-boards', examBoardsApp);
 
 // Public routes (no auth required)
 const publicApp = new Hono<{ Bindings: Env }>();

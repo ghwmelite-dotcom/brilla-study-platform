@@ -36,6 +36,8 @@ import { cn } from '@/utils';
 import { useAuthStore, useExamStore, useChatStore, useProgressStore, useParentStore, useGradingStore } from '@/stores';
 import { SubjectNavigation } from '@/components/subjects';
 import { ExamModeSwitcher } from '@/components/exam';
+import type { GhanaExamTypeSlug, ExamTypeSlug } from '@/types';
+import { isGhanaExam } from '@/types';
 
 // Teacher navigation items - Main
 const teacherNavItems = [
@@ -70,8 +72,8 @@ const mainNavItems = [
   { path: '/practice', label: 'Practice', icon: Brain },
 ];
 
-// Exam-specific navigation items
-const examSpecificItems = {
+// Exam-specific navigation items (for Ghana exams)
+const examSpecificItems: Record<GhanaExamTypeSlug, { path: string; label: string; icon: typeof Trophy; auth?: boolean }[]> = {
   nsmq: [
     { path: '/battle', label: '1v1 Battle', icon: Swords, auth: true },
     { path: '/competition', label: 'Competition Sim', icon: Trophy },
@@ -97,6 +99,11 @@ const resourcesNavItems = [
   { path: '/counselor', label: 'AI Counselor', icon: Heart, auth: true },
 ];
 
+// International Exams navigation
+const internationalExamsItems = [
+  { path: '/exam-setup', label: 'O/A Level Setup', icon: GraduationCap, badge: 'NEW' },
+];
+
 // Community navigation items
 const communityNavItems = [
   { path: '/community', label: 'Community Hub', icon: Users, auth: true },
@@ -113,8 +120,8 @@ const chatActions = [
   { id: 'chats', label: 'Messages', icon: MessageSquare },
 ];
 
-// Exam mode descriptions
-const examModeInfo = {
+// Exam mode descriptions (for Ghana exams)
+const examModeInfo: Record<GhanaExamTypeSlug, { title: string; description: string; color: string; textColor: string; bgColor: string }> = {
   nsmq: {
     title: 'NSMQ Mode',
     description: 'Science & Maths Competition',
@@ -136,6 +143,22 @@ const examModeInfo = {
     textColor: 'text-emerald-600',
     bgColor: 'bg-emerald-50',
   },
+};
+
+// Get exam-specific items for a given exam type
+const getExamItems = (examType: ExamTypeSlug) => {
+  if (isGhanaExam(examType)) {
+    return examSpecificItems[examType] || [];
+  }
+  return [];
+};
+
+// Get exam mode info for a given exam type
+const getExamModeInfo = (examType: ExamTypeSlug) => {
+  if (isGhanaExam(examType)) {
+    return examModeInfo[examType];
+  }
+  return null;
 };
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
@@ -177,8 +200,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   }, [isTeacherOrAdmin, fetchGradingQueue]);
 
   // Get exam-specific navigation items
-  const examItems = examSpecificItems[currentExamType] || [];
-  const examInfo = examModeInfo[currentExamType];
+  const examItems = getExamItems(currentExamType);
+  const examInfo = getExamModeInfo(currentExamType);
 
   return (
     <>
@@ -281,16 +304,18 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <ExamModeSwitcher />
               </div>
 
-              {/* Exam Mode Indicator */}
-              <div className={cn('rounded-lg p-3', examInfo.bgColor)}>
-            <div className="flex items-center gap-2">
-              <div className={cn('w-2 h-2 rounded-full bg-gradient-to-r', examInfo.color)} />
-              <span className={cn('text-sm font-semibold', examInfo.textColor)}>
-                {examInfo.title}
-              </span>
-            </div>
-            <p className="text-xs text-neutral-600 mt-1 ml-4">{examInfo.description}</p>
-          </div>
+              {/* Exam Mode Indicator - only show for Ghana exams */}
+              {examInfo && (
+                <div className={cn('rounded-lg p-3', examInfo.bgColor)}>
+                  <div className="flex items-center gap-2">
+                    <div className={cn('w-2 h-2 rounded-full bg-gradient-to-r', examInfo.color)} />
+                    <span className={cn('text-sm font-semibold', examInfo.textColor)}>
+                      {examInfo.title}
+                    </span>
+                  </div>
+                  <p className="text-xs text-neutral-600 mt-1 ml-4">{examInfo.description}</p>
+                </div>
+              )}
 
           {/* Main Navigation */}
           <div>
@@ -343,7 +368,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           cn(
                             'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
                             isActive
-                              ? cn('bg-gradient-to-r text-white', examInfo.color)
+                              ? cn('bg-gradient-to-r text-white', examInfo?.color || 'from-primary to-primary-dark')
                               : 'text-neutral-700 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-800'
                           )
                         }
@@ -389,6 +414,39 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   </li>
                 );
               })}
+            </ul>
+          </div>
+
+          {/* International Exams (O-Level / A-Level) */}
+          <div>
+            <h3 className="px-3 text-xs font-semibold text-neutral-500 dark:text-slate-500 uppercase tracking-wider mb-2">
+              International Exams
+            </h3>
+            <ul className="space-y-1">
+              {internationalExamsItems.map((item) => (
+                <li key={item.path}>
+                  <NavLink
+                    to={item.path}
+                    onClick={onClose}
+                    className={({ isActive }) =>
+                      cn(
+                        'flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors',
+                        isActive
+                          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
+                          : 'text-neutral-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800 hover:text-indigo-700 dark:hover:text-indigo-400'
+                      )
+                    }
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span className="flex-1">{item.label}</span>
+                    {item.badge && (
+                      <span className="px-1.5 py-0.5 bg-gradient-to-r from-amber-400 to-orange-500 text-[10px] font-bold text-white rounded uppercase">
+                        {item.badge}
+                      </span>
+                    )}
+                  </NavLink>
+                </li>
+              ))}
             </ul>
           </div>
 

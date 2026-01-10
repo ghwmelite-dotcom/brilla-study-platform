@@ -19,6 +19,7 @@ import { EventBanner } from '@/components/events';
 import { DailyMultiplierBanner, MysteryChestModal, LuckyWheelModal, SurpriseChallengePopup } from '@/components/rewards';
 import { StreakWarningBanner, ComebackModal, NudgeContainer } from '@/components/engagement';
 import { DashboardHero, ExamFlyers, DailyTip, FeaturedStats } from '@/components/dashboard';
+import { OALevelBanner } from '@/components/exam-setup';
 import {
   useAuthStore,
   useProgressStore,
@@ -226,6 +227,9 @@ export function DashboardPage() {
       {/* Exam-Specific Promotional Flyers */}
       <ExamFlyers />
 
+      {/* O-Level / A-Level Setup Banner */}
+      <OALevelBanner variant="full" />
+
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column */}
@@ -365,6 +369,9 @@ export function DashboardPage() {
             onOpenModal={openQuickPlayModal}
             onOpenBrainTeaser={() => setBrainTeaserOpen(true)}
           />
+
+          {/* O-Level / A-Level Setup Card (sidebar version) */}
+          <OALevelBanner variant="card" />
 
           {/* Rewards Widget - Mystery Chest & Lucky Wheel */}
           {(hasAvailableChest || hasWheelSpin) && (

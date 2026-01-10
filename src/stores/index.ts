@@ -5,6 +5,8 @@ export { useHouseStore } from './houseStore';
 export { useBattleStore } from './battleStore';
 export { useAiTutorStore } from './aiTutorStore';
 export { useExamStore } from './examStore';
+export { useExamBoardStore } from './examBoardStore';
+export type { ExamBoardState } from './examBoardStore';
 export { useEssayStore } from './essayStore';
 export { useChatStore } from './chatStore';
 export { useModerationStore } from './moderationStore';

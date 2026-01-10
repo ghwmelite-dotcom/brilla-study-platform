@@ -2,7 +2,24 @@
 // EXAM TYPE SYSTEM
 // =============================================
 
-export type ExamTypeSlug = 'nsmq' | 'wassce' | 'bece';
+// Ghana-specific exams (existing system)
+export type GhanaExamTypeSlug = 'nsmq' | 'wassce' | 'bece';
+
+// International O/A Level exams
+export type InternationalExamTypeSlug = 'igcse' | 'cambridge-as' | 'cambridge-a-level' | 'edexcel-igcse' | 'edexcel-as' | 'edexcel-a-level';
+
+// All exam types combined
+export type ExamTypeSlug = GhanaExamTypeSlug | InternationalExamTypeSlug;
+
+// Helper to check if an exam type is a Ghana exam
+export const isGhanaExam = (slug: ExamTypeSlug): slug is GhanaExamTypeSlug => {
+  return ['nsmq', 'wassce', 'bece'].includes(slug);
+};
+
+// Helper to check if an exam type is an international exam
+export const isInternationalExam = (slug: ExamTypeSlug): slug is InternationalExamTypeSlug => {
+  return ['igcse', 'cambridge-as', 'cambridge-a-level', 'edexcel-igcse', 'edexcel-as', 'edexcel-a-level'].includes(slug);
+};
 
 export interface ExamType {
   id: string;
@@ -14,6 +31,181 @@ export interface ExamType {
   displayOrder: number;
   icon?: string;
   color?: string;
+  // O/A Level additions
+  examBoardId?: string;
+  level?: 'GCSE' | 'IGCSE' | 'AS' | 'A2' | 'A-Level' | 'O-Level';
+  gradingScale?: 'A*-G' | '9-1' | 'A*-E' | 'A*-U';
+}
+
+// =============================================
+// O-LEVEL / A-LEVEL SYSTEM TYPES
+// =============================================
+
+export interface ExamBoard {
+  id: string;
+  name: string;
+  code: string;
+  fullName?: string;
+  region: string;
+  websiteUrl?: string;
+  logoUrl?: string;
+  isActive: boolean;
+  displayOrder: number;
+}
+
+export interface SubjectSpecification {
+  id: string;
+  examBoardId: string;
+  subjectId: string;
+  examTypeId: string;
+  syllabusCode: string;
+  syllabusName: string;
+  specificationYear?: string;
+  validFrom?: string;
+  validTo?: string;
+  syllabusPdfUrl?: string;
+  specimenPapersUrl?: string;
+  totalPapers: number;
+  assessmentInfo?: Record<string, unknown>;
+  isActive: boolean;
+  displayOrder: number;
+  // Joined data
+  subject?: Subject;
+  examBoard?: ExamBoard;
+  examType?: ExamType;
+  paperComponents?: PaperComponent[];
+}
+
+export interface PaperComponent {
+  id: string;
+  specificationId: string;
+  paperNumber: number;
+  paperName: string;
+  paperCode?: string;
+  durationMinutes?: number;
+  totalMarks?: number;
+  weightingPercent?: number;
+  questionFormat: 'mcq' | 'structured' | 'essay' | 'practical' | 'coursework' | 'mixed';
+  isCompulsory: boolean;
+  tier?: 'core' | 'extended' | 'foundation' | 'higher';
+  description?: string;
+  notes?: string;
+  displayOrder: number;
+}
+
+export interface SyllabusTopic {
+  id: string;
+  specificationId: string;
+  parentId?: string;
+  topicCode: string;
+  title: string;
+  description?: string;
+  learningObjectives?: string[];
+  assessmentObjectives?: string[];
+  commandWords?: string[];
+  tier?: 'core' | 'extended' | 'both';
+  hoursRecommended?: number;
+  displayOrder: number;
+  // Hierarchy
+  children?: SyllabusTopic[];
+  // Progress
+  userProgress?: UserSyllabusProgress;
+}
+
+export interface TopicSyllabusMapping {
+  id: string;
+  topicId: string;
+  syllabusTopicId: string;
+  coverageLevel: 'full' | 'partial' | 'introduces';
+  notes?: string;
+}
+
+export interface GradeBoundary {
+  id: string;
+  specificationId: string;
+  paperComponentId?: string;
+  session: string;
+  year: number;
+  grade: string;
+  rawMark: number;
+  umsMark?: number;
+  percentage?: number;
+  isOverall: boolean;
+}
+
+export interface PastPaperFile {
+  id: string;
+  pastPaperId: string;
+  fileType: 'question_paper' | 'mark_scheme' | 'examiner_report' | 'specimen' | 'insert' | 'grade_thresholds';
+  fileUrl: string;
+  fileName?: string;
+  fileSize?: number;
+  pageCount?: number;
+  isPremium: boolean;
+  uploadedBy?: string;
+}
+
+export interface UserTargetGrade {
+  id: string;
+  userId: string;
+  specificationId: string;
+  targetGrade: string;
+  currentPredicted?: string;
+  examSession?: string;
+  examYear?: number;
+  notes?: string;
+  // Joined
+  specification?: SubjectSpecification;
+}
+
+export interface CommandWord {
+  id: string;
+  word: string;
+  definition: string;
+  marksGuidance?: string;
+  exampleUsage?: string;
+  typicalMarksRange?: string;
+  examBoardId?: string;
+  subjectArea?: string;
+}
+
+export interface UserSpecificationSelection {
+  id: string;
+  userId: string;
+  specificationId: string;
+  isActive: boolean;
+  priority: number;
+  // Joined
+  specification?: SubjectSpecification;
+}
+
+export interface UserSyllabusProgress {
+  id: string;
+  userId: string;
+  syllabusTopicId: string;
+  status: 'not_started' | 'in_progress' | 'completed' | 'needs_review';
+  confidenceLevel: number;
+  questionsAttempted: number;
+  questionsCorrect: number;
+  lastPracticedAt?: string;
+  notes?: string;
+}
+
+// Extended PastPaper for O/A Levels
+export interface ExtendedPastPaper extends PastPaper {
+  examBoardId?: string;
+  specificationId?: string;
+  paperComponentId?: string;
+  variant?: string;
+  session?: string;
+  tier?: 'core' | 'extended' | 'foundation' | 'higher';
+  hasMarkScheme: boolean;
+  hasExaminerReport: boolean;
+  // Joined
+  examBoard?: ExamBoard;
+  specification?: SubjectSpecification;
+  paperComponent?: PaperComponent;
+  files?: PastPaperFile[];
 }
 
 export interface UserExamPreference {
