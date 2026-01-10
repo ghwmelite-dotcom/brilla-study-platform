@@ -17,6 +17,12 @@ import {
   ArrowRight,
   Settings,
   Plus,
+  Play,
+  FileText,
+  Timer,
+  Trophy,
+  Flame,
+  ListChecks,
 } from 'lucide-react';
 import { useExamBoardStore } from '@/stores/examBoardStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -202,6 +208,103 @@ function RecommendationCard({
         </div>
         <ChevronRight className="w-5 h-5 text-neutral-400 flex-shrink-0" />
       </div>
+    </button>
+  );
+}
+
+// Quiz Card Component for subject-specific quizzes
+function QuizCard({
+  subject,
+  questionsCount,
+  duration,
+  difficulty,
+  color,
+  onStart,
+}: {
+  subject: string;
+  questionsCount: number;
+  duration: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard' | 'Mixed';
+  color: string;
+  onStart: () => void;
+}) {
+  const difficultyColors = {
+    Easy: 'bg-green-100 text-green-700',
+    Medium: 'bg-amber-100 text-amber-700',
+    Hard: 'bg-red-100 text-red-700',
+    Mixed: 'bg-purple-100 text-purple-700',
+  };
+
+  return (
+    <div className="bg-white rounded-xl border border-neutral-200 p-4 hover:shadow-lg transition-all group">
+      <div className="flex items-start gap-3">
+        <div
+          className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{ backgroundColor: color || '#6366F1' }}
+        >
+          <FileText className="w-6 h-6 text-white" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h4 className="font-semibold text-neutral-900 truncate">{subject}</h4>
+          <div className="flex items-center gap-3 mt-1 text-xs text-neutral-500">
+            <span className="flex items-center gap-1">
+              <ListChecks className="w-3.5 h-3.5" />
+              {questionsCount} questions
+            </span>
+            <span className="flex items-center gap-1">
+              <Timer className="w-3.5 h-3.5" />
+              {duration}
+            </span>
+          </div>
+          <div className="mt-2">
+            <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', difficultyColors[difficulty])}>
+              {difficulty}
+            </span>
+          </div>
+        </div>
+      </div>
+      <button
+        onClick={onStart}
+        className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary to-accent text-white font-medium rounded-xl hover:opacity-90 transition-all group-hover:shadow-md"
+      >
+        <Play className="w-4 h-4" />
+        Start Quiz
+      </button>
+    </div>
+  );
+}
+
+// Topic Quiz Item Component
+function TopicQuizItem({
+  topic,
+  questionsAvailable,
+  lastScore,
+  onClick,
+}: {
+  topic: string;
+  questionsAvailable: number;
+  lastScore?: number;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-neutral-50 transition-colors text-left group"
+    >
+      <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center group-hover:bg-primary-200 transition-colors">
+        <Brain className="w-5 h-5 text-primary" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-medium text-neutral-900 truncate group-hover:text-primary transition-colors">{topic}</p>
+        <p className="text-xs text-neutral-500">{questionsAvailable} questions available</p>
+      </div>
+      {lastScore !== undefined && (
+        <div className="flex items-center gap-1 text-sm">
+          <Trophy className="w-4 h-4 text-amber-500" />
+          <span className="font-semibold text-neutral-900">{lastScore}%</span>
+        </div>
+      )}
+      <ChevronRight className="w-5 h-5 text-neutral-300 group-hover:text-primary transition-colors" />
     </button>
   );
 }
@@ -454,6 +557,93 @@ export default function OALevelDashboard() {
                     />
                   ))}
                 </div>
+              )}
+            </div>
+
+            {/* Start a Quiz - Subject Quizzes */}
+            <div className="bg-white rounded-2xl border border-neutral-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
+                    <Play className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-neutral-900">Start a Quiz</h2>
+                    <p className="text-sm text-neutral-500">Practice with timed quizzes</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-neutral-500">
+                  <Flame className="w-4 h-4 text-orange-500" />
+                  <span>Build your streak!</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {selectedSpecs.slice(0, 3).map((spec) => (
+                  <QuizCard
+                    key={spec.id}
+                    subject={spec.syllabusName}
+                    questionsCount={10}
+                    duration="15 min"
+                    difficulty="Mixed"
+                    color={spec.subject?.color || '#6366F1'}
+                    onStart={() => navigate(`/practice?subject=${encodeURIComponent(spec.syllabusName)}&mode=quiz&count=10`)}
+                  />
+                ))}
+              </div>
+
+              {selectedSpecs.length > 3 && (
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={() => navigate('/practice')}
+                    className="text-sm text-primary font-medium hover:text-primary-600"
+                  >
+                    View all {selectedSpecs.length} subjects →
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Topic-Based Practice */}
+            <div className="bg-white rounded-2xl border border-neutral-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                    <ListChecks className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-neutral-900">Topic Practice</h2>
+                    <p className="text-sm text-neutral-500">Focus on specific syllabus topics</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                {syllabusTopics
+                  .filter((topic) => !topic.parentId)
+                  .slice(0, 5)
+                  .map((topic) => {
+                    const progress = userSyllabusProgress.find((p) => p.syllabusTopicId === topic.id);
+                    return (
+                      <TopicQuizItem
+                        key={topic.id}
+                        topic={topic.title}
+                        questionsAvailable={15}
+                        lastScore={progress?.confidenceLevel}
+                        onClick={() => navigate(`/practice?topic=${encodeURIComponent(topic.title)}&mode=quiz`)}
+                      />
+                    );
+                  })}
+              </div>
+
+              {syllabusTopics.filter((t) => !t.parentId).length > 5 && (
+                <Link
+                  to={selectedSpecs[0] ? `/oa-level/syllabus/${selectedSpecs[0].id}` : '/oa-level'}
+                  className="flex items-center justify-center gap-2 mt-4 w-full py-2.5 text-sm text-primary font-medium hover:bg-primary-50 rounded-xl transition-colors"
+                >
+                  Browse all topics
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
               )}
             </div>
 
