@@ -19,7 +19,7 @@ import { EventBanner } from '@/components/events';
 import { DailyMultiplierBanner, MysteryChestModal, LuckyWheelModal, SurpriseChallengePopup } from '@/components/rewards';
 import { StreakWarningBanner, ComebackModal, NudgeContainer } from '@/components/engagement';
 import { DashboardHero, ExamFlyers, DailyTip, FeaturedStats } from '@/components/dashboard';
-import { OALevelBanner } from '@/components/exam-setup';
+import { OALevelBanner, OALevelProgressWidget } from '@/components/exam-setup';
 import {
   useAuthStore,
   useProgressStore,
@@ -29,12 +29,14 @@ import {
   useEngagementStore,
 } from '@/stores';
 import { useExamStore } from '@/stores/examStore';
+import { useExamBoardStore } from '@/stores/examBoardStore';
 import { getExamConfig } from '@/config';
 import { cn } from '@/utils';
 
 export function DashboardPage() {
   const { user } = useAuthStore();
   const { currentExamType } = useExamStore();
+  const { setupComplete, userSpecifications, fetchUserSpecifications } = useExamBoardStore();
   const examConfig = getExamConfig(currentExamType);
   const {
     totalQuestionsAttempted,
@@ -88,7 +90,8 @@ export function DashboardPage() {
     fetchAvailableChests();
     fetchLuckyWheel();
     checkEngagementStatus();
-  }, [fetchActiveEvents, fetchDailyMultiplier, checkForSurpriseChallenge, fetchAvailableChests, fetchLuckyWheel, checkEngagementStatus]);
+    fetchUserSpecifications();
+  }, [fetchActiveEvents, fetchDailyMultiplier, checkForSurpriseChallenge, fetchAvailableChests, fetchLuckyWheel, checkEngagementStatus, fetchUserSpecifications]);
 
   // Show comeback modal if applicable
   useEffect(() => {
@@ -227,8 +230,12 @@ export function DashboardPage() {
       {/* Exam-Specific Promotional Flyers */}
       <ExamFlyers />
 
-      {/* O-Level / A-Level Setup Banner */}
-      <OALevelBanner variant="full" />
+      {/* O-Level / A-Level Progress Widget or Setup Banner */}
+      {setupComplete || userSpecifications.length > 0 ? (
+        <OALevelProgressWidget variant="full" />
+      ) : (
+        <OALevelBanner variant="full" />
+      )}
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -370,8 +377,12 @@ export function DashboardPage() {
             onOpenBrainTeaser={() => setBrainTeaserOpen(true)}
           />
 
-          {/* O-Level / A-Level Setup Card (sidebar version) */}
-          <OALevelBanner variant="card" />
+          {/* O-Level / A-Level Progress Widget or Setup Card (sidebar version) */}
+          {setupComplete || userSpecifications.length > 0 ? (
+            <OALevelProgressWidget variant="compact" />
+          ) : (
+            <OALevelBanner variant="card" />
+          )}
 
           {/* Rewards Widget - Mystery Chest & Lucky Wheel */}
           {(hasAvailableChest || hasWheelSpin) && (

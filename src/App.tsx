@@ -101,6 +101,10 @@ const OAuthCallback = lazy(() => import('@/pages/OAuthCallback'));
 // Exam setup wizard (O-Level / A-Level)
 const ExamSetup = lazy(() => import('@/pages/ExamSetup'));
 
+// O/A Level Dashboard and Syllabus Browser
+const OALevelDashboard = lazy(() => import('@/pages/OALevelDashboard'));
+const SyllabusBrowser = lazy(() => import('@/pages/SyllabusBrowser'));
+
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -648,6 +652,24 @@ function App() {
 
           {/* O-Level / A-Level Exam Setup */}
           <Route path="exam-setup" element={<LazyPage><ExamSetup /></LazyPage>} />
+
+          {/* O/A Level Dashboard and Syllabus Browser */}
+          <Route
+            path="oa-level"
+            element={
+              <ProtectedRoute>
+                <LazyPage><OALevelDashboard /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="oa-level/syllabus/:specificationId"
+            element={
+              <ProtectedRoute>
+                <LazyPage><SyllabusBrowser /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
 
           {/* Pricing and Subscription routes */}
           <Route path="pricing" element={<LazyPage><PricingPage /></LazyPage>} />

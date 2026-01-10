@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { useAuthStore, useExamStore, useChatStore, useProgressStore, useParentStore, useGradingStore } from '@/stores';
+import { useExamBoardStore } from '@/stores/examBoardStore';
 import { SubjectNavigation } from '@/components/subjects';
 import { ExamModeSwitcher } from '@/components/exam';
 import type { GhanaExamTypeSlug, ExamTypeSlug } from '@/types';
@@ -99,10 +100,25 @@ const resourcesNavItems = [
   { path: '/counselor', label: 'AI Counselor', icon: Heart, auth: true },
 ];
 
-// International Exams navigation
-const internationalExamsItems = [
-  { path: '/exam-setup', label: 'O/A Level Setup', icon: GraduationCap, badge: 'NEW' },
-];
+// International Exams navigation (dynamic based on setup status)
+interface InternationalExamItem {
+  path: string;
+  label: string;
+  icon: typeof GraduationCap;
+  badge?: string;
+}
+
+const getInternationalExamsItems = (hasSetup: boolean): InternationalExamItem[] => {
+  if (hasSetup) {
+    return [
+      { path: '/oa-level', label: 'O/A Level Dashboard', icon: GraduationCap },
+      { path: '/exam-setup', label: 'Manage Subjects', icon: BookOpen },
+    ];
+  }
+  return [
+    { path: '/exam-setup', label: 'O/A Level Setup', icon: GraduationCap, badge: 'NEW' },
+  ];
+};
 
 // Community navigation items
 const communityNavItems = [
@@ -168,6 +184,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { totalQuestionsAttempted, overallAccuracy } = useProgressStore();
   const { unreadCount: parentUnreadCount, fetchNotifications } = useParentStore();
   const { pendingCount: gradingPendingCount, fetchGradingQueue } = useGradingStore();
+  const { setupComplete, userSpecifications, fetchUserSpecifications } = useExamBoardStore();
   const isTeacherOrAdmin = user?.role === 'teacher' || user?.role === 'admin';
   const isAdmin = user?.role === 'admin';
   const isParent = user?.role === 'parent';
@@ -198,6 +215,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       fetchGradingQueue();
     }
   }, [isTeacherOrAdmin, fetchGradingQueue]);
+
+  // Fetch user's O/A Level specifications
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchUserSpecifications();
+    }
+  }, [isAuthenticated, fetchUserSpecifications]);
+
+  // Get international exams items based on setup status
+  const hasOALevelSetup = setupComplete || userSpecifications.length > 0;
+  const internationalExamsItems = getInternationalExamsItems(hasOALevelSetup);
 
   // Get exam-specific navigation items
   const examItems = getExamItems(currentExamType);
