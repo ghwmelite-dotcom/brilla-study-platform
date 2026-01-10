@@ -292,6 +292,7 @@ export const useExamBoardStore = create<ExamBoardState>()(
 
       // Fetch user's selected specifications
       fetchUserSpecifications: async () => {
+        set({ isLoading: true });
         try {
           const response = await api.get('/exam-boards/user/specifications');
           if (response.success && response.data) {
@@ -299,10 +300,14 @@ export const useExamBoardStore = create<ExamBoardState>()(
             set({
               userSpecifications: data.specifications || [],
               userTargetGrades: data.targetGrades || [],
+              isLoading: false,
             });
+          } else {
+            set({ isLoading: false });
           }
         } catch (error) {
           console.error('Failed to fetch user specifications:', error);
+          set({ isLoading: false });
         }
       },
 

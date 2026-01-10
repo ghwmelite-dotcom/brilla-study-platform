@@ -225,11 +225,16 @@ export default function OALevelDashboard() {
   } = useExamBoardStore();
 
   const [selectedSpecs, setSelectedSpecs] = useState<typeof specifications>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Fetch data on mount
   useEffect(() => {
-    fetchExamBoards();
-    fetchUserSpecifications();
+    const init = async () => {
+      await fetchExamBoards();
+      await fetchUserSpecifications();
+      setIsInitialized(true);
+    };
+    init();
   }, [fetchExamBoards, fetchUserSpecifications]);
 
   // Get user's selected specifications details
@@ -299,8 +304,20 @@ export default function OALevelDashboard() {
     return recommendations.slice(0, 5);
   };
 
+  // Show loading state while initializing
+  if (!isInitialized || isLoading) {
+    return (
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-neutral-600">Loading your subjects...</p>
+        </div>
+      </div>
+    );
+  }
+
   // If no subjects selected, show setup prompt
-  if (!isLoading && userSpecifications.length === 0) {
+  if (userSpecifications.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white py-12 px-4">
         <div className="max-w-2xl mx-auto text-center">
