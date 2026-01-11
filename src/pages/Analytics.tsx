@@ -54,14 +54,16 @@ export function AnalyticsPage() {
   const subjectMeta = useMemo(() => {
     const meta: Record<string, { name: string; color: string }> = {};
     examSubjects.forEach((subject, index) => {
+      // Use subject's actual color if available, otherwise fall back to default
+      const color = subject.color || subjectColors[index % subjectColors.length];
       meta[subject.id] = {
         name: subject.name,
-        color: subjectColors[index % subjectColors.length],
+        color,
       };
       // Also map by slug for flexibility
       meta[subject.slug] = {
         name: subject.name,
-        color: subjectColors[index % subjectColors.length],
+        color,
       };
     });
     return meta;
