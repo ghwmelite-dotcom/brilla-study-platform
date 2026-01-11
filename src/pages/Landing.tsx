@@ -712,10 +712,10 @@ function PWAInstallBanner() {
 // ============================================
 
 const stats = [
-  { text: 'Growing Community', label: 'Join Learners Across Ghana', icon: Users },
-  { text: 'Comprehensive', label: 'Question Bank', icon: BookOpen },
-  { text: 'Built For', label: 'NSMQ, WASSCE & BECE Success', icon: TrendingUp },
-  { text: 'Trusted By', label: 'Schools Nationwide', icon: GraduationCap },
+  { text: '4,000+', label: 'Practice Questions', icon: BookOpen },
+  { text: '5 Exams', label: 'NSMQ, WASSCE, BECE, IGCSE, A-Level', icon: Target },
+  { text: '50+', label: 'Subjects Covered', icon: TrendingUp },
+  { text: 'AI-Powered', label: 'Learning & Tutoring', icon: Brain },
 ];
 
 const examModes = [
@@ -1078,7 +1078,7 @@ export function LandingPage() {
             Master Your
             <br />
             <span className="text-gradient glow-text">
-              <TypewriterText texts={['NSMQ', 'WASSCE', 'BECE']} />
+              <TypewriterText texts={['NSMQ', 'WASSCE', 'BECE', 'IGCSE', 'A-Level']} />
             </span>
             <br />
             <span className="text-white">with </span>
@@ -1220,10 +1220,10 @@ export function LandingPage() {
             </span>
             <h2 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
               One Platform.{' '}
-              <span className="text-gradient">Three Exams.</span>
+              <span className="text-gradient">Every Exam.</span>
             </h2>
             <p className="text-xl text-white/60 max-w-2xl mx-auto">
-              Whether you're preparing for NSMQ, WASSCE, or BECE, we've got the tools you need to succeed.
+              Whether you're preparing for NSMQ, WASSCE, BECE, or international exams like IGCSE and A-Level, we've got you covered.
             </p>
           </div>
 
@@ -1289,6 +1289,272 @@ export function LandingPage() {
                 </div>
               </Card3D>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* International Exams Section - Cambridge IGCSE & A-Level */}
+      <section className="relative py-24 sm:py-32 overflow-hidden">
+        {/* Premium gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-indigo-950/50 to-slate-950" />
+
+        {/* Animated accent orbs */}
+        <GradientOrb className="w-[500px] h-[500px] bg-gradient-to-r from-indigo-500/30 to-purple-500/30 -left-64 top-0" delay={0} />
+        <GradientOrb className="w-[400px] h-[400px] bg-gradient-to-r from-cyan-500/30 to-blue-500/30 -right-48 bottom-0" delay={2} />
+
+        {/* Decorative pattern */}
+        <div className="absolute inset-0 opacity-[0.02]" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        }} />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          {/* Section Header */}
+          <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+            <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-500/30">
+              <Award className="w-4 h-4 text-indigo-400" />
+              <span className="text-sm font-medium text-indigo-300">Cambridge International</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 sm:mb-6">
+              Go{' '}
+              <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                International
+              </span>
+            </h2>
+            <p className="text-lg sm:text-xl text-white/60 max-w-2xl mx-auto">
+              Prepare for Cambridge IGCSE and A-Level examinations with our comprehensive question bank and expert-aligned content.
+            </p>
+          </div>
+
+          {/* International Exams Cards */}
+          <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 mb-12 sm:mb-16">
+            {/* IGCSE Card */}
+            <Card3D>
+              <div className="relative h-full rounded-2xl sm:rounded-3xl overflow-hidden group">
+                {/* Animated border gradient */}
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-border-dance" />
+                <div className="absolute inset-[1px] rounded-2xl sm:rounded-3xl bg-slate-950" />
+
+                {/* Content */}
+                <div className="relative p-6 sm:p-8 lg:p-10">
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-6 sm:mb-8">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-xl sm:rounded-2xl bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 flex items-center justify-center shadow-xl shadow-cyan-500/25 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                        <BookOpen className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="px-2 py-0.5 text-[10px] sm:text-xs font-semibold bg-cyan-500/20 text-cyan-400 rounded-full">O-LEVEL</span>
+                        </div>
+                        <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">IGCSE</h3>
+                        <p className="text-white/50 text-sm sm:text-base">International GCSE</p>
+                      </div>
+                    </div>
+                    <div className="hidden sm:flex flex-col items-end">
+                      <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">160</span>
+                      <span className="text-white/50 text-xs sm:text-sm">Questions</span>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-white/70 text-sm sm:text-base mb-6 leading-relaxed">
+                    Master the Cambridge IGCSE curriculum with expertly crafted questions covering all key topics. Perfect for students aged 14-16 preparing for international qualifications.
+                  </p>
+
+                  {/* Subjects Grid */}
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                    <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 hover:bg-cyan-500/5 transition-all">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0">
+                        <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white font-semibold text-sm sm:text-base">Physics</p>
+                        <p className="text-white/50 text-xs">40 Questions</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white font-semibold text-sm sm:text-base">Chemistry</p>
+                        <p className="text-white/50 text-xs">40 Questions</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-rose-500/30 hover:bg-rose-500/5 transition-all">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                        <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white font-semibold text-sm sm:text-base">Biology</p>
+                        <p className="text-white/50 text-xs">40 Questions</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center flex-shrink-0">
+                        <Target className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white font-semibold text-sm sm:text-base">Mathematics</p>
+                        <p className="text-white/50 text-xs">40 Questions</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Features */}
+                  <div className="flex flex-wrap gap-2 sm:gap-3 mb-6 sm:mb-8">
+                    <span className="px-3 py-1.5 text-xs sm:text-sm rounded-full bg-white/5 text-white/70 border border-white/10">
+                      Cambridge Aligned
+                    </span>
+                    <span className="px-3 py-1.5 text-xs sm:text-sm rounded-full bg-white/5 text-white/70 border border-white/10">
+                      Detailed Explanations
+                    </span>
+                    <span className="px-3 py-1.5 text-xs sm:text-sm rounded-full bg-white/5 text-white/70 border border-white/10">
+                      Exam-Style Questions
+                    </span>
+                  </div>
+
+                  {/* CTA */}
+                  <Link
+                    to="/exam-setup"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:shadow-lg hover:shadow-cyan-500/25 transition-all group/btn"
+                  >
+                    Start IGCSE Practice
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover/btn:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+              </div>
+            </Card3D>
+
+            {/* A-Level Card */}
+            <Card3D>
+              <div className="relative h-full rounded-2xl sm:rounded-3xl overflow-hidden group">
+                {/* Animated border gradient */}
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-border-dance" />
+                <div className="absolute inset-[1px] rounded-2xl sm:rounded-3xl bg-slate-950" />
+
+                {/* Premium badge */}
+                <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
+                  <div className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg">
+                    <Crown className="w-3 h-3" />
+                    Advanced
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="relative p-6 sm:p-8 lg:p-10">
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-6 sm:mb-8">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 flex items-center justify-center shadow-xl shadow-purple-500/25 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                        <GraduationCap className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="px-2 py-0.5 text-[10px] sm:text-xs font-semibold bg-purple-500/20 text-purple-400 rounded-full">ADVANCED</span>
+                        </div>
+                        <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">A-Level</h3>
+                        <p className="text-white/50 text-sm sm:text-base">Advanced Level</p>
+                      </div>
+                    </div>
+                    <div className="hidden sm:flex flex-col items-end">
+                      <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">160</span>
+                      <span className="text-white/50 text-xs sm:text-sm">Questions</span>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-white/70 text-sm sm:text-base mb-6 leading-relaxed">
+                    Challenge yourself with university-prep content. Our A-Level questions cover advanced topics in depth, preparing you for top universities worldwide.
+                  </p>
+
+                  {/* Subjects Grid */}
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                    <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-purple-500/30 hover:bg-purple-500/5 transition-all">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center flex-shrink-0">
+                        <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white font-semibold text-sm sm:text-base">Physics</p>
+                        <p className="text-white/50 text-xs">40 Questions</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-pink-500/30 hover:bg-pink-500/5 transition-all">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white font-semibold text-sm sm:text-base">Chemistry</p>
+                        <p className="text-white/50 text-xs">40 Questions</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-rose-500/30 hover:bg-rose-500/5 transition-all">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-rose-500 to-red-500 flex items-center justify-center flex-shrink-0">
+                        <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white font-semibold text-sm sm:text-base">Biology</p>
+                        <p className="text-white/50 text-xs">40 Questions</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-orange-500/30 hover:bg-orange-500/5 transition-all">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center flex-shrink-0">
+                        <Target className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white font-semibold text-sm sm:text-base">Mathematics</p>
+                        <p className="text-white/50 text-xs">40 Questions</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Advanced Topics */}
+                  <div className="flex flex-wrap gap-2 sm:gap-3 mb-6 sm:mb-8">
+                    <span className="px-3 py-1.5 text-xs sm:text-sm rounded-full bg-white/5 text-white/70 border border-white/10">
+                      Calculus & Vectors
+                    </span>
+                    <span className="px-3 py-1.5 text-xs sm:text-sm rounded-full bg-white/5 text-white/70 border border-white/10">
+                      Organic Chemistry
+                    </span>
+                    <span className="px-3 py-1.5 text-xs sm:text-sm rounded-full bg-white/5 text-white/70 border border-white/10">
+                      Quantum Physics
+                    </span>
+                  </div>
+
+                  {/* CTA */}
+                  <Link
+                    to="/exam-setup"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:shadow-lg hover:shadow-purple-500/25 transition-all group/btn"
+                  >
+                    Start A-Level Practice
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover/btn:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+              </div>
+            </Card3D>
+          </div>
+
+          {/* Bottom Stats Bar */}
+          <div className="glass rounded-2xl p-6 sm:p-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-1">320</div>
+                <div className="text-white/60 text-xs sm:text-sm">Total Questions</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-1">8</div>
+                <div className="text-white/60 text-xs sm:text-sm">Subject Areas</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent mb-1">100%</div>
+                <div className="text-white/60 text-xs sm:text-sm">Cambridge Aligned</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent mb-1">24/7</div>
+                <div className="text-white/60 text-xs sm:text-sm">AI Tutor Support</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
