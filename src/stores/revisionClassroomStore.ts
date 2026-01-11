@@ -682,7 +682,7 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
       // =============================================
 
       requestAITeaching: async (phase) => {
-        const { currentLesson, currentSession } = get();
+        const { currentLesson, currentSession, aiMessages } = get();
         if (!currentLesson || !currentSession) return;
 
         set({
@@ -696,21 +696,31 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
         });
 
         try {
-          // Generate AI content
-          const content = await generateAITeachingContent(
-            currentLesson,
-            phase,
-            currentSession.examType
-          );
+          // Build previous messages context for AI
+          const previousMessages = aiMessages.slice(-6).map(msg => ({
+            role: msg.userResponse ? 'user' : 'assistant',
+            content: msg.userResponse || msg.aiMessage,
+          })).filter(msg => msg.content);
 
-          // Record interaction on server
-          await api.post(`/revision-classroom/lessons/${currentLesson.id}/interactions`, {
-            interactionType: 'teaching',
-            aiMessage: content,
+          // Call the AI teaching API endpoint
+          const response = await api.post<{
+            content: string;
+            phase: string;
+            interactionId: string;
+            context: { topicName: string; subjectName: string; examType: string };
+          }>(`/revision-classroom/lessons/${currentLesson.id}/teach`, {
+            phase,
+            previousMessages,
           });
 
+          if (!response.success || !response.data) {
+            throw new Error(response.error || 'Failed to get AI response');
+          }
+
+          const content = response.data.content;
+
           const message: RevisionAIMessage = {
-            id: generateLocalId('msg'),
+            id: response.data.interactionId || generateLocalId('msg'),
             lessonId: currentLesson.id,
             interactionType: 'teaching',
             aiMessage: content,
@@ -728,12 +738,31 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
           }));
         } catch (error) {
           console.error('Error generating AI teaching:', error);
+
+          // Fallback to local generation if API fails
+          const content = await generateAITeachingContent(
+            currentLesson,
+            phase,
+            currentSession.examType
+          );
+
+          const message: RevisionAIMessage = {
+            id: generateLocalId('msg'),
+            lessonId: currentLesson.id,
+            interactionType: 'teaching',
+            aiMessage: content,
+            timestamp: new Date().toISOString(),
+          };
+
           set(state => ({
             aiTeachingState: {
               ...state.aiTeachingState,
+              currentMessage: content,
               isThinking: false,
+              awaitingResponse: phase === 'check' || phase === 'practice',
             },
-            error: 'Failed to generate teaching content',
+            aiMessages: [...state.aiMessages, message],
+            error: undefined, // Clear error since we recovered with fallback
           }));
         }
       },
@@ -802,10 +831,21 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
       },
 
       askQuestion: async (question) => {
-        const { currentLesson, currentSession } = get();
+        const { currentLesson, currentSession, aiMessages } = get();
         if (!currentLesson || !currentSession) return;
 
+        // Add user's question to messages immediately
+        const userMessage: RevisionAIMessage = {
+          id: generateLocalId('msg'),
+          lessonId: currentLesson.id,
+          interactionType: 'question',
+          aiMessage: '',
+          userResponse: question,
+          timestamp: new Date().toISOString(),
+        };
+
         set(state => ({
+          aiMessages: [...state.aiMessages, userMessage],
           aiTeachingState: {
             ...state.aiTeachingState,
             isThinking: true,
@@ -813,43 +853,70 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
         }));
 
         try {
-          // Generate clarification response
-          const response = `Great question! Let me clarify that for you.
+          // Build previous messages context
+          const previousMessages = aiMessages.slice(-6).map(msg => ({
+            role: msg.userResponse ? 'user' : 'assistant',
+            content: msg.userResponse || msg.aiMessage,
+          })).filter(msg => msg.content);
 
-${question.toLowerCase().includes('why') ? 'The reason is that this concept helps us understand...' : 'Here\'s how it works...'}
-
-Understanding this is important because it helps you see how ${currentLesson.topicName || currentLesson.title} connects to exam questions.
-
-Does this help? Feel free to ask more questions!`;
-
-          // Record interaction
-          await api.post(`/revision-classroom/lessons/${currentLesson.id}/interactions`, {
-            interactionType: 'clarification',
-            aiMessage: response,
-            userResponse: question,
+          // Call the AI ask endpoint
+          const apiResponse = await api.post<{
+            answer: string;
+            interactionId?: string;
+          }>(`/revision-classroom/lessons/${currentLesson.id}/ask`, {
+            question,
+            previousMessages,
           });
 
-          const message: RevisionAIMessage = {
-            id: generateLocalId('msg'),
+          if (!apiResponse.success || !apiResponse.data) {
+            throw new Error(apiResponse.error || 'Failed to get AI response');
+          }
+
+          const answer = apiResponse.data.answer;
+
+          const aiMessage: RevisionAIMessage = {
+            id: apiResponse.data.interactionId || generateLocalId('msg'),
             lessonId: currentLesson.id,
             interactionType: 'clarification',
-            aiMessage: response,
-            userResponse: question,
+            aiMessage: answer,
             timestamp: new Date().toISOString(),
           };
 
           set(state => ({
-            aiMessages: [...state.aiMessages, message],
+            aiMessages: [...state.aiMessages, aiMessage],
             aiTeachingState: {
               ...state.aiTeachingState,
-              currentMessage: response,
+              currentMessage: answer,
               isThinking: false,
             },
           }));
         } catch (error) {
           console.error('Error asking question:', error);
+
+          // Fallback response
+          const fallbackAnswer = `Great question about "${question}"! Let me help you understand this.
+
+${question.toLowerCase().includes('why') ? 'The reason relates to the core principles of this topic...' : 'Here\'s how it works...'}
+
+Understanding this is important because it helps you see how ${currentLesson.topicName || currentLesson.title} connects to exam questions.
+
+Does this help? Feel free to ask more questions!`;
+
+          const fallbackMessage: RevisionAIMessage = {
+            id: generateLocalId('msg'),
+            lessonId: currentLesson.id,
+            interactionType: 'clarification',
+            aiMessage: fallbackAnswer,
+            timestamp: new Date().toISOString(),
+          };
+
           set(state => ({
-            aiTeachingState: { ...state.aiTeachingState, isThinking: false },
+            aiMessages: [...state.aiMessages, fallbackMessage],
+            aiTeachingState: {
+              ...state.aiTeachingState,
+              currentMessage: fallbackAnswer,
+              isThinking: false,
+            },
           }));
         }
       },
