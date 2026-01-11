@@ -1,9 +1,11 @@
 import { Hono } from 'hono';
+import type { BaseAiTextGenerationModels } from '@cloudflare/workers-types';
 
 interface Env {
   DB: D1Database;
   JWT_SECRET: string;
-  ANTHROPIC_API_KEY?: string;
+  AI: Ai;  // Cloudflare Workers AI binding
+  AI_MODEL?: string;
 }
 
 interface UserPayload {
@@ -12,10 +14,305 @@ interface UserPayload {
   role: string;
 }
 
+// Teaching phase types
+type TeachingPhase = 'hook' | 'explain' | 'check' | 'practice' | 'confirm' | 'connect';
+
+interface TeachingContext {
+  topicName: string;
+  subjectName: string;
+  examType: string;
+  examBoard?: string;
+  previousMessages?: { role: string; content: string }[];
+  studentResponse?: string;
+  checkpointResult?: { correct: boolean; answer: string };
+  masteryLevel?: number;
+}
+
 const revisionClassroomApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
 
 // Helper to generate unique IDs
 const generateId = (prefix: string) => `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+// =============================================
+// AI TEACHING PROMPTS - 6-Phase Methodology
+// =============================================
+
+const TEACHING_SYSTEM_PROMPT = `You are Brilla AI Teacher, an expert educator on the Brilla Study Platform. You teach students preparing for BECE, WASSCE, Cambridge IGCSE, Cambridge A-Level, and Edexcel exams.
+
+Your teaching follows a proven 6-phase methodology:
+1. HOOK - Capture attention with an intriguing question or real-world connection
+2. EXPLAIN - Teach the concept clearly with examples
+3. CHECK - Ask questions to verify understanding
+4. PRACTICE - Provide practice problems
+5. CONFIRM - Ensure mastery before moving on
+6. CONNECT - Link to related concepts and exam strategies
+
+Guidelines:
+- Use clear, simple language appropriate for secondary/high school students
+- Include relevant examples from Ghana/West Africa when appropriate
+- For Cambridge/Edexcel exams, reference specific syllabus points
+- Use emojis sparingly to keep engagement (1-2 per message max)
+- Break complex concepts into digestible parts
+- Be encouraging but honest about areas needing improvement
+- Reference exam techniques and common mark scheme points
+- Keep responses focused and not too long (aim for 150-300 words)`;
+
+const PHASE_PROMPTS: Record<TeachingPhase, string> = {
+  hook: `You are in the HOOK phase. Your goal is to capture the student's attention and spark curiosity about the topic.
+
+Instructions:
+- Start with an intriguing question or surprising fact related to the topic
+- Connect to something the student might experience in daily life
+- Create curiosity that makes them want to learn more
+- Keep it brief and engaging (2-3 sentences max)
+- End with something that naturally leads into the explanation
+
+DO NOT explain the concept yet - just hook their attention!`,
+
+  explain: `You are in the EXPLAIN phase. Your goal is to teach the core concept clearly.
+
+Instructions:
+- Explain the main concept in a clear, structured way
+- Use analogies and real-world examples to aid understanding
+- Break down complex ideas into simpler parts
+- Include key definitions and formulas if relevant
+- Mention how this appears in exams (question types, mark allocation)
+- Use bullet points or numbered lists for clarity when appropriate
+- Highlight what examiners look for in answers
+
+This is the main teaching moment - be thorough but accessible.`,
+
+  check: `You are in the CHECK phase. Your goal is to verify the student understood the explanation.
+
+Instructions:
+- Ask 1-2 quick comprehension questions
+- Questions should test understanding, not just memory
+- Frame questions conversationally, not like a formal test
+- Keep questions focused on the key concepts just taught
+- Be encouraging in your tone
+
+Wait for the student's response before moving on.`,
+
+  practice: `You are in the PRACTICE phase. Your goal is to let the student apply what they learned.
+
+Instructions:
+- Present a practice problem or scenario
+- The problem should be at exam level difficulty
+- Specify what type of answer you're looking for (e.g., "Explain in 2-3 sentences" or "Calculate and show your working")
+- If relevant, mention how many marks this would be worth in an exam
+- Encourage the student to try before asking for help
+
+This is their chance to actively engage with the material.`,
+
+  confirm: `You are in the CONFIRM phase. Your goal is to ensure the student has achieved mastery.
+
+Instructions:
+- Based on their practice response, confirm if they've understood correctly
+- If correct: celebrate and reinforce what they did well
+- If incorrect: explain the error gently and clarify the concept
+- Provide the model answer showing proper exam technique
+- Share any exam tips specific to this type of question
+- Ask if they have any remaining questions about this topic
+
+Be specific about what was good/needs improvement.`,
+
+  connect: `You are in the CONNECT phase. Your goal is to link this topic to the bigger picture.
+
+Instructions:
+- Connect to related topics they should study next
+- Mention how this concept appears in other questions/contexts
+- Highlight synoptic links (how it connects across the syllabus)
+- Provide exam strategy tips for questions on this topic
+- Suggest specific areas to review if they struggled
+- End on an encouraging note about their progress
+
+Help them see how this fits into their overall exam preparation.`,
+};
+
+// Generate AI teaching content
+async function generateTeachingContent(
+  env: Env,
+  phase: TeachingPhase,
+  context: TeachingContext
+): Promise<{ content: string; tokensUsed?: number }> {
+  const systemPrompt = `${TEACHING_SYSTEM_PROMPT}
+
+Current Context:
+- Topic: ${context.topicName}
+- Subject: ${context.subjectName}
+- Exam: ${context.examType.toUpperCase()}${context.examBoard ? ` (${context.examBoard})` : ''}
+${context.masteryLevel !== undefined ? `- Student's mastery level: ${context.masteryLevel}%` : ''}
+
+${PHASE_PROMPTS[phase]}`;
+
+  const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
+    { role: 'system', content: systemPrompt },
+  ];
+
+  // Add conversation history if available
+  if (context.previousMessages && context.previousMessages.length > 0) {
+    for (const msg of context.previousMessages.slice(-6)) { // Keep last 6 messages for context
+      messages.push({
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content,
+      });
+    }
+  }
+
+  // Add the appropriate user message based on phase
+  let userMessage = '';
+  switch (phase) {
+    case 'hook':
+      userMessage = `Start teaching me about "${context.topicName}" with an engaging hook.`;
+      break;
+    case 'explain':
+      userMessage = `Now explain the concept of "${context.topicName}" to me clearly.`;
+      break;
+    case 'check':
+      userMessage = `Ask me a question to check if I understood "${context.topicName}".`;
+      break;
+    case 'practice':
+      userMessage = `Give me a practice problem about "${context.topicName}".`;
+      break;
+    case 'confirm':
+      if (context.studentResponse) {
+        userMessage = `Here's my answer: "${context.studentResponse}". Please evaluate it and confirm my understanding.`;
+      } else if (context.checkpointResult) {
+        userMessage = context.checkpointResult.correct
+          ? `I got the question right! My answer was: "${context.checkpointResult.answer}". Please confirm I understand correctly.`
+          : `I got the question wrong. My answer was: "${context.checkpointResult.answer}". Please help me understand the correct answer.`;
+      } else {
+        userMessage = `Please confirm my understanding of "${context.topicName}".`;
+      }
+      break;
+    case 'connect':
+      userMessage = `Help me connect "${context.topicName}" to other topics and exam strategies.`;
+      break;
+  }
+
+  messages.push({ role: 'user', content: userMessage });
+
+  try {
+    const model = env.AI_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+
+    const result = await env.AI.run(model as BaseAiTextGenerationModels, {
+      messages,
+      max_tokens: 1024,
+      temperature: 0.7,
+    });
+
+    // Handle the response
+    const content = typeof result === 'object' && result !== null && 'response' in result
+      ? (result as { response: string }).response
+      : String(result);
+
+    if (!content || content.trim() === '') {
+      console.error('Empty response from Workers AI');
+      return getFallbackContent(phase, context);
+    }
+
+    return { content, tokensUsed: 0 }; // Workers AI doesn't return token count directly
+  } catch (error) {
+    console.error('Error calling Workers AI for teaching:', error);
+    return getFallbackContent(phase, context);
+  }
+}
+
+// Fallback content when AI is unavailable
+function getFallbackContent(phase: TeachingPhase, context: TeachingContext): { content: string } {
+  const fallbacks: Record<TeachingPhase, string> = {
+    hook: `Have you ever wondered about ${context.topicName}? 🤔 This is one of the most important concepts in ${context.subjectName}, and understanding it well could make a real difference in your ${context.examType.toUpperCase()} exam. Let me show you why this matters...`,
+
+    explain: `Let me explain ${context.topicName} to you.\n\n**Key Concept:**\n${context.topicName} is a fundamental topic in ${context.subjectName}. In your ${context.examType.toUpperCase()} exam, you'll encounter questions testing your understanding of this concept.\n\n**Important Points:**\n• Pay attention to the key definitions\n• Understand the underlying principles\n• Practice applying the concept to different scenarios\n\nLet's make sure you understand this thoroughly before moving on.`,
+
+    check: `Now let me check your understanding! 📝\n\nThink about what we just covered about ${context.topicName}. Can you explain in your own words what the main concept is and why it's important?\n\nTake your time to think about it.`,
+
+    practice: `Time to put your knowledge into practice! ✍️\n\nHere's a question about ${context.topicName}:\n\nBased on what you've learned, explain the key concept and give one example of how it applies.\n\n*This would be worth about 4 marks in your exam.*\n\nType your answer below.`,
+
+    confirm: `Let's confirm your understanding! ✅\n\n${context.studentResponse
+      ? `Thank you for your answer. You've shown good understanding of ${context.topicName}. Remember to include specific details and examples in your exam answers for full marks.`
+      : `You're making great progress with ${context.topicName}. The key things to remember are the main definitions and how to apply them.`
+    }\n\nDo you have any questions before we move on?`,
+
+    connect: `Excellent work on ${context.topicName}! 🎉\n\n**Connections:**\nThis topic links to several other areas in ${context.subjectName}. Make sure you can see how concepts build on each other.\n\n**Exam Tips:**\n• Questions on this topic often appear in Paper 2\n• Examiners look for clear explanations with examples\n• Practice past paper questions on this topic\n\nYou're making great progress! Keep up the excellent work. 💪`,
+  };
+
+  return { content: fallbacks[phase] };
+}
+
+// Generate a checkpoint question using AI
+async function generateCheckpointQuestion(
+  env: Env,
+  context: TeachingContext,
+  difficulty: 'easy' | 'medium' | 'hard' = 'medium'
+): Promise<{
+  question: string;
+  options?: string[];
+  correctAnswer: string;
+  explanation: string;
+}> {
+  const systemPrompt = `You are creating exam-style questions for the Brilla Study Platform.
+
+Context:
+- Topic: ${context.topicName}
+- Subject: ${context.subjectName}
+- Exam: ${context.examType.toUpperCase()}
+- Difficulty: ${difficulty}
+
+Generate a multiple choice question with 4 options (A, B, C, D).
+
+RESPOND IN THIS EXACT JSON FORMAT:
+{
+  "question": "The question text here",
+  "options": ["A) First option", "B) Second option", "C) Third option", "D) Fourth option"],
+  "correctAnswer": "A",
+  "explanation": "Brief explanation of why this is correct"
+}`;
+
+  try {
+    const model = env.AI_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+
+    const result = await env.AI.run(model as BaseAiTextGenerationModels, {
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Generate a ${difficulty} difficulty multiple choice question about "${context.topicName}".` },
+      ],
+      max_tokens: 512,
+      temperature: 0.8,
+    });
+
+    const content = typeof result === 'object' && result !== null && 'response' in result
+      ? (result as { response: string }).response
+      : String(result);
+
+    // Try to parse JSON from response
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+      return {
+        question: parsed.question || `What is a key concept of ${context.topicName}?`,
+        options: parsed.options || ['A) Option 1', 'B) Option 2', 'C) Option 3', 'D) Option 4'],
+        correctAnswer: parsed.correctAnswer || 'A',
+        explanation: parsed.explanation || 'Review the topic for the complete explanation.',
+      };
+    }
+  } catch (error) {
+    console.error('Error generating checkpoint question:', error);
+  }
+
+  // Fallback question
+  return {
+    question: `Which of the following best describes ${context.topicName}?`,
+    options: [
+      'A) The first possible explanation',
+      'B) The second possible explanation',
+      'C) The correct explanation based on the lesson',
+      'D) An incorrect explanation',
+    ],
+    correctAnswer: 'C',
+    explanation: `Review the explanation of ${context.topicName} to understand why option C is correct.`,
+  };
+}
 
 // =============================================
 // REVISION SESSIONS
@@ -507,6 +804,309 @@ revisionClassroomApp.get('/lessons/:lessonId/interactions', async (c) => {
   } catch (error) {
     console.error('Error fetching interactions:', error);
     return c.json({ success: false, error: 'Failed to fetch interactions' }, 500);
+  }
+});
+
+// =============================================
+// AI TEACHING - Generate teaching content using Llama AI
+// =============================================
+
+// Generate AI teaching content for a specific phase
+revisionClassroomApp.post('/lessons/:lessonId/teach', async (c) => {
+  try {
+    const user = c.get('user');
+    const lessonId = c.req.param('lessonId');
+    const body = await c.req.json();
+    const {
+      phase,
+      studentResponse,
+      checkpointResult,
+      previousMessages,
+    } = body as {
+      phase: TeachingPhase;
+      studentResponse?: string;
+      checkpointResult?: { correct: boolean; answer: string };
+      previousMessages?: { role: string; content: string }[];
+    };
+
+    // Validate phase
+    const validPhases: TeachingPhase[] = ['hook', 'explain', 'check', 'practice', 'confirm', 'connect'];
+    if (!validPhases.includes(phase)) {
+      return c.json({ success: false, error: 'Invalid teaching phase' }, 400);
+    }
+
+    // Get lesson details with topic and subject info
+    const lesson = await c.env.DB.prepare(`
+      SELECT
+        rl.*,
+        t.name as topic_name,
+        s.name as subject_name,
+        rs.exam_type,
+        rs.user_id,
+        tm.mastery_percentage
+      FROM revision_lessons rl
+      LEFT JOIN topics t ON rl.topic_id = t.id
+      LEFT JOIN revision_sessions rs ON rl.session_id = rs.id
+      LEFT JOIN subjects s ON rs.subject_id = s.id
+      LEFT JOIN topic_mastery tm ON tm.topic_id = rl.topic_id AND tm.user_id = rs.user_id
+      WHERE rl.id = ? AND rs.user_id = ?
+    `).bind(lessonId, user.userId).first();
+
+    if (!lesson) {
+      return c.json({ success: false, error: 'Lesson not found' }, 404);
+    }
+
+    // Build teaching context
+    const context: TeachingContext = {
+      topicName: (lesson as any).topic_name || 'this topic',
+      subjectName: (lesson as any).subject_name || 'this subject',
+      examType: (lesson as any).exam_type || 'wassce',
+      previousMessages,
+      studentResponse,
+      checkpointResult,
+      masteryLevel: (lesson as any).mastery_percentage,
+    };
+
+    // Generate AI teaching content
+    const { content, tokensUsed } = await generateTeachingContent(c.env, phase, context);
+
+    // Record the interaction
+    const interactionId = generateId('interaction');
+    const now = new Date().toISOString();
+
+    await c.env.DB.prepare(`
+      INSERT INTO revision_ai_interactions (
+        id, lesson_id, user_id, interaction_type, ai_message,
+        user_response, tokens_used, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      interactionId, lessonId, user.userId, `teach_${phase}`,
+      content, studentResponse || null, tokensUsed || null, now
+    ).run();
+
+    // Update lesson's current phase
+    await c.env.DB.prepare(`
+      UPDATE revision_lessons
+      SET current_phase = ?, updated_at = ?
+      WHERE id = ?
+    `).bind(phase, now, lessonId).run();
+
+    return c.json({
+      success: true,
+      data: {
+        content,
+        phase,
+        interactionId,
+        context: {
+          topicName: context.topicName,
+          subjectName: context.subjectName,
+          examType: context.examType,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Error generating teaching content:', error);
+    return c.json({ success: false, error: 'Failed to generate teaching content' }, 500);
+  }
+});
+
+// Generate an AI checkpoint question
+revisionClassroomApp.post('/lessons/:lessonId/checkpoint/generate', async (c) => {
+  try {
+    const user = c.get('user');
+    const lessonId = c.req.param('lessonId');
+    const body = await c.req.json();
+    const { difficulty = 'medium' } = body as { difficulty?: 'easy' | 'medium' | 'hard' };
+
+    // Get lesson details
+    const lesson = await c.env.DB.prepare(`
+      SELECT
+        rl.*,
+        t.name as topic_name,
+        s.name as subject_name,
+        rs.exam_type,
+        rs.user_id
+      FROM revision_lessons rl
+      LEFT JOIN topics t ON rl.topic_id = t.id
+      LEFT JOIN revision_sessions rs ON rl.session_id = rs.id
+      LEFT JOIN subjects s ON rs.subject_id = s.id
+      WHERE rl.id = ? AND rs.user_id = ?
+    `).bind(lessonId, user.userId).first();
+
+    if (!lesson) {
+      return c.json({ success: false, error: 'Lesson not found' }, 404);
+    }
+
+    // Build context
+    const context: TeachingContext = {
+      topicName: (lesson as any).topic_name || 'this topic',
+      subjectName: (lesson as any).subject_name || 'this subject',
+      examType: (lesson as any).exam_type || 'wassce',
+    };
+
+    // Generate checkpoint question
+    const checkpoint = await generateCheckpointQuestion(c.env, context, difficulty);
+
+    // Save checkpoint to database
+    const checkpointId = generateId('checkpoint');
+    const now = new Date().toISOString();
+
+    // Get max order
+    const maxOrder = await c.env.DB.prepare(`
+      SELECT COALESCE(MAX(order_index), 0) as max_order FROM revision_checkpoints WHERE lesson_id = ?
+    `).bind(lessonId).first();
+
+    await c.env.DB.prepare(`
+      INSERT INTO revision_checkpoints (
+        id, lesson_id, checkpoint_type, question_text, question_type,
+        options, correct_answer, explanation, difficulty, points, order_index, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      checkpointId,
+      lessonId,
+      'understanding',
+      checkpoint.question,
+      'multiple_choice',
+      JSON.stringify(checkpoint.options),
+      checkpoint.correctAnswer,
+      checkpoint.explanation,
+      difficulty,
+      difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3,
+      ((maxOrder as any)?.max_order || 0) + 1,
+      now
+    ).run();
+
+    return c.json({
+      success: true,
+      data: {
+        checkpointId,
+        question: checkpoint.question,
+        options: checkpoint.options,
+        difficulty,
+        // Don't send correctAnswer to frontend - validate on submit
+      },
+    });
+  } catch (error) {
+    console.error('Error generating checkpoint:', error);
+    return c.json({ success: false, error: 'Failed to generate checkpoint' }, 500);
+  }
+});
+
+// Handle student question (ask anything, anytime feature)
+revisionClassroomApp.post('/lessons/:lessonId/ask', async (c) => {
+  try {
+    const user = c.get('user');
+    const lessonId = c.req.param('lessonId');
+    const body = await c.req.json();
+    const { question, previousMessages } = body as {
+      question: string;
+      previousMessages?: { role: string; content: string }[];
+    };
+
+    if (!question || question.trim().length === 0) {
+      return c.json({ success: false, error: 'Question is required' }, 400);
+    }
+
+    // Get lesson details
+    const lesson = await c.env.DB.prepare(`
+      SELECT
+        rl.*,
+        t.name as topic_name,
+        s.name as subject_name,
+        rs.exam_type,
+        rs.user_id
+      FROM revision_lessons rl
+      LEFT JOIN topics t ON rl.topic_id = t.id
+      LEFT JOIN revision_sessions rs ON rl.session_id = rs.id
+      LEFT JOIN subjects s ON rs.subject_id = s.id
+      WHERE rl.id = ? AND rs.user_id = ?
+    `).bind(lessonId, user.userId).first();
+
+    if (!lesson) {
+      return c.json({ success: false, error: 'Lesson not found' }, 404);
+    }
+
+    // Build the prompt for answering student questions
+    const systemPrompt = `${TEACHING_SYSTEM_PROMPT}
+
+Current Context:
+- Topic: ${(lesson as any).topic_name || 'General'}
+- Subject: ${(lesson as any).subject_name || 'General'}
+- Exam: ${((lesson as any).exam_type || 'wassce').toUpperCase()}
+
+The student has a question. Answer it helpfully and concisely, relating it back to the current topic when relevant. If the question is off-topic, gently guide them back while still being helpful.`;
+
+    const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
+      { role: 'system', content: systemPrompt },
+    ];
+
+    // Add conversation history
+    if (previousMessages && previousMessages.length > 0) {
+      for (const msg of previousMessages.slice(-6)) {
+        messages.push({
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content,
+        });
+      }
+    }
+
+    messages.push({ role: 'user', content: question });
+
+    try {
+      const model = c.env.AI_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+
+      const result = await c.env.AI.run(model as BaseAiTextGenerationModels, {
+        messages,
+        max_tokens: 1024,
+        temperature: 0.7,
+      });
+
+      const content = typeof result === 'object' && result !== null && 'response' in result
+        ? (result as { response: string }).response
+        : String(result);
+
+      if (!content || content.trim() === '') {
+        return c.json({
+          success: true,
+          data: {
+            answer: `That's a great question about ${(lesson as any).topic_name}! Let me help you understand this better. Could you be more specific about what aspect you'd like me to explain?`,
+          },
+        });
+      }
+
+      // Record the interaction
+      const interactionId = generateId('interaction');
+      const now = new Date().toISOString();
+
+      await c.env.DB.prepare(`
+        INSERT INTO revision_ai_interactions (
+          id, lesson_id, user_id, interaction_type, ai_message,
+          user_response, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        interactionId, lessonId, user.userId, 'student_question',
+        content, question, now
+      ).run();
+
+      return c.json({
+        success: true,
+        data: {
+          answer: content,
+          interactionId,
+        },
+      });
+    } catch (aiError) {
+      console.error('AI error answering question:', aiError);
+      return c.json({
+        success: true,
+        data: {
+          answer: `That's a thoughtful question! While I'm having some technical difficulties, I encourage you to think about how ${(lesson as any).topic_name} relates to what you're asking. Try breaking down your question into smaller parts - what specific concept are you struggling with?`,
+        },
+      });
+    }
+  } catch (error) {
+    console.error('Error handling student question:', error);
+    return c.json({ success: false, error: 'Failed to process question' }, 500);
   }
 });
 
