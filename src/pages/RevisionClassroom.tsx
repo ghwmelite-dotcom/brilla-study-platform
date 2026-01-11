@@ -497,6 +497,7 @@ export default function RevisionClassroom() {
   void _isLoading;
   void _requestAITeaching;
   void _resetClassroom;
+  void clearWhiteboardContent;
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showSubjectSelector, setShowSubjectSelector] = useState(!currentSession);

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import {
   Play,
   Pause,
@@ -10,7 +10,6 @@ import {
   VolumeX,
   Maximize2,
   Minimize2,
-  Loader2,
   ChevronLeft,
   ChevronRight,
   Sparkles,
@@ -19,7 +18,7 @@ import {
   Calculator,
   GitBranch,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 // Types matching the backend
 interface WhiteboardDrawCommand {
@@ -162,8 +161,10 @@ export function AIWhiteboardTeacher({
       const scale = Math.min(scaleX, scaleY, 1);
 
       fabricRef.current.setZoom(scale);
-      fabricRef.current.setWidth(content.canvasSize.width * scale);
-      fabricRef.current.setHeight(content.canvasSize.height * scale);
+      fabricRef.current.setDimensions({
+        width: content.canvasSize.width * scale,
+        height: content.canvasSize.height * scale,
+      });
       fabricRef.current.renderAll();
     };
 
@@ -327,7 +328,7 @@ export function AIWhiteboardTeacher({
 
     // Highlight objects
     if (step.highlights && step.highlights.length > 0) {
-      canvas.getObjects().forEach((obj) => {
+      canvas.getObjects().forEach((obj: fabric.Object) => {
         const customId = (obj as any).customId;
         if (step.highlights!.includes(customId)) {
           // Add glow effect

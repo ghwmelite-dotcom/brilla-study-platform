@@ -17,6 +17,7 @@ import {
   Shield,
   Sparkles,
   ChevronRight,
+  ChevronLeft,
   Quote,
   Menu,
   X,
@@ -45,6 +46,7 @@ import {
   Wallet,
   Percent,
   Search,
+  Play,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { AuthModal } from '@/components/auth';
@@ -871,6 +873,9 @@ export function LandingPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
+  // AI Classroom preview mode toggle
+  const [aiPreviewMode, setAiPreviewMode] = useState<'chat' | 'whiteboard'>('chat');
+
   const handleOpenAuth = (mode: 'login' | 'register') => {
     setAuthMode(mode);
     setShowAuthModal(true);
@@ -1237,89 +1242,233 @@ export function LandingPage() {
 
               {/* Preview card */}
               <div className="relative glass rounded-2xl border border-violet-400/20 shadow-2xl overflow-hidden">
-                {/* Header */}
+                {/* Header with mode toggle */}
                 <div className="bg-gradient-to-r from-violet-600 to-purple-600 p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                        <Brain className="w-5 h-5 text-white" />
+                        {aiPreviewMode === 'chat' ? (
+                          <Brain className="w-5 h-5 text-white" />
+                        ) : (
+                          <Presentation className="w-5 h-5 text-white" />
+                        )}
                       </div>
                       <div>
                         <p className="font-semibold text-white">Brilla AI Teacher</p>
-                        <p className="text-xs text-white/70">Teaching Phase: Explain</p>
+                        <p className="text-xs text-white/70">
+                          {aiPreviewMode === 'chat' ? 'Teaching Phase: Explain' : 'Visual Whiteboard Mode'}
+                        </p>
                       </div>
                     </div>
-                    {/* Phase indicators */}
-                    <div className="hidden sm:flex gap-1">
-                      {['Hook', 'Explain', 'Check', 'Practice', 'Confirm', 'Connect'].map((phase, i) => (
+                    {/* Mode Toggle */}
+                    <div className="flex items-center gap-2 bg-white/10 rounded-full p-1">
+                      <button
+                        onClick={() => setAiPreviewMode('chat')}
+                        className={cn(
+                          "px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1",
+                          aiPreviewMode === 'chat'
+                            ? "bg-white text-violet-600"
+                            : "text-white/70 hover:text-white"
+                        )}
+                      >
+                        <MessageCircle className="w-3 h-3" />
+                        Chat
+                      </button>
+                      <button
+                        onClick={() => setAiPreviewMode('whiteboard')}
+                        className={cn(
+                          "px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1",
+                          aiPreviewMode === 'whiteboard'
+                            ? "bg-white text-violet-600"
+                            : "text-white/70 hover:text-white"
+                        )}
+                      >
+                        <PenTool className="w-3 h-3" />
+                        Whiteboard
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Chat Mode Preview */}
+                {aiPreviewMode === 'chat' && (
+                  <>
+                    <div className="p-4 space-y-3 min-h-[220px] bg-slate-900/80">
+                      {/* AI Message 1 */}
+                      <div className="flex gap-2">
+                        <div className="w-7 h-7 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
+                          <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+                        </div>
+                        <div className="glass rounded-xl rounded-tl-sm p-3 max-w-[85%] border border-white/10">
+                          <p className="text-sm text-white/90">Let me ask you something interesting... Have you ever wondered why ice floats on water?</p>
+                        </div>
+                      </div>
+
+                      {/* AI Message 2 */}
+                      <div className="flex gap-2">
+                        <div className="w-7 h-7 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
+                          <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+                        </div>
+                        <div className="glass rounded-xl rounded-tl-sm p-3 max-w-[85%] border border-white/10">
+                          <p className="text-sm text-white/90">Most substances become denser when they solidify, but water is special! This is because of <strong className="text-violet-300">hydrogen bonding</strong>...</p>
+                        </div>
+                      </div>
+
+                      {/* User response */}
+                      <div className="flex gap-2 justify-end">
+                        <div className="bg-violet-600 text-white rounded-xl rounded-tr-sm p-3 max-w-[80%]">
+                          <p className="text-sm">That's fascinating! So the hydrogen bonds create a crystal structure?</p>
+                        </div>
+                      </div>
+
+                      {/* Typing indicator */}
+                      <div className="flex gap-2">
+                        <div className="w-7 h-7 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
+                          <Sparkles className="w-3.5 h-3.5 text-violet-400 animate-pulse" />
+                        </div>
+                        <div className="glass rounded-xl rounded-tl-sm px-4 py-3 border border-white/10">
+                          <div className="flex gap-1">
+                            <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                            <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                            <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Input area */}
+                    <div className="p-3 border-t border-white/10 bg-slate-900/50">
+                      <div className="flex gap-2">
+                        <div className="flex-1 glass rounded-lg px-3 py-2 text-white/40 text-sm border border-white/10">
+                          Type your answer or ask a question...
+                        </div>
+                        <button className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-white text-sm font-medium transition-colors">
+                          Continue →
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Whiteboard Mode Preview */}
+                {aiPreviewMode === 'whiteboard' && (
+                  <>
+                    <div className="relative min-h-[340px] sm:min-h-[380px] bg-slate-900/90">
+                      {/* Whiteboard Canvas Area */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-slate-800/50 to-slate-900/50">
+                        {/* Grid pattern */}
                         <div
-                          key={phase}
-                          className={cn(
-                            "w-2 h-2 rounded-full transition-all",
-                            i === 1 ? "w-5 bg-white" : i < 1 ? "bg-white/70" : "bg-white/30"
-                          )}
-                          title={phase}
+                          className="absolute inset-0 opacity-20"
+                          style={{
+                            backgroundImage: `
+                              linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)
+                            `,
+                            backgroundSize: '30px 30px'
+                          }}
                         />
-                      ))}
-                    </div>
-                  </div>
-                </div>
 
-                {/* Chat area */}
-                <div className="p-4 space-y-3 min-h-[220px] bg-slate-900/80">
-                  {/* AI Message 1 */}
-                  <div className="flex gap-2">
-                    <div className="w-7 h-7 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
-                      <Sparkles className="w-3.5 h-3.5 text-violet-400" />
-                    </div>
-                    <div className="glass rounded-xl rounded-tl-sm p-3 max-w-[85%] border border-white/10">
-                      <p className="text-sm text-white/90">Let me ask you something interesting... Have you ever wondered why ice floats on water? 🤔</p>
-                    </div>
-                  </div>
+                        {/* Animated math equation being drawn */}
+                        <div className="absolute top-4 left-4 right-4">
+                          <div className="text-xs sm:text-sm font-medium text-violet-400 mb-2 flex items-center gap-2">
+                            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                            Step 2: Apply the Quadratic Formula
+                          </div>
+                        </div>
 
-                  {/* AI Message 2 */}
-                  <div className="flex gap-2">
-                    <div className="w-7 h-7 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
-                      <Sparkles className="w-3.5 h-3.5 text-violet-400" />
-                    </div>
-                    <div className="glass rounded-xl rounded-tl-sm p-3 max-w-[85%] border border-white/10">
-                      <p className="text-sm text-white/90">Most substances become denser when they solidify, but water is special! This is because of <strong className="text-violet-300">hydrogen bonding</strong>...</p>
-                    </div>
-                  </div>
+                        {/* Visual equation */}
+                        <div className="absolute top-14 sm:top-16 left-1/2 transform -translate-x-1/2 w-full px-4">
+                          <div className="text-center space-y-4 sm:space-y-5">
+                            {/* Formula box */}
+                            <div className="inline-block glass rounded-xl p-4 border border-violet-400/30 animate-fade-in">
+                              <div className="text-lg sm:text-2xl text-white font-mono">
+                                x = <span className="text-violet-400">−b</span> ± √<span className="border-t-2 border-white inline-block px-1">b² − 4ac</span>
+                              </div>
+                              <div className="border-t border-white/30 mt-2 pt-2 text-base sm:text-xl text-white font-mono">
+                                <span className="text-violet-400">2a</span>
+                              </div>
+                            </div>
 
-                  {/* User response */}
-                  <div className="flex gap-2 justify-end">
-                    <div className="bg-violet-600 text-white rounded-xl rounded-tr-sm p-3 max-w-[80%]">
-                      <p className="text-sm">That's fascinating! So the hydrogen bonds create a crystal structure?</p>
-                    </div>
-                  </div>
+                            {/* Substitution step */}
+                            <div className="animate-slide-up" style={{ animationDelay: '0.5s' }}>
+                              <div className="inline-block glass rounded-xl p-3 border border-emerald-400/30">
+                                <div className="text-xs sm:text-base text-emerald-300 font-mono">
+                                  x = <span className="text-amber-400">−(−3)</span> ± √<span className="border-t border-white inline-block px-1">(−3)² − 4(1)(2)</span>
+                                </div>
+                                <div className="border-t border-white/30 mt-1 pt-1 text-xs sm:text-base text-white font-mono">
+                                  2(1)
+                                </div>
+                              </div>
+                            </div>
 
-                  {/* Typing indicator */}
-                  <div className="flex gap-2">
-                    <div className="w-7 h-7 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
-                      <Sparkles className="w-3.5 h-3.5 text-violet-400 animate-pulse" />
-                    </div>
-                    <div className="glass rounded-xl rounded-tl-sm px-4 py-3 border border-white/10">
-                      <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                            {/* Arrow indicator */}
+                            <div className="animate-bounce" style={{ animationDuration: '1.5s' }}>
+                              <ChevronRight className="w-6 h-6 text-violet-400 mx-auto rotate-90" />
+                            </div>
+
+                            {/* Result with highlighting */}
+                            <div className="animate-slide-up" style={{ animationDelay: '1s' }}>
+                              <div className="inline-flex items-center gap-2 glass rounded-xl px-4 py-3 border-2 border-fuchsia-400/40 shadow-lg shadow-fuchsia-500/20">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                                <span className="text-white font-bold text-base sm:text-lg">x = 2 or x = 1</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Drawing cursor indicator */}
+                        <div className="absolute bottom-16 right-4 sm:right-10 animate-pulse">
+                          <div className="flex items-center gap-2 glass px-3 py-1.5 rounded-full border border-violet-400/30">
+                            <div className="w-3 h-3 rounded-full bg-violet-500 animate-ping" style={{ animationDuration: '2s' }} />
+                            <span className="text-xs text-violet-300">AI drawing...</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Step navigation */}
+                      <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex items-center gap-3">
+                        <button className="w-9 h-9 glass rounded-full flex items-center justify-center text-white/50 hover:text-white border border-white/10 hover:border-violet-400/30 transition-colors">
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <div className="flex gap-1.5">
+                          {[1, 2, 3, 4, 5].map((step) => (
+                            <div
+                              key={step}
+                              className={cn(
+                                "h-2 rounded-full transition-all",
+                                step === 2 ? "w-8 bg-violet-500" : step < 2 ? "w-2 bg-violet-400" : "w-2 bg-white/30"
+                              )}
+                            />
+                          ))}
+                        </div>
+                        <button className="w-9 h-9 glass rounded-full flex items-center justify-center text-white/50 hover:text-white border border-white/10 hover:border-violet-400/30 transition-colors">
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
-                  </div>
-                </div>
 
-                {/* Input area */}
-                <div className="p-3 border-t border-white/10 bg-slate-900/50">
-                  <div className="flex gap-2">
-                    <div className="flex-1 glass rounded-lg px-3 py-2 text-white/40 text-sm border border-white/10">
-                      Type your answer or ask a question...
+                    {/* Whiteboard controls footer */}
+                    <div className="p-3 border-t border-white/10 bg-slate-900/50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <button className="w-8 h-8 bg-emerald-500/20 hover:bg-emerald-500/30 rounded-lg flex items-center justify-center text-emerald-400 transition-colors">
+                            <Play className="w-4 h-4" />
+                          </button>
+                          <div className="text-xs text-white/50">0:45 / 2:30</div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-white/50 hidden sm:inline">Voice narration</span>
+                          <div className="flex gap-1">
+                            <div className="w-1 h-3 bg-violet-400 rounded-full animate-pulse" style={{ animationDelay: '0ms' }} />
+                            <div className="w-1 h-4 bg-violet-400 rounded-full animate-pulse" style={{ animationDelay: '100ms' }} />
+                            <div className="w-1 h-2 bg-violet-400 rounded-full animate-pulse" style={{ animationDelay: '200ms' }} />
+                            <div className="w-1 h-5 bg-violet-400 rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <button className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-white text-sm font-medium transition-colors">
-                      Continue →
-                    </button>
-                  </div>
-                </div>
+                  </>
+                )}
               </div>
 
               {/* Floating badges */}
@@ -1348,6 +1497,12 @@ export function LandingPage() {
                     title: 'Proactive Teaching',
                     desc: 'AI initiates and leads lessons through a proven 6-phase methodology: Hook → Explain → Check → Practice → Confirm → Connect',
                     color: 'from-violet-500 to-purple-500'
+                  },
+                  {
+                    icon: PenTool,
+                    title: 'Visual Whiteboard Mode',
+                    desc: 'Watch AI draw diagrams, solve equations step-by-step, and create concept maps — like having a private tutor at a whiteboard',
+                    color: 'from-fuchsia-500 to-pink-500'
                   },
                   {
                     icon: Target,
@@ -1414,8 +1569,8 @@ export function LandingPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {[
                 { value: '6', label: 'Teaching Phases', icon: BookOpen },
-                { value: '∞', label: 'Ask Questions', icon: MessageCircle },
-                { value: '100%', label: 'Personalized', icon: Target },
+                { value: '2', label: 'Learning Modes', icon: PenTool },
+                { value: '100%', label: 'Visual Learning', icon: Presentation },
                 { value: '24/7', label: 'Available', icon: Zap },
               ].map((stat, i) => (
                 <div key={i} className="group">
