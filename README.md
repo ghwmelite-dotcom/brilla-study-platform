@@ -31,12 +31,81 @@
 
 ### Why Brilla?
 
+- **🧠 AI Revision Classroom** - Revolutionary AI that *teaches* you, not just answers questions
 - **Adaptive Learning** - AI-powered question selection that focuses on your weak areas
 - **Exam-Authentic** - Questions following real WAEC and Cambridge formats
 - **24/7 AI Tutor** - Get help anytime with our Llama 3.3 70B-powered tutor
 - **Gamified Experience** - XP, streaks, battles, and leaderboards keep you motivated
 - **Works Offline** - PWA support for studying without internet
 - **Ghana-First Design** - Built with Ghanaian students in mind, with local curriculum support
+
+---
+
+## 🌟 Featured: AI Revision Classroom
+
+<div align="center">
+
+### *The World's First AI Teacher That Actually Teaches*
+
+</div>
+
+Unlike traditional AI tutors that passively wait for your questions, **Brilla's AI Revision Classroom** proactively teaches you through a proven **6-phase pedagogical methodology**:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   🪝 HOOK  →  📖 EXPLAIN  →  ✓ CHECK  →  ✍️ PRACTICE  →  ✅ CONFIRM  →  🔗 CONNECT   │
+│                                                                             │
+│   Engage      Teach the      Test         Apply        Verify       Link to  │
+│   curiosity   concept        understanding knowledge   mastery      context  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Key Differentiators
+
+| Feature | Traditional AI Tutors | Brilla AI Classroom |
+|---------|----------------------|---------------------|
+| **Teaching Style** | Reactive (answers questions) | **Proactive (leads lessons)** |
+| **Methodology** | Random explanations | **Structured 6-phase pedagogy** |
+| **Curriculum** | Generic content | **Exam board aligned (WAEC, Cambridge, Edexcel)** |
+| **Progress Tracking** | None or basic | **Spaced repetition + mastery tracking** |
+| **Interaction** | Q&A only | **Ask questions anytime without breaking flow** |
+| **Availability** | Limited | **24/7, unlimited access** |
+
+### How It Works
+
+```
+Student selects a subject → AI generates personalized lesson plan →
+AI teaches through interactive phases → Student asks questions anytime →
+AI checks understanding with checkpoints → Mastery tracked with spaced repetition
+```
+
+### Sample AI Teaching Interaction
+
+```
+🤖 AI Teacher: "Let me ask you something interesting... Have you ever wondered
+               why ice floats on water? 🤔"
+
+🤖 AI Teacher: "Most substances become denser when they solidify, but water is
+               special! This is because of hydrogen bonding..."
+
+👤 Student:    "That's fascinating! So the hydrogen bonds create a crystal structure?"
+
+🤖 AI Teacher: "Exactly right! ✨ You're connecting the dots perfectly. The hydrogen
+               bonds arrange water molecules into a hexagonal lattice with more space
+               between molecules than liquid water. Now let me check your understanding..."
+```
+
+### Supported Exam Boards
+
+| Exam System | AI Teaching Coverage |
+|-------------|---------------------|
+| **BECE** | All 8 core subjects |
+| **WASSCE** | 50+ subjects with WAEC-specific strategies |
+| **Cambridge IGCSE** | Physics, Chemistry, Biology, Mathematics |
+| **Cambridge A-Level** | AS and A2 content for all science subjects |
+| **Edexcel A-Level** | Full syllabus coverage (coming soon) |
 
 ### Key Statistics
 
@@ -104,6 +173,15 @@
 
 ## Features
 
+### 🧠 AI-Powered Learning (Flagship)
+
+| Feature | Description |
+|---------|-------------|
+| **AI Revision Classroom** | 🌟 Revolutionary proactive AI teacher with 6-phase pedagogy (Hook → Explain → Check → Practice → Confirm → Connect) |
+| **AI Tutor** | 24/7 reactive tutoring powered by Llama 3.3 70B with LaTeX math support |
+| **AI Essay Grader** | Detailed essay feedback with mark schemes and model answers |
+| **AI Career Counselor** | Personalized career guidance based on performance and interests |
+
 ### Core Learning
 
 | Feature | Description |
@@ -112,7 +190,7 @@
 | **Mock Exams** | Timed exams replicating real conditions with authentic formats |
 | **Past Papers** | Official past papers with mark schemes and examiner reports |
 | **Topic Browser** | Navigate syllabi by topic with mastery tracking |
-| **AI Tutor** | 24/7 tutoring powered by Llama 3.3 70B with LaTeX math support |
+| **Spaced Repetition** | Smart scheduling of topics due for review based on mastery levels |
 | **Essay Practice** | AI-graded essays with detailed feedback and model answers |
 
 ### Gamification & Engagement
@@ -140,12 +218,12 @@
 
 | Feature | Description |
 |---------|-------------|
-| **AI Career Counselor** | Personalized career guidance based on performance |
 | **Parent Dashboard** | Real-time progress monitoring for parents |
 | **Teacher Portal** | Assessment creation, grading, and student tracking |
 | **E-Library** | Digital textbooks, past papers, and study materials |
 | **Interactive Whiteboard** | Drawing tool for math and science problems |
 | **Tutoring Marketplace** | Connect with qualified tutors |
+| **Affiliate Program** | Earn commissions by referring students |
 
 ---
 
@@ -197,18 +275,25 @@ brilla-study-platform/
 │   │   ├── gamification/   # XP, streaks, achievements, quests
 │   │   ├── learning/       # Study plans, readiness gauge
 │   │   └── subscription/   # Premium features, usage tracking
-│   ├── pages/              # Route pages (40+ pages)
-│   ├── stores/             # Zustand state stores
+│   ├── pages/
+│   │   ├── RevisionClassroom.tsx  # 🌟 AI Revision Classroom
+│   │   └── ...             # 40+ other route pages
+│   ├── stores/
+│   │   ├── revisionClassroomStore.ts  # 🌟 AI teaching state
+│   │   └── ...             # Other Zustand stores
 │   ├── hooks/              # Custom React hooks
 │   ├── lib/                # API client, utilities
 │   ├── types/              # TypeScript definitions
 │   ├── config/             # Exam configs, freemium rules
 │   └── data/               # Static exam data, subjects
 ├── workers/
-│   └── api/                # Cloudflare Workers API
+│   └── api/
+│       ├── revision-classroom.ts  # 🌟 AI classroom endpoints
 │       └── index.ts        # 50+ API routes
 ├── database/
-│   └── migrations/         # D1 migrations (100+)
+│   └── migrations/
+│       ├── 085_ai_revision_classroom.sql  # 🌟 Classroom schema
+│       └── ...             # 100+ other migrations
 ├── public/                 # PWA manifest, icons, assets
 └── docs/                   # Documentation
 ```
@@ -274,6 +359,7 @@ wrangler deploy
 | Category | Endpoints | Description |
 |----------|-----------|-------------|
 | **Auth** | `/api/auth/*` | Login, register, OAuth, email verification |
+| **Revision Classroom** | `/api/revision-classroom/*` | 🌟 AI teaching sessions, lessons, checkpoints, mastery |
 | **Questions** | `/api/questions/*` | Practice, exams, by topic/subject |
 | **Papers** | `/api/papers/*` | Past papers, mock exams, attempts |
 | **Progress** | `/api/progress/*` | XP, streaks, achievements, analytics |
@@ -290,6 +376,7 @@ wrangler deploy
 
 | Feature | Description |
 |:-------:|:-----------:|
+| **AI Revision Classroom** | 🌟 Proactive AI teaching with 6-phase methodology |
 | **Dashboard** | Personalized exam-specific dashboard with progress tracking |
 | **Practice Mode** | Adaptive question practice with instant feedback |
 | **AI Tutor** | 24/7 intelligent tutoring with LaTeX math support |
@@ -303,13 +390,19 @@ wrangler deploy
 
 ## Roadmap
 
+### Recently Completed
+- [x] **AI Revision Classroom** - Revolutionary 6-phase proactive teaching system
+- [x] Spaced repetition for topic mastery tracking
+- [x] Exam board-aligned curriculum intelligence
+- [x] Cambridge IGCSE and A-Level support
+
 ### In Progress
-- [ ] Offline mode with service worker caching
 - [ ] Edexcel IGCSE and A-Level support
+- [ ] Voice-based AI tutoring
 - [ ] More Cambridge subjects (English, Economics, Business)
+- [ ] Offline mode with service worker caching
 
 ### Planned
-- [ ] Voice-based AI tutoring
 - [ ] Video lessons integration
 - [ ] School administration portal
 - [ ] Regional competitions platform
