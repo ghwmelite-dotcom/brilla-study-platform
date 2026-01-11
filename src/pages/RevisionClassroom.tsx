@@ -27,6 +27,111 @@ import {
 } from '@/stores';
 import type { ExamTypeSlug } from '@/types';
 import { subjects as examSubjects } from '@/data/examData';
+import type { TeachingPhase } from '@/stores/revisionClassroomStore';
+
+// Beautiful AI Typing Indicator Component
+function AITypingIndicator({ phase }: { phase?: TeachingPhase }) {
+  const [dotIndex, setDotIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDotIndex((prev) => (prev + 1) % 4);
+    }, 400);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Phase-specific messages
+  const phaseMessages: Record<TeachingPhase, string> = {
+    hook: 'Crafting an engaging hook',
+    explain: 'Preparing explanation',
+    check: 'Creating comprehension check',
+    practice: 'Generating practice problem',
+    confirm: 'Evaluating your response',
+    connect: 'Finding connections',
+  };
+
+  const message = phase ? phaseMessages[phase] : 'Thinking';
+
+  return (
+    <div className="flex gap-3">
+      {/* AI Avatar with animated gradient border */}
+      <div className="relative flex-shrink-0">
+        <div className="absolute inset-0 w-10 h-10 rounded-full bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 animate-spin-slow opacity-75 blur-sm" />
+        <div className="relative w-10 h-10 bg-gradient-to-br from-violet-600 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+          <Brain className="w-5 h-5 text-white animate-pulse" />
+        </div>
+      </div>
+
+      {/* Typing bubble */}
+      <div className="relative">
+        {/* Glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 to-purple-500/20 rounded-2xl blur-xl" />
+
+        {/* Main bubble */}
+        <div className="relative bg-gradient-to-br from-white to-violet-50/50 rounded-2xl rounded-tl-sm p-4 shadow-lg border border-violet-100/50 min-w-[200px]">
+          {/* Animated header */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-1">
+              <Sparkles className="w-4 h-4 text-violet-500" />
+              <span className="text-xs font-semibold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+                AI Teacher
+              </span>
+            </div>
+            <div className="flex-1 h-px bg-gradient-to-r from-violet-200 to-transparent" />
+          </div>
+
+          {/* Message with animated dots */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-neutral-600">{message}</span>
+            <span className="text-sm text-violet-500 w-6">
+              {'.'.repeat(dotIndex + 1)}
+            </span>
+          </div>
+
+          {/* Animated dots */}
+          <div className="flex items-center gap-1.5 mt-3">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="w-2 h-2 rounded-full bg-gradient-to-r from-violet-500 to-purple-500"
+                style={{
+                  animation: 'bounce 1.4s ease-in-out infinite',
+                  animationDelay: `${i * 0.16}s`,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Subtle progress line */}
+          <div className="mt-3 h-1 bg-violet-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-violet-500 via-purple-500 to-violet-500 rounded-full"
+              style={{
+                animation: 'shimmer 2s linear infinite',
+                backgroundSize: '200% 100%',
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Custom keyframes in a style tag */}
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 3s linear infinite;
+        }
+      `}</style>
+    </div>
+  );
+}
 
 // Subject selection component
 function SubjectSelector({
@@ -287,19 +392,9 @@ function AITeachingDisplay({
           </div>
         ))}
 
-        {/* Thinking indicator */}
+        {/* AI Typing Animation */}
         {aiState.isThinking && (
-          <div className="flex gap-3">
-            <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-            </div>
-            <div className="bg-white rounded-xl rounded-tl-sm p-4 shadow-sm border border-neutral-100">
-              <div className="flex items-center gap-2">
-                <Loader2 className="w-4 h-4 text-primary animate-spin" />
-                <span className="text-sm text-neutral-500">Thinking...</span>
-              </div>
-            </div>
-          </div>
+          <AITypingIndicator phase={aiState.currentPhase} />
         )}
 
         <div ref={messagesEndRef} />
