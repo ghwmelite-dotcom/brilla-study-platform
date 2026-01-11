@@ -838,7 +838,7 @@ export const subjects: Subject[] = [
     questionCount: 80,
   },
   {
-    id: 'subj_alevel_maths',
+    id: 'subj_alevel_math',
     name: 'Mathematics',
     slug: 'alevel-mathematics',
     icon: 'Calculator',

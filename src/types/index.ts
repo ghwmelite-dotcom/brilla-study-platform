@@ -237,7 +237,7 @@ export interface PaperType {
   name: string;
   slug: string;
   description?: string;
-  questionFormat: 'objective' | 'essay' | 'practical' | 'mixed';
+  questionFormat: 'objective' | 'essay' | 'practical' | 'mixed' | 'structured' | 'mcq';
   typicalDuration?: number; // in minutes
   totalMarks?: number;
   displayOrder: number;
