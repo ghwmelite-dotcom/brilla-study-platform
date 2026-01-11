@@ -111,12 +111,26 @@ export function PastPapers() {
 
   const hasFilters = selectedSubject || selectedYear || selectedPaperType;
 
+  // Get display label for exam type
+  const examTypeLabelMap: Record<string, string> = {
+    'nsmq': 'NSMQ',
+    'wassce': 'WASSCE',
+    'bece': 'BECE',
+    'igcse': 'Cambridge IGCSE',
+    'cambridge-a-level': 'Cambridge A-Level',
+    'cambridge-as': 'Cambridge AS-Level',
+    'edexcel-igcse': 'Edexcel IGCSE',
+    'edexcel-as': 'Edexcel AS-Level',
+    'edexcel-a-level': 'Edexcel A-Level',
+  };
+  const examTypeLabel = examTypeLabelMap[currentExamType] || currentExamType.toUpperCase();
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-neutral-900 mb-2">
-          {currentExamType.toUpperCase()} Past Papers
+          {examTypeLabel} Past Papers
         </h1>
         <p className="text-neutral-600">
           Practice with real exam papers from previous years
