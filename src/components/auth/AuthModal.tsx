@@ -22,6 +22,7 @@ import {
   Users,
   Phone,
   Crown,
+  Globe,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/utils';
@@ -32,7 +33,7 @@ import { GoogleSignInButton } from './GoogleSignInButton';
 
 type AuthMode = 'login' | 'register';
 type UserRole = 'student' | 'teacher' | 'admin' | 'parent';
-type SchoolLevel = 'jss' | 'shs';
+type SchoolLevel = 'jss' | 'shs' | 'international';
 type RegistrationStatus = 'idle' | 'pending' | 'error';
 type RegistrationStep = 'role' | 'schoolLevel' | 'plan' | 'form';
 
@@ -609,6 +610,19 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                 </div>
               </button>
 
+              <button
+                onClick={() => handleSchoolLevelSelect('international')}
+                className="w-full flex items-center gap-4 p-4 border-2 border-neutral-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all group"
+              >
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                  <Globe className="w-6 h-6 text-purple-600" />
+                </div>
+                <div className="text-left flex-1">
+                  <h3 className="font-semibold text-neutral-900">International School</h3>
+                  <p className="text-sm text-neutral-500">Cambridge IGCSE or A-Level student</p>
+                </div>
+              </button>
+
               <div className="pt-4 text-center">
                 <p className="text-neutral-600 text-sm">
                   Already have an account?{' '}
@@ -778,7 +792,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                         <label className="block text-sm font-medium text-neutral-700 mb-1">
                           School Level
                         </label>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-3 gap-2">
                           <button
                             type="button"
                             onClick={() => { setSchoolLevel('jss'); setYearGroup(''); }}
@@ -789,8 +803,8 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                                 : 'border-neutral-200 hover:border-neutral-300'
                             )}
                           >
-                            <span className="font-medium">JHS</span>
-                            <span className="block text-xs text-neutral-500">Junior High School</span>
+                            <span className="font-medium text-sm">JHS</span>
+                            <span className="block text-xs text-neutral-500">Junior High</span>
                           </button>
                           <button
                             type="button"
@@ -802,8 +816,21 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                                 : 'border-neutral-200 hover:border-neutral-300'
                             )}
                           >
-                            <span className="font-medium">SHS</span>
-                            <span className="block text-xs text-neutral-500">Senior High School</span>
+                            <span className="font-medium text-sm">SHS</span>
+                            <span className="block text-xs text-neutral-500">Senior High</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setSchoolLevel('international'); setYearGroup(''); }}
+                            className={cn(
+                              'p-3 border-2 rounded-lg text-center transition-all',
+                              schoolLevel === 'international'
+                                ? 'border-purple-500 bg-purple-50 text-purple-700'
+                                : 'border-neutral-200 hover:border-neutral-300'
+                            )}
+                          >
+                            <span className="font-medium text-sm">Int'l</span>
+                            <span className="block text-xs text-neutral-500">IGCSE/A-Level</span>
                           </button>
                         </div>
                         {formErrors.schoolLevel && <p className="text-red-500 text-xs mt-1">{formErrors.schoolLevel}</p>}
@@ -831,11 +858,18 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                                   <option value="2">Form 2 (JHS 2)</option>
                                   <option value="3">Form 3 (JHS 3)</option>
                                 </>
-                              ) : (
+                              ) : schoolLevel === 'shs' ? (
                                 <>
                                   <option value="1">Year 1 (SHS 1)</option>
                                   <option value="2">Year 2 (SHS 2)</option>
                                   <option value="3">Year 3 (SHS 3)</option>
+                                </>
+                              ) : (
+                                <>
+                                  <option value="10">Year 10 (IGCSE)</option>
+                                  <option value="11">Year 11 (IGCSE)</option>
+                                  <option value="12">Year 12 (A-Level AS)</option>
+                                  <option value="13">Year 13 (A-Level A2)</option>
                                 </>
                               )}
                             </select>
@@ -847,7 +881,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                       {/* Exam Type Selection */}
                       {schoolLevel && (
                         <ExamTypeSelector
-                          schoolLevel={schoolLevel === 'jss' ? 'jhs' : 'shs'}
+                          schoolLevel={schoolLevel === 'jss' ? 'jhs' : schoolLevel === 'shs' ? 'shs' : 'international'}
                           selectedExamTypes={selectedExamTypes}
                           primaryExamType={primaryExamType}
                           onChange={(examTypeIds, primaryId) => {

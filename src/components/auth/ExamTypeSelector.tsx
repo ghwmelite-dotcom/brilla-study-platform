@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Trophy, GraduationCap, BookOpen, Check, Star } from 'lucide-react';
+import { Trophy, GraduationCap, BookOpen, Check, Star, Globe, Award } from 'lucide-react';
 
 // Exam type configuration with icons and colors
 const EXAM_TYPE_CONFIG = {
@@ -45,10 +45,38 @@ const EXAM_TYPE_CONFIG = {
     selectedBg: 'bg-amber-100',
     selectedBorder: 'border-amber-500',
   },
+  exam_igcse: {
+    id: 'exam_igcse',
+    name: 'IGCSE',
+    fullName: 'International General Certificate of Secondary Education',
+    description: 'Cambridge O-Level for international students',
+    icon: Globe,
+    color: 'cyan',
+    bgColor: 'bg-cyan-50',
+    borderColor: 'border-cyan-200',
+    textColor: 'text-cyan-700',
+    iconColor: 'text-cyan-600',
+    selectedBg: 'bg-cyan-100',
+    selectedBorder: 'border-cyan-500',
+  },
+  exam_alevel: {
+    id: 'exam_alevel',
+    name: 'A-Level',
+    fullName: 'Cambridge Advanced Level',
+    description: 'Cambridge A-Level for pre-university students',
+    icon: Award,
+    color: 'purple',
+    bgColor: 'bg-purple-50',
+    borderColor: 'border-purple-200',
+    textColor: 'text-purple-700',
+    iconColor: 'text-purple-600',
+    selectedBg: 'bg-purple-100',
+    selectedBorder: 'border-purple-500',
+  },
 };
 
 interface ExamTypeSelectorProps {
-  schoolLevel: 'jhs' | 'shs' | null;
+  schoolLevel: 'jhs' | 'shs' | 'international' | null;
   selectedExamTypes: string[];
   primaryExamType: string;
   onChange: (examTypeIds: string[], primaryId: string) => void;
@@ -72,7 +100,7 @@ export function ExamTypeSelector({
   useEffect(() => {
     if (allowAll || isTeacher) {
       // Teachers and admins can see all exam types
-      setAvailableExamTypes(['exam_bece', 'exam_wassce', 'exam_nsmq']);
+      setAvailableExamTypes(['exam_bece', 'exam_wassce', 'exam_nsmq', 'exam_igcse', 'exam_alevel']);
     } else if (schoolLevel === 'jhs') {
       // JHS students only see BECE
       setAvailableExamTypes(['exam_bece']);
@@ -86,6 +114,13 @@ export function ExamTypeSelector({
       // Auto-select WASSCE for SHS if nothing selected
       if (selectedExamTypes.length === 0) {
         onChange(['exam_wassce'], 'exam_wassce');
+      }
+    } else if (schoolLevel === 'international') {
+      // International students see IGCSE and A-Level
+      setAvailableExamTypes(['exam_igcse', 'exam_alevel']);
+      // Auto-select IGCSE for international if nothing selected
+      if (selectedExamTypes.length === 0) {
+        onChange(['exam_igcse'], 'exam_igcse');
       }
     } else {
       setAvailableExamTypes([]);
