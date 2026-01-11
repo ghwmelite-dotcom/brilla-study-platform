@@ -96,6 +96,7 @@ const examSpecificItems: Record<GhanaExamTypeSlug, { path: string; label: string
 
 // Learning Resources navigation items
 const resourcesNavItems = [
+  { path: '/revision-classroom', label: 'AI Revision Classroom', icon: Brain, auth: true, badge: 'NEW', highlight: true },
   { path: '/library', label: 'E-Library', icon: Library },
   { path: '/counselor', label: 'AI Counselor', icon: Heart, auth: true },
 ];
@@ -431,13 +432,22 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           isActive
                             ? item.path === '/counselor'
                               ? 'bg-green-600 text-white'
+                              : item.path === '/revision-classroom'
+                              ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white'
                               : 'bg-primary text-white'
+                            : item.path === '/revision-classroom'
+                            ? 'text-violet-700 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-slate-800'
                             : 'text-neutral-700 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-800'
                         )
                       }
                     >
                       <item.icon className="w-5 h-5" />
-                      {item.label}
+                      <span className="flex-1">{item.label}</span>
+                      {'badge' in item && item.badge && (
+                        <span className="px-1.5 py-0.5 bg-gradient-to-r from-violet-500 to-purple-500 text-[10px] font-bold text-white rounded uppercase">
+                          {item.badge}
+                        </span>
+                      )}
                     </NavLink>
                   </li>
                 );
