@@ -581,6 +581,52 @@ examBoardsApp.post('/user/syllabus-progress', async (c) => {
   }
 });
 
+// =============================================
+// ADMIN SEED ENDPOINT (Protected by secret key)
+// =============================================
+
+// POST /seed-questions - Seed O/A Level questions (Admin only)
+examBoardsApp.post('/seed-questions', async (c) => {
+  const db = c.env.DB;
+  const body = await c.req.json();
+  const { secretKey, questions } = body;
+
+  // Simple secret key check (should match JWT_SECRET for admin access)
+  if (secretKey !== c.env.JWT_SECRET) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  if (!questions || !Array.isArray(questions) || questions.length === 0) {
+    return c.json({ success: false, error: 'Questions array is required' }, 400);
+  }
+
+  try {
+    let inserted = 0;
+    for (const q of questions) {
+      await db
+        .prepare(`
+          INSERT OR IGNORE INTO questions (
+            id, topic_id, subject_id, exam_type_id, question_text, question_type,
+            options, correct_answer, explanation, difficulty, points, marks,
+            syllabus_topic_id, exam_board_id, command_word
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `)
+        .bind(
+          q.id, q.topic_id, q.subject_id, q.exam_type_id, q.question_text, q.question_type,
+          q.options || null, q.correct_answer, q.explanation, q.difficulty, q.points || 3, q.marks || 1,
+          q.syllabus_topic_id || null, q.exam_board_id || null, q.command_word || null
+        )
+        .run();
+      inserted++;
+    }
+
+    return c.json({ success: true, message: `Inserted ${inserted} questions` });
+  } catch (error) {
+    console.error('Error seeding questions:', error);
+    return c.json({ success: false, error: 'Failed to seed questions' }, 500);
+  }
+});
+
 // GET /user/syllabus-progress/:specificationId - Get syllabus progress for a specification
 examBoardsApp.get('/user/syllabus-progress/:specificationId', async (c) => {
   const user = c.get('user');
