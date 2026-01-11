@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { verify } from 'hono/jwt';
 import type { BaseAiTextGenerationModels } from '@cloudflare/workers-types';
 
 interface Env {
@@ -29,6 +30,34 @@ interface TeachingContext {
 }
 
 const revisionClassroomApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
+
+// JWT verification helper
+async function verifyJWT(token: string, secret: string): Promise<UserPayload | null> {
+  try {
+    const payload = await verify(token, secret);
+    return payload as unknown as UserPayload;
+  } catch {
+    return null;
+  }
+}
+
+// Auth middleware - apply to all routes
+revisionClassroomApp.use('*', async (c, next) => {
+  const authHeader = c.req.header('Authorization');
+  if (!authHeader?.startsWith('Bearer ')) {
+    return c.json({ success: false, error: 'Unauthorized - Please log in' }, 401);
+  }
+
+  const token = authHeader.slice(7);
+  const payload = await verifyJWT(token, c.env.JWT_SECRET);
+
+  if (!payload) {
+    return c.json({ success: false, error: 'Invalid or expired token' }, 401);
+  }
+
+  c.set('user', payload);
+  await next();
+});
 
 // Helper to generate unique IDs
 const generateId = (prefix: string) => `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
