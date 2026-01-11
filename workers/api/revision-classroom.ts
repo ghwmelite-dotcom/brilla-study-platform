@@ -872,7 +872,7 @@ revisionClassroomApp.post('/lessons/:lessonId/teach', async (c) => {
         s.name as subject_name,
         rs.exam_type,
         rs.user_id,
-        tm.mastery_percentage
+        tm.mastery_level
       FROM revision_lessons rl
       LEFT JOIN topics t ON rl.topic_id = t.id
       LEFT JOIN revision_sessions rs ON rl.session_id = rs.id
@@ -893,7 +893,7 @@ revisionClassroomApp.post('/lessons/:lessonId/teach', async (c) => {
       previousMessages,
       studentResponse,
       checkpointResult,
-      masteryLevel: (lesson as any).mastery_percentage,
+      masteryLevel: (lesson as any).mastery_level,
     };
 
     // Generate AI teaching content
@@ -935,7 +935,8 @@ revisionClassroomApp.post('/lessons/:lessonId/teach', async (c) => {
     });
   } catch (error) {
     console.error('Error generating teaching content:', error);
-    return c.json({ success: false, error: 'Failed to generate teaching content' }, 500);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return c.json({ success: false, error: `Failed to generate teaching content: ${errorMessage}` }, 500);
   }
 });
 
