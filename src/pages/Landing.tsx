@@ -873,8 +873,46 @@ export function LandingPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
-  // AI Classroom preview mode toggle
+  // AI Classroom preview mode toggle with auto-cycle
   const [aiPreviewMode, setAiPreviewMode] = useState<'chat' | 'whiteboard'>('chat');
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const autoPlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-cycle between chat and whiteboard modes
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+
+    const interval = setInterval(() => {
+      setAiPreviewMode(prev => prev === 'chat' ? 'whiteboard' : 'chat');
+    }, 5000); // Switch every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying]);
+
+  // Handle manual toggle - pause auto-play briefly then resume
+  const handlePreviewModeChange = (mode: 'chat' | 'whiteboard') => {
+    setAiPreviewMode(mode);
+    setIsAutoPlaying(false);
+
+    // Clear any existing timeout
+    if (autoPlayTimeoutRef.current) {
+      clearTimeout(autoPlayTimeoutRef.current);
+    }
+
+    // Resume auto-play after 10 seconds of inactivity
+    autoPlayTimeoutRef.current = setTimeout(() => {
+      setIsAutoPlaying(true);
+    }, 10000);
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (autoPlayTimeoutRef.current) {
+        clearTimeout(autoPlayTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleOpenAuth = (mode: 'login' | 'register') => {
     setAuthMode(mode);
@@ -1263,7 +1301,7 @@ export function LandingPage() {
                     {/* Mode Toggle */}
                     <div className="flex items-center gap-2 bg-white/10 rounded-full p-1">
                       <button
-                        onClick={() => setAiPreviewMode('chat')}
+                        onClick={() => handlePreviewModeChange('chat')}
                         className={cn(
                           "px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1",
                           aiPreviewMode === 'chat'
@@ -1275,7 +1313,7 @@ export function LandingPage() {
                         Chat
                       </button>
                       <button
-                        onClick={() => setAiPreviewMode('whiteboard')}
+                        onClick={() => handlePreviewModeChange('whiteboard')}
                         className={cn(
                           "px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1",
                           aiPreviewMode === 'whiteboard'
