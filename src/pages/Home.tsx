@@ -1,10 +1,22 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import {
   Flame,
   Star,
   Medal,
   Trophy,
   ArrowRight,
+  Brain,
+  Sparkles,
+  Target,
+  MessageCircle,
+  CheckCircle2,
+  Lightbulb,
+  GraduationCap,
+  Zap,
+  Play,
+  BookOpen,
+  TrendingUp,
 } from 'lucide-react';
 import { Card, Button, Badge } from '@/components/common';
 import { useAuthStore } from '@/stores';
@@ -14,6 +26,253 @@ import { cn } from '@/utils';
 
 // Icon mapping for subjects
 import * as Icons from 'lucide-react';
+
+// AI Revision Classroom Showcase Component
+function AIRevisionShowcase() {
+  const [currentPhase, setCurrentPhase] = useState(0);
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  const phases = ['Hook', 'Explain', 'Check', 'Practice', 'Confirm', 'Connect'];
+
+  const demoMessages = [
+    { type: 'ai', text: "Let me ask you something interesting... Have you ever wondered why ice floats on water? 🤔" },
+    { type: 'ai', text: "Most substances become denser when they solidify, but water is special! This is because of hydrogen bonding..." },
+    { type: 'user', text: "That's fascinating! So the hydrogen bonds create a crystal structure?" },
+    { type: 'ai', text: "Exactly right! ✨ You're connecting the dots perfectly. Now, let me check your understanding with a quick question..." },
+  ];
+
+  useEffect(() => {
+    const phaseInterval = setInterval(() => {
+      setCurrentPhase((prev) => (prev + 1) % phases.length);
+    }, 2000);
+
+    const messageInterval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % demoMessages.length);
+    }, 3000);
+
+    return () => {
+      clearInterval(phaseInterval);
+      clearInterval(messageInterval);
+    };
+  }, []);
+
+  return (
+    <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-950 via-purple-900 to-indigo-950 p-1">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl animate-pulse-slow" />
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-fuchsia-500/10 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }} />
+
+        {/* Floating particles */}
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-white/30 rounded-full animate-pulse"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${2 + Math.random() * 3}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Inner content with glass effect */}
+      <div className="relative rounded-[1.4rem] bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/10 p-8 md:p-12">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          {/* Left side - Content */}
+          <div className="relative z-10">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500/20 to-purple-500/20 rounded-full border border-violet-400/30 mb-6">
+              <Sparkles className="w-4 h-4 text-violet-300" />
+              <span className="text-sm font-medium text-violet-200">Revolutionary AI Learning</span>
+              <span className="px-2 py-0.5 bg-violet-500 text-white text-xs font-bold rounded-full">NEW</span>
+            </div>
+
+            {/* Main heading */}
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-4 leading-tight">
+              Meet Your Personal{' '}
+              <span className="relative">
+                <span className="relative z-10 bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
+                  AI Teacher
+                </span>
+                <span className="absolute -inset-1 bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 blur-lg" />
+              </span>
+            </h2>
+
+            <p className="text-lg text-violet-100/80 mb-8 leading-relaxed">
+              Unlike other AI tutors that only answer questions, our <strong className="text-white">AI Revision Classroom</strong> proactively
+              teaches you — explaining concepts, checking your understanding, and adapting to your pace.
+              Just like having a world-class tutor by your side.
+            </p>
+
+            {/* Key differentiators */}
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              {[
+                { icon: Lightbulb, text: 'Proactive Teaching', desc: 'AI initiates lessons' },
+                { icon: Target, text: 'Exam-Focused', desc: 'Aligned to your syllabus' },
+                { icon: MessageCircle, text: 'Interactive', desc: 'Ask questions anytime' },
+                { icon: TrendingUp, text: 'Tracks Mastery', desc: 'Personalized progress' },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-500/30 to-purple-500/30 flex items-center justify-center flex-shrink-0">
+                    <item.icon className="w-4 h-4 text-violet-300" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-white text-sm">{item.text}</p>
+                    <p className="text-xs text-violet-300/70">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap gap-4">
+              <Link to="/revision-classroom">
+                <button className="group relative px-6 py-3 bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl font-semibold text-white shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all duration-300 hover:scale-105 overflow-hidden">
+                  <span className="relative z-10 flex items-center gap-2">
+                    <Play className="w-5 h-5" />
+                    Start Learning Now
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-violet-400 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+              </Link>
+              <Link to="/revision-classroom">
+                <button className="px-6 py-3 border-2 border-violet-400/30 rounded-xl font-semibold text-violet-200 hover:bg-violet-500/10 hover:border-violet-400/50 transition-all duration-300">
+                  See How It Works
+                </button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Right side - Interactive Preview */}
+          <div className="relative">
+            {/* Floating glow behind the card */}
+            <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 via-purple-500/20 to-fuchsia-500/20 blur-3xl scale-110" />
+
+            {/* Preview card */}
+            <div className="relative bg-gradient-to-br from-neutral-900/90 to-neutral-800/90 rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-violet-600 to-purple-600 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <Brain className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-white">Brilla AI Teacher</p>
+                      <p className="text-xs text-white/70">Teaching Phase: {phases[currentPhase]}</p>
+                    </div>
+                  </div>
+                  {/* Phase indicators */}
+                  <div className="flex gap-1">
+                    {phases.map((_, i) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "w-2 h-2 rounded-full transition-all duration-500",
+                          i === currentPhase ? "w-5 bg-white" : i < currentPhase ? "bg-white/70" : "bg-white/30"
+                        )}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Chat area */}
+              <div className="p-4 space-y-3 min-h-[200px] bg-neutral-900/50">
+                {/* AI Message */}
+                <div className="flex gap-2 animate-fade-in" key={messageIndex}>
+                  <div className="w-7 h-7 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+                  </div>
+                  <div className="bg-neutral-800 rounded-xl rounded-tl-sm p-3 max-w-[85%] border border-neutral-700">
+                    <p className="text-sm text-neutral-200">{demoMessages[messageIndex].text}</p>
+                  </div>
+                </div>
+
+                {/* User response (shows for certain messages) */}
+                {messageIndex === 2 && (
+                  <div className="flex gap-2 justify-end animate-fade-in">
+                    <div className="bg-violet-600 text-white rounded-xl rounded-tr-sm p-3 max-w-[80%]">
+                      <p className="text-sm">{demoMessages[2].text}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Typing indicator */}
+                <div className="flex gap-2 opacity-60">
+                  <div className="w-7 h-7 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-3.5 h-3.5 text-violet-400 animate-pulse" />
+                  </div>
+                  <div className="bg-neutral-800 rounded-xl rounded-tl-sm px-4 py-3 border border-neutral-700">
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Input area */}
+              <div className="p-3 border-t border-neutral-800 bg-neutral-900/50">
+                <div className="flex gap-2">
+                  <div className="flex-1 bg-neutral-800 rounded-lg px-3 py-2 text-neutral-400 text-sm border border-neutral-700">
+                    Type your answer or ask a question...
+                  </div>
+                  <button className="px-4 py-2 bg-violet-600 rounded-lg text-white text-sm font-medium">
+                    Continue →
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Floating feature badges */}
+            <div className="absolute -top-4 -right-4 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-green-600 rounded-full text-white text-xs font-semibold shadow-lg animate-bounce-slow">
+              <div className="flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" />
+                <span>6-Phase Teaching</span>
+              </div>
+            </div>
+
+            <div className="absolute -bottom-3 -left-3 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full text-white text-xs font-semibold shadow-lg animate-bounce-slow" style={{ animationDelay: '0.5s' }}>
+              <div className="flex items-center gap-1">
+                <GraduationCap className="w-3 h-3" />
+                <span>Exam Board Aligned</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom stats bar */}
+        <div className="mt-10 pt-8 border-t border-white/10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            {[
+              { value: '6', label: 'Teaching Phases', icon: BookOpen },
+              { value: '∞', label: 'Ask Questions', icon: MessageCircle },
+              { value: '100%', label: 'Personalized', icon: Target },
+              { value: '24/7', label: 'Available', icon: Zap },
+            ].map((stat, i) => (
+              <div key={i} className="group">
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <stat.icon className="w-4 h-4 text-violet-400 group-hover:scale-110 transition-transform" />
+                  <span className="text-2xl md:text-3xl font-bold text-white">{stat.value}</span>
+                </div>
+                <p className="text-sm text-violet-300/70">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function getSubjectIcon(iconName?: string) {
   if (!iconName) return Icons.BookOpen;
@@ -100,6 +359,9 @@ export function HomePage() {
           </Card>
         </section>
       )}
+
+      {/* AI Revision Classroom Showcase - Our Trump Card! */}
+      <AIRevisionShowcase />
 
       {/* Subjects */}
       <section>
