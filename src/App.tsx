@@ -105,6 +105,9 @@ const ExamSetup = lazy(() => import('@/pages/ExamSetup'));
 const OALevelDashboard = lazy(() => import('@/pages/OALevelDashboard'));
 const SyllabusBrowser = lazy(() => import('@/pages/SyllabusBrowser'));
 
+// AI Revision Classroom
+const RevisionClassroom = lazy(() => import('@/pages/RevisionClassroom'));
+
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -430,6 +433,16 @@ function App() {
           element={
             <ProtectedRoute>
               <LazyPage><ExamModeResults /></LazyPage>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* AI Revision Classroom - full-screen immersive (no layout) */}
+        <Route
+          path="/revision-classroom"
+          element={
+            <ProtectedRoute>
+              <LazyPage><RevisionClassroom /></LazyPage>
             </ProtectedRoute>
           }
         />

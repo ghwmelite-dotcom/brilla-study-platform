@@ -54,3 +54,19 @@ export type { Notification, NotificationType, StreakData, XPData } from './notif
 export type { ChatMessage as AiChatMessage, UserPersonalization } from './aiTutorStore';
 export { useUsageStore } from './usageStore';
 export type { DailyUsage } from './usageStore';
+export { useRevisionClassroomStore } from './revisionClassroomStore';
+export type {
+  RevisionSession,
+  RevisionLesson,
+  TopicMastery,
+  RevisionCheckpoint,
+  CheckpointResponse,
+  RevisionAIMessage,
+  AITeachingState,
+  TeachingPhase,
+  RevisionSessionType,
+  RevisionSessionStatus,
+  LessonType,
+  LessonStatus,
+  ConfidenceLevel,
+} from './revisionClassroomStore';

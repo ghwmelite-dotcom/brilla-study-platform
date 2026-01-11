@@ -9,6 +9,8 @@ import {
   Award,
   Gift,
   Sparkles,
+  GraduationCap,
+  ArrowRight,
 } from 'lucide-react';
 import { Card, CardHeader, Button, Badge, ProgressBar, CircularProgress } from '@/components/common';
 import { TrialBanner } from '@/components/subscription';
@@ -236,6 +238,45 @@ export function DashboardPage() {
       ) : (
         <OALevelBanner variant="full" />
       )}
+
+      {/* AI Revision Classroom Banner */}
+      <Link
+        to="/revision-classroom"
+        className="block group"
+      >
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+          {/* Background pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 left-0 w-32 h-32 bg-white rounded-full -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute bottom-0 right-0 w-48 h-48 bg-white rounded-full translate-x-1/4 translate-y-1/4" />
+          </div>
+
+          <div className="relative flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                <Brain className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-lg font-bold">AI Revision Classroom</h3>
+                  <Badge variant="accent" className="bg-white/20 text-white border-0 text-xs">
+                    NEW
+                  </Badge>
+                </div>
+                <p className="text-white/80 text-sm max-w-md">
+                  Let AI teach you every topic before your exam. Personalized, comprehensive revision led by your AI tutor.
+                </p>
+              </div>
+            </div>
+
+            <div className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-white/20 rounded-xl backdrop-blur-sm group-hover:bg-white/30 transition-colors">
+              <GraduationCap className="w-5 h-5" />
+              <span className="font-semibold">Start Learning</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+        </div>
+      </Link>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
