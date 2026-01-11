@@ -1202,6 +1202,235 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* AI Revision Classroom Showcase - Our Trump Card */}
+      <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-violet-950/30 to-slate-950" />
+        <GradientOrb className="w-[600px] h-[600px] bg-violet-500/20 -left-64 top-0" />
+        <GradientOrb className="w-[500px] h-[500px] bg-purple-500/20 -right-48 bottom-0" delay={1} />
+        <GradientOrb className="w-[300px] h-[300px] bg-fuchsia-500/15 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" delay={2} />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          {/* Section Header */}
+          <div className="text-center mb-12 lg:mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-violet-500/10 rounded-full border border-violet-400/20 mb-6">
+              <Sparkles className="w-4 h-4 text-violet-400" />
+              <span className="text-sm font-medium text-violet-300">Revolutionary AI Learning</span>
+              <span className="px-2 py-0.5 bg-violet-500 text-white text-xs font-bold rounded-full animate-pulse">NEW</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-white mb-4">
+              Meet Your Personal{' '}
+              <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
+                AI Teacher
+              </span>
+            </h2>
+            <p className="text-lg text-white/70 max-w-3xl mx-auto">
+              Unlike other AI tutors that only answer questions, our <strong className="text-white">AI Revision Classroom</strong> proactively
+              teaches you — explaining concepts, checking your understanding, and adapting to your learning pace.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Left side - Interactive Preview */}
+            <div className="relative order-2 lg:order-1">
+              {/* Floating glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 via-purple-500/20 to-fuchsia-500/20 blur-3xl scale-110" />
+
+              {/* Preview card */}
+              <div className="relative glass rounded-2xl border border-violet-400/20 shadow-2xl overflow-hidden">
+                {/* Header */}
+                <div className="bg-gradient-to-r from-violet-600 to-purple-600 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <Brain className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white">Brilla AI Teacher</p>
+                        <p className="text-xs text-white/70">Teaching Phase: Explain</p>
+                      </div>
+                    </div>
+                    {/* Phase indicators */}
+                    <div className="hidden sm:flex gap-1">
+                      {['Hook', 'Explain', 'Check', 'Practice', 'Confirm', 'Connect'].map((phase, i) => (
+                        <div
+                          key={phase}
+                          className={cn(
+                            "w-2 h-2 rounded-full transition-all",
+                            i === 1 ? "w-5 bg-white" : i < 1 ? "bg-white/70" : "bg-white/30"
+                          )}
+                          title={phase}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Chat area */}
+                <div className="p-4 space-y-3 min-h-[220px] bg-slate-900/80">
+                  {/* AI Message 1 */}
+                  <div className="flex gap-2">
+                    <div className="w-7 h-7 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+                    </div>
+                    <div className="glass rounded-xl rounded-tl-sm p-3 max-w-[85%] border border-white/10">
+                      <p className="text-sm text-white/90">Let me ask you something interesting... Have you ever wondered why ice floats on water? 🤔</p>
+                    </div>
+                  </div>
+
+                  {/* AI Message 2 */}
+                  <div className="flex gap-2">
+                    <div className="w-7 h-7 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+                    </div>
+                    <div className="glass rounded-xl rounded-tl-sm p-3 max-w-[85%] border border-white/10">
+                      <p className="text-sm text-white/90">Most substances become denser when they solidify, but water is special! This is because of <strong className="text-violet-300">hydrogen bonding</strong>...</p>
+                    </div>
+                  </div>
+
+                  {/* User response */}
+                  <div className="flex gap-2 justify-end">
+                    <div className="bg-violet-600 text-white rounded-xl rounded-tr-sm p-3 max-w-[80%]">
+                      <p className="text-sm">That's fascinating! So the hydrogen bonds create a crystal structure?</p>
+                    </div>
+                  </div>
+
+                  {/* Typing indicator */}
+                  <div className="flex gap-2">
+                    <div className="w-7 h-7 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-3.5 h-3.5 text-violet-400 animate-pulse" />
+                    </div>
+                    <div className="glass rounded-xl rounded-tl-sm px-4 py-3 border border-white/10">
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Input area */}
+                <div className="p-3 border-t border-white/10 bg-slate-900/50">
+                  <div className="flex gap-2">
+                    <div className="flex-1 glass rounded-lg px-3 py-2 text-white/40 text-sm border border-white/10">
+                      Type your answer or ask a question...
+                    </div>
+                    <button className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-white text-sm font-medium transition-colors">
+                      Continue →
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating badges */}
+              <div className="absolute -top-4 -right-4 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-green-600 rounded-full text-white text-xs font-semibold shadow-lg animate-bounce" style={{ animationDuration: '2s' }}>
+                <div className="flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span>6-Phase Teaching</span>
+                </div>
+              </div>
+
+              <div className="absolute -bottom-3 -left-3 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full text-white text-xs font-semibold shadow-lg animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '2s' }}>
+                <div className="flex items-center gap-1">
+                  <GraduationCap className="w-3 h-3" />
+                  <span>Exam Board Aligned</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right side - Features */}
+            <div className="order-1 lg:order-2">
+              <div className="space-y-6">
+                {/* Key differentiators */}
+                {[
+                  {
+                    icon: Brain,
+                    title: 'Proactive Teaching',
+                    desc: 'AI initiates and leads lessons through a proven 6-phase methodology: Hook → Explain → Check → Practice → Confirm → Connect',
+                    color: 'from-violet-500 to-purple-500'
+                  },
+                  {
+                    icon: Target,
+                    title: 'Exam-Board Aligned',
+                    desc: 'Curriculum perfectly matched to BECE, WASSCE, IGCSE, Cambridge & Edexcel A-Levels with exam-specific strategies',
+                    color: 'from-emerald-500 to-green-500'
+                  },
+                  {
+                    icon: MessageCircle,
+                    title: 'Ask Anything, Anytime',
+                    desc: 'Interrupt at any point to ask questions. Get instant clarification without breaking your learning flow',
+                    color: 'from-blue-500 to-cyan-500'
+                  },
+                  {
+                    icon: TrendingUp,
+                    title: 'Mastery Tracking',
+                    desc: 'Smart spaced repetition ensures you remember what you learn. Topics due for review are automatically scheduled',
+                    color: 'from-amber-500 to-orange-500'
+                  },
+                ].map((feature, i) => (
+                  <div
+                    key={i}
+                    className="group flex items-start gap-4 p-4 rounded-xl glass border border-white/10 hover:border-violet-400/30 transition-all"
+                  >
+                    <div className={cn(
+                      "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform",
+                      feature.color
+                    )}>
+                      <feature.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white mb-1">{feature.title}</h3>
+                      <p className="text-sm text-white/60 leading-relaxed">{feature.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA */}
+              <div className="mt-8 flex flex-wrap gap-4">
+                <button
+                  onClick={() => handleOpenAuth('register')}
+                  className="group relative px-6 py-3 bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl font-semibold text-white shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-105 overflow-hidden"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5" />
+                    Try AI Classroom Free
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-violet-400 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+                <Link
+                  to="/revision-classroom"
+                  className="px-6 py-3 glass rounded-xl font-medium text-violet-200 hover:bg-violet-500/10 border border-violet-400/20 hover:border-violet-400/40 transition-all flex items-center gap-2"
+                >
+                  Learn More
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom stats */}
+          <div className="mt-16 pt-8 border-t border-white/10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              {[
+                { value: '6', label: 'Teaching Phases', icon: BookOpen },
+                { value: '∞', label: 'Ask Questions', icon: MessageCircle },
+                { value: '100%', label: 'Personalized', icon: Target },
+                { value: '24/7', label: 'Available', icon: Zap },
+              ].map((stat, i) => (
+                <div key={i} className="group">
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <stat.icon className="w-5 h-5 text-violet-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-3xl md:text-4xl font-bold text-white">{stat.value}</span>
+                  </div>
+                  <p className="text-sm text-white/50">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Exam Modes Section */}
       <section
         ref={modesRef.ref}
