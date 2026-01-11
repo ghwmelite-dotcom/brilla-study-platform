@@ -45,8 +45,8 @@ const EXAM_TYPE_CONFIG = {
     selectedBg: 'bg-amber-100',
     selectedBorder: 'border-amber-500',
   },
-  exam_igcse: {
-    id: 'exam_igcse',
+  igcse: {
+    id: 'igcse',
     name: 'IGCSE',
     fullName: 'International General Certificate of Secondary Education',
     description: 'Cambridge O-Level for international students',
@@ -59,8 +59,8 @@ const EXAM_TYPE_CONFIG = {
     selectedBg: 'bg-cyan-100',
     selectedBorder: 'border-cyan-500',
   },
-  exam_alevel: {
-    id: 'exam_alevel',
+  cambridge_a2: {
+    id: 'cambridge_a2',
     name: 'A-Level',
     fullName: 'Cambridge Advanced Level',
     description: 'Cambridge A-Level for pre-university students',
@@ -100,7 +100,7 @@ export function ExamTypeSelector({
   useEffect(() => {
     if (allowAll || isTeacher) {
       // Teachers and admins can see all exam types
-      setAvailableExamTypes(['exam_bece', 'exam_wassce', 'exam_nsmq', 'exam_igcse', 'exam_alevel']);
+      setAvailableExamTypes(['exam_bece', 'exam_wassce', 'exam_nsmq', 'igcse', 'cambridge_a2']);
     } else if (schoolLevel === 'jhs') {
       // JHS students only see BECE
       setAvailableExamTypes(['exam_bece']);
@@ -117,10 +117,10 @@ export function ExamTypeSelector({
       }
     } else if (schoolLevel === 'international') {
       // International students see IGCSE and A-Level
-      setAvailableExamTypes(['exam_igcse', 'exam_alevel']);
+      setAvailableExamTypes(['igcse', 'cambridge_a2']);
       // Auto-select IGCSE for international if nothing selected
       if (selectedExamTypes.length === 0) {
-        onChange(['exam_igcse'], 'exam_igcse');
+        onChange(['igcse'], 'igcse');
       }
     } else {
       setAvailableExamTypes([]);

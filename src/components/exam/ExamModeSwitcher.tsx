@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { ChevronDown, Trophy, GraduationCap, BookOpen, Check } from 'lucide-react';
+import { ChevronDown, Trophy, GraduationCap, BookOpen, Check, Globe, Award } from 'lucide-react';
 import { useExamStore } from '@/stores/examStore';
 import { useExamPreferencesStore } from '@/stores/examPreferencesStore';
-import type { ExamTypeSlug, GhanaExamTypeSlug } from '@/types';
-import { isGhanaExam } from '@/types';
+import type { ExamTypeSlug } from '@/types';
 
 // Exam config interface
 interface ExamConfigItem {
@@ -14,8 +13,8 @@ interface ExamConfigItem {
   bgColor: string;
 }
 
-// Ghana exam types for the mode switcher (international exams use a separate system)
-const EXAM_CONFIG: Record<GhanaExamTypeSlug, ExamConfigItem> = {
+// All exam types for the mode switcher
+const EXAM_CONFIG: Record<ExamTypeSlug, ExamConfigItem> = {
   nsmq: {
     name: 'National Science & Maths Quiz',
     shortName: 'NSMQ',
@@ -37,29 +36,75 @@ const EXAM_CONFIG: Record<GhanaExamTypeSlug, ExamConfigItem> = {
     color: 'text-emerald-600',
     bgColor: 'bg-emerald-50',
   },
+  igcse: {
+    name: 'Cambridge IGCSE',
+    shortName: 'IGCSE',
+    icon: Globe,
+    color: 'text-cyan-600',
+    bgColor: 'bg-cyan-50',
+  },
+  'cambridge-a-level': {
+    name: 'Cambridge A-Level',
+    shortName: 'A-Level',
+    icon: Award,
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+  },
+  // Edexcel exams (placeholders - not fully implemented yet)
+  'cambridge-as': {
+    name: 'Cambridge AS-Level',
+    shortName: 'AS-Level',
+    icon: Award,
+    color: 'text-purple-500',
+    bgColor: 'bg-purple-50',
+  },
+  'edexcel-igcse': {
+    name: 'Edexcel IGCSE',
+    shortName: 'Ed. IGCSE',
+    icon: Globe,
+    color: 'text-teal-600',
+    bgColor: 'bg-teal-50',
+  },
+  'edexcel-as': {
+    name: 'Edexcel AS-Level',
+    shortName: 'Ed. AS',
+    icon: Award,
+    color: 'text-teal-500',
+    bgColor: 'bg-teal-50',
+  },
+  'edexcel-a-level': {
+    name: 'Edexcel A-Level',
+    shortName: 'Ed. A-Level',
+    icon: Award,
+    color: 'text-teal-600',
+    bgColor: 'bg-teal-50',
+  },
 };
 
-// Map exam type IDs to slugs (only Ghana exams)
-const EXAM_ID_TO_SLUG: Record<string, GhanaExamTypeSlug> = {
+// Map exam type IDs to slugs
+const EXAM_ID_TO_SLUG: Record<string, ExamTypeSlug> = {
   'exam_bece': 'bece',
   'exam_wassce': 'wassce',
   'exam_nsmq': 'nsmq',
+  'igcse': 'igcse',
+  'cambridge_a2': 'cambridge-a-level',
+  'cambridge_as': 'cambridge-as',
+  'edexcel_igcse': 'edexcel-igcse',
+  'edexcel_as': 'edexcel-as',
+  'edexcel_a2': 'edexcel-a-level',
 };
 
 // Get config for an exam type with fallback
 const getExamSwitcherConfig = (examType: ExamTypeSlug): ExamConfigItem => {
-  if (isGhanaExam(examType)) {
-    return EXAM_CONFIG[examType];
-  }
-  // Default to NSMQ config for international exams (they don't use this switcher)
-  return EXAM_CONFIG.nsmq;
+  return EXAM_CONFIG[examType] || EXAM_CONFIG.nsmq;
 };
 
 export function ExamModeSwitcher() {
   const [isOpen, setIsOpen] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { currentExamType, setExamType, isLoading } = useExamStore();
-  const { preferences, setActiveExamType } = useExamPreferencesStore();
+  const { preferences, setActiveExamType, primaryExamTypeId } = useExamPreferencesStore();
 
   // Get user's available exam type slugs from preferences
   const userExamSlugs = preferences
@@ -67,10 +112,22 @@ export function ExamModeSwitcher() {
     .filter(Boolean) as ExamTypeSlug[];
 
   // If user has preferences, filter to only show their exam types
-  // Otherwise show all exam types (for admins, new users without preferences, etc.)
+  // Otherwise show Ghana exam types by default (for admins, new users without preferences, etc.)
+  const defaultExamTypes: ExamTypeSlug[] = ['nsmq', 'wassce', 'bece'];
   const availableExamTypes = userExamSlugs.length > 0
     ? userExamSlugs
-    : (Object.keys(EXAM_CONFIG) as ExamTypeSlug[]);
+    : defaultExamTypes;
+
+  // Initialize exam type from user's primary preference on first load
+  useEffect(() => {
+    if (!hasInitialized && primaryExamTypeId && preferences.length > 0) {
+      const primarySlug = EXAM_ID_TO_SLUG[primaryExamTypeId];
+      if (primarySlug && primarySlug !== currentExamType) {
+        setExamType(primarySlug);
+      }
+      setHasInitialized(true);
+    }
+  }, [primaryExamTypeId, preferences, currentExamType, setExamType, hasInitialized]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -174,6 +231,8 @@ export function ExamModeSwitcher() {
               {currentExamType === 'nsmq' && 'Competition prep for SHS students'}
               {currentExamType === 'wassce' && '50+ subjects for SHS final exams'}
               {currentExamType === 'bece' && 'JHS exam preparation'}
+              {currentExamType === 'igcse' && 'Cambridge O-Level international curriculum'}
+              {currentExamType === 'cambridge-a-level' && 'Cambridge A-Level pre-university'}
             </p>
           </div>
         </div>
