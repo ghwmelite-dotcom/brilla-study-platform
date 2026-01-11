@@ -29,6 +29,7 @@ function getIconComponent(iconName: string): React.ComponentType<{ className?: s
     Atom: Icons.Atom,
     FlaskConical: Icons.FlaskConical,
     Leaf: Icons.Leaf,
+    Dna: Icons.Dna,
     BookOpen: Icons.BookOpen,
     Languages: Icons.Languages,
     Beaker: Icons.Beaker,
@@ -52,6 +53,19 @@ function getIconComponent(iconName: string): React.ComponentType<{ className?: s
   };
   return iconMap[iconName] || Icons.BookOpen;
 }
+
+// Exam type display labels
+const examTypeLabelMap: Record<string, string> = {
+  'nsmq': 'NSMQ',
+  'wassce': 'WASSCE',
+  'bece': 'BECE',
+  'igcse': 'Cambridge IGCSE',
+  'cambridge-a-level': 'Cambridge A-Level',
+  'cambridge-as': 'Cambridge AS-Level',
+  'edexcel-igcse': 'Edexcel IGCSE',
+  'edexcel-as': 'Edexcel AS-Level',
+  'edexcel-a-level': 'Edexcel A-Level',
+};
 
 // Subject progress will be fetched from API in production
 // For now, return default empty progress for all subjects
@@ -161,7 +175,7 @@ export function SubjectCatalogPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-neutral-900">
-                {currentExamType.toUpperCase()} Subject Catalog
+                {examTypeLabelMap[currentExamType] || currentExamType.toUpperCase()} Subject Catalog
               </h1>
               <p className="text-neutral-600">
                 {subjects.length} subjects across {categories.length} categories
