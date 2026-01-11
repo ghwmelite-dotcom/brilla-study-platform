@@ -1158,11 +1158,21 @@ export function getExamConfig(examType: ExamTypeSlug): ExamConfig {
 
 // Get gradient class for exam type
 export function getExamGradient(examType: ExamTypeSlug): string {
+  // Ghana exams
   if (isGhanaExam(examType)) {
     const config = examConfigs[examType];
     return `${config.gradientFrom} ${config.gradientTo}`;
   }
-  // Default gradient for international exams
+
+  // International exams with dedicated configs
+  if (examType === 'igcse' || examType === 'edexcel-igcse') {
+    return `${examConfigs.igcse.gradientFrom} ${examConfigs.igcse.gradientTo}`;
+  }
+  if (examType === 'cambridge-a-level' || examType === 'cambridge-as' || examType === 'edexcel-a-level' || examType === 'edexcel-as') {
+    return `${examConfigs['cambridge-a-level'].gradientFrom} ${examConfigs['cambridge-a-level'].gradientTo}`;
+  }
+
+  // Default fallback
   return 'from-blue-600 to-indigo-700';
 }
 
