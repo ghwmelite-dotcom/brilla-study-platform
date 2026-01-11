@@ -73,6 +73,8 @@ function getColorClass(hexColor: string): string {
     '#EA580C': 'bg-orange-600',
     '#2563EB': 'bg-blue-600',
     '#059669': 'bg-emerald-600',
+    '#22C55E': 'bg-green-500',  // IGCSE Biology
+    '#16A34A': 'bg-green-600',  // A-Level Biology
   };
   return colorMap[hexColor] || 'bg-primary';
 }
@@ -354,7 +356,18 @@ export function TopicsPage() {
   }
 
   // Get current exam type for display
-  const examTypeLabel = currentExamType.toUpperCase();
+  const examTypeLabelMap: Record<string, string> = {
+    'nsmq': 'NSMQ',
+    'wassce': 'WASSCE',
+    'bece': 'BECE',
+    'igcse': 'IGCSE',
+    'cambridge-a-level': 'A-Level',
+    'cambridge-as': 'AS-Level',
+    'edexcel-igcse': 'Edexcel IGCSE',
+    'edexcel-as': 'Edexcel AS',
+    'edexcel-a-level': 'Edexcel A-Level',
+  };
+  const examTypeLabel = examTypeLabelMap[currentExamType] || currentExamType.toUpperCase();
 
   // Handle click on locked subject
   const handleSubjectClick = (subject: typeof subjects[0], isLocked: boolean) => {
