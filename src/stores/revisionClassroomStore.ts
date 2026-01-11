@@ -131,6 +131,35 @@ export interface AITeachingState {
   awaitingResponse: boolean;
 }
 
+// Whiteboard Teaching Types
+export type WhiteboardLessonType = 'diagram' | 'step-by-step' | 'problem-solving' | 'concept-map';
+
+export interface WhiteboardDrawCommand {
+  type: 'rect' | 'circle' | 'line' | 'arrow' | 'text' | 'path' | 'polygon' | 'group';
+  id: string;
+  props: Record<string, any>;
+}
+
+export interface WhiteboardStep {
+  stepNumber: number;
+  explanation: string;
+  voiceOver?: string;
+  duration: number;
+  commands: WhiteboardDrawCommand[];
+  highlights?: string[];
+  clearPrevious?: boolean;
+}
+
+export interface WhiteboardTeachingContent {
+  title: string;
+  topic: string;
+  totalDuration: number;
+  canvasSize: { width: number; height: number };
+  backgroundColor: string;
+  steps: WhiteboardStep[];
+  summary: string;
+}
+
 interface RevisionClassroomState {
   // Sessions
   currentSession: RevisionSession | null;
@@ -150,6 +179,11 @@ interface RevisionClassroomState {
   // AI Teaching
   aiTeachingState: AITeachingState;
   aiMessages: RevisionAIMessage[];
+
+  // AI Whiteboard Teaching
+  whiteboardContent: WhiteboardTeachingContent | null;
+  isWhiteboardLoading: boolean;
+  whiteboardMode: boolean;
 
   // Statistics
   stats: {
@@ -191,6 +225,11 @@ interface RevisionClassroomState {
   respondToAI: (response: string) => Promise<void>;
   askQuestion: (question: string) => Promise<void>;
   requestClarification: (topic: string) => Promise<void>;
+
+  // Actions - AI Whiteboard Teaching
+  requestWhiteboardTeaching: (lessonType: WhiteboardLessonType) => Promise<void>;
+  toggleWhiteboardMode: () => void;
+  clearWhiteboardContent: () => void;
 
   // Actions - Checkpoints
   answerCheckpoint: (checkpointId: string, answer: string, timeTaken?: number) => Promise<CheckpointResponse>;
@@ -324,6 +363,9 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
         awaitingResponse: false,
       },
       aiMessages: [],
+      whiteboardContent: null,
+      isWhiteboardLoading: false,
+      whiteboardMode: false,
       stats: null,
       isLoading: false,
       error: null,
@@ -923,6 +965,50 @@ Does this help? Feel free to ask more questions!`;
 
       requestClarification: async (topic) => {
         await get().askQuestion(`Can you explain ${topic} in more detail?`);
+      },
+
+      // =============================================
+      // AI WHITEBOARD TEACHING ACTIONS
+      // =============================================
+
+      requestWhiteboardTeaching: async (lessonType) => {
+        const { currentLesson, currentSession } = get();
+        if (!currentLesson || !currentSession) return;
+
+        set({ isWhiteboardLoading: true, whiteboardMode: true });
+
+        try {
+          const response = await api.post<{
+            whiteboardContent: WhiteboardTeachingContent;
+            interactionId: string;
+            lessonType: string;
+          }>(`/revision-classroom/lessons/${currentLesson.id}/whiteboard-teach`, {
+            lessonType,
+          });
+
+          if (!response.success || !response.data) {
+            throw new Error(response.error || 'Failed to generate whiteboard content');
+          }
+
+          set({
+            whiteboardContent: response.data.whiteboardContent,
+            isWhiteboardLoading: false,
+          });
+        } catch (error) {
+          console.error('Error generating whiteboard content:', error);
+          set({
+            isWhiteboardLoading: false,
+            error: error instanceof Error ? error.message : 'Failed to generate whiteboard content',
+          });
+        }
+      },
+
+      toggleWhiteboardMode: () => {
+        set(state => ({ whiteboardMode: !state.whiteboardMode }));
+      },
+
+      clearWhiteboardContent: () => {
+        set({ whiteboardContent: null, whiteboardMode: false });
       },
 
       // =============================================

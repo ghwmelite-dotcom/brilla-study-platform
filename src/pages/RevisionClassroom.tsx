@@ -19,7 +19,10 @@ import {
   Zap,
   Award,
   BarChart3,
+  Presentation,
+  MessageSquare,
 } from 'lucide-react';
+import { AIWhiteboardTeacher } from '@/components/whiteboard/AIWhiteboardTeacher';
 import {
   useAuthStore,
   useExamStore,
@@ -472,6 +475,9 @@ export default function RevisionClassroom() {
     lessonPlan,
     aiTeachingState,
     aiMessages,
+    whiteboardContent,
+    isWhiteboardLoading,
+    whiteboardMode,
     isLoading: _isLoading,
     error,
     startRevisionSession,
@@ -480,6 +486,9 @@ export default function RevisionClassroom() {
     startLesson,
     respondToAI,
     askQuestion,
+    requestWhiteboardTeaching,
+    toggleWhiteboardMode,
+    clearWhiteboardContent,
     requestAITeaching: _requestAITeaching,
     resetClassroom: _resetClassroom,
   } = useRevisionClassroomStore();
@@ -654,6 +663,32 @@ export default function RevisionClassroom() {
               <span className="text-neutral-600">{currentSession.lessonsCompleted}/{currentSession.totalLessons} lessons</span>
             </div>
 
+            {/* Mode toggle */}
+            <div className="flex items-center gap-1 bg-neutral-100 p-1 rounded-lg">
+              <button
+                onClick={() => whiteboardMode && toggleWhiteboardMode()}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  !whiteboardMode
+                    ? 'bg-white text-primary shadow-sm'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span className="hidden sm:inline">Chat</span>
+              </button>
+              <button
+                onClick={() => !whiteboardMode && toggleWhiteboardMode()}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  whiteboardMode
+                    ? 'bg-white text-violet-600 shadow-sm'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                <Presentation className="w-4 h-4" />
+                <span className="hidden sm:inline">Whiteboard</span>
+              </button>
+            </div>
+
             {/* Session controls */}
             <div className="flex items-center gap-2">
               <button
@@ -682,13 +717,22 @@ export default function RevisionClassroom() {
         {/* AI Teaching area */}
         <div className="flex-1 bg-white rounded-xl border border-neutral-200 overflow-hidden" style={{ height: 'calc(100vh - 140px)' }}>
           {currentLesson ? (
-            <AITeachingDisplay
-              aiState={aiTeachingState}
-              messages={aiMessages}
-              onRespond={respondToAI}
-              onAskQuestion={askQuestion}
-              onContinue={handleContinue}
-            />
+            whiteboardMode ? (
+              <AIWhiteboardTeacher
+                content={whiteboardContent || undefined}
+                isLoading={isWhiteboardLoading}
+                onRequestContent={requestWhiteboardTeaching}
+                className="h-full"
+              />
+            ) : (
+              <AITeachingDisplay
+                aiState={aiTeachingState}
+                messages={aiMessages}
+                onRespond={respondToAI}
+                onAskQuestion={askQuestion}
+                onContinue={handleContinue}
+              />
+            )
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center p-8">
               <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />

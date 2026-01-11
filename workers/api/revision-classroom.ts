@@ -1723,4 +1723,534 @@ revisionClassroomApp.get('/stats', async (c) => {
   }
 });
 
+// =============================================
+// AI WHITEBOARD TUTORING
+// =============================================
+
+// Types for whiteboard drawing commands
+interface WhiteboardDrawCommand {
+  type: 'rect' | 'circle' | 'line' | 'arrow' | 'text' | 'path' | 'polygon' | 'group';
+  id: string;
+  props: {
+    // Position
+    left?: number;
+    top?: number;
+    // Dimensions
+    width?: number;
+    height?: number;
+    radius?: number;
+    // Line/Arrow points
+    x1?: number;
+    y1?: number;
+    x2?: number;
+    y2?: number;
+    // Path data for complex shapes
+    path?: string;
+    // Polygon points
+    points?: { x: number; y: number }[];
+    // Styling
+    fill?: string;
+    stroke?: string;
+    strokeWidth?: number;
+    opacity?: number;
+    // Text specific
+    text?: string;
+    fontSize?: number;
+    fontFamily?: string;
+    fontWeight?: string;
+    textAlign?: string;
+    // Transform
+    angle?: number;
+    scaleX?: number;
+    scaleY?: number;
+  };
+}
+
+interface WhiteboardStep {
+  stepNumber: number;
+  explanation: string;
+  voiceOver?: string; // Text for TTS
+  duration: number; // Seconds to display this step
+  commands: WhiteboardDrawCommand[];
+  highlights?: string[]; // IDs of objects to highlight
+  clearPrevious?: boolean; // Whether to clear canvas before this step
+}
+
+interface WhiteboardTeachingContent {
+  title: string;
+  topic: string;
+  totalDuration: number;
+  canvasSize: { width: number; height: number };
+  backgroundColor: string;
+  steps: WhiteboardStep[];
+  summary: string;
+}
+
+// Prompt for generating whiteboard teaching content
+const WHITEBOARD_TEACHING_PROMPT = `You are an expert visual educator creating whiteboard lessons for the Brilla Study Platform.
+
+Your task is to create a step-by-step visual explanation that will be rendered on a digital whiteboard canvas.
+
+IMPORTANT GUIDELINES:
+1. Think like a teacher drawing on a whiteboard - start simple, build complexity
+2. Use shapes, arrows, and text to explain concepts visually
+3. Each step should have ONE main idea with supporting visuals
+4. Use colors meaningfully (e.g., red for important, blue for definitions, green for examples)
+5. Position elements logically - left to right, top to bottom
+6. Keep text concise - use labels, not paragraphs
+7. Use arrows to show relationships and flow
+8. For math: show step-by-step working
+9. For science: draw diagrams, label parts
+10. For concepts: use mind maps, flowcharts
+
+CANVAS COORDINATES:
+- Canvas is 1200x800 pixels
+- (0,0) is top-left corner
+- Use the full canvas space effectively
+- Leave margins of about 50px
+
+COLOR PALETTE:
+- #1e40af (dark blue) - for main concepts/titles
+- #dc2626 (red) - for important points/highlights
+- #16a34a (green) - for examples/correct answers
+- #7c3aed (purple) - for formulas/equations
+- #ea580c (orange) - for warnings/common mistakes
+- #0891b2 (teal) - for definitions
+- #000000 (black) - for general text/lines
+- #6b7280 (gray) - for secondary elements
+
+RESPOND WITH VALID JSON ONLY in this exact format:
+{
+  "title": "Lesson title",
+  "topic": "Topic name",
+  "totalDuration": 60,
+  "canvasSize": { "width": 1200, "height": 800 },
+  "backgroundColor": "#ffffff",
+  "steps": [
+    {
+      "stepNumber": 1,
+      "explanation": "What the student should understand from this step",
+      "voiceOver": "What to say while showing this step",
+      "duration": 5,
+      "commands": [
+        {
+          "type": "text",
+          "id": "title1",
+          "props": {
+            "left": 100,
+            "top": 50,
+            "text": "Title Text",
+            "fontSize": 32,
+            "fontWeight": "bold",
+            "fill": "#1e40af"
+          }
+        }
+      ],
+      "highlights": [],
+      "clearPrevious": false
+    }
+  ],
+  "summary": "Key takeaways from this visual lesson"
+}`;
+
+// Generate whiteboard teaching content
+async function generateWhiteboardContent(
+  env: Env,
+  topic: string,
+  subject: string,
+  examType: string,
+  lessonType: 'diagram' | 'step-by-step' | 'problem-solving' | 'concept-map' = 'step-by-step'
+): Promise<WhiteboardTeachingContent> {
+  const lessonTypeInstructions: Record<string, string> = {
+    'diagram': `Create a labeled diagram explaining ${topic}. Include:
+- Main diagram with clear labels
+- Arrows pointing to key parts
+- Brief text explanations for each component
+- A title and summary`,
+
+    'step-by-step': `Create a step-by-step visual explanation of ${topic}. Include:
+- Start with the concept name/title
+- Break down into 4-6 clear steps
+- Each step builds on the previous
+- Use shapes and arrows to show progression
+- End with a summary/key points`,
+
+    'problem-solving': `Create a worked example solving a problem related to ${topic}. Include:
+- The problem statement at the top
+- Step-by-step solution with calculations
+- Highlight each step as you work through
+- Use colors to distinguish steps
+- Show the final answer prominently`,
+
+    'concept-map': `Create a concept map/mind map for ${topic}. Include:
+- Central concept in the middle
+- Related sub-concepts branching out
+- Connecting lines with relationship labels
+- Use different colors for different branches
+- Keep it organized and readable`,
+  };
+
+  const systemPrompt = `${WHITEBOARD_TEACHING_PROMPT}
+
+Context:
+- Subject: ${subject}
+- Topic: ${topic}
+- Exam: ${examType.toUpperCase()}
+- Lesson Type: ${lessonType}
+
+${lessonTypeInstructions[lessonType]}
+
+Create content appropriate for ${examType.toUpperCase()} exam preparation.`;
+
+  try {
+    const model = env.AI_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+
+    const result = await env.AI.run(model as BaseAiTextGenerationModels, {
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Create a ${lessonType} whiteboard lesson about "${topic}" for ${subject}.` },
+      ],
+      max_tokens: 4096,
+      temperature: 0.7,
+    });
+
+    const responseText = typeof result === 'object' && result !== null && 'response' in result
+      ? (result as { response: string }).response
+      : String(result);
+
+    // Extract JSON from response
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]) as WhiteboardTeachingContent;
+      return parsed;
+    }
+
+    throw new Error('Failed to parse whiteboard content');
+  } catch (error) {
+    console.error('Error generating whiteboard content:', error);
+    // Return fallback content
+    return getDefaultWhiteboardContent(topic, subject, examType);
+  }
+}
+
+// Default/fallback whiteboard content
+function getDefaultWhiteboardContent(topic: string, subject: string, examType: string): WhiteboardTeachingContent {
+  return {
+    title: `Understanding ${topic}`,
+    topic,
+    totalDuration: 30,
+    canvasSize: { width: 1200, height: 800 },
+    backgroundColor: '#ffffff',
+    steps: [
+      {
+        stepNumber: 1,
+        explanation: `Let's explore ${topic} together.`,
+        voiceOver: `Welcome! Today we're going to learn about ${topic} in ${subject}.`,
+        duration: 5,
+        commands: [
+          {
+            type: 'text',
+            id: 'title',
+            props: {
+              left: 600,
+              top: 80,
+              text: topic,
+              fontSize: 48,
+              fontWeight: 'bold',
+              fill: '#1e40af',
+              textAlign: 'center',
+            },
+          },
+          {
+            type: 'line',
+            id: 'underline',
+            props: {
+              x1: 300,
+              y1: 130,
+              x2: 900,
+              y2: 130,
+              stroke: '#1e40af',
+              strokeWidth: 3,
+            },
+          },
+        ],
+        highlights: [],
+        clearPrevious: false,
+      },
+      {
+        stepNumber: 2,
+        explanation: `Key concepts in ${topic}`,
+        voiceOver: `Let me show you the main ideas you need to understand.`,
+        duration: 8,
+        commands: [
+          {
+            type: 'text',
+            id: 'concept1-label',
+            props: {
+              left: 150,
+              top: 200,
+              text: 'Key Concept 1',
+              fontSize: 24,
+              fontWeight: 'bold',
+              fill: '#16a34a',
+            },
+          },
+          {
+            type: 'rect',
+            id: 'concept1-box',
+            props: {
+              left: 100,
+              top: 230,
+              width: 300,
+              height: 100,
+              fill: '#f0fdf4',
+              stroke: '#16a34a',
+              strokeWidth: 2,
+            },
+          },
+          {
+            type: 'text',
+            id: 'concept1-text',
+            props: {
+              left: 120,
+              top: 260,
+              text: `Understanding the basics\nof ${topic}`,
+              fontSize: 18,
+              fill: '#000000',
+            },
+          },
+        ],
+        highlights: ['concept1-box'],
+        clearPrevious: false,
+      },
+      {
+        stepNumber: 3,
+        explanation: `How this applies to your ${examType.toUpperCase()} exam`,
+        voiceOver: `This is important for your exam. Let me show you how questions are typically asked.`,
+        duration: 10,
+        commands: [
+          {
+            type: 'text',
+            id: 'exam-label',
+            props: {
+              left: 600,
+              top: 200,
+              text: `${examType.toUpperCase()} Exam Tips`,
+              fontSize: 28,
+              fontWeight: 'bold',
+              fill: '#dc2626',
+              textAlign: 'center',
+            },
+          },
+          {
+            type: 'rect',
+            id: 'exam-box',
+            props: {
+              left: 450,
+              top: 240,
+              width: 300,
+              height: 150,
+              fill: '#fef2f2',
+              stroke: '#dc2626',
+              strokeWidth: 2,
+            },
+          },
+          {
+            type: 'text',
+            id: 'exam-tip1',
+            props: {
+              left: 470,
+              top: 270,
+              text: '• Read questions carefully',
+              fontSize: 16,
+              fill: '#000000',
+            },
+          },
+          {
+            type: 'text',
+            id: 'exam-tip2',
+            props: {
+              left: 470,
+              top: 300,
+              text: '• Show all working',
+              fontSize: 16,
+              fill: '#000000',
+            },
+          },
+          {
+            type: 'text',
+            id: 'exam-tip3',
+            props: {
+              left: 470,
+              top: 330,
+              text: '• Check your answers',
+              fontSize: 16,
+              fill: '#000000',
+            },
+          },
+        ],
+        highlights: ['exam-box'],
+        clearPrevious: false,
+      },
+      {
+        stepNumber: 4,
+        explanation: 'Summary of what we learned',
+        voiceOver: `Great job! Let's summarize what we've covered about ${topic}.`,
+        duration: 7,
+        commands: [
+          {
+            type: 'rect',
+            id: 'summary-bg',
+            props: {
+              left: 100,
+              top: 450,
+              width: 1000,
+              height: 280,
+              fill: '#f8fafc',
+              stroke: '#64748b',
+              strokeWidth: 2,
+            },
+          },
+          {
+            type: 'text',
+            id: 'summary-title',
+            props: {
+              left: 600,
+              top: 480,
+              text: 'Summary',
+              fontSize: 32,
+              fontWeight: 'bold',
+              fill: '#7c3aed',
+              textAlign: 'center',
+            },
+          },
+          {
+            type: 'text',
+            id: 'summary-content',
+            props: {
+              left: 150,
+              top: 530,
+              text: `✓ We learned about ${topic}\n✓ Key concepts and definitions\n✓ How to approach ${examType.toUpperCase()} questions\n✓ Common mistakes to avoid`,
+              fontSize: 20,
+              fill: '#000000',
+            },
+          },
+        ],
+        highlights: [],
+        clearPrevious: false,
+      },
+    ],
+    summary: `In this lesson, we explored ${topic} as it relates to ${subject} for the ${examType.toUpperCase()} exam.`,
+  };
+}
+
+// API Endpoint: Generate AI whiteboard teaching content
+revisionClassroomApp.post('/lessons/:lessonId/whiteboard-teach', async (c) => {
+  try {
+    const user = c.get('user');
+    const lessonId = c.req.param('lessonId');
+    const body = await c.req.json();
+    const { lessonType = 'step-by-step' } = body as {
+      lessonType?: 'diagram' | 'step-by-step' | 'problem-solving' | 'concept-map';
+    };
+
+    // Get lesson details
+    const lesson = await c.env.DB.prepare(`
+      SELECT
+        rl.*,
+        t.name as topic_name,
+        s.name as subject_name,
+        rs.exam_type,
+        rs.user_id
+      FROM revision_lessons rl
+      LEFT JOIN topics t ON rl.topic_id = t.id
+      LEFT JOIN revision_sessions rs ON rl.session_id = rs.id
+      LEFT JOIN subjects s ON rs.subject_id = s.id
+      WHERE rl.id = ? AND rs.user_id = ?
+    `).bind(lessonId, user.userId).first();
+
+    if (!lesson) {
+      return c.json({ success: false, error: 'Lesson not found' }, 404);
+    }
+
+    const topicName = (lesson as any).topic_name || 'this topic';
+    const subjectName = (lesson as any).subject_name || 'this subject';
+    const examType = (lesson as any).exam_type || 'wassce';
+
+    // Generate whiteboard content
+    const whiteboardContent = await generateWhiteboardContent(
+      c.env,
+      topicName,
+      subjectName,
+      examType,
+      lessonType
+    );
+
+    // Record the interaction
+    const interactionId = generateId('wb_interaction');
+    const now = new Date().toISOString();
+
+    await c.env.DB.prepare(`
+      INSERT INTO revision_ai_interactions (
+        id, lesson_id, user_id, interaction_type, ai_message, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(
+      interactionId, lessonId, user.userId, `whiteboard_${lessonType}`,
+      JSON.stringify(whiteboardContent), now
+    ).run();
+
+    return c.json({
+      success: true,
+      data: {
+        whiteboardContent,
+        interactionId,
+        lessonType,
+      },
+    });
+  } catch (error) {
+    console.error('Error generating whiteboard content:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return c.json({ success: false, error: `Failed to generate whiteboard content: ${errorMessage}` }, 500);
+  }
+});
+
+// API Endpoint: Get available whiteboard lesson types
+revisionClassroomApp.get('/whiteboard-types', async (c) => {
+  return c.json({
+    success: true,
+    data: {
+      types: [
+        {
+          id: 'diagram',
+          name: 'Labeled Diagram',
+          description: 'Visual diagram with labeled parts and explanations',
+          icon: 'diagram',
+          bestFor: ['Science', 'Biology', 'Geography', 'Technical subjects'],
+        },
+        {
+          id: 'step-by-step',
+          name: 'Step-by-Step Explanation',
+          description: 'Progressive visual walkthrough of a concept',
+          icon: 'steps',
+          bestFor: ['All subjects', 'Complex concepts', 'Processes'],
+        },
+        {
+          id: 'problem-solving',
+          name: 'Worked Example',
+          description: 'Step-by-step solution to a problem with calculations',
+          icon: 'calculator',
+          bestFor: ['Mathematics', 'Physics', 'Chemistry', 'Economics'],
+        },
+        {
+          id: 'concept-map',
+          name: 'Concept Map',
+          description: 'Mind map showing relationships between ideas',
+          icon: 'map',
+          bestFor: ['Social Studies', 'History', 'English', 'Overview topics'],
+        },
+      ],
+    },
+  });
+});
+
 export { revisionClassroomApp };
