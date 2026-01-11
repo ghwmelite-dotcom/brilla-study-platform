@@ -26,6 +26,7 @@ import { engagementApp } from './engagement';
 import { friendsApp } from './friends';
 import { oauthApp } from './oauth';
 import { examBoardsApp } from './exam-boards';
+import { revisionClassroomApp } from './revision-classroom';
 import {
   getDailyUsage,
   checkCanAnswer,
@@ -10244,6 +10245,7 @@ app.route('/api/cosmetics', cosmeticsApp);
 app.route('/api/rewards', rewardsApp);
 app.route('/api/engagement', engagementApp);
 app.route('/api/friends', friendsApp);
+app.route('/api/revision-classroom', revisionClassroomApp);
 
 // Mount OAuth routes (public with internal auth handling)
 app.route('/api/auth/oauth', oauthApp);
