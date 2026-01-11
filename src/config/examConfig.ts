@@ -142,9 +142,9 @@ export interface ExamConfig {
   }[];
 }
 
-// Configuration for Ghana-specific exams (NSMQ, WASSCE, BECE)
-// International exams (O/A Levels) use the exam board system with dynamic configuration
-export const examConfigs: Record<GhanaExamTypeSlug, ExamConfig> = {
+// Configuration for all exam types
+// Ghana exams have full custom configs, international exams have adapted configs
+export const examConfigs: Record<GhanaExamTypeSlug | 'igcse' | 'cambridge-a-level', ExamConfig> = {
   nsmq: {
     // Branding
     name: 'National Science & Maths Quiz',
@@ -732,15 +732,427 @@ export const examConfigs: Record<GhanaExamTypeSlug, ExamConfig> = {
       { slug: 'social-studies', label: 'Social Studies', icon: Globe, color: 'bg-amber-500' },
     ],
   },
+
+  igcse: {
+    // Branding
+    name: 'Cambridge IGCSE',
+    shortName: 'IGCSE',
+    tagline: 'Excel Internationally',
+    description: 'International General Certificate of Secondary Education',
+    targetAudience: 'O-Level Students',
+
+    // Colors
+    primaryColor: '#0891B2',
+    gradientFrom: 'from-cyan-600',
+    gradientTo: 'to-teal-700',
+    accentColor: 'cyan',
+
+    // Hero section
+    heroTitle: 'Master Cambridge IGCSE',
+    heroSubtitle: 'Prepare for international O-Level exams with comprehensive practice and past papers.',
+
+    // Subjects section
+    subjectsTitle: 'IGCSE Subjects',
+    subjectsSubtitle: 'Practice all Cambridge O-Level subjects',
+
+    // Practice modes
+    practiceModes: [
+      {
+        id: 'drill',
+        name: 'Topic Practice',
+        description: 'Master syllabus topics with focused practice questions.',
+        icon: Brain,
+        color: 'text-cyan-600',
+        borderColor: 'border-l-cyan-500',
+        link: '/practice?mode=drill',
+      },
+      {
+        id: 'past-papers',
+        name: 'Past Papers',
+        description: 'Practice with Cambridge past examination papers.',
+        icon: FileText,
+        color: 'text-teal-500',
+        borderColor: 'border-l-teal-500',
+        link: '/past-papers',
+      },
+      {
+        id: 'mock',
+        name: 'Mock Exams',
+        description: 'Full-length timed exams following Cambridge format.',
+        icon: Clock,
+        color: 'text-cyan-700',
+        borderColor: 'border-l-cyan-700',
+        link: '/mock-exams',
+      },
+    ],
+
+    // Features
+    features: [
+      {
+        icon: BookOpen,
+        title: 'Cambridge Syllabus',
+        description: 'Complete coverage of all IGCSE syllabus points',
+      },
+      {
+        icon: FileText,
+        title: 'Past Papers',
+        description: 'Access Cambridge past papers with mark schemes',
+      },
+      {
+        icon: Target,
+        title: 'Grade Tracking',
+        description: 'Track your progress against grade boundaries',
+      },
+      {
+        icon: Award,
+        title: 'Exam Skills',
+        description: 'Learn command words and examiner expectations',
+      },
+    ],
+
+    // Competition mode
+    hasCompetitionMode: false,
+    competitionLabel: 'Mock Exams',
+    competitionDescription: 'Take full Cambridge-style mock examinations',
+
+    // Dashboard
+    examReadinessLabel: 'IGCSE Readiness',
+    studyPlanLabel: 'Exam Study Plan',
+
+    // Stats
+    statsLabels: {
+      streak: 'Study Streak',
+      accuracy: 'Accuracy Rate',
+      xp: 'Study XP',
+      level: 'Student Level',
+    },
+
+    // Dashboard
+    dashboard: {
+      welcomeTitle: 'Excel Internationally',
+      welcomeSubtitle: 'Master the Cambridge syllabus and achieve top grades!',
+
+      heroBanner: {
+        title: '🌍 Cambridge IGCSE Excellence',
+        subtitle: 'Practice with past papers, master syllabus topics, and track your progress towards your target grades.',
+        ctaText: 'Practice Past Papers',
+        ctaLink: '/past-papers',
+        secondaryCtaText: 'Topic Practice',
+        secondaryCtaLink: '/practice',
+      },
+
+      quickActions: [
+        {
+          id: 'past-papers',
+          label: 'Past Papers',
+          description: 'Cambridge papers',
+          icon: FileText,
+          link: '/past-papers',
+          color: 'text-cyan-600',
+          bgColor: 'bg-cyan-100',
+        },
+        {
+          id: 'mock-exam',
+          label: 'Mock Exam',
+          description: 'Timed practice',
+          icon: Clock,
+          link: '/mock-exams',
+          color: 'text-teal-600',
+          bgColor: 'bg-teal-100',
+        },
+        {
+          id: 'topics',
+          label: 'Syllabus Topics',
+          description: 'By topic',
+          icon: BookOpen,
+          link: '/topics',
+          color: 'text-cyan-700',
+          bgColor: 'bg-cyan-50',
+        },
+        {
+          id: 'progress',
+          label: 'My Progress',
+          description: 'Track grades',
+          icon: Target,
+          link: '/progress',
+          color: 'text-emerald-600',
+          bgColor: 'bg-emerald-100',
+        },
+      ],
+
+      flyers: [
+        {
+          id: 'past-papers',
+          title: 'Cambridge Past Papers',
+          description: 'Practice with official past examination papers and mark schemes from recent sessions.',
+          icon: '📝',
+          ctaText: 'Browse Papers',
+          ctaLink: '/past-papers',
+          gradient: 'from-cyan-500 to-teal-600',
+          textColor: 'text-white',
+        },
+        {
+          id: 'grade-boundaries',
+          title: 'Track Your Grades',
+          description: 'See how your practice scores compare to Cambridge grade boundaries.',
+          icon: '📊',
+          ctaText: 'View Progress',
+          ctaLink: '/progress',
+          gradient: 'from-teal-500 to-emerald-600',
+          textColor: 'text-white',
+        },
+      ],
+
+      tips: [
+        'Focus on understanding command words like "explain", "describe", and "evaluate".',
+        'Practice under timed conditions to build exam stamina.',
+        'Review mark schemes to understand how examiners award marks.',
+        'Cover extended content for A* to A grade potential.',
+        'Use past paper examiner reports to avoid common mistakes.',
+      ],
+
+      featuredTitle: 'Exam Progress',
+      featuredItems: [
+        { label: 'Papers Done', value: '--', icon: FileText, color: 'text-cyan-500' },
+        { label: 'Topics', value: '--', icon: BookOpen, color: 'text-teal-500' },
+        { label: 'Accuracy', value: '--', icon: Target, color: 'text-emerald-500' },
+        { label: 'Predicted', value: '--', icon: Award, color: 'text-cyan-600' },
+      ],
+    },
+
+    // Quick start subjects for practice - IGCSE specific
+    quickStartSubjects: [
+      { slug: 'igcse-mathematics', label: 'Mathematics', icon: Calculator, color: 'bg-cyan-500' },
+      { slug: 'igcse-physics', label: 'Physics', icon: Atom, color: 'bg-teal-500' },
+      { slug: 'igcse-chemistry', label: 'Chemistry', icon: FlaskConical, color: 'bg-emerald-500' },
+      { slug: 'igcse-biology', label: 'Biology', icon: Dna, color: 'bg-green-500' },
+    ],
+  },
+
+  'cambridge-a-level': {
+    // Branding
+    name: 'Cambridge A-Level',
+    shortName: 'A-Level',
+    tagline: 'Achieve Excellence',
+    description: 'Cambridge International Advanced Level',
+    targetAudience: 'Pre-University Students',
+
+    // Colors
+    primaryColor: '#7C3AED',
+    gradientFrom: 'from-purple-600',
+    gradientTo: 'to-violet-700',
+    accentColor: 'purple',
+
+    // Hero section
+    heroTitle: 'Excel at A-Level',
+    heroSubtitle: 'Advanced preparation for university-level examinations with comprehensive practice.',
+
+    // Subjects section
+    subjectsTitle: 'A-Level Subjects',
+    subjectsSubtitle: 'Master advanced subjects for university preparation',
+
+    // Practice modes
+    practiceModes: [
+      {
+        id: 'drill',
+        name: 'Topic Practice',
+        description: 'Master advanced syllabus topics with in-depth practice.',
+        icon: Brain,
+        color: 'text-purple-600',
+        borderColor: 'border-l-purple-500',
+        link: '/practice?mode=drill',
+      },
+      {
+        id: 'past-papers',
+        name: 'Past Papers',
+        description: 'Practice with Cambridge A-Level past papers.',
+        icon: FileText,
+        color: 'text-violet-500',
+        borderColor: 'border-l-violet-500',
+        link: '/past-papers',
+      },
+      {
+        id: 'mock',
+        name: 'Mock Exams',
+        description: 'Full A-Level examination simulations.',
+        icon: Clock,
+        color: 'text-purple-700',
+        borderColor: 'border-l-purple-700',
+        link: '/mock-exams',
+      },
+    ],
+
+    // Features
+    features: [
+      {
+        icon: BookOpen,
+        title: 'Complete Syllabus',
+        description: 'Full coverage of A-Level content and specifications',
+      },
+      {
+        icon: FileText,
+        title: 'Past Papers',
+        description: 'Extensive A-Level past paper collection with solutions',
+      },
+      {
+        icon: Target,
+        title: 'Grade Prediction',
+        description: 'Track progress against A-Level grade boundaries',
+      },
+      {
+        icon: Award,
+        title: 'University Prep',
+        description: 'Develop critical thinking and analysis skills',
+      },
+    ],
+
+    // Competition mode
+    hasCompetitionMode: false,
+    competitionLabel: 'Mock Exams',
+    competitionDescription: 'Take full A-Level mock examinations',
+
+    // Dashboard
+    examReadinessLabel: 'A-Level Readiness',
+    studyPlanLabel: 'A-Level Study Plan',
+
+    // Stats
+    statsLabels: {
+      streak: 'Study Streak',
+      accuracy: 'Accuracy Rate',
+      xp: 'Study XP',
+      level: 'Student Level',
+    },
+
+    // Dashboard
+    dashboard: {
+      welcomeTitle: 'Aim for Excellence',
+      welcomeSubtitle: 'Master advanced content and achieve your university goals!',
+
+      heroBanner: {
+        title: '🎓 Cambridge A-Level Mastery',
+        subtitle: 'Advanced preparation with past papers, detailed explanations, and grade tracking for university success.',
+        ctaText: 'Practice Past Papers',
+        ctaLink: '/past-papers',
+        secondaryCtaText: 'Topic Practice',
+        secondaryCtaLink: '/practice',
+      },
+
+      quickActions: [
+        {
+          id: 'past-papers',
+          label: 'Past Papers',
+          description: 'A-Level papers',
+          icon: FileText,
+          link: '/past-papers',
+          color: 'text-purple-600',
+          bgColor: 'bg-purple-100',
+        },
+        {
+          id: 'mock-exam',
+          label: 'Mock Exam',
+          description: 'Full exam sim',
+          icon: Clock,
+          link: '/mock-exams',
+          color: 'text-violet-600',
+          bgColor: 'bg-violet-100',
+        },
+        {
+          id: 'topics',
+          label: 'Syllabus',
+          description: 'Advanced topics',
+          icon: BookOpen,
+          link: '/topics',
+          color: 'text-purple-700',
+          bgColor: 'bg-purple-50',
+        },
+        {
+          id: 'progress',
+          label: 'Progress',
+          description: 'Grade tracking',
+          icon: Target,
+          link: '/progress',
+          color: 'text-emerald-600',
+          bgColor: 'bg-emerald-100',
+        },
+      ],
+
+      flyers: [
+        {
+          id: 'past-papers',
+          title: 'A-Level Past Papers',
+          description: 'Practice with official Cambridge A-Level papers and mark schemes for exam excellence.',
+          icon: '📚',
+          ctaText: 'Browse Papers',
+          ctaLink: '/past-papers',
+          gradient: 'from-purple-500 to-violet-600',
+          textColor: 'text-white',
+        },
+        {
+          id: 'university-prep',
+          title: 'University Preparation',
+          description: 'Build the analytical skills and deep understanding required for university success.',
+          icon: '🎯',
+          ctaText: 'Start Practice',
+          ctaLink: '/practice',
+          gradient: 'from-violet-500 to-purple-600',
+          textColor: 'text-white',
+        },
+      ],
+
+      tips: [
+        'Focus on developing analytical and evaluative skills.',
+        'Practice extended response questions for higher marks.',
+        'Understand the depth required for A-Level answers.',
+        'Review mark schemes to see how top-band answers are structured.',
+        'Connect topics to build a comprehensive understanding.',
+      ],
+
+      featuredTitle: 'A-Level Progress',
+      featuredItems: [
+        { label: 'Papers Done', value: '--', icon: FileText, color: 'text-purple-500' },
+        { label: 'Topics', value: '--', icon: BookOpen, color: 'text-violet-500' },
+        { label: 'Accuracy', value: '--', icon: Target, color: 'text-emerald-500' },
+        { label: 'Predicted', value: '--', icon: Award, color: 'text-purple-600' },
+      ],
+    },
+
+    // Quick start subjects for practice - A-Level specific
+    quickStartSubjects: [
+      { slug: 'alevel-mathematics', label: 'Mathematics', icon: Calculator, color: 'bg-purple-500' },
+      { slug: 'alevel-physics', label: 'Physics', icon: Atom, color: 'bg-violet-500' },
+      { slug: 'alevel-chemistry', label: 'Chemistry', icon: FlaskConical, color: 'bg-purple-600' },
+      { slug: 'alevel-biology', label: 'Biology', icon: Dna, color: 'bg-emerald-500' },
+    ],
+  },
 };
 
-// Get config for exam type (returns wassce config as fallback for international exams)
+// Get config for exam type
 export function getExamConfig(examType: ExamTypeSlug): ExamConfig {
+  // Ghana exams
   if (isGhanaExam(examType)) {
     return examConfigs[examType];
   }
-  // International exams use WASSCE config as a fallback
-  // TODO: Create dedicated configs for international exams
+
+  // International exams with dedicated configs
+  if (examType === 'igcse') {
+    return examConfigs.igcse;
+  }
+  if (examType === 'cambridge-a-level') {
+    return examConfigs['cambridge-a-level'];
+  }
+
+  // Other international exams (AS-Level, Edexcel) fall back to IGCSE or A-Level
+  if (examType === 'cambridge-as' || examType === 'edexcel-as') {
+    return examConfigs['cambridge-a-level']; // AS uses A-Level config
+  }
+  if (examType === 'edexcel-igcse') {
+    return examConfigs.igcse; // Edexcel IGCSE uses Cambridge IGCSE config
+  }
+  if (examType === 'edexcel-a-level') {
+    return examConfigs['cambridge-a-level']; // Edexcel A-Level uses Cambridge A-Level config
+  }
+
+  // Ultimate fallback
   return examConfigs.wassce;
 }
 
