@@ -20,7 +20,7 @@ import { Button, Card, Badge } from '@/components/common';
 import { useExamStore } from '@/stores';
 import { cn } from '@/utils';
 import { api } from '@/services/api';
-import type { GhanaExamTypeSlug } from '@/types';
+import type { GhanaExamTypeSlug, ExamTypeSlug } from '@/types';
 import { isGhanaExam } from '@/types';
 
 // Mock exam paper type
@@ -52,7 +52,7 @@ interface MockExamConfig {
 
 // Mock exam configurations per exam type
 // Each exam ID maps to an actual paper ID in the database for Paper 1 (objectives)
-const mockExamConfigs: Record<GhanaExamTypeSlug, MockExamConfig> = {
+const mockExamConfigs: Record<GhanaExamTypeSlug | 'igcse' | 'cambridge-a-level', MockExamConfig> = {
   wassce: {
     title: 'WASSCE Mock Exams',
     description: 'Full-length timed practice exams following WAEC format',
@@ -331,6 +331,106 @@ const mockExamConfigs: Record<GhanaExamTypeSlug, MockExamConfig> = {
       },
     ],
   },
+  igcse: {
+    title: 'Cambridge IGCSE Mock Exams',
+    description: 'Full-length timed practice exams following Cambridge O-Level format',
+    exams: [
+      {
+        id: 'pp_igcse_math_2024_1',
+        name: 'Mathematics (0580)',
+        subject: 'Mathematics',
+        papers: [
+          { type: 'Paper 1', questions: 40, duration: 60, marks: 40, format: 'Non-Calculator', paperId: 'pp_igcse_math_2024_1' },
+          { type: 'Paper 2', questions: 25, duration: 90, marks: 70, format: 'Extended', paperId: 'pp_igcse_math_2024_2' },
+        ],
+        difficulty: 'Standard',
+        color: '#8B5CF6',
+      },
+      {
+        id: 'pp_igcse_phy_2024_1',
+        name: 'Physics (0625)',
+        subject: 'Physics',
+        papers: [
+          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Multiple Choice', paperId: 'pp_igcse_phy_2024_1' },
+          { type: 'Paper 2', questions: 20, duration: 75, marks: 80, format: 'Theory', paperId: 'pp_igcse_phy_2024_2' },
+        ],
+        difficulty: 'Standard',
+        color: '#3B82F6',
+      },
+      {
+        id: 'pp_igcse_chem_2024_1',
+        name: 'Chemistry (0620)',
+        subject: 'Chemistry',
+        papers: [
+          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Multiple Choice', paperId: 'pp_igcse_chem_2024_1' },
+          { type: 'Paper 2', questions: 20, duration: 75, marks: 80, format: 'Theory', paperId: 'pp_igcse_chem_2024_2' },
+        ],
+        difficulty: 'Standard',
+        color: '#10B981',
+      },
+      {
+        id: 'pp_igcse_bio_2024_1',
+        name: 'Biology (0610)',
+        subject: 'Biology',
+        papers: [
+          { type: 'Paper 1', questions: 40, duration: 45, marks: 40, format: 'Multiple Choice', paperId: 'pp_igcse_bio_2024_1' },
+          { type: 'Paper 2', questions: 20, duration: 75, marks: 80, format: 'Theory', paperId: 'pp_igcse_bio_2024_2' },
+        ],
+        difficulty: 'Standard',
+        color: '#22C55E',
+      },
+    ],
+  },
+  'cambridge-a-level': {
+    title: 'Cambridge A-Level Mock Exams',
+    description: 'Full-length timed practice exams following Cambridge A-Level format',
+    exams: [
+      {
+        id: 'pp_alevel_math_2024_1',
+        name: 'Mathematics (9709)',
+        subject: 'Mathematics',
+        papers: [
+          { type: 'Paper 1', questions: 10, duration: 75, marks: 75, format: 'Pure Mathematics 1', paperId: 'pp_alevel_math_2024_1' },
+          { type: 'Paper 3', questions: 10, duration: 75, marks: 75, format: 'Pure Mathematics 3', paperId: 'pp_alevel_math_2024_3' },
+        ],
+        difficulty: 'Advanced',
+        color: '#7C3AED',
+      },
+      {
+        id: 'pp_alevel_phy_2024_1',
+        name: 'Physics (9702)',
+        subject: 'Physics',
+        papers: [
+          { type: 'Paper 1', questions: 40, duration: 60, marks: 40, format: 'Multiple Choice', paperId: 'pp_alevel_phy_2024_1' },
+          { type: 'Paper 2', questions: 7, duration: 75, marks: 60, format: 'AS Structured', paperId: 'pp_alevel_phy_2024_2' },
+        ],
+        difficulty: 'Advanced',
+        color: '#2563EB',
+      },
+      {
+        id: 'pp_alevel_chem_2024_1',
+        name: 'Chemistry (9701)',
+        subject: 'Chemistry',
+        papers: [
+          { type: 'Paper 1', questions: 40, duration: 60, marks: 40, format: 'Multiple Choice', paperId: 'pp_alevel_chem_2024_1' },
+          { type: 'Paper 2', questions: 6, duration: 75, marks: 60, format: 'AS Structured', paperId: 'pp_alevel_chem_2024_2' },
+        ],
+        difficulty: 'Advanced',
+        color: '#059669',
+      },
+      {
+        id: 'pp_alevel_bio_2024_1',
+        name: 'Biology (9700)',
+        subject: 'Biology',
+        papers: [
+          { type: 'Paper 1', questions: 40, duration: 60, marks: 40, format: 'Multiple Choice', paperId: 'pp_alevel_bio_2024_1' },
+          { type: 'Paper 2', questions: 6, duration: 75, marks: 60, format: 'AS Structured', paperId: 'pp_alevel_bio_2024_2' },
+        ],
+        difficulty: 'Advanced',
+        color: '#16A34A',
+      },
+    ],
+  },
 };
 
 // Exam history type
@@ -401,10 +501,21 @@ export function MockExamsPage() {
     fetchExamHistory();
   }, []);
 
-  // Get config for current exam type, default to wassce for international exams
-  const config = isGhanaExam(currentExamType)
-    ? mockExamConfigs[currentExamType]
-    : mockExamConfigs.wassce;
+  // Get config for current exam type
+  const getConfigForExamType = (examType: ExamTypeSlug): MockExamConfig => {
+    if (isGhanaExam(examType)) {
+      return mockExamConfigs[examType];
+    }
+    if (examType === 'igcse' || examType === 'edexcel-igcse') {
+      return mockExamConfigs.igcse;
+    }
+    if (examType === 'cambridge-a-level' || examType === 'cambridge-as' || examType === 'edexcel-a-level' || examType === 'edexcel-as') {
+      return mockExamConfigs['cambridge-a-level'];
+    }
+    return mockExamConfigs.wassce; // Ultimate fallback
+  };
+
+  const config = getConfigForExamType(currentExamType);
 
   const formatDuration = (minutes: number) => {
     if (minutes >= 60) {
