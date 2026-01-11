@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="public/icons/icon-192.png" alt="Brilla Logo" width="120" height="120">
+<img src="public/icons/icon-192x192.png" alt="Brilla Logo" width="120" height="120">
 
 # **Brilla Study Platform**
 
