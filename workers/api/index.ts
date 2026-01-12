@@ -28,7 +28,7 @@ import { oauthApp } from './oauth';
 import { examBoardsApp } from './exam-boards';
 import { revisionClassroomApp } from './revision-classroom';
 import { studyRoomsApp } from './study-rooms';
-import { tutorClassroomApp } from './tutor-classroom';
+import tutorClassroomApp from './tutor-classroom';
 import {
   getDailyUsage,
   checkCanAnswer,
