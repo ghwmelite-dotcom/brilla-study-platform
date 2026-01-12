@@ -108,6 +108,12 @@ const SyllabusBrowser = lazy(() => import('@/pages/SyllabusBrowser'));
 // AI Revision Classroom
 const RevisionClassroom = lazy(() => import('@/pages/RevisionClassroom'));
 
+// Multiplayer Study Rooms
+const StudyRooms = lazy(() => import('@/pages/StudyRooms'));
+
+// Immersive Learning Mode
+const ImmersiveLearning = lazy(() => import('@/pages/ImmersiveLearning'));
+
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -443,6 +449,26 @@ function App() {
           element={
             <ProtectedRoute>
               <LazyPage><RevisionClassroom /></LazyPage>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Multiplayer Study Rooms - full-screen immersive (no layout) */}
+        <Route
+          path="/study-rooms"
+          element={
+            <ProtectedRoute>
+              <LazyPage><StudyRooms /></LazyPage>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Immersive Learning Mode - zero distraction focus mode (no layout) */}
+        <Route
+          path="/immersive-learning"
+          element={
+            <ProtectedRoute>
+              <LazyPage><ImmersiveLearning /></LazyPage>
             </ProtectedRoute>
           }
         />

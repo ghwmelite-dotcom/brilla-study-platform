@@ -47,6 +47,12 @@ import {
   Percent,
   Search,
   Play,
+  Mic,
+  Focus,
+  Volume2,
+  UsersRound,
+  Maximize,
+  Headset,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { AuthModal } from '@/components/auth';
@@ -874,23 +880,27 @@ export function LandingPage() {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
   // AI Classroom preview mode toggle with auto-cycle
-  const [aiPreviewMode, setAiPreviewMode] = useState<'chat' | 'whiteboard'>('chat');
+  const [aiPreviewMode, setAiPreviewMode] = useState<'chat' | 'whiteboard' | 'voice' | 'focus'>('chat');
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const autoPlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Auto-cycle between chat and whiteboard modes
+  // Auto-cycle between all preview modes
+  const previewModes: Array<'chat' | 'whiteboard' | 'voice' | 'focus'> = ['chat', 'whiteboard', 'voice', 'focus'];
   useEffect(() => {
     if (!isAutoPlaying) return;
 
     const interval = setInterval(() => {
-      setAiPreviewMode(prev => prev === 'chat' ? 'whiteboard' : 'chat');
-    }, 5000); // Switch every 5 seconds
+      setAiPreviewMode(prev => {
+        const currentIndex = previewModes.indexOf(prev);
+        return previewModes[(currentIndex + 1) % previewModes.length];
+      });
+    }, 4000); // Switch every 4 seconds
 
     return () => clearInterval(interval);
   }, [isAutoPlaying]);
 
   // Handle manual toggle - pause auto-play briefly then resume
-  const handlePreviewModeChange = (mode: 'chat' | 'whiteboard') => {
+  const handlePreviewModeChange = (mode: 'chat' | 'whiteboard' | 'voice' | 'focus') => {
     setAiPreviewMode(mode);
     setIsAutoPlaying(false);
 
@@ -1294,36 +1304,35 @@ export function LandingPage() {
                       <div>
                         <p className="font-semibold text-white">Brilla AI Teacher</p>
                         <p className="text-xs text-white/70">
-                          {aiPreviewMode === 'chat' ? 'Teaching Phase: Explain' : 'Visual Whiteboard Mode'}
+                          {aiPreviewMode === 'chat' && 'Teaching Phase: Explain'}
+                          {aiPreviewMode === 'whiteboard' && 'Visual Whiteboard Mode'}
+                          {aiPreviewMode === 'voice' && 'Voice Conversation Mode'}
+                          {aiPreviewMode === 'focus' && 'Immersive Focus Mode'}
                         </p>
                       </div>
                     </div>
                     {/* Mode Toggle */}
-                    <div className="flex items-center gap-2 bg-white/10 rounded-full p-1">
-                      <button
-                        onClick={() => handlePreviewModeChange('chat')}
-                        className={cn(
-                          "px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1",
-                          aiPreviewMode === 'chat'
-                            ? "bg-white text-violet-600"
-                            : "text-white/70 hover:text-white"
-                        )}
-                      >
-                        <MessageCircle className="w-3 h-3" />
-                        Chat
-                      </button>
-                      <button
-                        onClick={() => handlePreviewModeChange('whiteboard')}
-                        className={cn(
-                          "px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1",
-                          aiPreviewMode === 'whiteboard'
-                            ? "bg-white text-violet-600"
-                            : "text-white/70 hover:text-white"
-                        )}
-                      >
-                        <PenTool className="w-3 h-3" />
-                        Whiteboard
-                      </button>
+                    <div className="flex items-center gap-1 bg-white/10 rounded-full p-1">
+                      {[
+                        { mode: 'chat' as const, icon: MessageCircle, label: 'Chat' },
+                        { mode: 'whiteboard' as const, icon: PenTool, label: 'Draw' },
+                        { mode: 'voice' as const, icon: Mic, label: 'Voice' },
+                        { mode: 'focus' as const, icon: Focus, label: 'Focus' },
+                      ].map(({ mode, icon: Icon, label }) => (
+                        <button
+                          key={mode}
+                          onClick={() => handlePreviewModeChange(mode)}
+                          className={cn(
+                            "px-2 sm:px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1",
+                            aiPreviewMode === mode
+                              ? "bg-white text-violet-600"
+                              : "text-white/70 hover:text-white"
+                          )}
+                        >
+                          <Icon className="w-3 h-3" />
+                          <span className="hidden sm:inline">{label}</span>
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -1507,73 +1516,245 @@ export function LandingPage() {
                     </div>
                   </>
                 )}
+
+                {/* Voice Mode Preview */}
+                {aiPreviewMode === 'voice' && (
+                  <>
+                    <div className="relative min-h-[340px] sm:min-h-[380px] bg-slate-900/90 flex flex-col items-center justify-center">
+                      {/* Ambient background */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/50 via-slate-900 to-violet-950/50" />
+
+                      {/* Central voice orb */}
+                      <div className="relative z-10 flex flex-col items-center">
+                        {/* Pulsing rings */}
+                        <div className="relative">
+                          <div className="absolute inset-0 w-32 h-32 rounded-full bg-cyan-500/20 animate-ping" style={{ animationDuration: '2s' }} />
+                          <div className="absolute inset-2 w-28 h-28 rounded-full bg-cyan-500/30 animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.3s' }} />
+                          <div className="relative w-32 h-32 rounded-full bg-gradient-to-br from-cyan-500 via-violet-500 to-fuchsia-500 flex items-center justify-center shadow-2xl shadow-cyan-500/30">
+                            <div className="absolute inset-1 rounded-full bg-gradient-to-br from-cyan-400/20 to-transparent" />
+                            <Mic className="w-12 h-12 text-white animate-pulse" />
+                          </div>
+                        </div>
+
+                        {/* Voice visualization */}
+                        <div className="flex items-end gap-1 mt-6 h-8">
+                          {[...Array(12)].map((_, i) => (
+                            <div
+                              key={i}
+                              className="w-1.5 bg-gradient-to-t from-cyan-500 to-violet-400 rounded-full animate-pulse"
+                              style={{
+                                height: `${Math.random() * 24 + 8}px`,
+                                animationDelay: `${i * 100}ms`,
+                                animationDuration: '0.5s'
+                              }}
+                            />
+                          ))}
+                        </div>
+
+                        {/* Status text */}
+                        <p className="mt-6 text-lg text-white font-medium">Listening...</p>
+                        <p className="mt-2 text-sm text-white/60">"Explain photosynthesis step by step"</p>
+                      </div>
+
+                      {/* AI Response bubble */}
+                      <div className="absolute bottom-16 left-4 right-4 animate-slide-up" style={{ animationDelay: '0.5s' }}>
+                        <div className="glass rounded-2xl p-4 border border-cyan-400/20 max-w-sm mx-auto">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Volume2 className="w-4 h-4 text-cyan-400 animate-pulse" />
+                            <span className="text-xs text-cyan-300 font-medium">AI Speaking</span>
+                          </div>
+                          <p className="text-sm text-white/80">"Photosynthesis is how plants convert sunlight into energy. Let me break it down..."</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Voice controls footer */}
+                    <div className="p-3 border-t border-white/10 bg-slate-900/50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <button className="w-10 h-10 bg-red-500/20 hover:bg-red-500/30 rounded-full flex items-center justify-center text-red-400 transition-colors ring-2 ring-red-500/50">
+                            <Mic className="w-5 h-5" />
+                          </button>
+                          <span className="text-sm text-white/70">Tap to speak</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Headset className="w-4 h-4 text-cyan-400" />
+                          <span className="text-xs text-white/50">Natural voice AI</span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Focus Mode Preview */}
+                {aiPreviewMode === 'focus' && (
+                  <>
+                    <div className="relative min-h-[340px] sm:min-h-[380px] bg-slate-950">
+                      {/* Immersive dark background */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-violet-950/20 to-slate-950" />
+
+                      {/* Subtle grid */}
+                      <div
+                        className="absolute inset-0 opacity-[0.03]"
+                        style={{
+                          backgroundImage: `
+                            linear-gradient(rgba(139, 92, 246, 0.5) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(139, 92, 246, 0.5) 1px, transparent 1px)
+                          `,
+                          backgroundSize: '40px 40px'
+                        }}
+                      />
+
+                      {/* Central content */}
+                      <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
+                        {/* Breathing AI orb */}
+                        <div className="relative mb-6">
+                          <div className="absolute inset-0 w-20 h-20 rounded-full bg-violet-500/20 animate-pulse" style={{ animationDuration: '3s' }} />
+                          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-violet-500/40 to-fuchsia-500/40 backdrop-blur-xl flex items-center justify-center border border-violet-400/20">
+                            <Sparkles className="w-8 h-8 text-violet-300" />
+                          </div>
+                        </div>
+
+                        {/* Focus content */}
+                        <div className="text-center max-w-md">
+                          <h3 className="text-xl font-semibold text-white mb-2">Zero Distractions</h3>
+                          <p className="text-white/50 text-sm mb-6">Fullscreen immersive learning with ambient sounds</p>
+
+                          {/* Feature pills */}
+                          <div className="flex flex-wrap justify-center gap-2">
+                            {[
+                              { icon: Maximize, label: 'Fullscreen' },
+                              { icon: Headphones, label: 'Lo-fi beats' },
+                              { icon: PenTool, label: 'Draw notes' },
+                              { icon: Mic, label: 'Voice chat' },
+                            ].map(({ icon: Icon, label }) => (
+                              <div key={label} className="flex items-center gap-1.5 px-3 py-1.5 glass rounded-full border border-white/10 text-xs text-white/70">
+                                <Icon className="w-3 h-3 text-violet-400" />
+                                {label}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Session stats preview */}
+                        <div className="absolute bottom-4 left-4 right-4">
+                          <div className="flex justify-center gap-6 text-center">
+                            <div>
+                              <p className="text-2xl font-bold text-white">45</p>
+                              <p className="text-xs text-white/40">minutes</p>
+                            </div>
+                            <div className="w-px bg-white/10" />
+                            <div>
+                              <p className="text-2xl font-bold text-emerald-400">12</p>
+                              <p className="text-xs text-white/40">concepts</p>
+                            </div>
+                            <div className="w-px bg-white/10" />
+                            <div>
+                              <p className="text-2xl font-bold text-violet-400">3</p>
+                              <p className="text-xs text-white/40">questions</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Focus mode footer */}
+                    <div className="p-3 border-t border-white/10 bg-slate-900/50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                          <span className="text-sm text-white/70">Focus session active</span>
+                        </div>
+                        <button className="px-4 py-1.5 bg-violet-600/20 hover:bg-violet-600/30 rounded-lg text-violet-300 text-xs font-medium transition-colors border border-violet-500/20">
+                          End Session
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Floating badges */}
-              <div className="absolute -top-4 -right-4 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-green-600 rounded-full text-white text-xs font-semibold shadow-lg animate-bounce" style={{ animationDuration: '2s' }}>
+              <div className="absolute -top-4 -right-4 px-3 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full text-white text-xs font-semibold shadow-lg animate-bounce" style={{ animationDuration: '2s' }}>
                 <div className="flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" />
-                  <span>6-Phase Teaching</span>
+                  <Mic className="w-3 h-3" />
+                  <span>Voice Enabled</span>
                 </div>
               </div>
 
-              <div className="absolute -bottom-3 -left-3 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full text-white text-xs font-semibold shadow-lg animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '2s' }}>
+              <div className="absolute -bottom-3 -left-3 px-3 py-1.5 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full text-white text-xs font-semibold shadow-lg animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '2s' }}>
                 <div className="flex items-center gap-1">
-                  <GraduationCap className="w-3 h-3" />
-                  <span>Exam Board Aligned</span>
+                  <Focus className="w-3 h-3" />
+                  <span>Focus Mode</span>
+                </div>
+              </div>
+
+              <div className="absolute top-1/2 -right-3 transform -translate-y-1/2 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-green-600 rounded-full text-white text-xs font-semibold shadow-lg animate-bounce" style={{ animationDelay: '1s', animationDuration: '2s' }}>
+                <div className="flex items-center gap-1">
+                  <UsersRound className="w-3 h-3" />
+                  <span>Study Rooms</span>
                 </div>
               </div>
             </div>
 
             {/* Right side - Features */}
             <div className="order-1 lg:order-2">
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {/* Key differentiators */}
                 {[
                   {
-                    icon: Brain,
-                    title: 'Proactive Teaching',
-                    desc: 'AI initiates and leads lessons through a proven 6-phase methodology: Hook → Explain → Check → Practice → Confirm → Connect',
-                    color: 'from-violet-500 to-purple-500'
+                    icon: Mic,
+                    title: 'Voice Conversations',
+                    desc: 'Talk naturally with your AI teacher. Ask questions, get explanations, and learn through real conversation — hands-free',
+                    color: 'from-cyan-500 to-blue-500',
+                    badge: 'NEW'
+                  },
+                  {
+                    icon: Focus,
+                    title: 'Immersive Focus Mode',
+                    desc: 'Zero-distraction fullscreen learning with ambient sounds, auto-hiding UI, and session tracking for deep focus',
+                    color: 'from-violet-500 to-purple-500',
+                    badge: 'NEW'
                   },
                   {
                     icon: PenTool,
-                    title: 'Visual Whiteboard Mode',
-                    desc: 'Watch AI draw diagrams, solve equations step-by-step, and create concept maps — like having a private tutor at a whiteboard',
-                    color: 'from-fuchsia-500 to-pink-500'
+                    title: 'Interactive Whiteboard',
+                    desc: 'Draw, annotate, and collaborate while AI explains. Circle anything to ask questions — just like a real classroom',
+                    color: 'from-fuchsia-500 to-pink-500',
+                    badge: 'NEW'
                   },
                   {
-                    icon: Target,
-                    title: 'Exam-Board Aligned',
-                    desc: 'Curriculum perfectly matched to BECE, WASSCE, IGCSE, Cambridge & Edexcel A-Levels with exam-specific strategies',
-                    color: 'from-emerald-500 to-green-500'
+                    icon: UsersRound,
+                    title: 'AI Study Rooms',
+                    desc: 'Invite friends to study together with a shared AI tutor. Real-time collaboration with multiplayer whiteboards',
+                    color: 'from-emerald-500 to-green-500',
+                    badge: 'NEW'
                   },
                   {
-                    icon: MessageCircle,
-                    title: 'Ask Anything, Anytime',
-                    desc: 'Interrupt at any point to ask questions. Get instant clarification without breaking your learning flow',
-                    color: 'from-blue-500 to-cyan-500'
-                  },
-                  {
-                    icon: TrendingUp,
-                    title: 'Mastery Tracking',
-                    desc: 'Smart spaced repetition ensures you remember what you learn. Topics due for review are automatically scheduled',
+                    icon: Brain,
+                    title: '6-Phase Teaching',
+                    desc: 'AI leads lessons through Hook → Explain → Check → Practice → Confirm → Connect for complete mastery',
                     color: 'from-amber-500 to-orange-500'
                   },
                 ].map((feature, i) => (
                   <div
                     key={i}
-                    className="group flex items-start gap-4 p-4 rounded-xl glass border border-white/10 hover:border-violet-400/30 transition-all"
+                    className="group relative flex items-start gap-4 p-4 rounded-xl glass border border-white/10 hover:border-violet-400/30 transition-all"
                   >
+                    {'badge' in feature && feature.badge && (
+                      <span className="absolute -top-2 -right-2 px-2 py-0.5 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-[10px] font-bold rounded-full shadow-lg">
+                        {feature.badge}
+                      </span>
+                    )}
                     <div className={cn(
-                      "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform",
+                      "w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform",
                       feature.color
                     )}>
-                      <feature.icon className="w-6 h-6 text-white" />
+                      <feature.icon className="w-5 h-5 text-white" />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-white mb-1">{feature.title}</h3>
-                      <p className="text-sm text-white/60 leading-relaxed">{feature.desc}</p>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-white mb-0.5 text-sm">{feature.title}</h3>
+                      <p className="text-xs text-white/60 leading-relaxed">{feature.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -1606,14 +1787,14 @@ export function LandingPage() {
           <div className="mt-16 pt-8 border-t border-white/10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {[
-                { value: '6', label: 'Teaching Phases', icon: BookOpen },
-                { value: '2', label: 'Learning Modes', icon: PenTool },
-                { value: '100%', label: 'Visual Learning', icon: Presentation },
-                { value: '24/7', label: 'Available', icon: Zap },
+                { value: '4', label: 'Learning Modes', icon: Sparkles, color: 'text-violet-400' },
+                { value: '∞', label: 'Voice Conversations', icon: Mic, color: 'text-cyan-400' },
+                { value: '100%', label: 'Immersive Focus', icon: Focus, color: 'text-fuchsia-400' },
+                { value: '24/7', label: 'Always Available', icon: Zap, color: 'text-amber-400' },
               ].map((stat, i) => (
                 <div key={i} className="group">
                   <div className="flex items-center justify-center gap-2 mb-1">
-                    <stat.icon className="w-5 h-5 text-violet-400 group-hover:scale-110 transition-transform" />
+                    <stat.icon className={cn("w-5 h-5 group-hover:scale-110 transition-transform", stat.color)} />
                     <span className="text-3xl md:text-4xl font-bold text-white">{stat.value}</span>
                   </div>
                   <p className="text-sm text-white/50">{stat.label}</p>

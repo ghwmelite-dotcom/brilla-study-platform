@@ -21,8 +21,11 @@ import {
   BarChart3,
   Presentation,
   MessageSquare,
+  Mic,
+  Focus,
 } from 'lucide-react';
 import { AIWhiteboardTeacher } from '@/components/whiteboard/AIWhiteboardTeacher';
+import { VoiceConversation } from '@/components/voice/VoiceConversation';
 import {
   useAuthStore,
   useExamStore,
@@ -501,6 +504,8 @@ export default function RevisionClassroom() {
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showSubjectSelector, setShowSubjectSelector] = useState(!currentSession);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [isVoiceProcessing, setIsVoiceProcessing] = useState(false);
 
   // Get exam type info
   const examTypeInfo = examTypes.find(e => e.slug === currentExamType);
@@ -545,6 +550,34 @@ export default function RevisionClassroom() {
       pauseSession();
     }
     navigate(-1);
+  };
+
+  // Handle voice message - sends to AI and returns spoken response
+  const handleVoiceMessage = async (text: string): Promise<string> => {
+    setIsVoiceProcessing(true);
+    try {
+      // Send to AI tutor and get response
+      await askQuestion(text);
+      // Return the latest AI message for TTS
+      // The AI response will be available in aiMessages after askQuestion completes
+      // For now, return a placeholder that will be replaced by actual response
+      const latestAiMessage = aiMessages[aiMessages.length - 1]?.aiMessage ||
+        "I received your question. Let me help you with that.";
+      return latestAiMessage;
+    } catch (error) {
+      console.error('Voice message error:', error);
+      return "I'm sorry, I couldn't process your question. Please try again.";
+    } finally {
+      setIsVoiceProcessing(false);
+    }
+  };
+
+  // Handle voice transcript (for display in chat)
+  const handleVoiceTranscript = (text: string, isFinal: boolean) => {
+    if (isFinal && text.trim()) {
+      // The transcript is final, it will be sent via handleVoiceMessage
+      console.log('Voice transcript:', text);
+    }
   };
 
   // Show subject selector if no session
@@ -690,6 +723,35 @@ export default function RevisionClassroom() {
               </button>
             </div>
 
+            {/* Voice toggle */}
+            <button
+              onClick={() => setVoiceEnabled(!voiceEnabled)}
+              className={`p-2 rounded-lg transition-all ${
+                voiceEnabled
+                  ? 'bg-emerald-500 text-white shadow-md'
+                  : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-600'
+              }`}
+              title={voiceEnabled ? 'Disable voice' : 'Enable voice conversation'}
+            >
+              <Mic className="w-5 h-5" />
+            </button>
+
+            {/* Focus Mode button */}
+            <button
+              onClick={() => {
+                const params = new URLSearchParams();
+                if (currentSession?.subjectId) params.set('subject', currentSession.subjectId);
+                if (currentLesson?.topicId) params.set('topic', currentLesson.topicId);
+                if (currentLesson?.id) params.set('lesson', currentLesson.id);
+                navigate(`/immersive-learning?${params.toString()}`);
+              }}
+              className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white rounded-lg shadow-md transition-all"
+              title="Enter Focus Mode - Zero distraction learning"
+            >
+              <Focus className="w-4 h-4" />
+              <span className="text-sm font-medium hidden sm:inline">Focus Mode</span>
+            </button>
+
             {/* Session controls */}
             <div className="flex items-center gap-2">
               <button
@@ -742,6 +804,22 @@ export default function RevisionClassroom() {
           )}
         </div>
       </div>
+
+      {/* Voice Conversation - Floating mode */}
+      {voiceEnabled && currentLesson && (
+        <VoiceConversation
+          onTranscript={handleVoiceTranscript}
+          onSendMessage={handleVoiceMessage}
+          isProcessing={isVoiceProcessing || aiTeachingState.isThinking}
+          mode="floating"
+          autoSpeak={true}
+          voiceSettings={{
+            rate: 0.95,
+            pitch: 1.0,
+            volume: 1.0,
+          }}
+        />
+      )}
 
       {/* Error toast */}
       {error && (
