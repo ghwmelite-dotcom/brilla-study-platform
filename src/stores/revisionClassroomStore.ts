@@ -185,6 +185,34 @@ interface RevisionClassroomState {
   isWhiteboardLoading: boolean;
   whiteboardMode: boolean;
 
+  // Tutor Integration
+  tutorPresence: {
+    isConnected: boolean;
+    tutorId?: string;
+    tutorName?: string;
+    tutorAvatarUrl?: string;
+    mode: 'observe' | 'co_teach' | 'takeover' | null;
+    joinedAt?: string;
+  } | null;
+
+  struggleSignals: {
+    consecutiveWrongAnswers: number;
+    timeStuckSeconds: number;
+    repeatedQuestionsCount: number;
+    clarificationRequestsCount: number;
+    struggleScore: number;
+    lastActivityAt: string;
+  };
+
+  handoffState: {
+    status: 'none' | 'suggested' | 'requested' | 'pending' | 'connected' | 'declined';
+    reason?: string;
+    suggestedAt?: string;
+    requestedAt?: string;
+  };
+
+  aiSessionId: string | null; // ID for tutor observation system
+
   // Statistics
   stats: {
     totalTimeMinutes: number;
@@ -239,6 +267,13 @@ interface RevisionClassroomState {
   updateTopicMastery: (topicId: string, examType: string, updates: Partial<TopicMastery>) => Promise<void>;
   fetchTopicMastery: (examType?: string, subjectId?: string) => Promise<void>;
   fetchDueTopics: (examType?: string) => Promise<TopicMastery[]>;
+
+  // Actions - Tutor Integration
+  updateStruggleSignals: (updates: Partial<RevisionClassroomState['struggleSignals']>) => void;
+  requestHumanTutor: (reason?: string) => Promise<void>;
+  acceptHandoffSuggestion: () => Promise<void>;
+  declineHandoffSuggestion: () => void;
+  dismissTutor: () => Promise<void>;
 
   // Actions - Utility
   fetchPastSessions: (status?: string, examType?: string) => Promise<void>;
@@ -366,6 +401,19 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
       whiteboardContent: null,
       isWhiteboardLoading: false,
       whiteboardMode: false,
+      tutorPresence: null,
+      struggleSignals: {
+        consecutiveWrongAnswers: 0,
+        timeStuckSeconds: 0,
+        repeatedQuestionsCount: 0,
+        clarificationRequestsCount: 0,
+        struggleScore: 0,
+        lastActivityAt: new Date().toISOString(),
+      },
+      handoffState: {
+        status: 'none',
+      },
+      aiSessionId: null,
       stats: null,
       isLoading: false,
       error: null,
@@ -1009,6 +1057,114 @@ Does this help? Feel free to ask more questions!`;
 
       clearWhiteboardContent: () => {
         set({ whiteboardContent: null, whiteboardMode: false });
+      },
+
+      // =============================================
+      // TUTOR INTEGRATION ACTIONS
+      // =============================================
+
+      updateStruggleSignals: (updates) => {
+        const { struggleSignals } = get();
+
+        // Calculate struggle score based on weighted signals
+        const updatedSignals = { ...struggleSignals, ...updates, lastActivityAt: new Date().toISOString() };
+
+        const wrongAnswerScore = Math.min(updatedSignals.consecutiveWrongAnswers * 25, 100) * 0.25;
+        const timeStuckScore = Math.min(updatedSignals.timeStuckSeconds / 3, 100) * 0.25;
+        const repeatedScore = Math.min(updatedSignals.repeatedQuestionsCount * 20, 100) * 0.20;
+        const clarificationScore = Math.min(updatedSignals.clarificationRequestsCount * 25, 100) * 0.30;
+
+        const struggleScore = wrongAnswerScore + timeStuckScore + repeatedScore + clarificationScore;
+        updatedSignals.struggleScore = Math.round(struggleScore);
+
+        // Auto-suggest handoff if struggle score exceeds threshold
+        const { handoffState, aiSessionId } = get();
+        if (struggleScore >= 60 && handoffState.status === 'none') {
+          set({
+            struggleSignals: updatedSignals,
+            handoffState: {
+              status: 'suggested',
+              suggestedAt: new Date().toISOString(),
+            },
+          });
+
+          // Notify API about high struggle (for tutor observation dashboard)
+          if (aiSessionId) {
+            api.post(`/tutor-classroom/ai-sessions/${aiSessionId}/struggle-update`, {
+              struggleScore: updatedSignals.struggleScore,
+              signals: updatedSignals,
+            }).catch(console.error);
+          }
+        } else {
+          set({ struggleSignals: updatedSignals });
+        }
+      },
+
+      requestHumanTutor: async (reason) => {
+        const { aiSessionId, currentSession } = get();
+        if (!aiSessionId && !currentSession) return;
+
+        try {
+          await api.post('/tutor-classroom/student/request-handoff', {
+            aiSessionId,
+            reason,
+          });
+
+          set({
+            handoffState: {
+              status: 'requested',
+              reason,
+              requestedAt: new Date().toISOString(),
+            },
+          });
+        } catch (error: any) {
+          console.error('Failed to request tutor:', error);
+          set({ error: error.message || 'Failed to request tutor' });
+        }
+      },
+
+      acceptHandoffSuggestion: async () => {
+        const { aiSessionId } = get();
+        if (!aiSessionId) return;
+
+        try {
+          await api.post('/tutor-classroom/student/accept-handoff-suggestion', {
+            aiSessionId,
+          });
+
+          set({
+            handoffState: {
+              status: 'pending',
+              requestedAt: new Date().toISOString(),
+            },
+          });
+        } catch (error: any) {
+          console.error('Failed to accept handoff:', error);
+        }
+      },
+
+      declineHandoffSuggestion: () => {
+        set({
+          handoffState: {
+            status: 'none',
+          },
+        });
+      },
+
+      dismissTutor: async () => {
+        const { aiSessionId } = get();
+        if (!aiSessionId) return;
+
+        try {
+          await api.post('/tutor-classroom/student/dismiss-tutor', { aiSessionId });
+
+          set({
+            tutorPresence: null,
+            handoffState: { status: 'none' },
+          });
+        } catch (error: any) {
+          console.error('Failed to dismiss tutor:', error);
+        }
       },
 
       // =============================================

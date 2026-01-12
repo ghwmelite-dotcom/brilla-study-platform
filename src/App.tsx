@@ -90,6 +90,7 @@ const TutoringRequests = lazy(() => import('@/pages/TutoringRequests'));
 const TutoringSessions = lazy(() => import('@/pages/TutoringSessions'));
 const TeacherTutoringDashboard = lazy(() => import('@/pages/TeacherTutoringDashboard'));
 const TeacherBonusStatus = lazy(() => import('@/pages/TeacherBonusStatus'));
+const TutorObservationDashboard = lazy(() => import('@/pages/TutorObservationDashboard'));
 
 // Exam mode pages (full-screen distraction-free)
 const ExamModePractice = lazy(() => import('@/pages/ExamModePractice'));
@@ -747,6 +748,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <LazyPage><TutoringSessions /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="tutor-classroom"
+            element={
+              <ProtectedRoute>
+                <LazyPage><TutorObservationDashboard /></LazyPage>
               </ProtectedRoute>
             }
           />

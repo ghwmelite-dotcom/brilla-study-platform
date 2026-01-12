@@ -7,6 +7,7 @@ import { AIPresenceIndicator } from './AIPresenceIndicator';
 import { AmbientSounds } from './AmbientSounds';
 import { SessionSummary } from './SessionSummary';
 import { VoiceConversation } from '../voice/VoiceConversation';
+import { TutorConnectPrompt, TutorPresenceIndicator } from '../tutor-classroom';
 import { useRevisionClassroomStore } from '@/stores/revisionClassroomStore';
 import { cn } from '@/utils';
 
@@ -36,9 +37,14 @@ export function ImmersiveClassroom({
     currentLesson,
     aiTeachingState,
     aiMessages,
+    tutorPresence,
+    handoffState,
     startLesson,
     askQuestion,
     pauseSession,
+    acceptHandoffSuggestion,
+    declineHandoffSuggestion,
+    dismissTutor,
   } = useRevisionClassroomStore();
 
   // State
@@ -426,6 +432,28 @@ export function ImmersiveClassroom({
             )}
           </AnimatePresence>
         </motion.div>
+      )}
+
+      {/* Tutor Presence Indicator */}
+      {tutorPresence?.isConnected && (
+        <TutorPresenceIndicator
+          isConnected={tutorPresence.isConnected}
+          tutorName={tutorPresence.tutorName}
+          tutorAvatarUrl={tutorPresence.tutorAvatarUrl}
+          mode={tutorPresence.mode}
+          onDismiss={tutorPresence.mode === 'observe' ? dismissTutor : undefined}
+        />
+      )}
+
+      {/* Tutor Connect Prompt */}
+      {handoffState.status !== 'none' && handoffState.status !== 'connected' && (
+        <TutorConnectPrompt
+          status={handoffState.status}
+          onAccept={acceptHandoffSuggestion}
+          onDecline={declineHandoffSuggestion}
+          onClose={declineHandoffSuggestion}
+          tutorName={tutorPresence?.tutorName}
+        />
       )}
 
       {/* Session Summary */}

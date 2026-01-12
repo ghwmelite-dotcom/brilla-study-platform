@@ -28,6 +28,7 @@ import { oauthApp } from './oauth';
 import { examBoardsApp } from './exam-boards';
 import { revisionClassroomApp } from './revision-classroom';
 import { studyRoomsApp } from './study-rooms';
+import { tutorClassroomApp } from './tutor-classroom';
 import {
   getDailyUsage,
   checkCanAnswer,
@@ -10248,6 +10249,7 @@ app.route('/api/engagement', engagementApp);
 app.route('/api/friends', friendsApp);
 app.route('/api/revision-classroom', revisionClassroomApp);
 app.route('/api/study-rooms', studyRoomsApp);
+app.route('/api/tutor-classroom', tutorClassroomApp);
 
 // Mount OAuth routes (public with internal auth handling)
 app.route('/api/auth/oauth', oauthApp);

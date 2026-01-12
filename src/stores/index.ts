@@ -70,3 +70,16 @@ export type {
   LessonStatus,
   ConfidenceLevel,
 } from './revisionClassroomStore';
+export { useTutorClassroomStore } from './tutorClassroomStore';
+export type {
+  TutorAvailability,
+  ObservableSession,
+  TutorObservation,
+  TutorClassroomEvent,
+  ScheduledSession,
+  HandoffRequest,
+  CoTeachState,
+  HandoffStatus,
+  TutorMode,
+  AnnotationType,
+} from './tutorClassroomStore';
