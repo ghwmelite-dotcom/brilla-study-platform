@@ -1340,7 +1340,7 @@ export function LandingPage() {
                 {/* Chat Mode Preview */}
                 {aiPreviewMode === 'chat' && (
                   <>
-                    <div className="p-4 space-y-3 min-h-[220px] bg-slate-900/80">
+                    <div className="p-3 sm:p-4 space-y-3 min-h-[280px] sm:min-h-[320px] bg-slate-900/80">
                       {/* AI Message 1 */}
                       <div className="flex gap-2">
                         <div className="w-7 h-7 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
@@ -1400,7 +1400,7 @@ export function LandingPage() {
                 {/* Whiteboard Mode Preview */}
                 {aiPreviewMode === 'whiteboard' && (
                   <>
-                    <div className="relative min-h-[340px] sm:min-h-[380px] bg-slate-900/90">
+                    <div className="relative min-h-[320px] sm:min-h-[380px] bg-slate-900/90">
                       {/* Whiteboard Canvas Area */}
                       <div className="absolute inset-0 bg-gradient-to-br from-slate-800/50 to-slate-900/50">
                         {/* Grid pattern */}
@@ -1520,30 +1520,30 @@ export function LandingPage() {
                 {/* Voice Mode Preview */}
                 {aiPreviewMode === 'voice' && (
                   <>
-                    <div className="relative min-h-[340px] sm:min-h-[380px] bg-slate-900/90 flex flex-col items-center justify-center">
+                    <div className="relative min-h-[320px] sm:min-h-[380px] bg-slate-900/90 flex flex-col items-center justify-center">
                       {/* Ambient background */}
                       <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/50 via-slate-900 to-violet-950/50" />
 
                       {/* Central voice orb */}
                       <div className="relative z-10 flex flex-col items-center">
-                        {/* Pulsing rings */}
+                        {/* Pulsing rings - responsive sizes */}
                         <div className="relative">
-                          <div className="absolute inset-0 w-32 h-32 rounded-full bg-cyan-500/20 animate-ping" style={{ animationDuration: '2s' }} />
-                          <div className="absolute inset-2 w-28 h-28 rounded-full bg-cyan-500/30 animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.3s' }} />
-                          <div className="relative w-32 h-32 rounded-full bg-gradient-to-br from-cyan-500 via-violet-500 to-fuchsia-500 flex items-center justify-center shadow-2xl shadow-cyan-500/30">
+                          <div className="absolute inset-0 w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-cyan-500/20 animate-ping" style={{ animationDuration: '2s' }} />
+                          <div className="absolute inset-2 w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-cyan-500/30 animate-ping" style={{ animationDuration: '1.5s', animationDelay: '0.3s' }} />
+                          <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-cyan-500 via-violet-500 to-fuchsia-500 flex items-center justify-center shadow-2xl shadow-cyan-500/30">
                             <div className="absolute inset-1 rounded-full bg-gradient-to-br from-cyan-400/20 to-transparent" />
-                            <Mic className="w-12 h-12 text-white animate-pulse" />
+                            <Mic className="w-10 h-10 sm:w-12 sm:h-12 text-white animate-pulse" />
                           </div>
                         </div>
 
-                        {/* Voice visualization */}
-                        <div className="flex items-end gap-1 mt-6 h-8">
-                          {[...Array(12)].map((_, i) => (
+                        {/* Voice visualization - fewer bars on mobile */}
+                        <div className="flex items-end gap-0.5 sm:gap-1 mt-4 sm:mt-6 h-6 sm:h-8">
+                          {[...Array(8)].map((_, i) => (
                             <div
                               key={i}
-                              className="w-1.5 bg-gradient-to-t from-cyan-500 to-violet-400 rounded-full animate-pulse"
+                              className="w-1 sm:w-1.5 bg-gradient-to-t from-cyan-500 to-violet-400 rounded-full animate-pulse"
                               style={{
-                                height: `${Math.random() * 24 + 8}px`,
+                                height: `${Math.random() * 20 + 6}px`,
                                 animationDelay: `${i * 100}ms`,
                                 animationDuration: '0.5s'
                               }}
@@ -1552,18 +1552,18 @@ export function LandingPage() {
                         </div>
 
                         {/* Status text */}
-                        <p className="mt-6 text-lg text-white font-medium">Listening...</p>
-                        <p className="mt-2 text-sm text-white/60">"Explain photosynthesis step by step"</p>
+                        <p className="mt-4 sm:mt-6 text-base sm:text-lg text-white font-medium">Listening...</p>
+                        <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-white/60 px-4 text-center">"Explain photosynthesis step by step"</p>
                       </div>
 
                       {/* AI Response bubble */}
-                      <div className="absolute bottom-16 left-4 right-4 animate-slide-up" style={{ animationDelay: '0.5s' }}>
-                        <div className="glass rounded-2xl p-4 border border-cyan-400/20 max-w-sm mx-auto">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Volume2 className="w-4 h-4 text-cyan-400 animate-pulse" />
-                            <span className="text-xs text-cyan-300 font-medium">AI Speaking</span>
+                      <div className="absolute bottom-12 sm:bottom-16 left-3 right-3 sm:left-4 sm:right-4 animate-slide-up" style={{ animationDelay: '0.5s' }}>
+                        <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-cyan-400/20 max-w-sm mx-auto">
+                          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+                            <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400 animate-pulse" />
+                            <span className="text-[10px] sm:text-xs text-cyan-300 font-medium">AI Speaking</span>
                           </div>
-                          <p className="text-sm text-white/80">"Photosynthesis is how plants convert sunlight into energy. Let me break it down..."</p>
+                          <p className="text-xs sm:text-sm text-white/80">"Photosynthesis is how plants convert sunlight into energy..."</p>
                         </div>
                       </div>
                     </div>
@@ -1589,7 +1589,7 @@ export function LandingPage() {
                 {/* Focus Mode Preview */}
                 {aiPreviewMode === 'focus' && (
                   <>
-                    <div className="relative min-h-[340px] sm:min-h-[380px] bg-slate-950">
+                    <div className="relative min-h-[320px] sm:min-h-[380px] bg-slate-950">
                       {/* Immersive dark background */}
                       <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-violet-950/20 to-slate-950" />
 
@@ -1606,52 +1606,52 @@ export function LandingPage() {
                       />
 
                       {/* Central content */}
-                      <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
+                      <div className="relative z-10 h-full flex flex-col items-center justify-center p-4 sm:p-6">
                         {/* Breathing AI orb */}
-                        <div className="relative mb-6">
-                          <div className="absolute inset-0 w-20 h-20 rounded-full bg-violet-500/20 animate-pulse" style={{ animationDuration: '3s' }} />
-                          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-violet-500/40 to-fuchsia-500/40 backdrop-blur-xl flex items-center justify-center border border-violet-400/20">
-                            <Sparkles className="w-8 h-8 text-violet-300" />
+                        <div className="relative mb-4 sm:mb-6">
+                          <div className="absolute inset-0 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-violet-500/20 animate-pulse" style={{ animationDuration: '3s' }} />
+                          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-violet-500/40 to-fuchsia-500/40 backdrop-blur-xl flex items-center justify-center border border-violet-400/20">
+                            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-violet-300" />
                           </div>
                         </div>
 
                         {/* Focus content */}
-                        <div className="text-center max-w-md">
-                          <h3 className="text-xl font-semibold text-white mb-2">Zero Distractions</h3>
-                          <p className="text-white/50 text-sm mb-6">Fullscreen immersive learning with ambient sounds</p>
+                        <div className="text-center max-w-md px-2">
+                          <h3 className="text-lg sm:text-xl font-semibold text-white mb-1.5 sm:mb-2">Zero Distractions</h3>
+                          <p className="text-white/50 text-xs sm:text-sm mb-4 sm:mb-6">Fullscreen immersive learning with ambient sounds</p>
 
-                          {/* Feature pills */}
-                          <div className="flex flex-wrap justify-center gap-2">
+                          {/* Feature pills - 2x2 grid on mobile, row on desktop */}
+                          <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-1.5 sm:gap-2">
                             {[
                               { icon: Maximize, label: 'Fullscreen' },
                               { icon: Headphones, label: 'Lo-fi beats' },
                               { icon: PenTool, label: 'Draw notes' },
                               { icon: Mic, label: 'Voice chat' },
                             ].map(({ icon: Icon, label }) => (
-                              <div key={label} className="flex items-center gap-1.5 px-3 py-1.5 glass rounded-full border border-white/10 text-xs text-white/70">
-                                <Icon className="w-3 h-3 text-violet-400" />
+                              <div key={label} className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 glass rounded-full border border-white/10 text-[10px] sm:text-xs text-white/70">
+                                <Icon className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-violet-400" />
                                 {label}
                               </div>
                             ))}
                           </div>
                         </div>
 
-                        {/* Session stats preview */}
-                        <div className="absolute bottom-4 left-4 right-4">
-                          <div className="flex justify-center gap-6 text-center">
+                        {/* Session stats preview - responsive spacing */}
+                        <div className="absolute bottom-3 sm:bottom-4 left-2 right-2 sm:left-4 sm:right-4">
+                          <div className="flex justify-center gap-4 sm:gap-6 text-center">
                             <div>
-                              <p className="text-2xl font-bold text-white">45</p>
-                              <p className="text-xs text-white/40">minutes</p>
+                              <p className="text-xl sm:text-2xl font-bold text-white">45</p>
+                              <p className="text-[10px] sm:text-xs text-white/40">minutes</p>
                             </div>
                             <div className="w-px bg-white/10" />
                             <div>
-                              <p className="text-2xl font-bold text-emerald-400">12</p>
-                              <p className="text-xs text-white/40">concepts</p>
+                              <p className="text-xl sm:text-2xl font-bold text-emerald-400">12</p>
+                              <p className="text-[10px] sm:text-xs text-white/40">concepts</p>
                             </div>
                             <div className="w-px bg-white/10" />
                             <div>
-                              <p className="text-2xl font-bold text-violet-400">3</p>
-                              <p className="text-xs text-white/40">questions</p>
+                              <p className="text-xl sm:text-2xl font-bold text-violet-400">3</p>
+                              <p className="text-[10px] sm:text-xs text-white/40">questions</p>
                             </div>
                           </div>
                         </div>
