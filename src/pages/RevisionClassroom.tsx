@@ -612,6 +612,8 @@ export default function RevisionClassroom() {
     setSessionError('');
 
     try {
+      console.log('Starting revision session...', { userId: user.id, examType: currentExamType, subjectId, subjectName });
+
       await startRevisionSession(
         user.id,
         currentExamType,
@@ -619,14 +621,29 @@ export default function RevisionClassroom() {
         subjectName
       );
 
-      // Check if there was an error in the store
-      const storeError = useRevisionClassroomStore.getState().error;
-      if (storeError) {
-        setSessionError(storeError);
+      // Wait a moment for state to update
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Check the store state after the call
+      const storeState = useRevisionClassroomStore.getState();
+      console.log('Store state after startRevisionSession:', {
+        currentSession: storeState.currentSession,
+        error: storeState.error,
+        isLoading: storeState.isLoading,
+      });
+
+      if (storeState.error) {
+        setSessionError(storeState.error);
+        setIsStartingSession(false);
         return;
       }
 
-      setShowSubjectSelector(false);
+      if (storeState.currentSession) {
+        // Session created successfully
+        setShowSubjectSelector(false);
+      } else {
+        setSessionError('Session could not be created. Please check your connection and try again.');
+      }
     } catch (err) {
       console.error('Failed to start session:', err);
       setSessionError(err instanceof Error ? err.message : 'Failed to start session. Please try again.');
