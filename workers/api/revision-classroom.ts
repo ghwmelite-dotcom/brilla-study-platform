@@ -620,10 +620,11 @@ revisionClassroomApp.get('/lessons/:lessonId', async (c) => {
       ORDER BY order_index ASC
     `).bind(lessonId).all();
 
-    // Get user's responses to checkpoints
+    // Get user's responses to checkpoints (join through checkpoints table)
     const responses = await c.env.DB.prepare(`
-      SELECT * FROM checkpoint_responses
-      WHERE lesson_id = ? AND user_id = ?
+      SELECT cr.* FROM checkpoint_responses cr
+      JOIN revision_checkpoints rc ON cr.checkpoint_id = rc.id
+      WHERE rc.lesson_id = ? AND cr.user_id = ?
     `).bind(lessonId, user.userId).all();
 
     return c.json({
