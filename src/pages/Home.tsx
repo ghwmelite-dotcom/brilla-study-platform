@@ -17,6 +17,9 @@ import {
   Play,
   BookOpen,
   TrendingUp,
+  X,
+  HelpCircle,
+  ChevronRight,
 } from 'lucide-react';
 import { Card, Button, Badge } from '@/components/common';
 import { useAuthStore } from '@/stores';
@@ -31,6 +34,7 @@ import * as Icons from 'lucide-react';
 function AIRevisionShowcase() {
   const [currentPhase, setCurrentPhase] = useState(0);
   const [messageIndex, setMessageIndex] = useState(0);
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
 
   const phases = ['Hook', 'Explain', 'Check', 'Practice', 'Confirm', 'Connect'];
 
@@ -142,11 +146,13 @@ function AIRevisionShowcase() {
                   <div className="absolute inset-0 bg-gradient-to-r from-violet-400 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>
               </Link>
-              <Link to="/revision-classroom">
-                <button className="px-6 py-3 border-2 border-violet-400/30 rounded-xl font-semibold text-violet-200 hover:bg-violet-500/10 hover:border-violet-400/50 transition-all duration-300">
-                  See How It Works
-                </button>
-              </Link>
+              <button
+                onClick={() => setShowHowItWorks(true)}
+                className="px-6 py-3 border-2 border-violet-400/30 rounded-xl font-semibold text-violet-200 hover:bg-violet-500/10 hover:border-violet-400/50 transition-all duration-300 flex items-center gap-2"
+              >
+                <HelpCircle className="w-5 h-5" />
+                See How It Works
+              </button>
             </div>
           </div>
 
@@ -270,6 +276,162 @@ function AIRevisionShowcase() {
           </div>
         </div>
       </div>
+
+      {/* How It Works Modal */}
+      {showHowItWorks && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setShowHowItWorks(false)}
+          />
+
+          {/* Modal Content */}
+          <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-neutral-900 via-violet-950/50 to-neutral-900 rounded-2xl border border-violet-500/20 shadow-2xl">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowHowItWorks(false)}
+              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Header */}
+            <div className="bg-gradient-to-r from-violet-600 to-purple-600 p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Brain className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white">How Your AI Teacher Works</h3>
+                  <p className="text-violet-200">The 6-Phase Teaching Method</p>
+                </div>
+              </div>
+              <p className="text-white/80 mt-4">
+                Unlike traditional AI chatbots that only respond to questions, our AI Teacher proactively guides you through concepts using a proven 6-phase pedagogical approach.
+              </p>
+            </div>
+
+            {/* Phases Grid */}
+            <div className="p-6 md:p-8">
+              <div className="grid md:grid-cols-2 gap-4 mb-8">
+                {[
+                  {
+                    phase: 1,
+                    name: 'Hook',
+                    icon: Lightbulb,
+                    color: 'from-amber-500 to-orange-500',
+                    description: 'Captures your attention with an intriguing question or real-world scenario that relates to what you\'re about to learn.',
+                    example: '"Have you ever wondered why ice floats on water when most solids sink?"'
+                  },
+                  {
+                    phase: 2,
+                    name: 'Explain',
+                    icon: BookOpen,
+                    color: 'from-blue-500 to-cyan-500',
+                    description: 'Breaks down the concept into digestible pieces, using analogies and examples tailored to your level.',
+                    example: 'Clear explanations with diagrams, analogies, and step-by-step breakdowns of complex ideas.'
+                  },
+                  {
+                    phase: 3,
+                    name: 'Check',
+                    icon: HelpCircle,
+                    color: 'from-violet-500 to-purple-500',
+                    description: 'Verifies your understanding with targeted questions before moving forward.',
+                    example: '"Can you explain in your own words why hydrogen bonds make ice less dense?"'
+                  },
+                  {
+                    phase: 4,
+                    name: 'Practice',
+                    icon: Target,
+                    color: 'from-green-500 to-emerald-500',
+                    description: 'Provides practice problems that reinforce the concept and build your confidence.',
+                    example: 'Interactive exercises, worked examples, and problems of increasing difficulty.'
+                  },
+                  {
+                    phase: 5,
+                    name: 'Confirm',
+                    icon: CheckCircle2,
+                    color: 'from-teal-500 to-cyan-500',
+                    description: 'Ensures you\'ve truly mastered the topic before marking it complete.',
+                    example: 'Summary questions and self-assessment to verify deep understanding.'
+                  },
+                  {
+                    phase: 6,
+                    name: 'Connect',
+                    icon: Sparkles,
+                    color: 'from-pink-500 to-rose-500',
+                    description: 'Links new knowledge to what you already know and previews related topics.',
+                    example: '"This connects to what you learned about molecular structure. Next, we\'ll explore..."'
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.phase}
+                    className="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+                  >
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className={cn(
+                        "w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center flex-shrink-0",
+                        item.color
+                      )}>
+                        <item.icon className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-violet-400">PHASE {item.phase}</span>
+                        </div>
+                        <h4 className="font-semibold text-white text-lg">{item.name}</h4>
+                      </div>
+                    </div>
+                    <p className="text-sm text-neutral-300 mb-2">{item.description}</p>
+                    <p className="text-xs text-violet-300/70 italic">"{item.example}"</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Key Benefits */}
+              <div className="bg-gradient-to-r from-violet-500/10 to-purple-500/10 rounded-xl p-6 border border-violet-500/20 mb-6">
+                <h4 className="font-semibold text-white mb-4 flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-violet-400" />
+                  Why This Approach Works
+                </h4>
+                <ul className="space-y-3">
+                  {[
+                    'Active learning through questioning, not passive reading',
+                    'Personalized pacing - move faster or slower based on your understanding',
+                    'Immediate feedback on your answers and misconceptions',
+                    'Exam-aligned content designed for WASSCE/BECE success',
+                    'Available 24/7 - study whenever works best for you',
+                  ].map((benefit, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-neutral-300">
+                      <ChevronRight className="w-4 h-4 text-violet-400 mt-0.5 flex-shrink-0" />
+                      {benefit}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* CTA */}
+              <div className="flex flex-wrap gap-4 justify-center">
+                <Link to="/revision-classroom">
+                  <button className="group relative px-8 py-3 bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl font-semibold text-white shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all duration-300 hover:scale-105">
+                    <span className="flex items-center gap-2">
+                      <Play className="w-5 h-5" />
+                      Start Learning Now
+                    </span>
+                  </button>
+                </Link>
+                <button
+                  onClick={() => setShowHowItWorks(false)}
+                  className="px-6 py-3 border-2 border-violet-400/30 rounded-xl font-semibold text-violet-200 hover:bg-violet-500/10 transition-all duration-300"
+                >
+                  Maybe Later
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
