@@ -153,9 +153,13 @@ function AITypingIndicator({ phase }: { phase?: TeachingPhase }) {
 function SubjectSelector({
   examType,
   onSelectSubject,
+  isLoading = false,
+  selectedSubjectId,
 }: {
   examType: ExamTypeSlug;
   onSelectSubject: (subjectId: string, subjectName: string) => void;
+  isLoading?: boolean;
+  selectedSubjectId?: string;
 }) {
   // Get subjects for the current exam type
   const subjects = examSubjects.filter((s) => {
@@ -168,30 +172,64 @@ function SubjectSelector({
     return false;
   });
 
+  if (subjects.length === 0) {
+    return (
+      <div className="text-center py-12 bg-white rounded-xl border border-neutral-200">
+        <BookOpen className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
+        <p className="text-neutral-500">No subjects available for {examType.toUpperCase()}</p>
+        <p className="text-sm text-neutral-400 mt-1">Please check back later or select a different exam type.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {subjects.map((subject) => (
-        <button
-          key={subject.id}
-          onClick={() => onSelectSubject(subject.id, subject.name)}
-          className="group p-6 bg-white rounded-xl border-2 border-neutral-200 hover:border-primary/50 hover:shadow-lg transition-all duration-200 text-left"
-        >
-          <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-            style={{ backgroundColor: `${subject.color}20` }}
+      {subjects.map((subject) => {
+        const isSelected = selectedSubjectId === subject.id;
+        const isDisabled = isLoading;
+
+        return (
+          <button
+            key={subject.id}
+            onClick={() => !isDisabled && onSelectSubject(subject.id, subject.name)}
+            disabled={isDisabled}
+            className={`group p-6 bg-white rounded-xl border-2 transition-all duration-200 text-left relative overflow-hidden ${
+              isSelected
+                ? 'border-primary bg-primary/5'
+                : 'border-neutral-200 hover:border-primary/50 hover:shadow-lg'
+            } ${isDisabled ? 'opacity-70 cursor-wait' : 'cursor-pointer'}`}
           >
-            <BookOpen className="w-6 h-6" style={{ color: subject.color }} />
-          </div>
-          <h3 className="font-semibold text-neutral-900 mb-1 group-hover:text-primary transition-colors">
-            {subject.name}
-          </h3>
-          <p className="text-sm text-neutral-500">{subject.description}</p>
-          <div className="mt-4 flex items-center text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-            <span className="text-sm font-medium">Start Revision</span>
-            <ChevronRight className="w-4 h-4 ml-1" />
-          </div>
-        </button>
-      ))}
+            {/* Loading overlay */}
+            {isSelected && isLoading && (
+              <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10">
+                <div className="flex items-center gap-2 text-primary">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span className="text-sm font-medium">Starting session...</span>
+                </div>
+              </div>
+            )}
+
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+              style={{ backgroundColor: `${subject.color}20` }}
+            >
+              <BookOpen className="w-6 h-6" style={{ color: subject.color }} />
+            </div>
+            <h3 className="font-semibold text-neutral-900 mb-1 group-hover:text-primary transition-colors">
+              {subject.name}
+            </h3>
+            <p className="text-sm text-neutral-500">{subject.description}</p>
+            <div className={`mt-4 flex items-center text-primary transition-opacity ${
+              isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+            }`}>
+              <span className="text-sm font-medium">
+                {isSelected && isLoading ? 'Loading...' : 'Start Revision'}
+              </span>
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </div>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -554,17 +592,31 @@ export default function RevisionClassroom() {
     return () => clearInterval(interval);
   }, [currentLesson, aiTeachingState.awaitingResponse, updateStruggleSignals]);
 
+  // Loading state for subject selection
+  const [isStartingSession, setIsStartingSession] = useState(false);
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string>('');
+
   // Handle subject selection
   const handleSelectSubject = async (subjectId: string, subjectName: string) => {
-    if (!user) return;
+    // Allow guest users with a generated visitor ID
+    const visitorId = user?.id || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    await startRevisionSession(
-      user.id,
-      currentExamType,
-      subjectId,
-      subjectName
-    );
-    setShowSubjectSelector(false);
+    setSelectedSubjectId(subjectId);
+    setIsStartingSession(true);
+    try {
+      await startRevisionSession(
+        visitorId,
+        currentExamType,
+        subjectId,
+        subjectName
+      );
+      setShowSubjectSelector(false);
+    } catch (error) {
+      console.error('Failed to start session:', error);
+    } finally {
+      setIsStartingSession(false);
+      setSelectedSubjectId('');
+    }
   };
 
   // Handle continue button
@@ -739,7 +791,12 @@ export default function RevisionClassroom() {
 
           {/* Subject selector */}
           <h2 className="text-lg font-semibold text-neutral-900 mb-4">Choose a Subject</h2>
-          <SubjectSelector examType={currentExamType} onSelectSubject={handleSelectSubject} />
+          <SubjectSelector
+            examType={currentExamType}
+            onSelectSubject={handleSelectSubject}
+            isLoading={isStartingSession}
+            selectedSubjectId={selectedSubjectId}
+          />
 
           {/* Stats Dashboard */}
           {stats && (
