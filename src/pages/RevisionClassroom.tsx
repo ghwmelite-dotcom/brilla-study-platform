@@ -23,6 +23,16 @@ import {
   MessageSquare,
   Mic,
   Focus,
+  Clock,
+  AlertTriangle,
+  UserPlus,
+  X,
+  Calendar,
+  RefreshCw,
+  Trophy,
+  Flame,
+  Star,
+  Timer,
 } from 'lucide-react';
 import { AIWhiteboardTeacher } from '@/components/whiteboard/AIWhiteboardTeacher';
 import { VoiceConversation } from '@/components/voice/VoiceConversation';
@@ -481,9 +491,15 @@ export default function RevisionClassroom() {
     whiteboardContent,
     isWhiteboardLoading,
     whiteboardMode,
-    isLoading: _isLoading,
+    isLoading,
     error,
+    stats,
+    struggleSignals,
+    handoffState,
+    currentCheckpoints,
+    topicMasteries,
     startRevisionSession,
+    resumeSession,
     pauseSession,
     completeSession,
     startLesson,
@@ -491,24 +507,52 @@ export default function RevisionClassroom() {
     askQuestion,
     requestWhiteboardTeaching,
     toggleWhiteboardMode,
-    clearWhiteboardContent,
-    requestAITeaching: _requestAITeaching,
-    resetClassroom: _resetClassroom,
+    answerCheckpoint,
+    fetchStats,
+    fetchPastSessions,
+    fetchDueTopics,
+    updateStruggleSignals,
+    requestHumanTutor,
+    acceptHandoffSuggestion,
+    declineHandoffSuggestion,
   } = useRevisionClassroomStore();
-
-  // Suppress unused variable warnings (used in future implementations)
-  void _isLoading;
-  void _requestAITeaching;
-  void _resetClassroom;
-  void clearWhiteboardContent;
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showSubjectSelector, setShowSubjectSelector] = useState(!currentSession);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isVoiceProcessing, setIsVoiceProcessing] = useState(false);
+  const [dueTopics, setDueTopics] = useState<typeof topicMasteries[string][]>([]);
+  const [pendingVoiceInput, setPendingVoiceInput] = useState<string>('');
+  const [checkpointFeedback, setCheckpointFeedback] = useState<{isCorrect: boolean; feedback: string} | null>(null);
+  const lastResponseTimeRef = useRef<number>(Date.now());
 
   // Get exam type info
   const examTypeInfo = examTypes.find(e => e.slug === currentExamType);
+
+  // Fetch stats and past sessions on mount
+  useEffect(() => {
+    if (user) {
+      fetchStats(currentExamType);
+      fetchPastSessions(undefined, currentExamType);
+      fetchDueTopics(currentExamType).then(setDueTopics);
+    }
+  }, [user, currentExamType, fetchStats, fetchPastSessions, fetchDueTopics]);
+
+  // Track struggle signals - time stuck
+  useEffect(() => {
+    if (!currentLesson || !aiTeachingState.awaitingResponse) return;
+
+    const interval = setInterval(() => {
+      const timeSinceLastActivity = Math.floor((Date.now() - lastResponseTimeRef.current) / 1000);
+      if (timeSinceLastActivity > 60) { // More than 1 minute stuck
+        updateStruggleSignals({
+          timeStuckSeconds: timeSinceLastActivity,
+        });
+      }
+    }, 10000); // Check every 10 seconds
+
+    return () => clearInterval(interval);
+  }, [currentLesson, aiTeachingState.awaitingResponse, updateStruggleSignals]);
 
   // Handle subject selection
   const handleSelectSubject = async (subjectId: string, subjectName: string) => {
@@ -552,18 +596,74 @@ export default function RevisionClassroom() {
     navigate(-1);
   };
 
+  // Handle resume session
+  const handleResumeSession = async (sessionId: string) => {
+    await resumeSession(sessionId);
+    setShowSubjectSelector(false);
+  };
+
+  // Handle checkpoint answer - integrated into respondToAI with feedback tracking
+  const handleCheckpointResponse = async (response: string) => {
+    lastResponseTimeRef.current = Date.now();
+
+    // Check if we have checkpoints and are in check/practice phase
+    if (currentCheckpoints.length > 0 && (aiTeachingState.currentPhase === 'check' || aiTeachingState.currentPhase === 'practice')) {
+      const checkpoint = currentCheckpoints[0];
+      const result = await answerCheckpoint(checkpoint.id, response);
+
+      // Show feedback toast
+      setCheckpointFeedback({
+        isCorrect: result.isCorrect,
+        feedback: result.aiFeedback || (result.isCorrect ? 'Correct! Well done!' : `The correct answer was: ${checkpoint.correctAnswer}`),
+      });
+
+      // Clear feedback after delay
+      setTimeout(() => setCheckpointFeedback(null), 3000);
+
+      // Track struggle signals
+      if (!result.isCorrect) {
+        updateStruggleSignals({
+          consecutiveWrongAnswers: struggleSignals.consecutiveWrongAnswers + 1,
+        });
+      } else {
+        updateStruggleSignals({
+          consecutiveWrongAnswers: 0,
+        });
+      }
+    }
+
+    // Continue with normal AI response flow
+    respondToAI(response);
+  };
+
   // Handle voice message - sends to AI and returns spoken response
   const handleVoiceMessage = async (text: string): Promise<string> => {
     setIsVoiceProcessing(true);
+    lastResponseTimeRef.current = Date.now();
+
     try {
-      // Send to AI tutor and get response
+      // Store the current message count to detect new responses
+      const currentMessageCount = aiMessages.length;
+
+      // Send to AI tutor
       await askQuestion(text);
-      // Return the latest AI message for TTS
-      // The AI response will be available in aiMessages after askQuestion completes
-      // For now, return a placeholder that will be replaced by actual response
-      const latestAiMessage = aiMessages[aiMessages.length - 1]?.aiMessage ||
-        "I received your question. Let me help you with that.";
-      return latestAiMessage;
+
+      // Wait a bit for state to update, then get the latest AI message
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Get the store state directly to get the latest message
+      const storeState = useRevisionClassroomStore.getState();
+      const latestMessages = storeState.aiMessages;
+
+      // Find the new AI message (should be after user's message)
+      if (latestMessages.length > currentMessageCount) {
+        const newAiMessage = latestMessages[latestMessages.length - 1];
+        if (newAiMessage?.aiMessage) {
+          return newAiMessage.aiMessage;
+        }
+      }
+
+      return "I've processed your question. Please check the chat for my response.";
     } catch (error) {
       console.error('Voice message error:', error);
       return "I'm sorry, I couldn't process your question. Please try again.";
@@ -575,8 +675,17 @@ export default function RevisionClassroom() {
   // Handle voice transcript (for display in chat)
   const handleVoiceTranscript = (text: string, isFinal: boolean) => {
     if (isFinal && text.trim()) {
-      // The transcript is final, it will be sent via handleVoiceMessage
-      console.log('Voice transcript:', text);
+      setPendingVoiceInput(text);
+      lastResponseTimeRef.current = Date.now();
+
+      // If awaiting response, use it as the response
+      if (aiTeachingState.awaitingResponse) {
+        respondToAI(text);
+        setPendingVoiceInput('');
+      }
+    } else if (!isFinal) {
+      // Show interim transcript
+      setPendingVoiceInput(text);
     }
   };
 
@@ -632,6 +741,99 @@ export default function RevisionClassroom() {
           <h2 className="text-lg font-semibold text-neutral-900 mb-4">Choose a Subject</h2>
           <SubjectSelector examType={currentExamType} onSelectSubject={handleSelectSubject} />
 
+          {/* Stats Dashboard */}
+          {stats && (
+            <div className="mt-8 mb-8">
+              <h2 className="text-lg font-semibold text-neutral-900 mb-4">Your Progress</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div className="p-4 bg-white rounded-xl border border-neutral-200 text-center">
+                  <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <Clock className="w-5 h-5 text-violet-600" />
+                  </div>
+                  <p className="text-2xl font-bold text-neutral-900">{stats.totalTimeMinutes || 0}</p>
+                  <p className="text-xs text-neutral-500">Minutes Studied</p>
+                </div>
+                <div className="p-4 bg-white rounded-xl border border-neutral-200 text-center">
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-600" />
+                  </div>
+                  <p className="text-2xl font-bold text-neutral-900">{stats.sessionsCompleted || 0}</p>
+                  <p className="text-xs text-neutral-500">Sessions Done</p>
+                </div>
+                <div className="p-4 bg-white rounded-xl border border-neutral-200 text-center">
+                  <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <Trophy className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <p className="text-2xl font-bold text-neutral-900">{stats.topicsMastered || 0}</p>
+                  <p className="text-xs text-neutral-500">Topics Mastered</p>
+                </div>
+                <div className="p-4 bg-white rounded-xl border border-neutral-200 text-center">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <TrendingUp className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <p className="text-2xl font-bold text-neutral-900">{stats.averageMastery || 0}%</p>
+                  <p className="text-xs text-neutral-500">Avg Mastery</p>
+                </div>
+                <div className="p-4 bg-white rounded-xl border border-neutral-200 text-center">
+                  <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <Award className="w-5 h-5 text-pink-600" />
+                  </div>
+                  <p className="text-2xl font-bold text-neutral-900">{stats.achievementCount || 0}</p>
+                  <p className="text-xs text-neutral-500">Achievements</p>
+                </div>
+                <div className="p-4 bg-white rounded-xl border border-neutral-200 text-center">
+                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <Star className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <p className="text-2xl font-bold text-neutral-900">{stats.totalXP || 0}</p>
+                  <p className="text-xs text-neutral-500">Total XP</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Due for Revision (Spaced Repetition) */}
+          {dueTopics.length > 0 && (
+            <div className="mt-8 mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-amber-500" />
+                  <h2 className="text-lg font-semibold text-neutral-900">Due for Revision</h2>
+                </div>
+                <span className="text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
+                  {dueTopics.length} topics need review
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {dueTopics.slice(0, 6).map((topic) => (
+                  <button
+                    key={topic.id}
+                    onClick={() => handleSelectSubject(topic.topicId, topic.topicName || 'Topic')}
+                    className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-200 hover:border-amber-400 hover:shadow-md transition-all text-left"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-neutral-900">{topic.topicName}</span>
+                      <RefreshCw className="w-4 h-4 text-amber-500" />
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-neutral-500">
+                      <span className="flex items-center gap-1">
+                        <BarChart3 className="w-3 h-3" />
+                        {topic.masteryLevel}% mastery
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Flame className="w-3 h-3" />
+                        {topic.revisionCount}x revised
+                      </span>
+                    </div>
+                    <div className="mt-2 text-xs text-amber-600 font-medium">
+                      Click to review now
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Past sessions */}
           {pastSessions.length > 0 && (
             <div className="mt-8">
@@ -640,10 +842,9 @@ export default function RevisionClassroom() {
                 {pastSessions.filter(s => s.status === 'paused').slice(0, 3).map((session) => (
                   <button
                     key={session.id}
-                    onClick={() => {
-                      // Resume session logic would go here
-                    }}
-                    className="p-4 bg-white rounded-xl border border-neutral-200 hover:border-primary/50 hover:shadow-md transition-all text-left"
+                    onClick={() => handleResumeSession(session.id)}
+                    disabled={isLoading}
+                    className="p-4 bg-white rounded-xl border border-neutral-200 hover:border-primary/50 hover:shadow-md transition-all text-left disabled:opacity-50"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-neutral-900">{session.subjectName}</span>
@@ -653,11 +854,18 @@ export default function RevisionClassroom() {
                       <BarChart3 className="w-4 h-4" />
                       <span>{session.progressPercentage}% complete</span>
                     </div>
+                    <div className="mt-2 text-xs text-neutral-400">
+                      {session.lessonsCompleted}/{session.totalLessons} lessons • Last active: {new Date(session.lastActivityAt).toLocaleDateString()}
+                    </div>
                     <div className="mt-3 h-1.5 bg-neutral-100 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-primary/60 rounded-full"
                         style={{ width: `${session.progressPercentage}%` }}
                       />
+                    </div>
+                    <div className="mt-3 flex items-center justify-center gap-2 text-primary text-sm font-medium">
+                      <ChevronRight className="w-4 h-4" />
+                      Resume Session
                     </div>
                   </button>
                 ))}
@@ -791,7 +999,7 @@ export default function RevisionClassroom() {
               <AITeachingDisplay
                 aiState={aiTeachingState}
                 messages={aiMessages}
-                onRespond={respondToAI}
+                onRespond={handleCheckpointResponse}
                 onAskQuestion={askQuestion}
                 onContinue={handleContinue}
               />
@@ -821,12 +1029,165 @@ export default function RevisionClassroom() {
         />
       )}
 
+      {/* Struggle Detection & Tutor Handoff UI */}
+      {handoffState.status === 'suggested' && (
+        <div className="fixed bottom-20 right-4 z-40 animate-slide-up">
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-300 rounded-2xl shadow-xl p-5 max-w-sm">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-neutral-900">Need Some Help?</h4>
+                <p className="text-sm text-neutral-600 mt-1">
+                  It looks like you might be struggling with this topic. Would you like to connect with a human tutor for personalized assistance?
+                </p>
+              </div>
+            </div>
+
+            {/* Struggle indicators */}
+            <div className="bg-white/60 rounded-lg p-3 mb-4">
+              <p className="text-xs text-neutral-500 mb-2">We noticed:</p>
+              <div className="space-y-1">
+                {struggleSignals.consecutiveWrongAnswers > 1 && (
+                  <p className="text-xs text-amber-700 flex items-center gap-1">
+                    <X className="w-3 h-3" /> {struggleSignals.consecutiveWrongAnswers} incorrect answers in a row
+                  </p>
+                )}
+                {struggleSignals.timeStuckSeconds > 120 && (
+                  <p className="text-xs text-amber-700 flex items-center gap-1">
+                    <Timer className="w-3 h-3" /> Spending extra time on this question
+                  </p>
+                )}
+                {struggleSignals.clarificationRequestsCount > 2 && (
+                  <p className="text-xs text-amber-700 flex items-center gap-1">
+                    <HelpCircle className="w-3 h-3" /> Multiple clarification requests
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={acceptHandoffSuggestion}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg font-medium hover:from-amber-600 hover:to-orange-600 transition-all"
+              >
+                <UserPlus className="w-4 h-4" />
+                Get Human Help
+              </button>
+              <button
+                onClick={declineHandoffSuggestion}
+                className="px-4 py-2.5 border border-neutral-200 rounded-lg text-neutral-600 hover:bg-neutral-50 transition-all"
+              >
+                I'm OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Handoff Pending Status */}
+      {(handoffState.status === 'pending' || handoffState.status === 'requested') && (
+        <div className="fixed bottom-20 right-4 z-40">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl shadow-xl p-5 max-w-sm">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center animate-pulse">
+                <UserPlus className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-neutral-900">Finding a Tutor</h4>
+                <p className="text-sm text-neutral-600">Please wait while we connect you...</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-blue-600">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Looking for available tutors...</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Request Human Tutor Button (always visible in main view) */}
+      {currentLesson && handoffState.status === 'none' && (
+        <button
+          onClick={() => requestHumanTutor('Student requested help')}
+          className="fixed bottom-20 left-4 z-30 flex items-center gap-2 px-4 py-2.5 bg-white border border-neutral-200 rounded-xl shadow-lg hover:shadow-xl hover:border-primary/50 transition-all group"
+          title="Request help from a human tutor"
+        >
+          <UserPlus className="w-5 h-5 text-neutral-500 group-hover:text-primary transition-colors" />
+          <span className="text-sm font-medium text-neutral-600 group-hover:text-primary transition-colors">
+            Get Human Help
+          </span>
+        </button>
+      )}
+
+      {/* Pending Voice Input Display */}
+      {pendingVoiceInput && !aiTeachingState.awaitingResponse && (
+        <div className="fixed bottom-32 left-1/2 transform -translate-x-1/2 z-30">
+          <div className="bg-white border border-neutral-200 rounded-xl shadow-lg px-4 py-2 flex items-center gap-2">
+            <Mic className="w-4 h-4 text-emerald-500 animate-pulse" />
+            <span className="text-sm text-neutral-600">{pendingVoiceInput}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Checkpoint Feedback Toast */}
+      {checkpointFeedback && (
+        <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-50 animate-slide-down`}>
+          <div className={`px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 ${
+            checkpointFeedback.isCorrect
+              ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
+              : 'bg-gradient-to-r from-red-500 to-rose-500 text-white'
+          }`}>
+            {checkpointFeedback.isCorrect ? (
+              <CheckCircle2 className="w-6 h-6" />
+            ) : (
+              <X className="w-6 h-6" />
+            )}
+            <div>
+              <p className="font-semibold">{checkpointFeedback.isCorrect ? 'Correct!' : 'Not quite right'}</p>
+              <p className="text-sm opacity-90">{checkpointFeedback.feedback}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Error toast */}
       {error && (
-        <div className="fixed bottom-4 right-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl shadow-lg">
+        <div className="fixed bottom-4 right-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl shadow-lg z-50">
           <p className="text-sm">{error}</p>
         </div>
       )}
+
+      {/* CSS Animations */}
+      <style>{`
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes slide-down {
+          from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
+        }
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
+        }
+        .animate-slide-down {
+          animation: slide-down 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
