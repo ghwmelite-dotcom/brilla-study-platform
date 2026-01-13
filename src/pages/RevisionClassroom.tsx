@@ -162,13 +162,16 @@ function SubjectSelector({
   selectedSubjectId?: string;
 }) {
   // Get subjects for the current exam type
+  // examTypeId in subjects uses format: exam_wassce, exam_bece, exam_nsmq, igcse, cambridge_a2
   const subjects = examSubjects.filter((s) => {
-    if (examType === 'bece') return s.examTypeId === 'bece';
-    if (examType === 'wassce') return s.examTypeId === 'wassce';
-    if (examType === 'nsmq') return ['mathematics', 'physics', 'chemistry', 'biology'].some(sub => s.slug.includes(sub));
+    if (examType === 'bece') return s.examTypeId === 'exam_bece';
+    if (examType === 'wassce') return s.examTypeId === 'exam_wassce';
+    if (examType === 'nsmq') return s.examTypeId === 'exam_nsmq';
     if (examType === 'igcse') return s.examTypeId === 'igcse';
-    if (examType === 'cambridge-as' || examType === 'cambridge-a-level') return s.examTypeId === 'cambridge_as' || s.examTypeId === 'cambridge_a2';
-    if (examType === 'edexcel-as' || examType === 'edexcel-a-level') return s.examTypeId === 'edexcel_as' || s.examTypeId === 'edexcel_a2';
+    if (examType === 'cambridge-as') return s.examTypeId === 'cambridge_as';
+    if (examType === 'cambridge-a-level') return s.examTypeId === 'cambridge_a2';
+    if (examType === 'edexcel-as') return s.examTypeId === 'edexcel_as';
+    if (examType === 'edexcel-a-level') return s.examTypeId === 'edexcel_a2';
     return false;
   });
 
