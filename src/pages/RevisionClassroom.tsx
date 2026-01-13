@@ -42,7 +42,7 @@ import {
   useRevisionClassroomStore,
 } from '@/stores';
 import type { ExamTypeSlug } from '@/types';
-import { subjects as examSubjects } from '@/data/examData';
+import { subjects as examSubjects, examTypes } from '@/data/examData';
 import type { TeachingPhase } from '@/stores/revisionClassroomStore';
 
 // Beautiful AI Typing Indicator Component
@@ -521,7 +521,7 @@ function AITeachingDisplay({
 export default function RevisionClassroom() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { currentExamType, examTypes } = useExamStore();
+  const { currentExamType } = useExamStore();
   const {
     currentSession,
     pastSessions,
@@ -566,9 +566,6 @@ export default function RevisionClassroom() {
   const [pendingVoiceInput, setPendingVoiceInput] = useState<string>('');
   const [checkpointFeedback, setCheckpointFeedback] = useState<{isCorrect: boolean; feedback: string} | null>(null);
   const lastResponseTimeRef = useRef<number>(Date.now());
-
-  // Get exam type info
-  const examTypeInfo = examTypes.find(e => e.slug === currentExamType);
 
   // Fetch stats and past sessions on mount
   useEffect(() => {
@@ -763,13 +760,24 @@ export default function RevisionClassroom() {
             </div>
           </div>
 
-          {/* Exam Type Badge */}
-          <div className="mb-6 flex items-center gap-2">
-            <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
-              {examTypeInfo?.name || currentExamType.toUpperCase()}
-            </span>
-            <span className="text-neutral-400">|</span>
-            <span className="text-neutral-600 text-sm">AI-Led Comprehensive Revision</span>
+          {/* Exam Type Selector */}
+          <div className="mb-6">
+            <p className="text-sm text-neutral-500 mb-2">Select your exam type:</p>
+            <div className="flex flex-wrap gap-2">
+              {examTypes.filter(e => e.isActive).map((exam) => (
+                <button
+                  key={exam.slug}
+                  onClick={() => useExamStore.getState().setExamType(exam.slug)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    currentExamType === exam.slug
+                      ? 'bg-primary text-white shadow-md'
+                      : 'bg-white border border-neutral-200 text-neutral-700 hover:border-primary/50 hover:text-primary'
+                  }`}
+                >
+                  {exam.name}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Features highlight */}
