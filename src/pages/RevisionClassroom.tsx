@@ -595,27 +595,43 @@ export default function RevisionClassroom() {
   // Loading state for subject selection
   const [isStartingSession, setIsStartingSession] = useState(false);
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>('');
+  const [sessionError, setSessionError] = useState<string>('');
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   // Handle subject selection
   const handleSelectSubject = async (subjectId: string, subjectName: string) => {
-    // Allow guest users with a generated visitor ID
-    const visitorId = user?.id || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Check if user is logged in - API requires authentication
+    if (!user) {
+      setShowLoginPrompt(true);
+      setSelectedSubjectId(subjectId);
+      return;
+    }
 
     setSelectedSubjectId(subjectId);
     setIsStartingSession(true);
+    setSessionError('');
+
     try {
       await startRevisionSession(
-        visitorId,
+        user.id,
         currentExamType,
         subjectId,
         subjectName
       );
+
+      // Check if there was an error in the store
+      const storeError = useRevisionClassroomStore.getState().error;
+      if (storeError) {
+        setSessionError(storeError);
+        return;
+      }
+
       setShowSubjectSelector(false);
-    } catch (error) {
-      console.error('Failed to start session:', error);
+    } catch (err) {
+      console.error('Failed to start session:', err);
+      setSessionError(err instanceof Error ? err.message : 'Failed to start session. Please try again.');
     } finally {
       setIsStartingSession(false);
-      setSelectedSubjectId('');
     }
   };
 
@@ -808,6 +824,69 @@ export default function RevisionClassroom() {
             isLoading={isStartingSession}
             selectedSubjectId={selectedSubjectId}
           />
+
+          {/* Error Display */}
+          {sessionError && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium text-red-800">Failed to start session</p>
+                <p className="text-sm text-red-600 mt-1">{sessionError}</p>
+                <button
+                  onClick={() => setSessionError('')}
+                  className="text-sm text-red-700 underline mt-2 hover:text-red-800"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Login Prompt Modal */}
+          {showLoginPrompt && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="absolute inset-0 bg-black/50" onClick={() => setShowLoginPrompt(false)} />
+              <div className="relative bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full">
+                <button
+                  onClick={() => setShowLoginPrompt(false)}
+                  className="absolute top-4 right-4 p-1 hover:bg-neutral-100 rounded-full"
+                >
+                  <X className="w-5 h-5 text-neutral-500" />
+                </button>
+
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Brain className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-bold text-neutral-900">Sign In Required</h3>
+                  <p className="text-neutral-500 mt-2">
+                    Please sign in to start your AI-powered revision session. Your progress will be saved automatically.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <button
+                    onClick={() => navigate('/login?redirect=/revision-classroom')}
+                    className="w-full py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-colors"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={() => navigate('/register?redirect=/revision-classroom')}
+                    className="w-full py-3 border border-neutral-200 text-neutral-700 rounded-xl font-medium hover:bg-neutral-50 transition-colors"
+                  >
+                    Create Free Account
+                  </button>
+                  <button
+                    onClick={() => setShowLoginPrompt(false)}
+                    className="w-full py-2 text-neutral-500 text-sm hover:text-neutral-700"
+                  >
+                    Maybe Later
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Stats Dashboard */}
           {stats && (
