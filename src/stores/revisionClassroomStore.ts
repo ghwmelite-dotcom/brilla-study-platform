@@ -477,106 +477,12 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
             await get().startLesson(lessonsWithNames[0].id);
           }
         } catch (error) {
-          console.error('Error starting revision session, falling back to demo mode:', error);
-
-          // DEMO MODE FALLBACK - Create a mock session for demonstration
-          const sessionId = generateLocalId('session');
-          const now = new Date().toISOString();
-
-          // Generate demo lessons based on subject
-          const demoLessons: RevisionLesson[] = [
-            {
-              id: generateLocalId('lesson'),
-              sessionId,
-              topicId: topicId || `topic_${subjectId}_1`,
-              topicName: `Introduction to ${subjectName}`,
-              lessonOrder: 1,
-              title: `Introduction to ${subjectName}`,
-              description: `Get started with the fundamentals of ${subjectName}`,
-              lessonType: 'concept',
-              status: 'pending',
-              understandingLevel: 0,
-              questionsAttempted: 0,
-              questionsCorrect: 0,
-              timeSpentSeconds: 0,
-            },
-            {
-              id: generateLocalId('lesson'),
-              sessionId,
-              topicId: topicId || `topic_${subjectId}_2`,
-              topicName: `Core Concepts in ${subjectName}`,
-              lessonOrder: 2,
-              title: `Core Concepts in ${subjectName}`,
-              description: `Master the essential concepts`,
-              lessonType: 'concept',
-              status: 'pending',
-              understandingLevel: 0,
-              questionsAttempted: 0,
-              questionsCorrect: 0,
-              timeSpentSeconds: 0,
-            },
-            {
-              id: generateLocalId('lesson'),
-              sessionId,
-              topicId: topicId || `topic_${subjectId}_3`,
-              topicName: `Practice Problems`,
-              lessonOrder: 3,
-              title: `${subjectName} Practice Problems`,
-              description: `Apply your knowledge with practice exercises`,
-              lessonType: 'practice',
-              status: 'pending',
-              understandingLevel: 0,
-              questionsAttempted: 0,
-              questionsCorrect: 0,
-              timeSpentSeconds: 0,
-            },
-            {
-              id: generateLocalId('lesson'),
-              sessionId,
-              topicId: topicId || `topic_${subjectId}_4`,
-              topicName: `Exam Preparation`,
-              lessonOrder: 4,
-              title: `${examType.toUpperCase()} Exam Tips for ${subjectName}`,
-              description: `Get ready for your exam with targeted preparation`,
-              lessonType: 'assessment',
-              status: 'pending',
-              understandingLevel: 0,
-              questionsAttempted: 0,
-              questionsCorrect: 0,
-              timeSpentSeconds: 0,
-            },
-          ];
-
-          const demoSession: RevisionSession = {
-            id: sessionId,
-            visitorId,
-            examType,
-            subjectId,
-            subjectName,
-            sessionType,
-            status: 'active',
-            progressPercentage: 0,
-            currentLessonId: demoLessons[0].id,
-            lessonsCompleted: 0,
-            totalLessons: demoLessons.length,
-            masteryScore: 0,
-            timeSpentMinutes: 0,
-            startedAt: now,
-            lastActivityAt: now,
-          };
-
+          console.error('Error starting revision session:', error);
+          const errorMessage = error instanceof Error ? error.message : 'Failed to start revision session';
           set({
-            currentSession: demoSession,
-            lessonPlan: demoLessons,
-            currentLesson: demoLessons[0],
+            error: errorMessage,
             isLoading: false,
-            aiMessages: [],
-            checkpointResponses: [],
-            error: null,
           });
-
-          // Start the first lesson with demo content
-          await get().requestAITeaching('hook');
         }
       },
 
