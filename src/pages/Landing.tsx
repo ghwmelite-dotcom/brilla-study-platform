@@ -53,6 +53,7 @@ import {
   UsersRound,
   Maximize,
   Headset,
+  Layers,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { AuthModal } from '@/components/auth';
@@ -803,9 +804,9 @@ const platformCapabilities = [
     category: 'Learning Resources',
     items: [
       { name: 'E-Library', description: 'PDFs, videos, audio, interactive content' },
+      { name: 'Flashcards', description: 'Spaced repetition memory system' },
       { name: 'Past Papers', description: 'WASSCE & BECE with marking schemes' },
-      { name: 'Topic Notes', description: 'Comprehensive study materials' },
-      { name: 'Practice Questions', description: 'Comprehensive question bank' },
+      { name: 'Practice Questions', description: '4,000+ questions across subjects' },
     ],
   },
   {
@@ -814,14 +815,14 @@ const platformCapabilities = [
       { name: 'AI Tutor', description: 'Instant explanations & guidance' },
       { name: 'AI Counselor', description: 'Academic, career & wellness support' },
       { name: 'Essay Grading', description: 'Instant AI feedback on essays' },
-      { name: 'Adaptive Learning', description: 'Personalized question difficulty' },
+      { name: 'Revision Classroom', description: 'AI-led interactive lessons' },
     ],
   },
   {
     category: 'Competition & Games',
     items: [
       { name: 'NSMQ Simulation', description: 'All 5 rounds recreated' },
-      { name: 'Live Battles', description: 'Real-time 1v1 competitions' },
+      { name: '1v1 & 3v3 Battles', description: 'Real-time solo & team fights' },
       { name: 'House Cup', description: 'Compete for your school house' },
       { name: 'Leaderboards', description: 'National & school rankings' },
     ],
@@ -1896,6 +1897,213 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ========================================== */}
+      {/* TEAM BATTLES & MULTIPLAYER SECTION */}
+      {/* ========================================== */}
+      <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-rose-950/20 to-slate-950" />
+        <GradientOrb className="w-[500px] h-[500px] bg-rose-500/20 -right-48 top-1/4" delay={0} />
+        <GradientOrb className="w-[400px] h-[400px] bg-orange-500/20 -left-32 bottom-1/4" delay={2} />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-rose-500/20 to-orange-500/20 border border-rose-500/30 rounded-full text-rose-400 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+              <Swords className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              Multiplayer Competition
+            </span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-display font-bold text-white mb-4 sm:mb-6">
+              Battle Solo or{' '}
+              <span className="bg-gradient-to-r from-rose-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
+                Team Up
+              </span>
+            </h2>
+            <p className="text-sm sm:text-base lg:text-xl text-white/60 max-w-3xl mx-auto">
+              Challenge friends to 1v1 duels or form teams for epic 3v3 school battles. Real-time competition with live leaderboards.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-16">
+            {/* 1v1 Battle Card */}
+            <Card3D>
+              <div className="relative glass rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 h-full overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                      <Zap className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-white">1v1 Battles</h3>
+                      <p className="text-white/50 text-sm sm:text-base">Quick Fire Duels</p>
+                    </div>
+                  </div>
+
+                  <p className="text-white/70 text-sm sm:text-base mb-6 leading-relaxed">
+                    Challenge any student to a real-time quiz battle. Answer faster and more accurately to claim victory and climb the rankings.
+                  </p>
+
+                  {/* Battle Preview */}
+                  <div className="relative glass rounded-xl p-4 mb-6 border border-amber-500/20">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white font-bold">Y</div>
+                        <div>
+                          <p className="text-white font-medium text-sm">You</p>
+                          <p className="text-emerald-400 text-xs font-bold">850 pts</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <Swords className="w-6 h-6 text-amber-400 mb-1" />
+                        <span className="text-white/50 text-xs">VS</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <p className="text-white font-medium text-sm">Opponent</p>
+                          <p className="text-rose-400 text-xs font-bold">720 pts</p>
+                        </div>
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white font-bold">K</div>
+                      </div>
+                    </div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full w-[54%] bg-gradient-to-r from-emerald-500 to-green-400 rounded-full" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div className="flex items-center gap-2 text-white/70 text-sm">
+                      <Clock className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                      <span>30-second rounds</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-white/70 text-sm">
+                      <Trophy className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                      <span>Ranked matchmaking</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-white/70 text-sm">
+                      <Flame className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                      <span>Win streaks bonus</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-white/70 text-sm">
+                      <Star className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                      <span>XP rewards</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card3D>
+
+            {/* 3v3 Team Battle Card */}
+            <Card3D>
+              <div className="relative glass rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 h-full overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                {/* NEW Badge */}
+                <div className="absolute -top-0 -right-0">
+                  <div className="px-3 py-1 bg-gradient-to-r from-rose-500 to-pink-500 rounded-bl-xl rounded-tr-2xl text-white text-xs font-semibold flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    POPULAR
+                  </div>
+                </div>
+
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                      <Users className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-white">3v3 Team Battles</h3>
+                      <p className="text-white/50 text-sm sm:text-base">School vs School</p>
+                    </div>
+                  </div>
+
+                  <p className="text-white/70 text-sm sm:text-base mb-6 leading-relaxed">
+                    Form a team of 3 and compete against other schools in NSMQ-style battles. Coordinate roles and dominate the leaderboards together.
+                  </p>
+
+                  {/* Team Preview */}
+                  <div className="relative glass rounded-xl p-4 mb-6 border border-rose-500/20">
+                    <div className="flex items-center justify-between">
+                      {/* Your Team */}
+                      <div className="flex-1">
+                        <p className="text-emerald-400 text-xs font-bold mb-2 text-center">Your Team</p>
+                        <div className="flex justify-center -space-x-2">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white text-xs font-bold border-2 border-slate-900">C1</div>
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold border-2 border-slate-900">C2</div>
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold border-2 border-slate-900">R</div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-center px-4">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center border border-rose-500/30">
+                          <Swords className="w-5 h-5 text-rose-400" />
+                        </div>
+                        <span className="text-white/50 text-xs mt-1">3v3</span>
+                      </div>
+
+                      {/* Opponent Team */}
+                      <div className="flex-1">
+                        <p className="text-rose-400 text-xs font-bold mb-2 text-center">Opponents</p>
+                        <div className="flex justify-center -space-x-2">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white text-xs font-bold border-2 border-slate-900">C1</div>
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white text-xs font-bold border-2 border-slate-900">C2</div>
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center text-white text-xs font-bold border-2 border-slate-900">R</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-center gap-4 text-xs text-white/50">
+                      <span>C1 = Contestant 1</span>
+                      <span>C2 = Contestant 2</span>
+                      <span>R = Reserve</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div className="flex items-center gap-2 text-white/70 text-sm">
+                      <Users className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                      <span>Team coordination</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-white/70 text-sm">
+                      <GraduationCap className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                      <span>School rankings</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-white/70 text-sm">
+                      <MessageCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                      <span>Team chat</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-white/70 text-sm">
+                      <Trophy className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                      <span>Seasonal leagues</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card3D>
+          </div>
+
+          {/* Battle Stats */}
+          <div className="glass rounded-2xl p-6 sm:p-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent mb-1">Real-time</div>
+                <div className="text-white/60 text-xs sm:text-sm">Live Battles</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-rose-400 to-pink-400 bg-clip-text text-transparent mb-1">3v3</div>
+                <div className="text-white/60 text-xs sm:text-sm">Team Mode</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent mb-1">5 Rounds</div>
+                <div className="text-white/60 text-xs sm:text-sm">NSMQ Format</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-1">Ranked</div>
+                <div className="text-white/60 text-xs sm:text-sm">Matchmaking</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* International Exams Section - Cambridge IGCSE & A-Level */}
       <section className="relative py-24 sm:py-32 overflow-hidden">
         {/* Premium gradient background */}
@@ -2162,6 +2370,214 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ========================================== */}
+      {/* MOCK EXAM SIMULATION SECTION */}
+      {/* ========================================== */}
+      <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-blue-950/20 to-slate-950" />
+        <GradientOrb className="w-[500px] h-[500px] bg-blue-500/20 -left-48 top-1/4" delay={0} />
+        <GradientOrb className="w-[400px] h-[400px] bg-indigo-500/20 -right-32 bottom-1/4" delay={2} />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 border border-blue-500/30 rounded-full text-blue-400 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              Exam Simulation
+            </span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-display font-bold text-white mb-4 sm:mb-6">
+              Experience{' '}
+              <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                Real Exam Conditions
+              </span>
+            </h2>
+            <p className="text-sm sm:text-base lg:text-xl text-white/60 max-w-3xl mx-auto">
+              Take full-length mock exams with strict timing, realistic question formats, and detailed performance analysis to prepare for the real thing.
+            </p>
+          </div>
+
+          {/* Mock Exam Interface Preview */}
+          <div className="max-w-4xl mx-auto mb-12 sm:mb-16">
+            <Card3D>
+              <div className="relative glass rounded-2xl sm:rounded-3xl overflow-hidden">
+                {/* Exam Header */}
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                        <FileText className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-white">WASSCE Mathematics 2024</h3>
+                        <p className="text-white/70 text-sm">Paper 2 - Essay & Structured Questions</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 sm:gap-6">
+                      <div className="text-center">
+                        <div className="flex items-center gap-2 text-white">
+                          <Clock className="w-5 h-5" />
+                          <span className="text-xl sm:text-2xl font-bold font-mono">1:45:30</span>
+                        </div>
+                        <p className="text-white/60 text-xs">Time Remaining</p>
+                      </div>
+                      <div className="text-center hidden sm:block">
+                        <span className="text-xl sm:text-2xl font-bold text-white">12/50</span>
+                        <p className="text-white/60 text-xs">Questions</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Exam Content Preview */}
+                <div className="p-4 sm:p-6 bg-slate-900/80">
+                  {/* Question */}
+                  <div className="mb-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium">Question 12</span>
+                      <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-sm font-medium">5 marks</span>
+                      <span className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-sm font-medium">Algebra</span>
+                    </div>
+                    <p className="text-white/90 text-sm sm:text-base leading-relaxed">
+                      Solve the simultaneous equations:
+                    </p>
+                    <div className="mt-3 p-4 bg-white/5 rounded-xl border border-white/10 font-mono text-center">
+                      <p className="text-white text-lg sm:text-xl mb-2">3x + 2y = 12</p>
+                      <p className="text-white text-lg sm:text-xl">x - y = 1</p>
+                    </div>
+                  </div>
+
+                  {/* Answer Area */}
+                  <div className="glass rounded-xl p-4 border border-white/10 mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-white/70 text-sm">Your Answer</span>
+                      <div className="flex items-center gap-2">
+                        <button className="px-3 py-1.5 rounded-lg bg-white/5 text-white/70 text-xs hover:bg-white/10 transition-colors">
+                          Clear
+                        </button>
+                        <button className="px-3 py-1.5 rounded-lg bg-blue-500/20 text-blue-400 text-xs hover:bg-blue-500/30 transition-colors flex items-center gap-1">
+                          <PenTool className="w-3 h-3" />
+                          Draw
+                        </button>
+                      </div>
+                    </div>
+                    <div className="h-24 bg-white/5 rounded-lg border border-dashed border-white/20 flex items-center justify-center text-white/30 text-sm">
+                      Type your solution or use the drawing tool...
+                    </div>
+                  </div>
+
+                  {/* Navigation */}
+                  <div className="flex items-center justify-between">
+                    <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-white/70 text-sm hover:bg-white/10 transition-colors">
+                      <ChevronLeft className="w-4 h-4" />
+                      Previous
+                    </button>
+                    <div className="flex gap-1.5">
+                      {[10, 11, 12, 13, 14].map((num) => (
+                        <button
+                          key={num}
+                          className={cn(
+                            "w-8 h-8 rounded-lg text-xs font-medium transition-colors",
+                            num === 12
+                              ? "bg-blue-500 text-white"
+                              : num < 12
+                              ? "bg-emerald-500/20 text-emerald-400"
+                              : "bg-white/5 text-white/50 hover:bg-white/10"
+                          )}
+                        >
+                          {num}
+                        </button>
+                      ))}
+                    </div>
+                    <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500 text-white text-sm hover:bg-blue-600 transition-colors">
+                      Next
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Card3D>
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
+            {[
+              {
+                icon: Clock,
+                title: 'Strict Timing',
+                desc: 'Real exam time limits with countdown and automatic submission',
+                color: 'from-blue-500 to-indigo-500'
+              },
+              {
+                icon: FileText,
+                title: 'Authentic Papers',
+                desc: 'Questions modeled after actual WASSCE, BECE & NSMQ exams',
+                color: 'from-purple-500 to-pink-500'
+              },
+              {
+                icon: BarChart3,
+                title: 'Instant Analysis',
+                desc: 'Detailed breakdown by topic, question type, and time spent',
+                color: 'from-emerald-500 to-green-500'
+              },
+              {
+                icon: Target,
+                title: 'Score Prediction',
+                desc: 'AI-powered grade prediction based on your performance',
+                color: 'from-amber-500 to-orange-500'
+              }
+            ].map((feature, i) => (
+              <div key={i} className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 text-center hover:bg-white/10 transition-all group">
+                <div className={cn(
+                  "w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform",
+                  feature.color
+                )}>
+                  <feature.icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-white mb-2">{feature.title}</h3>
+                <p className="text-white/60 text-sm">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Results Preview */}
+          <div className="glass rounded-2xl sm:rounded-3xl p-6 sm:p-8">
+            <h3 className="text-xl sm:text-2xl font-bold text-white text-center mb-8">After Your Mock Exam</h3>
+            <div className="grid sm:grid-cols-3 gap-6 sm:gap-8">
+              <div className="text-center">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-500/20 to-green-500/20 border-4 border-emerald-500/30 flex items-center justify-center">
+                  <div>
+                    <span className="text-3xl sm:text-4xl font-bold text-emerald-400">78%</span>
+                    <p className="text-white/50 text-xs mt-1">Score</p>
+                  </div>
+                </div>
+                <h4 className="text-white font-semibold mb-1">Overall Score</h4>
+                <p className="text-white/50 text-sm">Grade: B2 (Predicted)</p>
+              </div>
+              <div className="text-center">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border-4 border-blue-500/30 flex items-center justify-center">
+                  <div>
+                    <span className="text-3xl sm:text-4xl font-bold text-blue-400">42</span>
+                    <span className="text-blue-400 text-lg">/50</span>
+                    <p className="text-white/50 text-xs mt-1">Correct</p>
+                  </div>
+                </div>
+                <h4 className="text-white font-semibold mb-1">Questions Answered</h4>
+                <p className="text-white/50 text-sm">8 incorrect, 0 skipped</p>
+              </div>
+              <div className="text-center">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 border-4 border-amber-500/30 flex items-center justify-center">
+                  <div>
+                    <span className="text-3xl sm:text-4xl font-bold text-amber-400">1:52</span>
+                    <p className="text-white/50 text-xs mt-1">Avg/Question</p>
+                  </div>
+                </div>
+                <h4 className="text-white font-semibold mb-1">Time Management</h4>
+                <p className="text-white/50 text-sm">Finished 8 mins early</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section
         ref={featuresRef.ref}
@@ -2358,6 +2774,161 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ========================================== */}
+      {/* FLASHCARDS & SPACED REPETITION SECTION */}
+      {/* ========================================== */}
+      <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-amber-950/20 to-slate-950" />
+        <GradientOrb className="w-[500px] h-[500px] bg-amber-500/20 -right-48 top-1/4" delay={0} />
+        <GradientOrb className="w-[400px] h-[400px] bg-yellow-500/20 -left-32 bottom-1/4" delay={2} />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-full text-amber-400 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+              <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              Memory System
+            </span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-display font-bold text-white mb-4 sm:mb-6">
+              Master Content with{' '}
+              <span className="bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                Smart Flashcards
+              </span>
+            </h2>
+            <p className="text-sm sm:text-base lg:text-xl text-white/60 max-w-3xl mx-auto">
+              Create custom flashcards or use our pre-made decks. Our spaced repetition algorithm ensures you remember what you learn, forever.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
+            {/* Flashcard Demo */}
+            <div className="order-2 lg:order-1">
+              <Card3D>
+                <div className="relative">
+                  {/* Stack of cards effect */}
+                  <div className="absolute inset-0 glass rounded-2xl sm:rounded-3xl transform rotate-3 translate-y-2 opacity-30" />
+                  <div className="absolute inset-0 glass rounded-2xl sm:rounded-3xl transform -rotate-2 translate-y-1 opacity-50" />
+
+                  {/* Main card */}
+                  <div className="relative glass rounded-2xl sm:rounded-3xl overflow-hidden">
+                    {/* Card Header */}
+                    <div className="bg-gradient-to-r from-amber-600 to-yellow-600 p-4 sm:p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                            <Layers className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                          </div>
+                          <div>
+                            <p className="text-white font-semibold">Physics Formulas</p>
+                            <p className="text-white/70 text-sm">Card 15 of 42</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-medium">Mechanics</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Content */}
+                    <div className="p-6 sm:p-8 bg-slate-900/80 min-h-[280px] flex flex-col">
+                      {/* Question Side */}
+                      <div className="flex-1 flex flex-col items-center justify-center text-center mb-6">
+                        <p className="text-white/50 text-sm mb-4">What is the formula for?</p>
+                        <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">Kinetic Energy</h3>
+                        <p className="text-white/50 text-sm">(Tap to reveal answer)</p>
+                      </div>
+
+                      {/* Answer Preview (faded) */}
+                      <div className="glass rounded-xl p-4 border border-amber-500/30 bg-amber-500/5">
+                        <div className="flex items-center justify-center gap-4">
+                          <div className="text-center">
+                            <p className="text-amber-400 font-mono text-2xl sm:text-3xl font-bold">KE = ½mv²</p>
+                            <p className="text-white/50 text-xs mt-2">m = mass, v = velocity</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Rating Buttons */}
+                      <div className="flex items-center justify-center gap-3 mt-6">
+                        <button className="flex-1 py-3 px-4 rounded-xl bg-rose-500/20 text-rose-400 text-sm font-medium hover:bg-rose-500/30 transition-colors">
+                          Hard
+                        </button>
+                        <button className="flex-1 py-3 px-4 rounded-xl bg-amber-500/20 text-amber-400 text-sm font-medium hover:bg-amber-500/30 transition-colors">
+                          Good
+                        </button>
+                        <button className="flex-1 py-3 px-4 rounded-xl bg-emerald-500/20 text-emerald-400 text-sm font-medium hover:bg-emerald-500/30 transition-colors">
+                          Easy
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card3D>
+            </div>
+
+            {/* Features List */}
+            <div className="order-1 lg:order-2 space-y-6">
+              <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 hover:bg-white/10 transition-all group">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Brain className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Spaced Repetition</h3>
+                    <p className="text-white/60 text-sm sm:text-base">
+                      Our algorithm shows cards at optimal intervals. You'll review difficult cards more often and easy cards less frequently.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 hover:bg-white/10 transition-all group">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Layers className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Pre-made & Custom Decks</h3>
+                    <p className="text-white/60 text-sm sm:text-base">
+                      Use our curated decks for WASSCE, BECE, and NSMQ topics, or create your own cards for personalized study.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 hover:bg-white/10 transition-all group">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <BarChart3 className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Study Statistics</h3>
+                    <p className="text-white/60 text-sm sm:text-base">
+                      Track your retention rate, cards mastered, and study streaks. See which topics need more attention.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Stats Row */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="glass rounded-xl p-4 text-center">
+                  <span className="text-2xl sm:text-3xl font-bold text-amber-400">500+</span>
+                  <p className="text-white/50 text-xs sm:text-sm mt-1">Pre-made Cards</p>
+                </div>
+                <div className="glass rounded-xl p-4 text-center">
+                  <span className="text-2xl sm:text-3xl font-bold text-blue-400">95%</span>
+                  <p className="text-white/50 text-xs sm:text-sm mt-1">Retention Rate</p>
+                </div>
+                <div className="glass rounded-xl p-4 text-center">
+                  <span className="text-2xl sm:text-3xl font-bold text-purple-400">∞</span>
+                  <p className="text-white/50 text-xs sm:text-sm mt-1">Custom Cards</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* For Schools & Parents Section */}
       <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-slate-950" />
@@ -2449,6 +3020,253 @@ export function LandingPage() {
                 </li>
               </ul>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================== */}
+      {/* ANALYTICS DASHBOARD SECTION */}
+      {/* ========================================== */}
+      <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-teal-950/20 to-slate-950" />
+        <GradientOrb className="w-[500px] h-[500px] bg-teal-500/20 -right-48 top-1/4" delay={0} />
+        <GradientOrb className="w-[400px] h-[400px] bg-cyan-500/20 -left-32 bottom-1/4" delay={2} />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-teal-500/20 to-cyan-500/20 border border-teal-500/30 rounded-full text-teal-400 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+              <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              Deep Insights
+            </span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-display font-bold text-white mb-4 sm:mb-6">
+              Track Every{' '}
+              <span className="bg-gradient-to-r from-teal-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                Detail of Progress
+              </span>
+            </h2>
+            <p className="text-sm sm:text-base lg:text-xl text-white/60 max-w-3xl mx-auto">
+              Comprehensive analytics dashboard with study heatmaps, predicted scores, weakness identification, and personalized recommendations.
+            </p>
+          </div>
+
+          {/* Analytics Dashboard Preview */}
+          <div className="max-w-5xl mx-auto mb-12 sm:mb-16">
+            <Card3D>
+              <div className="relative glass rounded-2xl sm:rounded-3xl overflow-hidden">
+                {/* Dashboard Header */}
+                <div className="bg-gradient-to-r from-teal-600 to-cyan-600 p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                        <BarChart3 className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-white">Your Analytics Dashboard</h3>
+                        <p className="text-white/70 text-sm">Last 30 days performance</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="px-3 py-1.5 rounded-full bg-white/20 text-white text-sm font-medium flex items-center gap-1.5">
+                        <TrendingUp className="w-4 h-4" />
+                        +12% this week
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dashboard Content */}
+                <div className="p-4 sm:p-6 bg-slate-900/80">
+                  <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
+                    {/* Left Column - Stats Cards */}
+                    <div className="space-y-4">
+                      {/* Predicted Score Card */}
+                      <div className="glass rounded-xl p-4 border border-teal-500/20">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-white/70 text-sm">Predicted WASSCE Grade</span>
+                          <Target className="w-4 h-4 text-teal-400" />
+                        </div>
+                        <div className="flex items-end gap-2">
+                          <span className="text-3xl sm:text-4xl font-bold text-teal-400">B2</span>
+                          <span className="text-emerald-400 text-sm mb-1 flex items-center gap-1">
+                            <TrendingUp className="w-3 h-3" />
+                            Up from B3
+                          </span>
+                        </div>
+                        <div className="mt-3 h-2 bg-white/10 rounded-full overflow-hidden">
+                          <div className="h-full w-[72%] bg-gradient-to-r from-teal-500 to-cyan-400 rounded-full" />
+                        </div>
+                        <p className="text-white/50 text-xs mt-2">72% confidence based on 234 questions</p>
+                      </div>
+
+                      {/* Study Streak */}
+                      <div className="glass rounded-xl p-4 border border-amber-500/20">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-white/70 text-sm">Study Streak</span>
+                          <Flame className="w-4 h-4 text-amber-400" />
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-3xl sm:text-4xl font-bold text-amber-400">14</span>
+                          <span className="text-white/70 text-sm">days in a row</span>
+                        </div>
+                        <div className="flex gap-1 mt-3">
+                          {[...Array(7)].map((_, i) => (
+                            <div
+                              key={i}
+                              className={cn(
+                                "flex-1 h-6 rounded",
+                                i < 7 ? "bg-amber-500/30" : "bg-white/10"
+                              )}
+                            />
+                          ))}
+                        </div>
+                        <p className="text-white/50 text-xs mt-2">Best streak: 21 days</p>
+                      </div>
+
+                      {/* Questions Practiced */}
+                      <div className="glass rounded-xl p-4 border border-purple-500/20">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-white/70 text-sm">Questions This Week</span>
+                          <BookOpen className="w-4 h-4 text-purple-400" />
+                        </div>
+                        <div className="flex items-end gap-2">
+                          <span className="text-3xl sm:text-4xl font-bold text-purple-400">347</span>
+                          <span className="text-white/50 text-sm mb-1">/ 500 goal</span>
+                        </div>
+                        <div className="mt-3 h-2 bg-white/10 rounded-full overflow-hidden">
+                          <div className="h-full w-[69%] bg-gradient-to-r from-purple-500 to-pink-400 rounded-full" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Middle Column - Study Heatmap */}
+                    <div className="lg:col-span-2 space-y-4">
+                      {/* Heatmap */}
+                      <div className="glass rounded-xl p-4 border border-white/10">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-white font-medium">Study Activity Heatmap</span>
+                          <span className="text-white/50 text-xs">Last 12 weeks</span>
+                        </div>
+                        <div className="grid grid-cols-12 gap-1">
+                          {[...Array(84)].map((_, i) => {
+                            const intensity = Math.random();
+                            return (
+                              <div
+                                key={i}
+                                className={cn(
+                                  "aspect-square rounded-sm",
+                                  intensity > 0.8 ? "bg-teal-400" :
+                                  intensity > 0.6 ? "bg-teal-500/70" :
+                                  intensity > 0.4 ? "bg-teal-600/50" :
+                                  intensity > 0.2 ? "bg-teal-700/30" :
+                                  "bg-white/5"
+                                )}
+                              />
+                            );
+                          })}
+                        </div>
+                        <div className="flex items-center justify-end gap-2 mt-3 text-xs text-white/50">
+                          <span>Less</span>
+                          <div className="flex gap-0.5">
+                            <div className="w-3 h-3 rounded-sm bg-white/5" />
+                            <div className="w-3 h-3 rounded-sm bg-teal-700/30" />
+                            <div className="w-3 h-3 rounded-sm bg-teal-600/50" />
+                            <div className="w-3 h-3 rounded-sm bg-teal-500/70" />
+                            <div className="w-3 h-3 rounded-sm bg-teal-400" />
+                          </div>
+                          <span>More</span>
+                        </div>
+                      </div>
+
+                      {/* Subject Performance */}
+                      <div className="glass rounded-xl p-4 border border-white/10">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-white font-medium">Subject Strengths & Weaknesses</span>
+                        </div>
+                        <div className="space-y-3">
+                          {[
+                            { subject: 'Mathematics', score: 85, color: 'from-emerald-500 to-green-400', trend: 'up' },
+                            { subject: 'Physics', score: 72, color: 'from-blue-500 to-indigo-400', trend: 'up' },
+                            { subject: 'Chemistry', score: 68, color: 'from-purple-500 to-pink-400', trend: 'stable' },
+                            { subject: 'Biology', score: 54, color: 'from-rose-500 to-red-400', trend: 'down' },
+                          ].map((item) => (
+                            <div key={item.subject} className="flex items-center gap-4">
+                              <span className="text-white/70 text-sm w-24 flex-shrink-0">{item.subject}</span>
+                              <div className="flex-1 h-3 bg-white/10 rounded-full overflow-hidden">
+                                <div
+                                  className={cn("h-full bg-gradient-to-r rounded-full", item.color)}
+                                  style={{ width: `${item.score}%` }}
+                                />
+                              </div>
+                              <span className={cn(
+                                "text-sm font-medium w-12 text-right",
+                                item.score >= 70 ? "text-emerald-400" :
+                                item.score >= 50 ? "text-amber-400" :
+                                "text-rose-400"
+                              )}>
+                                {item.score}%
+                              </span>
+                              {item.trend === 'up' && <TrendingUp className="w-4 h-4 text-emerald-400" />}
+                              {item.trend === 'down' && <TrendingUp className="w-4 h-4 text-rose-400 rotate-180" />}
+                              {item.trend === 'stable' && <div className="w-4 h-0.5 bg-white/30 rounded" />}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-4 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20">
+                          <div className="flex items-start gap-2">
+                            <Target className="w-4 h-4 text-rose-400 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <p className="text-rose-400 text-sm font-medium">Focus Area: Biology</p>
+                              <p className="text-white/50 text-xs">Practice more Cell Biology and Genetics to improve</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card3D>
+          </div>
+
+          {/* Analytics Features */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {[
+              {
+                icon: BarChart3,
+                title: 'Study Heatmaps',
+                desc: 'Visualize your study patterns and consistency over time',
+                color: 'from-teal-500 to-cyan-500'
+              },
+              {
+                icon: Target,
+                title: 'Score Prediction',
+                desc: 'AI-powered grade predictions based on your performance',
+                color: 'from-purple-500 to-pink-500'
+              },
+              {
+                icon: TrendingUp,
+                title: 'Progress Tracking',
+                desc: 'See improvement trends across all subjects and topics',
+                color: 'from-emerald-500 to-green-500'
+              },
+              {
+                icon: Brain,
+                title: 'Smart Recommendations',
+                desc: 'Personalized study suggestions to target weak areas',
+                color: 'from-amber-500 to-orange-500'
+              }
+            ].map((feature, i) => (
+              <div key={i} className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 text-center hover:bg-white/10 transition-all group">
+                <div className={cn(
+                  "w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform",
+                  feature.color
+                )}>
+                  <feature.icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-white mb-2">{feature.title}</h3>
+                <p className="text-white/60 text-sm">{feature.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -2561,6 +3379,243 @@ export function LandingPage() {
             <p className="mt-3 sm:mt-4 text-white/50 text-sm sm:text-base">
               Verified teachers with ratings and reviews
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================== */}
+      {/* SOCIAL & COMMUNITY SECTION */}
+      {/* ========================================== */}
+      <section className="relative py-16 sm:py-24 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-violet-950/20 to-slate-950" />
+        <GradientOrb className="w-[500px] h-[500px] bg-violet-500/20 -left-48 top-1/4" delay={0} />
+        <GradientOrb className="w-[400px] h-[400px] bg-purple-500/20 -right-32 bottom-1/4" delay={2} />
+
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-violet-500/20 to-purple-500/20 border border-violet-500/30 rounded-full text-violet-400 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              Study Together
+            </span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-display font-bold text-white mb-4 sm:mb-6">
+              Learn Better{' '}
+              <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Together
+              </span>
+            </h2>
+            <p className="text-sm sm:text-base lg:text-xl text-white/60 max-w-3xl mx-auto">
+              Connect with classmates, form study groups, and chat with students across Ghana. Learning is more fun when you're not alone.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-16">
+            {/* Friends & Connections */}
+            <Card3D>
+              <div className="relative glass rounded-2xl sm:rounded-3xl p-6 sm:p-8 h-full overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                      <Heart className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-white">Friends</h3>
+                      <p className="text-white/50 text-sm sm:text-base">Connect & Compete</p>
+                    </div>
+                  </div>
+
+                  <p className="text-white/70 text-sm sm:text-base mb-6 leading-relaxed">
+                    Add friends, see their activity, and challenge them to battles. Track each other's progress and celebrate wins together.
+                  </p>
+
+                  {/* Friends Preview */}
+                  <div className="space-y-3 mb-6">
+                    {[
+                      { name: 'Kwame A.', status: 'Studying Physics', online: true, streak: 14 },
+                      { name: 'Ama S.', status: 'Just won a battle!', online: true, streak: 7 },
+                      { name: 'Kofi M.', status: 'Last seen 2h ago', online: false, streak: 21 },
+                    ].map((friend, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+                        <div className="relative">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                            {friend.name.charAt(0)}
+                          </div>
+                          {friend.online && (
+                            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-slate-900" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-medium text-sm truncate">{friend.name}</p>
+                          <p className="text-white/50 text-xs truncate">{friend.status}</p>
+                        </div>
+                        <div className="flex items-center gap-1 text-amber-400 text-xs">
+                          <Flame className="w-3 h-3" />
+                          {friend.streak}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-white/50">12 friends online</span>
+                    <button className="text-violet-400 hover:text-violet-300 font-medium">Find Friends</button>
+                  </div>
+                </div>
+              </div>
+            </Card3D>
+
+            {/* Study Groups */}
+            <Card3D>
+              <div className="relative glass rounded-2xl sm:rounded-3xl p-6 sm:p-8 h-full overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                      <Users className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-white">Study Groups</h3>
+                      <p className="text-white/50 text-sm sm:text-base">Learn as a Team</p>
+                    </div>
+                  </div>
+
+                  <p className="text-white/70 text-sm sm:text-base mb-6 leading-relaxed">
+                    Create or join study groups for your subjects. Share resources, discuss topics, and prepare for exams together.
+                  </p>
+
+                  {/* Groups Preview */}
+                  <div className="space-y-3 mb-6">
+                    {[
+                      { name: 'WASSCE Maths 2025', members: 24, icon: '📐', color: 'from-blue-500 to-indigo-500' },
+                      { name: 'Physics Study Squad', members: 18, icon: '⚡', color: 'from-purple-500 to-pink-500' },
+                      { name: 'Biology Champions', members: 31, icon: '🧬', color: 'from-emerald-500 to-green-500' },
+                    ].map((group, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+                        <div className={cn(
+                          "w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center text-lg",
+                          group.color
+                        )}>
+                          {group.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-medium text-sm truncate">{group.name}</p>
+                          <p className="text-white/50 text-xs">{group.members} members</p>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-white/30" />
+                      </div>
+                    ))}
+                  </div>
+
+                  <button className="w-full py-2.5 px-4 rounded-xl bg-blue-500/20 text-blue-400 text-sm font-medium hover:bg-blue-500/30 transition-colors flex items-center justify-center gap-2">
+                    <Users className="w-4 h-4" />
+                    Create New Group
+                  </button>
+                </div>
+              </div>
+            </Card3D>
+
+            {/* Chat Rooms */}
+            <Card3D>
+              <div className="relative glass rounded-2xl sm:rounded-3xl p-6 sm:p-8 h-full overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-rose-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                      <MessageCircle className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-white">Chat Rooms</h3>
+                      <p className="text-white/50 text-sm sm:text-base">Real-time Discussion</p>
+                    </div>
+                  </div>
+
+                  <p className="text-white/70 text-sm sm:text-base mb-6 leading-relaxed">
+                    Join subject-specific chat rooms, ask questions, share tips, and help fellow students. DM friends privately.
+                  </p>
+
+                  {/* Chat Preview */}
+                  <div className="glass rounded-xl p-4 border border-pink-500/20 mb-6">
+                    <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/10">
+                      <div className="w-6 h-6 rounded bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-xs">📚</div>
+                      <span className="text-white text-sm font-medium">General Maths</span>
+                      <span className="text-emerald-400 text-xs ml-auto flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        142 online
+                      </span>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-start gap-2">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs flex-shrink-0">K</div>
+                        <div>
+                          <span className="text-blue-400 text-xs">Kwame</span>
+                          <p className="text-white/70 text-xs">Can someone explain completing the square?</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white text-xs flex-shrink-0">A</div>
+                        <div>
+                          <span className="text-emerald-400 text-xs">Ama</span>
+                          <p className="text-white/70 text-xs">Sure! First, move the constant to the right...</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-3 pt-2 border-t border-white/10">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          placeholder="Type a message..."
+                          className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-xs placeholder:text-white/30 focus:outline-none focus:border-pink-500/50"
+                          disabled
+                        />
+                        <button className="w-8 h-8 rounded-lg bg-pink-500 flex items-center justify-center text-white">
+                          <ArrowRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="p-2 rounded-lg bg-white/5">
+                      <span className="text-pink-400 font-bold text-lg">50+</span>
+                      <p className="text-white/50 text-xs">Chat Rooms</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-white/5">
+                      <span className="text-pink-400 font-bold text-lg">DMs</span>
+                      <p className="text-white/50 text-xs">Private Chat</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-white/5">
+                      <span className="text-pink-400 font-bold text-lg">24/7</span>
+                      <p className="text-white/50 text-xs">Moderated</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card3D>
+          </div>
+
+          {/* Community Stats */}
+          <div className="glass rounded-2xl p-6 sm:p-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent mb-1">10K+</div>
+                <div className="text-white/60 text-xs sm:text-sm">Active Students</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-1">500+</div>
+                <div className="text-white/60 text-xs sm:text-sm">Study Groups</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent mb-1">50+</div>
+                <div className="text-white/60 text-xs sm:text-sm">Subject Chats</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent mb-1">Safe</div>
+                <div className="text-white/60 text-xs sm:text-sm">Moderated 24/7</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
