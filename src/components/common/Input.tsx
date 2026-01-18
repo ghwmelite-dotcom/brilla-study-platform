@@ -18,7 +18,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-neutral-700 mb-1"
+            className="block text-sm font-medium text-neutral-700 dark:text-slate-200 mb-1"
           >
             {label}
           </label>
@@ -32,15 +32,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             id={inputId}
+            aria-describedby={hint ? `${inputId}-hint` : undefined}
+            aria-invalid={error ? 'true' : undefined}
             className={cn(
               'w-full px-4 py-2 rounded-lg border transition-all duration-200',
               'focus:outline-none focus:ring-2 focus:border-transparent',
+              'dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600',
+              'placeholder:text-neutral-500 dark:placeholder:text-slate-400',
               error
-                ? 'border-red-300 focus:ring-red-500 bg-red-50'
+                ? 'border-red-300 focus:ring-red-500 bg-red-50 dark:bg-red-900/20'
                 : 'border-neutral-300 focus:ring-primary bg-white',
               leftIcon ? 'pl-10' : undefined,
               rightIcon ? 'pr-10' : undefined,
-              props.disabled ? 'bg-neutral-100 cursor-not-allowed' : undefined,
+              props.disabled ? 'bg-neutral-100 dark:bg-slate-700 cursor-not-allowed' : undefined,
               className
             )}
             {...props}
@@ -51,8 +55,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             </div>
           )}
         </div>
-        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-        {hint && !error && <p className="mt-1 text-sm text-neutral-500">{hint}</p>}
+        {error && (
+          <p className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+            {error}
+          </p>
+        )}
+        {hint && !error && (
+          <p className="mt-1 text-sm text-neutral-600 dark:text-slate-400" id={`${inputId}-hint`}>
+            {hint}
+          </p>
+        )}
       </div>
     );
   }
@@ -76,7 +88,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         {label && (
           <label
             htmlFor={textareaId}
-            className="block text-sm font-medium text-neutral-700 mb-1"
+            className="block text-sm font-medium text-neutral-700 dark:text-slate-200 mb-1"
           >
             {label}
           </label>
@@ -84,20 +96,31 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         <textarea
           ref={ref}
           id={textareaId}
+          aria-describedby={hint ? `${textareaId}-hint` : undefined}
+          aria-invalid={error ? 'true' : undefined}
           className={cn(
             'w-full px-4 py-2 rounded-lg border transition-all duration-200',
             'focus:outline-none focus:ring-2 focus:border-transparent',
             'resize-none',
+            'dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600',
             error
-              ? 'border-red-300 focus:ring-red-500 bg-red-50'
+              ? 'border-red-300 focus:ring-red-500 bg-red-50 dark:bg-red-900/20'
               : 'border-neutral-300 focus:ring-primary bg-white',
-            props.disabled && 'bg-neutral-100 cursor-not-allowed',
+            props.disabled && 'bg-neutral-100 dark:bg-slate-700 cursor-not-allowed',
             className
           )}
           {...props}
         />
-        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-        {hint && !error && <p className="mt-1 text-sm text-neutral-500">{hint}</p>}
+        {error && (
+          <p className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+            {error}
+          </p>
+        )}
+        {hint && !error && (
+          <p className="mt-1 text-sm text-neutral-600 dark:text-slate-400" id={`${textareaId}-hint`}>
+            {hint}
+          </p>
+        )}
       </div>
     );
   }
@@ -123,7 +146,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label
             htmlFor={selectId}
-            className="block text-sm font-medium text-neutral-700 mb-1"
+            className="block text-sm font-medium text-neutral-700 dark:text-slate-200 mb-1"
           >
             {label}
           </label>
@@ -131,14 +154,16 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           id={selectId}
+          aria-describedby={hint ? `${selectId}-hint` : undefined}
+          aria-invalid={error ? 'true' : undefined}
           className={cn(
             'w-full px-4 py-2 rounded-lg border transition-all duration-200',
             'focus:outline-none focus:ring-2 focus:border-transparent',
-            'appearance-none bg-white',
+            'appearance-none bg-white dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600',
             error
-              ? 'border-red-300 focus:ring-red-500 bg-red-50'
+              ? 'border-red-300 focus:ring-red-500 bg-red-50 dark:bg-red-900/20'
               : 'border-neutral-300 focus:ring-primary',
-            props.disabled && 'bg-neutral-100 cursor-not-allowed',
+            props.disabled && 'bg-neutral-100 dark:bg-slate-700 cursor-not-allowed',
             className
           )}
           {...props}
@@ -154,8 +179,16 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             </option>
           ))}
         </select>
-        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-        {hint && !error && <p className="mt-1 text-sm text-neutral-500">{hint}</p>}
+        {error && (
+          <p className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+            {error}
+          </p>
+        )}
+        {hint && !error && (
+          <p className="mt-1 text-sm text-neutral-600 dark:text-slate-400" id={`${selectId}-hint`}>
+            {hint}
+          </p>
+        )}
       </div>
     );
   }

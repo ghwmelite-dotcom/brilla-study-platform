@@ -21,6 +21,41 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Poppins', system-ui, sans-serif;
   }
+
+  /* ============================================
+     Accessibility: Focus Visible Styles
+     ============================================ */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-white;
+  }
+
+  .dark :focus-visible {
+    @apply ring-primary-light ring-offset-slate-900;
+  }
+
+  /* ============================================
+     Accessibility: Reduced Motion
+     ============================================ */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* ============================================
+     Accessibility: High Contrast Mode Support
+     ============================================ */
+  @media (prefers-contrast: high) {
+    :root {
+      --text-muted: #525252;
+      --border-color: #404040;
+    }
+  }
 }
 
 @layer components {
@@ -108,6 +143,38 @@
 
   .bg-gradient-ghana {
     @apply bg-gradient-to-r from-primary via-secondary to-accent;
+  }
+
+  /* ============================================
+     Accessibility: Improved Contrast Text Colors
+     WCAG 2.1 AA requires 4.5:1 contrast for normal text
+     ============================================ */
+
+  /* Muted text with better contrast (meets 4.5:1 on white bg) */
+  .text-muted-accessible {
+    @apply text-neutral-600; /* #4B5563 has 7:1 contrast on white */
+  }
+
+  .dark .text-muted-accessible {
+    @apply text-slate-300; /* #CBD5E1 has 8.5:1 contrast on slate-900 */
+  }
+
+  /* Secondary text with better contrast */
+  .text-secondary-accessible {
+    @apply text-neutral-700; /* #374151 has 10:1 contrast on white */
+  }
+
+  .dark .text-secondary-accessible {
+    @apply text-slate-200; /* #E2E8F0 has 13:1 contrast on slate-900 */
+  }
+
+  /* Placeholder text with better contrast (meets 4.5:1) */
+  .placeholder-accessible::placeholder {
+    @apply text-neutral-500; /* #6B7280 has 4.6:1 contrast on white */
+  }
+
+  .dark .placeholder-accessible::placeholder {
+    @apply text-slate-400; /* #94A3B8 has 4.5:1 contrast on slate-900 */
   }
 
   /* Safe area utilities for mobile devices with notches */

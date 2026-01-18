@@ -6,6 +6,7 @@ import { Footer } from './Footer';
 import { MobileBottomNav } from './MobileBottomNav';
 import { AiTutor, AiButton } from '@/components/ai';
 import { ChatButton, ChatSidebar } from '@/components/chat';
+import { SkipLink } from '@/components/common';
 import { useAuthStore } from '@/stores/authStore';
 import { useExamPreferencesStore } from '@/stores/examPreferencesStore';
 import { useThemeStore } from '@/stores/themeStore';
@@ -41,6 +42,9 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-slate-900 transition-colors duration-300">
+      {/* Skip link for keyboard navigation - WCAG 2.4.1 */}
+      <SkipLink />
+
       <Header
         onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)}
         isSidebarOpen={isSidebarOpen}
@@ -52,7 +56,12 @@ export function Layout({ children }: LayoutProps) {
           onClose={() => setIsSidebarOpen(false)}
         />
 
-        <main className="flex-1 overflow-auto pb-20 lg:pb-0">
+        <main
+          id="main-content"
+          role="main"
+          className="flex-1 overflow-auto pb-20 lg:pb-0"
+          tabIndex={-1}
+        >
           {children || (
             <div className="max-w-7xl mx-auto px-4 py-6 lg:px-6">
               <Outlet />

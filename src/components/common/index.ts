@@ -8,3 +8,5 @@ export { ProgressBar, CircularProgress, MasteryProgress } from './Progress';
 export { VoiceInput } from './VoiceInput';
 export { LoadingScreen, PageLoader } from './LoadingScreen';
 export { ThemeToggle } from './ThemeToggle';
+export { OptimizedImage, Avatar, BackgroundImage } from './OptimizedImage';
+export { SkipLink, VisuallyHidden, FocusTrap, LiveRegion } from './SkipLink';
