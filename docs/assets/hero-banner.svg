@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#050807"/>
+      <stop offset="0.55" stop-color="#081018"/>
+      <stop offset="1" stop-color="#0b1424"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.82" cy="0.42" r="0.55">
+      <stop offset="0" stop-color="#fcd116" stop-opacity="0.22"/>
+      <stop offset="0.5" stop-color="#fcd116" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#fcd116" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="wordmark" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffe98a"/>
+      <stop offset="0.5" stop-color="#fcd116"/>
+      <stop offset="1" stop-color="#e0a800"/>
+    </linearGradient>
+    <linearGradient id="star" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe98a"/>
+      <stop offset="1" stop-color="#f0b400"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fcd116" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#006b3f" stop-opacity="0.7"/>
+    </linearGradient>
+    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="320" fill="url(#bg)"/>
+  <rect width="1200" height="320" fill="url(#glow)"/>
+
+  <!-- faint grid -->
+  <g stroke="#ffffff" stroke-opacity="0.04" stroke-width="1">
+    <path d="M0 80 H1200 M0 160 H1200 M0 240 H1200"/>
+    <path d="M150 0 V320 M300 0 V320 M450 0 V320 M600 0 V320 M750 0 V320 M900 0 V320 M1050 0 V320"/>
+  </g>
+
+  <!-- Ghana flag accent bar -->
+  <g>
+    <rect x="0" y="312" width="400" height="8" fill="#ce1126"/>
+    <rect x="400" y="312" width="400" height="8" fill="#fcd116"/>
+    <rect x="800" y="312" width="400" height="8" fill="#006b3f"/>
+  </g>
+
+  <!-- Wordmark -->
+  <g font-family="'Segoe UI', system-ui, sans-serif">
+    <text x="80" y="128" font-size="76" font-weight="800" letter-spacing="4" fill="url(#wordmark)">BRILLA</text>
+    <text x="82" y="166" font-size="24" font-weight="600" letter-spacing="10" fill="#f5f7fa" fill-opacity="0.92">STUDY PLATFORM</text>
+    <text x="82" y="210" font-size="19" font-weight="400" fill="#9aa7b8">Ghana's AI-powered exam preparation platform for</text>
+    <text x="82" y="238" font-size="19" font-weight="400" fill="#9aa7b8">BECE &#183; WASSCE &#183; NSMQ &#183; Cambridge IGCSE &amp; A-Level</text>
+    <text x="82" y="284" font-size="15" font-style="italic" fill="#fcd116" fill-opacity="0.85">Sanbra Brilla — shine bright, study smart.</text>
+  </g>
+
+  <!-- Shining star motif -->
+  <g transform="translate(960,140)">
+    <circle r="118" fill="none" stroke="url(#ring)" stroke-width="1.5" stroke-opacity="0.5"/>
+    <circle r="118" fill="none" stroke="#fcd116" stroke-width="1.5" stroke-dasharray="40 700" stroke-linecap="round"/>
+    <ellipse rx="150" ry="52" fill="none" stroke="#fcd116" stroke-opacity="0.28" stroke-width="1.2" transform="rotate(-24)"/>
+    <ellipse rx="150" ry="52" fill="none" stroke="#006b3f" stroke-opacity="0.35" stroke-width="1.2" transform="rotate(28)"/>
+    <!-- glow core -->
+    <circle r="34" fill="#fcd116" opacity="0.35" filter="url(#soft)"/>
+    <!-- four-point star -->
+    <path d="M0 -46 C4 -14 14 -4 46 0 C14 4 4 14 0 46 C-4 14 -14 4 -46 0 C-14 -4 -4 -14 0 -46 Z" fill="url(#star)"/>
+    <circle r="6" fill="#fff8dd"/>
+    <!-- satellites -->
+    <circle cx="-96" cy="-58" r="5" fill="#ce1126"/>
+    <circle cx="104" cy="46" r="5" fill="#006b3f"/>
+    <circle cx="60" cy="-92" r="3.5" fill="#f5f7fa" opacity="0.8"/>
+    <!-- orbiting sparkles -->
+    <g fill="#fcd116">
+      <path d="M-150 20 l2.2 5 5 2.2 -5 2.2 -2.2 5 -2.2 -5 -5 -2.2 5 -2.2 Z" opacity="0.8"/>
+      <path d="M142 -64 l1.8 4 4 1.8 -4 1.8 -1.8 4 -1.8 -4 -4 -1.8 4 -1.8 Z" opacity="0.7"/>
+      <path d="M40 128 l1.6 3.6 3.6 1.6 -3.6 1.6 -1.6 3.6 -1.6 -3.6 -3.6 -1.6 3.6 -1.6 Z" opacity="0.6"/>
+    </g>
+  </g>
+
+  <!-- floating exam subject chips -->
+  <g font-family="'Segoe UI', system-ui, sans-serif" font-size="13" font-weight="600">
+    <g opacity="0.9">
+      <rect x="700" y="52" width="86" height="28" rx="14" fill="#0f1b2a" stroke="#fcd116" stroke-opacity="0.5"/>
+      <text x="743" y="70" text-anchor="middle" fill="#fcd116">WASSCE</text>
+    </g>
+    <g opacity="0.9">
+      <rect x="806" y="96" width="70" height="28" rx="14" fill="#0f1b2a" stroke="#006b3f" stroke-opacity="0.7"/>
+      <text x="841" y="114" text-anchor="middle" fill="#4ade80">NSMQ</text>
+    </g>
+    <g opacity="0.9">
+      <rect x="706" y="220" width="66" height="28" rx="14" fill="#0f1b2a" stroke="#ce1126" stroke-opacity="0.6"/>
+      <text x="739" y="238" text-anchor="middle" fill="#f87171">BECE</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <defs>
+    <linearGradient id="dbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f1b2a"/>
+      <stop offset="1" stop-color="#0a141f"/>
+    </linearGradient>
+  </defs>
+  <rect width="96" height="96" rx="20" fill="url(#dbg)" stroke="#4ade80" stroke-opacity="0.4" stroke-width="1.5"/>
+  <!-- gauge arc -->
+  <path d="M24 62 A26 26 0 0 1 72 62" fill="none" stroke="#22344a" stroke-width="6" stroke-linecap="round"/>
+  <path d="M24 62 A26 26 0 0 1 62 40" fill="none" stroke="#4ade80" stroke-width="6" stroke-linecap="round"/>
+  <!-- needle -->
+  <path d="M48 62 L60 42" stroke="#ffe98a" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="48" cy="62" r="4.5" fill="#ffe98a"/>
+  <!-- bars -->
+  <rect x="30" y="70" width="8" height="8" rx="2" fill="#4ade80" opacity="0.6"/>
+  <rect x="44" y="70" width="8" height="8" rx="2" fill="#fcd116" opacity="0.8"/>
+  <rect x="58" y="70" width="8" height="8" rx="2" fill="#f87171" opacity="0.7"/>
+</svg>

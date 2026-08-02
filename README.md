@@ -1,475 +1,225 @@
-# Brilla Study Platform
+<p align="center">
+  <img src="docs/assets/hero-banner.svg" alt="Brilla Study Platform" width="100%">
+</p>
 
-<div align="center">
+<p align="center">
+  <a href="https://brillaprep.org"><img src="https://img.shields.io/badge/Live-brillaprep.org-fcd116?style=for-the-badge&logo=googlechrome&logoColor=050807" alt="Live site"></a>
+  <img src="https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=050807" alt="React 18.3">
+  <img src="https://img.shields.io/badge/TypeScript-5.6-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5.6">
+  <img src="https://img.shields.io/badge/Cloudflare-Workers%20%C2%B7%20D1%20%C2%B7%20R2%20%C2%B7%20AI-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS 3.4">
+  <img src="https://img.shields.io/badge/License-Proprietary-ce1126?style=for-the-badge" alt="Proprietary license">
+</p>
 
-<img src="public/icons/icon-192x192.png" alt="Brilla Logo" width="120" height="120">
+<p align="center">
+  <strong>AI-powered exam preparation for BECE, WASSCE, NSMQ, and Cambridge IGCSE / A-Level — built in Ghana, for Ghanaian students first.</strong>
+</p>
 
-# **Brilla Study Platform**
-
-### Ghana's Premier AI-Powered Exam Preparation Platform
-
-[![Live Demo](https://img.shields.io/badge/Live-brillagh.com-00C853?style=for-the-badge&logo=vercel&logoColor=white)](https://brillagh.com)
-[![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
-[![Tailwind](https://img.shields.io/badge/Tailwind-3.4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
-
----
-
-*Empowering students across Ghana and beyond to excel in **BECE**, **WASSCE**, **NSMQ**, **Cambridge IGCSE**, and **Cambridge A-Level** examinations through intelligent, personalized learning.*
-
-[**Get Started**](https://brillagh.com) | [**Features**](#features) | [**Tech Stack**](#tech-stack) | [**Documentation**](#documentation)
-
-</div>
+<p align="center">
+  <a href="#overview">Overview</a> ·
+  <a href="#key-features">Features</a> ·
+  <a href="#architecture">Architecture</a> ·
+  <a href="#tech-stack">Tech Stack</a> ·
+  <a href="#getting-started">Getting Started</a> ·
+  <a href="#project-structure">Structure</a> ·
+  <a href="#roadmap">Roadmap</a> ·
+  <a href="#contributing">Contributing</a>
+</p>
 
 ---
 
 ## Overview
 
-**Brilla Study Platform** is a comprehensive, AI-powered educational platform designed for students preparing for national and international examinations. Built with cutting-edge technology and deep understanding of both Ghanaian and Cambridge curricula, Brilla provides an engaging, gamified learning experience that makes exam preparation effective and enjoyable.
+**Brilla Study Platform** is a full-stack, AI-driven exam preparation platform serving students across Ghana and beyond. It combines an exam-authentic question bank and past-paper library with a proactive **AI Revision Classroom**, a 24/7 AI tutor, real-time quiz battles, and deep gamification (XP, streaks, houses, quests, leaderboards) — all delivered as an installable PWA backed by a serverless Cloudflare edge stack.
 
-### Why Brilla?
+The platform supports five exam systems end-to-end:
 
-- **🧠 AI Revision Classroom** - Revolutionary AI that *teaches* you, not just answers questions
-- **Adaptive Learning** - AI-powered question selection that focuses on your weak areas
-- **Exam-Authentic** - Questions following real WAEC and Cambridge formats
-- **24/7 AI Tutor** - Get help anytime with our Llama 3.3 70B-powered tutor
-- **Gamified Experience** - XP, streaks, battles, and leaderboards keep you motivated
-- **Works Offline** - PWA support for studying without internet
-- **Ghana-First Design** - Built with Ghanaian students in mind, with local curriculum support
+| Exam | Level | Coverage |
+|------|-------|----------|
+| **BECE** | JHS | Core subjects incl. English, Maths, Integrated Science, Social Studies, RME, ICT, French |
+| **WASSCE** | SHS | Core, science, business, arts and vocational electives |
+| **NSMQ** | SHS | Speed-race, Problem of the Day, True/False and riddle round simulations |
+| **Cambridge IGCSE** | O-Level | Physics (0625), Chemistry (0620), Biology (0610), Mathematics (0580) |
+| **Cambridge A-Level** | Pre-university | Physics (9702), Chemistry (9701), Biology (9700), Mathematics (9709) |
 
----
+## Key Features
 
-## 🌟 Featured: AI Revision Classroom
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/assets/icon-ai-classroom.svg" width="72" alt="AI Revision Classroom"><br>
+      <strong>AI Revision Classroom</strong><br>
+      <sub>A proactive AI teacher that leads structured lessons — Hook &#8594; Explain &#8594; Check &#8594; Practice &#8594; Confirm &#8594; Connect — with checkpoints and mastery tracking via spaced repetition.</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/assets/icon-ai-tutor.svg" width="72" alt="AI Tutor"><br>
+      <strong>24/7 AI Suite</strong><br>
+      <sub>Llama 3.3 70B tutor with KaTeX math rendering, an AI essay grader with mark schemes, and an AI career counselor.</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/assets/icon-exams.svg" width="72" alt="Exam practice"><br>
+      <strong>Exam-Authentic Practice</strong><br>
+      <sub>Adaptive smart practice, timed mock exams, and official past papers with mark schemes across all five exam systems.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="docs/assets/icon-gamification.svg" width="72" alt="Gamification"><br>
+      <strong>Gamified Learning</strong><br>
+      <sub>XP and levels, daily streaks with shields, 50+ achievements, daily/weekly quests, and the four-house House Cup.</sub>
+    </td>
+    <td align="center">
+      <img src="docs/assets/icon-battles.svg" width="72" alt="Battles"><br>
+      <strong>Battles &amp; Study Rooms</strong><br>
+      <sub>Real-time solo and team quiz battles, multiplayer study rooms, friends, chat, and community forums.</sub>
+    </td>
+    <td align="center">
+      <img src="docs/assets/icon-dashboards.svg" width="72" alt="Dashboards"><br>
+      <strong>Parents, Teachers &amp; Admins</strong><br>
+      <sub>Parent dashboards with reports and notifications, teacher assessment builder and grading, plus a full admin and moderation portal.</sub>
+    </td>
+  </tr>
+</table>
 
-<div align="center">
+Also on board: an **e-library** with multimedia content (R2-backed), an **interactive whiteboard** with recorded sessions, a **tutoring marketplace**, an **affiliate program**, and **subscriptions &amp; payments** via Paystack (incl. mobile money).
 
-### *The World's First AI Teacher That Actually Teaches*
+## Architecture
 
-</div>
+<p align="center">
+  <img src="docs/assets/architecture.svg" alt="Brilla system architecture" width="100%">
+</p>
 
-Unlike traditional AI tutors that passively wait for your questions, **Brilla's AI Revision Classroom** proactively teaches you through a proven **6-phase pedagogical methodology**:
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                                                                             │
-│   🪝 HOOK  →  📖 EXPLAIN  →  ✓ CHECK  →  ✍️ PRACTICE  →  ✅ CONFIRM  →  🔗 CONNECT   │
-│                                                                             │
-│   Engage      Teach the      Test         Apply        Verify       Link to  │
-│   curiosity   concept        understanding knowledge   mastery      context  │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Key Differentiators
-
-| Feature | Traditional AI Tutors | Brilla AI Classroom |
-|---------|----------------------|---------------------|
-| **Teaching Style** | Reactive (answers questions) | **Proactive (leads lessons)** |
-| **Methodology** | Random explanations | **Structured 6-phase pedagogy** |
-| **Curriculum** | Generic content | **Exam board aligned (WAEC, Cambridge, Edexcel)** |
-| **Progress Tracking** | None or basic | **Spaced repetition + mastery tracking** |
-| **Interaction** | Q&A only | **Ask questions anytime without breaking flow** |
-| **Availability** | Limited | **24/7, unlimited access** |
-
-### How It Works
-
-```
-Student selects a subject → AI generates personalized lesson plan →
-AI teaches through interactive phases → Student asks questions anytime →
-AI checks understanding with checkpoints → Mastery tracked with spaced repetition
-```
-
-### Sample AI Teaching Interaction
-
-```
-🤖 AI Teacher: "Let me ask you something interesting... Have you ever wondered
-               why ice floats on water? 🤔"
-
-🤖 AI Teacher: "Most substances become denser when they solidify, but water is
-               special! This is because of hydrogen bonding..."
-
-👤 Student:    "That's fascinating! So the hydrogen bonds create a crystal structure?"
-
-🤖 AI Teacher: "Exactly right! ✨ You're connecting the dots perfectly. The hydrogen
-               bonds arrange water molecules into a hexagonal lattice with more space
-               between molecules than liquid water. Now let me check your understanding..."
-```
-
-### Supported Exam Boards
-
-| Exam System | AI Teaching Coverage |
-|-------------|---------------------|
-| **BECE** | All 8 core subjects |
-| **WASSCE** | 50+ subjects with WAEC-specific strategies |
-| **Cambridge IGCSE** | Physics, Chemistry, Biology, Mathematics |
-| **Cambridge A-Level** | AS and A2 content for all science subjects |
-| **Edexcel A-Level** | Full syllabus coverage (coming soon) |
-
-### Key Statistics
-
-| Metric | Value |
-|--------|-------|
-| Practice Questions | **4,000+** |
-| Subjects Covered | **50+** |
-| Exam Systems | **5** (BECE, WASSCE, NSMQ, IGCSE, A-Level) |
-| Database Migrations | **100+** |
-| Active Features | **30+** |
-
----
-
-## Supported Examinations
-
-<div align="center">
-
-| Exam | Level | Subjects | Status |
-|------|-------|----------|--------|
-| **BECE** | JHS | 8 Core Subjects | ✅ Full Support |
-| **WASSCE** | SHS | 50+ Subjects | ✅ Full Support |
-| **NSMQ** | SHS | Maths, Physics, Chemistry, Biology | ✅ Full Support |
-| **Cambridge IGCSE** | O-Level | Physics, Chemistry, Biology, Mathematics | ✅ Full Support |
-| **Cambridge A-Level** | Pre-University | Physics, Chemistry, Biology, Mathematics | ✅ Full Support |
-
-</div>
-
-### Ghana National Exams
-
-#### BECE (Basic Education Certificate Examination)
-- **Core Subjects:** English Language, Mathematics, Integrated Science, Social Studies
-- **Additional:** RME, BDT, ICT, French, Ghanaian Language
-
-#### WASSCE (West African Senior School Certificate Examination)
-- **Core 4:** English, Core Mathematics, Integrated Science, Social Studies
-- **Sciences:** Physics, Chemistry, Biology, Elective Mathematics
-- **Business:** Economics, Accounting, Business Management, Cost Accounting
-- **Arts:** Literature, Government, History, Geography, CRS/IRS
-- **Vocational:** Foods & Nutrition, Technical Drawing
-
-#### NSMQ (National Science & Maths Quiz)
-- Speed-based competition preparation
-- Round simulations (Speed Race, Problem of the Day, True/False, Riddles)
-- Real-time battle mode for team practice
-
-### Cambridge International Exams
-
-#### Cambridge IGCSE (O-Level)
-| Subject | Syllabus Code | Papers |
-|---------|---------------|--------|
-| Physics | 0625 | Paper 1 (MCQ), Paper 2 (Core), Paper 4 (Extended), Paper 6 (ATP) |
-| Chemistry | 0620 | Paper 1 (MCQ), Paper 2 (Core), Paper 4 (Extended), Paper 6 (ATP) |
-| Biology | 0610 | Paper 1 (MCQ), Paper 2 (Core), Paper 4 (Extended), Paper 6 (ATP) |
-| Mathematics | 0580 | Paper 1 (Non-Calc), Paper 2 (Extended), Paper 4 (Extended) |
-
-#### Cambridge A-Level
-| Subject | Syllabus Code | Papers |
-|---------|---------------|--------|
-| Physics | 9702 | Paper 1 (MCQ), Paper 2 (AS), Paper 3 (Practical), Paper 4 (A2), Paper 5 (Planning) |
-| Chemistry | 9701 | Paper 1 (MCQ), Paper 2 (AS), Paper 3 (Practical), Paper 4 (A2), Paper 5 (Planning) |
-| Biology | 9700 | Paper 1 (MCQ), Paper 2 (AS), Paper 3 (Practical), Paper 4 (A2), Paper 5 (Planning) |
-| Mathematics | 9709 | Paper 1 (Pure 1), Paper 3 (Pure 3), Paper 4 (Mechanics), Paper 6 (Statistics) |
-
----
-
-## Features
-
-### 🧠 AI-Powered Learning (Flagship)
-
-| Feature | Description |
-|---------|-------------|
-| **AI Revision Classroom** | 🌟 Revolutionary proactive AI teacher with 6-phase pedagogy (Hook → Explain → Check → Practice → Confirm → Connect) |
-| **AI Tutor** | 24/7 reactive tutoring powered by Llama 3.3 70B with LaTeX math support |
-| **AI Essay Grader** | Detailed essay feedback with mark schemes and model answers |
-| **AI Career Counselor** | Personalized career guidance based on performance and interests |
-
-### Core Learning
-
-| Feature | Description |
-|---------|-------------|
-| **Smart Practice** | Adaptive questions based on performance, weak areas, and syllabus coverage |
-| **Mock Exams** | Timed exams replicating real conditions with authentic formats |
-| **Past Papers** | Official past papers with mark schemes and examiner reports |
-| **Topic Browser** | Navigate syllabi by topic with mastery tracking |
-| **Spaced Repetition** | Smart scheduling of topics due for review based on mastery levels |
-| **Essay Practice** | AI-graded essays with detailed feedback and model answers |
-
-### Gamification & Engagement
-
-| Feature | Description |
-|---------|-------------|
-| **XP & Levels** | Earn experience points and level up through activities |
-| **Daily Streaks** | Maintain study streaks with streak shields and freeze protection |
-| **House Cup** | Compete in houses: Ashanti, Volta, Northern, Coastal |
-| **Leaderboards** | Daily, weekly, monthly, and all-time rankings |
-| **Achievements** | 50+ badges for milestones and accomplishments |
-| **Quests** | Daily and weekly challenges for bonus rewards |
-
-### Social Learning
-
-| Feature | Description |
-|---------|-------------|
-| **Battle Mode** | Real-time quiz battles against friends or random opponents |
-| **Study Groups** | Create and join study groups with classmates |
-| **Community Forums** | Discussion boards and peer support |
-| **Friends System** | Connect and track each other's progress |
-| **Chat** | Real-time messaging with study partners |
-
-### Advanced Features
-
-| Feature | Description |
-|---------|-------------|
-| **Parent Dashboard** | Real-time progress monitoring for parents |
-| **Teacher Portal** | Assessment creation, grading, and student tracking |
-| **E-Library** | Digital textbooks, past papers, and study materials |
-| **Interactive Whiteboard** | Drawing tool for math and science problems |
-| **Tutoring Marketplace** | Connect with qualified tutors |
-| **Affiliate Program** | Earn commissions by referring students |
-
----
+The frontend is a React 18 SPA (73 route pages, 49 Zustand stores) built with Vite and deployed to Cloudflare Pages. The backend is a single Cloudflare Worker running a Hono router with 28 route modules (`workers/api/index.ts`), backed by Cloudflare D1 (SQLite, 109 migrations), two R2 buckets (e-library media, whiteboard recordings), and Workers AI (Llama 3.3 70B) for all AI features. A cron trigger runs every six hours to clean up expired demo data. Email goes through Resend, sign-in supports Google OAuth, and payments run through Paystack.
 
 ## Tech Stack
 
-### Frontend
-```
-React 18        - Modern UI with concurrent features
-TypeScript 5.6  - Type-safe development
-Tailwind CSS    - Utility-first styling with Ghana flag theme
-Framer Motion   - Smooth animations and transitions
-Zustand         - Lightweight state management
-React Router 6  - Client-side routing
-Recharts        - Data visualization and analytics
-KaTeX           - Mathematical equation rendering
-Lucide React    - Beautiful, consistent icons
-```
-
-### Backend
-```
-Cloudflare Workers  - Edge computing for global low-latency
-Hono               - Ultra-fast web framework (100k req/s+)
-Cloudflare D1      - SQLite at the edge
-Cloudflare R2      - Object storage for media
-Workers AI         - Llama 3.3 70B inference
-```
-
-### Infrastructure
-```
-Vite              - Next-generation build tool
-PWA               - Installable progressive web app
-Cloudflare Pages  - Global CDN deployment
-GitHub Actions    - CI/CD pipelines
-```
-
----
-
-## Project Structure
-
-```
-brilla-study-platform/
-├── src/
-│   ├── components/          # Reusable UI components
-│   │   ├── ai/             # AI tutor, counselor, essay grader
-│   │   ├── auth/           # Authentication flows, exam type selector
-│   │   ├── battle/         # Real-time quiz battles
-│   │   ├── dashboard/      # Dashboard widgets, flyers, hero
-│   │   ├── exam/           # Exam mode, question cards, timer
-│   │   ├── gamification/   # XP, streaks, achievements, quests
-│   │   ├── learning/       # Study plans, readiness gauge
-│   │   └── subscription/   # Premium features, usage tracking
-│   ├── pages/
-│   │   ├── RevisionClassroom.tsx  # 🌟 AI Revision Classroom
-│   │   └── ...             # 40+ other route pages
-│   ├── stores/
-│   │   ├── revisionClassroomStore.ts  # 🌟 AI teaching state
-│   │   └── ...             # Other Zustand stores
-│   ├── hooks/              # Custom React hooks
-│   ├── lib/                # API client, utilities
-│   ├── types/              # TypeScript definitions
-│   ├── config/             # Exam configs, freemium rules
-│   └── data/               # Static exam data, subjects
-├── workers/
-│   └── api/
-│       ├── revision-classroom.ts  # 🌟 AI classroom endpoints
-│       └── index.ts        # 50+ API routes
-├── database/
-│   └── migrations/
-│       ├── 085_ai_revision_classroom.sql  # 🌟 Classroom schema
-│       └── ...             # 100+ other migrations
-├── public/                 # PWA manifest, icons, assets
-└── docs/                   # Documentation
-```
-
----
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | React 18.3, TypeScript 5.6, Vite 5, Tailwind CSS 3.4, Framer Motion, Zustand 5, React Router 6 |
+| **Specialized UI** | KaTeX (math), Recharts (analytics), Fabric.js (whiteboard), react-pdf, Lucide icons |
+| **Backend** | Cloudflare Workers, Hono 4, jose (JWT auth) |
+| **Data** | Cloudflare D1 (SQLite at the edge), Cloudflare R2 (object storage) |
+| **AI** | Cloudflare Workers AI — `@cf/meta/llama-3.3-70b-instruct-fp8-fast` |
+| **Services** | Resend (email), Google OAuth, Paystack (payments &amp; MoMo) |
+| **Tooling** | Wrangler 3, ESLint 9, PostCSS, PWA (service worker + manifest) |
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- npm or yarn
-- Cloudflare account (for Workers and D1)
-- Wrangler CLI (`npm install -g wrangler`)
+- A Cloudflare account with the [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/)
 
 ### Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/ghwmelite-dotcom/brilla-study-platform.git
 cd brilla-study-platform
-
-# Install dependencies
 npm install
 
-# Set up environment variables
-cp .env.example .env.local
-# Configure VITE_API_URL in .env.local
-
-# Start development
-npm run dev        # Frontend on http://localhost:3000
-npm run dev:api    # API on http://localhost:8787
+# Frontend env: point the SPA at the API
+cp .env.example .env.local   # VITE_API_URL=http://localhost:8787/api
 ```
 
-### Database Setup
+### Run locally
 
 ```bash
-# Create D1 database
-wrangler d1 create brilla-db
+npm run dev        # Frontend (Vite) on http://localhost:3000
+npm run dev:api    # API (wrangler dev) on http://localhost:8787
+npm run dev:all    # Both, via concurrently
+```
 
-# Run all migrations
+### Database
+
+D1 migrations live in `database/migrations/` and are wired in `wrangler.toml`:
+
+```bash
+wrangler d1 create brilla-db
 for file in database/migrations/*.sql; do
-  wrangler d1 execute brilla-db --file="$file"
+  wrangler d1 execute brilla-db --local --file="$file"
 done
 ```
 
-### Deployment
+### Worker secrets
 
 ```bash
-# Build frontend
-npm run build
-
-# Deploy API to Cloudflare Workers
-wrangler deploy
-
-# Frontend auto-deploys via Cloudflare Pages on push
+wrangler secret put JWT_SECRET
+wrangler secret put RESEND_API_KEY
+wrangler secret put GOOGLE_CLIENT_ID
+wrangler secret put GOOGLE_CLIENT_SECRET
 ```
 
----
+### Build &amp; deploy
 
-## API Overview
+```bash
+npm run build      # tsc -b && vite build
+npm run lint       # ESLint
+wrangler deploy    # API to Cloudflare Workers
+```
 
-| Category | Endpoints | Description |
-|----------|-----------|-------------|
-| **Auth** | `/api/auth/*` | Login, register, OAuth, email verification |
-| **Revision Classroom** | `/api/revision-classroom/*` | 🌟 AI teaching sessions, lessons, checkpoints, mastery |
-| **Questions** | `/api/questions/*` | Practice, exams, by topic/subject |
-| **Papers** | `/api/papers/*` | Past papers, mock exams, attempts |
-| **Progress** | `/api/progress/*` | XP, streaks, achievements, analytics |
-| **Social** | `/api/friends/*`, `/api/groups/*` | Social features |
-| **Battle** | `/api/battle/*` | Real-time quiz battles |
-| **AI** | `/api/ai/*` | Tutor, counselor, essay grading |
-| **Admin** | `/api/admin/*` | User management, content, analytics |
+## Project Structure
 
----
-
-## Screenshots
-
-<div align="center">
-
-| Feature | Description |
-|:-------:|:-----------:|
-| **AI Revision Classroom** | 🌟 Proactive AI teaching with 6-phase methodology |
-| **Dashboard** | Personalized exam-specific dashboard with progress tracking |
-| **Practice Mode** | Adaptive question practice with instant feedback |
-| **AI Tutor** | 24/7 intelligent tutoring with LaTeX math support |
-| **Mock Exams** | Timed examinations following real exam formats |
-| **Leaderboards** | Competitive rankings across schools and regions |
-| **Mobile PWA** | Fully responsive design, installable on any device |
-
-</div>
-
----
+```
+brilla-study-platform/
+├── src/
+│   ├── components/        # 46 UI domains: ai, battle, exam, gamification,
+│   │                      #   whiteboard, parent, subscription, tutor-classroom...
+│   ├── pages/             # 73 route pages (RevisionClassroom, Battle, MockExams,
+│   │                      #   ParentDashboard, AdminAnalytics, HouseCup, ...)
+│   ├── stores/            # 49 Zustand stores (auth, exam, battle, quest, ...)
+│   ├── hooks/  lib/  services/  utils/
+│   ├── config/            # examConfig, freemiumConfig
+│   └── data/              # static exam & subject data
+├── workers/api/           # Hono Worker — 28 route modules
+│   ├── index.ts           #   router, auth, cron handler (~10k lines)
+│   ├── revision-classroom.ts
+│   └── ...                # tutor, teambattles, payments, whiteboards, ...
+├── database/migrations/   # 109 D1 (SQLite) migrations
+├── public/                # PWA manifest, service worker, icons, offline page
+├── scripts/               # PWA icon/asset generators
+└── docs/                  # platform docs, user manual, README assets
+```
 
 ## Roadmap
 
-### Recently Completed
-- [x] **AI Revision Classroom** - Revolutionary 6-phase proactive teaching system
-- [x] Spaced repetition for topic mastery tracking
-- [x] Exam board-aligned curriculum intelligence
-- [x] Cambridge IGCSE and A-Level support
+**Shipped**
+- AI Revision Classroom with 6-phase pedagogy and spaced-repetition mastery
+- Cambridge IGCSE &amp; A-Level subject coverage
+- Multiplayer study rooms, team battles, House Cup, quests &amp; achievements
+- Teacher assessment builder, parent dashboards, tutoring marketplace
 
-### In Progress
-- [ ] Edexcel IGCSE and A-Level support
-- [ ] Voice-based AI tutoring
-- [ ] More Cambridge subjects (English, Economics, Business)
-- [ ] Offline mode with service worker caching
+**In progress**
+- Edexcel IGCSE / A-Level support
+- Voice-based AI tutoring
+- Expanded Cambridge subjects (English, Economics, Business)
 
-### Planned
-- [ ] Video lessons integration
-- [ ] School administration portal
-- [ ] Regional competitions platform
-- [ ] Native mobile apps (iOS & Android)
-- [ ] West African expansion (NECO, JAMB, WAEC Nigeria)
-
----
+**Planned**
+- Native mobile apps (iOS &amp; Android)
+- School administration portal and regional competitions
+- West African expansion (NECO, JAMB, WAEC Nigeria)
 
 ## Contributing
 
-We welcome contributions! Please follow these guidelines:
+Contributions are welcome:
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes and push the branch
+4. Open a Pull Request
 
-### Code Style
-- Follow TypeScript best practices
-- Use meaningful variable and function names
-- Write tests for new features
-- Update documentation as needed
-
----
-
-## Support
-
-| Channel | Link |
-|---------|------|
-| **Website** | [brillagh.com](https://brillagh.com) |
-| **Email** | brillaprepgh@gmail.com |
-| **Help Center** | [brillagh.com/help](https://brillagh.com/help) |
-| **Issues** | [GitHub Issues](https://github.com/ghwmelite-dotcom/brilla-study-platform/issues) |
-
----
+Please follow the existing TypeScript conventions, run `npm run lint` before submitting, and update documentation when behavior changes.
 
 ## License
 
 This project is proprietary software. All rights reserved.
 
-Copyright (c) 2024-2025 Brilla Study Platform
+Copyright (c) 2024–2026 Brilla Study Platform.
 
 ---
 
-## Acknowledgments
-
-- **Ghana Education Service** - Curriculum guidance and standards
-- **WAEC** - Examination formats and past papers
-- **Cambridge Assessment** - International examination frameworks
-- **Anthropic** - Claude AI for development assistance
-- **Cloudflare** - Edge infrastructure and AI
-- **Open Source Community** - Amazing tools and libraries
-
----
-
-<div align="center">
-
-### Built with love for students across Ghana and Africa
-
-**"Sanbra Brilla - Shine Bright, Study Smart"**
-
----
-
-Made with React, TypeScript, and Cloudflare Workers
-
-[![Ghana](https://img.shields.io/badge/Made%20in-Ghana-006B3F?style=flat-square)](https://brillagh.com)
-[![Stars](https://img.shields.io/github/stars/ghwmelite-dotcom/brilla-study-platform?style=flat-square)](https://github.com/ghwmelite-dotcom/brilla-study-platform)
-
-</div>
+<p align="center">
+  <strong>Sanbra Brilla — shine bright, study smart.</strong><br>
+  <sub>Built with React, TypeScript, and Cloudflare Workers · Made in Ghana</sub><br><br>
+  <a href="https://brillaprep.org"><img src="https://img.shields.io/badge/Made%20in-Ghana-006B3F?style=flat-square" alt="Made in Ghana"></a>
+  <a href="https://github.com/ghwmelite-dotcom/brilla-study-platform"><img src="https://img.shields.io/github/stars/ghwmelite-dotcom/brilla-study-platform?style=flat-square" alt="GitHub stars"></a>
+</p>

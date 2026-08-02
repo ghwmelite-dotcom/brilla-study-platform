@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <defs>
+    <linearGradient id="ebg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f1b2a"/>
+      <stop offset="1" stop-color="#0a141f"/>
+    </linearGradient>
+  </defs>
+  <rect width="96" height="96" rx="20" fill="url(#ebg)" stroke="#f87171" stroke-opacity="0.4" stroke-width="1.5"/>
+  <!-- exam paper -->
+  <rect x="28" y="18" width="40" height="60" rx="6" fill="none" stroke="#f87171" stroke-width="3"/>
+  <path d="M36 32 H60 M36 42 H54 M36 52 H58" stroke="#f87171" stroke-width="3" stroke-linecap="round" opacity="0.65"/>
+  <!-- check mark -->
+  <circle cx="62" cy="64" r="14" fill="#132235" stroke="#f87171" stroke-width="3"/>
+  <path d="M55 64 L60 69 L70 58" fill="none" stroke="#f87171" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

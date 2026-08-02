@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <defs>
+    <linearGradient id="gbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f1b2a"/>
+      <stop offset="1" stop-color="#0a141f"/>
+    </linearGradient>
+    <linearGradient id="gold2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe98a"/>
+      <stop offset="1" stop-color="#e0a800"/>
+    </linearGradient>
+  </defs>
+  <rect width="96" height="96" rx="20" fill="url(#gbg)" stroke="#fcd116" stroke-opacity="0.4" stroke-width="1.5"/>
+  <!-- trophy -->
+  <path d="M32 24 H64 V40 C64 50 57 56 48 56 C39 56 32 50 32 40 Z" fill="url(#gold2)"/>
+  <path d="M32 28 H22 C22 38 27 44 34 45 M64 28 H74 C74 38 69 44 62 45" fill="none" stroke="#fcd116" stroke-width="3" stroke-linecap="round"/>
+  <rect x="44" y="56" width="8" height="10" fill="#e0a800"/>
+  <rect x="36" y="66" width="24" height="6" rx="3" fill="#e0a800"/>
+  <!-- streak flame hint -->
+  <path d="M70 60 c2 4 -1 6 -3 8 c4 -1 7 -3 7 -8 c-1 2 -2 2 -4 0 Z" fill="#f6821f" opacity="0.9"/>
+</svg>
