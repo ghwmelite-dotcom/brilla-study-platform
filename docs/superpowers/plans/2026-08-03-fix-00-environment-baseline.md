@@ -603,9 +603,9 @@ npx wrangler dev --env dev --dry-run    # wrangler config parses
 
 Filled in by the executor during Tasks 1, 8, 9 (do not delete — later phases ratchet against these):
 
-- Frontend `tsc -b` errors (Task 1): `<fill in>`
-- Frontend+repo `eslint .` problems before workers/ inclusion (Task 1): `<fill in>` (errors: `<fill in>`, warnings: `<fill in>`)
-- `npm audit` vulnerabilities before bumps (Task 1): `<fill in>`
+- Frontend `tsc -b` errors (Task 1): `0`
+- Frontend+repo `eslint .` problems before workers/ inclusion (Task 1): `144` (errors: `63`, warnings: `81`)
+- `npm audit` vulnerabilities before bumps (Task 1): `24` (1 low, 5 moderate, 16 high, 2 critical)
 - `npm audit` vulnerabilities after bumps (Task 7): `<fill in>` (breaking-fix-only remainder: `<fill in>`)
 - `npm run typecheck:api` errors (Task 8): `<fill in>`
 - `npm run lint` problems after workers/ inclusion (Task 9): `<fill in>` (errors: `<fill in>`, warnings: `<fill in>`)
