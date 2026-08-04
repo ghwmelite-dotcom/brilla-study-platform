@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { jwt, sign, verify } from 'hono/jwt';
+import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware';
 import type { JWTPayload } from 'hono/utils/jwt/types';
 import { libraryApp } from './library';
 import { counselorApp } from './counselor';
@@ -250,7 +251,7 @@ async function generateJWT(payload: UserPayload, secret: string): Promise<string
   return await sign(
     {
       ...payload,
-      exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 7 days
+      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
       iat: Math.floor(Date.now() / 1000),
     },
     secret
@@ -907,75 +908,22 @@ const publicApp = new Hono<{ Bindings: Env }>();
 // Protected routes with JWT authentication middleware
 const protectedApp = new Hono<{ Bindings: Env }>();
 
-// Authentication middleware for protected routes
-protectedApp.use('*', async (c, next) => {
-  const authHeader = c.req.header('Authorization');
-
-  // Skip auth for OPTIONS requests (CORS preflight)
-  if (c.req.method === 'OPTIONS') {
-    return next();
-  }
-
-  // Check for Authorization header
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
-  }
-
-  const token = authHeader.replace('Bearer ', '');
-
-  // SECURITY: Demo tokens only allowed in development environment
-  if (token.endsWith('_demo_token')) {
-    const isDevelopment = c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev';
-    if (isDevelopment) {
-      // For demo mode, get the user based on token prefix
-      const tokenPrefix = token.replace('_demo_token', '');
-      const demoUsers: Record<string, { id: string; role: string }> = {
-        'student': { id: 'student_1766327981521', role: 'student' },
-        'teacher': { id: 'teacher_1766327981453', role: 'teacher' },
-        'admin': { id: 'admin_prod_001', role: 'admin' },
-      };
-      const demoUser = demoUsers[tokenPrefix];
-      if (demoUser) {
-        c.set('userId', demoUser.id);
-        c.set('userRole', demoUser.role);
-        c.set('isDemo', true); // Mark as demo user
-        return next();
-      }
-    }
-    // In production, demo tokens are rejected
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-
-  // Verify JWT token
-  try {
-    const payload = await verifyJWT(token, c.env.JWT_SECRET);
-    if (!payload) {
-      return c.json({ success: false, error: 'Invalid token' }, 401);
-    }
-    c.set('userId', payload.userId);
-    c.set('userRole', payload.role);
-    // Check if this is a demo user by their ID or email
-    const isDemo = isDemoUserId(payload.userId) || isDemoEmail(payload.email);
-    c.set('isDemo', isDemo);
-    return next();
-  } catch (error) {
-    console.error('Token verification error:', error);
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-});
+// Authentication middleware for protected routes: verified JWT + fresh DB
+// role/status/is_active re-check (shared middleware, sets userId/userRole/user).
+protectedApp.use('*', requireAuth);
 
 // Helper to check if current user is demo
 function isUserDemo(c: { get: (key: string) => boolean | undefined }): boolean {
   return c.get('isDemo') === true;
 }
 
-// Helper to get user from context or header (for backwards compatibility)
-function getUserId(c: { get: (key: string) => string | undefined; req: { header: (name: string) => string | undefined } }): string | undefined {
-  return c.get('userId') || c.req.header('x-user-id');
+// Identity comes only from verified JWT context (set by requireAuth).
+function getUserId(c: { get: (key: string) => string | undefined }): string | undefined {
+  return c.get('userId');
 }
 
-function getUserRole(c: { get: (key: string) => string | undefined; req: { header: (name: string) => string | undefined } }): string | undefined {
-  return c.get('userRole') || c.req.header('x-user-role');
+function getUserRole(c: { get: (key: string) => string | undefined }): string | undefined {
+  return c.get('userRole');
 }
 
 // Health check
@@ -1640,7 +1588,7 @@ publicApp.post('/auth/reset-password', async (c) => {
 publicApp.post('/auth/test-notification', async (c) => {
   const { adminKey } = await c.req.json();
 
-  if (adminKey !== c.env.JWT_SECRET) {
+  if (typeof adminKey !== 'string' || !constantTimeEqual(adminKey, c.env.JWT_SECRET)) {
     return c.json({ success: false, error: 'Invalid admin key' }, 401);
   }
 
@@ -1741,7 +1689,7 @@ publicApp.post('/auth/setup', async (c) => {
 
   // Simple security check - require a setup key that matches JWT_SECRET
   // In production, you might use a separate SETUP_KEY secret
-  if (setupKey !== c.env.JWT_SECRET) {
+  if (typeof setupKey !== 'string' || !constantTimeEqual(setupKey, c.env.JWT_SECRET)) {
     return c.json({ success: false, error: 'Invalid setup key' }, 401);
   }
 
@@ -5899,52 +5847,10 @@ protectedApp.put('/parents/preferences', userAuth, async (c) => {
 // ADMIN USER MANAGEMENT ENDPOINTS
 // =============================================
 
-// Middleware to verify admin role with enhanced security
-const adminAuth = async (c: any, next: any) => {
-  const authHeader = c.req.header('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
-  }
-
-  const token = authHeader.slice(7);
-
-  // SECURITY: Demo tokens only allowed in development environment
-  if (token.endsWith('_demo_token')) {
-    const isDevelopment = c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev';
-    if (isDevelopment) {
-      const tokenPrefix = token.replace('_demo_token', '');
-      if (tokenPrefix === 'admin') {
-        c.set('user', { userId: 'admin_prod_001', role: 'admin', email: 'admin@brillaprep.org' });
-        c.set('userId', 'admin_prod_001');
-        c.set('userRole', 'admin');
-        return next();
-      } else {
-        return c.json({ success: false, error: 'Admin access required' }, 403);
-      }
-    }
-    // In production, demo tokens are rejected
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-
-  const payload = await verifyJWT(token, c.env.JWT_SECRET);
-
-  if (!payload) {
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-
-  if (payload.role !== 'admin') {
-    return c.json({ success: false, error: 'Admin access required' }, 403);
-  }
-
-  c.set('user', payload);
-  c.set('userId', payload.userId);
-  c.set('userRole', payload.role);
-  await next();
-};
-
-// Admin routes
+// Admin routes: shared middleware (verified JWT + fresh DB admin-role re-check,
+// sets user/userId/userRole like the old adminAuth did).
 const adminApp = new Hono<{ Bindings: Env }>();
-adminApp.use('*', adminAuth);
+adminApp.use('*', requireAdmin);
 
 // Dashboard stats
 adminApp.get('/dashboard/stats', async (c) => {

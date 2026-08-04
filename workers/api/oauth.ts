@@ -83,7 +83,7 @@ async function generateJWT(payload: UserPayload, secret: string): Promise<string
   return await sign(
     {
       ...payload,
-      exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 7 days
+      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
       iat: Math.floor(Date.now() / 1000),
     },
     secret
