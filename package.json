@@ -9,6 +9,7 @@
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:api\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "typecheck:api": "tsc -p workers/tsconfig.json",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
