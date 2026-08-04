@@ -10,6 +10,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "typecheck:api": "tsc -p workers/tsconfig.json",
+    "lint:api": "eslint workers",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",

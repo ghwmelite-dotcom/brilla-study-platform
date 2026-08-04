@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', 'workers'] },
+  { ignores: ['dist'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
@@ -24,6 +24,19 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    },
+  },
+  {
+    files: ['workers/**/*.ts'],
+    languageOptions: {
+      globals: {
+        ...globals.serviceworker,
+      },
+    },
+    rules: {
+      // Ratchet: workers/ has a large pre-existing violation backlog.
+      // Phase 0 only measures it; later phases re-enable rules as counts drop.
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   }
 );
