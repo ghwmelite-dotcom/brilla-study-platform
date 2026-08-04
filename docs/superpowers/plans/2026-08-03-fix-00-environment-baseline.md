@@ -606,7 +606,7 @@ Filled in by the executor during Tasks 1, 8, 9 (do not delete — later phases r
 - Frontend `tsc -b` errors (Task 1): `0`
 - Frontend+repo `eslint .` problems before workers/ inclusion (Task 1): `144` (errors: `63`, warnings: `81`)
 - `npm audit` vulnerabilities before bumps (Task 1): `24` (1 low, 5 moderate, 16 high, 2 critical)
-- `npm audit` vulnerabilities after bumps (Task 7): `<fill in>` (breaking-fix-only remainder: `<fill in>`)
+- `npm audit` vulnerabilities after bumps (Task 7): `12` (breaking-fix-only remainder: `12` — 6 moderate, 5 high, 1 critical; includes 2 parked react-router moderates with no patched 6.x, plus esbuild/vite/vitest, sharp, undici/miniflare, ws chains that all require `npm audit fix --force`)
 - `npm run typecheck:api` errors (Task 8): `<fill in>`
 - `npm run lint` problems after workers/ inclusion (Task 9): `<fill in>` (errors: `<fill in>`, warnings: `<fill in>`)
 - hono / fabric / react-router-dom versions after bumps (Tasks 4–6): `<fill in>`
