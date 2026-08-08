@@ -510,8 +510,15 @@ async function sendEmail(
   }
 }
 
+// Escape user/request-derived data before interpolating into outbound email HTML
+function escapeHtml(value: string): string {
+  return String(value).replace(/[&<>"']/g, (ch) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch] as string,
+  );
+}
+
 // Email templates
-function getVerificationEmailHTML(name: string, verificationUrl: string): string {
+export function getVerificationEmailHTML(name: string, verificationUrl: string): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -525,7 +532,7 @@ function getVerificationEmailHTML(name: string, verificationUrl: string): string
         <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to Brilla!</h1>
       </div>
       <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-        <p style="font-size: 16px;">Hello <strong>${name}</strong>,</p>
+        <p style="font-size: 16px;">Hello <strong>${escapeHtml(name)}</strong>,</p>
         <p style="font-size: 16px;">Your account has been created on the Brilla Study Platform. Click the button below to set up your password and start learning!</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${verificationUrl}" style="background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">Set Up Password</a>
@@ -539,7 +546,7 @@ function getVerificationEmailHTML(name: string, verificationUrl: string): string
   `;
 }
 
-function getPasswordResetEmailHTML(name: string, resetUrl: string): string {
+export function getPasswordResetEmailHTML(name: string, resetUrl: string): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -553,7 +560,7 @@ function getPasswordResetEmailHTML(name: string, resetUrl: string): string {
         <h1 style="color: white; margin: 0; font-size: 28px;">Password Reset</h1>
       </div>
       <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-        <p style="font-size: 16px;">Hello <strong>${name}</strong>,</p>
+        <p style="font-size: 16px;">Hello <strong>${escapeHtml(name)}</strong>,</p>
         <p style="font-size: 16px;">We received a request to reset your password. Click the button below to create a new password:</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${resetUrl}" style="background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">Reset Password</a>
@@ -567,7 +574,7 @@ function getPasswordResetEmailHTML(name: string, resetUrl: string): string {
   `;
 }
 
-function getApprovalEmailHTML(userName: string, appUrl: string, trialStarted: boolean = false): string {
+export function getApprovalEmailHTML(userName: string, appUrl: string, trialStarted: boolean = false): string {
   const trialBanner = trialStarted ? `
         <div style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
           <p style="color: white; font-size: 18px; font-weight: 600; margin: 0 0 8px 0;">🎁 Your 14-Day Premium Trial is Active!</p>
@@ -588,7 +595,7 @@ function getApprovalEmailHTML(userName: string, appUrl: string, trialStarted: bo
         <h1 style="color: white; margin: 0; font-size: 28px;">🎉 You're Approved!</h1>
       </div>
       <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-        <p style="font-size: 16px;">Hello <strong>${userName}</strong>,</p>
+        <p style="font-size: 16px;">Hello <strong>${escapeHtml(userName)}</strong>,</p>
         <p style="font-size: 16px;">Great news! Your Brilla Study Platform account has been approved. You can now log in and start your learning journey!</p>
         ${trialBanner}
         <div style="text-align: center; margin: 30px 0;">
@@ -603,7 +610,7 @@ function getApprovalEmailHTML(userName: string, appUrl: string, trialStarted: bo
   `;
 }
 
-function getRejectionEmailHTML(userName: string, reason: string | null, appUrl: string): string {
+export function getRejectionEmailHTML(userName: string, reason: string | null, appUrl: string): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -617,11 +624,11 @@ function getRejectionEmailHTML(userName: string, reason: string | null, appUrl: 
         <h1 style="color: white; margin: 0; font-size: 28px;">Registration Update</h1>
       </div>
       <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-        <p style="font-size: 16px;">Hello <strong>${userName}</strong>,</p>
+        <p style="font-size: 16px;">Hello <strong>${escapeHtml(userName)}</strong>,</p>
         <p style="font-size: 16px;">Thank you for your interest in Brilla Study Platform. Unfortunately, we were unable to approve your registration at this time.</p>
         ${reason ? `
         <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
-          <p style="margin: 0; font-size: 14px;"><strong>Reason:</strong> ${reason}</p>
+          <p style="margin: 0; font-size: 14px;"><strong>Reason:</strong> ${escapeHtml(reason)}</p>
         </div>
         ` : ''}
         <p style="font-size: 14px; color: #6b7280;">If you believe this was a mistake or would like to provide additional information, please contact us or try registering again.</p>
@@ -636,7 +643,7 @@ function getRejectionEmailHTML(userName: string, reason: string | null, appUrl: 
   `;
 }
 
-function getNewRegistrationEmailHTML(userName: string, userEmail: string, userRole: string, appUrl: string): string {
+export function getNewRegistrationEmailHTML(userName: string, userEmail: string, userRole: string, appUrl: string): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -653,9 +660,9 @@ function getNewRegistrationEmailHTML(userName: string, userEmail: string, userRo
         <p style="font-size: 16px;">Hello Admin,</p>
         <p style="font-size: 16px;">A new user has registered on Brilla Study Platform and is awaiting your approval:</p>
         <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <p style="margin: 8px 0; font-size: 15px;"><strong>Name:</strong> ${userName}</p>
-          <p style="margin: 8px 0; font-size: 15px;"><strong>Email:</strong> ${userEmail}</p>
-          <p style="margin: 8px 0; font-size: 15px;"><strong>Role:</strong> ${userRole}</p>
+          <p style="margin: 8px 0; font-size: 15px;"><strong>Name:</strong> ${escapeHtml(userName)}</p>
+          <p style="margin: 8px 0; font-size: 15px;"><strong>Email:</strong> ${escapeHtml(userEmail)}</p>
+          <p style="margin: 8px 0; font-size: 15px;"><strong>Role:</strong> ${escapeHtml(userRole)}</p>
           <p style="margin: 8px 0; font-size: 15px;"><strong>Time:</strong> ${new Date().toLocaleString()}</p>
         </div>
         <div style="text-align: center; margin: 30px 0;">
@@ -680,7 +687,7 @@ interface SecurityAlertDetails {
   country?: string;
 }
 
-function getSecurityAlertEmailHTML(details: SecurityAlertDetails, appUrl: string): string {
+export function getSecurityAlertEmailHTML(details: SecurityAlertDetails, appUrl: string): string {
   const severityColor = details.attemptCount >= 10 ? '#dc2626' : '#f59e0b'; // Red for high, amber for medium
   const severityText = details.attemptCount >= 10 ? 'HIGH' : 'MEDIUM';
 
@@ -710,11 +717,11 @@ function getSecurityAlertEmailHTML(details: SecurityAlertDetails, appUrl: string
           <table style="width: 100%; border-collapse: collapse;">
             <tr>
               <td style="padding: 8px 0; font-size: 14px; color: #6b7280; width: 140px;">Target Account:</td>
-              <td style="padding: 8px 0; font-size: 14px; font-weight: 600;">${details.targetEmail}</td>
+              <td style="padding: 8px 0; font-size: 14px; font-weight: 600;">${escapeHtml(details.targetEmail)}</td>
             </tr>
             <tr>
               <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">IP Address:</td>
-              <td style="padding: 8px 0; font-size: 14px; font-family: monospace; background: #f3f4f6; padding: 4px 8px; border-radius: 4px; display: inline-block;">${details.ipAddress}</td>
+              <td style="padding: 8px 0; font-size: 14px; font-family: monospace; background: #f3f4f6; padding: 4px 8px; border-radius: 4px; display: inline-block;">${escapeHtml(details.ipAddress)}</td>
             </tr>
             <tr>
               <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Failed Attempts:</td>
@@ -731,7 +738,7 @@ function getSecurityAlertEmailHTML(details: SecurityAlertDetails, appUrl: string
             ${details.country ? `
             <tr>
               <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Location:</td>
-              <td style="padding: 8px 0; font-size: 14px;">${details.country}</td>
+              <td style="padding: 8px 0; font-size: 14px;">${escapeHtml(details.country)}</td>
             </tr>
             ` : ''}
           </table>
