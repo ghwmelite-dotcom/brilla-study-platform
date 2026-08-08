@@ -1390,9 +1390,8 @@ publicApp.post('/auth/login', async (c) => {
 
     return c.json({ success: true, data: { user, token } });
   } catch (error) {
-    console.error('Login error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({ success: false, error: `Login failed: ${errorMessage}` }, 500);
+    console.error('Login error:', error); // detail stays in logs
+    return c.json({ success: false, error: 'Login failed' }, 500);
   }
 });
 
@@ -4180,9 +4179,8 @@ protectedApp.post('/papers/:id/attempt', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Paper attempt error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({ success: false, error: `Failed to start paper attempt: ${errorMessage}` }, 500);
+    console.error('Paper attempt error:', error); // detail stays in logs
+    return c.json({ success: false, error: 'Failed to start paper attempt' }, 500);
   }
 });
 
@@ -10223,9 +10221,8 @@ app.notFound((c) => {
 
 // Error handler
 app.onError((err, c) => {
-  console.error('Error:', err);
-  const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-  return c.json({ success: false, error: `Internal server error: ${errorMessage}` }, 500);
+  console.error('Unhandled error:', err); // detail stays in logs
+  return c.json({ success: false, error: 'Internal server error' }, 500);
 });
 
 // =============================================
