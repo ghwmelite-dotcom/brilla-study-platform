@@ -2992,81 +2992,10 @@ publicApp.get('/battles/available', async (c) => {
   }
 });
 
-// Get battle history (must be before /battles/:id)
-publicApp.get('/battles/history', async (c) => {
-  // Get userId from auth header if present
-  const authHeader = c.req.header('Authorization');
-  let userId: string | null = null;
-
-  if (authHeader?.startsWith('Bearer ')) {
-    const token = authHeader.replace('Bearer ', '');
-    try {
-      const payload = await verifyJWT(token, c.env.JWT_SECRET);
-      if (payload) {
-        userId = payload.userId;
-      }
-    } catch {
-      // Token invalid, continue without userId
-    }
-  }
-
-  // Also check query param as fallback
-  if (!userId) {
-    userId = c.req.query('userId') || null;
-  }
-
-  if (!userId) {
-    return c.json({ success: false, error: 'Authentication required' }, 401);
-  }
-
-  const limit = parseInt(c.req.query('limit') || '20');
-
-  try {
-    const { results } = await c.env.DB.prepare(`
-      SELECT b.*,
-        c.name as challenger_name, c.avatar_url as challenger_avatar,
-        o.name as opponent_name, o.avatar_url as opponent_avatar,
-        s.name as subject_name,
-        CASE
-          WHEN b.challenger_id = ? THEN b.challenger_score
-          ELSE b.opponent_score
-        END as your_score,
-        CASE
-          WHEN b.challenger_id = ? THEN b.opponent_score
-          ELSE b.challenger_score
-        END as opponent_score,
-        CASE
-          WHEN b.challenger_id = ? THEN o.name
-          ELSE c.name
-        END as opponent_name_display
-      FROM battles b
-      JOIN users c ON b.challenger_id = c.id
-      LEFT JOIN users o ON b.opponent_id = o.id
-      LEFT JOIN subjects s ON b.subject_id = s.id
-      WHERE b.challenger_id = ? OR b.opponent_id = ?
-      ORDER BY b.created_at DESC
-      LIMIT ?
-    `).bind(userId, userId, userId, userId, userId, limit).all();
-
-    // Format results for the frontend
-    const formattedResults = results.map((battle: Record<string, unknown>) => ({
-      id: battle.id,
-      status: battle.status,
-      winner_id: battle.winner_id,
-      your_score: battle.your_score,
-      opponent_score: battle.opponent_score,
-      created_at: battle.created_at,
-      opponent: {
-        name: battle.opponent_name_display || 'Opponent',
-      },
-    }));
-
-    return c.json(formattedResults);
-  } catch (error) {
-    console.error('Failed to fetch battle history:', error);
-    return c.json({ success: false, error: 'Failed to fetch battle history' }, 500);
-  }
-});
+// NOTE: GET /battles/history is served only by protectedApp (JWT-derived
+// userId). The unauthenticated publicApp duplicate was removed: publicApp is
+// mounted before protectedApp, so it shadowed the protected route and let
+// callers pass an arbitrary ?userId= to read anyone's battle history (IDOR).
 
 // Get battle by ID
 publicApp.get('/battles/:id', async (c) => {
@@ -3160,6 +3089,35 @@ publicApp.get('/flashcards/public', async (c) => {
   } catch (error) {
     console.error('Failed to fetch public decks:', error);
     return c.json({ success: false, error: 'Failed to fetch decks' }, 500);
+  }
+});
+
+// Get user's battle history (identity from JWT only). Registered on `app`
+// BEFORE the publicApp mount: publicApp's `/battles/:id` param route is
+// registered earlier than protectedApp's routes and would otherwise shadow
+// `/battles/history` (Hono: first-registered matching route wins).
+app.get('/api/battles/history', requireAuth, async (c) => {
+  const userId = getUserId(c)!;
+  const limit = parseInt(c.req.query('limit') || '20');
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT b.*,
+        c.name as challenger_name, c.avatar_url as challenger_avatar,
+        o.name as opponent_name, o.avatar_url as opponent_avatar,
+        s.name as subject_name
+      FROM battles b
+      JOIN users c ON b.challenger_id = c.id
+      LEFT JOIN users o ON b.opponent_id = o.id
+      LEFT JOIN subjects s ON b.subject_id = s.id
+      WHERE b.challenger_id = ? OR b.opponent_id = ?
+      ORDER BY b.created_at DESC
+      LIMIT ?
+    `).bind(userId, userId, limit).all();
+
+    return c.json({ success: true, data: results });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch battle history' }, 500);
   }
 });
 
@@ -3635,18 +3593,15 @@ protectedApp.post('/flashcards/:id/review', async (c) => {
 
 // Create custom house (admin only)
 protectedApp.post('/houses', async (c) => {
-  const { name, color, icon, description, schoolId, userId } = await c.req.json();
+  const { name, color, icon, description, schoolId } = await c.req.json();
 
-  // In production, verify user is admin
+  // Admin check uses the fresh DB role set by requireAuth, never a
+  // caller-supplied id.
+  if (getUserRole(c) !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
   try {
-    const user = await c.env.DB.prepare(`
-      SELECT role FROM users WHERE id = ?
-    `).bind(userId).first();
-
-    if (!user || user.role !== 'admin') {
-      return c.json({ success: false, error: 'Admin access required' }, 403);
-    }
-
     const id = `house_${Date.now()}`;
     await c.env.DB.prepare(`
       INSERT INTO houses (id, name, color, icon, description, is_default, school_id)
@@ -3659,9 +3614,15 @@ protectedApp.post('/houses', async (c) => {
   }
 });
 
-// Award house points
+// Award house points (admin or teacher only — students must not self-award)
 protectedApp.post('/houses/points', async (c) => {
-  const { houseId, userId, points, source, sourceId } = await c.req.json();
+  const { houseId, points, source, sourceId } = await c.req.json();
+  const userId = getUserId(c)!;
+  const userRole = getUserRole(c);
+
+  if (userRole !== 'admin' && userRole !== 'teacher') {
+    return c.json({ success: false, error: 'Only teachers and admins can award house points' }, 403);
+  }
 
   try {
     // Get current period (YYYY-WW format for weekly)
@@ -3682,10 +3643,15 @@ protectedApp.post('/houses/points', async (c) => {
   }
 });
 
-// Update user's house
+// Update user's house (self or admin)
 protectedApp.put('/users/:id/house', async (c) => {
   const id = c.req.param('id');
   const { houseId } = await c.req.json();
+  const userId = getUserId(c)!;
+
+  if (userId !== id && getUserRole(c) !== 'admin') {
+    return c.json({ success: false, error: 'Forbidden' }, 403);
+  }
 
   try {
     await c.env.DB.prepare(`
@@ -3704,7 +3670,8 @@ protectedApp.put('/users/:id/house', async (c) => {
 
 // Create a new battle (challenge)
 protectedApp.post('/battles', async (c) => {
-  const { userId, subjectId, difficulty, questionCount } = await c.req.json();
+  const { subjectId, difficulty, questionCount } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     // Fetch random questions for the battle
@@ -3780,7 +3747,7 @@ protectedApp.post('/battles', async (c) => {
 // Join a battle
 protectedApp.post('/battles/:id/join', async (c) => {
   const battleId = c.req.param('id');
-  const { userId } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     // Check if battle exists and is waiting
@@ -3830,7 +3797,8 @@ protectedApp.post('/battles/:id/join', async (c) => {
 // Submit answer in battle
 protectedApp.post('/battles/:id/answer', async (c) => {
   const battleId = c.req.param('id');
-  const { userId, questionIndex, answer, timeTaken } = await c.req.json();
+  const { questionIndex, answer, timeTaken } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     // Get battle
@@ -3930,7 +3898,7 @@ protectedApp.post('/battles/:id/answer', async (c) => {
 // Cancel/forfeit battle
 protectedApp.post('/battles/:id/cancel', async (c) => {
   const battleId = c.req.param('id');
-  const { userId } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     const battle = await c.env.DB.prepare(`
@@ -3962,35 +3930,9 @@ protectedApp.post('/battles/:id/cancel', async (c) => {
   }
 });
 
-// Get user's battle history
-protectedApp.get('/battles/history', async (c) => {
-  const userId = c.req.query('userId');
-  const limit = parseInt(c.req.query('limit') || '20');
-
-  if (!userId) {
-    return c.json({ success: false, error: 'userId required' }, 400);
-  }
-
-  try {
-    const { results } = await c.env.DB.prepare(`
-      SELECT b.*,
-        c.name as challenger_name, c.avatar_url as challenger_avatar,
-        o.name as opponent_name, o.avatar_url as opponent_avatar,
-        s.name as subject_name
-      FROM battles b
-      JOIN users c ON b.challenger_id = c.id
-      LEFT JOIN users o ON b.opponent_id = o.id
-      LEFT JOIN subjects s ON b.subject_id = s.id
-      WHERE b.challenger_id = ? OR b.opponent_id = ?
-      ORDER BY b.created_at DESC
-      LIMIT ?
-    `).bind(userId, userId, limit).all();
-
-    return c.json({ success: true, data: results });
-  } catch (error) {
-    return c.json({ success: false, error: 'Failed to fetch battle history' }, 500);
-  }
-});
+// Get user's battle history: served by the app-level route registered before
+// the publicApp mount (see above `app.route('/api', publicApp)`), because
+// publicApp's `/battles/:id` param route would shadow a protectedApp copy.
 
 // =============================================
 // PAPER ATTEMPT ENDPOINTS (Timed Practice)
