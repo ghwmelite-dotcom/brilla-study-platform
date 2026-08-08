@@ -1,21 +1,20 @@
 import { Hono } from 'hono';
-import type { Env } from './types';
+import { requireAuth } from './auth-middleware';
 
-const notificationsApp = new Hono<{ Bindings: Env }>();
+// Types for Cloudflare bindings
+interface Env {
+  DB: D1Database;
+  JWT_SECRET: string;
+}
 
-// Helper to get user ID from request
-const getUserId = (c: any): string | null => {
-  const authHeader = c.req.header('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) return null;
+const notificationsApp = new Hono<{
+  Bindings: Env;
+  Variables: { userId: string; userRole: string };
+}>();
 
-  try {
-    const token = authHeader.substring(7);
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.sub || payload.userId || null;
-  } catch {
-    return null;
-  }
-};
+// All notification/streak/XP/reminder routes are private: identity comes only
+// from a signature-verified JWT via the shared middleware.
+notificationsApp.use('*', requireAuth);
 
 // =============================================
 // NOTIFICATION ENDPOINTS
@@ -24,10 +23,7 @@ const getUserId = (c: any): string | null => {
 // Get user's notifications
 notificationsApp.get('/', async (c) => {
   try {
-    const userId = getUserId(c);
-    if (!userId) {
-      return c.json({ success: false, error: 'Authentication required' }, 401);
-    }
+    const userId = c.get('userId')!;
 
     const limit = parseInt(c.req.query('limit') || '20');
     const offset = parseInt(c.req.query('offset') || '0');
@@ -80,10 +76,7 @@ notificationsApp.get('/', async (c) => {
 // Get unread count only
 notificationsApp.get('/count', async (c) => {
   try {
-    const userId = getUserId(c);
-    if (!userId) {
-      return c.json({ success: false, error: 'Authentication required' }, 401);
-    }
+    const userId = c.get('userId')!;
 
     const result = await c.env.DB.prepare(
       'SELECT COUNT(*) as count FROM notifications WHERE user_id = ? AND is_read = 0'
@@ -102,10 +95,7 @@ notificationsApp.get('/count', async (c) => {
 // Mark notification as read
 notificationsApp.post('/:id/read', async (c) => {
   try {
-    const userId = getUserId(c);
-    if (!userId) {
-      return c.json({ success: false, error: 'Authentication required' }, 401);
-    }
+    const userId = c.get('userId')!;
 
     const notificationId = c.req.param('id');
 
@@ -124,10 +114,7 @@ notificationsApp.post('/:id/read', async (c) => {
 // Mark all notifications as read
 notificationsApp.post('/read-all', async (c) => {
   try {
-    const userId = getUserId(c);
-    if (!userId) {
-      return c.json({ success: false, error: 'Authentication required' }, 401);
-    }
+    const userId = c.get('userId')!;
 
     await c.env.DB.prepare(
       `UPDATE notifications SET is_read = 1, read_at = datetime('now')
@@ -144,10 +131,7 @@ notificationsApp.post('/read-all', async (c) => {
 // Delete a notification
 notificationsApp.delete('/:id', async (c) => {
   try {
-    const userId = getUserId(c);
-    if (!userId) {
-      return c.json({ success: false, error: 'Authentication required' }, 401);
-    }
+    const userId = c.get('userId')!;
 
     const notificationId = c.req.param('id');
 
@@ -169,10 +153,7 @@ notificationsApp.delete('/:id', async (c) => {
 // Get user's streak data
 notificationsApp.get('/streak', async (c) => {
   try {
-    const userId = getUserId(c);
-    if (!userId) {
-      return c.json({ success: false, error: 'Authentication required' }, 401);
-    }
+    const userId = c.get('userId')!;
 
     // Get user's current streak
     const user = await c.env.DB.prepare(
@@ -225,15 +206,12 @@ notificationsApp.get('/streak', async (c) => {
 // Get user's XP data and transactions
 notificationsApp.get('/xp', async (c) => {
   try {
-    const userId = getUserId(c);
-    if (!userId) {
-      return c.json({ success: false, error: 'Authentication required' }, 401);
-    }
+    const userId = c.get('userId')!;
 
     // Get user's XP and level
     const user = await c.env.DB.prepare(
       'SELECT xp_points, level FROM users WHERE id = ?'
-    ).bind(userId).first();
+    ).bind(userId).first<{ xp_points: number; level: number }>();
 
     // Get recent XP transactions
     const transactions = await c.env.DB.prepare(`
@@ -371,10 +349,7 @@ export async function recordStreakActivity(
 // Get reminder settings
 notificationsApp.get('/reminders/settings', async (c) => {
   try {
-    const userId = getUserId(c);
-    if (!userId) {
-      return c.json({ success: false, error: 'Authentication required' }, 401);
-    }
+    const userId = c.get('userId')!;
 
     const settings = await c.env.DB.prepare(
       'SELECT * FROM reminder_settings WHERE user_id = ?'
@@ -417,10 +392,7 @@ notificationsApp.get('/reminders/settings', async (c) => {
 // Update/create reminder settings
 notificationsApp.post('/reminders/settings', async (c) => {
   try {
-    const userId = getUserId(c);
-    if (!userId) {
-      return c.json({ success: false, error: 'Authentication required' }, 401);
-    }
+    const userId = c.get('userId')!;
 
     const body = await c.req.json();
     const {
@@ -495,10 +467,7 @@ notificationsApp.post('/reminders/settings', async (c) => {
 // Get pending reminders for user
 notificationsApp.get('/reminders/pending', async (c) => {
   try {
-    const userId = getUserId(c);
-    if (!userId) {
-      return c.json({ success: false, error: 'Authentication required' }, 401);
-    }
+    const userId = c.get('userId')!;
 
     // Check if user should receive reminders today
     const settings = await c.env.DB.prepare(
@@ -576,10 +545,7 @@ notificationsApp.get('/reminders/pending', async (c) => {
 // Send a test reminder notification
 notificationsApp.post('/reminders/test', async (c) => {
   try {
-    const userId = getUserId(c);
-    if (!userId) {
-      return c.json({ success: false, error: 'Authentication required' }, 401);
-    }
+    const userId = c.get('userId')!;
 
     // Create a test notification
     const notificationId = await createNotification(
