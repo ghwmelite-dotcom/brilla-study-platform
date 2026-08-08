@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { requireAuth } from './auth-middleware';
 
 interface Env {
   DB: D1Database;
@@ -12,6 +13,9 @@ interface UserPayload {
 }
 
 const teamBattlesApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
+
+// All team battle routes require a verified JWT (sets user on context).
+teamBattlesApp.use('*', requireAuth);
 
 const generateId = () => `tb_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 

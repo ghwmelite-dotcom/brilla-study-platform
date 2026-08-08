@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { requireAuth } from './auth-middleware';
 
 interface Env {
   DB: D1Database;
@@ -12,6 +13,9 @@ interface UserPayload {
 }
 
 const learningPathApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
+
+// All learning path routes require a verified JWT (sets user on context).
+learningPathApp.use('*', requireAuth);
 
 const generateId = () => `lp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 

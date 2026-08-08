@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { requireAuth } from './auth-middleware';
 
 interface Env {
   DB: D1Database;
@@ -12,6 +13,9 @@ interface UserPayload {
 }
 
 const cosmeticsApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
+
+// All cosmetics routes require a verified JWT (sets user on context).
+cosmeticsApp.use('*', requireAuth);
 
 const generateId = () => `cos_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 

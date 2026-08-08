@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { requireAuth } from './auth-middleware';
 
 interface Env {
   DB: D1Database;
@@ -12,6 +13,9 @@ interface UserPayload {
 }
 
 const eventsApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
+
+// All event routes require a verified JWT (sets user on context).
+eventsApp.use('*', requireAuth);
 
 const generateId = () => `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
