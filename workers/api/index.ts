@@ -3214,13 +3214,45 @@ app.get('/api/papers/attempts', requireAuth, async (c) => {
   }
 });
 
+// Get user's essay history (identity from JWT only). Registered on `app`
+// BEFORE the publicApp mount: publicApp's `/essays/:questionId` param route
+// is registered earlier than protectedApp's routes and would otherwise shadow
+// `/essays/history` (Hono: first-registered matching route wins).
+app.get('/api/essays/history', requireAuth, async (c) => {
+  // Self only: identity comes only from the verified JWT.
+  const userId = getUserId(c)!;
+  const limit = parseInt(c.req.query('limit') || '20');
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT ea.*, q.question_text, q.marks, s.name as subject_name
+      FROM essay_attempts ea
+      JOIN questions q ON ea.question_id = q.id
+      JOIN subjects s ON q.subject_id = s.id
+      WHERE ea.user_id = ?
+      ORDER BY ea.created_at DESC
+      LIMIT ?
+    `).bind(userId, limit).all();
+
+    // Parse feedback JSON
+    const attempts = results.map((a: Record<string, unknown>) => ({
+      ...a,
+      aiFeedback: a.ai_feedback ? JSON.parse(a.ai_feedback as string) : null,
+    }));
+
+    return c.json({ success: true, data: attempts });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch essay history' }, 500);
+  }
+});
+
 // Mount public routes
 app.route('/api', publicApp);
 
 // Get daily usage info for freemium limits
 protectedApp.get('/usage/daily', async (c) => {
-  // Get userId from JWT context (set by auth middleware)
-  const userId = c.get('userId') as string || c.req.query('userId') || 'user_demo';
+  // Identity comes only from the verified JWT (set by requireAuth).
+  const userId = getUserId(c)!;
 
   try {
     const usage = await getDailyUsage(userId, c.env.DB);
@@ -4285,7 +4317,10 @@ protectedApp.get('/papers/attempts/:attemptId/results', async (c) => {
 
 // Submit essay for grading
 protectedApp.post('/essays/submit', async (c) => {
-  const { userId, questionId, answerText, gradingType } = await c.req.json();
+  // Identity comes only from the verified JWT — a body-supplied userId would
+  // let a caller spend another user's AI grading credits.
+  const userId = getUserId(c)!;
+  const { questionId, answerText, gradingType } = await c.req.json();
 
   try {
     // Get user subscription info
@@ -4375,6 +4410,11 @@ protectedApp.post('/essays/:attemptId/grade', async (c) => {
 
     if (!attempt) {
       return c.json({ success: false, error: 'Essay attempt not found or not eligible for AI grading' }, 404);
+    }
+
+    // IDOR guard: only the attempt's owner (or an admin) may trigger grading.
+    if (attempt.user_id !== getUserId(c) && getUserRole(c) !== 'admin') {
+      return c.json({ success: false, error: 'Forbidden' }, 403);
     }
 
     // Update status to grading
@@ -4481,37 +4521,11 @@ Please grade this essay.`;
   }
 });
 
-// Get user's essay history
-protectedApp.get('/essays/history', async (c) => {
-  const userId = c.req.query('userId');
-  const limit = parseInt(c.req.query('limit') || '20');
-
-  if (!userId) {
-    return c.json({ success: false, error: 'userId required' }, 400);
-  }
-
-  try {
-    const { results } = await c.env.DB.prepare(`
-      SELECT ea.*, q.question_text, q.marks, s.name as subject_name
-      FROM essay_attempts ea
-      JOIN questions q ON ea.question_id = q.id
-      JOIN subjects s ON q.subject_id = s.id
-      WHERE ea.user_id = ?
-      ORDER BY ea.created_at DESC
-      LIMIT ?
-    `).bind(userId, limit).all();
-
-    // Parse feedback JSON
-    const attempts = results.map((a: Record<string, unknown>) => ({
-      ...a,
-      aiFeedback: a.ai_feedback ? JSON.parse(a.ai_feedback as string) : null,
-    }));
-
-    return c.json({ success: true, data: attempts });
-  } catch (error) {
-    return c.json({ success: false, error: 'Failed to fetch essay history' }, 500);
-  }
-});
+// NOTE: GET /essays/history is served only by the app-level requireAuth
+// route registered just before `app.route('/api', publicApp)` above
+// (JWT-derived userId, self only). The protectedApp copy was
+// removed: publicApp's `/essays/:questionId` param route is registered
+// earlier and would shadow it (Hono: first-registered matching route wins).
 
 // =====================
 // AI TUTOR ENDPOINTS
