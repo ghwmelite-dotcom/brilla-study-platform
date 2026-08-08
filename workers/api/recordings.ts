@@ -1,5 +1,7 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
+import { requireAuth } from './auth-middleware';
+import type { AuthPayload } from './auth-middleware';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -7,6 +9,13 @@ interface Env {
   JWT_SECRET: string;
   RECORDINGS_BUCKET?: R2Bucket;
   APP_URL?: string;
+}
+
+// Context variables set by requireAuth
+interface AuthVars {
+  userId: string;
+  userRole: string;
+  user: AuthPayload;
 }
 
 // Recording type
@@ -32,39 +41,6 @@ interface WhiteboardRecording {
   updated_at: string;
 }
 
-// JWT verification helper
-async function verifyJWT(token: string, secret: string): Promise<{ userId: string; email: string; role: string } | null> {
-  try {
-    const [headerB64, payloadB64, signatureB64] = token.split('.');
-    if (!headerB64 || !payloadB64 || !signatureB64) return null;
-
-    const encoder = new TextEncoder();
-    const key = await crypto.subtle.importKey(
-      'raw',
-      encoder.encode(secret),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['verify']
-    );
-
-    const signatureData = Uint8Array.from(atob(signatureB64.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
-    const dataToVerify = encoder.encode(`${headerB64}.${payloadB64}`);
-
-    const isValid = await crypto.subtle.verify('HMAC', key, signatureData, dataToVerify);
-    if (!isValid) return null;
-
-    const payload = JSON.parse(atob(payloadB64.replace(/-/g, '+').replace(/_/g, '/')));
-
-    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-      return null;
-    }
-
-    return payload;
-  } catch {
-    return null;
-  }
-}
-
 // Generate unique ID
 function generateId(prefix: string): string {
   return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
@@ -77,68 +53,26 @@ function generateShareToken(): string {
 }
 
 // Recordings routes
-const recordingsApp = new Hono<{ Bindings: Env }>();
+const recordingsApp = new Hono<{ Bindings: Env; Variables: AuthVars }>();
 
-// Auth middleware
+// Auth middleware: public endpoints stay public, everything else requires a
+// verified JWT (sets userId/userRole on context).
 recordingsApp.use('*', async (c, next) => {
-  // Skip auth for public endpoints
   const url = new URL(c.req.url);
   if (url.pathname.includes('/public/') || url.pathname.includes('/files/')) {
     return next();
   }
-
-  const authHeader = c.req.header('Authorization');
-
-  if (authHeader?.startsWith('Bearer ')) {
-    const token = authHeader.replace('Bearer ', '');
-
-    // Handle demo tokens
-    if (token.endsWith('_demo_token')) {
-      const tokenPrefix = token.replace('_demo_token', '');
-      const demoUsers: Record<string, { id: string; role: string }> = {
-        'student': { id: 'demo_student_1', role: 'student' },
-        'teacher': { id: 'demo_teacher_1', role: 'teacher' },
-        'admin': { id: 'demo_admin_1', role: 'admin' },
-      };
-      const demoUser = demoUsers[tokenPrefix];
-      if (demoUser) {
-        c.set('userId', demoUser.id);
-        c.set('userRole', demoUser.role);
-      }
-    } else {
-      try {
-        const payload = await verifyJWT(token, c.env.JWT_SECRET);
-        if (payload) {
-          c.set('userId', payload.userId);
-          c.set('userRole', payload.role);
-        }
-      } catch (error) {
-        console.error('Token verification error:', error);
-      }
-    }
-  }
-
-  // Check headers as fallback
-  if (!c.get('userId')) {
-    const headerUserId = c.req.header('x-user-id');
-    const headerRole = c.req.header('x-user-role');
-    if (headerUserId) {
-      c.set('userId', headerUserId);
-      c.set('userRole', headerRole || 'student');
-    }
-  }
-
-  return next();
+  return requireAuth(c, next);
 });
 
 // Helper to get user ID from context
 function getUserId(c: Context): string | undefined {
-  return c.get('userId') || c.req.header('x-user-id');
+  return c.get('userId');
 }
 
 // Helper to check if user is teacher or admin
 function isTeacherOrAdmin(c: Context): boolean {
-  const role = c.get('userRole') || c.req.header('x-user-role');
+  const role = c.get('userRole');
   return role === 'teacher' || role === 'admin';
 }
 
