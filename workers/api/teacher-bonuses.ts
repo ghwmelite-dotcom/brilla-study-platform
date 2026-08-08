@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
-import { verify } from 'hono/jwt';
+import { requireAuth } from './auth-middleware';
+import type { AuthPayload } from './auth-middleware';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -8,71 +9,12 @@ interface Env {
   APP_URL: string;
 }
 
-// JWT payload type
-interface UserPayload {
+// Context variables set by requireAuth
+interface AuthVars {
   userId: string;
-  email: string;
-  role: string;
-  exp?: number;
+  userRole: string;
+  user: AuthPayload;
 }
-
-// Verify JWT token
-async function verifyJWT(token: string, secret: string): Promise<UserPayload | null> {
-  try {
-    const payload = await verify(token, secret);
-    return payload as UserPayload;
-  } catch {
-    return null;
-  }
-}
-
-// Authentication middleware
-const authMiddleware = async (c: any, next: any) => {
-  const authHeader = c.req.header('Authorization');
-
-  if (c.req.method === 'OPTIONS') {
-    return next();
-  }
-
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
-  }
-
-  const token = authHeader.replace('Bearer ', '');
-
-  // Demo token support for development
-  if (token.endsWith('_demo_token')) {
-    const isDevelopment = c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev';
-    if (isDevelopment) {
-      const tokenPrefix = token.replace('_demo_token', '');
-      const demoUsers: Record<string, { id: string; role: string }> = {
-        'student': { id: 'student_1766327981521', role: 'student' },
-        'teacher': { id: 'teacher_1766327981453', role: 'teacher' },
-        'admin': { id: 'admin_prod_001', role: 'admin' },
-      };
-      const demoUser = demoUsers[tokenPrefix];
-      if (demoUser) {
-        c.set('userId', demoUser.id);
-        c.set('userRole', demoUser.role);
-        return next();
-      }
-    }
-  }
-
-  try {
-    const payload = await verifyJWT(token, c.env.JWT_SECRET);
-    if (!payload) {
-      return c.json({ success: false, error: 'Invalid token' }, 401);
-    }
-
-    c.set('userId', payload.userId);
-    c.set('userEmail', payload.email);
-    c.set('userRole', payload.role);
-    return next();
-  } catch (error) {
-    return c.json({ success: false, error: 'Token verification failed' }, 401);
-  }
-};
 
 // Admin-only middleware
 const adminMiddleware = async (c: any, next: any) => {
@@ -93,10 +35,10 @@ const teacherMiddleware = async (c: any, next: any) => {
 };
 
 // Create the router
-export const teacherBonusesRouter = new Hono<{ Bindings: Env }>();
+export const teacherBonusesRouter = new Hono<{ Bindings: Env; Variables: AuthVars }>();
 
-// Apply auth middleware to all routes
-teacherBonusesRouter.use('*', authMiddleware);
+// Apply shared auth middleware to all routes (verified JWT + active DB user)
+teacherBonusesRouter.use('*', requireAuth);
 
 
 // ============================================

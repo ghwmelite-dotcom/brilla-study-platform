@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { verify } from 'hono/jwt';
+import { requireAuth } from './auth-middleware';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -10,75 +10,6 @@ interface Env {
   PAYSTACK_WEBHOOK_SECRET?: string;
   APP_URL: string;
 }
-
-// JWT payload type
-interface UserPayload {
-  userId: string;
-  email: string;
-  role: string;
-  exp?: number;
-}
-
-// Verify JWT token
-async function verifyJWT(token: string, secret: string): Promise<UserPayload | null> {
-  try {
-    const payload = await verify(token, secret);
-    return payload as UserPayload;
-  } catch {
-    return null;
-  }
-}
-
-// Authentication middleware for protected routes
-const authMiddleware = async (c: any, next: any) => {
-  const authHeader = c.req.header('Authorization');
-
-  // Skip auth for OPTIONS requests (CORS preflight)
-  if (c.req.method === 'OPTIONS') {
-    return next();
-  }
-
-  // Check for Authorization header
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
-  }
-
-  const token = authHeader.replace('Bearer ', '');
-
-  // SECURITY: Demo tokens only allowed in development environment
-  if (token.endsWith('_demo_token')) {
-    const isDevelopment = c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev';
-    if (isDevelopment) {
-      const tokenPrefix = token.replace('_demo_token', '');
-      const demoUsers: Record<string, { id: string; role: string }> = {
-        'student': { id: 'student_1766327981521', role: 'student' },
-        'teacher': { id: 'teacher_1766327981453', role: 'teacher' },
-        'admin': { id: 'admin_prod_001', role: 'admin' },
-      };
-      const demoUser = demoUsers[tokenPrefix];
-      if (demoUser) {
-        c.set('userId', demoUser.id);
-        c.set('userRole', demoUser.role);
-        return next();
-      }
-    }
-    // In production, demo tokens are rejected
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-
-  // Verify JWT token
-  try {
-    const payload = await verifyJWT(token, c.env.JWT_SECRET);
-    if (!payload) {
-      return c.json({ success: false, error: 'Invalid token' }, 401);
-    }
-    c.set('userId', payload.userId);
-    c.set('userRole', payload.role);
-    return next();
-  } catch {
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-};
 
 // Paystack API base URL
 const PAYSTACK_API = 'https://api.paystack.co';
@@ -279,6 +210,8 @@ const FRAUD_THRESHOLDS = {
 export const paymentsApp = new Hono<{ Bindings: Env }>();
 
 // Get subscription plans
+// PUBLIC (no requireAuth): the pricing page lists plans pre-login. Mirrors the
+// public /api/subscriptions/plans route.
 paymentsApp.get('/plans', async (c) => {
   try {
     const { results } = await c.env.DB.prepare(`
@@ -310,7 +243,7 @@ paymentsApp.get('/plans', async (c) => {
 });
 
 // Initialize payment
-paymentsApp.post('/initialize', authMiddleware, async (c) => {
+paymentsApp.post('/initialize', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const { planId, billingCycle } = await c.req.json();
@@ -432,7 +365,7 @@ paymentsApp.post('/initialize', authMiddleware, async (c) => {
 });
 
 // Verify payment
-paymentsApp.get('/verify/:reference', authMiddleware, async (c) => {
+paymentsApp.get('/verify/:reference', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const reference = c.req.param('reference');
@@ -748,6 +681,9 @@ async function checkAffiliateTierUpgrade(
 }
 
 // Paystack webhook handler with proper signature verification
+// PUBLIC (no requireAuth): Paystack servers call this with no JWT; it
+// authenticates via the x-paystack-signature HMAC below. Signature-hardening
+// is Phase 2 scope — this logic is intentionally unchanged.
 paymentsApp.post('/webhook', async (c) => {
   try {
     const signature = c.req.header('x-paystack-signature');
@@ -835,7 +771,7 @@ paymentsApp.post('/webhook', async (c) => {
 });
 
 // Get user's payment history
-paymentsApp.get('/history', authMiddleware, async (c) => {
+paymentsApp.get('/history', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const limit = parseInt(c.req.query('limit') || '20');
@@ -861,7 +797,7 @@ paymentsApp.get('/history', authMiddleware, async (c) => {
 });
 
 // Request affiliate payout with enhanced security
-paymentsApp.post('/payout/request', authMiddleware, async (c) => {
+paymentsApp.post('/payout/request', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const { amount } = await c.req.json();
@@ -1035,7 +971,7 @@ paymentsApp.post('/payout/request', authMiddleware, async (c) => {
 });
 
 // Get payout history
-paymentsApp.get('/payouts', authMiddleware, async (c) => {
+paymentsApp.get('/payouts', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -1062,7 +998,7 @@ paymentsApp.get('/payouts', authMiddleware, async (c) => {
 });
 
 // Update mobile money details
-paymentsApp.put('/mobile-money', authMiddleware, async (c) => {
+paymentsApp.put('/mobile-money', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const { mobileMoneyNumber, mobileMoneyProvider } = await c.req.json();

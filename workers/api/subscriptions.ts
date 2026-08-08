@@ -1,20 +1,20 @@
 import { Hono } from 'hono';
-import { verify } from 'hono/jwt';
+import { requireAuth } from './auth-middleware';
+import type { AuthPayload } from './auth-middleware';
 import { DAILY_QUESTION_LIMIT, CORE_SUBJECTS } from './usage-limits';
 
 // Types for Cloudflare bindings
 interface Env {
   DB: D1Database;
   JWT_SECRET: string;
-  APP_URL: string;
 }
 
-// Demo user mappings (must match actual database IDs)
-const demoUsers: Record<string, { id: string; role: string }> = {
-  'student': { id: 'student_1766327981521', role: 'student' },
-  'teacher': { id: 'teacher_1766327981453', role: 'teacher' },
-  'admin': { id: 'admin_prod_001', role: 'admin' },
-};
+// Context variables set by requireAuth
+interface AuthVars {
+  userId: string;
+  userRole: string;
+  user: AuthPayload;
+}
 
 // Trial task definitions
 const TRIAL_TASKS = [
@@ -38,40 +38,18 @@ const TRIAL_TASKS = [
 // SUBSCRIPTIONS API
 // =============================================
 
-export const subscriptionsApp = new Hono<{ Bindings: Env }>();
+export const subscriptionsApp = new Hono<{ Bindings: Env; Variables: AuthVars }>();
 
-// Authentication middleware
+// Authentication middleware (shared requireAuth from ./auth-middleware).
+// GET /plans stays public: the pricing page fetches it pre-login and the
+// handler already tolerates a missing userId (defaults to the student view).
+// Every other route requires a verified JWT + active DB user.
 subscriptionsApp.use('*', async (c, next) => {
-  const authHeader = c.req.header('Authorization');
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'No authorization header' }, 401);
-  }
-
-  const token = authHeader.replace('Bearer ', '');
-
-  // Handle demo tokens
-  if (token.endsWith('_demo_token')) {
-    const tokenPrefix = token.replace('_demo_token', '');
-    const demoUser = demoUsers[tokenPrefix];
-
-    if (demoUser) {
-      c.set('userId', demoUser.id);
-      c.set('userRole', demoUser.role);
-      return next();
-    }
-  }
-
-  // Verify JWT token
-  try {
-    const payload = await verify(token, c.env.JWT_SECRET);
-    c.set('userId', payload.userId as string);
-    c.set('userRole', payload.role as string);
+  const url = new URL(c.req.url);
+  if (url.pathname.endsWith('/plans')) {
     return next();
-  } catch (error) {
-    console.error('Token verification error:', error);
-    return c.json({ success: false, error: 'Invalid token' }, 401);
   }
+  return requireAuth(c, next);
 });
 
 // Get subscription plans

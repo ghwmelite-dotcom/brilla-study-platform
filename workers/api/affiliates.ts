@@ -1,29 +1,11 @@
 import { Hono } from 'hono';
-import { verify } from 'hono/jwt';
+import { requireAuth } from './auth-middleware';
 
 // Types for Cloudflare bindings
 interface Env {
   DB: D1Database;
   JWT_SECRET: string;
   APP_URL: string;
-}
-
-// JWT payload type
-interface UserPayload {
-  userId: string;
-  email: string;
-  role: string;
-  exp?: number;
-}
-
-// Verify JWT token
-async function verifyJWT(token: string, secret: string): Promise<UserPayload | null> {
-  try {
-    const payload = await verify(token, secret);
-    return payload as UserPayload;
-  } catch {
-    return null;
-  }
 }
 
 // Rate limiting store (in-memory for single worker, use KV/Durable Objects for distributed)
@@ -46,57 +28,6 @@ function checkRateLimit(key: string, maxRequests: number, windowMs: number): boo
   record.count++;
   return true;
 }
-
-// Authentication middleware for protected routes
-const authMiddleware = async (c: any, next: any) => {
-  const authHeader = c.req.header('Authorization');
-
-  // Skip auth for OPTIONS requests (CORS preflight)
-  if (c.req.method === 'OPTIONS') {
-    return next();
-  }
-
-  // Check for Authorization header
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
-  }
-
-  const token = authHeader.replace('Bearer ', '');
-
-  // SECURITY: Demo tokens only allowed in development environment
-  if (token.endsWith('_demo_token')) {
-    const isDevelopment = c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev';
-    if (isDevelopment) {
-      const tokenPrefix = token.replace('_demo_token', '');
-      const demoUsers: Record<string, { id: string; role: string }> = {
-        'student': { id: 'student_1766327981521', role: 'student' },
-        'teacher': { id: 'teacher_1766327981453', role: 'teacher' },
-        'admin': { id: 'admin_prod_001', role: 'admin' },
-      };
-      const demoUser = demoUsers[tokenPrefix];
-      if (demoUser) {
-        c.set('userId', demoUser.id);
-        c.set('userRole', demoUser.role);
-        return next();
-      }
-    }
-    // In production, demo tokens are rejected
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-
-  // Verify JWT token
-  try {
-    const payload = await verifyJWT(token, c.env.JWT_SECRET);
-    if (!payload) {
-      return c.json({ success: false, error: 'Invalid token' }, 401);
-    }
-    c.set('userId', payload.userId);
-    c.set('userRole', payload.role);
-    return next();
-  } catch {
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-};
 
 // Generate unique referral code
 function generateReferralCode(name: string): string {
@@ -134,7 +65,7 @@ function sanitizePaginationParams(limitStr: string | undefined, offsetStr: strin
 export const affiliatesApp = new Hono<{ Bindings: Env }>();
 
 // Join affiliate program (protected)
-affiliatesApp.post('/join', authMiddleware, async (c) => {
+affiliatesApp.post('/join', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -212,7 +143,7 @@ affiliatesApp.post('/join', authMiddleware, async (c) => {
 });
 
 // Get affiliate profile (protected)
-affiliatesApp.get('/profile', authMiddleware, async (c) => {
+affiliatesApp.get('/profile', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -309,7 +240,7 @@ affiliatesApp.get('/profile', authMiddleware, async (c) => {
 });
 
 // Get affiliate dashboard stats (protected)
-affiliatesApp.get('/dashboard', authMiddleware, async (c) => {
+affiliatesApp.get('/dashboard', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -451,7 +382,7 @@ affiliatesApp.get('/dashboard', authMiddleware, async (c) => {
 });
 
 // Get referrals list (protected)
-affiliatesApp.get('/referrals', authMiddleware, async (c) => {
+affiliatesApp.get('/referrals', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const status = c.req.query('status');
@@ -531,7 +462,7 @@ affiliatesApp.get('/referrals', authMiddleware, async (c) => {
 });
 
 // Get commission history (protected)
-affiliatesApp.get('/commissions', authMiddleware, async (c) => {
+affiliatesApp.get('/commissions', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const status = c.req.query('status');
@@ -596,6 +527,7 @@ affiliatesApp.get('/commissions', authMiddleware, async (c) => {
 });
 
 // Get affiliate leaderboard
+// PUBLIC (no requireAuth): pre-login marketing/landing pages render the board.
 affiliatesApp.get('/leaderboard', async (c) => {
   try {
     const period = c.req.query('period') || 'monthly';
@@ -657,6 +589,7 @@ affiliatesApp.get('/leaderboard', async (c) => {
 });
 
 // Get school leaderboard
+// PUBLIC (no requireAuth): same as /leaderboard — pre-login marketing pages.
 affiliatesApp.get('/leaderboard/schools', async (c) => {
   try {
     const period = c.req.query('period') || 'monthly';
@@ -700,7 +633,7 @@ affiliatesApp.get('/leaderboard/schools', async (c) => {
 });
 
 // Get affiliate challenges (protected)
-affiliatesApp.get('/challenges', authMiddleware, async (c) => {
+affiliatesApp.get('/challenges', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -760,7 +693,7 @@ affiliatesApp.get('/challenges', authMiddleware, async (c) => {
 });
 
 // Claim challenge reward (protected)
-affiliatesApp.post('/challenges/:challengeId/claim', authMiddleware, async (c) => {
+affiliatesApp.post('/challenges/:challengeId/claim', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const challengeId = c.req.param('challengeId');
@@ -831,7 +764,7 @@ affiliatesApp.post('/challenges/:challengeId/claim', authMiddleware, async (c) =
 });
 
 // Get affiliate achievements (protected)
-affiliatesApp.get('/achievements', authMiddleware, async (c) => {
+affiliatesApp.get('/achievements', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -974,7 +907,7 @@ affiliatesApp.get('/ref/:code', async (c) => {
 });
 
 // Process referral (called during user registration - internal endpoint, protected)
-affiliatesApp.post('/process-referral', authMiddleware, async (c) => {
+affiliatesApp.post('/process-referral', requireAuth, async (c) => {
   try {
     const { referralCode, newUserId } = await c.req.json();
 
@@ -1068,7 +1001,7 @@ affiliatesApp.post('/process-referral', authMiddleware, async (c) => {
 });
 
 // Update referral status when user starts trial (protected)
-affiliatesApp.post('/referral/trial-started', authMiddleware, async (c) => {
+affiliatesApp.post('/referral/trial-started', requireAuth, async (c) => {
   try {
     const { userId } = await c.req.json();
 
