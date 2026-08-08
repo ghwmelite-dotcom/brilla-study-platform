@@ -8,7 +8,7 @@ import worker from '../index';
 
 const JWT_SECRET = 'test-secret-that-is-long-enough';
 
-function makeDb(userRow: unknown) {
+function makeDb(userRow: unknown, allResults: Record<string, unknown>[] = []) {
   const calls: { sql: string; args: unknown[] }[] = [];
   const db = {
     prepare: vi.fn((sql: string) => ({
@@ -16,7 +16,7 @@ function makeDb(userRow: unknown) {
         calls.push({ sql, args });
         return {
           first: vi.fn().mockResolvedValue(userRow),
-          all: vi.fn().mockResolvedValue({ results: [] }),
+          all: vi.fn().mockResolvedValue({ results: allResults }),
           run: vi.fn().mockResolvedValue({ success: true }),
         };
       },
@@ -94,7 +94,44 @@ describe('houses/battles IDOR fixes', () => {
     // The history SELECT must bind the JWT user, never the query param.
     const select = calls.find((c) => c.sql.includes('FROM battles b'));
     expect(select).toBeDefined();
-    expect(select!.args.slice(0, 2)).toEqual(['user_1', 'user_1']);
+    expect(select!.args.slice(0, 5)).toEqual(['user_1', 'user_1', 'user_1', 'user_1', 'user_1']);
     expect(select!.args).not.toContain('victim_1');
+  });
+
+  it('GET /api/battles/history returns rows in the Competition-page shape (your_score/opponent)', async () => {
+    const battleRow = {
+      id: 'battle_1',
+      status: 'completed',
+      winner_id: 'user_1',
+      your_score: 24,
+      opponent_score: 18,
+      created_at: '2026-08-01T10:00:00Z',
+      opponent_name_display: 'Ama Serwaa',
+    };
+    const { db } = makeDb({ role: 'student', status: 'approved', is_active: 1 }, [battleRow]);
+    const t = await token({ userId: 'user_1', role: 'student' });
+    const res = await worker.fetch(
+      new Request('http://x/api/battles/history?limit=10', {
+        headers: { Authorization: `Bearer ${t}` },
+      }),
+      { DB: db, JWT_SECRET },
+    );
+    expect(res.status).toBe(200);
+
+    const body = (await res.json()) as {
+      success: boolean;
+      data: Array<Record<string, unknown> & { opponent?: { name?: string } }>;
+    };
+    expect(body.success).toBe(true);
+    expect(body.data).toHaveLength(1);
+    expect(body.data[0]).toMatchObject({
+      id: 'battle_1',
+      status: 'completed',
+      winner_id: 'user_1',
+      your_score: 24,
+      opponent_score: 18,
+      created_at: '2026-08-01T10:00:00Z',
+      opponent: { name: 'Ama Serwaa' },
+    });
   });
 });

@@ -2992,10 +2992,12 @@ publicApp.get('/battles/available', async (c) => {
   }
 });
 
-// NOTE: GET /battles/history is served only by protectedApp (JWT-derived
-// userId). The unauthenticated publicApp duplicate was removed: publicApp is
-// mounted before protectedApp, so it shadowed the protected route and let
-// callers pass an arbitrary ?userId= to read anyone's battle history (IDOR).
+// NOTE: GET /battles/history is served only by the app-level requireAuth
+// route registered just before `app.route('/api', publicApp)` below
+// (JWT-derived userId). The unauthenticated publicApp duplicate was removed:
+// it let callers pass an arbitrary ?userId= to read anyone's battle history
+// (IDOR), and publicApp's `/battles/:id` param route would shadow any
+// protectedApp copy (Hono: first-registered matching route wins).
 
 // Get battle by ID
 publicApp.get('/battles/:id', async (c) => {
@@ -3105,7 +3107,19 @@ app.get('/api/battles/history', requireAuth, async (c) => {
       SELECT b.*,
         c.name as challenger_name, c.avatar_url as challenger_avatar,
         o.name as opponent_name, o.avatar_url as opponent_avatar,
-        s.name as subject_name
+        s.name as subject_name,
+        CASE
+          WHEN b.challenger_id = ? THEN b.challenger_score
+          ELSE b.opponent_score
+        END as your_score,
+        CASE
+          WHEN b.challenger_id = ? THEN b.opponent_score
+          ELSE b.challenger_score
+        END as opponent_score,
+        CASE
+          WHEN b.challenger_id = ? THEN o.name
+          ELSE c.name
+        END as opponent_name_display
       FROM battles b
       JOIN users c ON b.challenger_id = c.id
       LEFT JOIN users o ON b.opponent_id = o.id
@@ -3113,9 +3127,23 @@ app.get('/api/battles/history', requireAuth, async (c) => {
       WHERE b.challenger_id = ? OR b.opponent_id = ?
       ORDER BY b.created_at DESC
       LIMIT ?
-    `).bind(userId, userId, limit).all();
+    `).bind(userId, userId, userId, userId, userId, limit).all();
 
-    return c.json({ success: true, data: results });
+    // Shape the rows the way the Competition page consumes them
+    // (your_score/opponent_score relative to the JWT user, opponent object).
+    const formattedResults = results.map((battle: Record<string, unknown>) => ({
+      id: battle.id,
+      status: battle.status,
+      winner_id: battle.winner_id,
+      your_score: battle.your_score,
+      opponent_score: battle.opponent_score,
+      created_at: battle.created_at,
+      opponent: {
+        name: battle.opponent_name_display || 'Opponent',
+      },
+    }));
+
+    return c.json({ success: true, data: formattedResults });
   } catch (error) {
     return c.json({ success: false, error: 'Failed to fetch battle history' }, 500);
   }
