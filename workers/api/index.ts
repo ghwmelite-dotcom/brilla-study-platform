@@ -902,7 +902,18 @@ function getDemoDataSQL(userId: string): string {
 const app = new Hono<{ Bindings: Env }>();
 
 // Middleware
-app.use('*', cors());
+app.use('*', cors({
+  origin: (origin, c) => {
+    const allowed = ['https://brillaprep.org', 'https://www.brillaprep.org'];
+    if (c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev') {
+      allowed.push('http://localhost:5173', 'http://127.0.0.1:5173');
+    }
+    return allowed.includes(origin) ? origin : '';
+  },
+  allowHeaders: ['Content-Type', 'Authorization'],
+  allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  credentials: true,
+}));
 
 // Mount exam boards routes FIRST (O-Level / A-Level system) - must be before other /api routes
 app.route('/api/exam-boards', examBoardsApp);
