@@ -452,6 +452,22 @@ Recipe per module: add `import { requireAuth } from './auth-middleware';` and `<
 
 ---
 
+## Task 7b — Hand-rolled verifyJWT routers: revision-classroom, study-rooms, tutor-classroom (plan amendment, added 2026-08-04)
+
+Gap found during Task 5 review: these three modules were absent from the original task list. Each has a local hand-rolled `verifyJWT` (study-rooms.ts:7, revision-classroom.ts:35, tutor-classroom.ts:61) that DOES check the signature but without the alg pin and without the per-request DB status/is_active/role re-check — a weaker, divergent copy of the shared middleware. No `_demo_token` or `x-user-*` acceptance (verified by grep). The phase goal is one shared middleware everywhere.
+
+Recipe per module: delete the local `verifyJWT`/`authMiddleware` and any `UserPayload` helpers they orphan; mount `requireAuth` from `./auth-middleware`. For tutor-classroom (per-route `authMiddleware` on 6+ routes), replace each per-route usage with `requireAuth` — check whether the remaining routes are intentionally public before deciding between `use('*', ...)` and per-route mounts; document the choice. For study-rooms/revision-classroom (middleware via `use('*', ...)`), swap the function body for the shared middleware. Check for genuinely public routes (room-code joins may be public-by-link? — inspect and document). Fix any Hono generics (`Variables`) needed for `c.get('userId')`/`c.get('userRole')`/`c.get('user')` to typecheck.
+
+- [ ] `workers/api/study-rooms.ts` — delete verifyJWT (:7-~45), swap `studyRoomsApp.use('*', ...)` (:64) to requireAuth.
+- [ ] `workers/api/revision-classroom.ts` — delete verifyJWT (:35), swap its middleware usage (:52) to requireAuth.
+- [ ] `workers/api/tutor-classroom.ts` — replace authMiddleware (:61) usages with requireAuth (per-route or blanket, per public-route audit).
+- [ ] Sweep: `grep -rn "verifyJWT\|authMiddleware" workers/api/` → only auth-middleware.ts, index.ts's per-route userAuth (tracked separately), and tutoring.ts's reviewed optionalAuth remain.
+
+**Verify:** `npx vitest run` (root) all pass; `npx tsc -p workers/tsconfig.json` count must not exceed the current baseline; `npx wrangler deploy --dry-run` compiles.
+**Commit (with approval):** `fix(api): replace hand-rolled verifyJWT with shared middleware in classroom/study-room routers`
+
+---
+
 ## Task 8 — exam-boards.ts: shared middleware + seed-questions admin gate + batch insert
 
 - [ ] Replace the local `/user/*` JWT middleware at `workers/api/exam-boards.ts:24-47` with `examBoardsApp.use('/user/*', requireAuth);` (keeps public endpoints public — this module intentionally has them at :49+). `c.get('user')` consumers (:632 etc.) still work.
