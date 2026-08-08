@@ -1,47 +1,17 @@
 import { Hono } from 'hono';
 import { Env } from './index';
+import { requireAuth } from './auth-middleware';
 
-export const studyRoomsApp = new Hono<{ Bindings: Env }>();
-
-// JWT verification
-async function verifyJWT(token: string, secret: string): Promise<{ id: string; email: string; role: string } | null> {
-  try {
-    const parts = token.split('.');
-    if (parts.length !== 3) return null;
-
-    const payload = JSON.parse(atob(parts[1]));
-    if (payload.exp && payload.exp < Date.now() / 1000) {
-      return null;
-    }
-
-    // Verify signature
-    const encoder = new TextEncoder();
-    const key = await crypto.subtle.importKey(
-      'raw',
-      encoder.encode(secret),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['verify']
-    );
-
-    const signatureValid = await crypto.subtle.verify(
-      'HMAC',
-      key,
-      Uint8Array.from(atob(parts[2].replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0)),
-      encoder.encode(`${parts[0]}.${parts[1]}`)
-    );
-
-    if (!signatureValid) return null;
-
-    return {
-      id: payload.sub || payload.userId || payload.id,
-      email: payload.email,
-      role: payload.role,
-    };
-  } catch {
-    return null;
-  }
+// Identity shape read by the routes below. requireAuth sets `user` to the JWT
+// payload keyed by userId; the adapter middleware re-adds the legacy `id` key.
+interface StudyRoomUser {
+  userId: string;
+  id?: string;
+  email?: string;
+  role?: string;
 }
+
+export const studyRoomsApp = new Hono<{ Bindings: Env; Variables: { user: StudyRoomUser } }>();
 
 // Types
 interface CreateSessionRequest {
@@ -60,21 +30,18 @@ interface CreateSessionRequest {
   roomCode?: string;
 }
 
-// Auth middleware
+// Auth: shared middleware (HS256-pinned signature verify + per-request DB
+// status/is_active/role re-check).
+// Public-route audit: every route below reads or writes per-user session state
+// and was already behind the previous blanket middleware. The room-code join is
+// authenticated by design (the frontend always attaches Bearer via
+// src/services/api.ts) — no public routes.
+studyRoomsApp.use('*', requireAuth);
+// Adapter: legacy routes read c.get('user').id; the shared middleware keys the
+// JWT payload by userId, so re-add `id` for the routes below.
 studyRoomsApp.use('*', async (c, next) => {
-  const authHeader = c.req.header('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized - Please log in' }, 401);
-  }
-
-  const token = authHeader.slice(7);
-  const payload = await verifyJWT(token, c.env.JWT_SECRET);
-
-  if (!payload) {
-    return c.json({ success: false, error: 'Invalid or expired token' }, 401);
-  }
-
-  c.set('user', payload);
+  const user = c.get('user');
+  c.set('user', { ...user, id: user.userId });
   await next();
 });
 

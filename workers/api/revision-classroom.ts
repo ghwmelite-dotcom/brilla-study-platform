@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { verify } from 'hono/jwt';
 import type { BaseAiTextGenerationModels } from '@cloudflare/workers-types';
+import { requireAuth } from './auth-middleware';
 
 interface Env {
   DB: D1Database;
@@ -31,33 +31,12 @@ interface TeachingContext {
 
 const revisionClassroomApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
 
-// JWT verification helper
-async function verifyJWT(token: string, secret: string): Promise<UserPayload | null> {
-  try {
-    const payload = await verify(token, secret);
-    return payload as unknown as UserPayload;
-  } catch {
-    return null;
-  }
-}
-
-// Auth middleware - apply to all routes
-revisionClassroomApp.use('*', async (c, next) => {
-  const authHeader = c.req.header('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized - Please log in' }, 401);
-  }
-
-  const token = authHeader.slice(7);
-  const payload = await verifyJWT(token, c.env.JWT_SECRET);
-
-  if (!payload) {
-    return c.json({ success: false, error: 'Invalid or expired token' }, 401);
-  }
-
-  c.set('user', payload);
-  await next();
-});
+// Auth: shared middleware (HS256-pinned signature verify + per-request DB
+// status/is_active/role re-check). Sets `user` = { ...JWT payload, role },
+// which carries the userId/email/role keys the routes below read.
+// Public-route audit: every route reads or writes per-user revision state and
+// was already behind the previous blanket middleware — no public routes.
+revisionClassroomApp.use('*', requireAuth);
 
 // Helper to generate unique IDs
 const generateId = (prefix: string) => `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;

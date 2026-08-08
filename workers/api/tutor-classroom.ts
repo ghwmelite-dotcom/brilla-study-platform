@@ -1,7 +1,37 @@
 import { Hono } from 'hono';
 import type { Env } from './index';
+import { requireAuth } from './auth-middleware';
 
-const tutorClassroom = new Hono<{ Bindings: Env }>();
+// Identity shape read by the routes below. requireAuth sets `user` to the JWT
+// payload (keyed by userId) with role refreshed from the DB; the adapter
+// middleware re-adds the legacy `id` key the routes use.
+interface TutorClassroomUser {
+  userId: string;
+  id?: string;
+  email?: string;
+  role?: string;
+}
+
+const tutorClassroom = new Hono<{ Bindings: Env; Variables: { user: TutorClassroomUser } }>();
+
+// Auth: shared middleware (HS256-pinned signature verify + per-request DB
+// status/is_active/role re-check), mounted blanket.
+// Public-route audit: every route in this module previously mounted a
+// per-route auth or teacher gate, so all 27 routes already required a
+// logged-in user (incl. the room-code join at
+// /scheduled-sessions/join/:roomCode, which additionally checks participant
+// membership). No public routes exist, so a blanket mount is behavior-
+// equivalent to the previous per-route mounts. NOTE: the old per-route
+// gates only checked c.get('user'), which nothing upstream ever set —
+// these routes 401'd unconditionally before this fix.
+tutorClassroom.use('*', requireAuth);
+// Adapter: legacy routes read c.get('user').id; the shared middleware keys the
+// JWT payload by userId, so re-add `id`.
+tutorClassroom.use('*', async (c, next) => {
+  const user = c.get('user');
+  c.set('user', { ...user, id: user.userId });
+  await next();
+});
 
 // Helper to generate unique IDs
 function generateId(): string {
@@ -45,7 +75,8 @@ function calculateStruggleScore(signals: {
   );
 }
 
-// Auth middleware - requires teacher or admin role
+// Role gate - requires teacher or admin role. Runs after the blanket
+// requireAuth + adapter above; user.role is fresh from the DB (not the JWT).
 async function teacherMiddleware(c: any, next: () => Promise<void>) {
   const user = c.get('user');
   if (!user) {
@@ -53,15 +84,6 @@ async function teacherMiddleware(c: any, next: () => Promise<void>) {
   }
   if (user.role !== 'teacher' && user.role !== 'admin') {
     return c.json({ success: false, error: 'Teacher access required' }, 403);
-  }
-  await next();
-}
-
-// Auth middleware - requires any authenticated user
-async function authMiddleware(c: any, next: () => Promise<void>) {
-  const user = c.get('user');
-  if (!user) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
   }
   await next();
 }
@@ -431,7 +453,7 @@ tutorClassroom.get('/observable-sessions/:sessionId/updates', teacherMiddleware,
 // =====================================================
 
 // Suggest handoff to student (called by AI/system)
-tutorClassroom.post('/ai-sessions/:sessionId/suggest-handoff', authMiddleware, async (c) => {
+tutorClassroom.post('/ai-sessions/:sessionId/suggest-handoff', async (c) => {
   const { sessionId } = c.req.param();
   const body = await c.req.json();
   const db = c.env.DB;
@@ -459,7 +481,7 @@ tutorClassroom.post('/ai-sessions/:sessionId/suggest-handoff', authMiddleware, a
 });
 
 // Student requests a human tutor
-tutorClassroom.post('/ai-sessions/:sessionId/request-handoff', authMiddleware, async (c) => {
+tutorClassroom.post('/ai-sessions/:sessionId/request-handoff', async (c) => {
   const user = c.get('user');
   const { sessionId } = c.req.param();
   const body = await c.req.json();
@@ -899,7 +921,7 @@ tutorClassroom.post('/scheduled-sessions/:id/start', teacherMiddleware, async (c
 });
 
 // Join scheduled session (for both tutor and student)
-tutorClassroom.get('/scheduled-sessions/join/:roomCode', authMiddleware, async (c) => {
+tutorClassroom.get('/scheduled-sessions/join/:roomCode', async (c) => {
   const user = c.get('user');
   const { roomCode } = c.req.param();
   const db = c.env.DB;
@@ -930,7 +952,7 @@ tutorClassroom.get('/scheduled-sessions/join/:roomCode', authMiddleware, async (
 });
 
 // Request AI assistance during session
-tutorClassroom.post('/scheduled-sessions/:id/ai-assist', authMiddleware, async (c) => {
+tutorClassroom.post('/scheduled-sessions/:id/ai-assist', async (c) => {
   const user = c.get('user');
   const { id } = c.req.param();
   const body = await c.req.json();
@@ -1074,7 +1096,7 @@ tutorClassroom.post('/scheduled-sessions/:id/end', teacherMiddleware, async (c) 
 // =====================================================
 
 // Get tutor updates for student's AI session
-tutorClassroom.get('/student/session/:sessionId/tutor-updates', authMiddleware, async (c) => {
+tutorClassroom.get('/student/session/:sessionId/tutor-updates', async (c) => {
   const user = c.get('user');
   const { sessionId } = c.req.param();
   const { last_event_id } = c.req.query();
@@ -1126,7 +1148,7 @@ tutorClassroom.get('/student/session/:sessionId/tutor-updates', authMiddleware, 
 });
 
 // Student declines handoff suggestion
-tutorClassroom.post('/student/session/:sessionId/decline-handoff', authMiddleware, async (c) => {
+tutorClassroom.post('/student/session/:sessionId/decline-handoff', async (c) => {
   const user = c.get('user');
   const { sessionId } = c.req.param();
   const db = c.env.DB;
