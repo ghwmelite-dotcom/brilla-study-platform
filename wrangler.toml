@@ -13,6 +13,7 @@ NOTIFICATION_EMAILS = "brillaprepgh@gmail.com"
 
 # IMPORTANT: Set these secrets using wrangler:
 # wrangler secret put JWT_SECRET               (generate a secure random string)
+# wrangler secret put SETUP_KEY                (one-shot /auth/setup key; endpoint is disabled until set)
 # wrangler secret put RESEND_API_KEY           (your Resend API key for emails)
 # wrangler secret put GOOGLE_CLIENT_ID         (from Google Cloud Console)
 # wrangler secret put GOOGLE_CLIENT_SECRET     (from Google Cloud Console)

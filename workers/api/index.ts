@@ -45,6 +45,7 @@ import {
 interface Env {
   DB: D1Database;
   JWT_SECRET: string;
+  SETUP_KEY?: string;
   ENVIRONMENT: string;
   ANTHROPIC_API_KEY?: string;
   AI_PROVIDER?: string;
@@ -323,6 +324,10 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
   'demo-reset': {
     maxRequests: 3,
     windowMs: 60 * 60 * 1000,      // 3 attempts per hour per IP
+  },
+  'setup': {
+    maxRequests: 5,
+    windowMs: 60 * 60 * 1000,      // 5 attempts per hour per IP
   },
 };
 
@@ -1584,14 +1589,8 @@ publicApp.post('/auth/reset-password', async (c) => {
 });
 
 // Test notification endpoint - for testing email delivery
-// Requires JWT_SECRET as adminKey for security
-publicApp.post('/auth/test-notification', async (c) => {
-  const { adminKey } = await c.req.json();
-
-  if (typeof adminKey !== 'string' || !constantTimeEqual(adminKey, c.env.JWT_SECRET)) {
-    return c.json({ success: false, error: 'Invalid admin key' }, 401);
-  }
-
+// Requires a verified admin JWT (shared requireAdmin middleware)
+publicApp.post('/auth/test-notification', requireAdmin, async (c) => {
   if (!c.env.RESEND_API_KEY) {
     return c.json({ success: false, error: 'Email service not configured' }, 500);
   }
@@ -1682,64 +1681,93 @@ publicApp.post('/auth/test-notification', async (c) => {
   }
 });
 
-// Setup endpoint - Initialize demo users with passwords
-// This should only be called once during initial setup
+// Setup endpoint - one-shot initialization of initial users.
+// Requires the dedicated SETUP_KEY secret (separate from JWT_SECRET); the
+// endpoint returns 404 when SETUP_KEY is not configured. Rate limited to
+// 5 attempts/hour per IP, refuses to run once any admin account exists,
+// never overwrites existing users' passwords, and never creates admin
+// accounts. The caller must supply the full users array — there are no
+// built-in default credentials.
 publicApp.post('/auth/setup', async (c) => {
-  const { setupKey, users } = await c.req.json();
+  const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
 
-  // Simple security check - require a setup key that matches JWT_SECRET
-  // In production, you might use a separate SETUP_KEY secret
-  if (typeof setupKey !== 'string' || !constantTimeEqual(setupKey, c.env.JWT_SECRET)) {
+  // Rate limit this endpoint heavily
+  const ipRateLimit = await checkRateLimit(c.env.DB, clientIp, 'setup');
+  if (!ipRateLimit.allowed) {
+    return rateLimitResponse(c, ipRateLimit);
+  }
+
+  // Disabled unless the dedicated SETUP_KEY secret is configured
+  if (!c.env.SETUP_KEY) {
+    return c.json({ success: false, error: 'Not found' }, 404);
+  }
+
+  const body = await c.req.json().catch(() => null);
+  const setupKey = body?.setupKey;
+  const users = body?.users;
+
+  if (typeof setupKey !== 'string' || !constantTimeEqual(setupKey, c.env.SETUP_KEY)) {
     return c.json({ success: false, error: 'Invalid setup key' }, 401);
   }
 
   try {
+    // One-shot guard: setup can only run before any admin account exists
+    const adminCount = await c.env.DB.prepare(
+      "SELECT COUNT(*) as n FROM users WHERE role = 'admin'"
+    ).first<{ n: number }>();
+    if ((adminCount?.n ?? 0) > 0) {
+      return c.json({ success: false, error: 'Setup has already been completed' }, 403);
+    }
+
+    // The caller must supply the users to create (no default credentials)
+    if (!Array.isArray(users) || users.length === 0) {
+      return c.json({ success: false, error: 'A non-empty users array is required' }, 400);
+    }
+
+    // Role clamp: setup never creates admins (admins are seeded separately)
+    const allowedRoles = ['teacher', 'student', 'parent'];
+    for (const user of users) {
+      if (!user || typeof user.email !== 'string' || typeof user.password !== 'string' ||
+          typeof user.name !== 'string' || !allowedRoles.includes(user.role)) {
+        return c.json({ success: false, error: 'Invalid entry in users array' }, 400);
+      }
+    }
+
     const results = [];
 
-    // Default demo users if none provided
-    const demoUsers = users || [
-      { email: 'admin@brillaprep.org', password: 'Admin123!', name: 'System Admin', role: 'admin' },
-      { email: 'teacher@brillaprep.org', password: 'Teacher123!', name: 'Demo Teacher', role: 'teacher' },
-      { email: 'student@brillaprep.org', password: 'Student123!', name: 'Demo Student', role: 'student' },
-    ];
-
-    for (const user of demoUsers) {
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
       // Check if user exists
       const existing = await c.env.DB.prepare(
-        'SELECT id, password_hash FROM users WHERE email = ?'
+        'SELECT id FROM users WHERE email = ?'
       ).bind(user.email).first();
 
-      const passwordHash = await hashPassword(user.password);
-
       if (existing) {
-        // Update password if user exists
-        await c.env.DB.prepare(`
-          UPDATE users SET password_hash = ?, updated_at = datetime('now')
-          WHERE email = ?
-        `).bind(passwordHash, user.email).run();
-        results.push({ email: user.email, action: 'updated' });
-      } else {
-        // Create user if doesn't exist
-        const userId = `${user.role}_${Date.now()}`;
-        await c.env.DB.prepare(`
-          INSERT INTO users (id, email, password_hash, name, role, status, is_active, email_verified, xp_points, level, streak_days, ai_grading_credits)
-          VALUES (?, ?, ?, ?, ?, 'approved', 1, 1, 0, 1, 0, ?)
-        `).bind(
-          userId,
-          user.email,
-          passwordHash,
-          user.name,
-          user.role,
-          user.role === 'admin' ? 100 : user.role === 'teacher' ? 50 : 10
-        ).run();
-        results.push({ email: user.email, action: 'created' });
+        // Never overwrite an existing user's password
+        results.push({ email: user.email, action: 'skipped_exists' });
+        continue;
       }
+
+      const passwordHash = await hashPassword(user.password);
+      const userId = `${user.role}_${Date.now()}_${i}`;
+      await c.env.DB.prepare(`
+        INSERT INTO users (id, email, password_hash, name, role, status, is_active, email_verified, xp_points, level, streak_days, ai_grading_credits)
+        VALUES (?, ?, ?, ?, ?, 'approved', 1, 1, 0, 1, 0, ?)
+      `).bind(
+        userId,
+        user.email,
+        passwordHash,
+        user.name,
+        user.role,
+        user.role === 'teacher' ? 50 : 10
+      ).run();
+      results.push({ email: user.email, action: 'created' });
     }
 
     return c.json({ success: true, data: { message: 'Setup completed', results } });
   } catch (error) {
     console.error('Setup error:', error);
-    return c.json({ success: false, error: 'Setup failed: ' + (error instanceof Error ? error.message : 'Unknown error') }, 500);
+    return c.json({ success: false, error: 'Setup failed' }, 500);
   }
 });
 
