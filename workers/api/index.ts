@@ -856,6 +856,13 @@ async function callClaudeAPI(
 // Demo user email patterns (users with these emails are considered demo users)
 const DEMO_EMAIL_PATTERNS = ['@brillaprep.org'];
 
+// Explicit demo accounts allowed to skip Turnstile (never a domain-wide pattern)
+const TURNSTILE_EXEMPT_EMAILS = new Set([
+  'teacher@brillaprep.org',
+  'student@brillaprep.org',
+  'parent@brillaprep.org',
+]);
+
 // Excluded emails (real accounts that use demo email domain)
 const EXCLUDED_DEMO_EMAILS = ['admin@brillaprep.org'];
 
@@ -1254,8 +1261,8 @@ publicApp.post('/auth/login', async (c) => {
     }
   }
 
-  // Verify Turnstile token (skip for demo users to allow easy demo access)
-  const isDemo = isDemoEmail(email);
+  // Verify Turnstile token (skip only for explicit demo accounts to allow easy demo access)
+  const isDemo = TURNSTILE_EXEMPT_EMAILS.has((email || '').toLowerCase());
   if (c.env.TURNSTILE_SECRET && !isDemo) {
     if (turnstileToken) {
       const isValidTurnstile = await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET, clientIp);
