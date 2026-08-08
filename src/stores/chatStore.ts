@@ -271,7 +271,6 @@ export const useChatStore = create<ChatState>()(
           const response = await fetch(getApiUrl('/api/chat/rooms'), {
             headers: {
               ...getAuthHeaders(),
-              'x-user-id': user.id,
             },
           });
 
@@ -320,7 +319,6 @@ export const useChatStore = create<ChatState>()(
           const response = await fetch(getApiUrl(`/api/chat/rooms/${roomId}/messages`), {
             headers: {
               ...getAuthHeaders(),
-              'x-user-id': user.id,
             },
           });
 
@@ -371,7 +369,6 @@ export const useChatStore = create<ChatState>()(
               headers: {
                 'Content-Type': 'application/json',
                 ...getAuthHeaders(),
-                'x-user-id': user.id,
               },
               body: JSON.stringify(data),
             });
@@ -434,7 +431,6 @@ export const useChatStore = create<ChatState>()(
               method: 'POST',
               headers: {
                 ...getAuthHeaders(),
-                'x-user-id': user.id,
               },
             });
 
@@ -466,7 +462,6 @@ export const useChatStore = create<ChatState>()(
               method: 'POST',
               headers: {
                 ...getAuthHeaders(),
-                'x-user-id': user.id,
               },
             });
           }
@@ -500,7 +495,6 @@ export const useChatStore = create<ChatState>()(
               headers: {
                 'Content-Type': 'application/json',
                 ...getAuthHeaders(),
-                'x-user-id': currentUser.id,
               },
               body: JSON.stringify({ targetUserId: userId }),
             });
@@ -621,7 +615,6 @@ export const useChatStore = create<ChatState>()(
               headers: {
                 'Content-Type': 'application/json',
                 ...getAuthHeaders(),
-                'x-user-id': user.id,
               },
               body: JSON.stringify({
                 content: content.trim(),
@@ -685,7 +678,6 @@ export const useChatStore = create<ChatState>()(
               headers: {
                 'Content-Type': 'application/json',
                 ...getAuthHeaders(),
-                'x-user-id': user.id,
               },
               body: JSON.stringify({ content: newContent }),
             });
@@ -719,7 +711,6 @@ export const useChatStore = create<ChatState>()(
               method: 'DELETE',
               headers: {
                 ...getAuthHeaders(),
-                'x-user-id': user.id,
               },
             });
           }
@@ -811,7 +802,6 @@ export const useChatStore = create<ChatState>()(
             method: 'POST',
             headers: {
               ...getAuthHeaders(),
-              'x-user-id': user.id,
             },
           });
         } catch {
@@ -853,7 +843,6 @@ export const useChatStore = create<ChatState>()(
             {
               headers: {
                 ...getAuthHeaders(),
-                'x-user-id': user.id,
               },
             }
           );

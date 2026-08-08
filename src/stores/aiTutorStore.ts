@@ -338,7 +338,7 @@ export const useAiTutorStore = create<AiTutorState>()(
         }));
       },
 
-      uploadFile: async (file, userId) => {
+      uploadFile: async (file, _userId) => {
         try {
           const formData = new FormData();
           formData.append('file', file);
@@ -347,7 +347,6 @@ export const useAiTutorStore = create<AiTutorState>()(
             method: 'POST',
             headers: {
               ...getAuthHeaders(),
-              'x-user-id': userId,
             },
             body: formData,
           });
@@ -386,7 +385,7 @@ export const useAiTutorStore = create<AiTutorState>()(
         }
       },
 
-      sendMessage: async (message, userId, userName, files) => {
+      sendMessage: async (message, _userId, userName, files) => {
         // Upload files first if provided
         const attachments: FileAttachment[] = [];
 
@@ -505,7 +504,6 @@ export const useAiTutorStore = create<AiTutorState>()(
               headers: {
                 'Content-Type': 'application/json',
                 ...getAuthHeaders(),
-                'x-user-id': userId,
               },
               body: JSON.stringify({
                 conversationId: get().conversationId,
@@ -602,7 +600,7 @@ export const useAiTutorStore = create<AiTutorState>()(
         }
       },
 
-      explainQuestion: async (questionContext, userId) => {
+      explainQuestion: async (questionContext, _userId) => {
         set({ isLoading: true, thinkingStage: 'thinking', error: null });
 
         const userName = get().userPersonalization?.name;
@@ -621,7 +619,6 @@ export const useAiTutorStore = create<AiTutorState>()(
             headers: {
               'Content-Type': 'application/json',
               ...getAuthHeaders(),
-              'x-user-id': userId,
             },
             body: JSON.stringify({
               questionId: questionContext.id,
@@ -668,7 +665,7 @@ export const useAiTutorStore = create<AiTutorState>()(
         }
       },
 
-      getHint: async (questionContext, hintLevel, userId) => {
+      getHint: async (questionContext, hintLevel, _userId) => {
         set({ isLoading: true, thinkingStage: 'thinking', error: null });
 
         const userName = get().userPersonalization?.name;
@@ -687,7 +684,6 @@ export const useAiTutorStore = create<AiTutorState>()(
             headers: {
               'Content-Type': 'application/json',
               ...getAuthHeaders(),
-              'x-user-id': userId,
             },
             body: JSON.stringify({
               questionId: questionContext.id,
@@ -745,7 +741,7 @@ export const useAiTutorStore = create<AiTutorState>()(
         }
       },
 
-      getStepByStep: async (questionContext, userId) => {
+      getStepByStep: async (questionContext, _userId) => {
         set({ isLoading: true, thinkingStage: 'thinking', error: null });
 
         try {
@@ -762,7 +758,6 @@ export const useAiTutorStore = create<AiTutorState>()(
             headers: {
               'Content-Type': 'application/json',
               ...getAuthHeaders(),
-              'x-user-id': userId,
             },
             body: JSON.stringify({
               questionId: questionContext.id,

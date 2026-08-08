@@ -43,24 +43,6 @@ function getAuthToken(): string | null {
   return null;
 }
 
-// Get user info for headers
-function getUserInfo(): { userId?: string; role?: string } {
-  try {
-    const authStore = localStorage.getItem('brilla-auth');
-    if (authStore) {
-      const parsed = JSON.parse(authStore);
-      const user = parsed.state?.user;
-      return {
-        userId: user?.id,
-        role: user?.role,
-      };
-    }
-  } catch {
-    // Ignore errors
-  }
-  return {};
-}
-
 // Build URL with query parameters
 function buildUrl(endpoint: string, params?: Record<string, string | number | boolean | undefined>): string {
   let fullUrl: string;
@@ -93,7 +75,6 @@ async function request<T>(endpoint: string, options: ApiOptions = {}): Promise<A
   const { params, ...fetchOptions } = options;
 
   const token = getAuthToken();
-  const userInfo = getUserInfo();
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -102,14 +83,6 @@ async function request<T>(endpoint: string, options: ApiOptions = {}): Promise<A
 
   if (token) {
     (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
-  }
-
-  // Add user info headers for protected routes
-  if (userInfo.userId) {
-    (headers as Record<string, string>)['x-user-id'] = userInfo.userId;
-  }
-  if (userInfo.role) {
-    (headers as Record<string, string>)['x-user-role'] = userInfo.role;
   }
 
   const url = buildUrl(endpoint, params);
@@ -161,21 +134,13 @@ export const api = {
 
   upload: async <T>(endpoint: string, formData: FormData): Promise<ApiResponse<T>> => {
     const token = getAuthToken();
-    const userInfo = getUserInfo();
 
     console.log('Upload - token:', token ? 'present' : 'missing');
-    console.log('Upload - userInfo:', userInfo);
 
     const headers: HeadersInit = {};
 
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
-    }
-    if (userInfo.userId) {
-      headers['x-user-id'] = userInfo.userId;
-    }
-    if (userInfo.role) {
-      headers['x-user-role'] = userInfo.role;
     }
 
     console.log('Upload - headers being sent:', headers);
@@ -233,7 +198,6 @@ export function getApiUrl(path?: string): string {
 
 export function getAuthHeaders(): Record<string, string> {
   const token = getAuthToken();
-  const userInfo = getUserInfo();
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -241,12 +205,6 @@ export function getAuthHeaders(): Record<string, string> {
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
-  }
-  if (userInfo.userId) {
-    headers['x-user-id'] = userInfo.userId;
-  }
-  if (userInfo.role) {
-    headers['x-user-role'] = userInfo.role;
   }
 
   return headers;
