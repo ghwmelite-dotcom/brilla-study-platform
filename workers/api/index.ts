@@ -2929,29 +2929,11 @@ publicApp.get('/houses', async (c) => {
   }
 });
 
-// Get house by ID
-publicApp.get('/houses/:id', async (c) => {
-  const id = c.req.param('id');
-
-  try {
-    const house = await c.env.DB.prepare(`
-      SELECT h.*,
-        (SELECT COUNT(*) FROM users WHERE house = h.id) as member_count,
-        COALESCE((SELECT SUM(points) FROM house_points WHERE house_id = h.id), 0) as total_points
-      FROM houses h WHERE h.id = ?
-    `).bind(id).first();
-
-    if (!house) {
-      return c.json({ success: false, error: 'House not found' }, 404);
-    }
-
-    return c.json({ success: true, data: house });
-  } catch (error) {
-    return c.json({ success: false, error: 'Failed to fetch house' }, 500);
-  }
-});
-
 // Get house standings
+// NOTE: static routes (/houses/standings, /houses/activity) must be
+// registered BEFORE the `/houses/:id` param route below — Hono resolves
+// first-registered-wins, so the param route would otherwise capture
+// id='standings' / id='activity'.
 publicApp.get('/houses/standings', async (c) => {
   const period = c.req.query('period') || 'all_time';
 
@@ -2982,6 +2964,48 @@ publicApp.get('/houses/standings', async (c) => {
   }
 });
 
+// Get recent house activity
+publicApp.get('/houses/activity', async (c) => {
+  const limit = parseInt(c.req.query('limit') || '20');
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT hp.*, u.name as user_name, h.name as house_name, h.color as house_color
+      FROM house_points hp
+      JOIN users u ON hp.user_id = u.id
+      JOIN houses h ON hp.house_id = h.id
+      ORDER BY hp.created_at DESC
+      LIMIT ?
+    `).bind(limit).all();
+
+    return c.json({ success: true, data: results });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch activity' }, 500);
+  }
+});
+
+// Get house by ID
+publicApp.get('/houses/:id', async (c) => {
+  const id = c.req.param('id');
+
+  try {
+    const house = await c.env.DB.prepare(`
+      SELECT h.*,
+        (SELECT COUNT(*) FROM users WHERE house = h.id) as member_count,
+        COALESCE((SELECT SUM(points) FROM house_points WHERE house_id = h.id), 0) as total_points
+      FROM houses h WHERE h.id = ?
+    `).bind(id).first();
+
+    if (!house) {
+      return c.json({ success: false, error: 'House not found' }, 404);
+    }
+
+    return c.json({ success: true, data: house });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch house' }, 500);
+  }
+});
+
 // Get house members
 publicApp.get('/houses/:id/members', async (c) => {
   const id = c.req.param('id');
@@ -3000,26 +3024,6 @@ publicApp.get('/houses/:id/members', async (c) => {
     return c.json({ success: true, data: results });
   } catch (error) {
     return c.json({ success: false, error: 'Failed to fetch members' }, 500);
-  }
-});
-
-// Get recent house activity
-publicApp.get('/houses/activity', async (c) => {
-  const limit = parseInt(c.req.query('limit') || '20');
-
-  try {
-    const { results } = await c.env.DB.prepare(`
-      SELECT hp.*, u.name as user_name, h.name as house_name, h.color as house_color
-      FROM house_points hp
-      JOIN users u ON hp.user_id = u.id
-      JOIN houses h ON hp.house_id = h.id
-      ORDER BY hp.created_at DESC
-      LIMIT ?
-    `).bind(limit).all();
-
-    return c.json({ success: true, data: results });
-  } catch (error) {
-    return c.json({ success: false, error: 'Failed to fetch activity' }, 500);
   }
 });
 
@@ -3299,6 +3303,85 @@ app.get('/api/essays/history', requireAuth, async (c) => {
     return c.json({ success: true, data: attempts });
   } catch (error) {
     return c.json({ success: false, error: 'Failed to fetch essay history' }, 500);
+  }
+});
+
+// Question bank search (for question picker). Registered on `app` BEFORE
+// the publicApp mount: publicApp's `/questions/:id` param route is
+// registered earlier than protectedApp's routes and would otherwise shadow
+// `/questions/bank` (Hono: first-registered matching route wins).
+app.get('/api/questions/bank', requireAuth, async (c) => {
+  try {
+    const search = c.req.query('search');
+    const subjectId = c.req.query('subject');
+    const topicId = c.req.query('topic');
+    const difficulty = c.req.query('difficulty');
+    const questionType = c.req.query('type');
+    const limit = parseInt(c.req.query('limit') || '20');
+    const offset = parseInt(c.req.query('offset') || '0');
+
+    let query = `
+      SELECT q.*, t.name as topic_name, s.name as subject_name
+      FROM questions q
+      LEFT JOIN topics t ON q.topic_id = t.id
+      LEFT JOIN subjects s ON q.subject_id = s.id
+      WHERE 1=1
+    `;
+    const params: unknown[] = [];
+
+    if (search) {
+      query += ' AND q.question_text LIKE ?';
+      params.push(`%${search}%`);
+    }
+    if (subjectId) {
+      query += ' AND q.subject_id = ?';
+      params.push(subjectId);
+    }
+    if (topicId) {
+      query += ' AND q.topic_id = ?';
+      params.push(topicId);
+    }
+    if (difficulty) {
+      query += ' AND q.difficulty = ?';
+      params.push(difficulty);
+    }
+    if (questionType) {
+      query += ' AND q.question_type = ?';
+      params.push(questionType);
+    }
+
+    // Count total
+    const countQuery = query.replace('SELECT q.*, t.name as topic_name, s.name as subject_name', 'SELECT COUNT(*) as count');
+    const total = await c.env.DB.prepare(countQuery).bind(...params).first();
+
+    query += ' ORDER BY q.created_at DESC LIMIT ? OFFSET ?';
+    params.push(limit, offset);
+
+    const questions = await c.env.DB.prepare(query).bind(...params).all();
+
+    return c.json({
+      success: true,
+      data: {
+        questions: questions.results.map((q: Record<string, unknown>) => ({
+          id: q.id,
+          questionText: q.question_text,
+          questionType: q.question_type,
+          options: transformQuestionOptions(q.options, q.correct_answer as string),
+          correctAnswer: q.correct_answer,
+          explanation: q.explanation,
+          difficulty: q.difficulty,
+          points: q.points,
+          topicId: q.topic_id,
+          topicName: q.topic_name,
+          subjectId: q.subject_id,
+          subjectName: q.subject_name,
+        })),
+        total: total?.count || 0,
+      },
+    });
+  } catch (error) {
+    console.error('Error searching questions:', error);
+    return c.json({ success: false, error: 'Failed to search questions' }, 500);
   }
 });
 
@@ -10032,81 +10115,11 @@ protectedApp.get('/teacher/dashboard', async (c) => {
   }
 });
 
-// Question bank search (for question picker)
-protectedApp.get('/questions/bank', async (c) => {
-  try {
-    const search = c.req.query('search');
-    const subjectId = c.req.query('subject');
-    const topicId = c.req.query('topic');
-    const difficulty = c.req.query('difficulty');
-    const questionType = c.req.query('type');
-    const limit = parseInt(c.req.query('limit') || '20');
-    const offset = parseInt(c.req.query('offset') || '0');
-
-    let query = `
-      SELECT q.*, t.name as topic_name, s.name as subject_name
-      FROM questions q
-      LEFT JOIN topics t ON q.topic_id = t.id
-      LEFT JOIN subjects s ON q.subject_id = s.id
-      WHERE 1=1
-    `;
-    const params: unknown[] = [];
-
-    if (search) {
-      query += ' AND q.question_text LIKE ?';
-      params.push(`%${search}%`);
-    }
-    if (subjectId) {
-      query += ' AND q.subject_id = ?';
-      params.push(subjectId);
-    }
-    if (topicId) {
-      query += ' AND q.topic_id = ?';
-      params.push(topicId);
-    }
-    if (difficulty) {
-      query += ' AND q.difficulty = ?';
-      params.push(difficulty);
-    }
-    if (questionType) {
-      query += ' AND q.question_type = ?';
-      params.push(questionType);
-    }
-
-    // Count total
-    const countQuery = query.replace('SELECT q.*, t.name as topic_name, s.name as subject_name', 'SELECT COUNT(*) as count');
-    const total = await c.env.DB.prepare(countQuery).bind(...params).first();
-
-    query += ' ORDER BY q.created_at DESC LIMIT ? OFFSET ?';
-    params.push(limit, offset);
-
-    const questions = await c.env.DB.prepare(query).bind(...params).all();
-
-    return c.json({
-      success: true,
-      data: {
-        questions: questions.results.map((q: Record<string, unknown>) => ({
-          id: q.id,
-          questionText: q.question_text,
-          questionType: q.question_type,
-          options: transformQuestionOptions(q.options, q.correct_answer as string),
-          correctAnswer: q.correct_answer,
-          explanation: q.explanation,
-          difficulty: q.difficulty,
-          points: q.points,
-          topicId: q.topic_id,
-          topicName: q.topic_name,
-          subjectId: q.subject_id,
-          subjectName: q.subject_name,
-        })),
-        total: total?.count || 0,
-      },
-    });
-  } catch (error) {
-    console.error('Error searching questions:', error);
-    return c.json({ success: false, error: 'Failed to search questions' }, 500);
-  }
-});
+// NOTE: GET /questions/bank is served only by the app-level requireAuth
+// route registered just before `app.route('/api', publicApp)` above.
+// publicApp's `/questions/:id` param route is registered earlier than
+// protectedApp's routes and would shadow any protectedApp copy here
+// (Hono: first-registered matching route wins).
 
 // Search students (for adding to classes)
 protectedApp.get('/students/search', async (c) => {
