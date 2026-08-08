@@ -3149,6 +3149,71 @@ app.get('/api/battles/history', requireAuth, async (c) => {
   }
 });
 
+// Get user's paper attempts history (identity from JWT only). Registered on
+// `app` BEFORE the publicApp mount: publicApp's `/papers/:id` param route is
+// registered earlier than protectedApp's routes and would otherwise shadow
+// `/papers/attempts` (Hono: first-registered matching route wins).
+app.get('/api/papers/attempts', requireAuth, async (c) => {
+  const userId = getUserId(c)!;
+  const limit = parseInt(c.req.query('limit') || '20');
+  const status = c.req.query('status'); // Optional filter: completed, abandoned, in_progress
+
+  try {
+    let query = `
+      SELECT
+        pa.id,
+        pa.paper_id,
+        pa.status,
+        pa.time_allowed,
+        pa.time_used,
+        pa.total_score,
+        pa.percentage_score as percentage,
+        pa.started_at,
+        pa.submitted_at,
+        pp.title as paper_title,
+        pp.total_marks as max_score,
+        pt.name as paper_type
+      FROM paper_attempts pa
+      JOIN past_papers pp ON pa.paper_id = pp.id
+      LEFT JOIN paper_types pt ON pp.paper_type_id = pt.id
+      WHERE pa.user_id = ?
+    `;
+    const params: (string | number)[] = [userId];
+
+    if (status) {
+      query += ` AND pa.status = ?`;
+      params.push(status);
+    }
+
+    query += ` ORDER BY pa.started_at DESC LIMIT ?`;
+    params.push(limit);
+
+    const attempts = await c.env.DB.prepare(query).bind(...params).all();
+
+    // Transform to expected format
+    const data = attempts.results.map((attempt: Record<string, unknown>) => ({
+      id: attempt.id,
+      paper_id: attempt.paper_id,
+      status: attempt.status,
+      total_score: attempt.total_score || 0,
+      max_score: attempt.max_score || 100,
+      percentage: attempt.percentage || 0,
+      time_used: attempt.time_used || 0,
+      submitted_at: attempt.submitted_at,
+      started_at: attempt.started_at,
+      paper: {
+        title: attempt.paper_title,
+        paper_type: attempt.paper_type || 'Paper 1',
+      },
+    }));
+
+    return c.json(data);
+  } catch (error) {
+    console.error('Failed to fetch paper attempts:', error);
+    return c.json({ success: false, error: 'Failed to fetch paper attempts' }, 500);
+  }
+});
+
 // Mount public routes
 app.route('/api', publicApp);
 
@@ -3261,7 +3326,7 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
 
 // Get user progress
 protectedApp.get('/progress', async (c) => {
-  const userId = c.req.query('userId') || 'user_demo';
+  const userId = getUserId(c)!;
 
   try {
     const { results: progress } = await c.env.DB.prepare(`
@@ -3966,72 +4031,15 @@ protectedApp.post('/battles/:id/cancel', async (c) => {
 // PAPER ATTEMPT ENDPOINTS (Timed Practice)
 // =============================================
 
-// Get user's paper attempts history
-protectedApp.get('/papers/attempts', async (c) => {
-  const userId = c.req.query('userId') || c.get('userId');
-  const limit = parseInt(c.req.query('limit') || '20');
-  const status = c.req.query('status'); // Optional filter: completed, abandoned, in_progress
-
-  try {
-    let query = `
-      SELECT
-        pa.id,
-        pa.paper_id,
-        pa.status,
-        pa.time_allowed,
-        pa.time_used,
-        pa.total_score,
-        pa.percentage_score as percentage,
-        pa.started_at,
-        pa.submitted_at,
-        pp.title as paper_title,
-        pp.total_marks as max_score,
-        pt.name as paper_type
-      FROM paper_attempts pa
-      JOIN past_papers pp ON pa.paper_id = pp.id
-      LEFT JOIN paper_types pt ON pp.paper_type_id = pt.id
-      WHERE pa.user_id = ?
-    `;
-    const params: (string | number)[] = [userId];
-
-    if (status) {
-      query += ` AND pa.status = ?`;
-      params.push(status);
-    }
-
-    query += ` ORDER BY pa.started_at DESC LIMIT ?`;
-    params.push(limit);
-
-    const attempts = await c.env.DB.prepare(query).bind(...params).all();
-
-    // Transform to expected format
-    const data = attempts.results.map((attempt: Record<string, unknown>) => ({
-      id: attempt.id,
-      paper_id: attempt.paper_id,
-      status: attempt.status,
-      total_score: attempt.total_score || 0,
-      max_score: attempt.max_score || 100,
-      percentage: attempt.percentage || 0,
-      time_used: attempt.time_used || 0,
-      submitted_at: attempt.submitted_at,
-      started_at: attempt.started_at,
-      paper: {
-        title: attempt.paper_title,
-        paper_type: attempt.paper_type || 'Paper 1',
-      },
-    }));
-
-    return c.json(data);
-  } catch (error) {
-    console.error('Failed to fetch paper attempts:', error);
-    return c.json({ success: false, error: 'Failed to fetch paper attempts' }, 500);
-  }
-});
+// Get user's paper attempts history: served by the app-level route registered
+// before the publicApp mount (see above `app.route('/api', publicApp)`),
+// because publicApp's `/papers/:id` param route would shadow a protectedApp
+// copy (same pattern as /battles/history).
 
 // Start a paper attempt
 protectedApp.post('/papers/:id/attempt', async (c) => {
   const paperId = c.req.param('id');
-  const { userId } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     // Get paper info
@@ -4092,7 +4100,7 @@ protectedApp.post('/papers/:id/attempt', async (c) => {
 // Abandon existing paper attempt
 protectedApp.post('/papers/:id/abandon', async (c) => {
   const paperId = c.req.param('id');
-  const { userId } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     await c.env.DB.prepare(`
@@ -4111,7 +4119,8 @@ protectedApp.post('/papers/:id/abandon', async (c) => {
 // Save answer for paper attempt
 protectedApp.put('/papers/attempts/:attemptId/answer', async (c) => {
   const attemptId = c.req.param('attemptId');
-  const { questionId, answer, timeTaken, userId } = await c.req.json();
+  const { questionId, answer, timeTaken } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     // Verify attempt belongs to user and is in progress
@@ -4153,7 +4162,8 @@ protectedApp.put('/papers/attempts/:attemptId/answer', async (c) => {
 // Submit paper attempt
 protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
   const attemptId = c.req.param('attemptId');
-  const { userId, timeUsed } = await c.req.json();
+  const { timeUsed } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     // Verify attempt
@@ -4230,7 +4240,9 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
 // Get paper attempt results
 protectedApp.get('/papers/attempts/:attemptId/results', async (c) => {
   const attemptId = c.req.param('attemptId');
-  const userId = c.req.query('userId');
+  // Self-scope only (Task 10 decision): identity comes from the JWT; no admin
+  // ?userId= override — no admin UI needs support lookups here yet.
+  const userId = getUserId(c)!;
 
   try {
     const attempt = await c.env.DB.prepare(`
