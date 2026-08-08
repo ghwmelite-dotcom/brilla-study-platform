@@ -18,6 +18,11 @@ interface UserPayload {
   role: 'student' | 'teacher' | 'admin' | 'parent';
 }
 
+// Roles a caller may self-select during registration. Anything else
+// (e.g. 'admin') is rejected with 400 at account creation.
+// Typed as readonly string[] so .includes() accepts an arbitrary caller string.
+export const ALLOWED_SELF_SERVE_ROLES: readonly string[] = ['student', 'teacher', 'parent'];
+
 interface GoogleTokenResponse {
   access_token: string;
   id_token: string;
@@ -395,6 +400,9 @@ oauthApp.post('/google/callback', async (c) => {
 
     // Create new user
     const userId = `user_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
+    if (role && !ALLOWED_SELF_SERVE_ROLES.includes(role)) {
+      return c.json({ success: false, error: 'Invalid role' }, 400);
+    }
     const userRole = role || 'student';
 
     // Parse registration data
@@ -409,8 +417,9 @@ oauthApp.post('/google/callback', async (c) => {
     const selectedTierId = registrationData?.selectedTierId || 'tier_free';
     const primaryExamTypeId = registrationData?.primaryExamTypeId || null;
 
-    // Google users are auto-approved
-    const status = 'approved';
+    // Students are auto-approved (Google has verified their email);
+    // teachers/parents require admin approval, matching the pending-approval model.
+    const status = userRole === 'student' ? 'approved' : 'pending';
 
     // Generate a random password hash (user cannot know this password)
     // This satisfies the NOT NULL constraint while keeping the account OAuth-only
@@ -581,7 +590,7 @@ oauthApp.post('/google/callback', async (c) => {
       token,
       isNewUser,
       accountLinked,
-      requiresApproval: false, // Google users are auto-approved
+      requiresApproval: user.status !== 'approved', // students are auto-approved; teachers/parents go pending
     }
   });
 });

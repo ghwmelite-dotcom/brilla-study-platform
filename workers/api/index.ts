@@ -25,7 +25,7 @@ import { cosmeticsApp } from './cosmetics';
 import { rewardsApp } from './rewards';
 import { engagementApp } from './engagement';
 import { friendsApp } from './friends';
-import { oauthApp } from './oauth';
+import { oauthApp, ALLOWED_SELF_SERVE_ROLES } from './oauth';
 import { examBoardsApp } from './exam-boards';
 import { revisionClassroomApp } from './revision-classroom';
 import { studyRoomsApp } from './study-rooms';
@@ -1078,6 +1078,10 @@ publicApp.post('/auth/register', async (c) => {
     // Hash password
     const passwordHash = await hashPassword(password);
     const id = `user_${Date.now()}`;
+    // Defense-in-depth: only self-serve roles may be caller-selected
+    if (role && !ALLOWED_SELF_SERVE_ROLES.includes(role)) {
+      return c.json({ success: false, error: 'Invalid role' }, 400);
+    }
     const userRole = role || 'student';
 
     // Self-registered users go to pending status
