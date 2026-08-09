@@ -87,10 +87,6 @@ describe('XP awards use the real users.xp_points column', () => {
         match: /SELECT id FROM tournament_participants/,
         first: () => null,
       },
-      {
-        match: /SELECT xp_points FROM users/,
-        first: () => ({ xp_points: 100 }),
-      },
       { match: /UPDATE users SET xp_points = xp_points - \?/ },
       { match: /INSERT INTO tournament_participants/ },
     ]);
@@ -108,7 +104,10 @@ describe('XP awards use the real users.xp_points column', () => {
     const deduction = db.calls.find((c) => /UPDATE users SET/.test(c.sql));
     expect(deduction).toBeDefined();
     expect(deduction!.sql).toMatch(/xp_points - \?/);
-    expect(deduction!.binds).toEqual([50, 'user_1']);
+    // Conditional debit (Task 7): the balance guard is the third bind, so no
+    // separate balance SELECT is needed.
+    expect(deduction!.binds).toEqual([50, 'user_1', 50]);
+    expect(db.calls.some((c) => /SELECT xp_points FROM users/.test(c.sql))).toBe(false);
     expect(db.calls.some((c) => /SET xp =/.test(c.sql))).toBe(false);
   });
 

@@ -283,7 +283,8 @@ eventsApp.post('/tournaments/:tournamentId/join', async (c) => {
       return c.json({ success: false, error: 'Tournament not found or not active' }, 404);
     }
 
-    // Check if already joined
+    // Fast path for a distinct error message; the conditional INSERT below
+    // is the actual guard against duplicate joins.
     const existing = await c.env.DB.prepare(
       'SELECT id FROM tournament_participants WHERE tournament_id = ? AND user_id = ?'
     ).bind(tournamentId, user.userId).first();
@@ -292,37 +293,42 @@ eventsApp.post('/tournaments/:tournamentId/join', async (c) => {
       return c.json({ success: false, error: 'Already joined this tournament' }, 400);
     }
 
-    // Check participant limit
-    if (tournament.max_participants) {
-      const count = await c.env.DB.prepare(
-        'SELECT COUNT(*) as count FROM tournament_participants WHERE tournament_id = ?'
-      ).bind(tournamentId).first();
-
-      if ((count?.count as number) >= tournament.max_participants) {
-        return c.json({ success: false, error: 'Tournament is full' }, 400);
-      }
-    }
-
-    // Deduct entry fee if applicable
-    if (tournament.entry_fee > 0) {
-      const userData = await c.env.DB.prepare(
-        'SELECT xp_points FROM users WHERE id = ?'
-      ).bind(user.userId).first();
-
-      if ((userData?.xp_points as number) < tournament.entry_fee) {
+    // 1. Conditional fee debit — fails atomically if balance is insufficient
+    // (no separate balance SELECT, which could go stale between check and debit).
+    if ((tournament.entry_fee as number) > 0) {
+      const debit = await c.env.DB.prepare(
+        'UPDATE users SET xp_points = xp_points - ? WHERE id = ? AND xp_points >= ?'
+      ).bind(tournament.entry_fee, user.userId, tournament.entry_fee).run();
+      if (debit.meta.changes === 0) {
         return c.json({ success: false, error: 'Not enough XP for entry fee' }, 400);
       }
-
-      await c.env.DB.prepare(
-        'UPDATE users SET xp_points = xp_points - ? WHERE id = ?'
-      ).bind(tournament.entry_fee, user.userId).run();
     }
 
-    // Join tournament
-    await c.env.DB.prepare(`
+    // 2. Conditional insert — enforces uniqueness AND capacity in one
+    // statement (SQLite executes each statement atomically, so concurrent
+    // joins cannot exceed max_participants or double-join).
+    const join = await c.env.DB.prepare(`
       INSERT INTO tournament_participants (id, tournament_id, user_id)
-      VALUES (?, ?, ?)
-    `).bind(generateId(), tournamentId, user.userId).run();
+      SELECT ?, ?, ?
+      WHERE NOT EXISTS (
+        SELECT 1 FROM tournament_participants WHERE tournament_id = ? AND user_id = ?
+      )
+      AND (SELECT COUNT(*) FROM tournament_participants WHERE tournament_id = ?) < ?
+    `).bind(
+      `tp_${crypto.randomUUID()}`, tournamentId, user.userId,
+      tournamentId, user.userId,
+      tournamentId, tournament.max_participants ?? Number.MAX_SAFE_INTEGER
+    ).run();
+
+    if (join.meta.changes === 0) {
+      // Refund the fee if we debited it
+      if ((tournament.entry_fee as number) > 0) {
+        await c.env.DB.prepare(
+          'UPDATE users SET xp_points = xp_points + ? WHERE id = ?'
+        ).bind(tournament.entry_fee, user.userId).run();
+      }
+      return c.json({ success: false, error: 'Tournament is full or already joined' }, 400);
+    }
 
     return c.json({
       success: true,
