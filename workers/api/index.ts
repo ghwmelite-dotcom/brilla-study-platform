@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { jwt, sign } from 'hono/jwt';
 import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware';
-import { parseLimit } from './http';
+import { parseLimit, parseJsonBody } from './http';
 import type { JWTPayload } from 'hono/utils/jwt/types';
 import { libraryApp } from './library';
 import { counselorApp } from './counselor';
@@ -856,7 +856,8 @@ publicApp.get('/exam-types/:slug/paper-types', async (c) => {
 
 // Register new user (self-registration goes to pending)
 publicApp.post('/auth/register', async (c) => {
-  const body = await c.req.json();
+  const body = await parseJsonBody(c);
+  if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
   const { email, password, name, role, schoolLevel, yearGroup, schoolName, house,
           teacherLicenseNumber, subjectsTaught, yearsExperience, qualifications,
           selectedTierId, turnstileToken, examTypeIds, primaryExamTypeId } = body;
@@ -1043,7 +1044,9 @@ publicApp.post('/auth/register', async (c) => {
 
 // Login
 publicApp.post('/auth/login', async (c) => {
-  const { email, password, turnstileToken } = await c.req.json();
+  const body = await parseJsonBody(c);
+  if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+  const { email, password, turnstileToken } = body;
   const clientInfo = getClientInfo(c);
   const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
 

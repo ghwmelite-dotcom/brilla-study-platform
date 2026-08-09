@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { sign } from 'hono/jwt';
+import { parseJsonBody } from './http';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -151,7 +152,9 @@ export const oauthApp = new Hono<{ Bindings: Env }>();
 // Initiates Google OAuth flow
 // =============================================
 oauthApp.post('/google/init', async (c) => {
-  const { intent, role, registrationData, turnstileToken } = await c.req.json();
+  const body = await parseJsonBody(c);
+  if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+  const { intent, role, registrationData, turnstileToken } = body;
 
   // Validate intent
   if (!['login', 'register', 'link'].includes(intent)) {
@@ -223,7 +226,9 @@ oauthApp.post('/google/init', async (c) => {
 // Handles Google OAuth callback
 // =============================================
 oauthApp.post('/google/callback', async (c) => {
-  const { code, state } = await c.req.json();
+  const body = await parseJsonBody(c);
+  if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+  const { code, state } = body;
 
   if (!code || !state) {
     return c.json({ success: false, error: 'Missing code or state' }, 400);
