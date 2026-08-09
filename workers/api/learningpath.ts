@@ -36,12 +36,12 @@ learningPathApp.get('/recommendations', async (c) => {
         t.name as topic_name,
         t.subject_id,
         s.name as subject_name,
-        COALESCE(AVG(CASE WHEN uq.correct THEN 100 ELSE 0 END), 0) as mastery,
-        COUNT(uq.id) as questions_attempted
+        COALESCE(AVG(CASE WHEN qa.is_correct = 1 THEN 100 ELSE 0 END), 0) as mastery,
+        COUNT(qa.id) as questions_attempted
       FROM topics t
       LEFT JOIN subjects s ON t.subject_id = s.id
       LEFT JOIN questions q ON q.topic_id = t.id
-      LEFT JOIN user_questions uq ON uq.question_id = q.id AND uq.user_id = ?
+      LEFT JOIN question_attempts qa ON qa.question_id = q.id AND qa.user_id = ?
       GROUP BY t.id
       ORDER BY mastery ASC, questions_attempted ASC
       LIMIT ?
@@ -111,36 +111,53 @@ learningPathApp.get('/exam-readiness/:examType', async (c) => {
       ORDER BY s.name
     `).bind(examType).all();
 
-    const readinessData = [];
+    const subjectRows = subjects.results as any[];
 
-    for (const subject of subjects.results as any[]) {
-      // Calculate mastery per subject
-      const mastery = await c.env.DB.prepare(`
+    // Compute mastery for all subjects in a single grouped query (one round
+    // trip instead of one aggregate per subject).
+    const masteryBySubject = new Map<string, any>();
+    if (subjectRows.length > 0) {
+      const placeholders = subjectRows.map(() => '?').join(',');
+      const masteryRows = await c.env.DB.prepare(`
         SELECT
-          COUNT(DISTINCT t.id) as total_topics,
-          COUNT(DISTINCT CASE WHEN topic_mastery.mastery >= 70 THEN t.id END) as mastered_topics,
-          COALESCE(AVG(topic_mastery.mastery), 0) as avg_mastery
-        FROM topics t
+          s.id AS subject_id,
+          COUNT(DISTINCT t.id) AS total_topics,
+          COUNT(DISTINCT CASE WHEN topic_mastery.mastery >= 70 THEN t.id END) AS mastered_topics,
+          COALESCE(AVG(topic_mastery.mastery), 0) AS avg_mastery
+        FROM subjects s
+        LEFT JOIN topics t ON t.subject_id = s.id
         LEFT JOIN (
           SELECT
             q.topic_id,
-            AVG(CASE WHEN uq.correct THEN 100 ELSE 0 END) as mastery
+            AVG(CASE WHEN qa.is_correct = 1 THEN 100 ELSE 0 END) as mastery
           FROM questions q
-          LEFT JOIN user_questions uq ON uq.question_id = q.id AND uq.user_id = ?
+          LEFT JOIN question_attempts qa ON qa.question_id = q.id AND qa.user_id = ?
           GROUP BY q.topic_id
         ) topic_mastery ON topic_mastery.topic_id = t.id
-        WHERE t.subject_id = ?
-      `).bind(user.userId, subject.id).first();
+        WHERE s.id IN (${placeholders})
+        GROUP BY s.id
+      `).bind(user.userId, ...subjectRows.map((s: any) => s.id)).all();
 
-      // Get weak and strong topics
+      for (const m of masteryRows.results as any[]) {
+        masteryBySubject.set(m.subject_id, m);
+      }
+    }
+
+    const readinessData = [];
+
+    for (const subject of subjectRows) {
+      const mastery = masteryBySubject.get(subject.id);
+
+      // Get weak and strong topics (genuinely per-subject detail; bounded by
+      // subject count — flagged for the Task 16 query-count sweep).
       const topicDetails = await c.env.DB.prepare(`
         SELECT
           t.id,
           t.name,
-          COALESCE(AVG(CASE WHEN uq.correct THEN 100 ELSE 0 END), 0) as mastery
+          COALESCE(AVG(CASE WHEN qa.is_correct = 1 THEN 100 ELSE 0 END), 0) as mastery
         FROM topics t
         LEFT JOIN questions q ON q.topic_id = t.id
-        LEFT JOIN user_questions uq ON uq.question_id = q.id AND uq.user_id = ?
+        LEFT JOIN question_attempts qa ON qa.question_id = q.id AND qa.user_id = ?
         WHERE t.subject_id = ?
         GROUP BY t.id
       `).bind(user.userId, subject.id).all();
@@ -257,11 +274,11 @@ learningPathApp.post('/study-plan/generate', async (c) => {
         t.name,
         t.subject_id,
         s.name as subject_name,
-        COALESCE(AVG(CASE WHEN uq.correct THEN 100 ELSE 0 END), 0) as mastery
+        COALESCE(AVG(CASE WHEN qa.is_correct = 1 THEN 100 ELSE 0 END), 0) as mastery
       FROM topics t
       LEFT JOIN subjects s ON t.subject_id = s.id
       LEFT JOIN questions q ON q.topic_id = t.id
-      LEFT JOIN user_questions uq ON uq.question_id = q.id AND uq.user_id = ?
+      LEFT JOIN question_attempts qa ON qa.question_id = q.id AND qa.user_id = ?
       GROUP BY t.id
       HAVING mastery < 70
       ORDER BY mastery ASC
