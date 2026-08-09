@@ -111,4 +111,38 @@ describe('XP awards use the real users.xp_points column', () => {
     expect(deduction!.binds).toEqual([50, 'user_1']);
     expect(db.calls.some((c) => /SET xp =/.test(c.sql))).toBe(false);
   });
+
+  it('POST /api/engagement/streak/rescue reads the real streak_days column', async () => {
+    const db = createMockD1([
+      authHandler,
+      {
+        match: /SELECT streak_days, streak_protections FROM users/,
+        first: () => ({ streak_days: 7, streak_protections: 2 }),
+      },
+      { match: /UPDATE users\s+SET streak_protections = streak_protections - 1/ },
+      { match: /INSERT INTO streak_rescues/ },
+    ]);
+
+    const t = await token({ userId: 'user_1', role: 'student' });
+    const res = await worker.fetch(
+      new Request('http://x/api/engagement/streak/rescue', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${t}` },
+      }),
+      { DB: db as unknown as D1Database, JWT_SECRET },
+    );
+    expect(res.status).toBe(200);
+
+    // No statement may select the phantom users.streak column (real: streak_days).
+    expect(db.calls.some((c) => /SELECT streak\b(?!_)/.test(c.sql))).toBe(false);
+
+    // Rescue log binds streak_days before and after (phantom read would bind undefined).
+    const rescue = db.calls.find((c) => /INSERT INTO streak_rescues/.test(c.sql));
+    expect(rescue).toBeDefined();
+    expect(rescue!.binds.slice(2)).toEqual([7, 7]);
+
+    const body = (await res.json()) as { data: { currentStreak: number; protectionsRemaining: number } };
+    expect(body.data.currentStreak).toBe(7);
+    expect(body.data.protectionsRemaining).toBe(1);
+  });
 });

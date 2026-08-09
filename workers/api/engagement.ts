@@ -440,7 +440,7 @@ engagementApp.post('/streak/rescue', async (c) => {
     const user = c.get('user');
 
     const userData = await c.env.DB.prepare(
-      'SELECT streak, streak_protections FROM users WHERE id = ?'
+      'SELECT streak_days, streak_protections FROM users WHERE id = ?'
     ).bind(user.userId).first();
 
     if (!userData?.streak_protections || (userData.streak_protections as number) < 1) {
@@ -459,13 +459,13 @@ engagementApp.post('/streak/rescue', async (c) => {
     await c.env.DB.prepare(`
       INSERT INTO streak_rescues (id, user_id, rescue_type, streak_before, streak_after)
       VALUES (?, ?, 'main', ?, ?)
-    `).bind(generateId(), user.userId, userData.streak, userData.streak).run();
+    `).bind(generateId(), user.userId, userData.streak_days, userData.streak_days).run();
 
     return c.json({
       success: true,
       data: {
         streakSaved: true,
-        currentStreak: userData.streak,
+        currentStreak: userData.streak_days,
         protectionsRemaining: (userData.streak_protections as number) - 1,
       },
     });
