@@ -909,20 +909,21 @@ affiliatesApp.get('/ref/:code', async (c) => {
 // Process referral (called during user registration - internal endpoint, protected)
 affiliatesApp.post('/process-referral', requireAuth, async (c) => {
   try {
-    const { referralCode, newUserId } = await c.req.json();
+    const { referralCode } = await c.req.json();
 
-    if (!referralCode || !newUserId) {
+    // SECURITY: The referred user is always the authenticated caller (JWT
+    // identity), never a body field — a body-supplied ID would let any
+    // authenticated user attach ANY user as a referral of ANY code, writing
+    // users.referred_by on the victim and hijacking their commission.
+    const newUserId = c.get('userId') as string;
+
+    if (!referralCode) {
       return c.json({ success: false, error: 'Missing required fields' }, 400);
     }
 
     // SECURITY: Validate referral code format
     if (!isValidReferralCode(referralCode)) {
       return c.json({ success: false, error: 'Invalid referral code format' }, 400);
-    }
-
-    // SECURITY: Validate newUserId format (should be a valid UUID or ID format)
-    if (typeof newUserId !== 'string' || newUserId.length < 10 || newUserId.length > 100) {
-      return c.json({ success: false, error: 'Invalid user ID format' }, 400);
     }
 
     // Get affiliate by code
@@ -999,7 +1000,8 @@ affiliatesApp.post('/process-referral', requireAuth, async (c) => {
 // Update referral status when user starts trial (protected)
 affiliatesApp.post('/referral/trial-started', requireAuth, async (c) => {
   try {
-    const { userId } = await c.req.json();
+    // SECURITY: identity from the JWT, never the request body.
+    const userId = c.get('userId') as string;
 
     await c.env.DB.prepare(`
       UPDATE affiliate_referrals

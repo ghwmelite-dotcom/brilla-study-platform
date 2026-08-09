@@ -1735,12 +1735,21 @@ tutoringRouter.post('/sessions/pay/verify', requireAuth, async (c) => {
       return c.json({ success: false, error: 'Payment amount mismatch' }, 400);
     }
 
-    // Update payment status
-    await c.env.DB.prepare(`
+    // CLAIM FIRST, before any earnings side-effect: the status-guarded UPDATE
+    // atomically claims the payment. If changes = 0, a concurrent request
+    // already verified it — exit as already-verified and credit nothing.
+    const claim = await c.env.DB.prepare(`
       UPDATE tutoring_payments
       SET status = 'paid', paid_at = datetime('now'), updated_at = datetime('now')
-      WHERE id = ?
+      WHERE id = ? AND status != 'paid'
     `).bind(payment.id).run();
+
+    if (!claim.meta?.changes) {
+      return c.json({
+        success: true,
+        data: { status: 'paid', message: 'Payment already verified' }
+      });
+    }
 
     // Update teacher earnings
     await c.env.DB.prepare(`
