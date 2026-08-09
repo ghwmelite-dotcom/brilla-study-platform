@@ -381,6 +381,21 @@ await c.env.DB.batch(statements);
 **Verify:** full vitest suite passes.
 **Commit:** `fix(affiliates): batch referral record writes` (only with user's explicit approval).
 
+### Task 10b — Referral attribution identity + tutoring verify claim-first (plan amendment, added 2026-08-04)
+
+Two HIGH follow-ups from the Phase 2 final whole-branch review, same money-path blast radius:
+
+1. **Commission hijack:** `affiliates.ts` `/process-referral` (~:910-980) accepts `newUserId` (and code) from the request body — any authenticated user can attach ANY unattributed user as a referral of ANY valid code, writing `users.referred_by` on the victim; through `processAffiliateCommission` (payments verify path) that hijacks commission on a stranger's payment. Fix: derive the referred user from `c.get('userId')` (never the body); keep `code` from the body (that's the legitimate input). Reject if the user already has `referred_by` set (current behavior — verify). Also `/referral/trial-started` (~:1004-1012): body userId → context identity.
+2. **Tutoring double-credit race:** `tutoring.ts` verify flow (~:1713-1768) credits `teacher_earnings.pending_tutoring` after a `status === 'paid'` read-check with no status-guarded claim — the exact race class Phase 2 Task 2 fixed for subscriptions. Apply the Phase 2 pattern: make the tutoring_payments status UPDATE the atomic claim (`WHERE reference = ? AND status != 'paid'` — verify actual status values in the code), check `meta.changes`, and on 0 return the already-processed response BEFORE any earnings credit. Keep its existing ownership + exact-amount checks.
+
+**Files:** `workers/api/affiliates.ts`, `workers/api/tutoring.ts`, tests under `workers/api/__tests__/`
+- [ ] `/process-referral`: identity from `c.get('userId')`; test: body `newUserId: 'victim'` + attacker token → referral recorded (or rejected) for the ATTACKER, victim's `referred_by` never written (assert binds).
+- [ ] `/referral/trial-started`: identity from context.
+- [ ] `tutoring.ts` verify: claim-first status-guarded UPDATE + `meta.changes` early return; test: mock returning `changes: 0` on the claim → already-processed response, zero `teacher_earnings` writes.
+
+**Verify:** full vitest suite passes; `grep -n "newUserId" workers/api/affiliates.ts` → no body-driven writes remain.
+**Commit:** `fix(affiliates,tutoring): referral identity from JWT; claim-first tutoring verify` (only with user's explicit approval).
+
 ---
 
 ## Query performance
