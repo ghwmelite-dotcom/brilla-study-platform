@@ -5989,7 +5989,7 @@ adminApp.get('/dashboard/stats', async (c) => {
       c.env.DB.prepare('SELECT COUNT(*) as count FROM users WHERE created_at >= ?').bind(weekAgo).first(),
       c.env.DB.prepare("SELECT COUNT(*) as count FROM users WHERE status = 'pending'").first(),
       c.env.DB.prepare("SELECT COUNT(*) as count FROM user_trials WHERE status = 'active' AND expires_at > datetime('now')").first(),
-      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed'").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'success'").first(),
     ]);
 
     return c.json({
@@ -6165,8 +6165,8 @@ adminApp.get('/analytics', async (c) => {
 
     // Revenue stats
     const [revenueThisMonth, revenueLastMonth, activeSubs] = await Promise.all([
-      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed' AND created_at >= datetime('now', 'start of month')").first(),
-      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed' AND created_at >= datetime('now', 'start of month', '-1 month') AND created_at < datetime('now', 'start of month')").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'success' AND created_at >= datetime('now', 'start of month')").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'success' AND created_at >= datetime('now', 'start of month', '-1 month') AND created_at < datetime('now', 'start of month')").first(),
       c.env.DB.prepare("SELECT COUNT(*) as count FROM user_subscriptions WHERE status = 'active'").first(),
     ]);
 
@@ -6220,8 +6220,8 @@ adminApp.get('/subscriptions/stats', async (c) => {
       c.env.DB.prepare("SELECT COUNT(*) as count FROM user_subscriptions WHERE status = 'active'").first(),
       c.env.DB.prepare("SELECT COUNT(*) as count FROM user_trials WHERE status = 'active' AND expires_at > datetime('now')").first(),
       c.env.DB.prepare("SELECT COUNT(*) as count FROM user_subscriptions WHERE status = 'active' AND expires_at <= datetime('now', '+7 days')").first(),
-      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed' AND created_at >= datetime('now', 'start of month')").first(),
-      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed' AND created_at >= datetime('now', 'start of month', '-1 month') AND created_at < datetime('now', 'start of month')").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'success' AND created_at >= datetime('now', 'start of month')").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'success' AND created_at >= datetime('now', 'start of month', '-1 month') AND created_at < datetime('now', 'start of month')").first(),
     ]);
 
     const thisMonth = (revenueThis as { total: number })?.total || 0;
