@@ -440,60 +440,83 @@ teacherBonusesRouter.post('/admin/calculate', adminMiddleware, async (c) => {
     const teachers = teachersResult.results || [];
     const results = [];
 
+    // One grouped query: per-teacher, per-student active months and payments
+    const studentsResult = await c.env.DB.prepare(`
+      SELECT
+        ap.user_id AS teacher_id,
+        ar.referred_user_id AS student_id,
+        COUNT(DISTINCT strftime('%Y-%m', pt.verified_at)) AS active_months,
+        COALESCE(SUM(pt.amount), 0) AS total_payments
+      FROM affiliate_referrals ar
+      JOIN affiliate_profiles ap ON ar.affiliate_id = ap.id
+      LEFT JOIN payment_transactions pt ON pt.user_id = ar.referred_user_id
+        AND pt.status = 'success'
+        AND strftime('%Y', pt.verified_at) = ?
+      WHERE ar.status = 'converted'
+      GROUP BY ap.user_id, ar.referred_user_id
+    `).bind(targetYear.toString()).all();
+
+    // Group student rows in JS by teacher_id, keeping only qualified students
+    // (3+ active months with paid subscription)
+    const qualifiedByTeacher = new Map<string, any[]>();
+    for (const row of (studentsResult.results || []) as any[]) {
+      if ((row.active_months || 0) < 3) continue;
+      const list = qualifiedByTeacher.get(row.teacher_id) || [];
+      list.push(row);
+      qualifiedByTeacher.set(row.teacher_id, list);
+    }
+
+    // One grouped query: total referred students per teacher for the year
+    const totalReferredResult = await c.env.DB.prepare(`
+      SELECT
+        ap.user_id AS teacher_id,
+        COUNT(*) AS count
+      FROM affiliate_referrals ar
+      JOIN affiliate_profiles ap ON ar.affiliate_id = ap.id
+      WHERE (
+        strftime('%Y', ar.signup_at) = ?
+        OR strftime('%Y', ar.converted_at) = ?
+      )
+      GROUP BY ap.user_id
+    `).bind(targetYear.toString(), targetYear.toString()).all();
+
+    const totalReferredByTeacher = new Map<string, number>();
+    for (const row of (totalReferredResult.results || []) as any[]) {
+      totalReferredByTeacher.set(row.teacher_id, (row.count as number) || 0);
+    }
+
+    // Fetch all active tiers once; pick the matching tier in JS
+    const tiersResult = await c.env.DB.prepare(`
+      SELECT * FROM teacher_bonus_config
+      WHERE year = ? AND is_active = 1
+      ORDER BY min_students DESC
+    `).bind(targetYear).all();
+
+    const tiers = (tiersResult.results || []) as any[];
+    const pickTier = (activeStudents: number) =>
+      tiers.find(
+        (t) =>
+          t.min_students <= activeStudents &&
+          (t.max_students === null || t.max_students >= activeStudents)
+      );
+
+    // Compute bonuses in JS and collect upserts for a single batch
+    const upserts = [];
     for (const teacher of teachers as any[]) {
       const teacherId = teacher.teacher_id;
       const affiliateProfileId = teacher.affiliate_profile_id;
 
-      // Count qualified students (3+ active months with paid subscription)
-      const studentsResult = await c.env.DB.prepare(`
-        SELECT
-          ar.referred_user_id as student_id,
-          COUNT(DISTINCT strftime('%Y-%m', pt.verified_at)) as active_months,
-          COALESCE(SUM(pt.amount), 0) as total_payments
-        FROM affiliate_referrals ar
-        JOIN affiliate_profiles ap ON ar.affiliate_id = ap.id
-        LEFT JOIN payment_transactions pt ON pt.user_id = ar.referred_user_id
-          AND pt.status = 'success'
-          AND strftime('%Y', pt.verified_at) = ?
-        WHERE ap.user_id = ?
-          AND ar.status = 'converted'
-        GROUP BY ar.referred_user_id
-        HAVING active_months >= 3
-      `).bind(targetYear.toString(), teacherId).all();
-
-      const qualifiedStudents = studentsResult.results || [];
+      const qualifiedStudents = qualifiedByTeacher.get(teacherId) || [];
       const activeStudents = qualifiedStudents.length;
       const totalStudentPayments = qualifiedStudents.reduce(
         (sum: number, s: any) => sum + (s.total_payments || 0),
         0
       ) / 100; // Convert from pesewas
 
-      // Get total referred students for the year
-      const totalReferredResult = await c.env.DB.prepare(`
-        SELECT COUNT(*) as count
-        FROM affiliate_referrals ar
-        JOIN affiliate_profiles ap ON ar.affiliate_id = ap.id
-        WHERE ap.user_id = ?
-          AND (
-            strftime('%Y', ar.signup_at) = ?
-            OR strftime('%Y', ar.converted_at) = ?
-          )
-      `).bind(teacherId, targetYear.toString(), targetYear.toString()).first();
+      const totalReferredStudents = totalReferredByTeacher.get(teacherId) || 0;
 
-      const totalReferredStudents = (totalReferredResult?.count as number) || 0;
-
-      // Determine bonus tier
-      const tierResult = await c.env.DB.prepare(`
-        SELECT * FROM teacher_bonus_config
-        WHERE year = ?
-          AND is_active = 1
-          AND min_students <= ?
-          AND (max_students IS NULL OR max_students >= ?)
-        ORDER BY min_students DESC
-        LIMIT 1
-      `).bind(targetYear, activeStudents, activeStudents).first();
-
-      const bonusPercentage = (tierResult?.bonus_percentage as number) || 0;
+      const tier = pickTier(activeStudents);
+      const bonusPercentage = (tier?.bonus_percentage as number) || 0;
       const bonusAmount = totalStudentPayments * (bonusPercentage / 100);
 
       // Skip if no bonus earned
@@ -503,33 +526,35 @@ teacherBonusesRouter.post('/admin/calculate', adminMiddleware, async (c) => {
 
       // Create or update bonus record
       const bonusId = `bonus_${teacherId}_${targetYear}`;
-      await c.env.DB.prepare(`
-        INSERT INTO teacher_year_end_bonuses (
-          id, teacher_id, affiliate_profile_id, year,
-          total_referred_students, active_students,
-          total_student_payments, bonus_percentage, bonus_amount,
-          status, calculation_date, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'calculated', datetime('now'), datetime('now'), datetime('now'))
-        ON CONFLICT(teacher_id, year) DO UPDATE SET
-          total_referred_students = excluded.total_referred_students,
-          active_students = excluded.active_students,
-          total_student_payments = excluded.total_student_payments,
-          bonus_percentage = excluded.bonus_percentage,
-          bonus_amount = excluded.bonus_amount,
-          status = 'calculated',
-          calculation_date = datetime('now'),
-          updated_at = datetime('now')
-      `).bind(
-        bonusId,
-        teacherId,
-        affiliateProfileId,
-        targetYear,
-        totalReferredStudents,
-        activeStudents,
-        totalStudentPayments,
-        bonusPercentage,
-        bonusAmount
-      ).run();
+      upserts.push(
+        c.env.DB.prepare(`
+          INSERT INTO teacher_year_end_bonuses (
+            id, teacher_id, affiliate_profile_id, year,
+            total_referred_students, active_students,
+            total_student_payments, bonus_percentage, bonus_amount,
+            status, calculation_date, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'calculated', datetime('now'), datetime('now'), datetime('now'))
+          ON CONFLICT(teacher_id, year) DO UPDATE SET
+            total_referred_students = excluded.total_referred_students,
+            active_students = excluded.active_students,
+            total_student_payments = excluded.total_student_payments,
+            bonus_percentage = excluded.bonus_percentage,
+            bonus_amount = excluded.bonus_amount,
+            status = 'calculated',
+            calculation_date = datetime('now'),
+            updated_at = datetime('now')
+        `).bind(
+          bonusId,
+          teacherId,
+          affiliateProfileId,
+          targetYear,
+          totalReferredStudents,
+          activeStudents,
+          totalStudentPayments,
+          bonusPercentage,
+          bonusAmount
+        )
+      );
 
       results.push({
         teacherId,
@@ -539,6 +564,10 @@ teacherBonusesRouter.post('/admin/calculate', adminMiddleware, async (c) => {
         bonusPercentage,
         bonusAmount
       });
+    }
+
+    if (upserts.length > 0) {
+      await c.env.DB.batch(upserts);
     }
 
     return c.json({
