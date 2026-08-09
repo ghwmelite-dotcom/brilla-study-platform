@@ -193,72 +193,77 @@ function LoginPage() {
           />
         </div>
 
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-neutral-200"></div>
-          </div>
-          <div className="relative flex justify-center text-xs">
-            <span className="px-2 bg-white text-neutral-500">or use demo accounts</span>
-          </div>
-        </div>
-
-        {/* Demo login buttons */}
-        <div className="space-y-4">
-          {/* Admin - Primary button */}
-          <button
-            type="button"
-            onClick={() => handleDemoLogin('admin')}
-            disabled={isLoading || isSubmitting}
-            className="w-full py-3 px-4 bg-accent text-white rounded-lg font-semibold hover:bg-accent-dark active:scale-[0.98] transition-all disabled:opacity-50 shadow-md"
-          >
-            {isLoading || isSubmitting ? 'Signing in...' : 'Sign In as Admin'}
-          </button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-neutral-200"></div>
+        {/* Demo login section — dev builds only, tree-shaken from production */}
+        {import.meta.env.DEV && (
+          <>
+            <div className="relative mb-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-neutral-200"></div>
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="px-2 bg-white text-neutral-500">or use demo accounts</span>
+              </div>
             </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="px-2 bg-white text-neutral-600">or continue as</span>
+
+            {/* Demo login buttons */}
+            <div className="space-y-4">
+              {/* Admin - Primary button */}
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('admin')}
+                disabled={isLoading || isSubmitting}
+                className="w-full py-3 px-4 bg-accent text-white rounded-lg font-semibold hover:bg-accent-dark active:scale-[0.98] transition-all disabled:opacity-50 shadow-md"
+              >
+                {isLoading || isSubmitting ? 'Signing in...' : 'Sign In as Admin'}
+              </button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-neutral-200"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-2 bg-white text-neutral-600">or continue as</span>
+                </div>
+              </div>
+
+              {/* Teacher, Student, and Parent buttons */}
+              <div className="grid grid-cols-3 gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleDemoLogin('teacher')}
+                  disabled={isLoading || isSubmitting}
+                  className="py-3 px-4 bg-secondary text-neutral-900 rounded-lg font-medium hover:bg-secondary-dark active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
+                >
+                  Teacher
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDemoLogin('student')}
+                  disabled={isLoading || isSubmitting}
+                  className="py-3 px-4 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
+                >
+                  Student
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDemoLogin('parent')}
+                  disabled={isLoading || isSubmitting}
+                  className="py-3 px-4 bg-green-700 text-white rounded-lg font-medium hover:bg-green-800 active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
+                >
+                  Parent
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Teacher, Student, and Parent buttons */}
-          <div className="grid grid-cols-3 gap-3">
-            <button
-              type="button"
-              onClick={() => handleDemoLogin('teacher')}
-              disabled={isLoading || isSubmitting}
-              className="py-3 px-4 bg-secondary text-neutral-900 rounded-lg font-medium hover:bg-secondary-dark active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
-            >
-              Teacher
-            </button>
-            <button
-              type="button"
-              onClick={() => handleDemoLogin('student')}
-              disabled={isLoading || isSubmitting}
-              className="py-3 px-4 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
-            >
-              Student
-            </button>
-            <button
-              type="button"
-              onClick={() => handleDemoLogin('parent')}
-              disabled={isLoading || isSubmitting}
-              className="py-3 px-4 bg-green-700 text-white rounded-lg font-medium hover:bg-green-800 active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
-            >
-              Parent
-            </button>
-          </div>
-        </div>
-
-        {/* Demo credentials info */}
-        <div className="mt-6 p-4 bg-neutral-50 rounded-lg">
-          <p className="text-xs text-neutral-500 text-center">
-            <strong>Demo Mode:</strong> Click any button above to sign in instantly.
-            <br />No password required.
-          </p>
-        </div>
+            {/* Demo credentials info */}
+            <div className="mt-6 p-4 bg-neutral-50 rounded-lg">
+              <p className="text-xs text-neutral-500 text-center">
+                <strong>Demo Mode:</strong> Click any button above to sign in instantly.
+                <br />No password required.
+              </p>
+            </div>
+          </>
+        )}
 
         <div className="mt-6 text-center">
           <p className="text-sm text-neutral-500">

@@ -102,10 +102,6 @@ interface AuthState {
   getUserStats: () => UserStats;
   resendVerificationEmail: (userId: string) => Promise<void>;
 
-  // Email verification & password setup
-  verifyToken: (token: string) => ManagedUser | null;
-  setPassword: (token: string, password: string) => Promise<void>;
-
   // OAuth actions
   initiateGoogleAuth: (
     intent: 'login' | 'register',
@@ -184,145 +180,6 @@ interface RegisterData {
   primaryExamTypeId?: string;
 }
 
-// Storage keys (simulating database for fallback/demo)
-const PENDING_USERS_KEY = 'brilla-pending-users';
-const ALL_USERS_KEY = 'brilla-all-users';
-const DEMO_USERS_VERSION_KEY = 'brilla-demo-users-version';
-const CURRENT_DEMO_VERSION = 3; // Increment this when demo users change
-
-// Simple password hash (in production, use bcrypt on server)
-const hashPassword = (password: string): string => {
-  // Simple hash for demo - in production, this would be server-side bcrypt
-  return btoa(password + '_brilla_salt');
-};
-
-// Helper to load pending users from localStorage
-const loadPendingUsersFromStorage = (): PendingUser[] => {
-  try {
-    const stored = localStorage.getItem(PENDING_USERS_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-};
-
-// Helper to load all users from localStorage
-const loadAllUsersFromStorage = (): ManagedUser[] => {
-  try {
-    // Check if demo users version is current
-    const storedVersion = localStorage.getItem(DEMO_USERS_VERSION_KEY);
-    const currentVersion = parseInt(storedVersion || '0', 10);
-
-    if (currentVersion < CURRENT_DEMO_VERSION) {
-      // Reset to new default users when version changes
-      console.log('Demo users version updated, resetting to new defaults');
-      const defaultUsers = getDefaultUsers();
-      saveAllUsersToStorage(defaultUsers);
-      localStorage.setItem(DEMO_USERS_VERSION_KEY, String(CURRENT_DEMO_VERSION));
-      return defaultUsers;
-    }
-
-    const stored = localStorage.getItem(ALL_USERS_KEY);
-    if (!stored) {
-      const defaultUsers = getDefaultUsers();
-      saveAllUsersToStorage(defaultUsers);
-      localStorage.setItem(DEMO_USERS_VERSION_KEY, String(CURRENT_DEMO_VERSION));
-      return defaultUsers;
-    }
-
-    return JSON.parse(stored);
-  } catch {
-    return getDefaultUsers();
-  }
-};
-
-// Helper to save all users to localStorage
-const saveAllUsersToStorage = (users: ManagedUser[]) => {
-  localStorage.setItem(ALL_USERS_KEY, JSON.stringify(users));
-};
-
-// Default demo users (these have passwords already set)
-// IDs must match production database for demo mode fallback to work
-const getDefaultUsers = (): ManagedUser[] => [
-  {
-    id: 'admin_prod_001',
-    email: 'admin@brillaprep.org',
-    name: 'Admin User',
-    role: 'admin',
-    status: 'approved',
-    xpPoints: 0,
-    level: 1,
-    streakDays: 0,
-    aiGradingCredits: 100,
-    isActive: true,
-    emailVerified: true,
-    passwordSet: true,
-    passwordHash: hashPassword('Admin123!'),
-    createdAt: '2024-01-01T00:00:00.000Z',
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'teacher_1766327981453',
-    email: 'teacher@brillaprep.org',
-    name: 'Demo Teacher',
-    role: 'teacher',
-    status: 'approved',
-    schoolName: 'Achimota School',
-    subjectsTaught: ['Mathematics', 'Physics'],
-    yearsExperience: '6-10',
-    xpPoints: 0,
-    level: 1,
-    streakDays: 0,
-    aiGradingCredits: 50,
-    isActive: true,
-    emailVerified: true,
-    passwordSet: true,
-    passwordHash: hashPassword('Teacher123!'),
-    createdAt: '2024-01-15T00:00:00.000Z',
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'student_1766327981521',
-    email: 'student@brillaprep.org',
-    name: 'Demo Student',
-    role: 'student',
-    status: 'approved',
-    house: 'Blue House',
-    yearGroup: 2,
-    schoolLevel: 'shs',
-    schoolName: 'Achimota School',
-    xpPoints: 1500,
-    level: 5,
-    streakDays: 7,
-    aiGradingCredits: 10,
-    isActive: true,
-    emailVerified: true,
-    passwordSet: true,
-    passwordHash: hashPassword('Student123!'),
-    createdAt: '2024-02-01T00:00:00.000Z',
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'parent_1',
-    email: 'parent@brillaprep.org',
-    name: 'Demo Parent',
-    role: 'parent',
-    status: 'approved',
-    phoneNumber: '+233201234567',
-    linkedStudentCount: 1,
-    xpPoints: 0,
-    level: 1,
-    streakDays: 0,
-    aiGradingCredits: 0,
-    isActive: true,
-    emailVerified: true,
-    passwordSet: true,
-    passwordHash: hashPassword('Parent123!'),
-    createdAt: '2024-02-01T00:00:00.000Z',
-    updatedAt: new Date().toISOString(),
-  },
-];
-
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -391,38 +248,8 @@ export const useAuthStore = create<AuthState>()(
             throw new Error(response.error);
           }
 
-          // Fall back to demo mode if API is unavailable
-          console.log('API unavailable, using demo mode login');
-          const allUsers = loadAllUsersFromStorage();
-          const demoUser = allUsers.find(u => u.email === email);
-
-          if (!demoUser) {
-            throw new Error('Invalid email or password.');
-          }
-
-          // Verify password for demo user
-          if (!demoUser.passwordHash || demoUser.passwordHash !== hashPassword(password)) {
-            throw new Error('Invalid email or password.');
-          }
-
-          // Check account status
-          if (!demoUser.isActive) {
-            throw new Error('Your account has been deactivated.');
-          }
-
-          if (!demoUser.emailVerified) {
-            throw new Error('Please verify your email before logging in.');
-          }
-
-          // Generate a demo token
-          const demoToken = `demo_${Date.now()}_${btoa(email)}`;
-
-          set({
-            user: demoUser,
-            token: demoToken,
-            isAuthenticated: true,
-            isLoading: false,
-          });
+          // API unreachable — no client-side demo fallback
+          throw new Error('Network error. Please check your connection.');
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Login failed',
@@ -519,17 +346,11 @@ export const useAuthStore = create<AuthState>()(
             }));
             set({ pendingUsers: pending, pendingCount: pending.length });
           } else {
-            // Fallback to localStorage for demo mode
-            const pendingUsers = loadPendingUsersFromStorage();
-            const pending = pendingUsers.filter(u => u.status === 'pending');
-            set({ pendingUsers: pending, pendingCount: pending.length });
+            set({ pendingUsers: [], pendingCount: 0, error: response.error || 'Failed to load pending users' });
           }
         } catch (error) {
           console.error('Failed to load pending users:', error);
-          // Fallback to localStorage
-          const pendingUsers = loadPendingUsersFromStorage();
-          const pending = pendingUsers.filter(u => u.status === 'pending');
-          set({ pendingUsers: pending, pendingCount: pending.length });
+          set({ pendingUsers: [], pendingCount: 0, error: 'Failed to load pending users' });
         }
       },
 
@@ -597,9 +418,7 @@ export const useAuthStore = create<AuthState>()(
             const response = await api.get<UsersPage>(`/admin/users?page=${page}&limit=100`);
             if (!response.success || !response.data) {
               console.error('Failed to load users:', response.error);
-              // Fall back to localStorage for demo mode
-              const allUsers = loadAllUsersFromStorage();
-              set({ allUsers });
+              set({ allUsers: [], error: response.error || 'Failed to load users' });
               return;
             }
             total = response.data.total;
@@ -638,9 +457,7 @@ export const useAuthStore = create<AuthState>()(
           set({ allUsers: users });
         } catch (error) {
           console.error('Failed to load users from API:', error);
-          // Fall back to localStorage for demo mode
-          const allUsers = loadAllUsersFromStorage();
-          set({ allUsers });
+          set({ allUsers: [], error: 'Failed to load users' });
         }
       },
 
@@ -824,64 +641,6 @@ export const useAuthStore = create<AuthState>()(
           pending,
           activeToday,
         };
-      },
-
-      // Email verification & password setup
-      verifyToken: (token: string) => {
-        const allUsers = loadAllUsersFromStorage();
-        const user = allUsers.find(u => u.verificationToken === token);
-
-        if (!user) {
-          return null;
-        }
-
-        // Check if token is expired
-        if (user.verificationTokenExpiry) {
-          const expiry = new Date(user.verificationTokenExpiry);
-          if (expiry < new Date()) {
-            return null; // Token expired
-          }
-        }
-
-        return user;
-      },
-
-      setPassword: async (token: string, password: string) => {
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        const allUsers = loadAllUsersFromStorage();
-        const userIndex = allUsers.findIndex(u => u.verificationToken === token);
-
-        if (userIndex === -1) {
-          throw new Error('Invalid or expired verification link.');
-        }
-
-        const user = allUsers[userIndex];
-
-        // Check if token is expired
-        if (user.verificationTokenExpiry) {
-          const expiry = new Date(user.verificationTokenExpiry);
-          if (expiry < new Date()) {
-            throw new Error('This verification link has expired. Please request a new one.');
-          }
-        }
-
-        // Set password and mark as verified
-        allUsers[userIndex] = {
-          ...user,
-          passwordHash: hashPassword(password),
-          passwordSet: true,
-          emailVerified: true,
-          verificationToken: undefined,
-          verificationTokenExpiry: undefined,
-          updatedAt: new Date().toISOString(),
-        };
-
-        saveAllUsersToStorage(allUsers);
-        set({ allUsers });
-
-        // Log success
-        console.log('✅ Password set successfully for:', user.email);
       },
 
       resendVerificationEmail: async (userId: string) => {
