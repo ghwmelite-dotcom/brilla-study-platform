@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { jwt, sign, verify } from 'hono/jwt';
+import { jwt, sign } from 'hono/jwt';
 import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware';
 import type { JWTPayload } from 'hono/utils/jwt/types';
 import { libraryApp } from './library';
@@ -257,16 +257,6 @@ async function generateJWT(payload: UserPayload, secret: string): Promise<string
     },
     secret
   );
-}
-
-// Verify JWT token
-async function verifyJWT(token: string, secret: string): Promise<UserPayload | null> {
-  try {
-    const payload = await verify(token, secret);
-    return payload as UserPayload;
-  } catch {
-    return null;
-  }
 }
 
 // =============================================
@@ -4836,21 +4826,15 @@ protectedApp.post('/ai/study-plan', async (c) => {
 // USER SELF-SERVICE ENDPOINTS
 // =============================================
 
-// Middleware to verify authenticated user
+// Middleware to verify authenticated user.
+// requireAuth (protectedApp.use('*', requireAuth)) has already authenticated
+// the request and set user/userId/userRole with the DB-fresh role. Trust that
+// context instead of re-verifying the token — re-setting `user` from the raw
+// JWT payload here would overwrite the fresh DB role with the frozen JWT role.
 const userAuth = async (c: any, next: any) => {
-  const authHeader = c.req.header('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
+  if (!c.get('userId')) {
     return c.json({ success: false, error: 'Unauthorized' }, 401);
   }
-
-  const token = authHeader.slice(7);
-  const payload = await verifyJWT(token, c.env.JWT_SECRET);
-
-  if (!payload) {
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-
-  c.set('user', payload);
   await next();
 };
 
