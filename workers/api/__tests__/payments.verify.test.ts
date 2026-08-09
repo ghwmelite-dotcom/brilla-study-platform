@@ -5,7 +5,11 @@ import { paymentsApp } from '../payments';
 type Query = { sql: string; params: unknown[] };
 
 // D1 stub routing each query through a handler so different SELECTs return different rows.
-function createMockDb(handler: (sql: string, params: unknown[]) => unknown) {
+// runChanges optionally controls D1Result meta.changes for run() (default 1).
+function createMockDb(
+  handler: (sql: string, params: unknown[]) => unknown,
+  runChanges?: (sql: string, params: unknown[]) => number,
+) {
   const queries: Query[] = [];
   const db = {
     prepare(sql: string) {
@@ -16,7 +20,7 @@ function createMockDb(handler: (sql: string, params: unknown[]) => unknown) {
           return {
             first: async () => value ?? null,
             all: async () => ({ results: Array.isArray(value) ? value : value ? [value] : [] }),
-            run: async () => ({ meta: { changes: 1 } }),
+            run: async () => ({ meta: { changes: runChanges ? runChanges(sql, params) : 1 } }),
           };
         },
       };
@@ -138,5 +142,55 @@ describe('GET /payments/verify/:reference', () => {
     expect(res.status).toBe(200);
     const creditWrites = queries.filter((q) => q.sql.includes('ai_grading_credits'));
     expect(creditWrites).toHaveLength(1);
+  });
+
+  it('race loser (claim UPDATE changes=0) gets alreadyVerified and credits nothing', async () => {
+    stubPaystackVerify(2500, 'GHS');
+    // Simulate a concurrent verify winning the race: the status-guarded claim
+    // UPDATE matches 0 rows because the winner already set status='success'.
+    const { db, queries } = createMockDb(
+      (sql) => {
+        if (isAuthLookup(sql)) return ACTIVE_USER;
+        if (sql.includes('FROM payment_transactions')) return pendingTx; // read as pending
+        return null;
+      },
+      (sql) =>
+        sql.includes('UPDATE payment_transactions') && sql.includes("status = 'success'") ? 0 : 1,
+    );
+    const env = { ...baseEnv, DB: db };
+
+    const res = await paymentsApp.request('/verify/SUB_ref_1', {
+      headers: await authHeader('user_1'),
+    }, env);
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.data.alreadyVerified).toBe(true);
+    // Zero crediting side-effects of any kind
+    expect(queries.some((q) => q.sql.includes('ai_grading_credits'))).toBe(false);
+    expect(queries.some((q) => q.sql.includes('affiliate_'))).toBe(false);
+    expect(queries.some((q) => q.sql.includes('user_trials'))).toBe(false);
+  });
+
+  it('status transitions are guarded against concurrent success (claim SQL)', async () => {
+    stubPaystackVerify(2500, 'GHS');
+    const { db, queries } = createMockDb((sql) => {
+      if (isAuthLookup(sql)) return ACTIVE_USER;
+      if (sql.includes('FROM payment_transactions')) return pendingTx;
+      if (sql.includes('FROM subscription_tiers')) return { id: 'tier_pro', ai_grading_quota: 10 };
+      if (sql.includes('referred_by')) return { referred_by: null };
+      return null;
+    });
+    const env = { ...baseEnv, DB: db };
+
+    await paymentsApp.request('/verify/SUB_ref_1', {
+      headers: await authHeader('user_1'),
+    }, env);
+
+    const txUpdates = queries.filter((q) => q.sql.includes('UPDATE payment_transactions'));
+    expect(txUpdates.length).toBeGreaterThan(0);
+    for (const q of txUpdates) {
+      expect(q.sql).toContain("AND status != 'success'");
+    }
   });
 });

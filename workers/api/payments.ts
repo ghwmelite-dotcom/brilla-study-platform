@@ -420,20 +420,31 @@ paymentsApp.get('/verify/:reference', requireAuth, async (c) => {
           reference, expectedAmountGhs, paidAmountGhs,
           expectedCurrency: transaction.currency, paidCurrency: result.data.currency,
         });
+        // Status-guarded: a concurrent verify that already succeeded (or vice
+        // versa) must not be flipped back to failed.
         await c.env.DB.prepare(`
           UPDATE payment_transactions
           SET status = 'failed', paystack_response = ?
-          WHERE reference = ?
+          WHERE reference = ? AND status != 'success'
         `).bind(JSON.stringify(result.data), reference).run();
         return c.json({ success: false, error: 'Payment amount mismatch' }, 400);
       }
 
-      // Update transaction record
-      await c.env.DB.prepare(`
+      // CLAIM FIRST, before any crediting side-effect: the status-guarded UPDATE
+      // atomically claims the transaction. If changes = 0, a concurrent request
+      // already verified it — exit as alreadyVerified and credit nothing.
+      const claim = await c.env.DB.prepare(`
         UPDATE payment_transactions
         SET status = 'success', verified_at = datetime('now'), paystack_response = ?
-        WHERE reference = ?
+        WHERE reference = ? AND status != 'success'
       `).bind(JSON.stringify(result.data), reference).run();
+
+      if (!claim.meta?.changes) {
+        return c.json({
+          success: true,
+          data: { reference, status: 'success', alreadyVerified: true },
+        });
+      }
 
       // Get plan details for subscription duration
       const plan = await c.env.DB.prepare(`
