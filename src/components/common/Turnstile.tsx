@@ -66,7 +66,6 @@ export function Turnstile({
 
   const renderWidget = useCallback(() => {
     if (!containerRef.current || !window.turnstile) {
-      console.log('Turnstile: Container or API not ready');
       return;
     }
 
@@ -81,28 +80,24 @@ export function Turnstile({
     }
 
     try {
-      console.log('Turnstile: Rendering widget...');
       widgetIdRef.current = window.turnstile.render(containerRef.current, {
         sitekey: TURNSTILE_SITE_KEY,
         callback: (token: string) => {
-          console.log('Turnstile: Verified successfully');
           setStatus('ready');
           onVerifyRef.current(token);
         },
         'error-callback': () => {
-          console.log('Turnstile: Error callback triggered');
+          console.error('Turnstile: error callback triggered');
           setStatus('error');
           onErrorRef.current?.();
         },
         'expired-callback': () => {
-          console.log('Turnstile: Token expired');
           onExpireRef.current?.();
         },
         theme,
         size,
       });
       setStatus('ready');
-      console.log('Turnstile: Widget rendered, id:', widgetIdRef.current);
     } catch (err) {
       console.error('Turnstile render error:', err);
       setStatus('error');
@@ -178,7 +173,6 @@ export function Turnstile({
 
     // Set up the callback
     window.onTurnstileLoad = () => {
-      console.log('Turnstile: Script loaded');
       if (mounted) {
         initTurnstile();
       }

@@ -122,9 +122,7 @@ export default function ExamModePractice() {
           url += `&difficulty=${difficulty}`;
         }
 
-        console.log('Fetching questions from:', url);
         const res = await api.get<ApiQuestion[]>(url);
-        console.log('API response:', res);
         const data = res.success ? res.data : null;
 
         if (data && Array.isArray(data) && data.length > 0) {

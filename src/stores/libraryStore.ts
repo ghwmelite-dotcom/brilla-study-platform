@@ -442,7 +442,7 @@ export const useLibraryStore = create<LibraryState>()(
       trackDownload: async (resourceId: string) => {
         try {
           // Increment download count on the server
-          console.log('Tracked download for:', resourceId);
+          void resourceId;
         } catch {
           console.error('Failed to track download');
         }
@@ -487,7 +487,6 @@ export const useLibraryStore = create<LibraryState>()(
           }
 
           // API failed - fall back to demo mode with local storage
-          console.log('API unavailable, using demo mode for upload');
           const file = data.get('file') as File | null;
           const contentUrl = data.get('contentUrl') as string || '';
 

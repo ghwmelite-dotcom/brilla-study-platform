@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom';
 import { Suspense, useState } from 'react';
 import { Layout } from '@/components/layout';
 import { useAuthStore } from '@/stores';
@@ -268,9 +268,9 @@ function LoginPage() {
         <div className="mt-6 text-center">
           <p className="text-sm text-neutral-500">
             Don't have an account?{' '}
-            <a href="/register" className="text-primary underline hover:no-underline">
+            <Link to="/register" className="text-primary underline hover:no-underline">
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>

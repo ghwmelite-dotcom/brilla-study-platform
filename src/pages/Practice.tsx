@@ -517,9 +517,6 @@ export function PracticePage() {
           <TopicDrill
             questions={drillQuestions}
             topicName={selectedSubject !== 'all' ? subjectOptions.find(s => s.value === selectedSubject)?.label || 'Mixed Topics' : 'Mixed Topics'}
-            onComplete={(results) => {
-              console.log('Drill complete:', results);
-            }}
             onExit={handleEndSession}
           />
         );
@@ -567,9 +564,6 @@ export function PracticePage() {
         return (
           <SpeedRace
             questions={speedQuestions}
-            onComplete={(results) => {
-              console.log('Speed race complete:', results);
-            }}
             onExit={handleEndSession}
           />
         );
@@ -622,9 +616,6 @@ export function PracticePage() {
             <Flashcard
               cards={flashcards}
               title={flashcardDeckName}
-              onComplete={(results) => {
-                console.log('Flashcard session complete:', results);
-              }}
             />
           </div>
         );
