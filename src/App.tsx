@@ -1,12 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { lazy, Suspense, useState } from 'react';
+import { Suspense, useState } from 'react';
 import { Layout } from '@/components/layout';
 import { useAuthStore } from '@/stores';
 import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/guide';
 import { ToastContainer } from '@/components/toast';
-import { PageLoader } from '@/components/common';
+import { PageLoader, ErrorBoundary } from '@/components/common';
 import { GoogleSignInButton } from '@/components/auth';
 import { SplashScreen } from '@/components/SplashScreen';
+import { lazyWithRetry } from '@/lib/lazyWithRetry';
 
 // Wrapper for lazy-loaded components
 function LazyPage({ children }: { children: React.ReactNode }) {
@@ -19,101 +20,101 @@ import { DashboardPage } from '@/pages/Dashboard';
 import { LandingPage } from '@/pages/Landing';
 
 // Lazy loaded pages (direct imports for true code splitting)
-const TopicsPage = lazy(() => import('@/pages/Topics').then(m => ({ default: m.TopicsPage })));
-const PracticePage = lazy(() => import('@/pages/Practice').then(m => ({ default: m.PracticePage })));
-const CompetitionPage = lazy(() => import('@/pages/Competition').then(m => ({ default: m.CompetitionPage })));
-const HouseCupPage = lazy(() => import('@/pages/HouseCup').then(m => ({ default: m.HouseCupPage })));
-const AnalyticsPage = lazy(() => import('@/pages/Analytics').then(m => ({ default: m.AnalyticsPage })));
-const BattlePage = lazy(() => import('@/pages/Battle').then(m => ({ default: m.BattlePage })));
-const PastPapersPage = lazy(() => import('@/pages/PastPapers').then(m => ({ default: m.PastPapers })));
-const TakePaper = lazy(() => import('@/pages/TakePaper'));
-const PaperResults = lazy(() => import('@/pages/PaperResults'));
-const EssayPracticePage = lazy(() => import('@/pages/EssayPractice').then(m => ({ default: m.EssayPracticePage })));
-const ContentManagementPage = lazy(() => import('@/pages/ContentManagement').then(m => ({ default: m.ContentManagementPage })));
-const MockExamsPage = lazy(() => import('@/pages/MockExams').then(m => ({ default: m.MockExamsPage })));
-const SubjectCatalogPage = lazy(() => import('@/pages/SubjectCatalog').then(m => ({ default: m.SubjectCatalogPage })));
-const CommunityPage = lazy(() => import('@/pages/Community').then(m => ({ default: m.CommunityPage })));
-const SettingsPage = lazy(() => import('@/pages/Settings'));
+const TopicsPage = lazyWithRetry(() => import('@/pages/Topics').then(m => ({ default: m.TopicsPage })));
+const PracticePage = lazyWithRetry(() => import('@/pages/Practice').then(m => ({ default: m.PracticePage })));
+const CompetitionPage = lazyWithRetry(() => import('@/pages/Competition').then(m => ({ default: m.CompetitionPage })));
+const HouseCupPage = lazyWithRetry(() => import('@/pages/HouseCup').then(m => ({ default: m.HouseCupPage })));
+const AnalyticsPage = lazyWithRetry(() => import('@/pages/Analytics').then(m => ({ default: m.AnalyticsPage })));
+const BattlePage = lazyWithRetry(() => import('@/pages/Battle').then(m => ({ default: m.BattlePage })));
+const PastPapersPage = lazyWithRetry(() => import('@/pages/PastPapers').then(m => ({ default: m.PastPapers })));
+const TakePaper = lazyWithRetry(() => import('@/pages/TakePaper'));
+const PaperResults = lazyWithRetry(() => import('@/pages/PaperResults'));
+const EssayPracticePage = lazyWithRetry(() => import('@/pages/EssayPractice').then(m => ({ default: m.EssayPracticePage })));
+const ContentManagementPage = lazyWithRetry(() => import('@/pages/ContentManagement').then(m => ({ default: m.ContentManagementPage })));
+const MockExamsPage = lazyWithRetry(() => import('@/pages/MockExams').then(m => ({ default: m.MockExamsPage })));
+const SubjectCatalogPage = lazyWithRetry(() => import('@/pages/SubjectCatalog').then(m => ({ default: m.SubjectCatalogPage })));
+const CommunityPage = lazyWithRetry(() => import('@/pages/Community').then(m => ({ default: m.CommunityPage })));
+const SettingsPage = lazyWithRetry(() => import('@/pages/Settings'));
 
-const HelpCenter = lazy(() => import('@/pages/HelpCenter'));
-const AdminApprovals = lazy(() => import('@/pages/AdminApprovals'));
-const UserManagement = lazy(() => import('@/pages/UserManagement'));
-const AuditLog = lazy(() => import('@/pages/AuditLog'));
-const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
-const AdminAnalytics = lazy(() => import('@/pages/AdminAnalytics'));
-const AdminSubscriptions = lazy(() => import('@/pages/AdminSubscriptions'));
-const AdminAffiliates = lazy(() => import('@/pages/AdminAffiliates'));
-const AdminTutoringDirectory = lazy(() => import('@/pages/admin/AdminTutoringDirectory'));
-const AdminTeacherBonuses = lazy(() => import('@/pages/admin/AdminTeacherBonuses'));
+const HelpCenter = lazyWithRetry(() => import('@/pages/HelpCenter'));
+const AdminApprovals = lazyWithRetry(() => import('@/pages/AdminApprovals'));
+const UserManagement = lazyWithRetry(() => import('@/pages/UserManagement'));
+const AuditLog = lazyWithRetry(() => import('@/pages/AuditLog'));
+const AdminDashboard = lazyWithRetry(() => import('@/pages/AdminDashboard'));
+const AdminAnalytics = lazyWithRetry(() => import('@/pages/AdminAnalytics'));
+const AdminSubscriptions = lazyWithRetry(() => import('@/pages/AdminSubscriptions'));
+const AdminAffiliates = lazyWithRetry(() => import('@/pages/AdminAffiliates'));
+const AdminTutoringDirectory = lazyWithRetry(() => import('@/pages/admin/AdminTutoringDirectory'));
+const AdminTeacherBonuses = lazyWithRetry(() => import('@/pages/admin/AdminTeacherBonuses'));
 
 // Admin layout (lazy loaded)
-const AdminLayout = lazy(() => import('@/components/admin/layout/AdminLayout').then(m => ({ default: m.AdminLayout })));
-const SetPasswordPage = lazy(() => import('@/pages/SetPasswordPage').then(m => ({ default: m.SetPasswordPage })));
-const ParentDashboardPage = lazy(() => import('@/pages/ParentDashboard').then(m => ({ default: m.ParentDashboardPage })));
-const ParentSettingsPage = lazy(() => import('@/pages/ParentSettings').then(m => ({ default: m.ParentSettingsPage })));
-const ParentReportsPage = lazy(() => import('@/pages/ParentReports').then(m => ({ default: m.ParentReportsPage })));
-const ParentNotificationsPage = lazy(() => import('@/pages/ParentNotifications').then(m => ({ default: m.ParentNotificationsPage })));
-const VirtualLabPage = lazy(() => import('@/components/lab').then(m => ({ default: m.VirtualLabPage })));
+const AdminLayout = lazyWithRetry(() => import('@/components/admin/layout/AdminLayout').then(m => ({ default: m.AdminLayout })));
+const SetPasswordPage = lazyWithRetry(() => import('@/pages/SetPasswordPage').then(m => ({ default: m.SetPasswordPage })));
+const ParentDashboardPage = lazyWithRetry(() => import('@/pages/ParentDashboard').then(m => ({ default: m.ParentDashboardPage })));
+const ParentSettingsPage = lazyWithRetry(() => import('@/pages/ParentSettings').then(m => ({ default: m.ParentSettingsPage })));
+const ParentReportsPage = lazyWithRetry(() => import('@/pages/ParentReports').then(m => ({ default: m.ParentReportsPage })));
+const ParentNotificationsPage = lazyWithRetry(() => import('@/pages/ParentNotifications').then(m => ({ default: m.ParentNotificationsPage })));
+const VirtualLabPage = lazyWithRetry(() => import('@/components/lab').then(m => ({ default: m.VirtualLabPage })));
 
 // Teacher pages (lazy loaded)
-const TeacherDashboard = lazy(() => import('@/pages/TeacherDashboard'));
-const AssessmentList = lazy(() => import('@/pages/AssessmentList'));
-const AssessmentBuilder = lazy(() => import('@/pages/AssessmentBuilder'));
-const AssessmentGrading = lazy(() => import('@/pages/AssessmentGrading'));
-const ClassManagement = lazy(() => import('@/pages/ClassManagement'));
-const WhiteboardList = lazy(() => import('@/pages/WhiteboardList'));
-const WhiteboardEditor = lazy(() => import('@/pages/WhiteboardEditor'));
-const RecordingViewer = lazy(() => import('@/pages/RecordingViewer'));
+const TeacherDashboard = lazyWithRetry(() => import('@/pages/TeacherDashboard'));
+const AssessmentList = lazyWithRetry(() => import('@/pages/AssessmentList'));
+const AssessmentBuilder = lazyWithRetry(() => import('@/pages/AssessmentBuilder'));
+const AssessmentGrading = lazyWithRetry(() => import('@/pages/AssessmentGrading'));
+const ClassManagement = lazyWithRetry(() => import('@/pages/ClassManagement'));
+const WhiteboardList = lazyWithRetry(() => import('@/pages/WhiteboardList'));
+const WhiteboardEditor = lazyWithRetry(() => import('@/pages/WhiteboardEditor'));
+const RecordingViewer = lazyWithRetry(() => import('@/pages/RecordingViewer'));
 
 // Student assessment pages (lazy loaded)
-const AssignedAssessments = lazy(() => import('@/pages/AssignedAssessments'));
-const TakeAssessment = lazy(() => import('@/pages/TakeAssessment'));
-const AssessmentResults = lazy(() => import('@/pages/AssessmentResults'));
-const QuestsPage = lazy(() => import('@/pages/QuestsPage'));
-const FriendsPage = lazy(() => import('@/pages/FriendsPage'));
-const StudyGroupsPage = lazy(() => import('@/pages/StudyGroupsPage'));
-const LeaderboardPage = lazy(() => import('@/pages/Leaderboard'));
-const LibraryPage = lazy(() => import('@/pages/Library').then(m => ({ default: m.LibraryPage })));
-const CounselorPage = lazy(() => import('@/pages/Counselor').then(m => ({ default: m.CounselorPage })));
-const ModerationDashboard = lazy(() => import('@/pages/ModerationDashboard'));
-const PricingPage = lazy(() => import('@/pages/Pricing'));
-const AffiliatePage = lazy(() => import('@/pages/Affiliate'));
-const PaymentCallbackPage = lazy(() => import('@/pages/PaymentCallback'));
-const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicy'));
-const TermsOfServicePage = lazy(() => import('@/pages/TermsOfService'));
+const AssignedAssessments = lazyWithRetry(() => import('@/pages/AssignedAssessments'));
+const TakeAssessment = lazyWithRetry(() => import('@/pages/TakeAssessment'));
+const AssessmentResults = lazyWithRetry(() => import('@/pages/AssessmentResults'));
+const QuestsPage = lazyWithRetry(() => import('@/pages/QuestsPage'));
+const FriendsPage = lazyWithRetry(() => import('@/pages/FriendsPage'));
+const StudyGroupsPage = lazyWithRetry(() => import('@/pages/StudyGroupsPage'));
+const LeaderboardPage = lazyWithRetry(() => import('@/pages/Leaderboard'));
+const LibraryPage = lazyWithRetry(() => import('@/pages/Library').then(m => ({ default: m.LibraryPage })));
+const CounselorPage = lazyWithRetry(() => import('@/pages/Counselor').then(m => ({ default: m.CounselorPage })));
+const ModerationDashboard = lazyWithRetry(() => import('@/pages/ModerationDashboard'));
+const PricingPage = lazyWithRetry(() => import('@/pages/Pricing'));
+const AffiliatePage = lazyWithRetry(() => import('@/pages/Affiliate'));
+const PaymentCallbackPage = lazyWithRetry(() => import('@/pages/PaymentCallback'));
+const PrivacyPolicyPage = lazyWithRetry(() => import('@/pages/PrivacyPolicy'));
+const TermsOfServicePage = lazyWithRetry(() => import('@/pages/TermsOfService'));
 
 // Tutoring marketplace pages (lazy loaded)
-const TeacherDirectory = lazy(() => import('@/pages/TeacherDirectory'));
-const TeacherPublicProfile = lazy(() => import('@/pages/TeacherPublicProfile'));
-const TeacherDirectorySetup = lazy(() => import('@/pages/TeacherDirectorySetup'));
-const TutoringRequests = lazy(() => import('@/pages/TutoringRequests'));
-const TutoringSessions = lazy(() => import('@/pages/TutoringSessions'));
-const TeacherTutoringDashboard = lazy(() => import('@/pages/TeacherTutoringDashboard'));
-const TeacherBonusStatus = lazy(() => import('@/pages/TeacherBonusStatus'));
-const TutorObservationDashboard = lazy(() => import('@/pages/TutorObservationDashboard'));
+const TeacherDirectory = lazyWithRetry(() => import('@/pages/TeacherDirectory'));
+const TeacherPublicProfile = lazyWithRetry(() => import('@/pages/TeacherPublicProfile'));
+const TeacherDirectorySetup = lazyWithRetry(() => import('@/pages/TeacherDirectorySetup'));
+const TutoringRequests = lazyWithRetry(() => import('@/pages/TutoringRequests'));
+const TutoringSessions = lazyWithRetry(() => import('@/pages/TutoringSessions'));
+const TeacherTutoringDashboard = lazyWithRetry(() => import('@/pages/TeacherTutoringDashboard'));
+const TeacherBonusStatus = lazyWithRetry(() => import('@/pages/TeacherBonusStatus'));
+const TutorObservationDashboard = lazyWithRetry(() => import('@/pages/TutorObservationDashboard'));
 
 // Exam mode pages (full-screen distraction-free)
-const ExamModePractice = lazy(() => import('@/pages/ExamModePractice'));
-const ExamModeResults = lazy(() => import('@/pages/ExamModeResults'));
+const ExamModePractice = lazyWithRetry(() => import('@/pages/ExamModePractice'));
+const ExamModeResults = lazyWithRetry(() => import('@/pages/ExamModeResults'));
 
 // OAuth callback page
-const OAuthCallback = lazy(() => import('@/pages/OAuthCallback'));
+const OAuthCallback = lazyWithRetry(() => import('@/pages/OAuthCallback'));
 
 // Exam setup wizard (O-Level / A-Level)
-const ExamSetup = lazy(() => import('@/pages/ExamSetup'));
+const ExamSetup = lazyWithRetry(() => import('@/pages/ExamSetup'));
 
 // O/A Level Dashboard and Syllabus Browser
-const OALevelDashboard = lazy(() => import('@/pages/OALevelDashboard'));
-const SyllabusBrowser = lazy(() => import('@/pages/SyllabusBrowser'));
+const OALevelDashboard = lazyWithRetry(() => import('@/pages/OALevelDashboard'));
+const SyllabusBrowser = lazyWithRetry(() => import('@/pages/SyllabusBrowser'));
 
 // AI Revision Classroom
-const RevisionClassroom = lazy(() => import('@/pages/RevisionClassroom'));
+const RevisionClassroom = lazyWithRetry(() => import('@/pages/RevisionClassroom'));
 
 // Multiplayer Study Rooms
-const StudyRooms = lazy(() => import('@/pages/StudyRooms'));
+const StudyRooms = lazyWithRetry(() => import('@/pages/StudyRooms'));
 
 // Immersive Learning Mode
-const ImmersiveLearning = lazy(() => import('@/pages/ImmersiveLearning'));
+const ImmersiveLearning = lazyWithRetry(() => import('@/pages/ImmersiveLearning'));
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -404,6 +405,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ErrorBoundary>
       <Routes>
         {/* Landing page for guests, home for authenticated (no nested layout) */}
         <Route path="/" element={<HomeRoute />} />
@@ -994,6 +996,7 @@ function App() {
           <Route path="teacher-bonuses" element={<LazyPage><AdminTeacherBonuses /></LazyPage>} />
         </Route>
       </Routes>
+      </ErrorBoundary>
 
       {/* Global Guide Components */}
       <OnboardingTrigger />
