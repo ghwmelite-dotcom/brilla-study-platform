@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ReminderSettings } from '@/types';
-import { api } from '@/utils/api';
+import { api } from '@/lib/api';
 
 interface ReminderState {
   settings: ReminderSettings | null;

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { api } from '@/utils/api';
+import { api } from '@/lib/api';
 import type {
   CounselorConversation,
   CounselorMessage,
@@ -565,7 +565,7 @@ export const useCounselorStore = create<CounselorState>()(
 
       loadWellbeingHistory: async () => {
         try {
-          const response = await api.get<WellbeingLog[]>('/counselor/wellbeing/history', { days: 30 });
+          const response = await api.get<WellbeingLog[]>('/counselor/wellbeing/history?days=30');
           if (response.success && response.data) {
             set({ wellbeingHistory: response.data });
           } else {

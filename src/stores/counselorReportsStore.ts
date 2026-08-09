@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { api } from '@/utils/api';
+import { api } from '@/lib/api';
 import type {
   CounselorReport,
   WellbeingAlert,
@@ -186,11 +186,13 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
       loadReports: async (filters) => {
         set({ isLoadingReports: true, error: null });
         try {
-          const response = await api.get<CounselorReport[]>('/counselor/reports', {
-            studentId: filters?.studentId,
-            reportType: filters?.reportType,
-            status: filters?.status,
-          });
+          const params = new URLSearchParams();
+          if (filters?.studentId) params.append('studentId', filters.studentId);
+          if (filters?.reportType) params.append('reportType', filters.reportType);
+          if (filters?.status) params.append('status', filters.status);
+          const query = params.toString();
+
+          const response = await api.get<CounselorReport[]>(`/counselor/reports${query ? `?${query}` : ''}`);
 
           if (response.success && response.data) {
             set({ reports: response.data, reportFilters: filters || {}, isLoadingReports: false });
@@ -291,7 +293,7 @@ export const useCounselorReportsStore = create<CounselorReportsState>()(
       loadAlerts: async (studentId) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await api.get<WellbeingAlert[]>('/counselor/alerts', { studentId });
+          const response = await api.get<WellbeingAlert[]>(`/counselor/alerts${studentId ? `?studentId=${encodeURIComponent(studentId)}` : ''}`);
           if (response.success && response.data) {
             set({
               alerts: response.data,

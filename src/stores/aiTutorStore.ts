@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { getApiUrl, getAuthHeaders } from '../utils/api';
+import { getApiUrl, getAuthHeaders } from '@/lib/api';
 import { extractTextFromPDF, isPDFFile } from '../utils/pdfExtractor';
 
 export interface FileAttachment {
@@ -343,11 +343,13 @@ export const useAiTutorStore = create<AiTutorState>()(
           const formData = new FormData();
           formData.append('file', file);
 
+          // Strip Content-Type: the browser must set the multipart boundary itself
+          const headers = getAuthHeaders();
+          delete headers['Content-Type'];
+
           const response = await fetch(getApiUrl('/api/tutor/upload'), {
             method: 'POST',
-            headers: {
-              ...getAuthHeaders(),
-            },
+            headers,
             body: formData,
           });
 

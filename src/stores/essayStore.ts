@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { EssayQuestion, EssayAttempt, AIEssayFeedback } from '@/types';
-import { getAuthHeaders } from '../utils/api';
+import { getAuthHeaders } from '@/lib/api';
 
 interface EssayState {
   // Current essay session

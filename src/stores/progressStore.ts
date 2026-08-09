@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { UserProgress, Achievement, LeaderboardEntry, LeaderboardPeriod } from '@/types';
-import { getApiUrl, getAuthHeaders } from '../utils/api';
+import { getApiUrl, getAuthHeaders } from '@/lib/api';
 
 // Clear old cached data on load
 const STORE_VERSION = 2;

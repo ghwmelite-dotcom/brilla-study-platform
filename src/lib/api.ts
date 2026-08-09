@@ -371,7 +371,7 @@ export interface CreateUserData {
 // Export singleton instance
 export const api = new ApiClient(API_BASE_URL);
 
-// Token-only auth headers (no x-user-id / x-user-role)
+// Token-only auth headers (Bearer only; no legacy identity headers)
 export function getAuthHeaders(): Record<string, string> {
   const token = localStorage.getItem('brilla_token');
 

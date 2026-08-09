@@ -7,7 +7,7 @@ import type {
   CreateRoomData,
   ChatRoomType,
 } from '@/types';
-import { getApiUrl, getAuthHeaders } from '../utils/api';
+import { getApiUrl, getAuthHeaders } from '@/lib/api';
 
 interface ChatState {
   // Connection state
