@@ -788,7 +788,7 @@ function getUserRole(c: { get: (key: string) => string | undefined }): string | 
 
 // Health check
 publicApp.get('/health', (c) => {
-  return c.json({ status: 'ok', environment: c.env.ENVIRONMENT });
+  return c.json({ success: true, data: { status: 'ok' } });
 });
 
 // =============================================
