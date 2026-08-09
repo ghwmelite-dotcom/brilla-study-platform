@@ -32,6 +32,7 @@ import { examBoardsApp } from './exam-boards';
 import { revisionClassroomApp } from './revision-classroom';
 import { studyRoomsApp } from './study-rooms';
 import tutorClassroomApp from './tutor-classroom';
+import { cleanupExpiredDemoData } from './demoUtils';
 import {
   getDailyUsage,
   checkCanAnswer,
@@ -742,15 +743,6 @@ function getDemoDataFlags(userId: string): { is_demo_data: number; expires_at: s
   return { is_demo_data: 0, expires_at: null };
 }
 
-// SQL fragment for demo data columns
-function getDemoDataSQL(userId: string): string {
-  const flags = getDemoDataFlags(userId);
-  if (flags.is_demo_data) {
-    return `, is_demo_data, expires_at) VALUES (?, ?, ?, ..., 1, '${flags.expires_at}'`;
-  }
-  return `, is_demo_data, expires_at) VALUES (?, ?, ?, ..., 0, NULL`;
-}
-
 const app = new Hono<{ Bindings: Env }>();
 
 // Middleware
@@ -802,21 +794,6 @@ publicApp.get('/health', (c) => {
 // =============================================
 // EXAM TYPES ENDPOINTS
 // =============================================
-
-// Get all exam types
-publicApp.get('/exam-types', async (c) => {
-  try {
-    const { results } = await c.env.DB.prepare(`
-      SELECT * FROM exam_types
-      WHERE is_active = 1
-      ORDER BY display_order
-    `).all();
-
-    return c.json({ success: true, data: results });
-  } catch (error) {
-    return c.json({ success: false, error: 'Failed to fetch exam types' }, 500);
-  }
-});
 
 // Get exam type by slug
 publicApp.get('/exam-types/:slug', async (c) => {
@@ -10141,64 +10118,6 @@ app.onError((err, c) => {
 // =============================================
 // SCHEDULED HANDLER - Demo Data Cleanup (Cron)
 // =============================================
-
-// List of tables that need demo data cleanup
-const DEMO_DATA_TABLES = [
-  'user_progress',
-  'question_attempts',
-  'essay_attempts',
-  'paper_attempts',
-  'paper_attempt_answers',
-  'practice_sessions',
-  'user_achievements',
-  'battles',
-  'battle_answers',
-  'house_points',
-  'user_exam_preferences',
-  'user_subject_selections',
-  'chat_messages',
-  'chat_message_reactions',
-  'competitions',
-  'leaderboard',
-  'assessment_attempts',
-  'assessment_attempt_answers',
-  'parent_notifications',
-  'parent_activity_log',
-  'counselor_sessions',
-  'counselor_messages',
-  'tutor_conversations',
-  'tutor_messages',
-  'library_resources',
-  'notifications',
-];
-
-// Scheduled cleanup function
-async function cleanupExpiredDemoData(db: D1Database): Promise<{ tablesProcessed: number; rowsDeleted: number }> {
-  const now = new Date().toISOString();
-  let totalDeleted = 0;
-  let tablesProcessed = 0;
-
-  for (const table of DEMO_DATA_TABLES) {
-    try {
-      // Delete expired demo data
-      const result = await db.prepare(`
-        DELETE FROM ${table}
-        WHERE is_demo_data = 1 AND expires_at IS NOT NULL AND expires_at < ?
-      `).bind(now).run();
-
-      if (result.meta.changes > 0) {
-        console.log(`Cleaned up ${result.meta.changes} expired demo records from ${table}`);
-        totalDeleted += result.meta.changes;
-      }
-      tablesProcessed++;
-    } catch (error) {
-      // Table might not have the columns yet (migration not run)
-      console.log(`Skipping ${table}: ${error instanceof Error ? error.message : 'unknown error'}`);
-    }
-  }
-
-  return { tablesProcessed, rowsDeleted: totalDeleted };
-}
 
 // Cloudflare Worker with scheduled handler
 export default {
