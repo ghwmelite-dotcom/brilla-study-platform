@@ -69,78 +69,82 @@ chatApp.get('/rooms', async (c) => {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
 
-    // Get all rooms user is a member of
+    // Single query: last-message and DM other-user details come from
+    // correlated subqueries (same pattern as member_count/unread_count), so
+    // the route issues exactly 1 query instead of 1 + 2 per room.
+    //
+    // Bind order (positional, by appearance in the SQL):
+    //   1. unread_count sender_id != ?        -> userId
+    //   2. dm_other_id     m.user_id != ?     -> userId
+    //   3. dm_other_name   m.user_id != ?     -> userId
+    //   4. dm_other_avatar m.user_id != ?     -> userId
+    //   5. join            crm.user_id = ?    -> userId
     const rooms = await c.env.DB.prepare(`
       SELECT
         cr.id, cr.name, cr.description, cr.type, cr.subject_id, cr.avatar_url,
         cr.is_archived, cr.max_members, cr.created_by, cr.created_at, cr.updated_at,
         crm.role as my_role, crm.last_read_at,
         (SELECT COUNT(*) FROM chat_room_members WHERE room_id = cr.id) as member_count,
-        (SELECT COUNT(*) FROM chat_messages WHERE room_id = cr.id AND created_at > crm.last_read_at AND sender_id != ?) as unread_count
+        (SELECT COUNT(*) FROM chat_messages WHERE room_id = cr.id AND created_at > crm.last_read_at AND sender_id != ?) as unread_count,
+        (SELECT cm.content FROM chat_messages cm
+          WHERE cm.room_id = cr.id AND cm.is_deleted = 0
+          ORDER BY cm.created_at DESC LIMIT 1) as last_message_content,
+        (SELECT cm.created_at FROM chat_messages cm
+          WHERE cm.room_id = cr.id AND cm.is_deleted = 0
+          ORDER BY cm.created_at DESC LIMIT 1) as last_message_at,
+        (SELECT u.name FROM chat_messages cm JOIN users u ON u.id = cm.sender_id
+          WHERE cm.room_id = cr.id AND cm.is_deleted = 0
+          ORDER BY cm.created_at DESC LIMIT 1) as last_message_sender_name,
+        (SELECT u.id FROM chat_room_members m JOIN users u ON u.id = m.user_id
+          WHERE m.room_id = cr.id AND m.user_id != ? AND cr.type = 'dm' LIMIT 1) as dm_other_id,
+        (SELECT u.name FROM chat_room_members m JOIN users u ON u.id = m.user_id
+          WHERE m.room_id = cr.id AND m.user_id != ? AND cr.type = 'dm' LIMIT 1) as dm_other_name,
+        (SELECT u.avatar_url FROM chat_room_members m JOIN users u ON u.id = m.user_id
+          WHERE m.room_id = cr.id AND m.user_id != ? AND cr.type = 'dm' LIMIT 1) as dm_other_avatar
       FROM chat_rooms cr
       INNER JOIN chat_room_members crm ON cr.id = crm.room_id AND crm.user_id = ?
       WHERE cr.is_archived = 0
       ORDER BY cr.updated_at DESC
       LIMIT 100
-    `).bind(userId, userId).all();
+    `).bind(userId, userId, userId, userId, userId).all();
 
-    // For each room, get last message and other user (for DMs)
-    const roomsWithDetails = await Promise.all(
-      rooms.results.map(async (room: Record<string, unknown>) => {
-        // Get last message
-        const lastMessage = await c.env.DB.prepare(`
-          SELECT cm.content, cm.created_at, u.name as sender_name
-          FROM chat_messages cm
-          LEFT JOIN users u ON cm.sender_id = u.id
-          WHERE cm.room_id = ? AND cm.is_deleted = 0
-          ORDER BY cm.created_at DESC
-          LIMIT 1
-        `).bind(room.id).first();
+    // Reshape flat rows into the existing response shape (client contract unchanged).
+    const roomsWithDetails = rooms.results.map((room: Record<string, unknown>) => {
+      const hasLastMessage = room.last_message_at != null;
+      const otherUser =
+        room.type === 'dm' && room.dm_other_id != null
+          ? {
+              id: room.dm_other_id,
+              name: room.dm_other_name,
+              avatarUrl: room.dm_other_avatar,
+            }
+          : null;
 
-        // For DMs, get the other user
-        let otherUser = null;
-        if (room.type === 'dm') {
-          const other = await c.env.DB.prepare(`
-            SELECT u.id, u.name, u.avatar_url
-            FROM chat_room_members crm
-            JOIN users u ON crm.user_id = u.id
-            WHERE crm.room_id = ? AND crm.user_id != ?
-            LIMIT 1
-          `).bind(room.id, userId).first();
-
-          if (other) {
-            otherUser = {
-              id: other.id,
-              name: other.name,
-              avatarUrl: other.avatar_url,
-            };
-          }
-        }
-
-        return {
-          id: room.id,
-          name: room.name,
-          description: room.description,
-          type: room.type,
-          subjectId: room.subject_id,
-          avatarUrl: room.avatar_url,
-          isArchived: !!room.is_archived,
-          maxMembers: room.max_members,
-          createdBy: room.created_by,
-          createdAt: room.created_at,
-          updatedAt: room.updated_at,
-          myRole: room.my_role,
-          memberCount: room.member_count,
-          unreadCount: room.unread_count || 0,
-          lastMessage: lastMessage ? {
-            content: lastMessage.content,
-            senderName: lastMessage.sender_name,
-            createdAt: lastMessage.created_at,
-          } : null,
-          otherUser,
-        };
-      })
-    );
+      return {
+        id: room.id,
+        name: room.name,
+        description: room.description,
+        type: room.type,
+        subjectId: room.subject_id,
+        avatarUrl: room.avatar_url,
+        isArchived: !!room.is_archived,
+        maxMembers: room.max_members,
+        createdBy: room.created_by,
+        createdAt: room.created_at,
+        updatedAt: room.updated_at,
+        myRole: room.my_role,
+        memberCount: room.member_count,
+        unreadCount: room.unread_count || 0,
+        lastMessage: hasLastMessage
+          ? {
+              content: room.last_message_content,
+              senderName: room.last_message_sender_name,
+              createdAt: room.last_message_at,
+            }
+          : null,
+        otherUser,
+      };
+    });
 
     return c.json({ success: true, data: roomsWithDetails });
   } catch (error) {
