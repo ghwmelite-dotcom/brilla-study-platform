@@ -27,13 +27,11 @@ P0 closed: Paystack webhook fails closed when secret unset (unsigned events neve
 
 ⏸ Parked: `user_subscriptions.expires_at` format unverified (untouched deliberately), write-side legacy `started_at`, counselor /reports/generate ungated AI (staff-only), tutoring payouts separate surface (fixed in Phase 3 Task 10b).
 
-## Phase 3 — Runtime Feature Fixes (16/22 so far)
+## Phase 3 — Runtime Feature Fixes (22/22 ✅, 2 fix rounds)
 
-✅ T1 batch-aware mockD1 helper. ✅ T2 phantom `users.xp`/`streak` columns → `xp_points`/`streak_days` (🔧 fix round: /streak/rescue missed site). ✅ T3 phantom coin economy removed (client-side fiction documented). ✅ T4-T5 learningpath revived (exam_types JOIN, mastery off question_attempts, readiness N+1 collapsed). ✅ T6 quest claim atomic (conditional UPDATE + batch). ✅ T7 tournament join TOCTOU closed (conditional debit + INSERT...SELECT + refund). ✅ T8-T9 registration + OAuth registration batched. ✅ T10 affiliate referral batched. ✅ T10b (amendment): referral commission hijack closed (JWT identity), tutoring verify claim-first. ✅ T11 chat /rooms single-query. ✅ T12 quickplay IN-query grading + payload validation. ✅ T13 teacher bonuses O(1) grouped. ✅ T14 parseLimit caps (38 sites). ✅ T15 admin/users pagination + trial chunk (🔧 fix round: D1 batch headroom, loadAllUsers paging). ✅ T16 N+1 sweep (5 sites incl. user-search fold-in).
+✅ T1 batch-aware mockD1 helper. ✅ T2 phantom `users.xp`/`streak` columns → `xp_points`/`streak_days` (🔧 fix round: /streak/rescue missed site). ✅ T3 phantom coin economy removed (client-side fiction documented). ✅ T4-T5 learningpath revived (exam_types JOIN, mastery off question_attempts, readiness N+1 collapsed). ✅ T6 quest claim atomic (conditional UPDATE + batch). ✅ T7 tournament join TOCTOU closed (conditional debit + INSERT...SELECT + refund). ✅ T8-T9 registration + OAuth registration batched. ✅ T10 affiliate referral batched. ✅ T10b (amendment): referral commission hijack closed (JWT identity), tutoring verify claim-first. ✅ T11 chat /rooms single-query. ✅ T12 quickplay IN-query grading + payload validation. ✅ T13 teacher bonuses O(1) grouped. ✅ T14 parseLimit caps (38 sites). ✅ T15 admin/users pagination + trial chunk (🔧 fix round: D1 batch headroom, loadAllUsers paging). ✅ T16 N+1 sweep (5 sites incl. user-search fold-in). ✅ T17 recording upload 100MB cap + compensating R2 delete. ✅ T18 R2 objects deleted on recording delete. ✅ T19 /exam-types dedupe + demo cleanup unified on 33-table superset. ✅ T20 /health envelope standardized. ✅ T21 register 500 + guarded JSON parsing (parseJsonBody in http.ts).
 
-⏸ Parked: parseOffset/parsePage helpers, created_at tie-mixing in correlated subqueries, claim→batch D1 two-unit seams, real UI pagination in UserManagement, counselor.ts:848 phantom `user_streaks` table.
-
-Pending: T17 recording upload cap, T18 recording R2 delete, T19 dead code dedupe, T20 health envelope, T21 register 500/JSON guards.
+⏸ Parked: parseOffset/parsePage helpers, created_at tie-mixing in correlated subqueries, D1 two-unit seams, learningpath UPSERT loop, counselor.ts:526 **and** :848 phantom `user_streaks` table (TWO sites, both 500 when hit), demo-flag dedupe, ~43 unguarded JSON parses (set/forgot/reset-password the main public ones), real UI pagination in UserManagement, R2 orphan sweeper.
 
 ## Phases 4-6 — Pending
 
