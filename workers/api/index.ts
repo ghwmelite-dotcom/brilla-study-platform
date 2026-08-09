@@ -2290,11 +2290,11 @@ protectedApp.post('/quests/:questId/claim', async (c) => {
       VALUES (?, ?, ?, ?, (SELECT quest_type FROM quest_templates WHERE id = ?))
     `).bind(`qc_${crypto.randomUUID()}`, userId, quest.quest_template_id, xpReward, quest.quest_template_id).run();
 
+    // NOTE: coin_reward is display-only; no users.coins column exists. See docs/superpowers/plans/2026-08-03-fix-03-runtime-features.md
     return c.json({
       success: true,
       data: {
         xp: xpReward,
-        coins: quest.coin_reward || 0,
       },
     });
   } catch (error) {
