@@ -106,7 +106,8 @@ learningPathApp.get('/exam-readiness/:examType', async (c) => {
     const subjects = await c.env.DB.prepare(`
       SELECT s.id, s.name, s.icon
       FROM subjects s
-      WHERE s.exam_type = ? OR s.exam_type IS NULL
+      LEFT JOIN exam_types et ON et.id = s.exam_type_id
+      WHERE et.slug = ? OR s.exam_type_id IS NULL
       ORDER BY s.name
     `).bind(examType).all();
 
