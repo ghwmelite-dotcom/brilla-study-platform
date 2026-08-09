@@ -4,6 +4,8 @@ import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
 import type { AuthPayload } from './auth-middleware';
 
+const MAX_RECORDING_BYTES = 100 * 1024 * 1024; // 100MB
+
 // Types for Cloudflare bindings
 interface Env {
   DB: D1Database;
@@ -515,8 +517,15 @@ recordingsApp.put('/upload/:recordingId/:fileType', async (c) => {
         return c.json({ success: false, error: 'Invalid file type' }, 400);
     }
 
-    // Get request body as ArrayBuffer
+    // Get request body as ArrayBuffer (capped to MAX_RECORDING_BYTES)
+    const declared = Number(c.req.header('Content-Length') || 0);
+    if (declared > MAX_RECORDING_BYTES) {
+      return c.json({ success: false, error: 'File exceeds 100MB limit' }, 413);
+    }
     const body = await c.req.arrayBuffer();
+    if (body.byteLength > MAX_RECORDING_BYTES) {
+      return c.json({ success: false, error: 'File exceeds 100MB limit' }, 413);
+    }
     const contentType = c.req.header('Content-Type') || 'application/octet-stream';
 
     // Upload to R2
@@ -529,9 +538,20 @@ recordingsApp.put('/upload/:recordingId/:fileType', async (c) => {
     // Update database with the file URL
     const publicUrl = `/api/recordings/files/${path}`;
     if (dbColumn) {
-      await c.env.DB.prepare(`
-        UPDATE whiteboard_recordings SET ${dbColumn} = ?, updated_at = datetime('now') WHERE id = ?
-      `).bind(publicUrl, recordingId).run();
+      try {
+        await c.env.DB.prepare(`
+          UPDATE whiteboard_recordings SET ${dbColumn} = ?, updated_at = datetime('now') WHERE id = ?
+        `).bind(publicUrl, recordingId).run();
+      } catch (dbError) {
+        // Best-effort compensating delete so no orphaned R2 object remains
+        try {
+          await c.env.RECORDINGS_BUCKET.delete(path);
+        } catch (deleteError) {
+          console.error(`Orphan risk: failed to link R2 object ${path}`, deleteError);
+        }
+        console.error(`Orphan risk: failed to link R2 object ${path}`, dbError);
+        return c.json({ success: false, error: 'Failed to upload file' }, 500);
+      }
     }
 
     return c.json({
