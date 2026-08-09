@@ -664,20 +664,27 @@ recordingsApp.delete('/:id', async (c) => {
       UPDATE whiteboard_recordings SET status = 'deleted', updated_at = datetime('now') WHERE id = ?
     `).bind(recordingId).run();
 
-    // Optionally delete files from R2 (uncomment if you want hard delete)
-    // if (c.env.RECORDINGS_BUCKET) {
-    //   const filesToDelete = [
-    //     recording.canvas_events_url,
-    //     recording.audio_url,
-    //     recording.webcam_url,
-    //     recording.thumbnail_url,
-    //   ].filter(Boolean) as string[];
-    //
-    //   for (const url of filesToDelete) {
-    //     const path = url.replace('/api/recordings/files/', '');
-    //     await c.env.RECORDINGS_BUCKET.delete(path);
-    //   }
-    // }
+    // Delete files from R2 in the background so the response isn't blocked;
+    // log orphans instead of failing the request.
+    if (c.env.RECORDINGS_BUCKET) {
+      const filesToDelete = [
+        recording.canvas_events_url,
+        recording.audio_url,
+        recording.webcam_url,
+        recording.thumbnail_url,
+      ].filter(Boolean) as string[];
+
+      c.executionCtx.waitUntil((async () => {
+        for (const url of filesToDelete) {
+          const path = url.replace('/api/recordings/files/', '');
+          try {
+            await c.env.RECORDINGS_BUCKET!.delete(path);
+          } catch (err) {
+            console.error(`Orphaned R2 object ${path}:`, err);
+          }
+        }
+      })());
+    }
 
     return c.json({ success: true, data: { id: recordingId } });
   } catch (error) {
