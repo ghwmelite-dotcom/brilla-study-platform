@@ -204,7 +204,7 @@ eventsApp.post('/:eventId/claim/:rewardId', async (c) => {
     // Grant reward based on type
     if (reward.type === 'xp') {
       await c.env.DB.prepare(
-        'UPDATE users SET xp = xp + ? WHERE id = ?'
+        'UPDATE users SET xp_points = xp_points + ? WHERE id = ?'
       ).bind(reward.amount, user.userId).run();
     } else if (reward.type === 'cosmetic') {
       await c.env.DB.prepare(`
@@ -306,15 +306,15 @@ eventsApp.post('/tournaments/:tournamentId/join', async (c) => {
     // Deduct entry fee if applicable
     if (tournament.entry_fee > 0) {
       const userData = await c.env.DB.prepare(
-        'SELECT xp FROM users WHERE id = ?'
+        'SELECT xp_points FROM users WHERE id = ?'
       ).bind(user.userId).first();
 
-      if ((userData?.xp as number) < tournament.entry_fee) {
+      if ((userData?.xp_points as number) < tournament.entry_fee) {
         return c.json({ success: false, error: 'Not enough XP for entry fee' }, 400);
       }
 
       await c.env.DB.prepare(
-        'UPDATE users SET xp = xp - ? WHERE id = ?'
+        'UPDATE users SET xp_points = xp_points - ? WHERE id = ?'
       ).bind(tournament.entry_fee, user.userId).run();
     }
 

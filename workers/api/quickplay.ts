@@ -253,7 +253,7 @@ quickPlayApp.post('/submit', async (c) => {
 
     // Award XP to user
     await c.env.DB.prepare(
-      'UPDATE users SET xp = xp + ? WHERE id = ?'
+      'UPDATE users SET xp_points = xp_points + ? WHERE id = ?'
     ).bind(totalXp, user.userId).run();
 
     // Log activity

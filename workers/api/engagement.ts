@@ -70,14 +70,14 @@ engagementApp.get('/status', async (c) => {
 
     // Get user's streak info
     const userData = await c.env.DB.prepare(
-      'SELECT streak, streak_last_activity FROM users WHERE id = ?'
+      'SELECT streak_days, streak_last_activity FROM users WHERE id = ?'
     ).bind(user.userId).first();
 
     // Calculate streak at risk
     let streakAtRisk = false;
     let hoursUntilStreakLoss = null;
 
-    if (userData?.streak && userData.streak > 0 && userData.streak_last_activity) {
+    if (userData?.streak_days && userData.streak_days > 0 && userData.streak_last_activity) {
       const lastActivity = new Date(userData.streak_last_activity as string);
       const now = new Date();
       const hoursSinceActivity = (now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60);
@@ -136,7 +136,7 @@ engagementApp.get('/status', async (c) => {
     return c.json({
       success: true,
       data: {
-        streak: userData?.streak || 0,
+        streak: userData?.streak_days || 0,
         streakAtRisk,
         hoursUntilStreakLoss: hoursUntilStreakLoss ? Math.round(hoursUntilStreakLoss * 10) / 10 : null,
         daysInactive: metrics?.days_since_last_activity || 0,
@@ -342,7 +342,7 @@ engagementApp.post('/comeback/claim', async (c) => {
 
     // Award XP
     await c.env.DB.prepare(
-      'UPDATE users SET xp = xp + ? WHERE id = ?'
+      'UPDATE users SET xp_points = xp_points + ? WHERE id = ?'
     ).bind(challenge.xp_reward, user.userId).run();
 
     // Mark challenge complete
