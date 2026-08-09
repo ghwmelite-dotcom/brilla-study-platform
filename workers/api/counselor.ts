@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { getDemoDataFlags, isDemoUserId } from './demoUtils';
 import { requireAuth } from './auth-middleware';
+import { checkRateLimit } from './rate-limit';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -465,6 +466,17 @@ counselorApp.post('/chat', async (c) => {
 
     if (!message?.trim()) {
       return c.json({ success: false, error: 'Message is required' }, 400);
+    }
+
+    // COST CONTROL: per-user daily AI quota (shared 'ai' bucket with /ai/explain and /ai/chat)
+    const quota = await checkRateLimit(c.env.DB, userId, 'ai');
+    if (!quota.allowed) {
+      return c.json({
+        success: false,
+        error: 'Daily AI limit reached. Try again tomorrow.',
+        code: 'AI_LIMIT_REACHED',
+        retryAfter: quota.retryAfter,
+      }, 429);
     }
 
     // Get or create conversation

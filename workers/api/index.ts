@@ -26,6 +26,7 @@ import { rewardsApp } from './rewards';
 import { engagementApp } from './engagement';
 import { friendsApp } from './friends';
 import { oauthApp, ALLOWED_SELF_SERVE_ROLES } from './oauth';
+import { checkRateLimit, cleanupRateLimits, RATE_LIMITS, type RateLimitResult } from './rate-limit';
 import { examBoardsApp } from './exam-boards';
 import { revisionClassroomApp } from './revision-classroom';
 import { studyRoomsApp } from './study-rooms';
@@ -262,163 +263,9 @@ async function generateJWT(payload: UserPayload, secret: string): Promise<string
 // =============================================
 // RATE LIMITING
 // =============================================
-
-interface RateLimitConfig {
-  maxRequests: number;      // Max requests allowed
-  windowMs: number;         // Time window in milliseconds
-  blockDurationMs?: number; // How long to block after limit exceeded (optional)
-}
-
-interface RateLimitResult {
-  allowed: boolean;
-  remaining: number;
-  resetAt: Date;
-  retryAfter?: number;      // Seconds until retry allowed
-}
-
-// Rate limit configurations for different endpoints
-const RATE_LIMITS: Record<string, RateLimitConfig> = {
-  'login': {
-    maxRequests: 5,
-    windowMs: 15 * 60 * 1000,      // 5 attempts per 15 minutes
-    blockDurationMs: 30 * 60 * 1000 // 30 min block after exceeded
-  },
-  'login-ip': {
-    maxRequests: 20,
-    windowMs: 15 * 60 * 1000,      // 20 attempts per IP per 15 minutes
-  },
-  'register': {
-    maxRequests: 3,
-    windowMs: 60 * 60 * 1000,      // 3 registrations per hour per IP
-  },
-  'forgot-password': {
-    maxRequests: 3,
-    windowMs: 60 * 60 * 1000,      // 3 requests per hour per email
-  },
-  'forgot-password-ip': {
-    maxRequests: 10,
-    windowMs: 60 * 60 * 1000,      // 10 requests per hour per IP
-  },
-  'reset-password': {
-    maxRequests: 5,
-    windowMs: 60 * 60 * 1000,      // 5 attempts per hour
-  },
-  'set-password': {
-    maxRequests: 5,
-    windowMs: 60 * 60 * 1000,      // 5 attempts per hour
-  },
-  'change-password': {
-    maxRequests: 5,
-    windowMs: 60 * 60 * 1000,      // 5 attempts per hour
-  },
-  'demo-reset': {
-    maxRequests: 3,
-    windowMs: 60 * 60 * 1000,      // 3 attempts per hour per IP
-  },
-  'setup': {
-    maxRequests: 5,
-    windowMs: 60 * 60 * 1000,      // 5 attempts per hour per IP
-  },
-};
-
-async function checkRateLimit(
-  db: D1Database,
-  identifier: string,
-  endpoint: string,
-  config?: RateLimitConfig
-): Promise<RateLimitResult> {
-  const limits = config || RATE_LIMITS[endpoint] || { maxRequests: 10, windowMs: 60000 };
-  const now = new Date();
-  const windowStart = new Date(now.getTime() - limits.windowMs);
-  const windowStartISO = windowStart.toISOString();
-
-  try {
-    // Get current request count in window
-    const result = await db.prepare(`
-      SELECT SUM(request_count) as total_requests, MAX(updated_at) as last_request
-      FROM rate_limits
-      WHERE identifier = ? AND endpoint = ? AND window_start >= ?
-    `).bind(identifier, endpoint, windowStartISO).first();
-
-    const totalRequests = (result?.total_requests as number) || 0;
-    const remaining = Math.max(0, limits.maxRequests - totalRequests - 1);
-
-    // Check if blocked due to excessive attempts
-    if (limits.blockDurationMs && totalRequests >= limits.maxRequests) {
-      const lastRequest = result?.last_request ? new Date(result.last_request as string) : now;
-      const blockEnd = new Date(lastRequest.getTime() + limits.blockDurationMs);
-
-      if (now < blockEnd) {
-        const retryAfter = Math.ceil((blockEnd.getTime() - now.getTime()) / 1000);
-        return {
-          allowed: false,
-          remaining: 0,
-          resetAt: blockEnd,
-          retryAfter
-        };
-      }
-    }
-
-    // Check if limit exceeded
-    if (totalRequests >= limits.maxRequests) {
-      const resetAt = new Date(now.getTime() + limits.windowMs);
-      return {
-        allowed: false,
-        remaining: 0,
-        resetAt,
-        retryAfter: Math.ceil(limits.windowMs / 1000)
-      };
-    }
-
-    // Record this request
-    const currentWindowStart = new Date(Math.floor(now.getTime() / limits.windowMs) * limits.windowMs).toISOString();
-
-    // Try to update existing record or insert new one
-    const existing = await db.prepare(`
-      SELECT id, request_count FROM rate_limits
-      WHERE identifier = ? AND endpoint = ? AND window_start = ?
-    `).bind(identifier, endpoint, currentWindowStart).first();
-
-    if (existing) {
-      await db.prepare(`
-        UPDATE rate_limits
-        SET request_count = request_count + 1, updated_at = datetime('now')
-        WHERE id = ?
-      `).bind(existing.id).run();
-    } else {
-      await db.prepare(`
-        INSERT INTO rate_limits (identifier, endpoint, request_count, window_start)
-        VALUES (?, ?, 1, ?)
-      `).bind(identifier, endpoint, currentWindowStart).run();
-    }
-
-    return {
-      allowed: true,
-      remaining,
-      resetAt: new Date(now.getTime() + limits.windowMs)
-    };
-  } catch (error) {
-    console.error('Rate limit check error:', error);
-    // On error, allow the request but log it
-    return {
-      allowed: true,
-      remaining: limits.maxRequests,
-      resetAt: new Date(now.getTime() + limits.windowMs)
-    };
-  }
-}
-
-// Clean up old rate limit records (called periodically)
-async function cleanupRateLimits(db: D1Database): Promise<void> {
-  try {
-    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(); // 24 hours ago
-    await db.prepare(`
-      DELETE FROM rate_limits WHERE window_start < ?
-    `).bind(cutoff).run();
-  } catch (error) {
-    console.error('Rate limit cleanup error:', error);
-  }
-}
+// RateLimitConfig, RateLimitResult, RATE_LIMITS, checkRateLimit and
+// cleanupRateLimits now live in ./rate-limit (extracted in Phase 2 Task 5 so
+// counselor.ts can share them without a circular import).
 
 // Helper to get rate limit error response
 function rateLimitResponse(c: any, result: RateLimitResult) {
@@ -4661,7 +4508,24 @@ Please grade this essay.`;
 
 // AI explain question/answer
 protectedApp.post('/ai/explain', async (c) => {
-  const { question, userAnswer, correctAnswer, isCorrect, userId, context } = await c.req.json();
+  const { question, userAnswer, correctAnswer, isCorrect, context } = await c.req.json();
+  // Identity comes only from verified JWT context (body userId was spoofable).
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  // COST CONTROL: per-user daily AI quota
+  const quota = await checkRateLimit(c.env.DB, userId, 'ai');
+  if (!quota.allowed) {
+    return c.json({
+      success: false,
+      error: 'Daily AI limit reached. Try again tomorrow.',
+      code: 'AI_LIMIT_REACHED',
+      retryAfter: quota.retryAfter,
+    }, 429);
+  }
+
   const apiKey = c.env.ANTHROPIC_API_KEY;
   const model = c.env.AI_MODEL || 'claude-3-haiku-20240307';
 
@@ -4711,7 +4575,24 @@ Please explain:
 
 // AI chat
 protectedApp.post('/ai/chat', async (c) => {
-  const { message, context, conversationHistory, userId, userName, userPersonalization } = await c.req.json();
+  const { message, context, conversationHistory, userName, userPersonalization } = await c.req.json();
+  // Identity comes only from verified JWT context (body userId was spoofable).
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  // COST CONTROL: per-user daily AI quota
+  const quota = await checkRateLimit(c.env.DB, userId, 'ai');
+  if (!quota.allowed) {
+    return c.json({
+      success: false,
+      error: 'Daily AI limit reached. Try again tomorrow.',
+      code: 'AI_LIMIT_REACHED',
+      retryAfter: quota.retryAfter,
+    }, 429);
+  }
+
   const apiKey = c.env.ANTHROPIC_API_KEY;
   const model = c.env.AI_MODEL || 'claude-3-haiku-20240307';
 
