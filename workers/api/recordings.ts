@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 import type { AuthPayload } from './auth-middleware';
 
 // Types for Cloudflare bindings
@@ -196,7 +197,7 @@ recordingsApp.get('/', async (c) => {
   try {
     const status = c.req.query('status') || 'active';
     const search = c.req.query('search') || '';
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
     const offset = parseInt(c.req.query('offset') || '0');
 
     let query = `

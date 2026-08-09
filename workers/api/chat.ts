@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { getDemoDataFlags, isDemoUserId } from './demoUtils';
 import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -709,7 +710,7 @@ chatApp.get('/rooms/:id/messages', async (c) => {
       return c.json({ success: false, error: 'Not a member of this room' }, 403);
     }
 
-    const limit = parseInt(c.req.query('limit') || '50');
+    const limit = parseLimit(c, 50);
     const before = c.req.query('before'); // For pagination
 
     let query = `

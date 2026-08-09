@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { jwt, sign } from 'hono/jwt';
 import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware';
+import { parseLimit } from './http';
 import type { JWTPayload } from 'hono/utils/jwt/types';
 import { libraryApp } from './library';
 import { counselorApp } from './counselor';
@@ -1848,7 +1849,7 @@ publicApp.get('/questions', async (c) => {
   const topic = c.req.query('topic');
   const difficulty = c.req.query('difficulty');
   const round = c.req.query('round');
-  const limit = parseInt(c.req.query('limit') || '20');
+  const limit = parseLimit(c, 20);
   const offset = parseInt(c.req.query('offset') || '0');
 
   try {
@@ -2591,7 +2592,7 @@ publicApp.get('/papers', async (c) => {
   const subject = c.req.query('subject');
   const year = c.req.query('year');
   const paperType = c.req.query('paper_type');
-  const limit = parseInt(c.req.query('limit') || '50');
+  const limit = parseLimit(c, 50);
   const offset = parseInt(c.req.query('offset') || '0');
 
   try {
@@ -2817,7 +2818,7 @@ publicApp.get('/houses/standings', async (c) => {
 
 // Get recent house activity
 publicApp.get('/houses/activity', async (c) => {
-  const limit = parseInt(c.req.query('limit') || '20');
+  const limit = parseLimit(c, 20);
 
   try {
     const { results } = await c.env.DB.prepare(`
@@ -2860,7 +2861,7 @@ publicApp.get('/houses/:id', async (c) => {
 // Get house members
 publicApp.get('/houses/:id/members', async (c) => {
   const id = c.req.param('id');
-  const limit = parseInt(c.req.query('limit') || '20');
+  const limit = parseLimit(c, 20);
 
   try {
     const { results } = await c.env.DB.prepare(`
@@ -2976,7 +2977,7 @@ publicApp.get('/flashcards/decks/:id/cards', async (c) => {
 // Get all public flashcard decks (for browsing)
 publicApp.get('/flashcards/public', async (c) => {
   const subjectId = c.req.query('subject');
-  const limit = parseInt(c.req.query('limit') || '20');
+  const limit = parseLimit(c, 20);
 
   try {
     let query = `
@@ -3011,7 +3012,7 @@ publicApp.get('/flashcards/public', async (c) => {
 // `/battles/history` (Hono: first-registered matching route wins).
 app.get('/api/battles/history', requireAuth, async (c) => {
   const userId = getUserId(c)!;
-  const limit = parseInt(c.req.query('limit') || '20');
+  const limit = parseLimit(c, 20);
 
   try {
     const { results } = await c.env.DB.prepare(`
@@ -3066,7 +3067,7 @@ app.get('/api/battles/history', requireAuth, async (c) => {
 // `/papers/attempts` (Hono: first-registered matching route wins).
 app.get('/api/papers/attempts', requireAuth, async (c) => {
   const userId = getUserId(c)!;
-  const limit = parseInt(c.req.query('limit') || '20');
+  const limit = parseLimit(c, 20);
   const status = c.req.query('status'); // Optional filter: completed, abandoned, in_progress
 
   try {
@@ -3132,7 +3133,7 @@ app.get('/api/papers/attempts', requireAuth, async (c) => {
 app.get('/api/essays/history', requireAuth, async (c) => {
   // Self only: identity comes only from the verified JWT.
   const userId = getUserId(c)!;
-  const limit = parseInt(c.req.query('limit') || '20');
+  const limit = parseLimit(c, 20);
 
   try {
     const { results } = await c.env.DB.prepare(`
@@ -3168,7 +3169,7 @@ app.get('/api/questions/bank', requireAuth, async (c) => {
     const topicId = c.req.query('topic');
     const difficulty = c.req.query('difficulty');
     const questionType = c.req.query('type');
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
     const offset = parseInt(c.req.query('offset') || '0');
 
     let query = `
@@ -3390,7 +3391,7 @@ protectedApp.get('/practice/sessions', async (c) => {
     return c.json({ success: false, error: 'Unauthorized' }, 401);
   }
 
-  const limit = parseInt(c.req.query('limit') || '10');
+  const limit = parseLimit(c, 10);
   const offset = parseInt(c.req.query('offset') || '0');
 
   try {
@@ -3592,7 +3593,7 @@ protectedApp.get('/flashcards/due', async (c) => {
     return c.json({ success: false, error: 'Unauthorized' }, 401);
   }
 
-  const limit = parseInt(c.req.query('limit') || '20');
+  const limit = parseLimit(c, 20);
 
   try {
     // Get cards that are due for review or haven't been reviewed yet
@@ -5591,7 +5592,7 @@ protectedApp.get('/parents/students/:studentId/progress', userAuth, async (c) =>
 protectedApp.get('/parents/students/:studentId/activity', userAuth, async (c) => {
   const user = c.get('user') as UserPayload;
   const studentId = c.req.param('studentId');
-  const limit = parseInt(c.req.query('limit') || '30');
+  const limit = parseLimit(c, 30);
 
   if (user.role !== 'parent') {
     return c.json({ success: false, error: 'Only parents can view student activity' }, 403);
@@ -5679,7 +5680,7 @@ protectedApp.get('/parents/students/:studentId/activity', userAuth, async (c) =>
 protectedApp.get('/parents/notifications', userAuth, async (c) => {
   const user = c.get('user') as UserPayload;
   const unreadOnly = c.req.query('unreadOnly') === 'true';
-  const limit = parseInt(c.req.query('limit') || '50');
+  const limit = parseLimit(c, 50);
 
   if (user.role !== 'parent') {
     return c.json({ success: false, error: 'Only parents can view notifications' }, 403);
@@ -10010,7 +10011,7 @@ protectedApp.get('/students/search', async (c) => {
     const search = c.req.query('search');
     const schoolLevel = c.req.query('schoolLevel');
     const yearGroup = c.req.query('yearGroup');
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
 
     let query = `
       SELECT id, name, email, avatar_url, school_level, year_group

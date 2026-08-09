@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -69,7 +70,7 @@ moderationApp.get('/reports', async (c) => {
     }
 
     const status = c.req.query('status');
-    const limit = parseInt(c.req.query('limit') || '50');
+    const limit = parseLimit(c, 50);
     const offset = parseInt(c.req.query('offset') || '0');
 
     let query = `
@@ -343,7 +344,7 @@ moderationApp.get('/actions', async (c) => {
     const userId = c.req.query('user_id');
     const roomId = c.req.query('room_id');
     const actionType = c.req.query('action_type');
-    const limit = parseInt(c.req.query('limit') || '50');
+    const limit = parseLimit(c, 50);
     const offset = parseInt(c.req.query('offset') || '0');
 
     let query = `
@@ -1035,7 +1036,7 @@ moderationApp.get('/audit-log', async (c) => {
 
     const moderatorId = c.req.query('moderator_id');
     const targetType = c.req.query('target_type');
-    const limit = parseInt(c.req.query('limit') || '100');
+    const limit = parseLimit(c, 100);
     const offset = parseInt(c.req.query('offset') || '0');
 
     let query = `

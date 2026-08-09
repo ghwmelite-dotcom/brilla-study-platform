@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -821,7 +822,7 @@ paymentsApp.post('/webhook', async (c) => {
 paymentsApp.get('/history', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
     const offset = parseInt(c.req.query('offset') || '0');
 
     const { results } = await c.env.DB.prepare(`

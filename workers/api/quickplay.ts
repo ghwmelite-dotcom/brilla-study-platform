@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 interface Env {
   DB: D1Database;
@@ -302,7 +303,7 @@ quickPlayApp.post('/submit', async (c) => {
 quickPlayApp.get('/history', async (c) => {
   try {
     const user = c.get('user');
-    const limit = parseInt(c.req.query('limit') || '10');
+    const limit = parseLimit(c, 10);
 
     const sessions = await c.env.DB.prepare(`
       SELECT qp.*, s.name as subject_name

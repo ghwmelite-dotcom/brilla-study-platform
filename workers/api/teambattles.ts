@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 interface Env {
   DB: D1Database;
@@ -455,7 +456,7 @@ teamBattlesApp.post('/:battleId/answer', async (c) => {
 teamBattlesApp.get('/history/me', async (c) => {
   try {
     const user = c.get('user');
-    const limit = parseInt(c.req.query('limit') || '10');
+    const limit = parseLimit(c, 10);
 
     const battles = await c.env.DB.prepare(`
       SELECT

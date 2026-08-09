@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import type { BaseAiTextGenerationModels } from '@cloudflare/workers-types';
 import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 interface Env {
   DB: D1Database;
@@ -332,7 +333,7 @@ revisionClassroomApp.get('/sessions', async (c) => {
     const user = c.get('user');
     const status = c.req.query('status'); // 'active', 'paused', 'completed', 'abandoned'
     const examType = c.req.query('examType');
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
 
     let query = `
       SELECT
@@ -1400,7 +1401,7 @@ revisionClassroomApp.get('/mastery/due', async (c) => {
   try {
     const user = c.get('user');
     const examType = c.req.query('examType');
-    const limit = parseInt(c.req.query('limit') || '10');
+    const limit = parseLimit(c, 10);
 
     let query = `
       SELECT

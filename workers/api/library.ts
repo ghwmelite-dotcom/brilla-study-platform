@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 import type { AuthPayload } from './auth-middleware';
 
 // Types for Cloudflare bindings
@@ -78,7 +79,7 @@ libraryApp.get('/resources', async (c) => {
     const accessLevel = c.req.query('accessLevel') || 'all';
     const sortBy = c.req.query('sortBy') || 'newest';
     const page = parseInt(c.req.query('page') || '1');
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
     const offset = (page - 1) * limit;
 
     let query = `
@@ -210,7 +211,7 @@ libraryApp.get('/resources', async (c) => {
 // Get featured resources
 libraryApp.get('/featured', async (c) => {
   try {
-    const limit = parseInt(c.req.query('limit') || '6');
+    const limit = parseLimit(c, 6);
 
     const resources = await c.env.DB.prepare(`
       SELECT
@@ -369,7 +370,7 @@ libraryApp.get('/resources/:id', async (c) => {
 libraryApp.get('/subjects/:subjectId/resources', async (c) => {
   try {
     const subjectId = c.req.param('subjectId');
-    const limit = parseInt(c.req.query('limit') || '10');
+    const limit = parseLimit(c, 10);
 
     const resources = await c.env.DB.prepare(`
       SELECT
@@ -744,7 +745,7 @@ libraryApp.get('/history', async (c) => {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
 
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
 
     const history = await c.env.DB.prepare(`
       SELECT

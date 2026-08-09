@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 interface Env {
   DB: D1Database;
@@ -344,7 +345,7 @@ eventsApp.post('/tournaments/:tournamentId/join', async (c) => {
 eventsApp.get('/tournaments/:tournamentId/leaderboard', async (c) => {
   try {
     const tournamentId = c.req.param('tournamentId');
-    const limit = parseInt(c.req.query('limit') || '50');
+    const limit = parseLimit(c, 50);
 
     const participants = await c.env.DB.prepare(`
       SELECT

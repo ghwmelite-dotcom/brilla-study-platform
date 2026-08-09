@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -25,7 +26,7 @@ notificationsApp.get('/', async (c) => {
   try {
     const userId = c.get('userId')!;
 
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
     const offset = parseInt(c.req.query('offset') || '0');
     const unreadOnly = c.req.query('unread') === 'true';
 

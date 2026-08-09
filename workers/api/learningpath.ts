@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 interface Env {
   DB: D1Database;
@@ -27,7 +28,7 @@ const generateId = () => `lp_${Date.now()}_${Math.random().toString(36).substrin
 learningPathApp.get('/recommendations', async (c) => {
   try {
     const user = c.get('user');
-    const limit = parseInt(c.req.query('limit') || '10');
+    const limit = parseLimit(c, 10);
 
     // Get user's topic mastery from progress
     const topicMastery = await c.env.DB.prepare(`

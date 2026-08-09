@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -386,7 +387,7 @@ affiliatesApp.get('/referrals', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const status = c.req.query('status');
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
     const offset = parseInt(c.req.query('offset') || '0');
 
     const profile = await c.env.DB.prepare(`
@@ -466,7 +467,7 @@ affiliatesApp.get('/commissions', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const status = c.req.query('status');
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
     const offset = parseInt(c.req.query('offset') || '0');
 
     const profile = await c.env.DB.prepare(`
@@ -531,7 +532,7 @@ affiliatesApp.get('/commissions', requireAuth, async (c) => {
 affiliatesApp.get('/leaderboard', async (c) => {
   try {
     const period = c.req.query('period') || 'monthly';
-    const limit = parseInt(c.req.query('limit') || '50');
+    const limit = parseLimit(c, 50);
 
     // Calculate period value
     let periodValue = '';
@@ -593,7 +594,7 @@ affiliatesApp.get('/leaderboard', async (c) => {
 affiliatesApp.get('/leaderboard/schools', async (c) => {
   try {
     const period = c.req.query('period') || 'monthly';
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
 
     const { results } = await c.env.DB.prepare(`
       SELECT
