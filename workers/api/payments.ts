@@ -56,7 +56,7 @@ async function initializeTransaction(
 async function verifyTransaction(
   secretKey: string,
   reference: string
-): Promise<{ status: boolean; data?: { status: string; amount: number; customer: { email: string }; metadata?: Record<string, unknown> }; message?: string }> {
+): Promise<{ status: boolean; data?: { status: string; amount: number; currency: string; customer: { email: string }; metadata?: Record<string, unknown> }; message?: string }> {
   try {
     const response = await fetch(`${PAYSTACK_API}/transaction/verify/${reference}`, {
       method: 'GET',
@@ -383,6 +383,21 @@ paymentsApp.get('/verify/:reference', requireAuth, async (c) => {
       return c.json({ success: false, error: 'Transaction not found' }, 404);
     }
 
+    // SECURITY: ownership check — 404 (not 403) to avoid leaking which references exist
+    if (transaction.user_id !== userId) {
+      return c.json({ success: false, error: 'Transaction not found' }, 404);
+    }
+
+    // IDEMPOTENCY: already verified — never credit twice. Returns before ANY
+    // crediting side-effect (grading credits, subscription, trial conversion,
+    // affiliate commission).
+    if (transaction.status === 'success') {
+      return c.json({
+        success: true,
+        data: { reference, status: 'success', alreadyVerified: true },
+      });
+    }
+
     // Verify with Paystack
     const result = await verifyTransaction(c.env.PAYSTACK_SECRET_KEY, reference);
 
@@ -393,6 +408,26 @@ paymentsApp.get('/verify/:reference', requireAuth, async (c) => {
     const paymentStatus = result.data.status;
 
     if (paymentStatus === 'success') {
+      // SECURITY: validate Paystack's amount/currency against what we recorded at initialize.
+      // Paystack amount is in pesewas; payment_transactions.amount is in GHS.
+      const paidAmountGhs = (result.data.amount as number) / 100;
+      const expectedAmountGhs = transaction.amount as number;
+      const currencyMatches = result.data.currency === (transaction.currency as string || 'GHS');
+      const amountMatches = Math.abs(paidAmountGhs - expectedAmountGhs) < 0.01;
+
+      if (!currencyMatches || !amountMatches) {
+        console.error('Payment amount/currency mismatch', {
+          reference, expectedAmountGhs, paidAmountGhs,
+          expectedCurrency: transaction.currency, paidCurrency: result.data.currency,
+        });
+        await c.env.DB.prepare(`
+          UPDATE payment_transactions
+          SET status = 'failed', paystack_response = ?
+          WHERE reference = ?
+        `).bind(JSON.stringify(result.data), reference).run();
+        return c.json({ success: false, error: 'Payment amount mismatch' }, 400);
+      }
+
       // Update transaction record
       await c.env.DB.prepare(`
         UPDATE payment_transactions
