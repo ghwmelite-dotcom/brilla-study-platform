@@ -960,29 +960,25 @@ affiliatesApp.post('/process-referral', requireAuth, async (c) => {
       return c.json({ success: false, error: 'User already referred' }, 400);
     }
 
-    // Create referral record
+    // Create referral record + update affiliate/user stats atomically
     const referralId = crypto.randomUUID();
-    await c.env.DB.prepare(`
-      INSERT INTO affiliate_referrals (id, affiliate_id, referred_user_id, status)
-      VALUES (?, ?, ?, 'pending')
-    `).bind(referralId, affiliate.id, newUserId).run();
-
-    // Update affiliate stats
-    await c.env.DB.prepare(`
-      UPDATE affiliate_profiles
-      SET total_referrals = total_referrals + 1, last_referral_at = datetime('now')
-      WHERE id = ?
-    `).bind(affiliate.id).run();
-
-    // Update referred user
-    await c.env.DB.prepare(`
-      UPDATE users SET referred_by = ? WHERE id = ?
-    `).bind(referralCode.toUpperCase(), newUserId).run();
-
-    // Award XP for referral
-    await c.env.DB.prepare(`
-      UPDATE users SET affiliate_xp = affiliate_xp + 50 WHERE id = ?
-    `).bind(affiliate.user_id).run();
+    await c.env.DB.batch([
+      c.env.DB.prepare(`
+        INSERT INTO affiliate_referrals (id, affiliate_id, referred_user_id, status)
+        VALUES (?, ?, ?, 'pending')
+      `).bind(referralId, affiliate.id, newUserId),
+      c.env.DB.prepare(`
+        UPDATE affiliate_profiles
+        SET total_referrals = total_referrals + 1, last_referral_at = datetime('now')
+        WHERE id = ?
+      `).bind(affiliate.id),
+      c.env.DB.prepare(`
+        UPDATE users SET referred_by = ? WHERE id = ?
+      `).bind(referralCode.toUpperCase(), newUserId),
+      c.env.DB.prepare(`
+        UPDATE users SET affiliate_xp = affiliate_xp + 50 WHERE id = ?
+      `).bind(affiliate.user_id),
+    ]);
 
     // Update challenge progress
     await updateChallengeProgress(c.env.DB, affiliate.user_id as string, 'referrals', 1);
