@@ -16,6 +16,7 @@ import { PremiumSubjectBadge } from '@/components/subscription';
 import { DailyUsageIndicator } from '@/components/subscription';
 import { cn } from '@/utils';
 import { api } from '@/lib/api';
+import { progressService } from '@/lib/services';
 import { useExamStore, useUsageStore } from '@/stores';
 import { isCoreSubject } from '@/config';
 
@@ -90,6 +91,12 @@ interface ApiTopic {
   questionCount: number;
 }
 
+// Row from user_progress as returned by GET /progress
+interface TopicProgressRow {
+  topic_id: string;
+  mastery_level: number;
+}
+
 export function TopicsPage() {
   const { subjectSlug } = useParams();
   const navigate = useNavigate();
@@ -98,6 +105,7 @@ export function TopicsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
   const [apiTopics, setApiTopics] = useState<ApiTopic[]>([]);
+  const [topicMastery, setTopicMastery] = useState<Map<string, number>>(new Map());
   const [loading, setLoading] = useState(false);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [masteryFilter, setMasteryFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
@@ -140,10 +148,19 @@ export function TopicsPage() {
       try {
         const subjectId = currentSubject?.id;
         const url = subjectId ? `/topics?subject=${subjectId}` : '/topics';
-        const res = await api.get<ApiTopic[]>(url);
+        const [res, progress] = await Promise.all([
+          api.get<ApiTopic[]>(url),
+          progressService.getProgress().catch(() => null),
+        ]);
         const data = res.success ? res.data : null;
         if (Array.isArray(data)) {
           setApiTopics(data);
+        }
+        const topicProgress = (progress as { topicProgress?: TopicProgressRow[] } | null)?.topicProgress;
+        if (Array.isArray(topicProgress)) {
+          setTopicMastery(
+            new Map(topicProgress.map(row => [row.topic_id, row.mastery_level ?? 0]))
+          );
         }
       } catch (err) {
         console.error('Failed to fetch topics:', err);
@@ -196,13 +213,13 @@ export function TopicsPage() {
         name: apiTopic.name,
         description: apiTopic.description || '',
         questionCount: apiTopic.questionCount || 0,
-        mastery: 0, // TODO: fetch from user progress
+        mastery: topicMastery.get(apiTopic.id) ?? 0,
         subtopics: children.map(child => ({
           id: child.id,  // Use actual topic ID for API queries
           slug: child.slug,
           name: child.name,
           questionCount: child.questionCount || 0,
-          mastery: 0,
+          mastery: topicMastery.get(child.id) ?? 0,
         })),
       };
     });
@@ -484,7 +501,10 @@ export function TopicsPage() {
           const subjectApiTopics = apiTopics.filter(t => t.subject_id === subject.id);
           const topicCount = subjectApiTopics.filter(t => t.parent_id === null).length || subject.topicCount || 0;
           const totalQuestions = subjectApiTopics.reduce((sum, t) => sum + (t.questionCount || 0), 0) || subject.questionCount || 0;
-          const avgMastery = 0; // TODO: fetch from user progress
+          const topicMasteries = subjectApiTopics.map(t => topicMastery.get(t.id) ?? 0);
+          const avgMastery = topicMasteries.length > 0
+            ? Math.round(topicMasteries.reduce((sum, m) => sum + m, 0) / topicMasteries.length)
+            : 0;
 
           return (
             <div
