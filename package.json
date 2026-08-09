@@ -13,6 +13,7 @@
     "lint:api": "eslint workers",
     "preview": "vite preview",
     "test": "vitest run",
+    "db:verify": "node scripts/verify-db.cjs",
     "test:watch": "vitest",
     "api:secret": "wrangler secret put ANTHROPIC_API_KEY"
   },
