@@ -36,8 +36,8 @@ describe('XP awards use the real users.xp_points column', () => {
         }),
       },
       {
-        match: /SELECT correct_answer, explanation FROM questions/,
-        first: () => ({ correct_answer: 'A', explanation: 'because' }),
+        match: /SELECT id, correct_answer, explanation FROM questions/,
+        all: () => ({ results: [{ id: 'q1', correct_answer: 'A', explanation: 'because' }] }),
       },
       {
         match: /SELECT id, multiplier FROM daily_multipliers/,
