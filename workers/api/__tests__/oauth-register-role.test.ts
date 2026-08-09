@@ -39,6 +39,13 @@ interface Captured {
   usersInsertArgs: unknown[] | null;
 }
 
+// Statement shape returned by the mocked prepare().bind() below. The register
+// flow batches its writes via DB.batch(), so the mock's batch() replays each
+// statement's run() to keep the existing bind-capture assertions working.
+interface MockStatement {
+  run: () => Promise<unknown>;
+}
+
 function makeDb(stateRow: unknown, captured: Captured) {
   return {
     prepare: vi.fn((sql: string) => ({
@@ -55,6 +62,9 @@ function makeDb(stateRow: unknown, captured: Captured) {
         all: vi.fn().mockResolvedValue({ results: [] }),
       })),
     })),
+    batch: vi.fn((statements: MockStatement[]) =>
+      Promise.all(statements.map((stmt) => stmt.run())),
+    ),
   } as unknown as D1Database;
 }
 

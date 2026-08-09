@@ -425,57 +425,67 @@ oauthApp.post('/google/callback', async (c) => {
     // This satisfies the NOT NULL constraint while keeping the account OAuth-only
     const randomPasswordHash = await generateRandomPasswordHash();
 
-    await c.env.DB.prepare(`
-      INSERT INTO users (
-        id, email, name, role, status, password_hash,
-        school_level, year_group, school_name, house,
-        teacher_license_number, subjects_taught, years_experience, qualifications,
-        subscription_tier_id, primary_exam_type_id,
-        email_verified, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
-    `).bind(
-      userId,
-      googleUser.email,
-      googleUser.name,
-      userRole,
-      status,
-      randomPasswordHash,
-      schoolLevel,
-      yearGroup,
-      schoolName,
-      house,
-      teacherLicenseNumber,
-      subjectsTaught,
-      yearsExperience,
-      qualifications,
-      selectedTierId,
-      primaryExamTypeId
-    ).run();
+    // Batch the user + provider + preference writes so a mid-sequence
+    // failure cannot leave a partial account behind.
+    const statements = [
+      c.env.DB.prepare(`
+        INSERT INTO users (
+          id, email, name, role, status, password_hash,
+          school_level, year_group, school_name, house,
+          teacher_license_number, subjects_taught, years_experience, qualifications,
+          subscription_tier_id, primary_exam_type_id,
+          email_verified, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
+      `).bind(
+        userId,
+        googleUser.email,
+        googleUser.name,
+        userRole,
+        status,
+        randomPasswordHash,
+        schoolLevel,
+        yearGroup,
+        schoolName,
+        house,
+        teacherLicenseNumber,
+        subjectsTaught,
+        yearsExperience,
+        qualifications,
+        selectedTierId,
+        primaryExamTypeId
+      ),
+    ];
 
     // Link Google provider
     const oauthId = `oauth_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
-    await c.env.DB.prepare(`
-      INSERT INTO user_oauth_providers (id, user_id, provider, provider_user_id, provider_email, provider_name, provider_avatar_url)
-      VALUES (?, ?, 'google', ?, ?, ?, ?)
-    `).bind(
-      oauthId,
-      userId,
-      googleUser.sub,
-      googleUser.email,
-      googleUser.name,
-      googleUser.picture || null
-    ).run();
+    statements.push(
+      c.env.DB.prepare(`
+        INSERT INTO user_oauth_providers (id, user_id, provider, provider_user_id, provider_email, provider_name, provider_avatar_url)
+        VALUES (?, ?, 'google', ?, ?, ?, ?)
+      `).bind(
+        oauthId,
+        userId,
+        googleUser.sub,
+        googleUser.email,
+        googleUser.name,
+        googleUser.picture || null
+      )
+    );
 
     // Handle exam types if provided
     if (registrationData?.examTypeIds && Array.isArray(registrationData.examTypeIds)) {
       for (const examTypeId of registrationData.examTypeIds) {
         const prefId = `pref_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
-        await c.env.DB.prepare(`
-          INSERT OR IGNORE INTO user_exam_preferences (id, user_id, exam_type_id, is_primary)
-          VALUES (?, ?, ?, ?)
-        `).bind(prefId, userId, examTypeId, examTypeId === primaryExamTypeId ? 1 : 0).run();
+        statements.push(
+          c.env.DB.prepare(`
+            INSERT OR IGNORE INTO user_exam_preferences (id, user_id, exam_type_id, is_primary)
+            VALUES (?, ?, ?, ?)
+          `).bind(prefId, userId, examTypeId, examTypeId === primaryExamTypeId ? 1 : 0)
+        );
       }
     }
+
+    await c.env.DB.batch(statements);
 
     user = {
       id: userId,
