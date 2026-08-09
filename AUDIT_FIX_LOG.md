@@ -33,8 +33,13 @@ P0 closed: Paystack webhook fails closed when secret unset (unsigned events neve
 
 ⏸ Parked: parseOffset/parsePage helpers, created_at tie-mixing in correlated subqueries, D1 two-unit seams, learningpath UPSERT loop, counselor.ts:526 **and** :848 phantom `user_streaks` table (TWO sites, both 500 when hit), demo-flag dedupe, ~43 unguarded JSON parses (set/forgot/reset-password the main public ones), real UI pagination in UserManagement, R2 orphan sweeper.
 
-## Phases 4-6 — Pending
+## Phase 4 — Frontend Hardening (11 tasks + 1 addendum ✅, 2 fix rounds)
 
-- Phase 4: Frontend hardening (XSS, API client consolidation, 401s, ErrorBoundary, demo-auth removal, polling).
+✅ T1 XSS closed (escape-before-regex in AiMessage; MathText fallback escaped). ✅ T2 lib/api hardened (401 handler + redirect, JSON guard, no logging). ✅ T3-T4 three API clients consolidated into lib/api + lib/services (32 consumer migrations; latent bugs fixed: usageStore always-defaults, Analytics, ContentManagement stats, recordings upload token-key). ✅ T5 ErrorBoundary + lazyWithRetry on 72 lazy pages. ✅ T6 client demo auth removed, prod bundle verified credential-free (🔧 fix round: AuthModal gated). ✅ T7 visibility-aware polling on 6 sites (🔧 fix round: jsdom declared). ✅ T8 StrictMode double-fire guards. ✅ T9 real mastery wiring on Topics. ✅ T10 SW banner + console sweep + a11y landmark. ✅ T11 12 orphan files deleted. ✅ T12 (addendum): user_progress write path on question attempts (mastery was unwritable before).
+
+⏸ Parked: raw-fetch stores bypass 401 redirect (chat silently falls back), user_progress NULL-exam_type unique-index race, Header/ObservingSessionPanel polling sites, SubjectCatalog stub progress, pdfjs/DOMMatrix test-env, authService dead routes.
+
+## Phases 5-6 — Pending
+
 - Phase 5: Database reckoning (canonical schema squash, 724 numeric-answer fixes, seed rework, prod runbook with 089_baseline_marker).
 - Phase 6: Headers & hygiene (CSP/HSTS, compat-date bump, CSPRNG invites, validation).
