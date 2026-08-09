@@ -582,21 +582,34 @@ export const useAuthStore = create<AuthState>()(
       // User Management Actions
       loadAllUsers: async () => {
         try {
-          const response = await api.get<{
+          type UsersPage = {
             users: Record<string, unknown>[];
             total: number;
             page: number;
             limit: number;
-          }>('/admin/users?limit=100');
-          if (!response.success || !response.data) {
-            console.error('Failed to load users:', response.error);
-            // Fall back to localStorage for demo mode
-            const allUsers = loadAllUsersFromStorage();
-            set({ allUsers });
-            return;
+          };
+          // TODO: N sequential requests for large user bases — replace with
+          // real UI pagination in UserManagement.tsx.
+          const rawUsers: Record<string, unknown>[] = [];
+          let page = 1;
+          let total = Infinity;
+          while (rawUsers.length < total) {
+            const response = await api.get<UsersPage>(`/admin/users?page=${page}&limit=100`);
+            if (!response.success || !response.data) {
+              console.error('Failed to load users:', response.error);
+              // Fall back to localStorage for demo mode
+              const allUsers = loadAllUsersFromStorage();
+              set({ allUsers });
+              return;
+            }
+            total = response.data.total;
+            rawUsers.push(...response.data.users);
+            // Guard against a short/empty page looping forever
+            if (response.data.users.length === 0) break;
+            page += 1;
           }
 
-          const users: ManagedUser[] = response.data.users.map((u: Record<string, unknown>) => ({
+          const users: ManagedUser[] = rawUsers.map((u: Record<string, unknown>) => ({
             id: u.id as string,
             email: u.email as string,
             name: u.name as string,

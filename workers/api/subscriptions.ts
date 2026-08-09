@@ -453,13 +453,14 @@ subscriptionsApp.post('/trial/check-expiry', async (c) => {
   try {
     // Find and expire trials (ISO lexicographic comparison against a bound
     // JS ISO parameter — never datetime('now') against ISO columns).
-    // LIMIT 500 chunks the job so a huge backlog can't blow the subrequest
-    // budget in a single invocation.
+    // LIMIT 400 keeps the batch under D1's 1000-statement cap: 400 trials ×
+    // 2 statements (expire + downgrade) = 800, leaving headroom. Remaining
+    // backlog drains on subsequent invocations.
     const nowIso = new Date().toISOString();
     const { results: expiredTrials } = await c.env.DB.prepare(`
       SELECT id, user_id FROM user_trials
       WHERE status = 'active' AND expires_at < ?
-      LIMIT 500
+      LIMIT 400
     `).bind(nowIso).all();
 
     if (expiredTrials.length > 0) {
