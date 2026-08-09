@@ -7,6 +7,7 @@ type Query = { sql: string; params: unknown[] };
 // D1 stub routing each query through a handler (same harness as payments.verify.test.ts).
 function createMockDb(handler: (sql: string, params: unknown[]) => unknown) {
   const queries: Query[] = [];
+  const batches: unknown[][] = [];
   const db = {
     prepare(sql: string) {
       return {
@@ -21,8 +22,12 @@ function createMockDb(handler: (sql: string, params: unknown[]) => unknown) {
         },
       };
     },
+    batch: async (statements: unknown[]) => {
+      batches.push(statements);
+      return statements.map(() => ({ meta: { changes: 1 } }));
+    },
   } as unknown as D1Database;
-  return { db, queries };
+  return { db, queries, batches };
 }
 
 const JWT_SECRET = 'test-secret';
@@ -63,7 +68,7 @@ describe('POST /subscriptions/trial/check-expiry', () => {
   });
 
   it('expires a same-day-expired trial and reports expiredCount', async () => {
-    const { db, queries } = createMockDb((sql, params) => {
+    const { db, queries, batches } = createMockDb((sql, params) => {
       if (isAuthLookup(sql)) return ACTIVE_USER;
       if (sql.includes('FROM user_trials') && sql.includes("status = 'active'")) {
         // Real D1 compares expires_at < bound ISO now. Emulate it: only return
@@ -90,6 +95,9 @@ describe('POST /subscriptions/trial/check-expiry', () => {
     expect(queries.some((q) =>
       q.sql.includes('UPDATE users') && q.sql.includes('tier_free') && q.params[0] === 'user_1',
     )).toBe(true);
+    // Writes go out as a single batch: 1 trial → 2 statements
+    expect(batches).toHaveLength(1);
+    expect(batches[0]).toHaveLength(2);
   });
 
   it('requires auth (no verified JWT → 401)', async () => {

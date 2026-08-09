@@ -133,8 +133,10 @@ class ApiClient {
   // ADMIN ENDPOINTS
   // =============================================
 
-  async getUsers() {
-    return this.get<ManagedUser[]>('/admin/users');
+  async getUsers(page = 1, limit = 50) {
+    return this.get<{ users: ManagedUser[]; total: number; page: number; limit: number }>(
+      `/admin/users?page=${page}&limit=${limit}`
+    );
   }
 
   async getUserStats() {

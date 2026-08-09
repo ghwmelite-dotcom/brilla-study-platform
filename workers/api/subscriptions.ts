@@ -452,24 +452,29 @@ subscriptionsApp.post('/trial/bonus-week', async (c) => {
 subscriptionsApp.post('/trial/check-expiry', async (c) => {
   try {
     // Find and expire trials (ISO lexicographic comparison against a bound
-    // JS ISO parameter — never datetime('now') against ISO columns)
+    // JS ISO parameter — never datetime('now') against ISO columns).
+    // LIMIT 500 chunks the job so a huge backlog can't blow the subrequest
+    // budget in a single invocation.
     const nowIso = new Date().toISOString();
     const { results: expiredTrials } = await c.env.DB.prepare(`
       SELECT id, user_id FROM user_trials
       WHERE status = 'active' AND expires_at < ?
+      LIMIT 500
     `).bind(nowIso).all();
 
-    for (const trial of expiredTrials) {
-      await c.env.DB.prepare(`
-        UPDATE user_trials SET status = 'expired' WHERE id = ?
-      `).bind(trial.id).run();
-
-      // Downgrade user to free tier
-      await c.env.DB.prepare(`
-        UPDATE users
-        SET subscription_tier_id = 'tier_free'
-        WHERE id = ? AND subscription_tier_id IS NULL
-      `).bind(trial.user_id).run();
+    if (expiredTrials.length > 0) {
+      const statements = expiredTrials.flatMap((trial) => [
+        c.env.DB.prepare(`
+          UPDATE user_trials SET status = 'expired' WHERE id = ?
+        `).bind(trial.id),
+        // Downgrade user to free tier
+        c.env.DB.prepare(`
+          UPDATE users
+          SET subscription_tier_id = 'tier_free'
+          WHERE id = ? AND subscription_tier_id IS NULL
+        `).bind(trial.user_id),
+      ]);
+      await c.env.DB.batch(statements);
     }
 
     return c.json({

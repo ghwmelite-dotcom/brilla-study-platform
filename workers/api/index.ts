@@ -6350,17 +6350,25 @@ adminApp.post('/affiliates/payouts/:id/approve', async (c) => {
   }
 });
 
-// Get all users with stats
+// Get all users with stats (paginated)
 adminApp.get('/users', async (c) => {
   try {
-    const { results } = await c.env.DB.prepare(`
-      SELECT id, email, name, role, status, email_verified, is_active,
-             school_level, year_group, school_name, house,
-             teacher_license_number, subjects_taught, years_experience, qualifications,
-             xp_points, level, streak_days, last_login_at, created_at, updated_at
-      FROM users
-      ORDER BY created_at DESC
-    `).all();
+    const limit = parseLimit(c, 50);
+    const page = Math.max(1, parseInt(c.req.query('page') || '1', 10) || 1);
+    const offset = (page - 1) * limit;
+
+    const [{ results }, totalRow] = await Promise.all([
+      c.env.DB.prepare(`
+        SELECT id, email, name, role, status, email_verified, is_active,
+               school_level, year_group, school_name, house,
+               teacher_license_number, subjects_taught, years_experience, qualifications,
+               xp_points, level, streak_days, last_login_at, created_at, updated_at
+        FROM users
+        ORDER BY created_at DESC
+        LIMIT ? OFFSET ?
+      `).bind(limit, offset).all(),
+      c.env.DB.prepare('SELECT COUNT(*) as total FROM users').first(),
+    ]);
 
     // Parse JSON fields
     const users = results.map((u: Record<string, unknown>) => ({
@@ -6368,7 +6376,15 @@ adminApp.get('/users', async (c) => {
       subjectsTaught: u.subjects_taught ? JSON.parse(u.subjects_taught as string) : [],
     }));
 
-    return c.json({ success: true, data: users });
+    return c.json({
+      success: true,
+      data: {
+        users,
+        total: (totalRow as { total?: number } | null)?.total || 0,
+        page,
+        limit,
+      },
+    });
   } catch (error) {
     console.error('Get users error:', error);
     return c.json({ success: false, error: 'Failed to fetch users' }, 500);

@@ -582,7 +582,12 @@ export const useAuthStore = create<AuthState>()(
       // User Management Actions
       loadAllUsers: async () => {
         try {
-          const response = await api.get<Record<string, unknown>[]>('/admin/users');
+          const response = await api.get<{
+            users: Record<string, unknown>[];
+            total: number;
+            page: number;
+            limit: number;
+          }>('/admin/users?limit=100');
           if (!response.success || !response.data) {
             console.error('Failed to load users:', response.error);
             // Fall back to localStorage for demo mode
@@ -591,7 +596,7 @@ export const useAuthStore = create<AuthState>()(
             return;
           }
 
-          const users: ManagedUser[] = response.data.map((u: Record<string, unknown>) => ({
+          const users: ManagedUser[] = response.data.users.map((u: Record<string, unknown>) => ({
             id: u.id as string,
             email: u.email as string,
             name: u.name as string,
