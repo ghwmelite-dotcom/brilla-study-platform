@@ -10,6 +10,17 @@ interface ApiResponse<T = unknown> {
   error?: string;
 }
 
+// Clear the session and bounce to /login on a 401.
+// Guard: don't redirect if already on an auth page (prevents loop).
+function handleUnauthorized() {
+  localStorage.removeItem('brilla_token');
+  localStorage.removeItem('brilla-auth');
+  const path = window.location.pathname;
+  if (path !== '/login' && path !== '/register' && !path.startsWith('/oauth')) {
+    window.location.href = '/login';
+  }
+}
+
 class ApiClient {
   private baseUrl: string;
   private token: string | null = null;
@@ -47,23 +58,113 @@ class ApiClient {
     }
 
     try {
-      const url = `${this.baseUrl}${endpoint}`;
-      console.log('[API] Fetching:', url);
-      const response = await fetch(url, {
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
         ...options,
         headers,
       });
 
-      console.log('[API] Response status:', response.status, response.statusText);
-      const data = await response.json();
-      console.log('[API] Response data:', data);
-      return data as ApiResponse<T>;
+      if (response.status === 401) {
+        handleUnauthorized();
+        return { success: false, error: 'Your session has expired. Please sign in again.' };
+      }
+
+      // Guard: non-JSON or empty bodies must not crash the caller
+      const text = await response.text();
+      let data: ApiResponse<T>;
+      try {
+        data = text ? JSON.parse(text) : { success: false, error: 'Empty response from server' };
+      } catch {
+        data = { success: false, error: 'Invalid response from server' };
+      }
+
+      if (!response.ok && data.success !== false) {
+        return { success: false, error: data.error || `Request failed (${response.status})` };
+      }
+      return data;
     } catch (error) {
       console.error('API request failed:', error);
       return {
         success: false,
         error: 'Network error. Please check your connection.',
       };
+    }
+  }
+
+  // Upload multipart form data (browser sets the Content-Type boundary)
+  async upload<T>(endpoint: string, formData: FormData): Promise<ApiResponse<T>> {
+    const headers: Record<string, string> = {};
+
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+
+    try {
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      if (response.status === 401) {
+        handleUnauthorized();
+        return { success: false, error: 'Your session has expired. Please sign in again.' };
+      }
+
+      const text = await response.text();
+      let data: ApiResponse<T>;
+      try {
+        data = text ? JSON.parse(text) : { success: false, error: 'Empty response from server' };
+      } catch {
+        data = { success: false, error: 'Invalid response from server' };
+      }
+
+      if (!response.ok && data.success !== false) {
+        return { success: false, error: data.error || `Upload failed (${response.status})` };
+      }
+      return data;
+    } catch (error) {
+      console.error('API upload failed:', error);
+      return { success: false, error: 'Network error. Please check your connection.' };
+    }
+  }
+
+  // Upload a raw blob with an explicit content type (e.g. recording assets)
+  async uploadBlob<T>(endpoint: string, blob: Blob, contentType: string): Promise<ApiResponse<T>> {
+    const headers: Record<string, string> = {
+      'Content-Type': contentType,
+    };
+
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+
+    try {
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+        method: 'PUT',
+        headers,
+        body: blob,
+      });
+
+      if (response.status === 401) {
+        handleUnauthorized();
+        return { success: false, error: 'Your session has expired. Please sign in again.' };
+      }
+
+      const text = await response.text();
+      let data: ApiResponse<T>;
+      try {
+        data = text ? JSON.parse(text) : { success: false, error: 'Empty response from server' };
+      } catch {
+        data = { success: false, error: 'Invalid response from server' };
+      }
+
+      if (!response.ok && data.success !== false) {
+        return { success: false, error: data.error || `Upload failed (${response.status})` };
+      }
+      return data;
+    } catch (error) {
+      console.error('API blob upload failed:', error);
+      return { success: false, error: 'Network error. Please check your connection.' };
     }
   }
 
@@ -268,3 +369,28 @@ export interface CreateUserData {
 
 // Export singleton instance
 export const api = new ApiClient(API_BASE_URL);
+
+// Token-only auth headers (no x-user-id / x-user-role)
+export function getAuthHeaders(): Record<string, string> {
+  const token = localStorage.getItem('brilla_token');
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  return headers;
+}
+
+export function getApiUrl(path?: string): string {
+  if (path) {
+    if (API_BASE_URL.startsWith('http')) {
+      return `${API_BASE_URL}${path.replace('/api', '')}`;
+    }
+    return `${window.location.origin}${API_BASE_URL}${path.replace('/api', '')}`;
+  }
+  return API_BASE_URL;
+}
