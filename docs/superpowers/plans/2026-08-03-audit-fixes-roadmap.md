@@ -34,7 +34,7 @@ Total: 84 tasks. Sequential as requested; phases 2, 3, 4 are mutually independen
 
 - OAuth registrations: students auto-approved, teachers/parents pending, admin rejected. Intentional divergence from register's all-pending; flagged for product review.
 - Coin economy: removed (was never credited; echoed phantom values). XP standardizes on `users.xp_points`.
-- DB squash: single canonical `schema.sql` + `088_baseline_marker`; old migration chain archived to `database/migrations/archive/`.
+- DB squash: single canonical `schema.sql` + `089_baseline_marker`; old migration chain archived to `database/migrations/archive/`.
 - 082 vs 084 A-level questions: keep both; 084 renumbered to `q_alevel_maths_001..040` and its phantom subject/exam-type IDs fixed.
 - CSP: inline scripts + `onload=` handlers externalized to `public/app-bootstrap.js` (hashes rejected); theme color unified to `#006B3F`; `workers/package.json` deleted.
 - Frontend client consolidation: `lib/api.ts` envelope shape survives; consumers: lib 33, services 25, utils 7 (65 total).

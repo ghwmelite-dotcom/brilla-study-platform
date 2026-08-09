@@ -8,7 +8,7 @@
 - New canonical layout:
   - `database/schema.sql` — regenerated to contain **every** table the API touches (58 current + ~147 migration-only names, incl. scratch tables to be filtered out) with all conflicts resolved.
   - `database/seed.sql` — rewritten idempotent (upserts, no `DELETE FROM`), absorbing all question/subject/topic data fixes.
-  - `database/migrations/088_baseline_marker.sql` — the ONLY file left in `migrations_dir`; a no-op marker so `wrangler d1 migrations apply` records the baseline in `d1_migrations` on both fresh and existing databases.
+  - `database/migrations/089_baseline_marker.sql` — the ONLY file left in `migrations_dir`; a no-op marker so `wrangler d1 migrations apply` records the baseline in `d1_migrations` on both fresh and existing databases.
   - Old migrations 001–087 + duplicates move to `database/migrations/archive/` (outside `migrations_dir`) for forensic reference.
 - Existing production DBs are already at end-of-chain state (modulo the silent `INSERT OR IGNORE` losses this phase fixes via targeted `UPDATE`s), so they need only the data-fix migration + baseline marker — no rebuild.
 
@@ -257,7 +257,7 @@ Expected: gate green; triple-seed runs without error and the count equals the si
 ## Task 5 — Baseline migration strategy
 
 **Files:**
-- `database/migrations/088_baseline_marker.sql` (new, only file left in `migrations_dir`)
+- `database/migrations/089_baseline_marker.sql` (new, only file left in `migrations_dir`)
 - `database/migrations/088a_data_fixes.sql` (from Task 3)
 - `database/migrations/archive/` (receives 001–087 + old seed_chat_rooms)
 - `workers/package.json` (scripts)
@@ -265,7 +265,7 @@ Expected: gate green; triple-seed runs without error and the count equals the si
 **Steps:**
 
 - [ ] `git mv database/migrations/0*.sql database/migrations/archive/` (keeps history; archive is outside `migrations_dir` so wrangler ignores it).
-- [ ] Write `088_baseline_marker.sql`:
+- [ ] Write `089_baseline_marker.sql`:
 
 ```sql
 -- Baseline marker. The chain 001-087 was squashed into database/schema.sql + seed.sql
@@ -294,7 +294,7 @@ INSERT OR IGNORE INTO schema_baseline (id, note) VALUES (1, 'squash of migration
 ```
 wrangler d1 migrations list brilla-db --local
 ```
-Expected: only `088_baseline_marker.sql` listed.
+Expected: only `089_baseline_marker.sql` listed.
 
 **Commit:** `refactor(db): squash migrations 001-087 into canonical schema + 088 baseline` — only with user approval.
 
