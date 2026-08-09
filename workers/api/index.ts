@@ -5975,6 +5975,7 @@ adminApp.get('/dashboard/stats', async (c) => {
   try {
     const today = new Date().toISOString().split('T')[0];
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const nowIso = new Date().toISOString();
 
     const [
       totalUsers,
@@ -5988,7 +5989,7 @@ adminApp.get('/dashboard/stats', async (c) => {
       c.env.DB.prepare('SELECT COUNT(*) as count FROM users WHERE DATE(last_login_at) = ?').bind(today).first(),
       c.env.DB.prepare('SELECT COUNT(*) as count FROM users WHERE created_at >= ?').bind(weekAgo).first(),
       c.env.DB.prepare("SELECT COUNT(*) as count FROM users WHERE status = 'pending'").first(),
-      c.env.DB.prepare("SELECT COUNT(*) as count FROM user_trials WHERE status = 'active' AND expires_at > datetime('now')").first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM user_trials WHERE status = 'active' AND expires_at > ?").bind(nowIso).first(),
       c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'success'").first(),
     ]);
 
@@ -6216,9 +6217,10 @@ adminApp.get('/analytics', async (c) => {
 // Subscription stats
 adminApp.get('/subscriptions/stats', async (c) => {
   try {
+    const nowIso = new Date().toISOString();
     const [active, trials, expiring, revenueThis, revenueLast] = await Promise.all([
       c.env.DB.prepare("SELECT COUNT(*) as count FROM user_subscriptions WHERE status = 'active'").first(),
-      c.env.DB.prepare("SELECT COUNT(*) as count FROM user_trials WHERE status = 'active' AND expires_at > datetime('now')").first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM user_trials WHERE status = 'active' AND expires_at > ?").bind(nowIso).first(),
       c.env.DB.prepare("SELECT COUNT(*) as count FROM user_subscriptions WHERE status = 'active' AND expires_at <= datetime('now', '+7 days')").first(),
       c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'success' AND created_at >= datetime('now', 'start of month')").first(),
       c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'success' AND created_at >= datetime('now', 'start of month', '-1 month') AND created_at < datetime('now', 'start of month')").first(),
@@ -8000,13 +8002,15 @@ protectedApp.get('/admin/subscriptions/stats', userAuth, async (c) => {
       SELECT COUNT(*) as count FROM user_trials WHERE status = 'active'
     `).first();
 
-    // Users whose trial expires in next 7 days
+    // Users whose trial expires in next 7 days (ISO comparisons against bound JS ISO params)
+    const nowIso = new Date().toISOString();
+    const weekAheadIso = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
     const expiringSoon = await c.env.DB.prepare(`
       SELECT COUNT(*) as count FROM user_trials
       WHERE status = 'active'
-      AND expires_at > datetime('now')
-      AND expires_at < datetime('now', '+7 days')
-    `).first();
+      AND expires_at > ?
+      AND expires_at < ?
+    `).bind(nowIso, weekAheadIso).first();
 
     // Revenue stats from payment_transactions
     const revenueThisMonth = await c.env.DB.prepare(`

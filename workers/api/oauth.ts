@@ -229,10 +229,10 @@ oauthApp.post('/google/callback', async (c) => {
     return c.json({ success: false, error: 'Missing code or state' }, 400);
   }
 
-  // Validate state and retrieve stored data
+  // Validate state and retrieve stored data (ISO comparison against bound JS ISO now)
   const storedState = await c.env.DB.prepare(`
-    SELECT * FROM oauth_states WHERE state = ? AND expires_at > datetime('now')
-  `).bind(state).first();
+    SELECT * FROM oauth_states WHERE state = ? AND expires_at > ?
+  `).bind(state, new Date().toISOString()).first();
 
   if (!storedState) {
     return c.json({ success: false, error: 'Invalid or expired state. Please try again.' }, 400);

@@ -451,11 +451,13 @@ subscriptionsApp.post('/trial/bonus-week', async (c) => {
 // Check and update expired trials (can be called by cron)
 subscriptionsApp.post('/trial/check-expiry', async (c) => {
   try {
-    // Find and expire trials
+    // Find and expire trials (ISO lexicographic comparison against a bound
+    // JS ISO parameter — never datetime('now') against ISO columns)
+    const nowIso = new Date().toISOString();
     const { results: expiredTrials } = await c.env.DB.prepare(`
       SELECT id, user_id FROM user_trials
-      WHERE status = 'active' AND expires_at < datetime('now')
-    `).all();
+      WHERE status = 'active' AND expires_at < ?
+    `).bind(nowIso).all();
 
     for (const trial of expiredTrials) {
       await c.env.DB.prepare(`

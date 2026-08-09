@@ -88,11 +88,12 @@ engagementApp.get('/status', async (c) => {
       }
     }
 
-    // Get pending nudges
+    // Get pending nudges (ISO comparison against bound JS ISO now)
+    const nowIso = new Date().toISOString();
     const nudges = await c.env.DB.prepare(`
       SELECT * FROM engagement_nudges
       WHERE user_id = ? AND dismissed = 0
-        AND (expires_at IS NULL OR expires_at > datetime('now'))
+        AND (expires_at IS NULL OR expires_at > ?)
       ORDER BY
         CASE priority
           WHEN 'urgent' THEN 1
@@ -102,7 +103,7 @@ engagementApp.get('/status', async (c) => {
         END,
         created_at DESC
       LIMIT 5
-    `).bind(user.userId).all();
+    `).bind(user.userId, nowIso).all();
 
     // Get active comeback challenge
     const comebackChallenge = await c.env.DB.prepare(
