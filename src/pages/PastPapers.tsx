@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { Button, Card } from '@/components/common';
 import { useExamStore } from '@/stores/examStore';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 
 // API response types
 interface ApiPaper {
@@ -70,7 +70,7 @@ export function PastPapers() {
         if (selectedSubject) params.set('subject', selectedSubject);
         if (selectedYear) params.set('year', selectedYear);
 
-        const response = await api.get(`/papers?${params.toString()}`) as { success: boolean; data: ApiPaper[] };
+        const response = await api.get<ApiPaper[]>(`/papers?${params.toString()}`);
 
         if (response.success && response.data) {
           setPapers(response.data);
@@ -88,7 +88,7 @@ export function PastPapers() {
 
     const fetchYears = async () => {
       try {
-        const response = await api.get(`/papers/years?exam_type=${currentExamType}`) as { success: boolean; data: number[] };
+        const response = await api.get<number[]>(`/papers/years?exam_type=${currentExamType}`);
         if (response.success && response.data) {
           setYears(response.data);
         }

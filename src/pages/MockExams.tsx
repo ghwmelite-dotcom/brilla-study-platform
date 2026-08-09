@@ -19,7 +19,7 @@ import {
 import { Button, Card, Badge } from '@/components/common';
 import { useExamStore } from '@/stores';
 import { cn } from '@/utils';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 import type { GhanaExamTypeSlug, ExamTypeSlug } from '@/types';
 import { isGhanaExam } from '@/types';
 
@@ -462,7 +462,7 @@ export function MockExamsPage() {
       setHistoryLoading(true);
       try {
         // Fetch paper attempts from API
-        const data = await api.get('/papers/attempts?limit=20') as Array<{
+        const res = await api.get<Array<{
           id: string;
           paper_id: string;
           status: string;
@@ -472,7 +472,8 @@ export function MockExamsPage() {
           time_used: number;
           submitted_at: string;
           paper?: { title: string; paper_type: string };
-        }>;
+        }>>('/papers/attempts?limit=20');
+        const data = res.success ? res.data : null;
 
         if (data && Array.isArray(data)) {
           // Transform API response to our format

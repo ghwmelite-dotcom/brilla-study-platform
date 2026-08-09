@@ -15,7 +15,7 @@ import { Card, Button, Badge, Input, ProgressBar } from '@/components/common';
 import { PremiumSubjectBadge } from '@/components/subscription';
 import { DailyUsageIndicator } from '@/components/subscription';
 import { cn } from '@/utils';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 import { useExamStore, useUsageStore } from '@/stores';
 import { isCoreSubject } from '@/config';
 
@@ -140,7 +140,8 @@ export function TopicsPage() {
       try {
         const subjectId = currentSubject?.id;
         const url = subjectId ? `/topics?subject=${subjectId}` : '/topics';
-        const data = await api.get(url) as ApiTopic[];
+        const res = await api.get<ApiTopic[]>(url);
+        const data = res.success ? res.data : null;
         if (Array.isArray(data)) {
           setApiTopics(data);
         }

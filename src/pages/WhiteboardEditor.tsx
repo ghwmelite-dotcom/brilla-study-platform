@@ -19,7 +19,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useWhiteboardRecorder } from '@/hooks/useWhiteboardRecorder';
 import type { WebcamSettings, RecordingSession } from '@/types/whiteboard';
 import { DEFAULT_WEBCAM_SETTINGS } from '@/types/whiteboard';
-import { recordingsService } from '@/services/api';
+import { recordingsService } from '@/lib/services';
 
 export default function WhiteboardEditor() {
   const navigate = useNavigate();

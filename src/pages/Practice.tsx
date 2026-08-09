@@ -21,7 +21,7 @@ import { DailyUsageIndicator, LimitReachedModal } from '@/components/subscriptio
 import { useExamStore, useUsageStore } from '@/stores';
 import { getExamConfig, isCoreSubject } from '@/config';
 import { cn } from '@/utils';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 import type { Question, GhanaExamTypeSlug } from '@/types';
 import { isGhanaExam } from '@/types';
 import type { LucideIcon } from 'lucide-react';
@@ -275,7 +275,8 @@ export function PracticePage() {
     const fetchRecentSessions = async () => {
       setSessionsLoading(true);
       try {
-        const data = await api.get('/practice/sessions?limit=5') as RecentSession[];
+        const res = await api.get<RecentSession[]>('/practice/sessions?limit=5');
+        const data = res.success ? res.data : null;
         if (data && Array.isArray(data)) {
           setRecentSessions(data);
         }
@@ -327,7 +328,8 @@ export function PracticePage() {
       if (selectedDifficulty !== 'all') {
         url += `&difficulty=${selectedDifficulty}`;
       }
-      const data = await api.get(url) as ApiQuestion[];
+      const res = await api.get<ApiQuestion[]>(url);
+      const data = res.success ? res.data : null;
       if (data && Array.isArray(data) && data.length > 0) {
         // Transform snake_case to camelCase
         const transformedQuestions = data.map(transformQuestion);
@@ -358,7 +360,8 @@ export function PracticePage() {
       if (selectedDifficulty !== 'all') {
         url += `&difficulty=${selectedDifficulty}`;
       }
-      const data = await api.get(url) as ApiQuestion[];
+      const res = await api.get<ApiQuestion[]>(url);
+      const data = res.success ? res.data : null;
       if (data && Array.isArray(data) && data.length > 0) {
         const transformedQuestions = data.map(transformQuestion);
         setDrillQuestions(transformedQuestions);
@@ -379,7 +382,8 @@ export function PracticePage() {
     setFlashcardError(null);
     try {
       // Fetch public flashcard decks
-      const decks = await api.get('/flashcards/public') as ApiFlashcardDeck[];
+      const decksRes = await api.get<ApiFlashcardDeck[]>('/flashcards/public');
+      const decks = decksRes.success ? decksRes.data : null;
 
       if (decks && Array.isArray(decks) && decks.length > 0) {
         // Get the first deck with cards or a random deck
@@ -397,7 +401,8 @@ export function PracticePage() {
 
         if (selectedDeck) {
           // Fetch the deck with cards
-          const deckWithCards = await api.get(`/flashcards/decks/${selectedDeck.id}/cards`) as { cards: ApiFlashcard[] };
+          const deckRes = await api.get<{ cards: ApiFlashcard[] }>(`/flashcards/decks/${selectedDeck.id}/cards`);
+          const deckWithCards = deckRes.success ? deckRes.data : null;
 
           if (deckWithCards && deckWithCards.cards && deckWithCards.cards.length > 0) {
             // Transform to the format expected by Flashcard component

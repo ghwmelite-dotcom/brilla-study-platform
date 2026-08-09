@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { examService } from '@/services/api';
+import { examService } from '@/lib/services';
 import type { UserExamPreference, ExamTypeSlug } from '@/types';
 
 interface ExamPreferencesState {

@@ -5,7 +5,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 import { DAILY_QUESTION_LIMIT } from '@/config';
 
 export interface DailyUsage {
@@ -56,10 +56,7 @@ export const useUsageStore = create<UsageState>()(
         set({ isLoading: true, error: null });
 
         try {
-          const response = await api.get('/usage/daily') as {
-            success: boolean;
-            data: DailyUsage;
-          };
+          const response = await api.get<DailyUsage>('/usage/daily');
 
           if (response && response.success && response.data) {
             set({

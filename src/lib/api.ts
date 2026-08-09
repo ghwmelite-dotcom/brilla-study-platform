@@ -4,10 +4,11 @@
 // In production, use the configured VITE_API_URL
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
-interface ApiResponse<T = unknown> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
+  code?: string;
 }
 
 // Clear the session and bounce to /login on a 401.

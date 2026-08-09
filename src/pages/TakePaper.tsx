@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { useThemeStore, useUIStore } from '@/stores';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 import { cn } from '@/utils';
 
 interface PaperQuestion {
@@ -102,7 +102,8 @@ export default function TakePaper() {
     const fetchPaper = async () => {
       try {
         setIsLoading(true);
-        const paper = await api.get(`/papers/${paperId}`) as PaperDetails;
+        const res = await api.get<PaperDetails>(`/papers/${paperId}`);
+        const paper = res.success ? res.data : null;
         if (paper && paper.id) {
           setPaper(paper);
           setTimeRemaining(paper.time_allowed * 60);
@@ -123,38 +124,39 @@ export default function TakePaper() {
   const startAttempt = async () => {
     if (!paperId || !user) return;
 
-    try {
-      const result = await api.post(`/papers/${paperId}/attempt`, { userId: user.id }) as { attemptId: string };
-      if (result && result.attemptId) {
-        setAttemptId(result.attemptId);
+    const res = await api.post<{ attemptId: string }>(`/papers/${paperId}/attempt`, { userId: user.id });
+
+    if (res.success) {
+      if (res.data?.attemptId) {
+        setAttemptId(res.data.attemptId);
         setShowStartConfirm(false);
         setIsTimerRunning(true);
       } else {
         setError('Failed to start attempt - no attempt ID returned');
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      if (errorMessage.includes('ongoing attempt')) {
-        const resume = window.confirm('You have an ongoing attempt for this paper. Would you like to abandon it and start fresh?');
-        if (resume) {
-          try {
-            await api.post(`/papers/${paperId}/abandon`, { userId: user.id });
-            const retryResult = await api.post(`/papers/${paperId}/attempt`, { userId: user.id }) as { attemptId: string };
-            if (retryResult && retryResult.attemptId) {
-              setAttemptId(retryResult.attemptId);
-              setShowStartConfirm(false);
-              setIsTimerRunning(true);
-              return;
-            }
-          } catch {
-            setError('Failed to restart attempt. Please try again.');
-            return;
-          }
+      return;
+    }
+
+    const errorMessage = res.error || 'Unknown error';
+    if (errorMessage.includes('ongoing attempt')) {
+      const resume = window.confirm('You have an ongoing attempt for this paper. Would you like to abandon it and start fresh?');
+      if (resume) {
+        const abandonRes = await api.post(`/papers/${paperId}/abandon`, { userId: user.id });
+        const retryRes = abandonRes.success
+          ? await api.post<{ attemptId: string }>(`/papers/${paperId}/attempt`, { userId: user.id })
+          : null;
+        if (retryRes?.success && retryRes.data?.attemptId) {
+          setAttemptId(retryRes.data.attemptId);
+          setShowStartConfirm(false);
+          setIsTimerRunning(true);
+          return;
         }
+        setError('Failed to restart attempt. Please try again.');
         return;
       }
-      setError(`Failed to start attempt: ${errorMessage}`);
+      return;
     }
+    setError(`Failed to start attempt: ${errorMessage}`);
   };
 
   // Timer
@@ -233,17 +235,15 @@ export default function TakePaper() {
       setAnsweredQuestions((prev) => new Set(prev).add(currentQuestion.id));
 
       setIsSaving(true);
-      try {
-        await api.put(`/papers/attempts/${attemptId}/answer`, {
-          questionId: currentQuestion.id,
-          answer: value,
-          userId: user.id,
-        });
-      } catch (err) {
-        console.error('Failed to save answer:', err);
-      } finally {
-        setIsSaving(false);
+      const res = await api.put(`/papers/attempts/${attemptId}/answer`, {
+        questionId: currentQuestion.id,
+        answer: value,
+        userId: user.id,
+      });
+      if (!res.success) {
+        console.error('Failed to save answer:', res.error);
       }
+      setIsSaving(false);
     },
     [currentQuestion, attemptId, user]
   );
@@ -268,18 +268,17 @@ export default function TakePaper() {
     setIsSubmitting(true);
     setIsTimerRunning(false);
 
-    try {
-      const timeUsed = paper ? paper.time_allowed * 60 - timeRemaining : 0;
-      await api.post(`/papers/attempts/${attemptId}/submit`, {
-        userId: user.id,
-        timeUsed,
-      });
+    const timeUsed = paper ? paper.time_allowed * 60 - timeRemaining : 0;
+    const res = await api.post(`/papers/attempts/${attemptId}/submit`, {
+      userId: user.id,
+      timeUsed,
+    });
+    if (res.success) {
       navigate(`/past-papers/results/${attemptId}`);
-    } catch {
+    } else {
       setError('Failed to submit paper');
-    } finally {
-      setIsSubmitting(false);
     }
+    setIsSubmitting(false);
   };
 
   const handleExit = () => {

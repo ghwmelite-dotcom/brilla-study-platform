@@ -13,7 +13,7 @@ import {
   ChevronRight,
   TrendingUp,
 } from 'lucide-react';
-import { teacherBonusService } from '@/services/api';
+import { teacherBonusService } from '@/lib/services';
 import type { TeacherYearEndBonus } from '@/types/tutoring';
 
 interface BonusWithTeacher extends TeacherYearEndBonus {

@@ -7,7 +7,7 @@ import type {
   CanvasHistoryState,
 } from '@/types/whiteboard';
 import { DEFAULT_SETTINGS } from '@/types/whiteboard';
-import { whiteboardsService, type WhiteboardData } from '@/services/api';
+import { whiteboardsService, type WhiteboardData } from '@/lib/services';
 
 interface WhiteboardState {
   // Current session

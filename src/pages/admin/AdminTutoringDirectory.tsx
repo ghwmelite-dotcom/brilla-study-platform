@@ -15,7 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { tutoringService } from '@/services/api';
+import { tutoringService } from '@/lib/services';
 import type { TeacherDirectoryProfile, SessionType } from '@/types/tutoring';
 
 interface PendingProfile extends TeacherDirectoryProfile {

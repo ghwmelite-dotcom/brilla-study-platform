@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { Question, Subject, Topic, Difficulty, RoundType } from '@/types';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 
 interface UseQuestionsOptions {
   subjectId?: string;
@@ -36,8 +36,12 @@ export function useQuestions(initialOptions?: UseQuestionsOptions): UseQuestions
       if (opts?.roundType) params.append('round', opts.roundType);
       if (opts?.limit) params.append('limit', opts.limit.toString());
 
-      const response = await api.get<Question[]>(`/questions?${params.toString()}`);
-      setQuestions(response);
+      const res = await api.get<Question[]>(`/questions?${params.toString()}`);
+      if (res.success && res.data) {
+        setQuestions(res.data);
+      } else {
+        setError(res.error || 'Failed to fetch questions');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch questions');
     } finally {
@@ -86,8 +90,12 @@ export function useSubjects() {
     setError(null);
 
     try {
-      const response = await api.get<Subject[]>('/subjects');
-      setSubjects(response);
+      const res = await api.get<Subject[]>('/subjects');
+      if (res.success && res.data) {
+        setSubjects(res.data);
+      } else {
+        setError(res.error || 'Failed to fetch subjects');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch subjects');
     } finally {
@@ -116,8 +124,12 @@ export function useTopics(subjectId?: string) {
 
     try {
       const url = id ? `/topics?subject=${id}` : '/topics';
-      const response = await api.get<Topic[]>(url);
-      setTopics(response);
+      const res = await api.get<Topic[]>(url);
+      if (res.success && res.data) {
+        setTopics(res.data);
+      } else {
+        setError(res.error || 'Failed to fetch topics');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch topics');
     } finally {

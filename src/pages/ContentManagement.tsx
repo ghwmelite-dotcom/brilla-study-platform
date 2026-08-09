@@ -19,7 +19,7 @@ import {
 import { Card, Button, Badge } from '@/components/common';
 import { useAuthStore } from '@/stores';
 import { cn } from '@/utils';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 
 // Types
 interface ContentItem {
@@ -264,9 +264,9 @@ export function ContentManagementPage() {
         if (statusFilter !== 'all') params.set('status', statusFilter);
         if (searchQuery) params.set('search', searchQuery);
 
-        const response = await api.get(`/admin/content?${params.toString()}`) as ContentApiResponse;
+        const response = (await api.get<ContentItem[]>(`/admin/content?${params.toString()}`)) as ContentApiResponse;
 
-        if (response && response.data) {
+        if (response.success && response.data) {
           setContent(response.data);
           setStats(response.stats || {
             total: response.data.length,
