@@ -946,42 +946,52 @@ publicApp.post('/auth/register', async (c) => {
     }
     const userRole = role || 'student';
 
-    // Self-registered users go to pending status
-    await c.env.DB.prepare(`
-      INSERT INTO users (id, email, password_hash, name, role, status, email_verified,
-                         school_level, year_group, school_name, house,
-                         teacher_license_number, subjects_taught, years_experience, qualifications,
-                         selected_tier_id)
-      VALUES (?, ?, ?, ?, ?, 'pending', 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(
-      id, email, passwordHash, name, userRole,
-      schoolLevel || null, yearGroup || null, schoolName || null, house || null,
-      teacherLicenseNumber || null,
-      subjectsTaught ? JSON.stringify(subjectsTaught) : null,
-      yearsExperience || null, qualifications || null,
-      selectedTierId || null
-    ).run();
+    // Self-registered users go to pending status. The user insert, primary
+    // exam-type update and preference inserts run in one D1 batch so a
+    // failure mid-write cannot leave a user without their preferences.
+    const statements = [
+      c.env.DB.prepare(`
+        INSERT INTO users (id, email, password_hash, name, role, status, email_verified,
+                           school_level, year_group, school_name, house,
+                           teacher_license_number, subjects_taught, years_experience, qualifications,
+                           selected_tier_id)
+        VALUES (?, ?, ?, ?, ?, 'pending', 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        id, email, passwordHash, name, userRole,
+        schoolLevel || null, yearGroup || null, schoolName || null, house || null,
+        teacherLicenseNumber || null,
+        subjectsTaught ? JSON.stringify(subjectsTaught) : null,
+        yearsExperience || null, qualifications || null,
+        selectedTierId || null
+      ),
+    ];
 
     // Create exam type preferences if provided
     if (examTypeIds && Array.isArray(examTypeIds) && examTypeIds.length > 0) {
       const actualPrimaryId = primaryExamTypeId || examTypeIds[0];
 
       // Update primary_exam_type_id in users table
-      await c.env.DB.prepare(`
-        UPDATE users SET primary_exam_type_id = ? WHERE id = ?
-      `).bind(actualPrimaryId, id).run();
+      statements.push(
+        c.env.DB.prepare(`
+          UPDATE users SET primary_exam_type_id = ? WHERE id = ?
+        `).bind(actualPrimaryId, id)
+      );
 
       // Insert exam preferences
       for (const examTypeId of examTypeIds) {
         const prefId = `pref_${id}_${examTypeId}_${Date.now()}`;
         const isPrimary = examTypeId === actualPrimaryId ? 1 : 0;
 
-        await c.env.DB.prepare(`
-          INSERT INTO user_exam_preferences (id, user_id, exam_type_id, is_primary)
-          VALUES (?, ?, ?, ?)
-        `).bind(prefId, id, examTypeId, isPrimary).run();
+        statements.push(
+          c.env.DB.prepare(`
+            INSERT INTO user_exam_preferences (id, user_id, exam_type_id, is_primary)
+            VALUES (?, ?, ?, ?)
+          `).bind(prefId, id, examTypeId, isPrimary)
+        );
       }
     }
+
+    await c.env.DB.batch(statements);
 
     // Notify all admin users about the new registration
     try {
@@ -1049,7 +1059,7 @@ publicApp.post('/auth/register', async (c) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
-    return c.json({ success: false, error: 'Registration failed' }, 400);
+    return c.json({ success: false, error: 'Registration failed' }, 500);
   }
 });
 
