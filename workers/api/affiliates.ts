@@ -1083,6 +1083,10 @@ async function checkAffiliateAchievements(
       WHERE uaa.id IS NULL
     `).bind(userId).all();
 
+    // Collect writes for all newly-unlocked achievements and flush them in a
+    // single db.batch() instead of up to 3 round trips per achievement.
+    const statements: D1PreparedStatement[] = [];
+
     for (const ach of achievements) {
       let currentValue = 0;
 
@@ -1100,27 +1104,37 @@ async function checkAffiliateAchievements(
 
       if (currentValue >= (ach.requirement_value as number)) {
         // Unlock achievement
-        await db.prepare(`
-          INSERT INTO user_affiliate_achievements (id, user_id, achievement_id)
-          VALUES (?, ?, ?)
-        `).bind(crypto.randomUUID(), userId, ach.id).run();
+        statements.push(
+          db.prepare(`
+            INSERT INTO user_affiliate_achievements (id, user_id, achievement_id)
+            VALUES (?, ?, ?)
+          `).bind(crypto.randomUUID(), userId, ach.id)
+        );
 
         // Award XP
         if (ach.xp_reward) {
-          await db.prepare(`
-            UPDATE users SET affiliate_xp = affiliate_xp + ? WHERE id = ?
-          `).bind(ach.xp_reward, userId).run();
+          statements.push(
+            db.prepare(`
+              UPDATE users SET affiliate_xp = affiliate_xp + ? WHERE id = ?
+            `).bind(ach.xp_reward, userId)
+          );
         }
 
         // Award cash bonus
         if (ach.cash_bonus) {
-          await db.prepare(`
-            UPDATE affiliate_profiles
-            SET available_earnings = available_earnings + ?
-            WHERE user_id = ?
-          `).bind(ach.cash_bonus, userId).run();
+          statements.push(
+            db.prepare(`
+              UPDATE affiliate_profiles
+              SET available_earnings = available_earnings + ?
+              WHERE user_id = ?
+            `).bind(ach.cash_bonus, userId)
+          );
         }
       }
+    }
+
+    if (statements.length > 0) {
+      await db.batch(statements);
     }
   } catch (error) {
     console.error('Check achievements error:', error);

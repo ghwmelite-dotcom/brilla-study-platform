@@ -76,7 +76,9 @@ describe('learningpath question_attempts migration', () => {
       },
       {
         match: /FROM topics t/,
-        all: () => ({ results: [{ id: 't1', name: 'Algebra', mastery: 30 }] }),
+        all: () => ({
+          results: [{ subject_id: 'sub_1', id: 't1', name: 'Algebra', mastery: 30 }],
+        }),
       },
     ]);
     const t = await token({ userId: 'user_1', role: 'student' });
@@ -101,6 +103,20 @@ describe('learningpath question_attempts migration', () => {
     const grouped = db.calls.filter((c) => c.sql.includes('GROUP BY s.id'));
     expect(grouped).toHaveLength(1);
     expect(grouped[0].binds).toEqual(['user_1', 'sub_1', 'sub_2']);
+
+    // Task 16: the per-subject weak/strong topic loop is collapsed too —
+    // exactly one grouped topics query over all subject ids, stitched in JS.
+    const topicsQueries = db.calls.filter((c) => /FROM topics t/.test(c.sql));
+    expect(topicsQueries).toHaveLength(1);
+    expect(topicsQueries[0].sql).toMatch(/t\.subject_id IN \(/);
+    expect(topicsQueries[0].binds).toEqual(['user_1', 'sub_1', 'sub_2']);
+
+    // Topic rows are stitched back onto the right subject.
+    expect(body.data.subjects[0].weakTopics).toEqual([
+      { id: 't1', name: 'Algebra', mastery: 30 },
+    ]);
+    expect(body.data.subjects[0].strongTopics).toEqual([]);
+    expect(body.data.subjects[1].weakTopics).toEqual([]);
   });
 
   it('POST /api/learning/study-plan/generate sources weak topics from question_attempts', async () => {

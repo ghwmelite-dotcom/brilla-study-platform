@@ -144,30 +144,43 @@ learningPathApp.get('/exam-readiness/:examType', async (c) => {
       }
     }
 
-    const readinessData = [];
-
-    for (const subject of subjectRows) {
-      const mastery = masteryBySubject.get(subject.id);
-
-      // Get weak and strong topics (genuinely per-subject detail; bounded by
-      // subject count — flagged for the Task 16 query-count sweep).
-      const topicDetails = await c.env.DB.prepare(`
+    // Get weak and strong topics for all subjects in a single grouped query
+    // (one round trip instead of one per subject), stitched in JS below.
+    const topicsBySubject = new Map<string, any[]>();
+    if (subjectRows.length > 0) {
+      const placeholders = subjectRows.map(() => '?').join(',');
+      const topicRows = await c.env.DB.prepare(`
         SELECT
+          t.subject_id,
           t.id,
           t.name,
           COALESCE(AVG(CASE WHEN qa.is_correct = 1 THEN 100 ELSE 0 END), 0) as mastery
         FROM topics t
         LEFT JOIN questions q ON q.topic_id = t.id
         LEFT JOIN question_attempts qa ON qa.question_id = q.id AND qa.user_id = ?
-        WHERE t.subject_id = ?
+        WHERE t.subject_id IN (${placeholders})
         GROUP BY t.id
-      `).bind(user.userId, subject.id).all();
+      `).bind(user.userId, ...subjectRows.map((s: any) => s.id)).all();
 
-      const weakTopics = topicDetails.results
+      for (const t of topicRows.results as any[]) {
+        const list = topicsBySubject.get(t.subject_id) || [];
+        list.push(t);
+        topicsBySubject.set(t.subject_id, list);
+      }
+    }
+
+    const readinessData = [];
+
+    for (const subject of subjectRows) {
+      const mastery = masteryBySubject.get(subject.id);
+
+      const topicDetails = topicsBySubject.get(subject.id) || [];
+
+      const weakTopics = topicDetails
         .filter((t: any) => t.mastery < 50)
         .map((t: any) => ({ id: t.id, name: t.name, mastery: Math.round(t.mastery) }));
 
-      const strongTopics = topicDetails.results
+      const strongTopics = topicDetails
         .filter((t: any) => t.mastery >= 70)
         .map((t: any) => ({ id: t.id, name: t.name, mastery: Math.round(t.mastery) }));
 
