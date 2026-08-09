@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { api } from '@/lib/api';
+import { createPoller, type Poller } from '@/utils/polling';
+
+let poller: Poller | null = null;
 
 // Types
 export interface Participant {
@@ -365,20 +368,15 @@ export const useStudyRoomStore = create<StudyRoomState>()(
 
       // Start polling for updates
       startPolling: () => {
-        const interval = setInterval(() => {
-          get().pollForUpdates();
-        }, 2000); // Poll every 2 seconds
-
-        set({ pollingInterval: interval });
+        if (!poller) {
+          poller = createPoller(() => get().pollForUpdates(), 2000); // Poll every 2 seconds
+        }
+        poller.start(); // idempotent
       },
 
       // Stop polling
       stopPolling: () => {
-        const { pollingInterval } = get();
-        if (pollingInterval) {
-          clearInterval(pollingInterval);
-          set({ pollingInterval: null });
-        }
+        poller?.stop();
       },
 
       // Poll for updates

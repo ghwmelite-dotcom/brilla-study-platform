@@ -8,6 +8,9 @@ import type {
   ChatRoomType,
 } from '@/types';
 import { getApiUrl, getAuthHeaders } from '@/lib/api';
+import { createPoller, type Poller } from '@/utils/polling';
+
+let poller: Poller | null = null;
 
 interface ChatState {
   // Connection state
@@ -811,22 +814,14 @@ export const useChatStore = create<ChatState>()(
 
       // Polling functions
       startPolling: () => {
-        const { pollingInterval } = get();
-        if (pollingInterval) return; // Already polling
-
-        const interval = setInterval(() => {
-          get().pollForUpdates();
-        }, 3000); // Poll every 3 seconds
-
-        set({ pollingInterval: interval });
+        if (!poller) {
+          poller = createPoller(() => get().pollForUpdates(), 3000); // Poll every 3 seconds
+        }
+        poller.start(); // idempotent — dedupes the double-start the old guard prevented
       },
 
       stopPolling: () => {
-        const { pollingInterval } = get();
-        if (pollingInterval) {
-          clearInterval(pollingInterval);
-          set({ pollingInterval: null });
-        }
+        poller?.stop();
       },
 
       pollForUpdates: async () => {

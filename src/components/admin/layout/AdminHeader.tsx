@@ -13,6 +13,7 @@ import {
   Command,
 } from 'lucide-react';
 import { useAuthStore, useNotificationStore } from '@/stores';
+import { usePolling } from '@/hooks/usePolling';
 import { cn } from '@/utils';
 import { AdminNotificationDropdown } from './AdminNotificationDropdown';
 
@@ -27,9 +28,10 @@ export function AdminHeader() {
   // Fetch notification count on mount and periodically
   useEffect(() => {
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30000); // Every 30 seconds
-    return () => clearInterval(interval);
   }, [fetchUnreadCount]);
+
+  // Poll every 30 seconds (pauses while the tab is hidden)
+  usePolling(fetchUnreadCount, 30000);
 
   // Generate breadcrumb items from path
   const getBreadcrumbs = () => {
