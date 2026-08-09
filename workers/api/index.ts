@@ -2272,23 +2272,27 @@ protectedApp.post('/quests/:questId/claim', async (c) => {
       return c.json({ success: false, error: 'Quest not completed yet' }, 400);
     }
 
-    // Mark as claimed
-    await c.env.DB.prepare(`
+    // Atomic claim transition: only one claimant can flip completed -> claimed
+    const claim = await c.env.DB.prepare(`
       UPDATE user_quests SET status = 'claimed', claimed_at = datetime('now')
-      WHERE id = ?
-    `).bind(questId).run();
+      WHERE id = ? AND user_id = ? AND status = 'completed'
+    `).bind(questId, userId).run();
 
-    // Award XP
+    if (claim.meta.changes === 0) {
+      return c.json({ success: false, error: 'Quest not completed yet or already claimed' }, 400);
+    }
+
+    // Award + record atomically
     const xpReward = quest.xp_reward as number;
-    await c.env.DB.prepare(`
-      UPDATE users SET xp_points = xp_points + ? WHERE id = ?
-    `).bind(xpReward, userId).run();
-
-    // Record completion
-    await c.env.DB.prepare(`
-      INSERT INTO quest_completions (id, user_id, quest_template_id, xp_earned, quest_type)
-      VALUES (?, ?, ?, ?, (SELECT quest_type FROM quest_templates WHERE id = ?))
-    `).bind(`qc_${crypto.randomUUID()}`, userId, quest.quest_template_id, xpReward, quest.quest_template_id).run();
+    await c.env.DB.batch([
+      c.env.DB.prepare(`
+        UPDATE users SET xp_points = xp_points + ? WHERE id = ?
+      `).bind(xpReward, userId),
+      c.env.DB.prepare(`
+        INSERT INTO quest_completions (id, user_id, quest_template_id, xp_earned, quest_type)
+        VALUES (?, ?, ?, ?, (SELECT quest_type FROM quest_templates WHERE id = ?))
+      `).bind(`qc_${crypto.randomUUID()}`, userId, quest.quest_template_id, xpReward, quest.quest_template_id),
+    ]);
 
     // NOTE: coin_reward is display-only; no users.coins column exists. See docs/superpowers/plans/2026-08-03-fix-03-runtime-features.md
     return c.json({
