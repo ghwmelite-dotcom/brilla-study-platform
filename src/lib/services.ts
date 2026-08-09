@@ -186,6 +186,10 @@ export const progressService = {
     return call(api.get('/progress'));
   },
 
+  // NOTE: no backend route exists for GET/POST /progress/topics/:id.
+  // The user_progress write path is the upsert inside
+  // POST /questions/:id/attempt (workers/api/index.ts); these methods are
+  // kept for API compatibility but currently have no callers.
   async getTopicProgress(topicId: string) {
     return call(api.get(`/progress/topics/${topicId}`));
   },
