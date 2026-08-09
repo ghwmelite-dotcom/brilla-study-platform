@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, XCircle, Loader2, ArrowRight, Home } from 'lucide-react';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
@@ -14,8 +14,12 @@ export default function PaymentCallback() {
   const [planName, setPlanName] = useState<string>('');
   const [expiresAt, setExpiresAt] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const hasExchanged = useRef(false);
 
   useEffect(() => {
+    if (hasExchanged.current) return;
+    hasExchanged.current = true;
+
     const reference = searchParams.get('reference') || searchParams.get('trxref');
 
     if (!reference) {
