@@ -682,23 +682,24 @@ async function checkAffiliateTierUpgrade(
 
 // Paystack webhook handler with proper signature verification
 // PUBLIC (no requireAuth): Paystack servers call this with no JWT; it
-// authenticates via the x-paystack-signature HMAC below. Signature-hardening
-// is Phase 2 scope — this logic is intentionally unchanged.
+// authenticates via the x-paystack-signature HMAC below. Fails closed: a
+// missing PAYSTACK_WEBHOOK_SECRET is a 500 and nothing is processed.
 paymentsApp.post('/webhook', async (c) => {
   try {
     const signature = c.req.header('x-paystack-signature');
     const body = await c.req.text();
 
-    // SECURITY: Verify webhook signature
-    if (c.env.PAYSTACK_WEBHOOK_SECRET) {
-      const isValid = await verifyWebhookSignature(body, signature || '', c.env.PAYSTACK_WEBHOOK_SECRET);
-      if (!isValid) {
-        console.error('Webhook signature verification failed');
-        return c.json({ success: false, error: 'Invalid signature' }, 401);
-      }
-    } else {
-      // Log warning if webhook secret is not configured
-      console.warn('PAYSTACK_WEBHOOK_SECRET not configured - skipping signature verification');
+    // SECURITY: Never process unsigned financial webhooks.
+    // Missing secret is a misconfiguration = hard fail, no processing, no DB writes.
+    if (!c.env.PAYSTACK_WEBHOOK_SECRET) {
+      console.error('ALERT: PAYSTACK_WEBHOOK_SECRET is not configured — refusing to process webhook');
+      return c.json({ success: false, error: 'Webhook not configured' }, 500);
+    }
+
+    const isValid = await verifyWebhookSignature(body, signature || '', c.env.PAYSTACK_WEBHOOK_SECRET);
+    if (!isValid) {
+      console.error('Webhook signature verification failed');
+      return c.json({ success: false, error: 'Invalid signature' }, 401);
     }
 
     let event;

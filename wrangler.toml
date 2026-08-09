@@ -19,6 +19,7 @@ NOTIFICATION_EMAILS = "brillaprepgh@gmail.com"
 # wrangler secret put GOOGLE_CLIENT_SECRET     (from Google Cloud Console)
 # wrangler secret put PAYSTACK_SECRET_KEY      (from Paystack dashboard)
 # wrangler secret put PAYSTACK_WEBHOOK_SECRET  (from Paystack dashboard)
+#                                              REQUIRED: /payments/webhook returns 500 and processes nothing without it
 # wrangler secret put TURNSTILE_SECRET         (from Cloudflare Turnstile)
 # wrangler secret put ANTHROPIC_API_KEY        (from Anthropic console, optional AI fallback)
 
