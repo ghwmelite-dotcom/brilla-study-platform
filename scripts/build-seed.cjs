@@ -50,6 +50,15 @@
  *        - subscription_tiers: ON CONFLICT(id) DO UPDATE SET <mutable cols>
  *                              (folds 021's catalog without its FK-breaking
  *                              DELETE FROM subscription_tiers)
+ *      "Mutable cols" EXCLUDES created_at: re-seeding an existing DB must not
+ *      overwrite row creation timestamps (review finding 2).
+ *
+ * Determinism (review finding 1): the replay bakes datetime('now') defaults
+ * into created_at/updated_at, which would make every regeneration differ.
+ * The dump therefore emits a FIXED literal (FIXED_TIMESTAMP below, the squash
+ * date) for every non-NULL created_at/updated_at value. Verified safe: the
+ * replayed sources contain zero explicit timestamp literals — every dumped
+ * timestamp is a replay-time default. Two consecutive runs are byte-identical.
  *   7. Self-test: apply schema + generated seed to a fresh DB with
  *      PRAGMA foreign_keys = ON (mirrors scripts/verify-db.cjs), then apply
  *      the seed twice more to prove idempotency (row counts must be stable).
@@ -320,6 +329,8 @@ function postPassAnswerLetters(db) {
       unresolvable.push(`${q.id}: full-text answer '${answer.slice(0, 40)}' matches no option`);
       continue;
     }
+    // When 2+ options share identical text (matchIdxs.length > 1) the first
+    // match is used: identical option text makes the choice grading-equivalent.
     const matchIdx = matchIdxs[0];
     const firstLetter = answer.charAt(0).toUpperCase();
     const collides = options.some((_, i) => i !== matchIdx && toLetter(i) === firstLetter);
@@ -527,6 +538,12 @@ function sortedRows(db, table, meta) {
 }
 
 const DO_UPDATE_TABLES = new Set(['questions', 'subscription_tiers']);
+// Squash date: fixed literal emitted for every non-NULL created_at/updated_at
+// (see "Determinism" in the file header).
+const FIXED_TIMESTAMP = '2026-08-04T00:00:00.000Z';
+const NORMALIZED_TS_COLS = new Set(['created_at', 'updated_at']);
+// Columns never touched by DO UPDATE on re-seed (identity + creation time).
+const DO_UPDATE_EXCLUDED_COLS = new Set(['created_at']);
 const CHUNK = 100;
 
 function dumpTable(db, table) {
@@ -536,7 +553,7 @@ function dumpTable(db, table) {
 
   let conflict;
   if (DO_UPDATE_TABLES.has(table) && meta.pkCols.length === 1) {
-    const mutable = meta.cols.filter((c) => c !== meta.pkCols[0]);
+    const mutable = meta.cols.filter((c) => c !== meta.pkCols[0] && !DO_UPDATE_EXCLUDED_COLS.has(c));
     conflict =
       `ON CONFLICT(${meta.pkCols[0]}) DO UPDATE SET\n` +
       mutable.map((c) => `  ${c} = excluded.${c}`).join(',\n');
@@ -550,7 +567,18 @@ function dumpTable(db, table) {
   const parts = [];
   for (let i = 0; i < rows.length; i += CHUNK) {
     const chunk = rows.slice(i, i + CHUNK);
-    const values = chunk.map((r) => '(' + meta.cols.map((c) => sqlLiteral(r[c])).join(', ') + ')');
+    const values = chunk.map(
+      (r) =>
+        '(' +
+        meta.cols
+          .map((c) =>
+            NORMALIZED_TS_COLS.has(c) && r[c] !== null && r[c] !== undefined
+              ? sqlLiteral(FIXED_TIMESTAMP)
+              : sqlLiteral(r[c])
+          )
+          .join(', ') +
+        ')'
+    );
     parts.push(`INSERT INTO "${table}" (${colList}) VALUES\n${values.join(',\n')}\n${conflict};`);
   }
   return { table, count: rows.length, sql: parts.join('\n\n') };
