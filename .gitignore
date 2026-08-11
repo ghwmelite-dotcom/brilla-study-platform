@@ -10,6 +10,9 @@ node_modules
 dist
 .wrangler
 
+# D1 backup exports (db:backup)
+backups/
+
 # Environment files
 .env
 .env.local

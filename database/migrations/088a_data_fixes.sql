@@ -148,11 +148,13 @@ UPDATE questions SET correct_answer = 'C' WHERE id = 'q_twi_005'; -- 'Ashantis' 
 
 -- Mathematically wrong answer (018:170; old explanation even said
 -- "needs verification"). f(2) = 8 - 12 + 2k + 2 = 0 -> 2k = 2 -> k = 1.
--- correct_answer stays the option TEXT '1' (options ["0","1","-1","2"]),
--- matching this file's full-text convention; the 3a guards above leave it
--- untouched on re-runs.
+-- correct_answer is the letter 'B' (option index 1, text '1'; options
+-- ["0","1","-1","2"]), matching the seed.sql fold and the letter convention
+-- of the collision fixes above — the option TEXT '1' would trip the
+-- db:verify numeric-MCQ check. The 3a guards leave 'B' untouched on re-runs,
+-- so applying this file over an already-seeded fresh DB is a no-op here.
 UPDATE questions
-SET correct_answer = '1',
+SET correct_answer = 'B',
     explanation = 'f(2) = 8 - 12 + 2k + 2 = 0 → 2k = 2 → k = 1.'
 WHERE id = 'q_em_007';
 
