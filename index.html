@@ -83,15 +83,15 @@
     <!-- Fonts - preconnect first, then load with swap -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <link id="google-fonts" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" media="print" />
     <noscript>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
     </noscript>
 
     <!-- KaTeX for Math - load async -->
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <link id="katex-css" rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" as="style" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous" />
     <noscript>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous" />
     </noscript>
 
     <!-- Preload critical assets -->
@@ -373,39 +373,7 @@
     </div>
     <script type="module" src="/src/main.tsx"></script>
 
-    <!-- Service Worker Registration -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
-              registration.addEventListener('updatefound', () => {
-                const newWorker = registration.installing;
-                if (!newWorker) return;
-                newWorker.addEventListener('statechange', () => {
-                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    const banner = document.createElement('div');
-                    banner.setAttribute('role', 'status');
-                    banner.style.cssText =
-                      'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);' +
-                      'background:#002B19;color:#fff;padding:12px 20px;border-radius:8px;' +
-                      'font:500 14px Inter,system-ui,sans-serif;z-index:10001;' +
-                      'box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;gap:12px;align-items:center;';
-                    banner.innerHTML =
-                      '<span>A new version is available.</span>' +
-                      '<button id="sw-update-btn" style="background:#FCD116;color:#002B19;border:0;' +
-                      'border-radius:6px;padding:6px 14px;font-weight:600;cursor:pointer;">Reload</button>';
-                    document.body.appendChild(banner);
-                    document.getElementById('sw-update-btn').addEventListener('click', () => {
-                      window.location.reload();
-                    });
-                  }
-                });
-              });
-            })
-            .catch(() => { /* SW registration failed — app still works */ });
-        });
-      }
-    </script>
+    <!-- Service Worker Registration + async stylesheet swaps (externalized for CSP) -->
+    <script src="/app-bootstrap.js" defer></script>
   </body>
 </html>
