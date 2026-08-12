@@ -35,6 +35,7 @@ import { studyRoomsApp } from './study-rooms';
 import tutorClassroomApp from './tutor-classroom';
 import { cleanupExpiredDemoData } from './demoUtils';
 import { awardPoints } from './points';
+import { raceApp, runRaceCycleMaintenance } from './race';
 import {
   getDailyUsage,
   checkCanAnswer,
@@ -68,6 +69,8 @@ interface Env {
   GOOGLE_CLIENT_SECRET?: string;
   GOOGLE_REDIRECT_URI?: string;
   NOTIFICATION_EMAILS?: string; // Comma-separated list of additional emails to receive all site notifications
+  REGISTRATION_MODE?: string; // Growth loop (Task 5): open | request
+  RACE_TARGET_POINTS?: string; // Growth loop: weekly race target (default 1000)
 }
 
 // User type for JWT payload
@@ -7344,6 +7347,54 @@ adminApp.get('/users/:id/subscription', async (c) => {
   }
 });
 
+// Growth loop: minimal founder knob for tuning a race cycle's target/window.
+adminApp.patch('/race/cycles/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+    const body = await parseJsonBody(c);
+    if (!body) {
+      return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+    }
+
+    const updates: string[] = [];
+    const binds: unknown[] = [];
+
+    if (body.targetPoints !== undefined) {
+      const target = Number(body.targetPoints);
+      if (!Number.isFinite(target) || target <= 0) {
+        return c.json({ success: false, error: 'targetPoints must be a positive number' }, 400);
+      }
+      updates.push('target_points = ?');
+      binds.push(Math.round(target));
+    }
+
+    if (body.endsAt !== undefined) {
+      if (typeof body.endsAt !== 'string' || isNaN(Date.parse(body.endsAt))) {
+        return c.json({ success: false, error: 'endsAt must be a valid datetime string' }, 400);
+      }
+      updates.push('ends_at = ?');
+      binds.push(body.endsAt);
+    }
+
+    if (updates.length === 0) {
+      return c.json({ success: false, error: 'Nothing to update' }, 400);
+    }
+
+    binds.push(id);
+    const result = await c.env.DB.prepare(
+      `UPDATE race_cycles SET ${updates.join(', ')} WHERE id = ?`
+    ).bind(...binds).run();
+
+    if (result.meta.changes === 0) {
+      return c.json({ success: false, error: 'Cycle not found' }, 404);
+    }
+    return c.json({ success: true, data: { id } });
+  } catch (error) {
+    console.error('Admin update race cycle error:', error);
+    return c.json({ success: false, error: 'Failed to update race cycle' }, 500);
+  }
+});
+
 // Mount admin routes
 app.route('/api/admin', adminApp);
 
@@ -10202,6 +10253,9 @@ app.route('/api/revision-classroom', revisionClassroomApp);
 app.route('/api/study-rooms', studyRoomsApp);
 app.route('/api/tutor-classroom', tutorClassroomApp);
 
+// Mount Race routes (growth loop; /current authed, /cycles public, param-free paths)
+app.route('/api/race', raceApp);
+
 // Mount OAuth routes (public with internal auth handling)
 app.route('/api/auth/oauth', oauthApp);
 
@@ -10257,6 +10311,14 @@ export default {
       console.log(`Stale paper attempts cleanup: ${stalePaperAttempts.meta.changes} attempts abandoned`);
     } catch (error) {
       console.error('Paper attempts cleanup failed:', error);
+    }
+
+    // Growth loop: crown ended race cycles, open next week's cycles
+    try {
+      const race = await runRaceCycleMaintenance(env.DB, Number(env.RACE_TARGET_POINTS) || 1000);
+      console.log(`Race maintenance: ${race.crowned} crowned, ${race.opened} opened`);
+    } catch (error) {
+      console.error('Race cycle maintenance failed:', error);
     }
   },
 };
