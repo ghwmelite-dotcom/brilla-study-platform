@@ -73,3 +73,14 @@ PENDING USER ACTIONS:
 2. Rotate JWT_SECRET on a quiet day (invalidates all sessions; forces re-login; closes the old-secret exposure question) + change the admin password from anything default-shaped.
 3. Browser smoke: login (Turnstile), one AI call, one D1 read, avatar upload (real + fake PNG), KaTeX question, PDF paper, PhET embed, ambient audio, one previously-unanswerable question (065/066/067 topic, 037 BECE, q_alevel_maths_*).
 4. Watch Workers Logs for 48h (observability now on).
+
+## PROD VERIFICATION SWEEP (2026-08-12, post-deploy)
+
+Live QA matrix: 28/29 PASS. Fixed the one FAIL + two safety items found along the way:
+- `/api/essays/history` 500 → root cause: prod was missing 15 tables (legacy migration chain partially failed years ago: essay_*, tutor-classroom set, chat moderation, structured_question_parts, etc.). Prod patch 088d created the 14 real ones (questions_new scratch excluded). Endpoint now 200.
+- `/auth/reset-demo-passwords` was live and unauthenticated (a probe reset both demo accounts). Now 404 outside development; worker redeployed. Demo account passwords should be rotated by the owner (they're repo-known: Teacher123!/Student123!).
+- Prod was missing the 40 A-level maths questions (082/084 PK collision's silent OR IGNORE loss). Prod patch 088e restored them — prod now has all 4,545 questions, matching the gate-verified seed.
+- Worker tail sample: zero exceptions during live traffic.
+- CORS verified: evil.com gets no ACAO; brillaprep.org echoed. /auth/setup 404. Admin routes 401/403 correctly.
+
+Remaining USER ACTIONS: rotate JWT_SECRET + demo/admin passwords; browser smoke list above; SETUP_KEY optional.
