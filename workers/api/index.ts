@@ -7071,6 +7071,13 @@ adminApp.post('/users', async (c) => {
   // No Turnstile here: this route sits behind requireAdmin, so the caller is
   // an authenticated admin — bot verification is for public endpoints only.
 
+  // Role whitelist: admin-created accounts may only be one of the four
+  // canonical roles (schema CHECK constraint enforces the same set).
+  const ADMIN_CREATABLE_ROLES = ['student', 'teacher', 'parent', 'admin'];
+  if (role && !ADMIN_CREATABLE_ROLES.includes(role)) {
+    return c.json({ success: false, error: 'Invalid role' }, 400);
+  }
+
   try {
     // Check if email already exists
     const existing = await c.env.DB.prepare(

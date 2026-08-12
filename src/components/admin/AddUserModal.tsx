@@ -14,12 +14,13 @@ import {
   Loader2,
   UserPlus,
   AlertCircle,
+  Heart,
 } from 'lucide-react';
 import { useAuthStore, type CreateUserData } from '@/stores/authStore';
 import { cn } from '@/utils';
 import type { SchoolLevel } from '@/types';
 
-type UserRole = 'student' | 'teacher' | 'admin';
+type UserRole = 'student' | 'teacher' | 'parent' | 'admin';
 
 interface AddUserModalProps {
   isOpen: boolean;
@@ -240,6 +241,19 @@ export function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModalProps) 
               </button>
 
               <button
+                onClick={() => setSelectedRole('parent')}
+                className="w-full flex items-center gap-4 p-4 border-2 border-neutral-200 rounded-xl hover:border-amber-500 hover:bg-amber-50 transition-all group"
+              >
+                <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center group-hover:bg-amber-200 transition-colors">
+                  <Heart className="w-6 h-6 text-amber-600" />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-semibold text-neutral-900">Parent</h3>
+                  <p className="text-sm text-neutral-500">Monitor a child's progress</p>
+                </div>
+              </button>
+
+              <button
                 onClick={() => setSelectedRole('admin')}
                 className="w-full flex items-center gap-4 p-4 border-2 border-neutral-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all group"
               >
@@ -270,6 +284,7 @@ export function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModalProps) 
                   'px-3 py-1 rounded-full text-sm font-medium',
                   selectedRole === 'student' ? 'bg-blue-100 text-blue-700' :
                   selectedRole === 'teacher' ? 'bg-green-100 text-green-700' :
+                  selectedRole === 'parent' ? 'bg-amber-100 text-amber-700' :
                   'bg-purple-100 text-purple-700'
                 )}>
                   {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}

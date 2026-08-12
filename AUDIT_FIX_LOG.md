@@ -176,3 +176,27 @@ grading, parent child-linking, admin approvals). Role gating is covered
 by the vitest suites (oauth-register-role, admin-schools, exam-boards-
 auth, notifications-auth et al.) but a live UI walkthrough per role
 requires approved test accounts.
+
+## Credentialed E2E — student + tutor live journeys (2026-08-12 ~23:55 UTC)
+
+Harness: scripts/e2e-roles.cjs (puppeteer-core + system Chrome, headed
+because Turnstile withholds tokens from headless). Test accounts created
+via admin panel; passwords set and email_verified flipped directly in D1
+(test mailboxes cannot receive the set-password email).
+
+Result: 31/31. Both roles log in through the real UI (Turnstile managed
+mode auto-passes headed Chrome), receive JWTs, render their dashboards
+with zero unexpected console errors or failed requests. API matrix:
+student 7/7 own endpoints 200; teacher 5/5 own endpoints 200; both
+roles correctly 403'd from /admin/* and /parents/*.
+
+Findings:
+- P3 (documented, no leak): GET /teacher/dashboard and GET /classes
+  return 200 to any authenticated role, but every query is self-scoped
+  (WHERE teacher_id = caller), so a student receives empty data only.
+  Optional hardening: explicit 403 for role !== 'teacher' — deferred so
+  as not to break any legit student-side callers.
+- Test-infra notes encoded in the harness: Turnstile needs headed
+  Chrome; the landing promo (8s timer) is suppressed via the
+  brilla_promo_dismissed sessionStorage flag; each account runs in an
+  isolated browser context to prevent session bleed.
