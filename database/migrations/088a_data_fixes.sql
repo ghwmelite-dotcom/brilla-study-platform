@@ -111,6 +111,11 @@ UPDATE flashcard_decks  SET subject_id = 'subj_wassce_biology'   WHERE subject_i
 -- (seed.sql:116 carries full metadata: exam_type_id, category_id, waec_code).
 -- 063:23 created the lookalike subj_wassce_business_mgt and topic_bm_* under
 -- it. Repoint and remove the duplicate subject row.
+-- Prod fix (2026-08-12): the canonical row was never inserted on prod (the
+-- destructive seed prologue removed it, and 063 created only the lookalike),
+-- so the repoint UPDATEs fail FK without this idempotent insert first.
+INSERT OR IGNORE INTO subjects (id, name, slug, icon, color, description, display_order, exam_type_id, category_id, waec_code, is_active, created_at)
+VALUES ('subj_wassce_bus_mgmt', 'Business Management', 'wassce-business-management', 'Briefcase', '#6366F1', 'Principles of planning, organizing, and managing business operations', 3, 'exam_wassce', 'cat_wassce_business', 'BMT', 1, datetime('now'));
 UPDATE topics    SET subject_id = 'subj_wassce_bus_mgmt' WHERE subject_id = 'subj_wassce_business_mgt';
 UPDATE questions SET subject_id = 'subj_wassce_bus_mgmt' WHERE subject_id = 'subj_wassce_business_mgt';
 DELETE FROM subjects WHERE id = 'subj_wassce_business_mgt';
