@@ -114,8 +114,18 @@ UPDATE flashcard_decks  SET subject_id = 'subj_wassce_biology'   WHERE subject_i
 -- Prod fix (2026-08-12): the canonical row was never inserted on prod (the
 -- destructive seed prologue removed it, and 063 created only the lookalike),
 -- so the repoint UPDATEs fail FK without this idempotent insert first.
-INSERT OR IGNORE INTO subjects (id, name, slug, icon, color, description, display_order, exam_type_id, category_id, waec_code, is_active, created_at)
-VALUES ('subj_wassce_bus_mgmt', 'Business Management', 'wassce-business-management', 'Briefcase', '#6366F1', 'Principles of planning, organizing, and managing business operations', 3, 'exam_wassce', 'cat_wassce_business', 'BMT', 1, datetime('now'));
+-- NOTE: prod's subjects table is an older shape (no exam_type_id/category_id/
+-- waec_code/is_active columns — dropped by the 018/028-era rebuilds), so this
+-- insert uses only the 8 columns both schemas share. The metadata columns are
+-- backfilled by database/prod-patches/088b_reconcile_subjects_columns.sql.
+INSERT OR IGNORE INTO subjects (id, name, slug, icon, color, description, display_order, created_at)
+VALUES ('subj_wassce_bus_mgmt', 'Business Management', 'wassce-business-management', 'Briefcase', '#6366F1', 'Principles of planning, organizing, and managing business operations', 3, datetime('now'));
+-- Backfill the metadata columns (exist on canonical schema; added to prod by
+-- database/prod-patches/088b which runs BEFORE this file on prod). On fresh
+-- deploys the row already carries metadata, so this is a no-op there.
+UPDATE subjects
+SET exam_type_id = 'exam_wassce', category_id = 'cat_wassce_business', waec_code = 'BMT', is_active = 1
+WHERE id = 'subj_wassce_bus_mgmt' AND exam_type_id IS NULL;
 UPDATE topics    SET subject_id = 'subj_wassce_bus_mgmt' WHERE subject_id = 'subj_wassce_business_mgt';
 UPDATE questions SET subject_id = 'subj_wassce_bus_mgmt' WHERE subject_id = 'subj_wassce_business_mgt';
 DELETE FROM subjects WHERE id = 'subj_wassce_business_mgt';
