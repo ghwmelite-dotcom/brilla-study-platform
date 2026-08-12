@@ -1,11 +1,14 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
+import { mintLinkToken, LINK_TOKEN_TTL_MS } from './telegram';
 
 // Types for Cloudflare bindings
 interface Env {
   DB: D1Database;
   JWT_SECRET: string;
+  TELEGRAM_BOT_USERNAME?: string;
+  TELEGRAM_COMMUNITY_URL?: string;
 }
 
 const notificationsApp = new Hono<{
@@ -145,6 +148,56 @@ notificationsApp.delete('/:id', async (c) => {
     console.error('Error deleting notification:', error);
     return c.json({ success: false, error: 'Failed to delete notification' }, 500);
   }
+});
+
+// =============================================
+// TELEGRAM LINKING ENDPOINTS
+// (the bot webhook lives in telegram.ts, mounted unauthenticated at
+// /api/telegram — do NOT add it here)
+// =============================================
+
+// Mint a one-time link token and return the t.me deep link for the bot.
+notificationsApp.post('/telegram/link', async (c) => {
+  try {
+    const userId = c.get('userId')!;
+    if (!c.env.TELEGRAM_BOT_USERNAME) {
+      return c.json({ success: false, error: 'Telegram linking is not configured' }, 503);
+    }
+    const token = mintLinkToken();
+    const expiresAt = new Date(Date.now() + LINK_TOKEN_TTL_MS).toISOString();
+    await c.env.DB.prepare(
+      'INSERT INTO telegram_link_tokens (token, user_id, expires_at) VALUES (?, ?, ?)'
+    ).bind(token, userId, expiresAt).run();
+    return c.json({
+      success: true,
+      data: { startUrl: `https://t.me/${c.env.TELEGRAM_BOT_USERNAME}?start=${token}`, expiresAt },
+    });
+  } catch (error) {
+    console.error('Error creating Telegram link token:', error);
+    return c.json({ success: false, error: 'Failed to create Telegram link' }, 500);
+  }
+});
+
+// Current link state for the signed-in user.
+notificationsApp.get('/telegram/status', async (c) => {
+  try {
+    const userId = c.get('userId')!;
+    const row = await c.env.DB.prepare(
+      'SELECT username, stale FROM telegram_links WHERE user_id = ?'
+    ).bind(userId).first<{ username: string | null; stale: number }>();
+    return c.json({
+      success: true,
+      data: { linked: !!row, username: row?.username ?? null, stale: !!row?.stale },
+    });
+  } catch (error) {
+    console.error('Error fetching Telegram status:', error);
+    return c.json({ success: false, error: 'Failed to fetch Telegram status' }, 500);
+  }
+});
+
+// Public community URL (null when not configured).
+notificationsApp.get('/telegram/community', async (c) => {
+  return c.json({ success: true, data: { url: c.env.TELEGRAM_COMMUNITY_URL ?? null } });
 });
 
 // =============================================

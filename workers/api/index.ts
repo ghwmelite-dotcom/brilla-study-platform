@@ -36,6 +36,7 @@ import tutorClassroomApp from './tutor-classroom';
 import { cleanupExpiredDemoData } from './demoUtils';
 import { awardPoints } from './points';
 import { raceApp, runRaceCycleMaintenance } from './race';
+import { telegramWebhookApp } from './telegram';
 import {
   getDailyUsage,
   checkCanAnswer,
@@ -10823,6 +10824,10 @@ app.route('/api/tutor-classroom', tutorClassroomApp);
 
 // Mount Race routes (growth loop; /current authed, /cycles public, param-free paths)
 app.route('/api/race', raceApp);
+
+// Telegram bot webhook — deliberately unauthenticated (Telegram holds no user
+// JWT); guarded by TELEGRAM_WEBHOOK_SECRET header check inside telegram.ts.
+app.route('/api/telegram', telegramWebhookApp);
 
 // Mount OAuth routes (public with internal auth handling)
 app.route('/api/auth/oauth', oauthApp);
