@@ -63,6 +63,11 @@ Final state: 200/200 tests green (40 files), frontend tsc 0 errors, workers tsc 
 - Site deployed to Pages: HSTS + CSP live on brillaprep.org (script-src no unsafe-inline, PhET/mixkit allowed), og-image 200, app-bootstrap 200. Pitch site deployed with HSTS+strict CSP.
 - Rehearsal: full fresh-env flow proven on throwaway D1 (deleted after); schema apply is idempotent (IF NOT EXISTS everywhere).
 
+## POST-DEPLOY FOLLOW-UPS LANDED (2026-08-12)
+
+- wrangler 3.114 → 4.121 (npm audit 12 → 7; remaining are vitest-3/vite-6 and react-router-7 majors). Pushed; prod worker still on the wrangler-3-built bundle (rides the next worker deploy).
+- Raw-fetch 401 parity: `fetchWithAuth` in `src/lib/api.ts` (shared handleUnauthorized incl. auth-page loop guard + FormData handling); 70 raw auth fetches migrated across 10 stores/pages; houseStore mutations (previously always-401, sending no auth) now authenticate. Bonus fix: Settings.tsx avatar upload's `brilla-token` typo (always-empty Bearer) repaired by the migration. Site redeployed.
+
 PENDING USER ACTIONS:
 1. Set 3 missing secrets: `wrangler secret put PAYSTACK_SECRET_KEY`, `PAYSTACK_WEBHOOK_SECRET`, `SETUP_KEY` (with `CLOUDFLARE_ACCOUNT_ID=ea2eb3a9813660dfca2a60e594858538`). Without PAYSTACK_SECRET_KEY all Paystack calls fail; without the webhook secret, webhooks 500 BY DESIGN.
 2. Rotate JWT_SECRET on a quiet day (invalidates all sessions; forces re-login; closes the old-secret exposure question) + change the admin password from anything default-shaped.
