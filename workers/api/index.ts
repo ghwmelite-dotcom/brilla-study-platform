@@ -7666,7 +7666,8 @@ adminApp.get('/schools', async (c) => {
     // system-generated @ambassador.brilla mailbox.
     const result = await c.env.DB.prepare(`
       SELECT s.id, s.name, s.slug, s.status, s.created_at,
-        (SELECT COUNT(*) FROM users u WHERE u.school_id = s.id) AS student_count,
+        (SELECT COUNT(*) FROM users u WHERE u.school_id = s.id
+          AND u.email NOT LIKE '%@ambassador.brilla') AS student_count,
         (SELECT ap.referral_code FROM affiliate_profiles ap
          JOIN users au ON au.id = ap.user_id
          WHERE au.school_id = s.id AND au.email LIKE '%@ambassador.brilla'
@@ -7837,16 +7838,24 @@ adminApp.post('/schools/:id/students', async (c) => {
       }
     }
 
-    // Resolve which candidate emails exist and whether they are already
-    // assigned, so skipped reasons distinguish not_found from
-    // already_assigned (a plain UPDATE ... WHERE school_id IS NULL would
-    // silently change 0 rows for both).
-    const existingByEmail = new Map<string, { id: string; school_id: string | null }>();
+    // Resolve which candidate emails exist, whether they are already
+    // assigned, and whether they are assignable at all (approved students
+    // only), so skipped reasons distinguish not_found / already_assigned /
+    // not_eligible (a plain UPDATE ... WHERE school_id IS NULL would silently
+    // change 0 rows for all three).
+    interface BulkUserRow {
+      id: string;
+      email: string;
+      school_id: string | null;
+      role: string;
+      status: string;
+    }
+    const existingByEmail = new Map<string, BulkUserRow>();
     if (validEmails.length > 0) {
       const placeholders = validEmails.map(() => '?').join(',');
       const found = await c.env.DB.prepare(
-        `SELECT id, email, school_id FROM users WHERE email IN (${placeholders})`
-      ).bind(...validEmails).all<{ id: string; email: string; school_id: string | null }>();
+        `SELECT id, email, school_id, role, status FROM users WHERE email IN (${placeholders})`
+      ).bind(...validEmails).all<BulkUserRow>();
       for (const row of found.results || []) {
         existingByEmail.set(row.email, row);
       }
@@ -7864,11 +7873,17 @@ adminApp.post('/schools/:id/students', async (c) => {
         skipped.push({ email, reason: 'already_assigned' });
         continue;
       }
-      // The school_id IS NULL guard stays in the SQL as a backstop against a
-      // concurrent assignment between the SELECT above and this batch.
+      if (user.role !== 'student' || user.status !== 'approved') {
+        skipped.push({ email, reason: 'not_eligible' });
+        continue;
+      }
+      // The school_id IS NULL + role/status guards stay in the SQL as a
+      // backstop against a concurrent change between the SELECT above and
+      // this batch.
       statements.push(
         c.env.DB.prepare(
-          'UPDATE users SET school_id = ? WHERE email = ? AND school_id IS NULL'
+          `UPDATE users SET school_id = ? WHERE email = ? AND school_id IS NULL
+             AND role = 'student' AND status = 'approved'`
         ).bind(schoolId, email)
       );
       assigned++;
@@ -7903,10 +7918,14 @@ adminApp.post('/schools/:id/students/:userId', async (c) => {
     }
 
     const user = await c.env.DB.prepare(
-      'SELECT id, school_id FROM users WHERE id = ?'
-    ).bind(userId).first<{ id: string; school_id: string | null }>();
+      'SELECT id, school_id, role, status FROM users WHERE id = ?'
+    ).bind(userId).first<{ id: string; school_id: string | null; role: string; status: string }>();
     if (!user) {
       return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    if (user.role !== 'student' || user.status !== 'approved') {
+      return c.json({ success: false, error: 'Only approved student accounts can be assigned to a school' }, 409);
     }
 
     if (user.school_id && user.school_id !== schoolId && !force) {
@@ -7914,7 +7933,8 @@ adminApp.post('/schools/:id/students/:userId', async (c) => {
     }
 
     await c.env.DB.prepare(
-      'UPDATE users SET school_id = ? WHERE id = ?'
+      `UPDATE users SET school_id = ? WHERE id = ?
+         AND role = 'student' AND status = 'approved'`
     ).bind(schoolId, userId).run();
 
     return c.json({ success: true, data: { userId, schoolId } });

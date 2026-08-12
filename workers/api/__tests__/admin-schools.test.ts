@@ -47,8 +47,8 @@ interface DbOptions {
   // Row for `SELECT id FROM affiliate_profiles WHERE referral_code = ?`.
   codeRow?: unknown;
   // Users found by the bulk-assign `WHERE email IN (...)` select.
-  usersByEmail?: Record<string, { id: string; school_id: string | null }>;
-  // Row for `SELECT id, school_id FROM users WHERE id = ?` (individual assign).
+  usersByEmail?: Record<string, { id: string; school_id: string | null; role: string; status: string }>;
+  // Row for `SELECT id, school_id, role, status FROM users WHERE id = ?` (individual assign).
   userRow?: unknown;
   // meta.changes returned by run().
   runChanges?: number;
@@ -60,6 +60,7 @@ function makeDb(opts: DbOptions = {}) {
   const batchCalls: CapturedStatement[][] = [];
   const allCalls: CapturedStatement[] = [];
   const runs: CapturedStatement[] = [];
+  const prepareCalls: string[] = [];
 
   const stmtFor = (sql: string, args: unknown[]) => ({
     sql,
@@ -96,7 +97,13 @@ function makeDb(opts: DbOptions = {}) {
       if (sql.includes('FROM users') && sql.includes('email IN')) {
         const rows = Object.entries(opts.usersByEmail ?? {})
           .filter(([email]) => args.includes(email))
-          .map(([email, u]) => ({ id: u.id, email, school_id: u.school_id }));
+          .map(([email, u]) => ({
+            id: u.id,
+            email,
+            school_id: u.school_id,
+            role: u.role,
+            status: u.status,
+          }));
         return Promise.resolve({ results: rows });
       }
       return Promise.resolve({ results: [] });
@@ -111,21 +118,24 @@ function makeDb(opts: DbOptions = {}) {
   });
 
   const db = {
-    prepare: vi.fn((sql: string) => ({
-      sql,
-      ...stmtFor(sql, []),
-      bind: (...args: unknown[]) => {
-        allCalls.push({ sql, args });
-        return stmtFor(sql, args);
-      },
-    })),
+    prepare: vi.fn((sql: string) => {
+      prepareCalls.push(sql);
+      return {
+        sql,
+        ...stmtFor(sql, []),
+        bind: (...args: unknown[]) => {
+          allCalls.push({ sql, args });
+          return stmtFor(sql, args);
+        },
+      };
+    }),
     batch: vi.fn((statements: CapturedStatement[]) => {
       batchCalls.push(statements.map((s) => ({ sql: s.sql, args: s.args })));
       return Promise.resolve([]);
     }),
   } as unknown as D1Database;
 
-  return { db, batchCalls, allCalls, runs };
+  return { db, batchCalls, allCalls, runs, prepareCalls };
 }
 
 async function authHeader(role: 'admin' | 'student' = 'admin') {
@@ -288,15 +298,17 @@ describe('admin pilot-schools endpoints (Task 1)', () => {
     const { db, batchCalls } = makeDb({
       schoolRow: SCHOOL,
       usersByEmail: {
-        'free@test.dev': { id: 'user_free', school_id: null },
-        'taken@test.dev': { id: 'user_taken', school_id: 'sch_other' },
+        'free@test.dev': { id: 'user_free', school_id: null, role: 'student', status: 'approved' },
+        'taken@test.dev': { id: 'user_taken', school_id: 'sch_other', role: 'student', status: 'approved' },
+        'admin@test.dev': { id: 'user_admin', school_id: null, role: 'admin', status: 'approved' },
+        'pending@test.dev': { id: 'user_pending', school_id: null, role: 'student', status: 'pending' },
       },
     });
     const res = await worker.fetch(
       adminRequest(
         '/schools/sch_achimota/students',
         'POST',
-        { emails: ['free@test.dev', 'ghost@test.dev', 'taken@test.dev'] },
+        { emails: ['free@test.dev', 'ghost@test.dev', 'taken@test.dev', 'admin@test.dev', 'pending@test.dev'] },
         await authHeader(),
       ),
       { DB: db, JWT_SECRET },
@@ -309,17 +321,23 @@ describe('admin pilot-schools endpoints (Task 1)', () => {
       expect.arrayContaining([
         { email: 'ghost@test.dev', reason: 'not_found' },
         { email: 'taken@test.dev', reason: 'already_assigned' },
+        // Non-student roles and non-approved accounts are never assigned.
+        { email: 'admin@test.dev', reason: 'not_eligible' },
+        { email: 'pending@test.dev', reason: 'not_eligible' },
       ]),
     );
-    expect(body.data.skipped).toHaveLength(2);
+    expect(body.data.skipped).toHaveLength(4);
 
-    // One batch, containing only the unassigned user's UPDATE — the
-    // already-assigned user is never re-binded.
+    // One batch, containing only the eligible unassigned user's UPDATE — the
+    // already-assigned and ineligible users are never re-binded.
     expect(batchCalls).toHaveLength(1);
     const batch = batchCalls[0];
     expect(batch).toHaveLength(1);
     expect(batch[0].sql).toContain('UPDATE users SET school_id = ?');
     expect(batch[0].sql).toContain('school_id IS NULL');
+    // Eligibility filter is also enforced in the SQL itself (race backstop).
+    expect(batch[0].sql).toContain("role = 'student'");
+    expect(batch[0].sql).toContain("status = 'approved'");
     expect(batch[0].args).toEqual(['sch_achimota', 'free@test.dev']);
   });
 
@@ -340,10 +358,10 @@ describe('admin pilot-schools endpoints (Task 1)', () => {
     expect(notArray.status).toBe(400);
   });
 
-  it('(d) POST /schools/:id/students/:userId assigns an unassigned user', async () => {
+  it('(d) POST /schools/:id/students/:userId assigns an unassigned approved student', async () => {
     const { db, runs } = makeDb({
       schoolRow: SCHOOL,
-      userRow: { id: 'user_1', school_id: null },
+      userRow: { id: 'user_1', school_id: null, role: 'student', status: 'approved' },
     });
     const res = await worker.fetch(
       adminRequest('/schools/sch_achimota/students/user_1', 'POST', {}, await authHeader()),
@@ -357,13 +375,44 @@ describe('admin pilot-schools endpoints (Task 1)', () => {
 
     const update = runs.find((r) => r.sql.includes('UPDATE users SET school_id = ?'));
     expect(update).toBeDefined();
+    // Eligibility filter enforced in the SQL too.
+    expect(update!.sql).toContain("role = 'student'");
+    expect(update!.sql).toContain("status = 'approved'");
     expect(update!.args).toEqual(['sch_achimota', 'user_1']);
+  });
+
+  it('(d) POST /schools/:id/students/:userId → 409 for non-student or non-approved accounts, no UPDATE', async () => {
+    const headers = await authHeader();
+
+    const teacher = makeDb({
+      schoolRow: SCHOOL,
+      userRow: { id: 'user_t', school_id: null, role: 'teacher', status: 'approved' },
+    });
+    const resTeacher = await worker.fetch(
+      adminRequest('/schools/sch_achimota/students/user_t', 'POST', {}, headers),
+      { DB: teacher.db, JWT_SECRET },
+    );
+    expect(resTeacher.status).toBe(409);
+    expect((await resTeacher.json()).error).toMatch(/approved student/);
+    expect(teacher.runs.some((r) => r.sql.includes('UPDATE users SET school_id'))).toBe(false);
+
+    const suspended = makeDb({
+      schoolRow: SCHOOL,
+      userRow: { id: 'user_s', school_id: null, role: 'student', status: 'suspended' },
+    });
+    const resSuspended = await worker.fetch(
+      adminRequest('/schools/sch_achimota/students/user_s', 'POST', { force: true }, headers),
+      { DB: suspended.db, JWT_SECRET },
+    );
+    // force does NOT override eligibility — only reassignment.
+    expect(resSuspended.status).toBe(409);
+    expect(suspended.runs.some((r) => r.sql.includes('UPDATE users SET school_id'))).toBe(false);
   });
 
   it('(d) POST /schools/:id/students/:userId → 409 on reassignment without force, 200 with force', async () => {
     const headers = await authHeader();
 
-    const noForce = makeDb({ schoolRow: SCHOOL, userRow: { id: 'user_1', school_id: 'sch_other' } });
+    const noForce = makeDb({ schoolRow: SCHOOL, userRow: { id: 'user_1', school_id: 'sch_other', role: 'student', status: 'approved' } });
     const res409 = await worker.fetch(
       adminRequest('/schools/sch_achimota/students/user_1', 'POST', {}, headers),
       { DB: noForce.db, JWT_SECRET },
@@ -371,7 +420,7 @@ describe('admin pilot-schools endpoints (Task 1)', () => {
     expect(res409.status).toBe(409);
     expect(noForce.runs.some((r) => r.sql.includes('UPDATE users SET school_id'))).toBe(false);
 
-    const forced = makeDb({ schoolRow: SCHOOL, userRow: { id: 'user_1', school_id: 'sch_other' } });
+    const forced = makeDb({ schoolRow: SCHOOL, userRow: { id: 'user_1', school_id: 'sch_other', role: 'student', status: 'approved' } });
     const res200 = await worker.fetch(
       adminRequest('/schools/sch_achimota/students/user_1', 'POST', { force: true }, headers),
       { DB: forced.db, JWT_SECRET },
@@ -425,7 +474,7 @@ describe('admin pilot-schools endpoints (Task 1)', () => {
   });
 
   it('GET /schools returns the mapped envelope with studentCount and ambassadorCode', async () => {
-    const { db } = makeDb({
+    const { db, prepareCalls } = makeDb({
       schoolsList: [
         { ...SCHOOL, student_count: 3, ambassador_code: 'ACHIM26' },
         {
@@ -466,6 +515,11 @@ describe('admin pilot-schools endpoints (Task 1)', () => {
         createdAt: '2026-08-02 00:00:00',
       },
     ]);
+
+    // studentCount must exclude the ambassador account itself.
+    const listSql = prepareCalls.find((sql) => sql.includes('FROM schools'));
+    expect(listSql).toBeDefined();
+    expect(listSql).toContain("NOT LIKE '%@ambassador.brilla'");
   });
 
   it('(e) all routes → 401 without a token, 403 with a student-role token', async () => {
