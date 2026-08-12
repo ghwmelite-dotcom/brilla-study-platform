@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { House, HouseStanding, HousePoints } from '@/types';
+import { fetchWithAuth } from '@/lib/api';
 
 interface HouseState {
   houses: House[];
@@ -128,7 +129,7 @@ export const useHouseStore = create<HouseState>()((set, get) => ({
 
   awardPoints: async (houseId, userId, points, source, sourceId) => {
     try {
-      const response = await fetch('/api/houses/points', {
+      const response = await fetchWithAuth('/api/houses/points', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ houseId, userId, points, source, sourceId }),
@@ -154,7 +155,7 @@ export const useHouseStore = create<HouseState>()((set, get) => ({
   createHouse: async (userId, houseData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch('/api/houses', {
+      const response = await fetchWithAuth('/api/houses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, ...houseData }),
@@ -194,7 +195,7 @@ export const useHouseStore = create<HouseState>()((set, get) => ({
 
   updateUserHouse: async (userId, houseId) => {
     try {
-      const response = await fetch(`/api/users/${userId}/house`, {
+      const response = await fetchWithAuth(`/api/users/${userId}/house`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ houseId }),
