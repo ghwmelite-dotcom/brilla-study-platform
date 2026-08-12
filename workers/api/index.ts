@@ -28,6 +28,7 @@ import { engagementApp } from './engagement';
 import { friendsApp } from './friends';
 import { oauthApp, ALLOWED_SELF_SERVE_ROLES } from './oauth';
 import { checkRateLimit, cleanupRateLimits, RATE_LIMITS, type RateLimitResult } from './rate-limit';
+import { validateRegistration } from './validation';
 import { examBoardsApp } from './exam-boards';
 import { revisionClassroomApp } from './revision-classroom';
 import { studyRoomsApp } from './study-rooms';
@@ -913,6 +914,11 @@ publicApp.post('/auth/register', async (c) => {
   }
 
   try {
+    const validationError = validateRegistration({ email, password, name });
+    if (validationError) {
+      return c.json({ success: false, error: validationError }, 400);
+    }
+
     // Check if email already exists
     const existing = await c.env.DB.prepare(
       'SELECT id FROM users WHERE email = ?'
