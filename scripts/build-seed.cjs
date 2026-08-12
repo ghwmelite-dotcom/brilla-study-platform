@@ -25,8 +25,8 @@
  *      fixes therefore land exactly as they do on production. Source fixes are
  *      applied as text transforms where Task 3/4 require the seed to differ
  *      from raw history:
- *        - seed.sql (base): demo user rows teacher_1/student_1 dropped
- *          (demo access removed; admin_1 bootstrap admin kept)
+ *        - seed.sql (base): demo user rows teacher_1/student_1/parent_1
+ *          dropped (demo access removed; admin_1 bootstrap admin kept)
  *        - 069: demo exam preferences dropped entirely (pref_student_bece,
  *          pref_teacher_*) — their user rows no longer exist
  *        - 084_alevel_maths: q_alevel_math_0NN -> q_alevel_maths_0NN (its
@@ -172,24 +172,33 @@ function classify(stmt) {
 const transformLog = [];
 function applySourceTransforms(file, sql) {
   if (file === 'seed.sql (base)') {
-    // Demo access removed: drop the demo teacher/student user rows. admin_1
-    // stays (bootstrap admin, NULL password; the owner sets it out-of-band)
-    // and parent_1 stays (local demo-mode placeholder, out of scope here).
+    // Demo access removed: drop ALL demo user rows (teacher/student/parent).
+    // admin_1 stays (bootstrap admin, NULL password; the owner sets it
+    // out-of-band).
     const dropped = [];
-    sql = sql
-      .split('\n')
-      .filter((line) => {
-        if (/^\('(teacher_1|student_1)',/.test(line)) {
-          dropped.push(line.slice(0, 30));
-          return false;
+    const lines = [];
+    for (const line of sql.split('\n')) {
+      if (/^\('(teacher_1|student_1|parent_1)',/.test(line)) {
+        dropped.push(line.slice(0, 30));
+        if (line.trimEnd().endsWith(';')) {
+          // The dropped row carried the INSERT's terminating ';' — move it
+          // onto the last retained row of the VALUES list.
+          for (let i = lines.length - 1; i >= 0; i--) {
+            if (lines[i].trimEnd().endsWith(',')) {
+              lines[i] = lines[i].trimEnd().slice(0, -1) + ';';
+              break;
+            }
+          }
         }
-        return true;
-      })
-      .join('\n');
-    if (dropped.length !== 2) {
-      throw new Error(`seed.sql (base): expected to drop teacher_1 + student_1 rows, dropped ${dropped.length}`);
+        continue;
+      }
+      lines.push(line);
     }
-    transformLog.push(`${file}: dropped demo user rows teacher_1/student_1 (demo access removed; admin_1 kept)`);
+    sql = lines.join('\n');
+    if (dropped.length !== 3) {
+      throw new Error(`seed.sql (base): expected to drop teacher_1 + student_1 + parent_1 rows, dropped ${dropped.length}`);
+    }
+    transformLog.push(`${file}: dropped demo user rows teacher_1/student_1/parent_1 (demo access removed; admin_1 kept)`);
   }
   if (file === '069_seed_demo_exam_preferences.sql') {
     // Demo access removed: the demo teacher/student users are dropped from the

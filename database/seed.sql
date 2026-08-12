@@ -329,11 +329,10 @@ INSERT INTO "subjects" (id, name, slug, icon, color, description, display_order,
 ON CONFLICT(id) DO NOTHING;
 
 -- =============================================
--- USERS (2 rows)
+-- USERS (1 rows)
 -- =============================================
 INSERT INTO "users" (id, email, password_hash, name, role, status, email_verified, verification_token, verification_token_expires_at, password_reset_token, password_reset_expires_at, is_active, last_login_at, created_by, approved_by, approved_at, rejection_reason, house, year_group, school_level, school_name, teacher_license_number, subjects_taught, years_experience, qualifications, xp_points, level, streak_days, last_activity_date, avatar_url, primary_exam_type_id, subscription_tier_id, subscription_expires_at, ai_grading_credits, created_at, updated_at, streak_protections, streak_protection_used_at, streak_freeze_active, streak_last_activity, is_demo, trial_started_at, trial_expires_at, referred_by, is_affiliate, affiliate_xp, selected_tier_id) VALUES
-('admin_1', 'admin@brillaprep.org', NULL, 'System Admin', 'admin', 'approved', 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, 0, NULL, NULL, NULL, 'tier_free', NULL, 100, '2026-08-04T00:00:00.000Z', '2026-08-04T00:00:00.000Z', 0, NULL, 0, NULL, 1, NULL, NULL, NULL, 0, 0, NULL),
-('parent_1', 'parent@brillaprep.org', NULL, 'Demo Parent', 'parent', 'approved', 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, 0, NULL, NULL, NULL, 'tier_free', NULL, 0, '2026-08-04T00:00:00.000Z', '2026-08-04T00:00:00.000Z', 0, NULL, 0, NULL, 1, NULL, NULL, NULL, 0, 0, NULL)
+('admin_1', 'admin@brillaprep.org', NULL, 'System Admin', 'admin', 'approved', 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, 0, NULL, NULL, NULL, 'tier_free', NULL, 100, '2026-08-04T00:00:00.000Z', '2026-08-04T00:00:00.000Z', 0, NULL, 0, NULL, 1, NULL, NULL, NULL, 0, 0, NULL)
 ON CONFLICT(id) DO NOTHING;
 
 -- =============================================
