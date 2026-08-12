@@ -47,9 +47,40 @@ async function hashIP(ip: string): Promise<string> {
 }
 
 // Validate referral code format
-function isValidReferralCode(code: string): boolean {
+export function isValidReferralCode(code: string): boolean {
   // Referral codes should be 6-10 alphanumeric characters
   return /^[A-Z0-9]{6,10}$/i.test(code);
+}
+
+// Attribute a new user to an affiliate: referral row + stats, atomically.
+// Shared by /process-referral (post-registration capture) and /auth/register
+// (register-time code). Re-sets users.referred_by — harmless when the
+// register INSERT already wrote the same value. Returns the referral id.
+export async function attributeReferral(
+  db: D1Database,
+  affiliate: { id: string; user_id: string },
+  newUserId: string,
+  code: string,
+): Promise<string> {
+  const referralId = crypto.randomUUID();
+  await db.batch([
+    db.prepare(`
+      INSERT INTO affiliate_referrals (id, affiliate_id, referred_user_id, status)
+      VALUES (?, ?, ?, 'pending')
+    `).bind(referralId, affiliate.id, newUserId),
+    db.prepare(`
+      UPDATE affiliate_profiles
+      SET total_referrals = total_referrals + 1, last_referral_at = datetime('now')
+      WHERE id = ?
+    `).bind(affiliate.id),
+    db.prepare(`
+      UPDATE users SET referred_by = ? WHERE id = ?
+    `).bind(code.toUpperCase(), newUserId),
+    db.prepare(`
+      UPDATE users SET affiliate_xp = affiliate_xp + 50 WHERE id = ?
+    `).bind(affiliate.user_id),
+  ]);
+  return referralId;
 }
 
 // Sanitize and validate pagination parameters
@@ -838,6 +869,44 @@ affiliatesApp.get('/achievements', requireAuth, async (c) => {
   }
 });
 
+// Validate a referral code (public, rate-limited) — pre-registration UI
+// reassurance: tells the user the code is real and which school it belongs to.
+affiliatesApp.get('/validate-code/:code', async (c) => {
+  try {
+    const code = c.req.param('code');
+
+    if (!code || !isValidReferralCode(code)) {
+      return c.json({ success: true, data: { valid: false, schoolName: null } });
+    }
+
+    const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
+
+    // SECURITY: in-memory rate limit, same pattern as /ref/:code click tracking
+    const rateLimitKey = `validate_${await hashIP(ip)}`;
+    if (!checkRateLimit(rateLimitKey, 30, 60000)) {
+      return c.json({ success: false, error: 'Too many requests' }, 429);
+    }
+
+    const row = await c.env.DB.prepare(`
+      SELECT u.school_name
+      FROM affiliate_profiles ap
+      JOIN users u ON ap.user_id = u.id
+      WHERE ap.referral_code = ? AND ap.is_active = 1
+    `).bind(code.toUpperCase()).first();
+
+    return c.json({
+      success: true,
+      data: {
+        valid: !!row,
+        schoolName: (row?.school_name as string | null) || null,
+      },
+    });
+  } catch (error) {
+    console.error('Validate referral code error:', error);
+    return c.json({ success: false, error: 'Failed to validate code' }, 500);
+  }
+});
+
 // Track referral link click (public endpoint with rate limiting)
 affiliatesApp.get('/ref/:code', async (c) => {
   try {
@@ -953,6 +1022,15 @@ affiliatesApp.post('/process-referral', requireAuth, async (c) => {
       return c.json({ success: false, error: 'Self-referral is not allowed' }, 400);
     }
 
+    // Single attribution path: register-time code sets referred_by directly.
+    // If it's already set, this endpoint has nothing to do (no double attribution).
+    const current = await c.env.DB.prepare(
+      'SELECT referred_by FROM users WHERE id = ?'
+    ).bind(newUserId).first<{ referred_by: string | null }>();
+    if (current?.referred_by) {
+      return c.json({ success: true, data: { alreadyAttributed: true } });
+    }
+
     // Check if user already referred
     const existing = await c.env.DB.prepare(`
       SELECT id FROM affiliate_referrals WHERE referred_user_id = ?
@@ -963,24 +1041,12 @@ affiliatesApp.post('/process-referral', requireAuth, async (c) => {
     }
 
     // Create referral record + update affiliate/user stats atomically
-    const referralId = crypto.randomUUID();
-    await c.env.DB.batch([
-      c.env.DB.prepare(`
-        INSERT INTO affiliate_referrals (id, affiliate_id, referred_user_id, status)
-        VALUES (?, ?, ?, 'pending')
-      `).bind(referralId, affiliate.id, newUserId),
-      c.env.DB.prepare(`
-        UPDATE affiliate_profiles
-        SET total_referrals = total_referrals + 1, last_referral_at = datetime('now')
-        WHERE id = ?
-      `).bind(affiliate.id),
-      c.env.DB.prepare(`
-        UPDATE users SET referred_by = ? WHERE id = ?
-      `).bind(referralCode.toUpperCase(), newUserId),
-      c.env.DB.prepare(`
-        UPDATE users SET affiliate_xp = affiliate_xp + 50 WHERE id = ?
-      `).bind(affiliate.user_id),
-    ]);
+    const referralId = await attributeReferral(
+      c.env.DB,
+      { id: affiliate.id as string, user_id: affiliate.user_id as string },
+      newUserId,
+      referralCode,
+    );
 
     // Update challenge progress
     await updateChallengeProgress(c.env.DB, affiliate.user_id as string, 'referrals', 1);

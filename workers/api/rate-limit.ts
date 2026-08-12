@@ -59,6 +59,10 @@ export const RATE_LIMITS: Record<string, RateLimitConfig> = {
     maxRequests: 3,
     windowMs: 60 * 60 * 1000,      // 3 attempts per hour per IP
   },
+  'code-request': {
+    maxRequests: 3,
+    windowMs: 60 * 60 * 1000,      // 3 invite-code requests per hour per IP
+  },
   'setup': {
     maxRequests: 5,
     windowMs: 60 * 60 * 1000,      // 5 attempts per hour per IP

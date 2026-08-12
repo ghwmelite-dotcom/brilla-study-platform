@@ -36,6 +36,8 @@ function referralDb() {
     { match: /FROM affiliate_profiles ap/, first: () => AFFILIATE },
     // Referred user's email lookup (self-referral guard)
     { match: /SELECT email FROM users/, first: () => ({ email: 'someone-else@test.dev' }) },
+    // Single-attribution no-op guard: referred_by not yet set
+    { match: /SELECT referred_by FROM users/, first: () => ({ referred_by: null }) },
     // No existing referral for this user
     { match: /FROM affiliate_referrals WHERE referred_user_id/, first: () => null },
     // Trial-started UPDATE / any other referral write
@@ -100,6 +102,30 @@ describe('POST /process-referral — referred user is the JWT identity, never th
   });
 });
 
+describe('POST /process-referral — no-op when referred_by already set (Task 5)', () => {
+  it('returns alreadyAttributed and writes nothing', async () => {
+    const db = createMockD1([
+      authHandler,
+      { match: /FROM affiliate_profiles ap/, first: () => AFFILIATE },
+      { match: /SELECT email FROM users/, first: () => ({ email: 'someone-else@test.dev' }) },
+      // Register-time code already attributed this user.
+      { match: /SELECT referred_by FROM users/, first: () => ({ referred_by: 'OTHER99X' }) },
+    ]);
+    const env = { ...baseEnv, DB: db };
+
+    const res = await affiliatesApp.request('/process-referral', {
+      method: 'POST',
+      headers: await authHeader('user_NEW'),
+      body: JSON.stringify({ referralCode: 'ABC123XY' }),
+    }, env);
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ success: true, data: { alreadyAttributed: true } });
+    expect(db.calls.some((c) => c.sql.includes('INSERT INTO affiliate_referrals'))).toBe(false);
+    expect(db.calls.some((c) => c.sql.includes('UPDATE users SET referred_by'))).toBe(false);
+  });
+});
+
 describe('POST /referral/trial-started — identity from context, not body', () => {
   it('updates the referral for the authenticated user even when body names someone else', async () => {
     const db = referralDb();
@@ -132,6 +158,7 @@ describe('checkAffiliateAchievements — single batch (Task 16)', () => {
       authHandler,
       { match: /FROM affiliate_profiles ap/, first: () => AFFILIATE },
       { match: /SELECT email FROM users/, first: () => ({ email: 'someone-else@test.dev' }) },
+      { match: /SELECT referred_by FROM users/, first: () => ({ referred_by: null }) },
       { match: /FROM affiliate_referrals WHERE referred_user_id/, first: () => null },
       { match: /INSERT INTO affiliate_referrals/, run: () => ({ success: true, meta: { changes: 1 } }) },
       { match: /UPDATE affiliate_profiles/, run: () => ({ success: true, meta: { changes: 1 } }) },
@@ -197,6 +224,7 @@ describe('checkAffiliateAchievements — single batch (Task 16)', () => {
       authHandler,
       { match: /FROM affiliate_profiles ap/, first: () => AFFILIATE },
       { match: /SELECT email FROM users/, first: () => ({ email: 'someone-else@test.dev' }) },
+      { match: /SELECT referred_by FROM users/, first: () => ({ referred_by: null }) },
       { match: /FROM affiliate_referrals WHERE referred_user_id/, first: () => null },
       { match: /INSERT INTO affiliate_referrals/, run: () => ({ success: true, meta: { changes: 1 } }) },
       { match: /UPDATE affiliate_profiles/, run: () => ({ success: true, meta: { changes: 1 } }) },

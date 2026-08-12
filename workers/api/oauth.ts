@@ -11,6 +11,7 @@ interface Env {
   GOOGLE_CLIENT_SECRET?: string;
   GOOGLE_REDIRECT_URI?: string;
   TURNSTILE_SECRET?: string;
+  REGISTRATION_MODE?: string; // Growth loop (Task 5): open | invite
 }
 
 interface UserPayload {
@@ -401,6 +402,17 @@ oauthApp.post('/google/callback', async (c) => {
         error: 'An account with this email already exists. Please sign in instead.',
         code: 'ACCOUNT_EXISTS',
       }, 409);
+    }
+
+    // Growth loop (Task 5): invite mode requires a referral code. The OAuth
+    // register flow has no code capture, so a codeless attempt gets the same
+    // codeRequired envelope as /auth/register.
+    if (c.env.REGISTRATION_MODE === 'invite' && !registrationData?.referralCode) {
+      return c.json({
+        success: false,
+        error: 'An invite code is required to register. Request one below.',
+        data: { codeRequired: true },
+      }, 400);
     }
 
     // Create new user

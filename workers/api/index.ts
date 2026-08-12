@@ -12,7 +12,7 @@ import { chatApp } from './chat';
 import { moderationApp } from './moderation';
 import { paymentsApp } from './payments';
 import { subscriptionsApp } from './subscriptions';
-import { affiliatesApp } from './affiliates';
+import { affiliatesApp, isValidReferralCode, attributeReferral } from './affiliates';
 import { recordingsApp } from './recordings';
 import { whiteboardsApp } from './whiteboards';
 import { teacherBonusesRouter } from './teacher-bonuses';
@@ -69,7 +69,7 @@ interface Env {
   GOOGLE_CLIENT_SECRET?: string;
   GOOGLE_REDIRECT_URI?: string;
   NOTIFICATION_EMAILS?: string; // Comma-separated list of additional emails to receive all site notifications
-  REGISTRATION_MODE?: string; // Growth loop (Task 5): open | request
+  REGISTRATION_MODE?: string; // Growth loop (Task 5): open | invite
   RACE_TARGET_POINTS?: string; // Growth loop: weekly race target (default 1000)
 }
 
@@ -858,13 +858,27 @@ publicApp.get('/exam-types/:slug/paper-types', async (c) => {
 // AUTHENTICATION ROUTES
 // =============================================
 
-// Register new user (self-registration goes to pending)
+// Growth loop (Task 5): referral_signup points fire on approval only, exactly
+// once. Invite-mode auto-approvals call this inline at register; the admin
+// approve handler calls it for users it approves with an unattributed
+// referred_by. 100 points = default, tune with pilot data.
+async function awardReferralSignupPoints(db: D1Database, affiliateUserId: string, newUserId: string): Promise<void> {
+  await awardPoints(db, {
+    userId: affiliateUserId,
+    points: 100,
+    source: 'referral_signup',
+    sourceRef: newUserId,
+  });
+}
+
+// Register new user (self-registration goes to pending, unless a valid
+// referral code approves immediately — growth loop Task 5)
 publicApp.post('/auth/register', async (c) => {
   const body = await parseJsonBody(c);
   if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
   const { email, password, name, role, schoolLevel, yearGroup, schoolName, house,
           teacherLicenseNumber, subjectsTaught, yearsExperience, qualifications,
-          selectedTierId, turnstileToken, examTypeIds, primaryExamTypeId } = body;
+          selectedTierId, turnstileToken, examTypeIds, primaryExamTypeId, referralCode } = body;
   const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
 
   // Rate limiting - check IP-based limit for registrations
@@ -911,6 +925,29 @@ publicApp.post('/auth/register', async (c) => {
   }
 
   try {
+    // Growth loop: referral code gate. Validated BEFORE any other field/user check —
+    // an invalid code is a 400 before the email-exists lookup or user creation.
+    const inviteMode = c.env.REGISTRATION_MODE === 'invite';
+    let referralAffiliate: { id: string; user_id: string; referral_code: string } | null = null;
+    if (referralCode) {
+      if (!isValidReferralCode(referralCode)) {
+        return c.json({ success: false, error: 'Invalid referral code format' }, 400);
+      }
+      referralAffiliate = await c.env.DB.prepare(`
+        SELECT id, user_id, referral_code FROM affiliate_profiles
+        WHERE referral_code = ? AND is_active = 1
+      `).bind(String(referralCode).toUpperCase()).first();
+      if (!referralAffiliate) {
+        return c.json({ success: false, error: 'Invalid referral code' }, 400);
+      }
+    } else if (inviteMode) {
+      return c.json({
+        success: false,
+        error: 'An invite code is required to register. Request one below.',
+        data: { codeRequired: true },
+      }, 400);
+    }
+
     const validationError = validateRegistration({ email, password, name });
     if (validationError) {
       return c.json({ success: false, error: validationError }, 400);
@@ -934,23 +971,28 @@ publicApp.post('/auth/register', async (c) => {
     }
     const userRole = role || 'student';
 
-    // Self-registered users go to pending status. The user insert, primary
-    // exam-type update and preference inserts run in one D1 batch so a
-    // failure mid-write cannot leave a user without their preferences.
+    // Self-registered users go to pending status — unless they arrived with a
+    // valid referral code, which IS the approval for pilot students. The user
+    // insert, primary exam-type update and preference inserts run in one D1
+    // batch so a failure mid-write cannot leave a user without their
+    // preferences. referred_by is always in the column list (NULL without a
+    // code) to keep a single INSERT shape.
+    const initialStatus = referralAffiliate ? 'approved' : 'pending';
     const statements = [
       c.env.DB.prepare(`
         INSERT INTO users (id, email, password_hash, name, role, status, email_verified,
                            school_level, year_group, school_name, house,
                            teacher_license_number, subjects_taught, years_experience, qualifications,
-                           selected_tier_id)
-        VALUES (?, ?, ?, ?, ?, 'pending', 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                           selected_tier_id, referred_by)
+        VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
-        id, email, passwordHash, name, userRole,
+        id, email, passwordHash, name, userRole, initialStatus,
         schoolLevel || null, yearGroup || null, schoolName || null, house || null,
         teacherLicenseNumber || null,
         subjectsTaught ? JSON.stringify(subjectsTaught) : null,
         yearsExperience || null, qualifications || null,
-        selectedTierId || null
+        selectedTierId || null,
+        referralAffiliate ? referralAffiliate.referral_code : null
       ),
     ];
 
@@ -980,6 +1022,18 @@ publicApp.post('/auth/register', async (c) => {
     }
 
     await c.env.DB.batch(statements);
+
+    // Growth loop: attribute the referral (creates the affiliate_referrals row;
+    // re-sets referred_by to the same value, harmlessly). referral_signup
+    // points fire ON APPROVAL ONLY, exactly once: invite-mode registrations
+    // are auto-approved here, so the award goes through the same helper the
+    // admin approve handler uses. Open-mode referred users wait for approval.
+    if (referralAffiliate) {
+      await attributeReferral(c.env.DB, referralAffiliate, id, referralAffiliate.referral_code);
+      if (inviteMode) {
+        await awardReferralSignupPoints(c.env.DB, referralAffiliate.user_id, id);
+      }
+    }
 
     // Notify all admin users about the new registration
     try {
@@ -1041,13 +1095,71 @@ publicApp.post('/auth/register', async (c) => {
     return c.json({
       success: true,
       data: {
-        status: 'pending',
-        message: 'Your registration is pending approval. You will be notified once an administrator reviews your application.',
+        status: initialStatus,
+        message: initialStatus === 'approved'
+          ? 'Your account is ready — you can log in now.'
+          : 'Your registration is pending approval. You will be notified once an administrator reviews your application.',
       }
     });
   } catch (error) {
     console.error('Registration error:', error);
     return c.json({ success: false, error: 'Registration failed' }, 500);
+  }
+});
+
+// Request an invite/referral code (public, rate-limited — growth loop Task 5).
+// Pilot students without a code ask here; admins fulfill from /admin/affiliates.
+publicApp.post('/referral-code-requests', async (c) => {
+  const body = await parseJsonBody(c);
+  if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+  const { name, contact, schoolName, message } = body;
+
+  if (!name || !contact) {
+    return c.json({ success: false, error: 'Name and contact are required' }, 400);
+  }
+
+  const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
+  const rateLimit = await checkRateLimit(c.env.DB, clientIp, 'code-request');
+  if (!rateLimit.allowed) {
+    return rateLimitResponse(c, rateLimit);
+  }
+
+  try {
+    const id = `rcr_${crypto.randomUUID()}`;
+    await c.env.DB.prepare(`
+      INSERT INTO referral_code_requests (id, name, contact, school_name, message)
+      VALUES (?, ?, ?, ?, ?)
+    `).bind(id, String(name).trim(), String(contact).trim(), schoolName || null, message || null).run();
+
+    // Notify admins in-app (same pattern as new registrations)
+    try {
+      const { results: admins } = await c.env.DB.prepare(
+        "SELECT id FROM users WHERE role = 'admin' AND status = 'approved'"
+      ).all();
+
+      for (const admin of admins as { id: string }[]) {
+        await createNotification(
+          c.env.DB,
+          admin.id,
+          'system',
+          'New Invite Code Request',
+          `${name} (${contact}) requested an invite code${schoolName ? ` — ${schoolName}` : ''}.`,
+          {
+            icon: 'ticket',
+            link: '/admin/affiliates',
+            metadata: { requestId: id }
+          }
+        );
+      }
+    } catch (notifyError) {
+      // Log but don't fail the request if notification fails
+      console.error('Failed to notify admins of code request:', notifyError);
+    }
+
+    return c.json({ success: true, data: { id } });
+  } catch (error) {
+    console.error('Referral code request error:', error);
+    return c.json({ success: false, error: 'Failed to submit request' }, 500);
   }
 });
 
@@ -6553,6 +6665,34 @@ adminApp.post('/users/:id/approve', async (c) => {
       WHERE id = ?
     `).bind(adminUser.userId, userId).run();
 
+    // Growth loop (Task 5): referral_signup points fire on approval only.
+    // Register-time codes are already attributed (affiliate_referrals row
+    // exists) and invite-mode ones already awarded, so this only backstops a
+    // user whose referred_by was set without a referral row (legacy/edge).
+    const referredBy = user.referred_by as string | null;
+    if (referredBy) {
+      try {
+        const existingReferral = await c.env.DB.prepare(
+          'SELECT id FROM affiliate_referrals WHERE referred_user_id = ?'
+        ).bind(userId).first();
+
+        if (!existingReferral) {
+          const affiliate = await c.env.DB.prepare(`
+            SELECT id, user_id, referral_code FROM affiliate_profiles
+            WHERE referral_code = ? AND is_active = 1
+          `).bind(referredBy.toUpperCase()).first<{ id: string; user_id: string; referral_code: string }>();
+
+          if (affiliate) {
+            await attributeReferral(c.env.DB, affiliate, userId, affiliate.referral_code);
+            await awardReferralSignupPoints(c.env.DB, affiliate.user_id, userId);
+          }
+        }
+      } catch (referralError) {
+        // Log but don't fail the approval if referral attribution fails
+        console.error('Failed to attribute referral on approval:', referralError);
+      }
+    }
+
     // Check if user selected a premium tier - auto-start their 14-day trial
     let trialStarted = false;
     const selectedTierId = user.selected_tier_id as string | null;
@@ -6632,6 +6772,105 @@ adminApp.post('/users/:id/approve', async (c) => {
     return c.json({ success: true, data: { message: 'User approved successfully', trialStarted } });
   } catch (error) {
     return c.json({ success: false, error: 'Failed to approve user' }, 500);
+  }
+});
+
+// =============================================
+// REFERRAL CODE REQUESTS (growth loop Task 5)
+// =============================================
+
+// List referral code requests, optionally filtered by status
+adminApp.get('/referral-code-requests', async (c) => {
+  try {
+    const status = c.req.query('status');
+
+    let query = 'SELECT * FROM referral_code_requests';
+    const params: unknown[] = [];
+    if (status) {
+      query += ' WHERE status = ?';
+      params.push(status);
+    }
+    query += ' ORDER BY created_at DESC LIMIT 200';
+
+    const { results } = await c.env.DB.prepare(query).bind(...params).all();
+
+    let countQuery = 'SELECT COUNT(*) as total FROM referral_code_requests';
+    if (status) {
+      countQuery += ' WHERE status = ?';
+    }
+    const countResult = await c.env.DB.prepare(countQuery).bind(...params).first();
+
+    return c.json({
+      success: true,
+      data: { requests: results, total: countResult?.total || 0 },
+    });
+  } catch (error) {
+    console.error('List referral code requests error:', error);
+    return c.json({ success: false, error: 'Failed to fetch referral code requests' }, 500);
+  }
+});
+
+// Fulfill a request by issuing an existing affiliate referral code
+adminApp.post('/referral-code-requests/:id/fulfill', async (c) => {
+  const requestId = c.req.param('id');
+  // adminApp's Hono generic lacks Variables (pre-existing typing gap that
+  // TS2769s the older handlers); requireAdmin sets 'user' — assert through
+  // unknown so this new handler adds no new tsc error.
+  const adminUser = (c as unknown as { get: (key: 'user') => UserPayload }).get('user');
+  const body = await parseJsonBody(c);
+  if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+  const { code } = body;
+
+  if (!code) {
+    return c.json({ success: false, error: 'Code is required' }, 400);
+  }
+
+  try {
+    // The issued code must belong to a real affiliate profile
+    const affiliate = await c.env.DB.prepare(
+      'SELECT id FROM affiliate_profiles WHERE referral_code = ?'
+    ).bind(String(code).toUpperCase()).first();
+
+    if (!affiliate) {
+      return c.json({ success: false, error: 'Unknown referral code' }, 400);
+    }
+
+    const result = await c.env.DB.prepare(`
+      UPDATE referral_code_requests
+      SET status = 'fulfilled', issued_code = ?, fulfilled_by = ?, fulfilled_at = datetime('now')
+      WHERE id = ? AND status = 'pending'
+    `).bind(String(code).toUpperCase(), adminUser.userId, requestId).run();
+
+    if (!result.meta?.changes) {
+      return c.json({ success: false, error: 'Request not found or already handled' }, 404);
+    }
+
+    return c.json({ success: true, data: { id: requestId, issuedCode: String(code).toUpperCase() } });
+  } catch (error) {
+    console.error('Fulfill referral code request error:', error);
+    return c.json({ success: false, error: 'Failed to fulfill request' }, 500);
+  }
+});
+
+// Reject a request
+adminApp.post('/referral-code-requests/:id/reject', async (c) => {
+  const requestId = c.req.param('id');
+
+  try {
+    const result = await c.env.DB.prepare(`
+      UPDATE referral_code_requests
+      SET status = 'rejected'
+      WHERE id = ? AND status = 'pending'
+    `).bind(requestId).run();
+
+    if (!result.meta?.changes) {
+      return c.json({ success: false, error: 'Request not found or already handled' }, 404);
+    }
+
+    return c.json({ success: true, data: { id: requestId } });
+  } catch (error) {
+    console.error('Reject referral code request error:', error);
+    return c.json({ success: false, error: 'Failed to reject request' }, 500);
   }
 });
 
