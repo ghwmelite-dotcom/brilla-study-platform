@@ -1021,7 +1021,7 @@ export default function Settings() {
                             'p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2',
                             appearance.theme === 'light'
                               ? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm'
-                              : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
+                              : 'border-neutral-200 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50'
                           )}
                         >
                           <Sun className="w-6 h-6" />
@@ -1033,7 +1033,7 @@ export default function Settings() {
                             'p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2',
                             appearance.theme === 'dark'
                               ? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm'
-                              : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
+                              : 'border-neutral-200 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50'
                           )}
                         >
                           <Moon className="w-6 h-6" />
@@ -1045,7 +1045,7 @@ export default function Settings() {
                             'p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2',
                             appearance.theme === 'system'
                               ? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm'
-                              : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
+                              : 'border-neutral-200 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50'
                           )}
                         >
                           <Monitor className="w-6 h-6" />
@@ -1072,7 +1072,7 @@ export default function Settings() {
                             'p-3 rounded-lg border-2 transition-all text-center',
                             appearance.fontSize === 'small'
                               ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                              : 'border-neutral-200 hover:border-neutral-300'
+                              : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                           )}
                         >
                           <span className="text-xs font-medium">Small</span>
@@ -1083,7 +1083,7 @@ export default function Settings() {
                             'p-3 rounded-lg border-2 transition-all text-center',
                             appearance.fontSize === 'medium'
                               ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                              : 'border-neutral-200 hover:border-neutral-300'
+                              : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                           )}
                         >
                           <span className="text-sm font-medium">Medium</span>
@@ -1094,7 +1094,7 @@ export default function Settings() {
                             'p-3 rounded-lg border-2 transition-all text-center',
                             appearance.fontSize === 'large'
                               ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                              : 'border-neutral-200 hover:border-neutral-300'
+                              : 'border-neutral-200 text-neutral-700 hover:border-neutral-300'
                           )}
                         >
                           <span className="text-base font-medium">Large</span>
