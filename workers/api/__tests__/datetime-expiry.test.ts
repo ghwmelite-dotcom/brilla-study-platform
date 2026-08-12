@@ -13,7 +13,10 @@ function setup() {
   return db;
 }
 
-const ISO_ONE_HOUR_AGO = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+// Anchored to 00:00 UTC today: "one hour ago" crosses the UTC day boundary
+// during the first hour of the day, which inverts the same-day string-
+// comparison semantics this suite documents.
+const ISO_ONE_HOUR_AGO = new Date().toISOString().slice(0, 10) + 'T00:00:00.000Z';
 const ISO_ONE_HOUR_AHEAD = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
 describe('ISO datetime expiry semantics', () => {
