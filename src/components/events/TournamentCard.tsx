@@ -122,6 +122,7 @@ export function TournamentCard({
             Top Prizes
           </h4>
           <div className="space-y-2">
+            {/* positional list: rank is the stable identity */}
             {tournament.prizes.slice(0, 3).map((prize, index) => (
               <PrizeRow key={index} prize={prize} rank={index + 1} />
             ))}
