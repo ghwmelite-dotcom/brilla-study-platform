@@ -1,6 +1,6 @@
 -- Brilla Study Platform Seed Data (IDEMPOTENT — safe to re-run)
--- NEVER run this file against production casually. It writes demo users
--- (admin_1, teacher_1, student_1) and reference content. For production,
+-- NEVER run this file against production casually. It writes the bootstrap
+-- admin (admin_1, NULL password) and reference content. For production,
 -- run only database/migrations/088a_data_fixes.sql.
 --
 -- GENERATED FILE — do not hand-edit. Regenerate with:
@@ -329,13 +329,11 @@ INSERT INTO "subjects" (id, name, slug, icon, color, description, display_order,
 ON CONFLICT(id) DO NOTHING;
 
 -- =============================================
--- USERS (4 rows)
+-- USERS (2 rows)
 -- =============================================
 INSERT INTO "users" (id, email, password_hash, name, role, status, email_verified, verification_token, verification_token_expires_at, password_reset_token, password_reset_expires_at, is_active, last_login_at, created_by, approved_by, approved_at, rejection_reason, house, year_group, school_level, school_name, teacher_license_number, subjects_taught, years_experience, qualifications, xp_points, level, streak_days, last_activity_date, avatar_url, primary_exam_type_id, subscription_tier_id, subscription_expires_at, ai_grading_credits, created_at, updated_at, streak_protections, streak_protection_used_at, streak_freeze_active, streak_last_activity, is_demo, trial_started_at, trial_expires_at, referred_by, is_affiliate, affiliate_xp, selected_tier_id) VALUES
 ('admin_1', 'admin@brillaprep.org', NULL, 'System Admin', 'admin', 'approved', 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, 0, NULL, NULL, NULL, 'tier_free', NULL, 100, '2026-08-04T00:00:00.000Z', '2026-08-04T00:00:00.000Z', 0, NULL, 0, NULL, 1, NULL, NULL, NULL, 0, 0, NULL),
-('parent_1', 'parent@brillaprep.org', NULL, 'Demo Parent', 'parent', 'approved', 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, 0, NULL, NULL, NULL, 'tier_free', NULL, 0, '2026-08-04T00:00:00.000Z', '2026-08-04T00:00:00.000Z', 0, NULL, 0, NULL, 1, NULL, NULL, NULL, 0, 0, NULL),
-('student_1', 'student@brillaprep.org', NULL, 'Demo Student', 'student', 'approved', 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1500, 5, 7, NULL, NULL, NULL, 'tier_free', NULL, 10, '2026-08-04T00:00:00.000Z', '2026-08-04T00:00:00.000Z', 0, NULL, 0, NULL, 1, NULL, NULL, NULL, 0, 0, NULL),
-('teacher_1', 'teacher@brillaprep.org', NULL, 'Demo Teacher', 'teacher', 'approved', 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, 0, NULL, NULL, NULL, 'tier_free', NULL, 50, '2026-08-04T00:00:00.000Z', '2026-08-04T00:00:00.000Z', 0, NULL, 0, NULL, 1, NULL, NULL, NULL, 0, 0, NULL)
+('parent_1', 'parent@brillaprep.org', NULL, 'Demo Parent', 'parent', 'approved', 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, 0, NULL, NULL, NULL, 'tier_free', NULL, 0, '2026-08-04T00:00:00.000Z', '2026-08-04T00:00:00.000Z', 0, NULL, 0, NULL, 1, NULL, NULL, NULL, 0, 0, NULL)
 ON CONFLICT(id) DO NOTHING;
 
 -- =============================================
@@ -556,16 +554,6 @@ INSERT INTO "topics" (id, subject_id, parent_id, name, slug, description, theory
 ('topic_waves', 'subj_nsmq_physics', NULL, 'Waves & Optics', 'waves-optics', 'Study of wave motion and light', 'Waves transfer energy without transferring matter. Optics is the study of light behavior including reflection, refraction, and diffraction.', '["v = fλ", "n = c/v", "n₁sinθ₁ = n₂sinθ₂ (Snell''s Law)", "1/f = 1/u + 1/v"]', 3, '2026-08-04T00:00:00.000Z'),
 ('topic_kinematics', 'subj_nsmq_physics', 'topic_mechanics', 'Kinematics', 'kinematics', 'Description of motion without considering forces', 'Kinematics describes motion using concepts of displacement, velocity, and acceleration without reference to the forces causing the motion.', '["Average velocity = Δs/Δt", "Instantaneous velocity = ds/dt", "Acceleration = dv/dt", "Range = u²sin2θ/g"]', 1, '2026-08-04T00:00:00.000Z'),
 ('topic_quadratic', 'subj_nsmq_math', 'topic_algebra', 'Quadratic Equations', 'quadratic-equations', 'Solving and graphing quadratic equations', 'A quadratic equation has the standard form ax² + bx + c = 0. Solutions can be found using factoring, completing the square, or the quadratic formula.', '["x = (-b ± √(b²-4ac)) / 2a", "Sum of roots = -b/a", "Product of roots = c/a", "Discriminant Δ = b² - 4ac"]', 1, '2026-08-04T00:00:00.000Z')
-ON CONFLICT(id) DO NOTHING;
-
--- =============================================
--- USER_EXAM_PREFERENCES (4 rows)
--- =============================================
-INSERT INTO "user_exam_preferences" (id, user_id, exam_type_id, is_primary, target_year, created_at, updated_at) VALUES
-('pref_student_bece', 'student_1', 'exam_bece', 0, NULL, '2026-08-04T00:00:00.000Z', '2026-08-04T00:00:00.000Z'),
-('pref_teacher_bece', 'teacher_1', 'exam_bece', 0, NULL, '2026-08-04T00:00:00.000Z', '2026-08-04T00:00:00.000Z'),
-('pref_teacher_nsmq', 'teacher_1', 'exam_nsmq', 0, NULL, '2026-08-04T00:00:00.000Z', '2026-08-04T00:00:00.000Z'),
-('pref_teacher_wassce', 'teacher_1', 'exam_wassce', 1, NULL, '2026-08-04T00:00:00.000Z', '2026-08-04T00:00:00.000Z')
 ON CONFLICT(id) DO NOTHING;
 
 -- =============================================

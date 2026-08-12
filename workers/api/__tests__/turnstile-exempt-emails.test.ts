@@ -1,11 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import worker from '../index';
 
-// Tests the login Turnstile skip narrowing: only the explicit
-// TURNSTILE_EXEMPT_EMAILS accounts (teacher@/student@/parent@brillaprep.org)
-// may skip the gate. Any other account on the @brillaprep.org domain — e.g.
-// admin@brillaprep.org — must present a Turnstile token when TURNSTILE_SECRET
-// is set.
+// Demo access has been removed: the TURNSTILE_EXEMPT_EMAILS exemption no
+// longer exists. Formerly-exempt demo accounts (teacher@/student@/parent@
+// brillaprep.org) must now present a Turnstile token like everyone else when
+// TURNSTILE_SECRET is set — no token means 400.
 //
 // Approach: full-route test through the worker app (same pattern as
 // index-auth.test.ts) with D1 mocked per-SQL so rate-limit checks pass and
@@ -36,7 +35,7 @@ function loginRequest(email: string) {
   );
 }
 
-describe('login Turnstile exemption narrowing', () => {
+describe('login Turnstile gate — no demo exemption', () => {
   it('admin@brillaprep.org without turnstileToken returns 400 Security verification required', async () => {
     const res = await loginRequest('admin@brillaprep.org');
     expect(res.status).toBe(400);
@@ -44,22 +43,28 @@ describe('login Turnstile exemption narrowing', () => {
     expect(body.error).toBe('Security verification required.');
   });
 
-  it('student@brillaprep.org without turnstileToken passes the Turnstile gate', async () => {
+  it('student@brillaprep.org (former demo account) without turnstileToken returns 400', async () => {
     const res = await loginRequest('student@brillaprep.org');
-    // Gate skipped → reaches credential check; mocked DB has no user → 401.
-    expect(res.status).toBe(401);
+    expect(res.status).toBe(400);
     const body = await res.json() as { success: boolean; error: string };
-    expect(body.error).not.toContain('Security verification');
+    expect(body.error).toBe('Security verification required.');
   });
 
-  it('Student@BrillaPrep.org (mixed case) also passes the Turnstile gate', async () => {
-    const res = await loginRequest('Student@BrillaPrep.org');
-    expect(res.status).toBe(401);
+  it('teacher@brillaprep.org (former demo account) without turnstileToken returns 400', async () => {
+    const res = await loginRequest('teacher@brillaprep.org');
+    expect(res.status).toBe(400);
     const body = await res.json() as { success: boolean; error: string };
-    expect(body.error).not.toContain('Security verification');
+    expect(body.error).toBe('Security verification required.');
   });
 
-  it('staff@brillaprep.org (non-exempt domain account) without token returns 400', async () => {
+  it('parent@brillaprep.org (former demo account, mixed case) without turnstileToken returns 400', async () => {
+    const res = await loginRequest('Parent@BrillaPrep.org');
+    expect(res.status).toBe(400);
+    const body = await res.json() as { success: boolean; error: string };
+    expect(body.error).toBe('Security verification required.');
+  });
+
+  it('staff@brillaprep.org without token returns 400', async () => {
     const res = await loginRequest('staff@brillaprep.org');
     expect(res.status).toBe(400);
     const body = await res.json() as { success: boolean; error: string };

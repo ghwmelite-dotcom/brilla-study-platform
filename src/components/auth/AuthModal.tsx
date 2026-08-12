@@ -355,30 +355,6 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
     }
   };
 
-  const handleDemoLogin = async (role: UserRole) => {
-    const demoCredentials: Partial<Record<UserRole, { email: string; password: string }>> = {
-      student: { email: 'student@brillaprep.org', password: 'Student123!' },
-      teacher: { email: 'teacher@brillaprep.org', password: 'Teacher123!' },
-      admin: { email: 'demo_admin@brillaprep.org', password: 'Admin123!' },
-    };
-
-    const creds = demoCredentials[role];
-    if (!creds) {
-      setFormErrors({ submit: 'Demo login not available for this role' });
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      await login(creds.email, creds.password);
-      onClose();
-    } catch (err) {
-      setFormErrors({ submit: err instanceof Error ? err.message : 'Demo login failed' });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const subjects = [
     'Mathematics', 'English Language', 'Integrated Science', 'Social Studies',
     'Physics', 'Chemistry', 'Biology', 'Economics', 'Geography', 'History',
@@ -1159,47 +1135,6 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                   mode === 'login' ? 'Sign In' : 'Create Account'
                 )}
               </button>
-
-              {/* Demo login section — dev builds only, tree-shaken from production */}
-              {mode === 'login' && import.meta.env.DEV && (
-                <>
-                  <div className="relative my-4">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-neutral-200" />
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white text-neutral-500">or try demo</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleDemoLogin('student')}
-                      className="flex flex-col items-center gap-1 p-3 border border-neutral-200 rounded-lg hover:border-primary hover:bg-primary/5 transition-all"
-                    >
-                      <GraduationCap className="w-5 h-5 text-blue-600" />
-                      <span className="text-xs font-medium">Student</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDemoLogin('teacher')}
-                      className="flex flex-col items-center gap-1 p-3 border border-neutral-200 rounded-lg hover:border-primary hover:bg-primary/5 transition-all"
-                    >
-                      <BookOpen className="w-5 h-5 text-green-600" />
-                      <span className="text-xs font-medium">Teacher</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDemoLogin('admin')}
-                      className="flex flex-col items-center gap-1 p-3 border border-neutral-200 rounded-lg hover:border-primary hover:bg-primary/5 transition-all"
-                    >
-                      <Shield className="w-5 h-5 text-purple-600" />
-                      <span className="text-xs font-medium">Admin</span>
-                    </button>
-                  </div>
-                </>
-              )}
 
               <div className="text-center pt-2">
                 <p className="text-neutral-600 text-sm">

@@ -25,7 +25,10 @@
  *      fixes therefore land exactly as they do on production. Source fixes are
  *      applied as text transforms where Task 3/4 require the seed to differ
  *      from raw history:
- *        - 069: dev-machine user IDs -> student_1 / teacher_1
+ *        - seed.sql (base): demo user rows teacher_1/student_1 dropped
+ *          (demo access removed; admin_1 bootstrap admin kept)
+ *        - 069: demo exam preferences dropped entirely (pref_student_bece,
+ *          pref_teacher_*) — their user rows no longer exist
  *        - 084_alevel_maths: q_alevel_math_0NN -> q_alevel_maths_0NN (its
  *          INSERT OR IGNORE rows collided with 082's PKs and were silently
  *          dropped on prod; the squashed seed restores these 40 questions)
@@ -168,11 +171,32 @@ function classify(stmt) {
 // ---------------------------------------------------------------------------
 const transformLog = [];
 function applySourceTransforms(file, sql) {
+  if (file === 'seed.sql (base)') {
+    // Demo access removed: drop the demo teacher/student user rows. admin_1
+    // stays (bootstrap admin, NULL password; the owner sets it out-of-band)
+    // and parent_1 stays (local demo-mode placeholder, out of scope here).
+    const dropped = [];
+    sql = sql
+      .split('\n')
+      .filter((line) => {
+        if (/^\('(teacher_1|student_1)',/.test(line)) {
+          dropped.push(line.slice(0, 30));
+          return false;
+        }
+        return true;
+      })
+      .join('\n');
+    if (dropped.length !== 2) {
+      throw new Error(`seed.sql (base): expected to drop teacher_1 + student_1 rows, dropped ${dropped.length}`);
+    }
+    transformLog.push(`${file}: dropped demo user rows teacher_1/student_1 (demo access removed; admin_1 kept)`);
+  }
   if (file === '069_seed_demo_exam_preferences.sql') {
-    const before = sql;
-    sql = sql.split("'student_1766327981521'").join("'student_1'");
-    sql = sql.split("'teacher_1766327981453'").join("'teacher_1'");
-    transformLog.push(`${file}: dev-machine user IDs -> student_1/teacher_1 (${before.length - sql.length === 0 ? 'ok' : 'ok'})`);
+    // Demo access removed: the demo teacher/student users are dropped from the
+    // base seed, so their exam-preference rows (pref_student_bece,
+    // pref_teacher_*) must go too. 069 contains nothing else.
+    sql = '-- demo exam preferences removed (demo access removed: teacher_1/student_1 no longer seeded)\n';
+    transformLog.push(`${file}: dropped pref_student_bece/pref_teacher_* demo exam preferences (demo access removed)`);
   }
   if (file === '084_alevel_maths_questions.sql') {
     const count = (sql.match(/q_alevel_math_/g) || []).length;
@@ -609,7 +633,7 @@ function main() {
   db.exec(fs.readFileSync(SCHEMA_FILE, 'utf8'));
 
   // Base seed (INSERTs only — the old DELETE prologue is intentionally dropped).
-  replayFile(db, 'seed.sql (base)', fs.readFileSync(BASE_SEED_FILE, 'utf8'));
+  replayFile(db, 'seed.sql (base)', applySourceTransforms('seed.sql (base)', fs.readFileSync(BASE_SEED_FILE, 'utf8')));
 
   // Replay set: the squashed 001-087 chain from migrations/archive/ PLUS the
   // live 088/088a data mutations (their UPDATE/DELETE effects are part of the
@@ -669,8 +693,8 @@ function main() {
 
   const header = [
     '-- Brilla Study Platform Seed Data (IDEMPOTENT — safe to re-run)',
-    '-- NEVER run this file against production casually. It writes demo users',
-    '-- (admin_1, teacher_1, student_1) and reference content. For production,',
+    '-- NEVER run this file against production casually. It writes the bootstrap',
+    '-- admin (admin_1, NULL password) and reference content. For production,',
     '-- run only database/migrations/088a_data_fixes.sql.',
     '--',
     '-- GENERATED FILE — do not hand-edit. Regenerate with:',
