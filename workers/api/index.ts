@@ -1650,6 +1650,12 @@ publicApp.post('/auth/reset-demo-passwords', async (c) => {
     return rateLimitResponse(c, ipRateLimit);
   }
 
+  // Demo password reset only works in local dev — the demo passwords are
+  // public knowledge, so this endpoint must not exist in production.
+  if (c.env.ENVIRONMENT !== 'development' && c.env.ENVIRONMENT !== 'dev') {
+    return c.json({ success: false, error: 'Not found' }, 404);
+  }
+
   try {
     const demoUsers = [
       { email: 'teacher@brillaprep.org', password: 'Teacher123!' },
