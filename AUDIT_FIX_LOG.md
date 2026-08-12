@@ -92,3 +92,16 @@ Remaining USER ACTIONS: rotate JWT_SECRET + demo/admin passwords; browser smoke 
 - Seed: generator transform drops teacher_1/student_1/parent_1 + their exam prefs; fresh deploys bootstrap only admin_1 (NULL password). db:verify 18/18 green.
 - Prod: 6 demo accounts (incl. a demo ADMIN) anonymized — emails scrubbed to deleted_*@deleted.invalid, is_active=0, status='suspended', password hash invalidated. Payment history (41 transactions on the demo student/teacher) preserved. Demo-owned chat rooms reassigned to the real admin. Demo login verified dead (401 Invalid email or password).
 - Inert remainder (documented for a later refactor): demoUtils is_demo_data isolation machinery + DEMO_* constants remain in code but have no live demo accounts to act on; the 6-hour cron cleanup still runs.
+
+## GROWTH LOOP SHIPPED (2026-08-12)
+
+Design (approved): ~/.gstack/projects/ghwmelite-dotcom-brilla-study-platform/ozzy-main-design-20260812-073217.md
+Plan: docs/superpowers/plans/2026-08-12-growth-loop.md — 10/10 tasks + 1 fix round, final review CLEAN, 235 tests green.
+
+Landed: points_ledger + shared awardPoints helper (anti-farm weights/caps) retrofit on all 8 XP write sites; weekly race cycles (platform + school scoped) with cron crowning on the existing 6-hourly trigger; referral-code registration gate (invite mode via REGISTRATION_MODE=invite) incl. OAuth, with request-a-code flow + admin issue tab; 500-pt paid-conversion points via the exactly-once commission path; frontend race tab + dashboard card + registration referral UI. Deployed to prod (090 applied first, then worker + site). Bonus fix: authStore.register no longer swallows errors as fake "pending" success.
+
+PILOT START (user-gated, docs/superpowers/plans/2026-08-12-growth-loop.md ## Prod Apply Runbook):
+1. Provision St John's: schools row ('sch_stjohns'), ambassador account + affiliate profile with referral_code 'STJOHNS' — AND set the ambassador's own users.school_id='sch_stjohns' so their points land in the school race.
+2. Assign pilot students' users.school_id (admin-verified).
+3. Flip REGISTRATION_MODE="invite" in wrangler.toml [vars] + redeploy. Do this before a Monday 00:00 UTC so the first race is a full week.
+4. During the pilot: before each crowning, eyeball referral_paid_conversion ledger rows (fraud-flagged conversions award points immediately).
