@@ -361,6 +361,17 @@
   @apply min-h-screen bg-admin-bg text-admin-text;
 }
 
+/* Light surfaces inside the dark admin shell must reset the inherited text
+   color. The shell paints near-white text at the root; any bg-white /
+   bg-neutral-50 panel (modals, stat cards, tables) that relies on
+   inheritance — inputs, selects, plain text — would render white-on-white.
+   Elements with their own explicit text-* classes are unaffected unless
+   they only inherit. */
+.admin-layout .bg-white,
+.admin-layout .bg-neutral-50 {
+  @apply text-neutral-900;
+}
+
 /* Admin card component */
 .admin-card {
   @apply bg-admin-bg-secondary border border-admin-border rounded-xl shadow-admin-card transition-all duration-200;

@@ -248,7 +248,7 @@ export function EditUserModal({ isOpen, user, onClose, onSuccess }: EditUserModa
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+      <div className="relative w-full max-w-lg max-h-[90vh] bg-white text-neutral-900 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
         <div className="relative px-6 py-5 bg-gradient-to-r from-indigo-600 to-blue-600 text-white">
           <button
