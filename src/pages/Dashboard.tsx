@@ -11,6 +11,7 @@ import {
   Sparkles,
   GraduationCap,
   ArrowRight,
+  Flag,
 } from 'lucide-react';
 import { Card, CardHeader, Button, Badge, ProgressBar, CircularProgress } from '@/components/common';
 import { TrialBanner } from '@/components/subscription';
@@ -29,6 +30,7 @@ import {
   useEventStore,
   useRewardStore,
   useEngagementStore,
+  useRaceStore,
 } from '@/stores';
 import { useExamStore } from '@/stores/examStore';
 import { useExamBoardStore } from '@/stores/examBoardStore';
@@ -53,6 +55,9 @@ export function DashboardPage() {
     getWeaknesses,
   } = useProgressStore();
   const { currentSession, isQuickPlayModalOpen, openQuickPlayModal, closeQuickPlayModal } = useQuickPlayStore();
+
+  // Race store
+  const { current: race, fetchCurrent: fetchRace } = useRaceStore();
 
   // Event store
   const { activeEvents, fetchActiveEvents } = useEventStore();
@@ -93,7 +98,8 @@ export function DashboardPage() {
     fetchLuckyWheel();
     checkEngagementStatus();
     fetchUserSpecifications();
-  }, [fetchActiveEvents, fetchDailyMultiplier, checkForSurpriseChallenge, fetchAvailableChests, fetchLuckyWheel, checkEngagementStatus, fetchUserSpecifications]);
+    fetchRace();
+  }, [fetchActiveEvents, fetchDailyMultiplier, checkForSurpriseChallenge, fetchAvailableChests, fetchLuckyWheel, checkEngagementStatus, fetchUserSpecifications, fetchRace]);
 
   // Show comeback modal if applicable
   useEffect(() => {
@@ -417,6 +423,38 @@ export function DashboardPage() {
             onOpenModal={openQuickPlayModal}
             onOpenBrainTeaser={() => setBrainTeaserOpen(true)}
           />
+
+          {/* Weekly Race */}
+          {race?.cycle && (
+            <Link to="/leaderboard" className="block group">
+              <Card className="p-4 hover:shadow-md transition-all">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-indigo-100 rounded-lg">
+                      <Flag className="w-5 h-5 text-indigo-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-neutral-900">Weekly Race</h3>
+                      <p className="text-xs text-neutral-500">
+                        First to {race.cycle.targetPoints.toLocaleString()} XP wins
+                      </p>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-neutral-400 group-hover:translate-x-1 transition-transform" />
+                </div>
+                <ProgressBar
+                  value={Math.min(((race.top[0]?.score ?? 0) / race.cycle.targetPoints) * 100, 100)}
+                  size="sm"
+                  className="mt-2"
+                />
+                <p className="text-xs text-neutral-500 mt-2">
+                  {race.me
+                    ? `You're #${race.me.rank} with ${race.me.score.toLocaleString()} XP`
+                    : 'Earn XP this week to join the race'}
+                </p>
+              </Card>
+            </Link>
+          )}
 
           {/* O-Level / A-Level Progress Widget or Setup Card (sidebar version) */}
           {setupComplete || userSpecifications.length > 0 ? (

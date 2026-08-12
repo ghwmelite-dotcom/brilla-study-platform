@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Trophy,
@@ -12,9 +12,13 @@ import {
   RefreshCw,
   ChevronUp,
   ChevronDown,
+  Flag,
+  Timer,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { useLeaderboardStore } from '@/stores/leaderboardStore';
+import { useRaceStore } from '@/stores/raceStore';
+import type { RaceCurrent } from '@/stores/raceStore';
 import type { LeaderboardPeriod, LeaderboardEntry } from '@/types';
 import { cn } from '@/utils';
 
@@ -69,6 +73,23 @@ function formatScore(score: number): string {
     return `${(score / 1000).toFixed(1)}K`;
   }
   return score.toString();
+}
+
+// Race timestamps come from SQLite as 'YYYY-MM-DD HH:MM:SS' in UTC.
+function parseRaceTime(value: string): Date {
+  return new Date(value.replace(' ', 'T') + 'Z');
+}
+
+function formatCountdown(endsAt: string, now: number): string {
+  const ms = parseRaceTime(endsAt).getTime() - now;
+  if (ms <= 0) return 'Ending soon';
+  const minutes = Math.floor(ms / 60000);
+  const days = Math.floor(minutes / 1440);
+  const hours = Math.floor((minutes % 1440) / 60);
+  const mins = minutes % 60;
+  if (days > 0) return `${days}d ${hours}h left`;
+  if (hours > 0) return `${hours}h ${mins}m left`;
+  return `${mins}m left`;
 }
 
 // Podium component for top 3
@@ -264,6 +285,179 @@ function LeaderboardRow({
   );
 }
 
+// Weekly Race tab content
+function RacePanel({
+  current,
+  isLoading,
+  error,
+}: {
+  current: RaceCurrent | null;
+  isLoading: boolean;
+  error: string | null;
+}) {
+  const { user } = useAuthStore();
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+        <p className="text-red-700">{error}</p>
+      </div>
+    );
+  }
+
+  if (isLoading && !current) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
+      </div>
+    );
+  }
+
+  const cycle = current?.cycle ?? null;
+
+  if (!cycle) {
+    return (
+      <div className="bg-white rounded-2xl border border-neutral-200 p-12 text-center">
+        <Flag className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
+        <h3 className="text-xl font-semibold text-neutral-900 mb-2">No Active Race</h3>
+        <p className="text-neutral-500">The next race starts Monday.</p>
+      </div>
+    );
+  }
+
+  const top = current?.top ?? [];
+  const me = current?.me ?? null;
+  const leaderScore = top[0]?.score ?? 0;
+  const progressPct = Math.min((leaderScore / cycle.targetPoints) * 100, 100);
+  const pointsToTarget = me ? Math.max(cycle.targetPoints - me.score, 0) : null;
+
+  return (
+    <div className="space-y-6">
+      {/* Target Progress */}
+      <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Flag className="w-5 h-5 text-indigo-600" />
+            <h2 className="font-semibold text-neutral-900">
+              First to {formatScore(cycle.targetPoints)} XP wins
+            </h2>
+          </div>
+          <div className="flex items-center gap-1.5 text-sm text-neutral-500">
+            <Timer className="w-4 h-4" />
+            <span>{formatCountdown(cycle.endsAt, now)}</span>
+          </div>
+        </div>
+        <div className="w-full bg-neutral-100 rounded-full h-3 overflow-hidden">
+          <div
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+        <p className="text-sm text-neutral-500 mt-2">
+          {leaderScore > 0
+            ? `${top[0].name} leads with ${formatScore(leaderScore)} XP`
+            : 'No scores yet — be the first to earn XP this week!'}
+        </p>
+      </div>
+
+      {/* Your Rank Chip */}
+      {me && (
+        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 text-white shadow-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-bold text-xl">
+                {user?.name?.charAt(0).toUpperCase() || '?'}
+              </div>
+              <div>
+                <p className="font-semibold">You're #{me.rank}</p>
+                <p className="text-indigo-200 text-sm">
+                  {pointsToTarget === 0
+                    ? 'Target hit — hold your lead!'
+                    : `${formatScore(pointsToTarget ?? 0)} points to the target`}
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-bold">{formatScore(me.score)}</p>
+              <p className="text-indigo-200 text-sm">XP this week</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Top 20 */}
+      {top.length > 0 ? (
+        <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-neutral-200">
+            <h2 className="font-semibold text-neutral-900">Race Standings</h2>
+          </div>
+          <div className="p-4 space-y-3 max-h-[500px] overflow-y-auto">
+            {top.map((entry) => (
+              <div
+                key={entry.userId}
+                className={cn(
+                  'flex items-center gap-4 p-4 rounded-xl border transition-all',
+                  getRankBgColor(entry.rank),
+                  entry.userId === user?.id && 'ring-2 ring-indigo-500 ring-offset-2',
+                  entry.rank <= 3 && 'shadow-md'
+                )}
+              >
+                <div className="w-12 flex items-center justify-center">
+                  {getRankIcon(entry.rank) || (
+                    <span className={cn(
+                      'text-lg font-bold',
+                      entry.rank <= 10 ? 'text-indigo-600' : 'text-neutral-500'
+                    )}>
+                      #{entry.rank}
+                    </span>
+                  )}
+                </div>
+                <div className="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold">
+                  {entry.avatarUrl ? (
+                    <img src={entry.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" />
+                  ) : (
+                    entry.name.charAt(0).toUpperCase()
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={cn(
+                    'font-semibold truncate',
+                    entry.userId === user?.id ? 'text-indigo-700' : 'text-neutral-900'
+                  )}>
+                    {entry.name}
+                    {entry.userId === user?.id && (
+                      <span className="ml-2 text-xs text-indigo-500">(You)</span>
+                    )}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-1 text-lg font-bold text-indigo-600">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    <span>{formatScore(entry.score)}</span>
+                  </div>
+                  <p className="text-xs text-neutral-500">XP</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white rounded-2xl border border-neutral-200 p-12 text-center">
+          <Trophy className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-neutral-900 mb-2">No Racers Yet</h3>
+          <p className="text-neutral-500">Earn XP this week to take the lead!</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Leaderboard() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
@@ -278,10 +472,23 @@ export default function Leaderboard() {
     fetchUserRank,
     setPeriod,
   } = useLeaderboardStore();
+  const [tab, setTab] = useState<'xp' | 'race'>('xp');
+  const {
+    current: race,
+    isLoading: raceLoading,
+    error: raceError,
+    fetchCurrent: fetchRace,
+  } = useRaceStore();
 
   useEffect(() => {
     fetchLeaderboard();
   }, [fetchLeaderboard]);
+
+  useEffect(() => {
+    if (tab === 'race') {
+      fetchRace();
+    }
+  }, [tab, fetchRace]);
 
   useEffect(() => {
     if (user?.id) {
@@ -314,15 +521,49 @@ export default function Leaderboard() {
           </div>
 
           <button
-            onClick={() => fetchLeaderboard()}
-            disabled={isLoading}
+            onClick={() => (tab === 'race' ? fetchRace() : fetchLeaderboard())}
+            disabled={tab === 'race' ? raceLoading : isLoading}
             aria-label="Refresh leaderboard"
             className="p-2.5 text-neutral-600 hover:text-neutral-900 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
           >
-            <RefreshCw className={cn('w-5 h-5', isLoading && 'animate-spin')} />
+            <RefreshCw className={cn('w-5 h-5', (tab === 'race' ? raceLoading : isLoading) && 'animate-spin')} />
           </button>
         </div>
 
+        {/* Tab Switcher */}
+        <div className="bg-white rounded-xl p-1.5 mb-6 shadow-sm border border-neutral-200">
+          <div className="flex">
+            <button
+              onClick={() => setTab('xp')}
+              className={cn(
+                'flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2',
+                tab === 'xp'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+              )}
+            >
+              <Trophy className="w-4 h-4" />
+              XP Leaders
+            </button>
+            <button
+              onClick={() => setTab('race')}
+              className={cn(
+                'flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2',
+                tab === 'race'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+              )}
+            >
+              <Flag className="w-4 h-4" />
+              Weekly Race
+            </button>
+          </div>
+        </div>
+
+        {tab === 'race' ? (
+          <RacePanel current={race} isLoading={raceLoading} error={raceError} />
+        ) : (
+          <>
         {/* Stats Bar */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-xl p-4 border border-neutral-200 shadow-sm">
@@ -450,6 +691,8 @@ export default function Leaderboard() {
               Start Practicing
             </button>
           </div>
+        )}
+          </>
         )}
       </div>
     </div>

@@ -17,6 +17,8 @@ export { useAssessmentStore } from './assessmentStore';
 export { useGradingStore } from './gradingStore';
 export { useStudentAssessmentStore } from './studentAssessmentStore';
 export { useLeaderboardStore } from './leaderboardStore';
+export { useRaceStore } from './raceStore';
+export type { RaceCycle, RaceEntry, RaceCurrent } from './raceStore';
 export { useToastStore } from './toastStore';
 export { useQuestStore } from './questStore';
 export { useStreakStore, STREAK_MILESTONES } from './streakStore';
