@@ -659,12 +659,10 @@ studyRoomsApp.post('/:roomCode/drawing', async (c) => {
 
 // Helper functions
 function generateRoomCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return code;
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 32 chars, excludes confusing ones
+  const bytes = crypto.getRandomValues(new Uint8Array(6));
+  // 256 % 32 === 0, so the modulo introduces no bias
+  return Array.from(bytes, (b) => chars.charAt(b % chars.length)).join('');
 }
 
 function getRandomColor(): string {
