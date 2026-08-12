@@ -41,7 +41,7 @@ const LEGACY_SCHEMA = path.join(DB_DIR, 'schema.sql');
 // Live DDL folded into the canonical schema (data-only 088/088a and the
 // 089 baseline marker stay out — an explicit list, not a directory scan,
 // so 089_baseline_marker.sql's schema_baseline INSERT can never leak in).
-const LIVE_DDL_FILES = ['090_growth_loop.sql'];
+const LIVE_DDL_FILES = ['090_growth_loop.sql', '091_telegram_community.sql'];
 
 const SCRATCH_RE = /(_backup|_v2|_old|_tmp)$/i;
 

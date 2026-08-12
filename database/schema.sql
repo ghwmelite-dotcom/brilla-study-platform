@@ -123,6 +123,7 @@
 --   database/migrations/088_normalize_datetime_to_iso.sql
 --   database/migrations/seed_chat_rooms.sql
 --   database/migrations/090_growth_loop.sql
+--   database/migrations/091_telegram_community.sql
 --
 -- PRAGMA foreign_keys = ON;  -- enforced by db:verify and D1; a schema file
 -- cannot set PRAGMAs on D1, so this is documented here as a comment.
@@ -473,6 +474,15 @@ CREATE TABLE IF NOT EXISTS command_words (
     subject_area TEXT,
     created_at TEXT DEFAULT (datetime('now')),
     UNIQUE(word, exam_board_id)
+);
+
+-- Source: migrations/091_telegram_community.sql
+CREATE TABLE IF NOT EXISTS school_channels (
+    school_id TEXT PRIMARY KEY REFERENCES schools(id) ON DELETE CASCADE,
+    channel_id TEXT NOT NULL,
+    channel_name TEXT,
+    broken INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now'))
 );
 
 -- Source: schema.sql
@@ -2056,7 +2066,11 @@ CREATE TABLE IF NOT EXISTS race_cycles (
     winner_user_id TEXT REFERENCES users(id),
     target_hit_at TEXT,
     crowned_at TEXT,
-    created_at TEXT DEFAULT (datetime('now'))
+    created_at TEXT DEFAULT (datetime('now')),
+    -- added by migrations/091_telegram_community.sql
+    start_announced_at TEXT,
+    -- added by migrations/091_telegram_community.sql
+    winner_announced_at TEXT
 );
 
 -- Source: migrations/090_growth_loop.sql
@@ -2070,6 +2084,24 @@ CREATE TABLE IF NOT EXISTS referral_code_requests (
     issued_code TEXT,
     fulfilled_by TEXT REFERENCES users(id),
     fulfilled_at TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Source: migrations/091_telegram_community.sql
+CREATE TABLE IF NOT EXISTS telegram_links (
+    user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    chat_id TEXT NOT NULL UNIQUE,
+    username TEXT,
+    linked_at TEXT NOT NULL DEFAULT (datetime('now')),
+    stale INTEGER NOT NULL DEFAULT 0
+);
+
+-- Source: migrations/091_telegram_community.sql
+CREATE TABLE IF NOT EXISTS telegram_link_tokens (
+    token TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at TEXT NOT NULL,
+    used_at TEXT,
     created_at TEXT DEFAULT (datetime('now'))
 );
 
@@ -2920,7 +2952,17 @@ CREATE TABLE IF NOT EXISTS race_crossings (
     PRIMARY KEY (cycle_id, user_id)
 );
 
--- Source: migrations/090_growth_loop.sql
+-- Source: migrations/091_telegram_community.sql
+CREATE TABLE IF NOT EXISTS race_alert_state (
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    cycle_id TEXT NOT NULL REFERENCES race_cycles(id) ON DELETE CASCADE,
+    last_rank INTEGER,
+    last_score INTEGER,
+    alerted_flags INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (user_id, cycle_id)
+);
+
+-- Source: migrations/091_telegram_community.sql (renamed from points_ledger_new)
 CREATE TABLE IF NOT EXISTS points_ledger (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -2928,7 +2970,8 @@ CREATE TABLE IF NOT EXISTS points_ledger (
     source TEXT NOT NULL CHECK (source IN (
         'question_correct', 'battle_win', 'streak_day', 'quest_claim',
         'tutor_session', 'essay_graded', 'referral_signup',
-        'referral_paid_conversion', 'house_contribution'
+        'referral_paid_conversion', 'house_contribution',
+        'notification_subscribe'
     )),
     source_ref TEXT,
     cycle_id TEXT REFERENCES race_cycles(id),
@@ -4455,6 +4498,7 @@ CREATE INDEX IF NOT EXISTS idx_tutor_availability_tutor
   ON tutor_availability(tutor_id);
 CREATE INDEX IF NOT EXISTS idx_race_cycles_status ON race_cycles(status, scope);
 CREATE INDEX IF NOT EXISTS idx_referral_code_requests_status ON referral_code_requests(status);
+CREATE INDEX IF NOT EXISTS idx_telegram_link_tokens_user ON telegram_link_tokens(user_id, used_at);
 CREATE INDEX IF NOT EXISTS idx_user_progress_user ON user_progress(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_progress_topic ON user_progress(topic_id);
 CREATE INDEX IF NOT EXISTS idx_user_progress_exam ON user_progress(exam_type_id);
@@ -4576,6 +4620,7 @@ CREATE INDEX IF NOT EXISTS idx_study_sessions_owner ON study_sessions(owner_id);
 CREATE INDEX IF NOT EXISTS idx_study_sessions_status ON study_sessions(status);
 CREATE INDEX IF NOT EXISTS idx_study_sessions_room_code ON study_sessions(room_code);
 CREATE INDEX IF NOT EXISTS idx_study_sessions_public ON study_sessions(is_public, status);
+CREATE INDEX IF NOT EXISTS idx_race_alert_state_cycle ON race_alert_state(cycle_id);
 CREATE INDEX IF NOT EXISTS idx_points_ledger_user_day ON points_ledger(user_id, source, created_at);
 CREATE INDEX IF NOT EXISTS idx_points_ledger_cycle ON points_ledger(cycle_id);
 CREATE INDEX IF NOT EXISTS idx_library_collection_items_collection ON library_collection_items(collection_id);

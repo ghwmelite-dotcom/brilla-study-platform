@@ -3,7 +3,8 @@ import type { D1Database } from '@cloudflare/workers-types';
 export type PointSource =
   | 'question_correct' | 'battle_win' | 'streak_day' | 'quest_claim'
   | 'tutor_session' | 'essay_graded'
-  | 'referral_signup' | 'referral_paid_conversion' | 'house_contribution';
+  | 'referral_signup' | 'referral_paid_conversion' | 'house_contribution'
+  | 'notification_subscribe';
 
 // Anti-farm: farmable sources are down-weighted AND capped per UTC day;
 // social/verified sources (battle_win, referral_*, tutor_session) stay uncapped.
@@ -17,6 +18,7 @@ export const SOURCE_WEIGHTS: Record<PointSource, number> = {
   referral_signup: 1,
   referral_paid_conversion: 1,
   house_contribution: 1,
+  notification_subscribe: 1,
 };
 
 export const DAILY_SOURCE_CAPS: Partial<Record<PointSource, number>> = {
@@ -36,6 +38,7 @@ const HOUSE_SOURCE_MAP: Partial<Record<PointSource, string>> = {
   referral_signup: 'bonus',
   referral_paid_conversion: 'bonus',
   house_contribution: 'bonus',
+  notification_subscribe: 'bonus',
 };
 
 // house_points.period convention copied from index.ts /houses/points (YYYY-WW, week-of-month)
