@@ -37,6 +37,7 @@ import { cleanupExpiredDemoData } from './demoUtils';
 import { awardPoints } from './points';
 import { raceApp, runRaceCycleMaintenance } from './race';
 import { telegramWebhookApp } from './telegram';
+import { runTelegramRaceAlerts } from './race-alerts';
 import {
   getDailyUsage,
   checkCanAnswer,
@@ -72,6 +73,12 @@ interface Env {
   NOTIFICATION_EMAILS?: string; // Comma-separated list of additional emails to receive all site notifications
   REGISTRATION_MODE?: string; // Growth loop (Task 5): open | invite
   RACE_TARGET_POINTS?: string; // Growth loop: weekly race target (default 1000)
+  // Telegram community (optional; alerts no-op when unset). Mirrors TelegramEnv.
+  TELEGRAM_BOT_TOKEN?: string;
+  TELEGRAM_WEBHOOK_SECRET?: string;
+  TELEGRAM_PLATFORM_CHANNEL_ID?: string;
+  TELEGRAM_COMMUNITY_URL?: string;
+  TELEGRAM_BOT_USERNAME?: string;
 }
 
 // User type for JWT payload
@@ -10893,5 +10900,13 @@ export default {
     } catch (error) {
       console.error('Race cycle maintenance failed:', error);
     }
+
+    // Telegram community alerts: fire-and-forget. Cron "success" no longer
+    // implies delivery success — failures log loudly but never fail the cron.
+    ctx.waitUntil(
+      runTelegramRaceAlerts(env.DB, env)
+        .then((r) => console.log(`Telegram alerts: ${r.posts} posts, ${r.dms} DMs`))
+        .catch((e) => console.error('Telegram race alerts failed:', e))
+    );
   },
 };
