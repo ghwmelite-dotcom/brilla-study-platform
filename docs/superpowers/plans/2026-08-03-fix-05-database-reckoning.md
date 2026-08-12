@@ -343,28 +343,35 @@ mkdir -p backups
 wrangler d1 export brilla-db --remote --output=backups/pre-squash-$(date +%Y%m%d-%H%M%S).sql
 # verify the backup: file exists, non-trivial size, tail shows COMMIT;
 
-# 2. Apply data fixes (idempotent; safe to re-run)
-wrangler d1 execute brilla-db --remote --file=database/migrations/088a_data_fixes.sql
-
-# 3. Record baseline
+# 2. Apply 088 (datetime normalization) + 088a (data fixes) + 089 (baseline)
+#    `migrations apply` runs the whole pending live chain in one go.
+#    NOTE: 088 is a PROD DATA MUTATION — it rewrites datetime columns to ISO
+#    form on users / user_trials / oauth_states / comeback_challenges /
+#    engagement_nudges. That is intended, but it means this step changes data,
+#    not just bookkeeping.
+#    Wrangler may order 088a before 088 (lexical vs numeric ordering); this is
+#    harmless — the two files touch no shared columns.
 wrangler d1 migrations apply brilla-db --remote
 
-# 4. Verify prod state
+# 3. Verify prod state
 wrangler d1 execute brilla-db --remote --command="SELECT count(*) FROM questions WHERE question_type='multiple_choice' AND options IS NOT NULL AND correct_answer GLOB '[0-9]*' AND correct_answer NOT GLOB '*[^0-9]*';"
-# expected: 0
+# expected on PROD: 88 (55 legit digit-text answers + 33 numeric-option-text
+# conversions that 088a deliberately leaves as digits). 0 is the FRESH-DEPLOY
+# expectation (squashed seed converts them to letter form) — do not confuse
+# the two.
 wrangler d1 execute brilla-db --remote --command="SELECT count(*) FROM questions q LEFT JOIN subjects s ON q.subject_id=s.id WHERE s.id IS NULL;"
 # expected: 0
 wrangler d1 execute brilla-db --remote --command="SELECT count(*) FROM schema_baseline;"
 # expected: 1
 
-# 5. Deploy worker (phases 0-4 code) only after 1-4 are green
+# 4. Deploy worker (phases 0-4 code) only after 1-3 are green
 npm run dev:api -- --dry-run   # sanity
 cd workers && npm run deploy
 ```
 
 ## Rollback
 
-- Data-fix rollback: 088a is UPDATE-only; restore from the pre-squash export for any table it touched:
+- Data-fix rollback: 088a is mostly UPDATEs but also has 2 guarded DELETEs (subjects dedup), so it is NOT update-only — restore from the pre-squash export for any table it touched:
   ```bash
   wrangler d1 execute brilla-db --remote --file=backups/pre-squash-<timestamp>.sql
   ```

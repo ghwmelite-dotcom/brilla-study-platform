@@ -139,7 +139,9 @@ function main() {
   let letterOutOfRange = 0;
   let fullTextNoOptionMatch = 0;
   let firstLetterCollisions = 0;
+  let malformedOptionsJson = 0;
   const collisionExamples = [];
+  const malformedExamples = [];
 
   for (const q of questions) {
     const answer = q.correct_answer == null ? '' : String(q.correct_answer).trim();
@@ -158,7 +160,11 @@ function main() {
     try {
       options = JSON.parse(q.options);
     } catch {
-      continue; // malformed JSON options — not this gate's check
+      // Malformed JSON options break grading outright — count and FAIL the
+      // gate below instead of silently skipping.
+      malformedOptionsJson++;
+      if (malformedExamples.length < 6) malformedExamples.push(q.id);
+      continue;
     }
     if (!Array.isArray(options) || options.length === 0) continue;
 
@@ -201,9 +207,11 @@ function main() {
     firstLetterCollisions,
     collisionExamples.join('; ')
   );
+  record('rows with malformed options JSON', malformedOptionsJson, malformedExamples.join('; '));
   console.log(
     `  numeric MCQ answers: ${numericMcqAnswers}, out-of-range letters: ${letterOutOfRange}, ` +
-      `no-option-match: ${fullTextNoOptionMatch}, first-letter collisions: ${firstLetterCollisions}`
+      `no-option-match: ${fullTextNoOptionMatch}, first-letter collisions: ${firstLetterCollisions}, ` +
+      `malformed options JSON: ${malformedOptionsJson}`
   );
 
   // --- 4. Referential checks ------------------------------------------------

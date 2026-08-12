@@ -12,9 +12,15 @@
  *   1. Apply database/schema.sql to an in-memory DB (node:sqlite, FK OFF).
  *   2. Apply base database/seed.sql INSERTs (its old destructive DELETE
  *      prologue is dropped).
- *   3. Replay every database/migrations/*.sql in filename order, executing
- *      only data statements (INSERT/UPDATE/DELETE); DDL is skipped because the
- *      canonical schema already encodes the final shape. This ordering is
+ *   3. Replay every database/migrations/archive/*.sql (the squashed 001-087
+ *      chain) plus the live 088_normalize_datetime_to_iso.sql and
+ *      088a_data_fixes.sql, in filename order, executing only data statements
+ *      (INSERT/UPDATE/DELETE); DDL is skipped because the canonical schema
+ *      already encodes the final shape. 088/088a MUST be replayed — their
+ *      UPDATE/DELETE effects are part of the committed seed (without 088a,
+ *      724 numeric answers are unresolvable). 089_baseline_marker.sql is NOT
+ *      replayed: its INSERT targets schema_baseline, which the canonical
+ *      schema deliberately does not carry. This ordering is
  *      prod-faithful (migrations ran after the original seed) and 088a's data
  *      fixes therefore land exactly as they do on production. Source fixes are
  *      applied as text transforms where Task 3/4 require the seed to differ
@@ -74,7 +80,7 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const DB_DIR = path.join(ROOT, 'database');
-const MIGRATIONS_DIR = path.join(DB_DIR, 'migrations');
+const MIGRATIONS_DIR = path.join(DB_DIR, 'migrations', 'archive');
 const SCHEMA_FILE = path.join(DB_DIR, 'schema.sql');
 // The pre-Task-4 base seed (exam types, subjects, NSMQ topics/questions,
 // riddles, achievements, houses, demo users). Preserved verbatim as the
@@ -85,6 +91,12 @@ const OUT_FILE = path.join(DB_DIR, 'seed.sql');
 // Files excluded from the replay (with reasons).
 const EXCLUDED_FILES = new Set([
   'seed_chat_rooms.sql', // moved to database/seeds/ (Task 4) — not folded in
+  // Belt-and-braces: 089 must never enter the replay (main() already selects
+  // replay files explicitly — listed here in case selection ever reverts to a
+  // directory scan).
+  '089_baseline_marker.sql', // baseline marker for wrangler d1_migrations; its
+  //                          INSERT targets schema_baseline, which the canonical
+  //                          schema deliberately does not carry.
 ]);
 
 // Statements whose failure is expected and safe to skip (table-rebuild scratch
@@ -599,11 +611,20 @@ function main() {
   // Base seed (INSERTs only — the old DELETE prologue is intentionally dropped).
   replayFile(db, 'seed.sql (base)', fs.readFileSync(BASE_SEED_FILE, 'utf8'));
 
-  const files = naturalMigrationOrder(
-    fs.readdirSync(MIGRATIONS_DIR).filter((f) => f.endsWith('.sql') && !EXCLUDED_FILES.has(f))
-  );
+  // Replay set: the squashed 001-087 chain from migrations/archive/ PLUS the
+  // live 088/088a data mutations (their UPDATE/DELETE effects are part of the
+  // committed seed — dropping them leaves 724 unresolvable numeric answers).
+  // 089_baseline_marker is deliberately NOT replayed: it INSERTs into
+  // schema_baseline, a table the canonical schema intentionally does not carry.
+  const LIVE_REPLAY_FILES = ['088_normalize_datetime_to_iso.sql', '088a_data_fixes.sql'];
+  const liveDir = path.join(DB_DIR, 'migrations');
+  const files = naturalMigrationOrder([
+    ...fs.readdirSync(MIGRATIONS_DIR).filter((f) => f.endsWith('.sql') && !EXCLUDED_FILES.has(f)),
+    ...LIVE_REPLAY_FILES,
+  ]);
   for (const file of files) {
-    const sql = applySourceTransforms(file, fs.readFileSync(path.join(MIGRATIONS_DIR, file), 'utf8'));
+    const dir = LIVE_REPLAY_FILES.includes(file) ? liveDir : MIGRATIONS_DIR;
+    const sql = applySourceTransforms(file, fs.readFileSync(path.join(dir, file), 'utf8'));
     replayFile(db, file, sql);
   }
 

@@ -34,10 +34,17 @@ const fs = require('fs');
 const path = require('path');
 
 const DB_DIR = path.join(__dirname, '..', 'database');
-const MIGRATIONS_DIR = path.join(DB_DIR, 'migrations');
+const MIGRATIONS_DIR = path.join(DB_DIR, 'migrations', 'archive');
 const LEGACY_SCHEMA = path.join(DB_DIR, 'schema.sql');
 
 const SCRATCH_RE = /(_backup|_v2|_old|_tmp)$/i;
+
+// Historical banner-only entries: these files lived in database/migrations/
+// when the canonical squash was first generated, so their banner lines are
+// part of the committed schema.sql. Neither contributes DDL (088 is
+// data-only UPDATEs; seed_chat_rooms.sql is INSERT-only and now lives in
+// database/seeds/). Kept so regeneration stays byte-identical.
+const BANNER_TRAILING_FILES = ['088_normalize_datetime_to_iso.sql', 'seed_chat_rooms.sql'];
 
 // ---------------------------------------------------------------------------
 // SQL statement splitter: string-literal aware, paren-depth tracking.
@@ -425,7 +432,7 @@ for (const [name, entry] of tables) {
         // Recover the column definition text from the earlier definition.
         const earlierStmt = stripComments(
           stripLeadingComments(
-            splitStatements(fs.readFileSync(h.source === 'schema.sql' ? LEGACY_SCHEMA : path.join(DB_DIR, h.source), 'utf8'))
+            splitStatements(fs.readFileSync(h.source === 'schema.sql' ? LEGACY_SCHEMA : path.join(MIGRATIONS_DIR, path.basename(h.source)), 'utf8'))
               .find((st) => new RegExp(`^\\s*CREATE\\s+TABLE\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?${name}\\b`, 'i').test(stripComments(st))) || ''
           )
         );
@@ -791,7 +798,7 @@ const banner = `-- =============================================================
 --
 -- Sources (in application order):
 --   database/schema.sql (legacy)
-${migrationFiles.map((f) => `--   database/migrations/${f}`).join('\n')}
+${[...migrationFiles, ...BANNER_TRAILING_FILES].map((f) => `--   database/migrations/${f}`).join('\n')}
 --
 -- PRAGMA foreign_keys = ON;  -- enforced by db:verify and D1; a schema file
 -- cannot set PRAGMAs on D1, so this is documented here as a comment.

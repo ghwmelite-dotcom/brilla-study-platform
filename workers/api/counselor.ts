@@ -521,9 +521,10 @@ counselorApp.post('/chat', async (c) => {
       WHERE user_id = ? AND created_at >= datetime('now', '-7 days')
     `).bind(userId).first();
 
-    // Get streak info
+    // Get streak info — user-level streak lives on users.streak_days
+    // (the old `user_streaks` table never existed; see fix/audit-remediation wave).
     const streakInfo = await c.env.DB.prepare(`
-      SELECT current_streak FROM user_streaks WHERE user_id = ?
+      SELECT streak_days AS current_streak FROM users WHERE id = ?
     `).bind(userId).first();
 
     const studentContext: StudentContext = {
@@ -843,9 +844,18 @@ counselorApp.post('/reports/generate', async (c) => {
       WHERE cc.user_id = ? AND DATE(cc.created_at) BETWEEN ? AND ?
     `).bind(studentId, startDate, endDate).first();
 
-    // Streak info
+    // Streak info — user-level streak lives on users.streak_days (the old
+    // `user_streaks` table never existed). No user-level longest-streak column
+    // exists, so longest falls back to the best per-subject longest streak
+    // (subject_streaks, migration 062), then to the current streak.
     const streak = await c.env.DB.prepare(`
-      SELECT current_streak, longest_streak FROM user_streaks WHERE user_id = ?
+      SELECT
+        u.streak_days AS current_streak,
+        COALESCE(
+          (SELECT MAX(longest_streak) FROM subject_streaks WHERE user_id = u.id),
+          u.streak_days
+        ) AS longest_streak
+      FROM users u WHERE u.id = ?
     `).bind(studentId).first();
 
     // Generate report content using Claude
