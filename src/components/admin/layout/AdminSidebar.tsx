@@ -17,6 +17,7 @@ import {
   Zap,
   GraduationCap,
   Gift,
+  School,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/utils';
@@ -90,7 +91,7 @@ export function AdminSidebar() {
 
   // Determine which group should be open based on current path
   const isDashboardSection = location.pathname === '/admin' || location.pathname.startsWith('/admin/analytics');
-  const isUsersSection = location.pathname.startsWith('/admin/users') || location.pathname.startsWith('/admin/approvals');
+  const isUsersSection = location.pathname.startsWith('/admin/users') || location.pathname.startsWith('/admin/approvals') || location.pathname.startsWith('/admin/schools');
   const isContentSection = location.pathname.startsWith('/admin/content') || location.pathname.startsWith('/admin/moderation');
   const isSystemSection = location.pathname.startsWith('/admin/audit') || location.pathname.startsWith('/admin/settings');
   const isRevenueSection = location.pathname.startsWith('/admin/subscriptions') || location.pathname.startsWith('/admin/affiliates');
@@ -123,6 +124,7 @@ export function AdminSidebar() {
         <NavGroup label="Users & Access" icon={<Users className="w-4 h-4" />} defaultOpen={isUsersSection}>
           <NavItem to="/admin/users" icon={<UserCog className="w-4 h-4" />} label="All Users" />
           <NavItem to="/admin/approvals" icon={<UserCheck className="w-4 h-4" />} label="Approvals" badge={pendingCount} />
+          <NavItem to="/admin/schools" icon={<School className="w-4 h-4" />} label="Pilot Schools" />
         </NavGroup>
 
         {/* Content */}

@@ -46,6 +46,7 @@ const AdminSubscriptions = lazyWithRetry(() => import('@/pages/AdminSubscription
 const AdminAffiliates = lazyWithRetry(() => import('@/pages/AdminAffiliates'));
 const AdminTutoringDirectory = lazyWithRetry(() => import('@/pages/admin/AdminTutoringDirectory'));
 const AdminTeacherBonuses = lazyWithRetry(() => import('@/pages/admin/AdminTeacherBonuses'));
+const AdminSchools = lazyWithRetry(() => import('@/pages/admin/AdminSchools'));
 
 // Admin layout (lazy loaded)
 const AdminLayout = lazyWithRetry(() => import('@/components/admin/layout/AdminLayout').then(m => ({ default: m.AdminLayout })));
@@ -898,6 +899,7 @@ function App() {
           <Route path="affiliates" element={<LazyPage><AdminAffiliates /></LazyPage>} />
           <Route path="tutoring" element={<LazyPage><AdminTutoringDirectory /></LazyPage>} />
           <Route path="teacher-bonuses" element={<LazyPage><AdminTeacherBonuses /></LazyPage>} />
+          <Route path="schools" element={<LazyPage><AdminSchools /></LazyPage>} />
         </Route>
       </Routes>
       </ErrorBoundary>
