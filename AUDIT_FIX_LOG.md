@@ -84,3 +84,11 @@ Live QA matrix: 28/29 PASS. Fixed the one FAIL + two safety items found along th
 - CORS verified: evil.com gets no ACAO; brillaprep.org echoed. /auth/setup 404. Admin routes 401/403 correctly.
 
 Remaining USER ACTIONS: rotate JWT_SECRET + demo/admin passwords; browser smoke list above; SETUP_KEY optional.
+
+## DEMO ACCESS REMOVED (2026-08-12)
+
+- Frontend: demo login UI + hardcoded credentials deleted from App.tsx and AuthModal.tsx (no longer even in dev builds); prod bundle verified credential-free.
+- Backend: Turnstile demo-email exemption removed — all logins require Turnstile when configured.
+- Seed: generator transform drops teacher_1/student_1/parent_1 + their exam prefs; fresh deploys bootstrap only admin_1 (NULL password). db:verify 18/18 green.
+- Prod: 6 demo accounts (incl. a demo ADMIN) anonymized — emails scrubbed to deleted_*@deleted.invalid, is_active=0, status='suspended', password hash invalidated. Payment history (41 transactions on the demo student/teacher) preserved. Demo-owned chat rooms reassigned to the real admin. Demo login verified dead (401 Invalid email or password).
+- Inert remainder (documented for a later refactor): demoUtils is_demo_data isolation machinery + DEMO_* constants remain in code but have no live demo accounts to act on; the 6-hour cron cleanup still runs.
