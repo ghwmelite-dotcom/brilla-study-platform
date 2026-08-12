@@ -55,10 +55,16 @@ P0 closed: Paystack webhook fails closed when secret unset (unsigned events neve
 
 Final state: 200/200 tests green (40 files), frontend tsc 0 errors, workers tsc 130 (from 316 baseline — ratcheted), lint 246 (from 256), npm audit 12 (all breaking-major-only), db:verify 18/18, wrangler bundles clean, prod bundle credential-free.
 
-DEPLOY CHECKLIST (user-gated, in order):
-1. Pre-deploy: `npm run db:verify` green; rehearsal on throwaway D1; `wrangler d1 export` backup (verify size + trailing COMMIT).
-2. `wrangler d1 migrations apply brilla-db --remote` (088 datetime normalization + 088a data fixes + 089 baseline) → verify (numeric-answer count expectation on prod: 88, not 0).
-3. `wrangler secret list` — confirm secrets set top-level (not under deleted --env production); set PAYSTACK_WEBHOOK_SECRET and SETUP_KEY if missing.
-4. Deploy worker (plain `wrangler deploy`) + static site.
-5. Post-deploy curls: HSTS+CSP on brillaprep.org (script-src no unsafe-inline), og-image 200, avatar nosniff, pitch-site headers.
-6. Browser smoke: login (Turnstile), one AI call, one D1 read, avatar upload (real + fake), KaTeX question, PDF paper, PhET embed, ambient audio, previously-unanswerable questions (065/066/067 topics, 037 BECE, q_alevel_maths_*).
+## DEPLOYED (2026-08-12)
+
+- Merged to main (`c99c265`, +2 prod-patch commits), pushed.
+- Prod D1: backup `backups/pre-squash-20260812-022533.sql` (6.3 MB); 088/088a/089 applied; prod patches 088b (subjects column reconcile — prod had lost 4 columns to the 018/028-era rebuilds) and 088c (orphan refs: 100 phantom-subject + 962 phantom-topic questions) applied. Verified: 0 orphan refs, baseline recorded, 87 all-digit answers (expected 88−1 for the q_em_007 letter fix), `subj_wassce_bus_mgmt` canonical with metadata.
+- Worker deployed (`brilla-api`, compat 2026-05-12): /api/health new envelope; header-auth and demo-token attempts → 401.
+- Site deployed to Pages: HSTS + CSP live on brillaprep.org (script-src no unsafe-inline, PhET/mixkit allowed), og-image 200, app-bootstrap 200. Pitch site deployed with HSTS+strict CSP.
+- Rehearsal: full fresh-env flow proven on throwaway D1 (deleted after); schema apply is idempotent (IF NOT EXISTS everywhere).
+
+PENDING USER ACTIONS:
+1. Set 3 missing secrets: `wrangler secret put PAYSTACK_SECRET_KEY`, `PAYSTACK_WEBHOOK_SECRET`, `SETUP_KEY` (with `CLOUDFLARE_ACCOUNT_ID=ea2eb3a9813660dfca2a60e594858538`). Without PAYSTACK_SECRET_KEY all Paystack calls fail; without the webhook secret, webhooks 500 BY DESIGN.
+2. Rotate JWT_SECRET on a quiet day (invalidates all sessions; forces re-login; closes the old-secret exposure question) + change the admin password from anything default-shaped.
+3. Browser smoke: login (Turnstile), one AI call, one D1 read, avatar upload (real + fake PNG), KaTeX question, PDF paper, PhET embed, ambient audio, one previously-unanswerable question (065/066/067 topic, 037 BECE, q_alevel_maths_*).
+4. Watch Workers Logs for 48h (observability now on).
