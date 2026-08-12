@@ -224,7 +224,7 @@ tutorClassroom.post('/availability/heartbeat', teacherMiddleware, async (c) => {
     `).bind(user.id).first();
 
     await db.prepare(`
-      UPDATE tutor_availability SET current_session_count = ? WHERE tutor_id = ?
+      UPDATE tutor_availability SET current_session_count = ?, updated_at = CURRENT_TIMESTAMP WHERE tutor_id = ?
     `).bind(observationCount?.count || 0, user.id).run();
 
     return c.json({ success: true });
@@ -367,7 +367,7 @@ tutorClassroom.post('/observable-sessions/:sessionId/observe', teacherMiddleware
 
     // Update session count
     await db.prepare(`
-      UPDATE tutor_availability SET current_session_count = current_session_count + 1 WHERE tutor_id = ?
+      UPDATE tutor_availability SET current_session_count = current_session_count + 1, updated_at = CURRENT_TIMESTAMP WHERE tutor_id = ?
     `).bind(user.id).run();
 
     return c.json({ success: true, observationId });
@@ -397,7 +397,7 @@ tutorClassroom.post('/observable-sessions/:sessionId/stop-observe', teacherMiddl
 
     // Update session count
     await db.prepare(`
-      UPDATE tutor_availability SET current_session_count = MAX(0, current_session_count - 1) WHERE tutor_id = ?
+      UPDATE tutor_availability SET current_session_count = MAX(0, current_session_count - 1), updated_at = CURRENT_TIMESTAMP WHERE tutor_id = ?
     `).bind(user.id).run();
 
     return c.json({ success: true });
@@ -503,7 +503,8 @@ tutorClassroom.post('/ai-sessions/:sessionId/request-handoff', async (c) => {
       UPDATE ai_classroom_sessions SET
         handoff_status = 'requested',
         handoff_reason = ?,
-        handoff_requested_at = CURRENT_TIMESTAMP
+        handoff_requested_at = CURRENT_TIMESTAMP,
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(body.reason || 'student_requested', sessionId).run();
 
@@ -582,7 +583,8 @@ tutorClassroom.post('/handoff-requests/:sessionId/accept', teacherMiddleware, as
         tutor_name = ?,
         tutor_avatar_url = ?,
         tutor_joined_at = CURRENT_TIMESTAMP,
-        tutor_mode = ?
+        tutor_mode = ?,
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(
       user.id,
@@ -746,7 +748,7 @@ tutorClassroom.post('/ai-sessions/:sessionId/change-mode', teacherMiddleware, as
 
   try {
     await db.prepare(`
-      UPDATE ai_classroom_sessions SET tutor_mode = ? WHERE id = ? AND tutor_id = ?
+      UPDATE ai_classroom_sessions SET tutor_mode = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND tutor_id = ?
     `).bind(body.mode, sessionId, user.id).run();
 
     // Log event
@@ -775,7 +777,8 @@ tutorClassroom.post('/ai-sessions/:sessionId/leave', teacherMiddleware, async (c
         tutor_id = NULL,
         tutor_name = NULL,
         tutor_mode = NULL,
-        handoff_status = 'none'
+        handoff_status = 'none',
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ? AND tutor_id = ?
     `).bind(sessionId, user.id).run();
 
@@ -908,7 +911,8 @@ tutorClassroom.post('/scheduled-sessions/:id/start', teacherMiddleware, async (c
     await db.prepare(`
       UPDATE scheduled_classroom_sessions SET
         status = 'active',
-        started_at = CURRENT_TIMESTAMP
+        started_at = CURRENT_TIMESTAMP,
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(id).run();
 
@@ -1033,7 +1037,8 @@ Exam Type: ${session.exam_type || 'General'}`;
     // Update metrics
     await db.prepare(`
       UPDATE scheduled_classroom_sessions SET
-        ai_suggestions_given = ai_suggestions_given + 1
+        ai_suggestions_given = ai_suggestions_given + 1,
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(id).run();
 
@@ -1076,7 +1081,8 @@ tutorClassroom.post('/scheduled-sessions/:id/end', teacherMiddleware, async (c) 
         actual_duration_minutes = ?,
         session_summary = ?,
         tutor_notes = ?,
-        homework_assigned = ?
+        homework_assigned = ?,
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(
       durationMinutes,
@@ -1157,7 +1163,7 @@ tutorClassroom.post('/student/session/:sessionId/decline-handoff', async (c) => 
 
   try {
     await db.prepare(`
-      UPDATE ai_classroom_sessions SET handoff_status = 'declined'
+      UPDATE ai_classroom_sessions SET handoff_status = 'declined', updated_at = CURRENT_TIMESTAMP
       WHERE id = ? AND student_id = ? AND handoff_status = 'suggested'
     `).bind(sessionId, user.id).run();
 
