@@ -59,6 +59,7 @@ libraryApp.get('/files/*', async (c) => {
 
     const headers = new Headers();
     headers.set('Content-Type', object.httpMetadata?.contentType || 'application/octet-stream');
+    headers.set('X-Content-Type-Options', 'nosniff');
     headers.set('Cache-Control', 'public, max-age=31536000');
 
     return new Response(object.body, { headers });

@@ -4798,6 +4798,24 @@ protectedApp.put('/users/me', userAuth, async (c) => {
   }
 });
 
+// Sniff image magic bytes — never trust client-supplied file.type/extension
+export function sniffImageType(bytes: Uint8Array): 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp' | null {
+  if (bytes.length < 12) return null;
+  if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return 'image/png';
+  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'image/jpeg';
+  if (bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x38) return 'image/gif';
+  if (bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
+      bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) return 'image/webp';
+  return null;
+}
+
+const IMAGE_EXTENSIONS: Record<string, string> = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/gif': 'gif',
+  'image/webp': 'webp',
+};
+
 // Upload avatar
 protectedApp.post('/users/me/avatar', userAuth, async (c) => {
   const user = c.get('user') as UserPayload;
@@ -4816,9 +4834,10 @@ protectedApp.post('/users/me/avatar', userAuth, async (c) => {
       return c.json({ success: false, error: 'No file provided' }, 400);
     }
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (!allowedTypes.includes(file.type)) {
+    // Read the file and sniff its real type from magic bytes
+    const buffer = new Uint8Array(await file.arrayBuffer());
+    const sniffedType = sniffImageType(buffer);
+    if (!sniffedType) {
       return c.json({ success: false, error: 'Invalid file type. Please upload a JPEG, PNG, WebP, or GIF image.' }, 400);
     }
 
@@ -4846,14 +4865,13 @@ protectedApp.post('/users/me/avatar', userAuth, async (c) => {
       }
     }
 
-    // Generate unique file key
-    const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-    const fileKey = `avatars/${user.userId}_${Date.now()}.${fileExtension}`;
+    // Generate unique file key — extension comes from the sniffed type, not the client filename
+    const fileKey = `avatars/${user.userId}_${Date.now()}.${IMAGE_EXTENSIONS[sniffedType]}`;
 
     // Upload to R2
-    await c.env.LIBRARY_BUCKET.put(fileKey, file.stream(), {
+    await c.env.LIBRARY_BUCKET.put(fileKey, buffer, {
       httpMetadata: {
-        contentType: file.type,
+        contentType: sniffedType,
       },
     });
 
