@@ -18,8 +18,7 @@
     "db:seed": "wrangler d1 execute brilla-db --local --file=database/seed.sql",
     "db:baseline": "wrangler d1 migrations apply brilla-db",
     "db:backup": "wrangler d1 export brilla-db --output=backups/brilla-db-$(date +%Y%m%d-%H%M%S).sql",
-    "test:watch": "vitest",
-    "api:secret": "wrangler secret put ANTHROPIC_API_KEY"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "clsx": "^2.1.1",
