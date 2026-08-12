@@ -4,7 +4,7 @@
   "description": "Ghana's #1 exam preparation platform. Master Mathematics, Physics, Chemistry, and Biology with AI-powered practice and competition simulations.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#050807",
+  "background_color": "#FFFDF7",
   "theme_color": "#006B3F",
   "orientation": "portrait-primary",
   "scope": "/",
