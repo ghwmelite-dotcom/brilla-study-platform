@@ -4,7 +4,8 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https://brilla-api.ghwmelite.workers.dev; connect-src 'self' https://brilla-api.ghwmelite.workers.dev https://challenges.cloudflare.com; worker-src 'self' https://unpkg.com; frame-src https://challenges.cloudflare.com; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  # Note: ambient sounds stream from assets.mixkit.co; self-hosting the mp3s later would let media-src drop back to 'self'.
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https://brilla-api.ghwmelite.workers.dev; connect-src 'self' https://brilla-api.ghwmelite.workers.dev https://challenges.cloudflare.com; worker-src 'self' https://unpkg.com; frame-src https://challenges.cloudflare.com https://phet.colorado.edu; media-src 'self' https://assets.mixkit.co; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
 
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
