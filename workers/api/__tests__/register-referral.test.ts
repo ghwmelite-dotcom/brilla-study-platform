@@ -11,10 +11,11 @@ import worker from '../index';
 //                                       referred_by=<CODE>; attribution batch
 //                                       runs; referral_signup points fire
 // (e) open mode + no code            → unchanged 'pending' flow
-// (f) open mode + valid code         → approved + attribution, but NO points
-//                                       (award on approval only — open-mode
-//                                       code users wait for the admin approve
-//                                       handler's backstop)
+// (f) open mode + valid code         → approved + attribution + signup points
+//                                       (a valid code IS the approval in
+//                                       either mode; the approve-handler
+//                                       backstop can't double-award because
+//                                       the referral row exists)
 // (g) ordering: code validation happens after Turnstile, before the
 //     email-exists check.
 //
@@ -194,7 +195,7 @@ describe('/auth/register — referral code gate (Task 5)', () => {
     expect(runsOutsideBatch.some((c) => c.sql.includes('INSERT INTO points_ledger'))).toBe(false);
   });
 
-  it('(f) open mode + valid code → approved + attribution, no register-time points', async () => {
+  it('(f) open mode + valid code → approved + attribution + signup points', async () => {
     const { db, batchCalls, runsOutsideBatch } = makeDb({ affiliateRow: AFFILIATE });
     const res = await worker.fetch(
       registerRequest({ ...VALID_BODY, referralCode: 'ABC123XY' }),
@@ -211,12 +212,13 @@ describe('/auth/register — referral code gate (Task 5)', () => {
     expect(batchCalls).toHaveLength(2);
     expect(batchCalls[1][0].sql).toContain('INSERT INTO affiliate_referrals');
 
-    // …but the referral_signup award is gated to invite-mode auto-approval.
-    expect(
-      runsOutsideBatch.some(
-        (c) => c.sql.includes('INSERT INTO points_ledger') && c.args[3] === 'referral_signup',
-      ),
-    ).toBe(false);
+    // …and so does the referral_signup award: the code IS the approval.
+    const ledger = runsOutsideBatch.find(
+      (c) => c.sql.includes('INSERT INTO points_ledger') && c.args[3] === 'referral_signup',
+    );
+    expect(ledger).toBeDefined();
+    expect(ledger!.args[1]).toBe('user_AFF');
+    expect(ledger!.args[2]).toBe(100);
   });
 
   it('(g) Turnstile runs before code validation; code validation before email-exists', async () => {

@@ -858,10 +858,11 @@ publicApp.get('/exam-types/:slug/paper-types', async (c) => {
 // AUTHENTICATION ROUTES
 // =============================================
 
-// Growth loop (Task 5): referral_signup points fire on approval only, exactly
-// once. Invite-mode auto-approvals call this inline at register; the admin
-// approve handler calls it for users it approves with an unattributed
-// referred_by. 100 points = default, tune with pilot data.
+// Growth loop (Task 5): referral_signup points fire when a valid referral
+// code is present — the code IS the approval. Called inline at register (both
+// modes) and on OAuth register; the admin approve handler calls it as a
+// backstop for users whose referred_by was set without a referral row.
+// 100 points = default, tune with pilot data.
 async function awardReferralSignupPoints(db: D1Database, affiliateUserId: string, newUserId: string): Promise<void> {
   await awardPoints(db, {
     userId: affiliateUserId,
@@ -1023,16 +1024,14 @@ publicApp.post('/auth/register', async (c) => {
 
     await c.env.DB.batch(statements);
 
-    // Growth loop: attribute the referral (creates the affiliate_referrals row;
-    // re-sets referred_by to the same value, harmlessly). referral_signup
-    // points fire ON APPROVAL ONLY, exactly once: invite-mode registrations
-    // are auto-approved here, so the award goes through the same helper the
-    // admin approve handler uses. Open-mode referred users wait for approval.
+    // Growth loop: a valid code IS the approval in either mode — attribute
+    // (creates the affiliate_referrals row; re-sets referred_by to the same
+    // value, harmlessly) and award referral_signup points now, exactly once.
+    // The admin approve handler's backstop only fires for referred users with
+    // no referral row, so it can never double-award.
     if (referralAffiliate) {
       await attributeReferral(c.env.DB, referralAffiliate, id, referralAffiliate.referral_code);
-      if (inviteMode) {
-        await awardReferralSignupPoints(c.env.DB, referralAffiliate.user_id, id);
-      }
+      await awardReferralSignupPoints(c.env.DB, referralAffiliate.user_id, id);
     }
 
     // Notify all admin users about the new registration
@@ -1116,6 +1115,16 @@ publicApp.post('/referral-code-requests', async (c) => {
 
   if (!name || !contact) {
     return c.json({ success: false, error: 'Name and contact are required' }, 400);
+  }
+
+  // Input length caps (untrusted public input)
+  if (
+    String(name).length > 100 ||
+    String(contact).length > 254 ||
+    (schoolName && String(schoolName).length > 120) ||
+    (message && String(message).length > 500)
+  ) {
+    return c.json({ success: false, error: 'Input too long' }, 400);
   }
 
   const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
@@ -6826,13 +6835,13 @@ adminApp.post('/referral-code-requests/:id/fulfill', async (c) => {
   }
 
   try {
-    // The issued code must belong to a real affiliate profile
+    // The issued code must belong to a real, active affiliate profile
     const affiliate = await c.env.DB.prepare(
-      'SELECT id FROM affiliate_profiles WHERE referral_code = ?'
+      'SELECT id FROM affiliate_profiles WHERE referral_code = ? AND is_active = 1'
     ).bind(String(code).toUpperCase()).first();
 
     if (!affiliate) {
-      return c.json({ success: false, error: 'Unknown referral code' }, 400);
+      return c.json({ success: false, error: 'Unknown or inactive referral code' }, 400);
     }
 
     const result = await c.env.DB.prepare(`

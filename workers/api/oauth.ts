@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { sign } from 'hono/jwt';
 import { parseJsonBody } from './http';
+import { isValidReferralCode, attributeReferral } from './affiliates';
+import { awardPoints } from './points';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -404,10 +406,24 @@ oauthApp.post('/google/callback', async (c) => {
       }, 409);
     }
 
-    // Growth loop (Task 5): invite mode requires a referral code. The OAuth
-    // register flow has no code capture, so a codeless attempt gets the same
-    // codeRequired envelope as /auth/register.
-    if (c.env.REGISTRATION_MODE === 'invite' && !registrationData?.referralCode) {
+    // Growth loop (Task 5): invite mode requires a referral code. The code
+    // arrives via registrationData — client-supplied through OAuth state, so
+    // untrusted: validate it exactly like /auth/register (format + active
+    // affiliate lookup). No code in invite mode → same codeRequired envelope.
+    let referralAffiliate: { id: string; user_id: string; referral_code: string } | null = null;
+    const oauthReferralCode = registrationData?.referralCode;
+    if (oauthReferralCode) {
+      if (!isValidReferralCode(String(oauthReferralCode))) {
+        return c.json({ success: false, error: 'Invalid referral code format' }, 400);
+      }
+      referralAffiliate = await c.env.DB.prepare(`
+        SELECT id, user_id, referral_code FROM affiliate_profiles
+        WHERE referral_code = ? AND is_active = 1
+      `).bind(String(oauthReferralCode).toUpperCase()).first();
+      if (!referralAffiliate) {
+        return c.json({ success: false, error: 'Invalid referral code' }, 400);
+      }
+    } else if (c.env.REGISTRATION_MODE === 'invite') {
       return c.json({
         success: false,
         error: 'An invite code is required to register. Request one below.',
@@ -450,9 +466,9 @@ oauthApp.post('/google/callback', async (c) => {
           id, email, name, role, status, password_hash,
           school_level, year_group, school_name, house,
           teacher_license_number, subjects_taught, years_experience, qualifications,
-          subscription_tier_id, primary_exam_type_id,
+          subscription_tier_id, primary_exam_type_id, referred_by,
           email_verified, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
       `).bind(
         userId,
         googleUser.email,
@@ -469,7 +485,8 @@ oauthApp.post('/google/callback', async (c) => {
         yearsExperience,
         qualifications,
         selectedTierId,
-        primaryExamTypeId
+        primaryExamTypeId,
+        referralAffiliate ? referralAffiliate.referral_code : null
       ),
     ];
 
@@ -503,6 +520,20 @@ oauthApp.post('/google/callback', async (c) => {
     }
 
     await c.env.DB.batch(statements);
+
+    // Growth loop (Task 5): valid code IS the approval — attribute and award
+    // referral_signup points immediately, exactly like /auth/register. (Uses
+    // awardPoints directly; the shared awardReferralSignupPoints helper lives
+    // in index.ts and importing it would be circular.)
+    if (referralAffiliate) {
+      await attributeReferral(c.env.DB, referralAffiliate, userId, referralAffiliate.referral_code);
+      await awardPoints(c.env.DB, {
+        userId: referralAffiliate.user_id,
+        points: 100,
+        source: 'referral_signup',
+        sourceRef: userId,
+      });
+    }
 
     user = {
       id: userId,

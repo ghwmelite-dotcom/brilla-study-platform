@@ -24,19 +24,20 @@ const GOOGLE_USER = {
   name: 'New User',
 };
 
-function makeStateRow(role: string | null) {
+function makeStateRow(role: string | null, registrationData?: Record<string, unknown>) {
   return {
     id: 'oauth_state_1',
     state: 'test-state',
     code_verifier: 'verifier',
     intent: 'register',
     role,
-    registration_data: null,
+    registration_data: registrationData ? JSON.stringify(registrationData) : null,
   };
 }
 
 interface Captured {
   usersInsertArgs: unknown[] | null;
+  runs: { sql: string; args: unknown[] }[];
 }
 
 // Statement shape returned by the mocked prepare().bind() below. The register
@@ -46,14 +47,25 @@ interface MockStatement {
   run: () => Promise<unknown>;
 }
 
-function makeDb(stateRow: unknown, captured: Captured) {
+interface DbOptions {
+  // Row returned for the affiliate_profiles referral-code lookup (null =
+  // unknown/inactive code).
+  affiliateRow?: unknown;
+}
+
+function makeDb(stateRow: unknown, captured: Captured, { affiliateRow = null }: DbOptions = {}) {
   return {
     prepare: vi.fn((sql: string) => ({
       bind: vi.fn((...args: unknown[]) => ({
-        first: vi.fn().mockResolvedValue(
-          sql.includes('FROM oauth_states') ? stateRow : null,
-        ),
+        first: vi.fn().mockImplementation(() => {
+          if (sql.includes('FROM oauth_states')) return Promise.resolve(stateRow);
+          if (sql.includes('FROM affiliate_profiles') && sql.includes('referral_code = ?')) {
+            return Promise.resolve(affiliateRow);
+          }
+          return Promise.resolve(null);
+        }),
         run: vi.fn().mockImplementation(() => {
+          captured.runs.push({ sql, args });
           if (sql.includes('INSERT INTO users')) {
             captured.usersInsertArgs = args;
           }
@@ -68,13 +80,14 @@ function makeDb(stateRow: unknown, captured: Captured) {
   } as unknown as D1Database;
 }
 
-function makeEnv(stateRow: unknown, captured: Captured) {
+function makeEnv(stateRow: unknown, captured: Captured, opts: DbOptions & { registrationMode?: string } = {}) {
   return {
-    DB: makeDb(stateRow, captured),
+    DB: makeDb(stateRow, captured, opts),
     JWT_SECRET,
     ENVIRONMENT: 'test',
     GOOGLE_CLIENT_ID: 'client-id',
     GOOGLE_CLIENT_SECRET: 'client-secret',
+    ...(opts.registrationMode ? { REGISTRATION_MODE: opts.registrationMode } : {}),
   };
 }
 
@@ -111,7 +124,7 @@ afterEach(() => {
 describe('OAuth register role hardening', () => {
   it("rejects role: 'admin' with 400", async () => {
     stubGoogleTokenExchange();
-    const captured: Captured = { usersInsertArgs: null };
+    const captured: Captured = { usersInsertArgs: null, runs: [] };
     const res = await oauthApp.fetch(
       callbackRequest(),
       makeEnv(makeStateRow('admin'), captured),
@@ -123,7 +136,7 @@ describe('OAuth register role hardening', () => {
 
   it("inserts role: 'teacher' with status 'pending'", async () => {
     stubGoogleTokenExchange();
-    const captured: Captured = { usersInsertArgs: null };
+    const captured: Captured = { usersInsertArgs: null, runs: [] };
     const res = await oauthApp.fetch(
       callbackRequest(),
       makeEnv(makeStateRow('teacher'), captured),
@@ -136,7 +149,7 @@ describe('OAuth register role hardening', () => {
 
   it("inserts role: 'student' with status 'approved'", async () => {
     stubGoogleTokenExchange();
-    const captured: Captured = { usersInsertArgs: null };
+    const captured: Captured = { usersInsertArgs: null, runs: [] };
     const res = await oauthApp.fetch(
       callbackRequest(),
       makeEnv(makeStateRow('student'), captured),
@@ -144,5 +157,87 @@ describe('OAuth register role hardening', () => {
     expect(res.status).toBe(200);
     expect(captured.usersInsertArgs?.[3]).toBe('student');
     expect(captured.usersInsertArgs?.[4]).toBe('approved');
+  });
+});
+
+// Growth loop (Task 5, fix round 1): the OAuth register path must validate a
+// client-supplied referralCode exactly like /auth/register — previously any
+// non-empty string bypassed invite mode and got an auto-approved student
+// account.
+const AFFILIATE = { id: 'aff_1', user_id: 'user_AFF', referral_code: 'ABC123XY' };
+
+describe('OAuth register — invite-mode referral code validation', () => {
+  it('rejects a malformed code with 400, no user created', async () => {
+    stubGoogleTokenExchange();
+    const captured: Captured = { usersInsertArgs: null, runs: [] };
+    const res = await oauthApp.fetch(
+      callbackRequest(),
+      makeEnv(makeStateRow('student', { referralCode: 'x' }), captured, {
+        registrationMode: 'invite',
+      }),
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({ success: false, error: 'Invalid referral code format' });
+    expect(captured.usersInsertArgs).toBeNull();
+  });
+
+  it('rejects an unknown code with 400, no user created', async () => {
+    stubGoogleTokenExchange();
+    const captured: Captured = { usersInsertArgs: null, runs: [] };
+    const res = await oauthApp.fetch(
+      callbackRequest(),
+      makeEnv(makeStateRow('student', { referralCode: 'ZZZ999ZZ' }), captured, {
+        registrationMode: 'invite',
+        affiliateRow: null,
+      }),
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({ success: false, error: 'Invalid referral code' });
+    expect(captured.usersInsertArgs).toBeNull();
+  });
+
+  it('rejects a codeless attempt in invite mode with the codeRequired envelope', async () => {
+    stubGoogleTokenExchange();
+    const captured: Captured = { usersInsertArgs: null, runs: [] };
+    const res = await oauthApp.fetch(
+      callbackRequest(),
+      makeEnv(makeStateRow('student'), captured, { registrationMode: 'invite' }),
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.success).toBe(false);
+    expect(body.data?.codeRequired).toBe(true);
+    expect(captured.usersInsertArgs).toBeNull();
+  });
+
+  it('valid code → referred_by on the user insert + attribution + signup points', async () => {
+    stubGoogleTokenExchange();
+    const captured: Captured = { usersInsertArgs: null, runs: [] };
+    const res = await oauthApp.fetch(
+      callbackRequest(),
+      makeEnv(makeStateRow('student', { referralCode: 'abc123xy' }), captured, {
+        registrationMode: 'invite',
+        affiliateRow: AFFILIATE,
+      }),
+    );
+    expect(res.status).toBe(200);
+
+    // referred_by is the last bind on INSERT INTO users (uppercased code).
+    expect(captured.usersInsertArgs).not.toBeNull();
+    expect(captured.usersInsertArgs![captured.usersInsertArgs!.length - 1]).toBe('ABC123XY');
+
+    // attributeReferral batch ran for the new user under the affiliate.
+    const referralInsert = captured.runs.find((r) => r.sql.includes('INSERT INTO affiliate_referrals'));
+    expect(referralInsert).toBeDefined();
+    expect(referralInsert!.args[1]).toBe('aff_1');
+    expect(referralInsert!.args[2]).toBe(captured.usersInsertArgs![0]); // new user id
+
+    // referral_signup points awarded to the referrer, sourced to the new user.
+    const ledger = captured.runs.find((r) => r.sql.includes('INSERT INTO points_ledger'));
+    expect(ledger).toBeDefined();
+    expect(ledger!.args[1]).toBe('user_AFF');
+    expect(ledger!.args[2]).toBe(100);
+    expect(ledger!.args[3]).toBe('referral_signup');
+    expect(ledger!.args[4]).toBe(captured.usersInsertArgs![0]);
   });
 });
