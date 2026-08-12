@@ -191,6 +191,54 @@ describe('(c) school-scoped winner announcement', () => {
   });
 });
 
+describe('(c2) school-scoped winner — membership gate targets the school channel', () => {
+  const CROWNED_SCHOOL_WINNER = { ...CROWNED_PLATFORM, id: 'cyc_sw', scope: 'school', school_id: 'sch_1' };
+
+  it('gate probes the school channel; member winner is named in the school post', async () => {
+    const fetchMock = stubTelegramFetch(); // getChatMember defaults to 200 ok
+    const db = alertsDb([
+      { match: /winner_announced_at IS NULL/, all: () => ({ results: [CROWNED_SCHOOL_WINNER] }) },
+      { match: /FROM school_channels WHERE school_id/, first: () => ({ channel_id: '-100123' }) },
+      { match: /FROM telegram_links WHERE user_id/, first: () => ({ chat_id: '777' }) },
+    ]);
+
+    const res = await runTelegramRaceAlerts(db, envFor(db), NOW);
+    expect(res).toEqual({ posts: 1, dms: 0 });
+
+    // getChatMember probed the SCHOOL channel, not the platform channel.
+    const memberCall = fetchMock.mock.calls.find(([url]) => String(url).includes('/getChatMember'));
+    expect(memberCall).toBeDefined();
+    const memberPayload = JSON.parse((memberCall![1] as RequestInit).body as string);
+    expect(memberPayload).toEqual({ chat_id: '-100123', user_id: '777' });
+
+    const msgs = sentMessages(fetchMock);
+    expect(msgs.length).toBe(1);
+    expect(msgs[0].chat_id).toBe('-100123');
+    expect(msgs[0].text).toContain('Ama');
+  });
+
+  it('non-member winner: unnamed school post + DM referencing the school channel', async () => {
+    const fetchMock = stubTelegramFetch({
+      getChatMember: { status: 400, body: { ok: false, description: 'user not found' } },
+    });
+    const db = alertsDb([
+      { match: /winner_announced_at IS NULL/, all: () => ({ results: [CROWNED_SCHOOL_WINNER] }) },
+      { match: /FROM school_channels WHERE school_id/, first: () => ({ channel_id: '-100123' }) },
+      { match: /FROM telegram_links WHERE user_id/, first: () => ({ chat_id: '777' }) },
+    ]);
+
+    const res = await runTelegramRaceAlerts(db, envFor(db), NOW);
+    expect(res).toEqual({ posts: 1, dms: 1 });
+
+    const msgs = sentMessages(fetchMock);
+    const channelPost = msgs.find((m) => m.chat_id === '-100123')!;
+    const dm = msgs.find((m) => m.chat_id === '777')!;
+    expect(channelPost.text).not.toContain('Ama');
+    expect(dm.text).toMatch(/school.*channel to see your win announced/i);
+    expect(dm.text).not.toMatch(/community channel/i);
+  });
+});
+
 describe('(d) cycle-start post', () => {
   it('posts once for a freshly opened cycle and sets start_announced_at', async () => {
     const fetchMock = stubTelegramFetch();

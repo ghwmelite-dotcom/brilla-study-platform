@@ -216,6 +216,57 @@ describe('telegram webhook — relink same user (f)', () => {
   });
 });
 
+describe('telegram webhook — mid-handler failure regression (award atomicity)', () => {
+  it('award throws after the link upsert → fresh link rolled back; retry awards exactly once', async () => {
+    const fetchMock = stubTelegramFetch();
+    const TOKEN2 = 'B'.repeat(22);
+    let ledgerInserted = 0;
+    let failLedger = true;
+    const db = createMockD1([
+      {
+        match: /FROM telegram_link_tokens WHERE token/,
+        first: (binds) => ({ token: binds[0], user_id: 'user_1', expires_at: FUTURE, used_at: null }),
+      },
+      { match: /UPDATE telegram_link_tokens SET used_at/, run: () => ({ success: true, meta: { changes: 1 } }) },
+      { match: /FROM telegram_links WHERE chat_id/, first: () => null },
+      // Rolled back after attempt 1, so the retry also sees no prior row.
+      { match: /FROM telegram_links WHERE user_id/, first: () => null },
+      { match: /INSERT INTO telegram_links/, run: () => ({ success: true, meta: { changes: 1 } }) },
+      { match: /DELETE FROM telegram_links/, run: () => ({ success: true, meta: { changes: 1 } }) },
+      { match: /UPDATE users SET xp_points/, run: () => ({ success: true, meta: { changes: 1 } }) },
+      { match: /FROM race_cycles/, first: () => null },
+      {
+        match: /INSERT INTO points_ledger/,
+        run: () => {
+          if (failLedger) {
+            failLedger = false;
+            throw new Error('simulated D1 fault');
+          }
+          ledgerInserted++;
+          return { success: true, meta: { changes: 1 } };
+        },
+      },
+      { match: /SELECT house FROM users/, first: () => null },
+    ]);
+
+    // Attempt 1: D1 fault inside awardPoints → rollback + polite failure reply.
+    const first = await telegramWebhookApp.fetch(startRequest(`/start ${TOKEN}`), webhookEnv(db));
+    expect(first.status).toBe(200);
+    expect(ledgerInserted).toBe(0);
+    expect(db.calls.some((c) => /DELETE FROM telegram_links/.test(c.sql))).toBe(true);
+    expect(sentTexts(fetchMock).some((t) => t.includes('went wrong'))).toBe(true);
+
+    // Retry with a fresh token (the first was consumed): no prior link row
+    // (rolled back) → the award fires again and succeeds — exactly once total.
+    const second = await telegramWebhookApp.fetch(startRequest(`/start ${TOKEN2}`), webhookEnv(db));
+    expect(second.status).toBe(200);
+    expect(ledgerInserted).toBe(1);
+    expect(sentTexts(fetchMock).some((t) => t.includes('Connected'))).toBe(true);
+    // One failed attempt + one success; never two successful ledger inserts.
+    expect(db.calls.filter((c) => /INSERT INTO points_ledger/.test(c.sql)).length).toBe(2);
+  });
+});
+
 // ---- authed endpoints on notificationsApp ----
 
 async function jwtFor(userId: string) {

@@ -77,26 +77,46 @@ export async function runTelegramRaceAlerts(
   `).bind().all<CrownedCycle>();
 
   for (const cy of crowned.results) {
+    const isSchool = cy.scope === 'school' && !!cy.school_id;
+    // The post — and therefore the getChatMember name gate — targets the school
+    // channel for school-scope cycles, the platform channel otherwise. Gating
+    // against the platform channel while posting to the school channel would
+    // name non-members and DM winners to join the wrong channel.
+    let targetChannel: string | null = env.TELEGRAM_PLATFORM_CHANNEL_ID ?? null;
+    if (isSchool) {
+      const ch = await db.prepare('SELECT channel_id FROM school_channels WHERE school_id = ? AND broken = 0')
+        .bind(cy.school_id).first<{ channel_id: string }>();
+      targetChannel = ch?.channel_id ?? null;
+      if (!targetChannel) {
+        // No school channel configured: skip the post entirely (a school-race
+        // winner does not belong on the platform channel). Still mark announced
+        // so setting the channel up later doesn't emit a stale winner post.
+        await db.prepare("UPDATE race_cycles SET winner_announced_at = datetime('now') WHERE id = ?").bind(cy.id).run();
+        continue;
+      }
+    }
     let named = false;
-    if (cy.winner_user_id && env.TELEGRAM_PLATFORM_CHANNEL_ID) {
+    if (cy.winner_user_id && targetChannel) {
       const link = await db.prepare('SELECT chat_id FROM telegram_links WHERE user_id = ? AND stale = 0')
         .bind(cy.winner_user_id).first<{ chat_id: string }>();
       if (link) {
         const member = await telegramApi(env, 'getChatMember', {
-          chat_id: env.TELEGRAM_PLATFORM_CHANNEL_ID, user_id: link.chat_id,
+          chat_id: targetChannel, user_id: link.chat_id,
         });
         named = member.ok;
         if (!named) {
-          if (await notifyUser(db, env, cy.winner_user_id,
-            '🏆 You won the weekly race! Join the BrillaPrep community channel to see your win announced.')) dms++;
+          const dmText = isSchool
+            ? "🏆 You won the weekly race! Join your school's Telegram channel to see your win announced."
+            : '🏆 You won the weekly race! Join the BrillaPrep community channel to see your win announced.';
+          if (await notifyUser(db, env, cy.winner_user_id, dmText)) dms++;
         }
       }
     }
     const text = named && cy.winner_name
       ? `🏆 This week's race winner: ${cy.winner_name}! Congratulations!`
       : `🏆 This week's race has a winner! Check the leaderboard on BrillaPrep.`;
-    const sent = cy.scope === 'school' && cy.school_id
-      ? await notifySchoolChannel(db, env, cy.school_id, text)
+    const sent = isSchool
+      ? await notifySchoolChannel(db, env, cy.school_id!, text)
       : await notifyPlatformChannel(env, text);
     if (sent) posts++;
     // Mark announced regardless of send outcome: a Telegram outage must not

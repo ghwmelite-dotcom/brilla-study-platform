@@ -110,12 +110,29 @@ telegramWebhookApp.post('/webhook', async (c) => {
 
   // Award gated on "no prior row for user": relinks never double-pay.
   if (!existing) {
-    await awardPoints(db, {
-      userId: row.user_id,
-      points: CONNECT_POINTS,
-      source: 'notification_subscribe',
-      sourceRef: chatId,
-    });
+    // Atomicity: the link upsert above commits before the award, so a D1 fault
+    // inside awardPoints would leave the user linked with no points — and every
+    // later handshake would see `existing` and never award. On award failure,
+    // roll back the fresh link row so a re-link (new token) retries the award;
+    // the award then happens exactly once across the retry.
+    try {
+      await awardPoints(db, {
+        userId: row.user_id,
+        points: CONNECT_POINTS,
+        source: 'notification_subscribe',
+        sourceRef: chatId,
+      });
+    } catch (e) {
+      console.error('telegram webhook: connect-points award failed — rolling back fresh link:', e);
+      try {
+        await db.prepare('DELETE FROM telegram_links WHERE user_id = ?').bind(row.user_id).run();
+      } catch (e2) {
+        // Double fault: linked without points. Log loudly for manual repair.
+        console.error(`telegram webhook: link rollback failed for ${row.user_id} (linked without points):`, e2);
+      }
+      await reply('Something went wrong connecting your Telegram. Generate a new link code in Settings and try again.');
+      return c.json({ ok: true });
+    }
     await reply(`Connected! +${CONNECT_POINTS} XP added to your race score 🎉`);
   } else {
     await reply('Telegram reconnected ✅');
