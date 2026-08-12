@@ -237,8 +237,14 @@ async function verifyPassword(password: string, storedHash: string): Promise<boo
     );
 
     const hashBytes = new Uint8Array(hash);
-    if (hashBytes.length !== storedHashBytes.length) return false;
-    return hashBytes.every((byte, i) => byte === storedHashBytes[i]);
+    // Constant-time comparison: no early exit on first mismatch.
+    // Length difference is folded into the accumulator; the modulo index
+    // keeps the loop bounded when lengths differ.
+    let diff = hashBytes.length ^ storedHashBytes.length;
+    for (let i = 0; i < hashBytes.length; i++) {
+      diff |= hashBytes[i] ^ storedHashBytes[i % storedHashBytes.length];
+    }
+    return diff === 0;
   } catch {
     return false;
   }
