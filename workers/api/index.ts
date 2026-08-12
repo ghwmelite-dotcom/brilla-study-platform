@@ -7643,6 +7643,306 @@ adminApp.patch('/race/cycles/:id', async (c) => {
   }
 });
 
+// ---------------------------------------------------------------------------
+// Pilot schools admin (Task 1): school CRUD-lite, ambassador provisioning,
+// and student assignment. Ambassador accounts are system-owned users with an
+// unusable password sentinel; their affiliate profile's referral_code doubles
+// as the school's invite code (a valid code IS the approval — see register).
+// ---------------------------------------------------------------------------
+
+interface SchoolRow {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
+  created_at: string;
+}
+
+adminApp.get('/schools', async (c) => {
+  try {
+    // One round-trip: studentCount and ambassadorCode are correlated
+    // subqueries instead of N+1 lookups. The ambassador is identified as the
+    // affiliate profile whose owner user belongs to the school and carries the
+    // system-generated @ambassador.brilla mailbox.
+    const result = await c.env.DB.prepare(`
+      SELECT s.id, s.name, s.slug, s.status, s.created_at,
+        (SELECT COUNT(*) FROM users u WHERE u.school_id = s.id) AS student_count,
+        (SELECT ap.referral_code FROM affiliate_profiles ap
+         JOIN users au ON au.id = ap.user_id
+         WHERE au.school_id = s.id AND au.email LIKE '%@ambassador.brilla'
+         LIMIT 1) AS ambassador_code
+      FROM schools s
+      ORDER BY s.created_at DESC
+    `).all<SchoolRow & { student_count: number; ambassador_code: string | null }>();
+
+    const schools = (result.results || []).map((row) => ({
+      id: row.id,
+      name: row.name,
+      slug: row.slug,
+      status: row.status,
+      studentCount: row.student_count ?? 0,
+      ambassadorCode: row.ambassador_code ?? null,
+      createdAt: row.created_at,
+    }));
+    return c.json({ success: true, data: { schools } });
+  } catch (error) {
+    console.error('Admin list schools error:', error);
+    return c.json({ success: false, error: 'Failed to list schools' }, 500);
+  }
+});
+
+adminApp.post('/schools', async (c) => {
+  try {
+    const body = await parseJsonBody(c);
+    if (!body) {
+      return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+    }
+
+    const name = typeof body.name === 'string' ? body.name.trim() : '';
+    const slug = typeof body.slug === 'string' ? body.slug.trim().toLowerCase() : '';
+
+    if (name.length < 2 || name.length > 100) {
+      return c.json({ success: false, error: 'name must be 2-100 characters' }, 400);
+    }
+    if (!/^[a-z0-9-]{2,40}$/.test(slug)) {
+      return c.json({ success: false, error: 'slug must be 2-40 chars of a-z, 0-9 and hyphens' }, 400);
+    }
+
+    const existing = await c.env.DB.prepare(
+      'SELECT id FROM schools WHERE slug = ?'
+    ).bind(slug).first();
+    if (existing) {
+      return c.json({ success: false, error: 'A school with this slug already exists' }, 400);
+    }
+
+    const id = `sch_${slug}`;
+    try {
+      await c.env.DB.prepare(
+        'INSERT INTO schools (id, name, slug) VALUES (?, ?, ?)'
+      ).bind(id, name, slug).run();
+    } catch (insertError) {
+      // Race fallback: slug claimed between the check and the insert.
+      if (String(insertError).includes('UNIQUE')) {
+        return c.json({ success: false, error: 'A school with this slug already exists' }, 400);
+      }
+      throw insertError;
+    }
+
+    return c.json({ success: true, data: { id } });
+  } catch (error) {
+    console.error('Admin create school error:', error);
+    return c.json({ success: false, error: 'Failed to create school' }, 500);
+  }
+});
+
+adminApp.post('/schools/:id/ambassador', async (c) => {
+  try {
+    const schoolId = c.req.param('id');
+    const body = await parseJsonBody(c);
+    if (!body) {
+      return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+    }
+
+    const code = typeof body.code === 'string' ? body.code.trim().toUpperCase() : '';
+    if (!isValidReferralCode(code)) {
+      return c.json({ success: false, error: 'Invalid referral code format' }, 400);
+    }
+
+    const school = await c.env.DB.prepare(
+      'SELECT id, name, slug FROM schools WHERE id = ?'
+    ).bind(schoolId).first<Pick<SchoolRow, 'id' | 'name' | 'slug'>>();
+    if (!school) {
+      return c.json({ success: false, error: 'School not found' }, 404);
+    }
+
+    // One ambassador per school: the ambassador is the user carrying this
+    // school's system-generated @ambassador.brilla mailbox.
+    const existingAmbassador = await c.env.DB.prepare(
+      `SELECT id FROM users WHERE school_id = ? AND email LIKE '%@ambassador.brilla'`
+    ).bind(schoolId).first();
+    if (existingAmbassador) {
+      return c.json({ success: false, error: 'School already has an ambassador' }, 409);
+    }
+
+    const codeTaken = await c.env.DB.prepare(
+      'SELECT id FROM affiliate_profiles WHERE referral_code = ?'
+    ).bind(code).first();
+    if (codeTaken) {
+      return c.json({ success: false, error: 'Referral code already in use' }, 409);
+    }
+
+    const userId = `user_${crypto.randomUUID()}`;
+    const affiliateId = `aff_${crypto.randomUUID()}`;
+    const email = `ambassador_${school.slug}@ambassador.brilla`;
+    // Unusable password sentinel: not a hash any login attempt can match, and
+    // greppable so these accounts are easy to audit. password_hash is NOT NULL
+    // on prod, so NULL is not an option.
+    const passwordSentinel = `disabled_ambassador_${crypto.randomUUID()}`;
+
+    // User + affiliate profile commit atomically — a half-provisioned
+    // ambassador (login without a code, or a code without an owner) must
+    // never be observable.
+    await c.env.DB.batch([
+      c.env.DB.prepare(`
+        INSERT INTO users (id, email, password_hash, name, role, status, is_active, email_verified, school_id)
+        VALUES (?, ?, ?, ?, 'student', 'approved', 1, 1, ?)
+      `).bind(userId, email, passwordSentinel, `${school.name} Ambassador`, schoolId),
+      c.env.DB.prepare(`
+        INSERT INTO affiliate_profiles (id, user_id, referral_code, tier_id)
+        VALUES (?, ?, ?, 'tier_scout')
+      `).bind(affiliateId, userId, code),
+    ]);
+
+    return c.json({ success: true, data: { userId, code } });
+  } catch (error) {
+    console.error('Admin provision ambassador error:', error);
+    return c.json({ success: false, error: 'Failed to provision ambassador' }, 500);
+  }
+});
+
+const ADMIN_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+adminApp.post('/schools/:id/students', async (c) => {
+  try {
+    const schoolId = c.req.param('id');
+    const body = await parseJsonBody(c);
+    if (!body) {
+      return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+    }
+
+    if (!Array.isArray(body.emails) || body.emails.length === 0) {
+      return c.json({ success: false, error: 'emails must be a non-empty array' }, 400);
+    }
+    if (body.emails.length > 500) {
+      return c.json({ success: false, error: 'Maximum 500 emails per request' }, 400);
+    }
+
+    const school = await c.env.DB.prepare(
+      'SELECT id FROM schools WHERE id = ?'
+    ).bind(schoolId).first();
+    if (!school) {
+      return c.json({ success: false, error: 'School not found' }, 404);
+    }
+
+    const skipped: { email: string; reason: string }[] = [];
+    const validEmails: string[] = [];
+    for (const raw of body.emails) {
+      const email = typeof raw === 'string' ? raw.trim().toLowerCase() : '';
+      if (!ADMIN_EMAIL_RE.test(email)) {
+        skipped.push({ email: typeof raw === 'string' ? raw : String(raw), reason: 'invalid_email' });
+        continue;
+      }
+      if (!validEmails.includes(email)) {
+        validEmails.push(email);
+      }
+    }
+
+    // Resolve which candidate emails exist and whether they are already
+    // assigned, so skipped reasons distinguish not_found from
+    // already_assigned (a plain UPDATE ... WHERE school_id IS NULL would
+    // silently change 0 rows for both).
+    const existingByEmail = new Map<string, { id: string; school_id: string | null }>();
+    if (validEmails.length > 0) {
+      const placeholders = validEmails.map(() => '?').join(',');
+      const found = await c.env.DB.prepare(
+        `SELECT id, email, school_id FROM users WHERE email IN (${placeholders})`
+      ).bind(...validEmails).all<{ id: string; email: string; school_id: string | null }>();
+      for (const row of found.results || []) {
+        existingByEmail.set(row.email, row);
+      }
+    }
+
+    const statements: D1PreparedStatement[] = [];
+    let assigned = 0;
+    for (const email of validEmails) {
+      const user = existingByEmail.get(email);
+      if (!user) {
+        skipped.push({ email, reason: 'not_found' });
+        continue;
+      }
+      if (user.school_id) {
+        skipped.push({ email, reason: 'already_assigned' });
+        continue;
+      }
+      // The school_id IS NULL guard stays in the SQL as a backstop against a
+      // concurrent assignment between the SELECT above and this batch.
+      statements.push(
+        c.env.DB.prepare(
+          'UPDATE users SET school_id = ? WHERE email = ? AND school_id IS NULL'
+        ).bind(schoolId, email)
+      );
+      assigned++;
+    }
+
+    if (statements.length > 0) {
+      await c.env.DB.batch(statements);
+    }
+
+    return c.json({ success: true, data: { assigned, skipped } });
+  } catch (error) {
+    console.error('Admin bulk assign students error:', error);
+    return c.json({ success: false, error: 'Failed to assign students' }, 500);
+  }
+});
+
+adminApp.post('/schools/:id/students/:userId', async (c) => {
+  try {
+    const schoolId = c.req.param('id');
+    const userId = c.req.param('userId');
+    const body = await parseJsonBody(c);
+    if (!body) {
+      return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+    }
+    const force = body.force === true;
+
+    const school = await c.env.DB.prepare(
+      'SELECT id FROM schools WHERE id = ?'
+    ).bind(schoolId).first();
+    if (!school) {
+      return c.json({ success: false, error: 'School not found' }, 404);
+    }
+
+    const user = await c.env.DB.prepare(
+      'SELECT id, school_id FROM users WHERE id = ?'
+    ).bind(userId).first<{ id: string; school_id: string | null }>();
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    if (user.school_id && user.school_id !== schoolId && !force) {
+      return c.json({ success: false, error: 'User already assigned to a school; pass force to reassign' }, 409);
+    }
+
+    await c.env.DB.prepare(
+      'UPDATE users SET school_id = ? WHERE id = ?'
+    ).bind(schoolId, userId).run();
+
+    return c.json({ success: true, data: { userId, schoolId } });
+  } catch (error) {
+    console.error('Admin assign student error:', error);
+    return c.json({ success: false, error: 'Failed to assign student' }, 500);
+  }
+});
+
+adminApp.delete('/schools/:id/students/:userId', async (c) => {
+  try {
+    const schoolId = c.req.param('id');
+    const userId = c.req.param('userId');
+
+    const result = await c.env.DB.prepare(
+      'UPDATE users SET school_id = NULL WHERE id = ? AND school_id = ?'
+    ).bind(userId, schoolId).run();
+
+    if (result.meta.changes === 0) {
+      return c.json({ success: false, error: 'Student is not assigned to this school' }, 404);
+    }
+    return c.json({ success: true, data: { userId } });
+  } catch (error) {
+    console.error('Admin unassign student error:', error);
+    return c.json({ success: false, error: 'Failed to unassign student' }, 500);
+  }
+});
+
 // Mount admin routes
 app.route('/api/admin', adminApp);
 
