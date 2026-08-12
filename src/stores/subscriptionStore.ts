@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { fetchWithAuth } from '@/lib/api';
 import type {
   SubscriptionPlan,
   SubscriptionStatus,
@@ -64,7 +65,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
             headers['Authorization'] = `Bearer ${token}`;
           }
 
-          const response = await fetch(`${API_BASE}/subscriptions/plans`, { headers });
+          const response = await fetchWithAuth(`${API_BASE}/subscriptions/plans`, { headers });
           const data = await response.json();
 
           if (data.success) {
@@ -86,7 +87,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
             return;
           }
 
-          const response = await fetch(`${API_BASE}/subscriptions/status`, {
+          const response = await fetchWithAuth(`${API_BASE}/subscriptions/status`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -113,7 +114,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
           const token = localStorage.getItem('brilla_token');
           if (!token) return;
 
-          const response = await fetch(`${API_BASE}/subscriptions/trial/status`, {
+          const response = await fetchWithAuth(`${API_BASE}/subscriptions/trial/status`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -138,7 +139,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
             return false;
           }
 
-          const response = await fetch(`${API_BASE}/subscriptions/trial/start`, {
+          const response = await fetchWithAuth(`${API_BASE}/subscriptions/trial/start`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -167,7 +168,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
           const token = localStorage.getItem('brilla_token');
           if (!token) return false;
 
-          const response = await fetch(`${API_BASE}/subscriptions/trial/task/${taskId}/complete`, {
+          const response = await fetchWithAuth(`${API_BASE}/subscriptions/trial/task/${taskId}/complete`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -193,7 +194,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
           const token = localStorage.getItem('brilla_token');
           if (!token) return false;
 
-          const response = await fetch(`${API_BASE}/subscriptions/trial/bonus-week`, {
+          const response = await fetchWithAuth(`${API_BASE}/subscriptions/trial/bonus-week`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -222,7 +223,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
             return null;
           }
 
-          const response = await fetch(`${API_BASE}/payments/initialize`, {
+          const response = await fetchWithAuth(`${API_BASE}/payments/initialize`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -255,7 +256,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
             return { success: false };
           }
 
-          const response = await fetch(`${API_BASE}/payments/verify/${reference}`, {
+          const response = await fetchWithAuth(`${API_BASE}/payments/verify/${reference}`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -288,7 +289,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
           const token = localStorage.getItem('brilla_token');
           if (!token) return;
 
-          const response = await fetch(`${API_BASE}/payments/history`, {
+          const response = await fetchWithAuth(`${API_BASE}/payments/history`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -313,7 +314,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
             return false;
           }
 
-          const response = await fetch(`${API_BASE}/subscriptions/cancel`, {
+          const response = await fetchWithAuth(`${API_BASE}/subscriptions/cancel`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -349,7 +350,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
             };
           }
 
-          const response = await fetch(`${API_BASE}/subscriptions/features`, {
+          const response = await fetchWithAuth(`${API_BASE}/subscriptions/features`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',

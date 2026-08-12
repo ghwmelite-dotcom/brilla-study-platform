@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, Button, Badge } from '@/components/common';
 import { useAuthStore } from '@/stores';
+import { fetchWithAuth } from '@/lib/api';
 import type {
   AuditLogEntry,
   SecurityEvent,
@@ -59,7 +60,7 @@ export function AuditLog() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/admin/audit/stats`, {
+      const response = await fetchWithAuth(`${API_URL}/api/admin/audit/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -78,7 +79,7 @@ export function AuditLog() {
       if (logsFilters.status) params.append('status', logsFilters.status);
       if (logsFilters.search) params.append('search', logsFilters.search);
 
-      const response = await fetch(`${API_URL}/api/admin/audit/logs?${params}`, {
+      const response = await fetchWithAuth(`${API_URL}/api/admin/audit/logs?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -99,7 +100,7 @@ export function AuditLog() {
         unresolvedOnly: showUnresolvedOnly.toString(),
       });
 
-      const response = await fetch(`${API_URL}/api/admin/audit/security-events?${params}`, {
+      const response = await fetchWithAuth(`${API_URL}/api/admin/audit/security-events?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -120,7 +121,7 @@ export function AuditLog() {
         failedOnly: showFailedOnly.toString(),
       });
 
-      const response = await fetch(`${API_URL}/api/admin/audit/login-attempts?${params}`, {
+      const response = await fetchWithAuth(`${API_URL}/api/admin/audit/login-attempts?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -135,7 +136,7 @@ export function AuditLog() {
 
   const resolveSecurityEvent = async (eventId: string, notes: string) => {
     try {
-      const response = await fetch(`${API_URL}/api/admin/audit/security-events/${eventId}/resolve`, {
+      const response = await fetchWithAuth(`${API_URL}/api/admin/audit/security-events/${eventId}/resolve`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,

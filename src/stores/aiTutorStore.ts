@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { getApiUrl, getAuthHeaders } from '@/lib/api';
+import { getApiUrl, getAuthHeaders, fetchWithAuth } from '@/lib/api';
 import { extractTextFromPDF, isPDFFile } from '../utils/pdfExtractor';
 
 export interface FileAttachment {
@@ -347,7 +347,7 @@ export const useAiTutorStore = create<AiTutorState>()(
           const headers = getAuthHeaders();
           delete headers['Content-Type'];
 
-          const response = await fetch(getApiUrl('/api/tutor/upload'), {
+          const response = await fetchWithAuth(getApiUrl('/api/tutor/upload'), {
             method: 'POST',
             headers,
             body: formData,
@@ -501,7 +501,7 @@ export const useAiTutorStore = create<AiTutorState>()(
               }
             }
 
-            const response = await fetch(getApiUrl('/api/tutor/chat'), {
+            const response = await fetchWithAuth(getApiUrl('/api/tutor/chat'), {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -616,7 +616,7 @@ export const useAiTutorStore = create<AiTutorState>()(
             );
           });
 
-          const response = await fetch(getApiUrl('/api/tutor/explain'), {
+          const response = await fetchWithAuth(getApiUrl('/api/tutor/explain'), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -681,7 +681,7 @@ export const useAiTutorStore = create<AiTutorState>()(
             );
           });
 
-          const response = await fetch(getApiUrl('/api/tutor/hint'), {
+          const response = await fetchWithAuth(getApiUrl('/api/tutor/hint'), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -755,7 +755,7 @@ export const useAiTutorStore = create<AiTutorState>()(
             );
           });
 
-          const response = await fetch(getApiUrl('/api/tutor/step-by-step'), {
+          const response = await fetchWithAuth(getApiUrl('/api/tutor/step-by-step'), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

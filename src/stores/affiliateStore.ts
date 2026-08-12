@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { fetchWithAuth } from '@/lib/api';
 import type {
   AffiliateProfile,
   AffiliateDashboard,
@@ -76,7 +77,7 @@ export const useAffiliateStore = create<AffiliateState>()(
             return;
           }
 
-          const response = await fetch(`${API_BASE}/affiliates/profile`, {
+          const response = await fetchWithAuth(`${API_BASE}/affiliates/profile`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -103,7 +104,7 @@ export const useAffiliateStore = create<AffiliateState>()(
             return;
           }
 
-          const response = await fetch(`${API_BASE}/affiliates/dashboard`, {
+          const response = await fetchWithAuth(`${API_BASE}/affiliates/dashboard`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -130,7 +131,7 @@ export const useAffiliateStore = create<AffiliateState>()(
             return false;
           }
 
-          const response = await fetch(`${API_BASE}/affiliates/join`, {
+          const response = await fetchWithAuth(`${API_BASE}/affiliates/join`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -162,7 +163,7 @@ export const useAffiliateStore = create<AffiliateState>()(
           let url = `${API_BASE}/affiliates/referrals`;
           if (status) url += `?status=${status}`;
 
-          const response = await fetch(url, {
+          const response = await fetchWithAuth(url, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -186,7 +187,7 @@ export const useAffiliateStore = create<AffiliateState>()(
           let url = `${API_BASE}/affiliates/commissions`;
           if (status) url += `?status=${status}`;
 
-          const response = await fetch(url, {
+          const response = await fetchWithAuth(url, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -207,7 +208,7 @@ export const useAffiliateStore = create<AffiliateState>()(
           const token = localStorage.getItem('brilla_token');
           if (!token) return;
 
-          const response = await fetch(`${API_BASE}/affiliates/challenges`, {
+          const response = await fetchWithAuth(`${API_BASE}/affiliates/challenges`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -228,7 +229,7 @@ export const useAffiliateStore = create<AffiliateState>()(
           const token = localStorage.getItem('brilla_token');
           if (!token) return null;
 
-          const response = await fetch(`${API_BASE}/affiliates/challenges/${challengeId}/claim`, {
+          const response = await fetchWithAuth(`${API_BASE}/affiliates/challenges/${challengeId}/claim`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -257,7 +258,7 @@ export const useAffiliateStore = create<AffiliateState>()(
           const token = localStorage.getItem('brilla_token');
           if (!token) return;
 
-          const response = await fetch(`${API_BASE}/affiliates/achievements`, {
+          const response = await fetchWithAuth(`${API_BASE}/affiliates/achievements`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -283,7 +284,7 @@ export const useAffiliateStore = create<AffiliateState>()(
             headers['Authorization'] = `Bearer ${token}`;
           }
 
-          const response = await fetch(`${API_BASE}/affiliates/leaderboard?period=${period}`, {
+          const response = await fetchWithAuth(`${API_BASE}/affiliates/leaderboard?period=${period}`, {
             headers,
           });
           const data = await response.json();
@@ -306,7 +307,7 @@ export const useAffiliateStore = create<AffiliateState>()(
             headers['Authorization'] = `Bearer ${token}`;
           }
 
-          const response = await fetch(`${API_BASE}/affiliates/leaderboard/schools?period=${period}`, {
+          const response = await fetchWithAuth(`${API_BASE}/affiliates/leaderboard/schools?period=${period}`, {
             headers,
           });
           const data = await response.json();
@@ -324,7 +325,7 @@ export const useAffiliateStore = create<AffiliateState>()(
           const token = localStorage.getItem('brilla_token');
           if (!token) return;
 
-          const response = await fetch(`${API_BASE}/payments/payouts`, {
+          const response = await fetchWithAuth(`${API_BASE}/payments/payouts`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -349,7 +350,7 @@ export const useAffiliateStore = create<AffiliateState>()(
             return false;
           }
 
-          const response = await fetch(`${API_BASE}/payments/payout/request`, {
+          const response = await fetchWithAuth(`${API_BASE}/payments/payout/request`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -385,7 +386,7 @@ export const useAffiliateStore = create<AffiliateState>()(
             return false;
           }
 
-          const response = await fetch(`${API_BASE}/payments/mobile-money`, {
+          const response = await fetchWithAuth(`${API_BASE}/payments/mobile-money`, {
             method: 'PUT',
             headers: {
               'Authorization': `Bearer ${token}`,

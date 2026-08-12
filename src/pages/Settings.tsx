@@ -23,7 +23,7 @@ import {
   Unlink,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import { api } from '@/lib/api';
+import { api, fetchWithAuth } from '@/lib/api';
 import { cn } from '@/utils';
 import { Turnstile, useTurnstile } from '@/components/common/Turnstile';
 
@@ -211,11 +211,8 @@ export default function Settings() {
       const formData = new FormData();
       formData.append('avatar', file);
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://brilla-api.ghwmelite.workers.dev/api'}/users/me/avatar`, {
+      const response = await fetchWithAuth(`${import.meta.env.VITE_API_URL || 'https://brilla-api.ghwmelite.workers.dev/api'}/users/me/avatar`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('brilla-token') || ''}`,
-        },
         body: formData,
       });
 

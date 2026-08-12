@@ -386,6 +386,25 @@ export function getAuthHeaders(): Record<string, string> {
   return headers;
 }
 
+// Raw fetch with auth headers attached and the same 401 handling as the
+// envelope client: on 401 the session is cleared and the user is bounced to
+// /login (see handleUnauthorized). Returns the response otherwise.
+export async function fetchWithAuth(input: string, init: RequestInit = {}): Promise<Response> {
+  const headers: Record<string, string> = {
+    ...getAuthHeaders(),
+    ...(init.headers as Record<string, string> | undefined),
+  };
+  // Let the browser set the multipart boundary itself for FormData bodies
+  if (init.body instanceof FormData) {
+    delete headers['Content-Type'];
+  }
+  const response = await fetch(input, { ...init, headers });
+  if (response.status === 401) {
+    handleUnauthorized();
+  }
+  return response;
+}
+
 export function getApiUrl(path?: string): string {
   if (path) {
     if (API_BASE_URL.startsWith('http')) {

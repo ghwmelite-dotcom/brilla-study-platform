@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { EssayQuestion, EssayAttempt, AIEssayFeedback } from '@/types';
-import { getAuthHeaders } from '@/lib/api';
+import { getAuthHeaders, fetchWithAuth } from '@/lib/api';
 
 interface EssayState {
   // Current essay session
@@ -89,7 +89,7 @@ export const useEssayStore = create<EssayState>((set, get) => ({
     set({ isSubmitting: true, error: null });
 
     try {
-      const response = await fetch(`${API_BASE}/essays/submit`, {
+      const response = await fetchWithAuth(`${API_BASE}/essays/submit`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
@@ -122,7 +122,7 @@ export const useEssayStore = create<EssayState>((set, get) => ({
     set({ isGrading: true, error: null });
 
     try {
-      const response = await fetch(`${API_BASE}/essays/${attemptId}/grade`, {
+      const response = await fetchWithAuth(`${API_BASE}/essays/${attemptId}/grade`, {
         method: 'POST',
         headers: getAuthHeaders(),
       });
@@ -159,7 +159,7 @@ export const useEssayStore = create<EssayState>((set, get) => ({
     set({ isLoadingHistory: true, error: null });
 
     try {
-      const response = await fetch(`${API_BASE}/essays/history`, {
+      const response = await fetchWithAuth(`${API_BASE}/essays/history`, {
         headers: getAuthHeaders(),
       });
 

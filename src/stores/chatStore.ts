@@ -7,7 +7,7 @@ import type {
   CreateRoomData,
   ChatRoomType,
 } from '@/types';
-import { getApiUrl, getAuthHeaders } from '@/lib/api';
+import { getApiUrl, getAuthHeaders, fetchWithAuth } from '@/lib/api';
 import { createPoller, type Poller } from '@/utils/polling';
 
 let poller: Poller | null = null;
@@ -271,7 +271,7 @@ export const useChatStore = create<ChatState>()(
             return;
           }
 
-          const response = await fetch(getApiUrl('/api/chat/rooms'), {
+          const response = await fetchWithAuth(getApiUrl('/api/chat/rooms'), {
             headers: {
               ...getAuthHeaders(),
             },
@@ -319,7 +319,7 @@ export const useChatStore = create<ChatState>()(
             return;
           }
 
-          const response = await fetch(getApiUrl(`/api/chat/rooms/${roomId}/messages`), {
+          const response = await fetchWithAuth(getApiUrl(`/api/chat/rooms/${roomId}/messages`), {
             headers: {
               ...getAuthHeaders(),
             },
@@ -367,7 +367,7 @@ export const useChatStore = create<ChatState>()(
 
         try {
           if (user?.id) {
-            const response = await fetch(getApiUrl('/api/chat/rooms'), {
+            const response = await fetchWithAuth(getApiUrl('/api/chat/rooms'), {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -430,7 +430,7 @@ export const useChatStore = create<ChatState>()(
 
         try {
           if (user?.id) {
-            const response = await fetch(getApiUrl(`/api/chat/rooms/${roomId}/join`), {
+            const response = await fetchWithAuth(getApiUrl(`/api/chat/rooms/${roomId}/join`), {
               method: 'POST',
               headers: {
                 ...getAuthHeaders(),
@@ -461,7 +461,7 @@ export const useChatStore = create<ChatState>()(
 
         try {
           if (user?.id) {
-            await fetch(getApiUrl(`/api/chat/rooms/${roomId}/leave`), {
+            await fetchWithAuth(getApiUrl(`/api/chat/rooms/${roomId}/leave`), {
               method: 'POST',
               headers: {
                 ...getAuthHeaders(),
@@ -493,7 +493,7 @@ export const useChatStore = create<ChatState>()(
 
         try {
           if (currentUser?.id) {
-            const response = await fetch(getApiUrl('/api/chat/dm'), {
+            const response = await fetchWithAuth(getApiUrl('/api/chat/dm'), {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -613,7 +613,7 @@ export const useChatStore = create<ChatState>()(
 
         try {
           if (user?.id) {
-            const response = await fetch(getApiUrl(`/api/chat/rooms/${activeRoomId}/messages`), {
+            const response = await fetchWithAuth(getApiUrl(`/api/chat/rooms/${activeRoomId}/messages`), {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -676,7 +676,7 @@ export const useChatStore = create<ChatState>()(
 
         try {
           if (user?.id) {
-            await fetch(getApiUrl(`/api/chat/messages/${messageId}`), {
+            await fetchWithAuth(getApiUrl(`/api/chat/messages/${messageId}`), {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
@@ -710,7 +710,7 @@ export const useChatStore = create<ChatState>()(
 
         try {
           if (user?.id) {
-            await fetch(getApiUrl(`/api/chat/messages/${messageId}`), {
+            await fetchWithAuth(getApiUrl(`/api/chat/messages/${messageId}`), {
               method: 'DELETE',
               headers: {
                 ...getAuthHeaders(),
@@ -801,7 +801,7 @@ export const useChatStore = create<ChatState>()(
         if (!user?.id) return;
 
         try {
-          await fetch(getApiUrl(`/api/chat/rooms/${activeRoomId}/typing`), {
+          await fetchWithAuth(getApiUrl(`/api/chat/rooms/${activeRoomId}/typing`), {
             method: 'POST',
             headers: {
               ...getAuthHeaders(),
@@ -833,7 +833,7 @@ export const useChatStore = create<ChatState>()(
 
         try {
           const since = lastPollTime || new Date(Date.now() - 60000).toISOString();
-          const response = await fetch(
+          const response = await fetchWithAuth(
             getApiUrl(`/api/chat/rooms/${activeRoomId}/poll?since=${encodeURIComponent(since)}`),
             {
               headers: {

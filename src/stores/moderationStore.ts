@@ -6,7 +6,7 @@ import type {
   ReportStatus,
   ReportResolution,
 } from '@/types';
-import { getApiUrl, getAuthHeaders } from '@/lib/api';
+import { getApiUrl, getAuthHeaders, fetchWithAuth } from '@/lib/api';
 
 interface ModerationStats {
   reports: {
@@ -121,7 +121,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
       params.append('limit', limit.toString());
       params.append('offset', offset.toString());
 
-      const response = await fetch(`${getApiUrl()}/moderation/reports?${params}`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/reports?${params}`, {
         headers: getAuthHeaders(),
       });
 
@@ -171,7 +171,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
 
   getReportDetails: async (reportId: string) => {
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/reports/${reportId}`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/reports/${reportId}`, {
         headers: getAuthHeaders(),
       });
 
@@ -190,7 +190,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   submitReport: async (reportedUserId: string, reason: string, description?: string, messageId?: string, roomId?: string) => {
     set({ isProcessing: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/reports`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/reports`, {
         method: 'POST',
         headers: {
           ...getAuthHeaders(),
@@ -224,7 +224,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   reviewReport: async (reportId: string, resolution: ReportResolution, notes?: string) => {
     set({ isProcessing: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/reports/${reportId}`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/reports/${reportId}`, {
         method: 'PUT',
         headers: {
           ...getAuthHeaders(),
@@ -268,7 +268,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   dismissReport: async (reportId: string, notes?: string) => {
     set({ isProcessing: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/reports/${reportId}`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/reports/${reportId}`, {
         method: 'PUT',
         headers: {
           ...getAuthHeaders(),
@@ -315,7 +315,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
       if (roomId) params.append('room_id', roomId);
       if (actionType) params.append('action_type', actionType);
 
-      const response = await fetch(`${getApiUrl()}/moderation/actions?${params}`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/actions?${params}`, {
         headers: getAuthHeaders(),
       });
 
@@ -354,7 +354,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   fetchUserHistory: async (userId: string) => {
     set({ isLoadingHistory: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/user/${userId}/history`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/user/${userId}/history`, {
         headers: getAuthHeaders(),
       });
 
@@ -376,7 +376,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   muteUser: async (userId: string, roomId?: string, duration = 60, reason?: string) => {
     set({ isProcessing: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/actions/mute`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/actions/mute`, {
         method: 'POST',
         headers: {
           ...getAuthHeaders(),
@@ -425,7 +425,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   unmuteUser: async (userId: string, roomId?: string, reason?: string) => {
     set({ isProcessing: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/actions/unmute`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/actions/unmute`, {
         method: 'POST',
         headers: {
           ...getAuthHeaders(),
@@ -470,7 +470,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   banUser: async (userId: string, roomId?: string, duration?: number, reason?: string) => {
     set({ isProcessing: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/actions/ban`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/actions/ban`, {
         method: 'POST',
         headers: {
           ...getAuthHeaders(),
@@ -519,7 +519,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   unbanUser: async (userId: string, roomId?: string, reason?: string) => {
     set({ isProcessing: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/actions/unban`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/actions/unban`, {
         method: 'POST',
         headers: {
           ...getAuthHeaders(),
@@ -564,7 +564,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   warnUser: async (userId: string, roomId?: string, reason?: string) => {
     set({ isProcessing: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/actions/warn`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/actions/warn`, {
         method: 'POST',
         headers: {
           ...getAuthHeaders(),
@@ -610,7 +610,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   kickUser: async (userId: string, roomId: string, reason?: string) => {
     set({ isProcessing: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/actions/kick`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/actions/kick`, {
         method: 'POST',
         headers: {
           ...getAuthHeaders(),
@@ -657,7 +657,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   fetchFilteredWords: async () => {
     set({ isLoadingWords: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/filters`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/filters`, {
         headers: getAuthHeaders(),
       });
 
@@ -690,7 +690,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   addFilteredWord: async (word: string, severity: 'low' | 'medium' | 'high' = 'medium', replacement?: string) => {
     set({ isProcessing: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/filters`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/filters`, {
         method: 'POST',
         headers: {
           ...getAuthHeaders(),
@@ -730,7 +730,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   removeFilteredWord: async (id: string) => {
     set({ isProcessing: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/filters/${id}`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/filters/${id}`, {
         method: 'DELETE',
         headers: getAuthHeaders(),
       });
@@ -755,7 +755,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   updateFilteredWord: async (id: string, updates: Partial<ChatFilteredWord>) => {
     set({ isProcessing: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/filters/${id}`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/filters/${id}`, {
         method: 'PUT',
         headers: {
           ...getAuthHeaders(),
@@ -789,7 +789,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
 
   checkContent: async (content: string) => {
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/check-content`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/check-content`, {
         method: 'POST',
         headers: {
           ...getAuthHeaders(),
@@ -814,7 +814,7 @@ export const useModerationStore = create<ModerationState>()((set, get) => ({
   fetchStats: async () => {
     set({ isLoadingStats: true, error: null });
     try {
-      const response = await fetch(`${getApiUrl()}/moderation/stats`, {
+      const response = await fetchWithAuth(`${getApiUrl()}/moderation/stats`, {
         headers: getAuthHeaders(),
       });
 

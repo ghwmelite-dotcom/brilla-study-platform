@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { fetchWithAuth } from '@/lib/api';
 
 // Types
 export type QuickPlayGameType = 'speed_blitz' | 'brain_teaser' | 'subject_dash';
@@ -296,7 +297,7 @@ export const useQuickPlayStore = create<QuickPlayState>()(
           // Try API first
           const token = localStorage.getItem('brilla_token');
           if (token) {
-            const response = await fetch('/api/quickplay/daily-challenge', {
+            const response = await fetchWithAuth('/api/quickplay/daily-challenge', {
               headers: { 'Authorization': `Bearer ${token}` },
             });
             if (response.ok) {
@@ -345,7 +346,7 @@ export const useQuickPlayStore = create<QuickPlayState>()(
           const token = localStorage.getItem('brilla_token');
           if (token) {
             try {
-              const response = await fetch('/api/quickplay/start', {
+              const response = await fetchWithAuth('/api/quickplay/start', {
                 method: 'POST',
                 headers: {
                   'Authorization': `Bearer ${token}`,

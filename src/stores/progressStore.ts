@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { UserProgress, Achievement, LeaderboardEntry, LeaderboardPeriod } from '@/types';
-import { getApiUrl, getAuthHeaders } from '@/lib/api';
+import { getApiUrl, getAuthHeaders, fetchWithAuth } from '@/lib/api';
 
 // Clear old cached data on load
 const STORE_VERSION = 2;
@@ -103,7 +103,7 @@ export const useProgressStore = create<ProgressState>()(
       fetchProgress: async () => {
         set({ isLoading: true, error: null });
         try {
-          const response = await fetch(getApiUrl('/api/progress'), {
+          const response = await fetchWithAuth(getApiUrl('/api/progress'), {
             headers: getAuthHeaders(),
           });
           const data = await response.json();
