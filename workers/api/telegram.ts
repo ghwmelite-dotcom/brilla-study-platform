@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { constantTimeEqual } from './auth-middleware';
 import { awardPoints } from './points';
+import { checkRateLimit, type RateLimitConfig } from './rate-limit';
+import { createNotification } from './notifications';
 
 // Telegram core module: bot API client + webhook receiver + link-token
 // handshake. The webhook is deliberately unauthenticated (Telegram cannot
@@ -120,3 +122,68 @@ telegramWebhookApp.post('/webhook', async (c) => {
   }
   return c.json({ ok: true });
 });
+
+// =============================================
+// OUTBOUND NOTIFIERS
+// =============================================
+// All three helpers never throw (catch + console.error) and return whether a
+// message was actually sent, so fan-out callers (Task 4 / cron) can wrap them
+// in ctx.waitUntil without defensive try/catch at every call site.
+
+// Max bot DMs per user per rolling 24h. The checkRateLimit call itself records
+// the send when allowed, so one call = check + consume.
+export const NOTIFY_DM_LIMIT: RateLimitConfig = { maxRequests: 3, windowMs: 24 * 60 * 60 * 1000 };
+
+export async function notifyUser(db: D1Database, env: TelegramEnv, userId: string, text: string): Promise<boolean> {
+  try {
+    const link = await db.prepare('SELECT chat_id FROM telegram_links WHERE user_id = ? AND stale = 0')
+      .bind(userId).first<{ chat_id: string }>();
+    if (!link) return false;
+    const budget = await checkRateLimit(db, userId, 'notify', NOTIFY_DM_LIMIT);
+    if (!budget.allowed) return false;
+    const res = await telegramApi(env, 'sendMessage', { chat_id: link.chat_id, text });
+    if (!res.ok) {
+      if (res.status === 403) {
+        await db.prepare('UPDATE telegram_links SET stale = 1 WHERE user_id = ?').bind(userId).run();
+        console.error(`notifyUser: user ${userId} blocked the bot — marked stale`);
+      } else {
+        console.error(`notifyUser: sendMessage failed for ${userId} (status ${res.status})`);
+      }
+      return false;
+    }
+    return true;
+  } catch (e) { console.error('notifyUser failed:', e); return false; }
+}
+
+export async function notifySchoolChannel(db: D1Database, env: TelegramEnv, schoolId: string, text: string): Promise<boolean> {
+  try {
+    const ch = await db.prepare('SELECT channel_id FROM school_channels WHERE school_id = ? AND broken = 0')
+      .bind(schoolId).first<{ channel_id: string }>();
+    if (!ch) return false;
+    const res = await telegramApi(env, 'sendMessage', { chat_id: ch.channel_id, text });
+    if (!res.ok) {
+      if (res.status === 400 || res.status === 403) {
+        await db.prepare('UPDATE school_channels SET broken = 1 WHERE school_id = ?').bind(schoolId).run();
+        const admins = await db.prepare("SELECT id FROM users WHERE role = 'admin' AND is_active = 1")
+          .bind().all<{ id: string }>();
+        for (const a of admins.results) {
+          await createNotification(db, a.id, 'system', 'Telegram school channel broken',
+            `The Telegram channel for school ${schoolId} rejected a post. Re-add the bot as admin, then re-save the channel.`,
+            { icon: 'alert-triangle', link: '/admin/schools' });
+        }
+      }
+      console.error(`notifySchoolChannel: post failed for ${schoolId} (status ${res.status})`);
+      return false;
+    }
+    return true;
+  } catch (e) { console.error('notifySchoolChannel failed:', e); return false; }
+}
+
+export async function notifyPlatformChannel(env: TelegramEnv, text: string): Promise<boolean> {
+  try {
+    if (!env.TELEGRAM_PLATFORM_CHANNEL_ID) return false;
+    const res = await telegramApi(env, 'sendMessage', { chat_id: env.TELEGRAM_PLATFORM_CHANNEL_ID, text });
+    if (!res.ok) console.error(`notifyPlatformChannel: post failed (status ${res.status})`);
+    return res.ok;
+  } catch (e) { console.error('notifyPlatformChannel failed:', e); return false; }
+}
