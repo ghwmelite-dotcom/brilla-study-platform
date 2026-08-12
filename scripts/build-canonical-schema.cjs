@@ -698,6 +698,24 @@ function topoSort() {
 const { sorted } = topoSort();
 
 // ---------------------------------------------------------------------------
+// Output-only idempotency normalization.
+// Some last-definition-wins sources use bare CREATE TABLE / CREATE INDEX
+// (e.g. migrations/016_fix_parent_counselor_messaging.sql's recreations of
+// report_schedules, parent_counselor_messages, report_access_logs and their
+// indexes). Emitting them bare makes a second application of the canonical
+// schema fail with "table/index already exists", which breaks ops rehearsals
+// that re-apply schema.sql. Every emitted statement is therefore rewritten to
+// its IF NOT EXISTS form here, at the emission boundary only — the stored
+// source text used by the collision/union/parity logic above is deliberately
+// left untouched.
+// ---------------------------------------------------------------------------
+function ensureIfNotExists(sql) {
+  return sql
+    .replace(/^(\s*CREATE\s+TABLE\s+)(?!IF\s+NOT\s+EXISTS\s)/i, '$1IF NOT EXISTS ')
+    .replace(/^(\s*CREATE\s+(?:UNIQUE\s+)?INDEX\s+)(?!IF\s+NOT\s+EXISTS\s)/i, '$1IF NOT EXISTS ');
+}
+
+// ---------------------------------------------------------------------------
 // Validation: table-set parity
 // ---------------------------------------------------------------------------
 // Expected = union of legacy schema.sql tables and non-scratch migration tables
@@ -825,7 +843,7 @@ for (const name of sorted) {
     header.push('-- match the task-2 scratch regex /(_backup|_v2|_old|_tmp)$/ so table-set parity');
     header.push('-- requires keeping it; no code references it. Candidate for a future DROP migration.');
   }
-  sections.push(header.join('\n') + '\n' + entry.sql.replace(/;\s*$/, '') + ';\n');
+  sections.push(header.join('\n') + '\n' + ensureIfNotExists(entry.sql.replace(/;\s*$/, '')) + ';\n');
 }
 
 sections.push('\n-- =============================================\n-- INDEXES\n-- =============================================\n');
@@ -836,7 +854,7 @@ const sortedIndexes = [...indexes.values()].sort((a, b) => {
   return a.order - b.order;
 });
 for (const idx of sortedIndexes) {
-  sections.push(idx.sql.replace(/;\s*$/, '') + ';');
+  sections.push(ensureIfNotExists(idx.sql.replace(/;\s*$/, '')) + ';');
 }
 
 process.stdout.write(sections.join('\n') + '\n');

@@ -1394,7 +1394,7 @@ CREATE TABLE IF NOT EXISTS moderation_audit_log (
 );
 
 -- Source: migrations/016_fix_parent_counselor_messaging.sql
-CREATE TABLE report_schedules (
+CREATE TABLE IF NOT EXISTS report_schedules (
     id TEXT PRIMARY KEY,
     student_id TEXT NOT NULL,
     parent_id TEXT NOT NULL,
@@ -2395,7 +2395,7 @@ CREATE TABLE IF NOT EXISTS chat_moderation_actions (
 );
 
 -- Source: migrations/016_fix_parent_counselor_messaging.sql
-CREATE TABLE parent_counselor_messages (
+CREATE TABLE IF NOT EXISTS parent_counselor_messages (
     id TEXT PRIMARY KEY,
     report_id TEXT,
     student_id TEXT,
@@ -2412,7 +2412,7 @@ CREATE TABLE parent_counselor_messages (
 );
 
 -- Source: migrations/016_fix_parent_counselor_messaging.sql
-CREATE TABLE report_access_logs (
+CREATE TABLE IF NOT EXISTS report_access_logs (
     id TEXT PRIMARY KEY,
     report_id TEXT NOT NULL,
     accessed_by TEXT NOT NULL,
@@ -4315,10 +4315,10 @@ CREATE INDEX IF NOT EXISTS idx_chat_blocks_blocker ON chat_user_blocks(blocker_i
 CREATE INDEX IF NOT EXISTS idx_chat_blocks_blocked ON chat_user_blocks(blocked_id);
 CREATE INDEX IF NOT EXISTS idx_filtered_words_active ON chat_filtered_words(is_active);
 CREATE INDEX IF NOT EXISTS idx_audit_log_moderator ON moderation_audit_log(moderator_id);
-CREATE INDEX idx_report_schedules_student ON report_schedules(student_id);
-CREATE INDEX idx_report_schedules_parent ON report_schedules(parent_id);
-CREATE INDEX idx_report_schedules_next ON report_schedules(next_scheduled_at);
-CREATE INDEX idx_report_schedules_active ON report_schedules(is_active);
+CREATE INDEX IF NOT EXISTS idx_report_schedules_student ON report_schedules(student_id);
+CREATE INDEX IF NOT EXISTS idx_report_schedules_parent ON report_schedules(parent_id);
+CREATE INDEX IF NOT EXISTS idx_report_schedules_next ON report_schedules(next_scheduled_at);
+CREATE INDEX IF NOT EXISTS idx_report_schedules_active ON report_schedules(is_active);
 CREATE INDEX IF NOT EXISTS idx_reminder_settings_user ON reminder_settings(user_id);
 CREATE INDEX IF NOT EXISTS idx_reminder_settings_enabled ON reminder_settings(enabled);
 CREATE INDEX IF NOT EXISTS idx_reminder_history_user ON reminder_history(user_id);
@@ -4447,13 +4447,13 @@ CREATE INDEX IF NOT EXISTS idx_moderation_actions_room ON chat_moderation_action
 CREATE INDEX IF NOT EXISTS idx_moderation_actions_type ON chat_moderation_actions(action_type);
 CREATE INDEX IF NOT EXISTS idx_moderation_actions_active ON chat_moderation_actions(is_active);
 CREATE INDEX IF NOT EXISTS idx_moderation_actions_expires ON chat_moderation_actions(expires_at);
-CREATE INDEX idx_parent_messages_parent ON parent_counselor_messages(parent_id);
-CREATE INDEX idx_parent_messages_student ON parent_counselor_messages(student_id);
-CREATE INDEX idx_parent_messages_sender ON parent_counselor_messages(sender_id);
-CREATE INDEX idx_parent_messages_report ON parent_counselor_messages(report_id);
-CREATE INDEX idx_parent_messages_created ON parent_counselor_messages(created_at);
-CREATE INDEX idx_report_access_logs_report ON report_access_logs(report_id);
-CREATE INDEX idx_report_access_logs_user ON report_access_logs(accessed_by);
+CREATE INDEX IF NOT EXISTS idx_parent_messages_parent ON parent_counselor_messages(parent_id);
+CREATE INDEX IF NOT EXISTS idx_parent_messages_student ON parent_counselor_messages(student_id);
+CREATE INDEX IF NOT EXISTS idx_parent_messages_sender ON parent_counselor_messages(sender_id);
+CREATE INDEX IF NOT EXISTS idx_parent_messages_report ON parent_counselor_messages(report_id);
+CREATE INDEX IF NOT EXISTS idx_parent_messages_created ON parent_counselor_messages(created_at);
+CREATE INDEX IF NOT EXISTS idx_report_access_logs_report ON report_access_logs(report_id);
+CREATE INDEX IF NOT EXISTS idx_report_access_logs_user ON report_access_logs(accessed_by);
 CREATE INDEX IF NOT EXISTS idx_affiliate_referrals_affiliate ON affiliate_referrals(affiliate_id);
 CREATE INDEX IF NOT EXISTS idx_affiliate_referrals_referred ON affiliate_referrals(referred_user_id);
 CREATE INDEX IF NOT EXISTS idx_affiliate_referrals_status ON affiliate_referrals(status);
