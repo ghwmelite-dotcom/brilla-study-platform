@@ -39,7 +39,26 @@ P0 closed: Paystack webhook fails closed when secret unset (unsigned events neve
 
 ⏸ Parked: raw-fetch stores bypass 401 redirect (chat silently falls back), user_progress NULL-exam_type unique-index race, Header/ObservingSessionPanel polling sites, SubjectCatalog stub progress, pdfjs/DOMMatrix test-env, authService dead routes.
 
-## Phases 5-6 — Pending
+## Phase 5 — Database Reckoning (6/6 ✅, 1 fix round + 1 fix wave)
 
-- Phase 5: Database reckoning (canonical schema squash, 724 numeric-answer fixes, seed rework, prod runbook with 089_baseline_marker).
-- Phase 6: Headers & hygiene (CSP/HSTS, compat-date bump, CSPRNG invites, validation).
+✅ T1 db:verify CI gate (node:sqlite, zero deps, 18 checks incl. malformed-JSON options gate). ✅ T2 canonical schema regenerated (203 tables, deterministic generator, ALTER/DROP/RENAME folding). ✅ T3 088a_data_fixes.sql (724 numeric answers converted with anti-corruption guards, subject ID reconciliation, 082/084 collision, 8 bad rows). ✅ T4 idempotent 4,545-question seed (🔧 fix round: deterministic generator + created_at preservation). ✅ T5 baseline strategy (108 files archived; migrations_dir = 088+088a+089; q_em_007 drift fixed). ✅ T6 updated_at trigger replacement (14/14 UPDATEs) + docs. 🔧 Final fix wave: user_streaks phantom repointed, generators repointed post-archive, runbook corrected.
+
+⏸ Parked: questions_new DROP migration; prod reconciliation proof pending prod apply.
+
+## Phase 6 — Headers & Hygiene (11/11 ✅, 2 fix rounds + 1 fix wave)
+
+✅ T1 inline scripts externalized (KaTeX SRI verified). ✅ T2 public/_headers with CSP (no unsafe-inline in script-src) + HSTS (🔧 fix round: PhET frame-src + mixkit media-src). ✅ T3 pitch-site headers. ✅ T4 og-image + theme color unified. ✅ T5 workers/package.json deleted. ✅ T6 compat date 2024-01-01→2026-05-12 + env.production dedupe. ✅ T7 CSPRNG invite codes. ✅ T8 constant-time password compare. ✅ T9 avatar magic-byte sniffing + nosniff (🔧 fix round: size check before buffering). ✅ T10 registration validation. ✅ T11 stable React keys. 🔧 Fix wave: CSPRNG room codes (study-rooms, tutor-classroom).
+
+⏸ Parked: library upload file.type trust, admin POST /users validation, wrangler 3→4, env.dev duplication.
+
+## ROADMAP COMPLETE (all 7 phases, 2026-08-12)
+
+Final state: 200/200 tests green (40 files), frontend tsc 0 errors, workers tsc 130 (from 316 baseline — ratcheted), lint 246 (from 256), npm audit 12 (all breaking-major-only), db:verify 18/18, wrangler bundles clean, prod bundle credential-free.
+
+DEPLOY CHECKLIST (user-gated, in order):
+1. Pre-deploy: `npm run db:verify` green; rehearsal on throwaway D1; `wrangler d1 export` backup (verify size + trailing COMMIT).
+2. `wrangler d1 migrations apply brilla-db --remote` (088 datetime normalization + 088a data fixes + 089 baseline) → verify (numeric-answer count expectation on prod: 88, not 0).
+3. `wrangler secret list` — confirm secrets set top-level (not under deleted --env production); set PAYSTACK_WEBHOOK_SECRET and SETUP_KEY if missing.
+4. Deploy worker (plain `wrangler deploy`) + static site.
+5. Post-deploy curls: HSTS+CSP on brillaprep.org (script-src no unsafe-inline), og-image 200, avatar nosniff, pitch-site headers.
+6. Browser smoke: login (Turnstile), one AI call, one D1 read, avatar upload (real + fake), KaTeX question, PDF paper, PhET embed, ambient audio, previously-unanswerable questions (065/066/067 topics, 037 BECE, q_alevel_maths_*).
