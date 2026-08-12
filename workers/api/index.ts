@@ -4834,17 +4834,17 @@ protectedApp.post('/users/me/avatar', userAuth, async (c) => {
       return c.json({ success: false, error: 'No file provided' }, 400);
     }
 
+    // Validate file size (5MB max) — reject before buffering the body into memory
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      return c.json({ success: false, error: 'File too large. Maximum size is 5MB.' }, 400);
+    }
+
     // Read the file and sniff its real type from magic bytes
     const buffer = new Uint8Array(await file.arrayBuffer());
     const sniffedType = sniffImageType(buffer);
     if (!sniffedType) {
       return c.json({ success: false, error: 'Invalid file type. Please upload a JPEG, PNG, WebP, or GIF image.' }, 400);
-    }
-
-    // Validate file size (5MB max)
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      return c.json({ success: false, error: 'File too large. Maximum size is 5MB.' }, 400);
     }
 
     // Get current avatar URL to delete old file
