@@ -10,6 +10,11 @@ APP_URL = "https://brillaprep.org"
 FROM_EMAIL = "Brilla Study Platform <noreply@brillaprep.org>"
 GOOGLE_REDIRECT_URI = "https://brillaprep.org/oauth/callback"
 NOTIFICATION_EMAILS = "brillaprepgh@gmail.com"
+TELEGRAM_BOT_USERNAME = "BrillaPrepCommunityBot"
+TELEGRAM_COMMUNITY_URL = "https://t.me/+uG4IHn1Z50U3Yzg0"
+# Numeric channel ID of the platform community channel (private channels have no @username).
+# Set after the first channel message reveals it via the bot webhook/updates.
+TELEGRAM_PLATFORM_CHANNEL_ID = ""
 
 # IMPORTANT: Set these secrets using wrangler:
 # wrangler secret put JWT_SECRET               (generate a secure random string)
