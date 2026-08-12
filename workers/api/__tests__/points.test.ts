@@ -80,6 +80,27 @@ describe('awardPoints', () => {
     expect(db.calls.some((c) => /INSERT INTO house_points/.test(c.sql))).toBe(false);
   });
 
+  it('(c2) partially clamps at the daily cap: ledger row gets only the remaining headroom', async () => {
+    // 95 of 100 weighted pts used today; awarding 50 XP * 0.2 = 10 weighted
+    // leaves room for exactly 5. Display XP still gets the raw 50.
+    const db = dbOf([
+      { match: /AS today FROM points_ledger/, first: () => ({ today: 95 }) },
+      xpUpdate,
+      { match: /FROM race_cycles rc/, first: () => null },
+      ledgerInsert,
+      houseSelectNull,
+    ]);
+
+    const res = await awardPoints(db, { userId: 'u1', points: 50, source: 'question_correct' });
+
+    expect(res).toEqual({ awarded: 5, capped: true });
+    const xp = db.calls.find((c) => /UPDATE users SET xp_points/.test(c.sql));
+    expect(xp!.binds).toEqual([50, 'u1']); // raw display XP is never clamped
+    const ledger = db.calls.find((c) => /INSERT INTO points_ledger/.test(c.sql));
+    expect(ledger).toBeDefined();
+    expect(ledger!.binds[2]).toBe(5);
+  });
+
   it('(d) writes house_points with mapped source for housed users only', async () => {
     const housed = dbOf([
       noCapToday,

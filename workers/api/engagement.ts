@@ -1,5 +1,7 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
+import { awardPoints } from './points';
+import { getDemoDataFlags } from './demoUtils';
 
 interface Env {
   DB: D1Database;
@@ -340,10 +342,16 @@ engagementApp.post('/comeback/claim', async (c) => {
       return c.json({ success: false, error: 'Not all tasks completed' }, 400);
     }
 
-    // Award XP
-    await c.env.DB.prepare(
-      'UPDATE users SET xp_points = xp_points + ? WHERE id = ?'
-    ).bind(challenge.xp_reward, user.userId).run();
+    // Award XP (raw display XP; weighted race points + ledger via helper)
+    const demoFlags = getDemoDataFlags(user.userId);
+    await awardPoints(c.env.DB, {
+      userId: user.userId,
+      points: challenge.xp_reward as number,
+      source: 'quest_claim',
+      sourceRef: challenge.id as string,
+      isDemoData: demoFlags.is_demo_data,
+      expiresAt: demoFlags.expires_at,
+    });
 
     // Mark challenge complete
     await c.env.DB.prepare(`

@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
+import { awardPoints } from './points';
+import { getDemoDataFlags } from './demoUtils';
 
 interface Env {
   DB: D1Database;
@@ -204,9 +206,15 @@ eventsApp.post('/:eventId/claim/:rewardId', async (c) => {
 
     // Grant reward based on type
     if (reward.type === 'xp') {
-      await c.env.DB.prepare(
-        'UPDATE users SET xp_points = xp_points + ? WHERE id = ?'
-      ).bind(reward.amount, user.userId).run();
+      const demoFlags = getDemoDataFlags(user.userId);
+      await awardPoints(c.env.DB, {
+        userId: user.userId,
+        points: reward.amount,
+        source: 'quest_claim',
+        sourceRef: `${eventId}/${rewardId}`,
+        isDemoData: demoFlags.is_demo_data,
+        expiresAt: demoFlags.expires_at,
+      });
     } else if (reward.type === 'cosmetic') {
       await c.env.DB.prepare(`
         INSERT OR IGNORE INTO user_cosmetics (id, user_id, cosmetic_id, acquired_method)

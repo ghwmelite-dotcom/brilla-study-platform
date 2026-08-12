@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
+import { awardPoints } from './points';
+import { getDemoDataFlags } from './demoUtils';
 
 interface Env {
   DB: D1Database;
@@ -264,10 +266,16 @@ quickPlayApp.post('/submit', async (c) => {
       ).bind(multiplierRecord.id).run();
     }
 
-    // Award XP to user
-    await c.env.DB.prepare(
-      'UPDATE users SET xp_points = xp_points + ? WHERE id = ?'
-    ).bind(totalXp, user.userId).run();
+    // Award XP to user (raw display XP; weighted race points + ledger via helper)
+    const demoFlags = getDemoDataFlags(user.userId);
+    await awardPoints(c.env.DB, {
+      userId: user.userId,
+      points: totalXp,
+      source: 'question_correct',
+      sourceRef: sessionId,
+      isDemoData: demoFlags.is_demo_data,
+      expiresAt: demoFlags.expires_at,
+    });
 
     // Log activity
     await c.env.DB.prepare(`

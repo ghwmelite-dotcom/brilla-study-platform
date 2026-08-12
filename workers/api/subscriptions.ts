@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
 import type { AuthPayload } from './auth-middleware';
 import { DAILY_QUESTION_LIMIT, CORE_SUBJECTS } from './usage-limits';
+import { awardPoints } from './points';
+import { getDemoDataFlags } from './demoUtils';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -376,10 +378,16 @@ subscriptionsApp.post('/trial/task/:taskId/complete', async (c) => {
       UPDATE user_trials SET tasks_completed = ? WHERE id = ?
     `).bind(JSON.stringify(tasksCompleted), trial.id).run();
 
-    // Award XP
-    await c.env.DB.prepare(`
-      UPDATE users SET xp_points = xp_points + ? WHERE id = ?
-    `).bind(task.xp, userId).run();
+    // Award XP (raw display XP; weighted race points + ledger via helper)
+    const demoFlags = getDemoDataFlags(userId);
+    await awardPoints(c.env.DB, {
+      userId,
+      points: task.xp,
+      source: 'quest_claim',
+      sourceRef: taskId,
+      isDemoData: demoFlags.is_demo_data,
+      expiresAt: demoFlags.expires_at,
+    });
 
     return c.json({
       success: true,

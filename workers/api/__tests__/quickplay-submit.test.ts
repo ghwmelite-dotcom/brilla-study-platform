@@ -36,7 +36,13 @@ const sessionHandler: MockHandler = {
 const writeHandlers: MockHandler[] = [
   { match: /SELECT id, multiplier FROM daily_multipliers/, first: () => null },
   { match: /UPDATE quick_play_sessions/ },
+  // awardPoints (question_correct): daily cap read, XP update, cycle lookup,
+  // ledger insert, house lookup (unhoused test user -> no house_points row).
+  { match: /AS today FROM points_ledger/, first: () => ({ today: 0 }) },
   { match: /UPDATE users SET xp_points = xp_points \+/ },
+  { match: /FROM race_cycles rc/, first: () => null },
+  { match: /INSERT INTO points_ledger/ },
+  { match: /SELECT house FROM users/, first: () => null },
   { match: /INSERT INTO activity_feed/ },
 ];
 

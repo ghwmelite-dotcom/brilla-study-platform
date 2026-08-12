@@ -9,6 +9,9 @@ import { createMockD1 } from './helpers/mockD1';
 // (WHERE id = ? AND user_id = ? AND status = 'completed', gated on
 // meta.changes === 0) is now the correctness mechanism; the pre-claim status
 // check remains only as a fast path for error messages.
+// Growth Loop Task 3: the XP award itself goes through awardPoints, which
+// adds a daily-cap read, a race-cycle lookup, and a points_ledger insert on
+// top of the same UPDATE users SET xp_points statement.
 
 const JWT_SECRET = 'test-secret-that-is-long-enough';
 const STUDENT = { role: 'student', status: 'approved', is_active: 1 };
@@ -37,6 +40,12 @@ describe('quest claim atomicity', () => {
         } },
       { match: /UPDATE users SET xp_points = xp_points \+/, run: (b) => {
           xp += b[0] as number; return { success: true, meta: { changes: 1 } }; } },
+      // awardPoints (quest_claim): daily cap read, cycle lookup, ledger insert.
+      // SELECT house FROM users matches the /FROM users WHERE id/ handler above,
+      // which returns a row with no `house` key -> no house_points insert.
+      { match: /AS today FROM points_ledger/, first: () => ({ today: 0 }) },
+      { match: /FROM race_cycles rc/, first: () => null },
+      { match: /INSERT INTO points_ledger/, run: () => ({ success: true, meta: { changes: 1 } }) },
       { match: /INSERT INTO quest_completions/, run: () => ({ success: true, meta: { changes: 1 } }) },
     ]);
 
@@ -81,6 +90,11 @@ describe('quest claim atomicity', () => {
           ({ success: true, meta: { changes: 0 } }) },
       { match: /UPDATE users SET xp_points = xp_points \+/, run: (b) => {
           xp += b[0] as number; return { success: true, meta: { changes: 1 } }; } },
+      // awardPoints handlers (unused here: the claim is rejected before any
+      // award, but the mock throws on unhandled SQL if reached).
+      { match: /AS today FROM points_ledger/, first: () => ({ today: 0 }) },
+      { match: /FROM race_cycles rc/, first: () => null },
+      { match: /INSERT INTO points_ledger/, run: () => ({ success: true, meta: { changes: 1 } }) },
       { match: /INSERT INTO quest_completions/, run: () => ({ success: true, meta: { changes: 1 } }) },
     ]);
 

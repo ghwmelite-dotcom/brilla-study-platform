@@ -34,6 +34,7 @@ import { revisionClassroomApp } from './revision-classroom';
 import { studyRoomsApp } from './study-rooms';
 import tutorClassroomApp from './tutor-classroom';
 import { cleanupExpiredDemoData } from './demoUtils';
+import { awardPoints } from './points';
 import {
   getDailyUsage,
   checkCanAnswer,
@@ -2283,12 +2284,21 @@ protectedApp.post('/quests/:questId/claim', async (c) => {
       return c.json({ success: false, error: 'Quest not completed yet or already claimed' }, 400);
     }
 
-    // Award + record atomically
+    // Award XP + race-ledger row via the shared helper, then record the
+    // completion. Trade-off: awardPoints does its own reads (daily caps,
+    // active cycle), so it can't join the caller's batch — the XP/ledger
+    // writes and the quest_completions insert are no longer one atomic batch.
     const xpReward = quest.xp_reward as number;
+    const demoFlags = getDemoDataFlags(userId);
+    await awardPoints(c.env.DB, {
+      userId,
+      points: xpReward,
+      source: 'quest_claim',
+      sourceRef: questId,
+      isDemoData: demoFlags.is_demo_data,
+      expiresAt: demoFlags.expires_at,
+    });
     await c.env.DB.batch([
-      c.env.DB.prepare(`
-        UPDATE users SET xp_points = xp_points + ? WHERE id = ?
-      `).bind(xpReward, userId),
       c.env.DB.prepare(`
         INSERT INTO quest_completions (id, user_id, quest_template_id, xp_earned, quest_type)
         VALUES (?, ?, ?, ?, (SELECT quest_type FROM quest_templates WHERE id = ?))
@@ -2472,16 +2482,25 @@ protectedApp.post('/streak/milestones/:milestoneId/claim', async (c) => {
       VALUES (?, ?, ?)
     `).bind(`usm_${crypto.randomUUID()}`, userId, milestoneId).run();
 
-    // Award rewards
+    // Award rewards: XP via the shared helper (raw display XP + weighted race
+    // ledger row), streak protections via a separate update.
     const xpReward = milestone.xp_reward as number;
     const protectionReward = milestone.protection_reward as number;
 
+    const demoFlags = getDemoDataFlags(userId);
+    await awardPoints(c.env.DB, {
+      userId,
+      points: xpReward,
+      source: 'streak_day',
+      sourceRef: milestoneId,
+      isDemoData: demoFlags.is_demo_data,
+      expiresAt: demoFlags.expires_at,
+    });
     await c.env.DB.prepare(`
       UPDATE users
-      SET xp_points = xp_points + ?,
-          streak_protections = streak_protections + ?
+      SET streak_protections = streak_protections + ?
       WHERE id = ?
-    `).bind(xpReward, protectionReward, userId).run();
+    `).bind(protectionReward, userId).run();
 
     // Log if protections earned
     if (protectionReward > 0) {

@@ -1,5 +1,7 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
+import { awardPoints } from './points';
+import { getDemoDataFlags } from './demoUtils';
 
 interface Env {
   DB: D1Database;
@@ -147,9 +149,15 @@ rewardsApp.post('/chests/:chestId/open', async (c) => {
     // Always give XP
     const xpAmount = Math.floor(Math.random() * (config.maxXp - config.minXp + 1)) + config.minXp;
     rewards.push({ type: 'xp', amount: xpAmount });
-    await c.env.DB.prepare(
-      'UPDATE users SET xp_points = xp_points + ? WHERE id = ?'
-    ).bind(xpAmount, user.userId).run();
+    const demoFlags = getDemoDataFlags(user.userId);
+    await awardPoints(c.env.DB, {
+      userId: user.userId,
+      points: xpAmount,
+      source: 'quest_claim',
+      sourceRef: chestId,
+      isDemoData: demoFlags.is_demo_data,
+      expiresAt: demoFlags.expires_at,
+    });
 
     // Chance for cosmetic
     if (Math.random() < config.cosmeticChance) {
@@ -334,9 +342,15 @@ rewardsApp.post('/wheel/spin', async (c) => {
     let rewardValue: any = selectedSegment.value;
 
     if (selectedSegment.type === 'xp') {
-      await c.env.DB.prepare(
-        'UPDATE users SET xp_points = xp_points + ? WHERE id = ?'
-      ).bind(selectedSegment.value, user.userId).run();
+      const demoFlags = getDemoDataFlags(user.userId);
+      await awardPoints(c.env.DB, {
+        userId: user.userId,
+        points: selectedSegment.value as number,
+        source: 'quest_claim',
+        sourceRef: `wheel_segment_${selectedSegment.id}`,
+        isDemoData: demoFlags.is_demo_data,
+        expiresAt: demoFlags.expires_at,
+      });
     } else if (selectedSegment.type === 'multiplier') {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
