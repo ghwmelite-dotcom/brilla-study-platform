@@ -105,3 +105,11 @@ PILOT START (user-gated, docs/superpowers/plans/2026-08-12-growth-loop.md ## Pro
 2. Assign pilot students' users.school_id (admin-verified).
 3. Flip REGISTRATION_MODE="invite" in wrangler.toml [vars] + redeploy. Do this before a Monday 00:00 UTC so the first race is a full week.
 4. During the pilot: before each crowning, eyeball referral_paid_conversion ledger rows (fraud-flagged conversions award points immediately).
+
+## PILOT SCHOOLS ADMIN (2026-08-12)
+
+Plan: docs/superpowers/plans/2026-08-12-pilot-schools-admin.md — 2 tasks + 1 fix round + deep-link fix, reviews clean, 251 tests.
+
+Landed: admin endpoints (schools create/list, ambassador provisioning with referral code, bulk assign by email list with skip reasons, individual assign/unassign — restricted to approved students); new /admin/schools "Pilot Schools" page (schools table, ambassador code + shareable link with copy, bulk assign textarea/CSV with per-row skip reasons); fixed the pre-existing deep-link gap: /?register=true&ref=CODE now actually opens the register modal (affiliate links previously landed on the homepage with no modal). Deployed (worker + site); /api/admin/schools verified 401-unauth.
+
+Founder pilot flow now: Admin → Pilot Schools → create "St John's Grammar School" (slug stjohns) → provision ambassador with code STJOHNS → copy the share link → assign students (bulk paste emails). Then flip REGISTRATION_MODE=invite + redeploy before a Monday 00:00 UTC.
