@@ -7679,10 +7679,20 @@ adminApp.get('/schools', async (c) => {
         (SELECT ap.referral_code FROM affiliate_profiles ap
          JOIN users au ON au.id = ap.user_id
          WHERE au.school_id = s.id AND au.email LIKE '%@ambassador.brilla'
-         LIMIT 1) AS ambassador_code
+         LIMIT 1) AS ambassador_code,
+        sc.channel_id AS telegram_channel_id,
+        sc.channel_name AS telegram_channel_name,
+        sc.broken AS telegram_channel_broken
       FROM schools s
+      LEFT JOIN school_channels sc ON sc.school_id = s.id
       ORDER BY s.created_at DESC
-    `).all<SchoolRow & { student_count: number; ambassador_code: string | null }>();
+    `).all<SchoolRow & {
+      student_count: number;
+      ambassador_code: string | null;
+      telegram_channel_id: string | null;
+      telegram_channel_name: string | null;
+      telegram_channel_broken: number | null;
+    }>();
 
     const schools = (result.results || []).map((row) => ({
       id: row.id,
@@ -7691,6 +7701,9 @@ adminApp.get('/schools', async (c) => {
       status: row.status,
       studentCount: row.student_count ?? 0,
       ambassadorCode: row.ambassador_code ?? null,
+      telegramChannelId: row.telegram_channel_id ?? null,
+      telegramChannelName: row.telegram_channel_name ?? null,
+      telegramChannelBroken: Boolean(row.telegram_channel_broken),
       createdAt: row.created_at,
     }));
     return c.json({ success: true, data: { schools } });
@@ -7741,6 +7754,58 @@ adminApp.post('/schools', async (c) => {
   } catch (error) {
     console.error('Admin create school error:', error);
     return c.json({ success: false, error: 'Failed to create school' }, 500);
+  }
+});
+
+// Telegram community channel (Task 6): upsert the school's channel row.
+// Saving always resets broken = 0 — re-saving after re-adding the bot as a
+// channel admin clears the flag. An empty channelId removes the row instead.
+adminApp.put('/schools/:id/channel', async (c) => {
+  try {
+    const schoolId = c.req.param('id');
+    const body = await parseJsonBody(c);
+    if (!body) {
+      return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+    }
+
+    if (typeof body.channelId !== 'string') {
+      return c.json({ success: false, error: 'channelId is required' }, 400);
+    }
+    const channelId = body.channelId.trim();
+    if (channelId.length > 64) {
+      return c.json({ success: false, error: 'channelId must be at most 64 characters' }, 400);
+    }
+    const channelName =
+      typeof body.channelName === 'string' && body.channelName.trim()
+        ? body.channelName.trim()
+        : null;
+
+    const school = await c.env.DB.prepare(
+      'SELECT id FROM schools WHERE id = ?'
+    ).bind(schoolId).first<Pick<SchoolRow, 'id'>>();
+    if (!school) {
+      return c.json({ success: false, error: 'School not found' }, 404);
+    }
+
+    if (channelId === '') {
+      await c.env.DB.prepare(
+        'DELETE FROM school_channels WHERE school_id = ?'
+      ).bind(schoolId).run();
+    } else {
+      await c.env.DB.prepare(
+        `INSERT INTO school_channels (school_id, channel_id, channel_name, broken)
+         VALUES (?, ?, ?, 0)
+         ON CONFLICT(school_id) DO UPDATE SET
+           channel_id = excluded.channel_id,
+           channel_name = excluded.channel_name,
+           broken = 0`
+      ).bind(schoolId, channelId, channelName).run();
+    }
+
+    return c.json({ success: true, data: { schoolId } });
+  } catch (error) {
+    console.error('Admin save school channel error:', error);
+    return c.json({ success: false, error: 'Failed to save school channel' }, 500);
   }
 });
 

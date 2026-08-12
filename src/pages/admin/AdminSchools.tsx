@@ -11,6 +11,7 @@ import {
   Search,
   UserPlus,
   UserMinus,
+  Send,
 } from 'lucide-react';
 import { AdminCard, AdminCardHeader, AdminButton, AdminBadge, AdminInput, AdminTextarea } from '@/components/admin';
 import { api } from '@/lib/api';
@@ -24,6 +25,9 @@ interface SchoolRow {
   status: string;
   studentCount: number;
   ambassadorCode: string | null;
+  telegramChannelId: string | null;
+  telegramChannelName: string | null;
+  telegramChannelBroken: boolean;
   createdAt: string;
 }
 
@@ -90,6 +94,12 @@ export default function AdminSchools() {
   const [ambassadorError, setAmbassadorError] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
+  // Telegram channel card
+  const [channelIdInput, setChannelIdInput] = useState('');
+  const [channelNameInput, setChannelNameInput] = useState('');
+  const [channelLoading, setChannelLoading] = useState(false);
+  const [channelError, setChannelError] = useState<string | null>(null);
+
   // Bulk assign card
   const [bulkText, setBulkText] = useState('');
   const [bulkLoading, setBulkLoading] = useState(false);
@@ -138,6 +148,11 @@ export default function AdminSchools() {
     setIndividualError(null);
     setIndividualNotice(null);
     setForceUserId(null);
+    // Prefill the channel form from the school's current row
+    const school = schools.find((s) => s.id === schoolId);
+    setChannelIdInput(school?.telegramChannelId ?? '');
+    setChannelNameInput(school?.telegramChannelName ?? '');
+    setChannelError(null);
   };
 
   const handleNameChange = (name: string) => {
@@ -180,6 +195,25 @@ export default function AdminSchools() {
       await loadSchools();
     } else {
       setAmbassadorError(res.error || 'Failed to provision ambassador');
+    }
+  };
+
+  const handleSaveChannel = async () => {
+    if (!selectedSchool) return;
+    setChannelLoading(true);
+    setChannelError(null);
+    const res = await api.put<{ schoolId: string }>(
+      `/admin/schools/${selectedSchool.id}/channel`,
+      {
+        channelId: channelIdInput.trim(),
+        channelName: channelNameInput.trim() || undefined,
+      }
+    );
+    setChannelLoading(false);
+    if (res.success) {
+      await loadSchools();
+    } else {
+      setChannelError(res.error || 'Failed to save channel');
     }
   };
 
@@ -492,6 +526,50 @@ export default function AdminSchools() {
                   <p className="text-sm text-admin-accent-rose">{ambassadorError}</p>
                 )}
               </div>
+            )}
+          </AdminCard>
+
+          {/* Telegram channel card */}
+          <AdminCard>
+            <AdminCardHeader
+              title={`Telegram channel — ${selectedSchool.name}`}
+              subtitle="Channel the bot posts race alerts to; the bot must be a channel admin"
+              icon={<Send className="w-5 h-5" />}
+            />
+            {selectedSchool.telegramChannelBroken && (
+              <div className="mb-4">
+                <AdminBadge variant="rose">
+                  Channel broken — re-add the bot as admin and re-save
+                </AdminBadge>
+              </div>
+            )}
+            <div className="flex flex-col sm:flex-row gap-3 items-start">
+              <div className="flex-1">
+                <AdminInput
+                  placeholder="Channel ID, e.g. -1001234567890"
+                  value={channelIdInput}
+                  hint="Clear the field and save to remove the channel"
+                  onChange={(e) => setChannelIdInput(e.target.value)}
+                />
+              </div>
+              <div className="flex-1">
+                <AdminInput
+                  placeholder="Display name (optional)"
+                  value={channelNameInput}
+                  onChange={(e) => setChannelNameInput(e.target.value)}
+                />
+              </div>
+              <AdminButton
+                variant="primary"
+                leftIcon={<Send className="w-4 h-4" />}
+                isLoading={channelLoading}
+                onClick={handleSaveChannel}
+              >
+                Save channel
+              </AdminButton>
+            </div>
+            {channelError && (
+              <p className="mt-3 text-sm text-admin-accent-rose">{channelError}</p>
             )}
           </AdminCard>
 

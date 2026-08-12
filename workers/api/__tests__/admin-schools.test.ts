@@ -476,7 +476,14 @@ describe('admin pilot-schools endpoints (Task 1)', () => {
   it('GET /schools returns the mapped envelope with studentCount and ambassadorCode', async () => {
     const { db, prepareCalls } = makeDb({
       schoolsList: [
-        { ...SCHOOL, student_count: 3, ambassador_code: 'ACHIM26' },
+        {
+          ...SCHOOL,
+          student_count: 3,
+          ambassador_code: 'ACHIM26',
+          telegram_channel_id: '-1001234567890',
+          telegram_channel_name: 'Achimota Announcements',
+          telegram_channel_broken: 1,
+        },
         {
           id: 'sch_mfantsipim',
           name: 'Mfantsipim School',
@@ -485,6 +492,9 @@ describe('admin pilot-schools endpoints (Task 1)', () => {
           created_at: '2026-08-02 00:00:00',
           student_count: 0,
           ambassador_code: null,
+          telegram_channel_id: null,
+          telegram_channel_name: null,
+          telegram_channel_broken: null,
         },
       ],
     });
@@ -503,6 +513,9 @@ describe('admin pilot-schools endpoints (Task 1)', () => {
         status: 'active',
         studentCount: 3,
         ambassadorCode: 'ACHIM26',
+        telegramChannelId: '-1001234567890',
+        telegramChannelName: 'Achimota Announcements',
+        telegramChannelBroken: true,
         createdAt: '2026-08-01 00:00:00',
       },
       {
@@ -512,6 +525,9 @@ describe('admin pilot-schools endpoints (Task 1)', () => {
         status: 'active',
         studentCount: 0,
         ambassadorCode: null,
+        telegramChannelId: null,
+        telegramChannelName: null,
+        telegramChannelBroken: false,
         createdAt: '2026-08-02 00:00:00',
       },
     ]);
@@ -520,12 +536,122 @@ describe('admin pilot-schools endpoints (Task 1)', () => {
     const listSql = prepareCalls.find((sql) => sql.includes('FROM schools'));
     expect(listSql).toBeDefined();
     expect(listSql).toContain("NOT LIKE '%@ambassador.brilla'");
+    // Channel fields come from a LEFT JOIN so schools without a row still list.
+    expect(listSql).toContain('LEFT JOIN school_channels');
+  });
+
+  it('(a) GET /schools maps channel fields to null/false when no school_channels row exists', async () => {
+    const { db } = makeDb({
+      schoolsList: [
+        {
+          ...SCHOOL,
+          student_count: 0,
+          ambassador_code: null,
+          // LEFT JOIN miss: all three channel columns come back NULL.
+          telegram_channel_id: null,
+          telegram_channel_name: null,
+          telegram_channel_broken: null,
+        },
+      ],
+    });
+    const res = await worker.fetch(
+      adminRequest('/schools', 'GET', undefined, await authHeader()),
+      { DB: db, JWT_SECRET },
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.data.schools[0]).toMatchObject({
+      telegramChannelId: null,
+      telegramChannelName: null,
+      telegramChannelBroken: false,
+    });
+  });
+
+  it('(b) PUT /schools/:id/channel upserts the row with broken = 0', async () => {
+    const { db, runs } = makeDb({ schoolRow: SCHOOL });
+    const res = await worker.fetch(
+      adminRequest(
+        '/schools/sch_achimota/channel',
+        'PUT',
+        { channelId: '-1001234567890', channelName: 'Achimota Announcements' },
+        await authHeader(),
+      ),
+      { DB: db, JWT_SECRET },
+    );
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      success: true,
+      data: { schoolId: 'sch_achimota' },
+    });
+
+    const upsert = runs.find((r) => r.sql.includes('INSERT INTO school_channels'));
+    expect(upsert).toBeDefined();
+    // broken = 0 on both insert and conflict-update (re-save clears the flag).
+    expect(upsert!.sql).toContain('VALUES (?, ?, ?, 0)');
+    expect(upsert!.sql).toContain('ON CONFLICT(school_id) DO UPDATE');
+    expect(upsert!.sql).toContain('broken = 0');
+    expect(upsert!.args).toEqual(['sch_achimota', '-1001234567890', 'Achimota Announcements']);
+  });
+
+  it('(b) PUT /schools/:id/channel → 400 on missing or oversized (>64) channelId', async () => {
+    const headers = await authHeader();
+
+    const missing = makeDb({ schoolRow: SCHOOL });
+    const resMissing = await worker.fetch(
+      adminRequest('/schools/sch_achimota/channel', 'PUT', { channelName: 'x' }, headers),
+      { DB: missing.db, JWT_SECRET },
+    );
+    expect(resMissing.status).toBe(400);
+    expect(missing.runs.some((r) => r.sql.includes('school_channels'))).toBe(false);
+
+    const oversized = makeDb({ schoolRow: SCHOOL });
+    const resOversized = await worker.fetch(
+      adminRequest('/schools/sch_achimota/channel', 'PUT', { channelId: 'x'.repeat(65) }, headers),
+      { DB: oversized.db, JWT_SECRET },
+    );
+    expect(resOversized.status).toBe(400);
+    expect(oversized.runs.some((r) => r.sql.includes('school_channels'))).toBe(false);
+  });
+
+  it('(c) PUT /schools/:id/channel with an empty channelId deletes the row', async () => {
+    const { db, runs } = makeDb({ schoolRow: SCHOOL });
+    const res = await worker.fetch(
+      adminRequest('/schools/sch_achimota/channel', 'PUT', { channelId: '  ' }, await authHeader()),
+      { DB: db, JWT_SECRET },
+    );
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      success: true,
+      data: { schoolId: 'sch_achimota' },
+    });
+
+    const del = runs.find((r) => r.sql.includes('DELETE FROM school_channels'));
+    expect(del).toBeDefined();
+    expect(del!.args).toEqual(['sch_achimota']);
+    expect(runs.some((r) => r.sql.includes('INSERT INTO school_channels'))).toBe(false);
+  });
+
+  it('(e) PUT /schools/:id/channel → 404 on unknown school', async () => {
+    const { db, runs } = makeDb({ schoolRow: null });
+    const res = await worker.fetch(
+      adminRequest(
+        '/schools/sch_ghost/channel',
+        'PUT',
+        { channelId: '-1001234567890' },
+        await authHeader(),
+      ),
+      { DB: db, JWT_SECRET },
+    );
+    expect(res.status).toBe(404);
+    expect((await res.json()).success).toBe(false);
+    expect(runs.some((r) => r.sql.includes('school_channels'))).toBe(false);
   });
 
   it('(e) all routes → 401 without a token, 403 with a student-role token', async () => {
     const routes: Array<[string, string, unknown?]> = [
       ['GET', '/schools'],
       ['POST', '/schools', { name: 'Achimota School', slug: 'achimota' }],
+      ['PUT', '/schools/sch_achimota/channel', { channelId: '-1001234567890' }],
       ['POST', '/schools/sch_achimota/ambassador', { code: 'ACHIM26' }],
       ['POST', '/schools/sch_achimota/students', { emails: ['a@b.co'] }],
       ['POST', '/schools/sch_achimota/students/user_1', {}],
