@@ -14,12 +14,14 @@ import {
   ChevronDown,
   Flag,
   Timer,
+  Send,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { useLeaderboardStore } from '@/stores/leaderboardStore';
 import { useRaceStore } from '@/stores/raceStore';
 import type { RaceCurrent } from '@/stores/raceStore';
 import type { LeaderboardPeriod, LeaderboardEntry } from '@/types';
+import { api } from '@/lib/api';
 import { cn } from '@/utils';
 
 const PERIODS: { value: LeaderboardPeriod; label: string }[] = [
@@ -297,10 +299,25 @@ function RacePanel({
 }) {
   const { user } = useAuthStore();
   const [now, setNow] = useState(() => Date.now());
+  const [communityUrl, setCommunityUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 30000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    api.get<{ url: string | null }>('/notifications/telegram/community').then((res) => {
+      if (!cancelled && res.success && res.data?.url) {
+        setCommunityUrl(res.data.url);
+      }
+    }).catch(() => {
+      // Banner is optional — render nothing on failure
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   if (error) {
@@ -339,6 +356,31 @@ function RacePanel({
 
   return (
     <div className="space-y-6">
+      {/* Community Banner */}
+      {communityUrl && (
+        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 text-white shadow-lg">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                <Send className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="font-semibold">Join the BrillaPrep community channel</p>
+                <p className="text-indigo-200 text-sm">Winners announced there every week</p>
+              </div>
+            </div>
+            <a
+              href={communityUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="shrink-0 px-4 py-2 bg-white text-indigo-600 rounded-lg text-sm font-semibold hover:bg-indigo-50 transition-colors"
+            >
+              Join
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* Target Progress */}
       <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm p-6">
         <div className="flex items-center justify-between mb-3">

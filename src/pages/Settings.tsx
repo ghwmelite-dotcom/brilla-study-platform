@@ -21,6 +21,7 @@ import {
   Trash2,
   Link,
   Unlink,
+  Send,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { api, fetchWithAuth } from '@/lib/api';
@@ -84,6 +85,11 @@ export default function Settings() {
   const [notificationsSaving, setNotificationsSaving] = useState(false);
   const [notificationsSuccess, setNotificationsSuccess] = useState(false);
 
+  // Telegram connect state
+  const [tg, setTg] = useState<{ linked: boolean; username: string | null; stale: boolean } | null>(null);
+  const [tgConnecting, setTgConnecting] = useState(false);
+  const [tgError, setTgError] = useState<string | null>(null);
+
   // Appearance preferences - load from localStorage
   const [appearance, setAppearance] = useState(() => {
     const saved = localStorage.getItem('brilla-appearance');
@@ -110,6 +116,46 @@ export default function Settings() {
       loadConnectedAccounts();
     }
   }, [activeTab]);
+
+  // Load Telegram link status when notifications tab is active
+  useEffect(() => {
+    if (activeTab === 'notifications') {
+      loadTelegramStatus();
+    }
+  }, [activeTab]);
+
+  const loadTelegramStatus = async () => {
+    try {
+      const res = await api.get<{ linked: boolean; username: string | null; stale: boolean }>(
+        '/notifications/telegram/status'
+      );
+      if (res.success && res.data) {
+        setTg(res.data);
+      }
+    } catch (error) {
+      console.error('Failed to load Telegram status:', error);
+    }
+  };
+
+  const handleTelegramConnect = async () => {
+    setTgConnecting(true);
+    setTgError(null);
+    try {
+      const res = await api.post<{ startUrl: string; expiresAt: string }>('/notifications/telegram/link');
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Failed to start Telegram linking');
+      }
+      window.open(res.data.startUrl, '_blank');
+      // Poll status once after 15s to pick up the completed handshake
+      setTimeout(() => {
+        void loadTelegramStatus();
+      }, 15000);
+    } catch (error) {
+      setTgError(error instanceof Error ? error.message : 'Failed to connect Telegram');
+    } finally {
+      setTgConnecting(false);
+    }
+  };
 
   const loadConnectedAccounts = async () => {
     setAccountsLoading(true);
@@ -791,6 +837,79 @@ export default function Settings() {
               {/* Notifications Tab */}
               {activeTab === 'notifications' && (
                 <div className="space-y-6">
+                  {/* Connect Telegram Card */}
+                  <div className="bg-white rounded-2xl border border-neutral-200 p-4">
+                    {tg === null ? (
+                      <div className="flex items-center gap-2 text-sm text-neutral-500">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Checking Telegram connection…
+                      </div>
+                    ) : tg.linked && !tg.stale ? (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                            <Send className="w-5 h-5 text-indigo-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-neutral-900">
+                              Connected as @{tg.username}
+                            </p>
+                            <p className="text-sm text-neutral-500">
+                              You'll get race alerts and notifications on Telegram
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={handleTelegramConnect}
+                          disabled={tgConnecting}
+                          className="text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                        >
+                          {tgConnecting ? 'Relinking…' : 'Relink'}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                            <Send className="w-5 h-5 text-indigo-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-neutral-900">Connect Telegram</p>
+                            <p className="text-sm text-neutral-500">
+                              Get 100 XP and race alerts on Telegram
+                            </p>
+                          </div>
+                        </div>
+                        {tg.stale && (
+                          <p className="text-xs text-amber-600 flex items-center gap-1">
+                            <AlertTriangle className="w-3 h-3" />
+                            Telegram disconnected — reconnect to keep receiving alerts
+                          </p>
+                        )}
+                        <div>
+                          <button
+                            onClick={handleTelegramConnect}
+                            disabled={tgConnecting}
+                            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium disabled:opacity-50"
+                          >
+                            {tgConnecting ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Send className="w-4 h-4" />
+                            )}
+                            {tg.stale ? 'Reconnect Telegram' : 'Connect Telegram'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {tgError && (
+                      <p className="text-xs text-red-600 flex items-center gap-1 mt-2">
+                        <AlertTriangle className="w-3 h-3" />
+                        {tgError}
+                      </p>
+                    )}
+                  </div>
+
                   <div>
                     <h2 className="text-lg font-semibold text-neutral-900 mb-1">Notification Preferences</h2>
                     <p className="text-sm text-neutral-500">Choose what notifications you receive</p>
