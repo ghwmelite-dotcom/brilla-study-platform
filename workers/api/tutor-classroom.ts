@@ -212,7 +212,8 @@ tutorClassroom.post('/availability/heartbeat', teacherMiddleware, async (c) => {
     await db.prepare(`
       UPDATE tutor_availability SET
         is_online = 1,
-        last_heartbeat = CURRENT_TIMESTAMP
+        last_heartbeat = CURRENT_TIMESTAMP,
+        updated_at = CURRENT_TIMESTAMP
       WHERE tutor_id = ?
     `).bind(user.id).run();
 
@@ -463,7 +464,8 @@ tutorClassroom.post('/ai-sessions/:sessionId/suggest-handoff', async (c) => {
       UPDATE ai_classroom_sessions SET
         handoff_status = 'suggested',
         handoff_reason = ?,
-        handoff_suggested_at = CURRENT_TIMESTAMP
+        handoff_suggested_at = CURRENT_TIMESTAMP,
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(body.reason || 'struggling_with_concept', sessionId).run();
 

@@ -1173,6 +1173,51 @@ CREATE TABLE affiliate_payouts (
 
 ### 20.2 Migration History
 
+**Squash (2026-08-11):** the original chain 001-087 was squashed into a canonical
+`database/schema.sql` + `database/seed.sql`. The old migration files are preserved
+untouched in `database/migrations/archive/` (outside `migrations_dir`, so wrangler
+ignores them) for forensic diffing. `database/migrations/` now contains only the
+post-squash chain:
+
+| # | Migration | Description |
+|---|-----------|-------------|
+| 088 | Normalize datetime to ISO | `088_normalize_datetime_to_iso.sql` |
+| 088a | Data fixes | `088a_data_fixes.sql` — repairs numeric MCQ answers, phantom subject IDs, and ID collisions (UPDATE-only, idempotent) |
+| 089 | Baseline marker | `089_baseline_marker.sql` — records the squash in `schema_baseline` |
+
+**Fresh-environment bootstrap (single path):**
+
+```bash
+wrangler d1 create brilla-db
+npm run db:migrate    # schema.sql — FRESH databases only, not idempotent
+npm run db:seed       # seed.sql — idempotent, safe to re-run
+wrangler d1 execute brilla-db --local --file=database/seeds/seed_chat_rooms.sql
+npm run db:baseline   # wrangler d1 migrations apply → records 088, 088a, 089
+npm run db:verify     # gate — must be green
+```
+
+`npm run db:verify` is the database gate (node:sqlite, zero deps): schema + seed
+apply clean with `foreign_keys=ON`; 0 numeric MCQ answers; all letter answers in
+range; 0 first-letter collisions; every FK reference resolves; no duplicate
+subjects. Run it before committing any change under `database/`. No CI workflow
+exists yet (`.github/workflows` is absent); when one is added, `db:verify`
+belongs in it.
+
+**Windows notes:**
+
+- `npm run db:backup` embeds `$(date ...)` — Git Bash / POSIX shells only; it
+  does not expand in cmd.exe or PowerShell.
+- `wrangler d1 execute --local --file=database/seed.sql` can crash workerd on
+  Windows (miniflare `kj HashIndex` internal error on the 4,545-row file). The
+  SQL is valid — `db:verify` proves it. Workaround: load the seed locally via
+  better-sqlite3 / `node:sqlite`, or run wrangler per-statement.
+
+Existing/production databases follow the runbook in
+`docs/superpowers/plans/2026-08-03-fix-05-database-reckoning.md`, not the
+bootstrap above.
+
+Pre-squash history (archived files, for reference):
+
 | # | Migration | Description |
 |---|-----------|-------------|
 | 001 | User verification | Email verification system |
@@ -1188,7 +1233,7 @@ CREATE TABLE affiliate_payouts (
 | ... | ... | ... |
 | 025 | Whiteboard recordings | Recording system |
 | 026 | Whiteboards | Whiteboard management |
-| 027+ | Ongoing | New features |
+| 027-087 | Ongoing | New features (see `database/migrations/archive/`) |
 
 ---
 

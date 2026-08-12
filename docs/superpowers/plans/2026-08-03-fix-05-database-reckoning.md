@@ -318,7 +318,7 @@ Whole-phase gate, in order:
 
 1. `npm run db:verify` — green (schema + seed apply clean with `foreign_keys=ON`; 0 numeric MCQ answers; all letter answers in range; 0 first-letter collisions; every FK reference resolves; no duplicate subjects).
 2. Triple-seed idempotency check (Task 4) — no error, stable row counts.
-3. `wrangler d1 migrations list brilla-db --local` — only 088.
+3. `wrangler d1 migrations list brilla-db --local` — exactly 3 files: 088, 088a, 089.
 4. `npm run build` (tsc + vite) — green, proving Phases 0–4 code still typechecks against the squashed schema's assumptions.
 5. Manual smoke: `npm run dev:all`, load one question each from a 065/066/067 topic (previously unanswerable), one 037 BECE paper question, and one renumbered `q_alevel_maths_*` question; answer each correctly and confirm grading accepts it.
 
@@ -369,7 +369,7 @@ cd workers && npm run deploy
   wrangler d1 execute brilla-db --remote --file=backups/pre-squash-<timestamp>.sql
   ```
   (Full-file restore; D1 import replaces content. Acceptable because no writes should occur during the maintenance window — announce one.)
-- Baseline marker rollback: `wrangler d1 execute brilla-db --remote --command="DROP TABLE IF EXISTS schema_baseline;"` and remove the 088 row from `d1_migrations` if present.
+- Baseline marker rollback: `wrangler d1 execute brilla-db --remote --command="DROP TABLE IF EXISTS schema_baseline;"` and remove the 088, 088a, and 089 rows from `d1_migrations` if present.
 - If anything fails mid-runbook: STOP, do not retry blind, restore from backup, post-mortem against the export.
 - The archive (`database/migrations/archive/`) preserves the old chain untouched for forensic diffing.
 
