@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
+import { awardPoints } from './points';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -203,6 +204,9 @@ const FRAUD_THRESHOLDS = {
   MIN_SIGNUP_TO_CONVERSION_HOURS: 1, // Minimum time between signup and conversion
   MAX_CONVERSIONS_PER_DAY: 10, // Maximum conversions per affiliate per day
 };
+
+// Growth loop: race points awarded to the affiliate when a referral makes their first payment
+export const REFERRAL_PAID_CONVERSION_POINTS = 500;
 
 // =============================================
 // PAYMENTS API
@@ -638,6 +642,16 @@ async function processAffiliateCommission(
       SET status = 'converted', converted_at = datetime('now'), first_payment_id = ?
       WHERE id = ?
     `).bind(transactionId, referral.id).run();
+
+    // Growth loop: race points ride the existing exactly-once path — this line is
+    // unreachable for duplicate verifies (claim-first at payments.ts:437) and for
+    // already-converted referrals (guard above), so the 500 pts can never double-fire.
+    await awardPoints(db, {
+      userId: affiliate.user_id as string,
+      points: REFERRAL_PAID_CONVERSION_POINTS,
+      source: 'referral_paid_conversion',
+      sourceRef: referral.id as string,
+    });
 
     // Update affiliate stats
     await db.prepare(`
