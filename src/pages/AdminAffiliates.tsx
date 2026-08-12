@@ -8,6 +8,9 @@ import {
   RefreshCw,
   Search,
   Eye,
+  Ticket,
+  Copy,
+  X,
 } from 'lucide-react';
 import { AdminCard, AdminButton, AdminBadge, AdminInput } from '@/components/admin';
 import { api } from '@/lib/api';
@@ -53,14 +56,34 @@ interface Payout {
   processedAt?: string;
 }
 
+// Raw row shape from GET /admin/referral-code-requests (growth loop Task 5)
+interface CodeRequest {
+  id: string;
+  name: string;
+  contact: string;
+  school_name: string | null;
+  message: string | null;
+  status: 'pending' | 'fulfilled' | 'rejected';
+  issued_code: string | null;
+  created_at: string;
+}
+
 export default function AdminAffiliates() {
   const [stats, setStats] = useState<AffiliateStats | null>(null);
   const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
   const [payouts, setPayouts] = useState<Payout[]>([]);
+  const [codeRequests, setCodeRequests] = useState<CodeRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'affiliates' | 'payouts'>('affiliates');
+  const [activeTab, setActiveTab] = useState<'affiliates' | 'payouts' | 'requests'>('affiliates');
   const [searchQuery, setSearchQuery] = useState('');
   const [tierFilter, setTierFilter] = useState<string>('all');
+  // Code Requests tab action state
+  const [issuingRequestId, setIssuingRequestId] = useState<string | null>(null);
+  const [issueCodeInput, setIssueCodeInput] = useState('');
+  const [requestActionLoading, setRequestActionLoading] = useState<string | null>(null);
+  const [requestActionError, setRequestActionError] = useState<string | null>(null);
+  const [issuedCodes, setIssuedCodes] = useState<Record<string, string>>({});
+  const [copiedRequestId, setCopiedRequestId] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -69,15 +92,17 @@ export default function AdminAffiliates() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [statsRes, affiliatesRes, payoutsRes] = await Promise.all([
+      const [statsRes, affiliatesRes, payoutsRes, requestsRes] = await Promise.all([
         api.get<AffiliateStats>('/admin/affiliates/stats'),
         api.get<Affiliate[]>('/admin/affiliates/list'),
         api.get<Payout[]>('/admin/affiliates/payouts'),
+        api.get<{ requests: CodeRequest[]; total: number }>('/admin/referral-code-requests'),
       ]);
 
       if (statsRes.success && statsRes.data) setStats(statsRes.data);
       if (affiliatesRes.success && affiliatesRes.data) setAffiliates(affiliatesRes.data);
       if (payoutsRes.success && payoutsRes.data) setPayouts(payoutsRes.data);
+      if (requestsRes.success && requestsRes.data) setCodeRequests(requestsRes.data.requests);
     } catch (error) {
       console.error('Failed to load affiliate data:', error);
     } finally {
@@ -127,6 +152,8 @@ export default function AdminAffiliates() {
       processing: 'cyan',
       completed: 'emerald',
       failed: 'rose',
+      fulfilled: 'emerald',
+      rejected: 'rose',
     };
     return <AdminBadge variant={variants[status] || 'amber'}>{status}</AdminBadge>;
   };
@@ -144,12 +171,63 @@ export default function AdminAffiliates() {
     return payout.affiliateName.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
+  const filteredCodeRequests = codeRequests.filter((req) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      req.name.toLowerCase().includes(q) ||
+      req.contact.toLowerCase().includes(q) ||
+      (req.school_name || '').toLowerCase().includes(q)
+    );
+  });
+
   const handleApprovePayout = async (payoutId: string) => {
     try {
       await api.post(`/admin/affiliates/payouts/${payoutId}/approve`);
       loadData();
     } catch (error) {
       console.error('Failed to approve payout:', error);
+    }
+  };
+
+  const handleFulfillRequest = async (requestId: string) => {
+    const code = issueCodeInput.trim();
+    if (!code) return;
+    setRequestActionLoading(requestId);
+    setRequestActionError(null);
+    const res = await api.post<{ id: string; issuedCode: string }>(
+      `/admin/referral-code-requests/${requestId}/fulfill`,
+      { code }
+    );
+    setRequestActionLoading(null);
+    if (res.success && res.data) {
+      setIssuedCodes((prev) => ({ ...prev, [requestId]: res.data!.issuedCode }));
+      setIssuingRequestId(null);
+      setIssueCodeInput('');
+      loadData();
+    } else {
+      setRequestActionError(res.error || 'Failed to issue code');
+    }
+  };
+
+  const handleRejectRequest = async (requestId: string) => {
+    setRequestActionLoading(requestId);
+    setRequestActionError(null);
+    const res = await api.post(`/admin/referral-code-requests/${requestId}/reject`);
+    setRequestActionLoading(null);
+    if (res.success) {
+      loadData();
+    } else {
+      setRequestActionError(res.error || 'Failed to reject request');
+    }
+  };
+
+  const handleCopyCode = async (requestId: string, code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedRequestId(requestId);
+      setTimeout(() => setCopiedRequestId(null), 2000);
+    } catch (error) {
+      console.error('Failed to copy code:', error);
     }
   };
 
@@ -272,13 +350,31 @@ export default function AdminAffiliates() {
           <DollarSign className="w-4 h-4 inline mr-2" />
           Payouts ({payouts.length})
         </button>
+        <button
+          onClick={() => setActiveTab('requests')}
+          className={cn(
+            'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors',
+            activeTab === 'requests'
+              ? 'border-admin-accent-cyan text-admin-accent-cyan'
+              : 'border-transparent text-admin-text-muted hover:text-admin-text'
+          )}
+        >
+          <Ticket className="w-4 h-4 inline mr-2" />
+          Code Requests ({codeRequests.filter((r) => r.status === 'pending').length})
+        </button>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1">
           <AdminInput
-            placeholder={activeTab === 'affiliates' ? 'Search by name, email, or code...' : 'Search payouts...'}
+            placeholder={
+              activeTab === 'affiliates'
+                ? 'Search by name, email, or code...'
+                : activeTab === 'payouts'
+                  ? 'Search payouts...'
+                  : 'Search requests by name, contact, or school...'
+            }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             leftIcon={<Search className="w-4 h-4" />}
@@ -357,7 +453,7 @@ export default function AdminAffiliates() {
               </tbody>
             </table>
           </div>
-        ) : (
+        ) : activeTab === 'payouts' ? (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -403,6 +499,122 @@ export default function AdminAffiliates() {
                   <tr>
                     <td colSpan={6} className="px-6 py-12 text-center text-admin-text-muted">
                       No payouts found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            {requestActionError && (
+              <p className="px-6 pt-4 text-sm text-admin-accent-rose">{requestActionError}</p>
+            )}
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-admin-border">
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Name</th>
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Contact</th>
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">School</th>
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Message</th>
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Requested</th>
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Status</th>
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-admin-border">
+                {filteredCodeRequests.map((req) => {
+                  const issuedCode = issuedCodes[req.id] || req.issued_code;
+                  return (
+                    <tr key={req.id} className="hover:bg-admin-bg-tertiary/50 transition-colors">
+                      <td className="px-6 py-4">
+                        <p className="text-sm font-medium text-admin-text">{req.name}</p>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-admin-text">{req.contact}</td>
+                      <td className="px-6 py-4 text-sm text-admin-text">{req.school_name || '—'}</td>
+                      <td className="px-6 py-4 text-sm text-admin-text-secondary max-w-xs truncate">
+                        {req.message || '—'}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-admin-text">{formatDate(req.created_at)}</td>
+                      <td className="px-6 py-4">{getStatusBadge(req.status)}</td>
+                      <td className="px-6 py-4">
+                        {req.status === 'pending' ? (
+                          issuingRequestId === req.id ? (
+                            <div className="flex items-center gap-2">
+                              <AdminInput
+                                placeholder="Ambassador code, e.g. STJOHNS"
+                                value={issueCodeInput}
+                                onChange={(e) => setIssueCodeInput(e.target.value.toUpperCase())}
+                              />
+                              <AdminButton
+                                variant="primary"
+                                size="sm"
+                                isLoading={requestActionLoading === req.id}
+                                onClick={() => handleFulfillRequest(req.id)}
+                              >
+                                Issue
+                              </AdminButton>
+                              <AdminButton
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setIssuingRequestId(null);
+                                  setIssueCodeInput('');
+                                }}
+                              >
+                                <X className="w-4 h-4" />
+                              </AdminButton>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <AdminButton
+                                variant="primary"
+                                size="sm"
+                                onClick={() => {
+                                  setIssuingRequestId(req.id);
+                                  setIssueCodeInput('');
+                                  setRequestActionError(null);
+                                }}
+                              >
+                                <Ticket className="w-4 h-4 mr-1" />
+                                Issue code
+                              </AdminButton>
+                              <AdminButton
+                                variant="ghost"
+                                size="sm"
+                                isLoading={requestActionLoading === req.id}
+                                onClick={() => handleRejectRequest(req.id)}
+                              >
+                                Reject
+                              </AdminButton>
+                            </div>
+                          )
+                        ) : req.status === 'fulfilled' && issuedCode ? (
+                          <div className="flex items-center gap-2">
+                            <code className="px-2 py-1 bg-admin-bg-tertiary rounded text-xs text-admin-accent-cyan">
+                              {issuedCode}
+                            </code>
+                            <AdminButton
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleCopyCode(req.id, issuedCode)}
+                            >
+                              {copiedRequestId === req.id ? (
+                                <CheckCircle className="w-4 h-4 text-admin-accent-emerald" />
+                              ) : (
+                                <Copy className="w-4 h-4" />
+                              )}
+                            </AdminButton>
+                          </div>
+                        ) : null}
+                      </td>
+                    </tr>
+                  );
+                })}
+                {filteredCodeRequests.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-12 text-center text-admin-text-muted">
+                      No code requests found
                     </td>
                   </tr>
                 )}
