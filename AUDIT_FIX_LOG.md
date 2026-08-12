@@ -125,3 +125,54 @@ LIVE-CONFIG STEPS (user-gated, runbook in the plan file):
 2. wrangler.toml [vars]: TELEGRAM_BOT_USERNAME, TELEGRAM_PLATFORM_CHANNEL_ID, TELEGRAM_COMMUNITY_URL → redeploy.
 3. setWebhook: curl -X POST "https://api.telegram.org/bot$TOKEN/setWebhook" -d "url=https://brilla-api.ghwmelite.workers.dev/api/telegram/webhook" -d "secret_token=$TELEGRAM_WEBHOOK_SECRET" (NOTE: the API origin, NOT brillaprep.org).
 4. E2E: Settings → Notifications → Connect Telegram → /start → +100 XP + status {linked:true}.
+
+## P0 Hotfix — Production frontend pointed at wrong API origin (2026-08-12 ~21:45 UTC)
+
+**Symptom:** Admin → Pilot Schools (and every other API-backed view) showed
+"Invalid response from server" after the 19:27 UTC deploy.
+
+**Root cause:** The production bundle was built without `VITE_API_URL` set, so
+`src/lib/api.ts` fell back to relative `/api`. Requests went to
+`brillaprep.org/api/*`, where the Pages SPA fallback (`_redirects: /*
+/index.html 200`) returned HTML with 200 — `JSON.parse` threw and the client
+rendered its generic "Invalid response from server" fallback. Every API call
+site-wide was affected; only locally-cached auth tokens kept sessions looking
+alive.
+
+**Fix:** Added `.env.production` with
+`VITE_API_URL=https://brilla-api.ghwmelite.workers.dev/api` (loaded
+automatically by `vite build`, committed so git-triggered Pages builds are
+covered too), rebuilt, and redeployed to Pages. Verified the live bundle
+(`index-BKB0I2VQ.js`) embeds the workers.dev API origin.
+
+**Verification:** `curl https://brillaprep.org/` → new bundle hash; bundle
+contains `Ds="https://brilla-api.ghwmelite.workers.dev/api"`.
+
+## Role-Based Readiness Audit (2026-08-12 ~22:50 UTC)
+
+**Layer 1 — automated suite:** 53 test files / 302 tests, all passing
+(vitest run against mocked D1: auth, IDOR, payments, quests, race,
+telegram, admin-*, registration modes, turnstile).
+
+**Layer 2 — live prod smoke (scripts/live-smoke.sh, committed):** 54/54.
+- 22 public catalog/gamification endpoints: 200 JSON.
+- 25 protected routes across all four roles: 401 JSON without token.
+- Garbage JWT rejected 401 (verification + fresh DB role check live).
+- Turnstile enforced on register AND login ("Security verification
+  required" before credential check — no tokenless probing possible).
+- Telegram webhook rejects missing secret (401); Paystack webhook
+  rejects unsigned payloads (401).
+
+**Findings:**
+- P3 latent: unmatched or trailing-slash API paths (e.g.
+  /api/exam-boards/) fall through to protectedApp and return 401 instead
+  of 404. No user impact (frontend never uses trailing slashes).
+- Not a bug: /api/auth/oauth/providers is intentionally token-checked
+  (lists the current user's linked providers).
+
+**Not covered (needs credentialed accounts):** authenticated per-role
+browser journeys (student practice/points/quests, teacher classes &
+grading, parent child-linking, admin approvals). Role gating is covered
+by the vitest suites (oauth-register-role, admin-schools, exam-boards-
+auth, notifications-auth et al.) but a live UI walkthrough per role
+requires approved test accounts.

@@ -7064,20 +7064,12 @@ adminApp.post('/users/:userId/exam-preferences', async (c) => {
 adminApp.post('/users', async (c) => {
   const body = await c.req.json();
   const { email, name, role, schoolLevel, yearGroup, schoolName, house,
-          teacherLicenseNumber, subjectsTaught, yearsExperience, qualifications, turnstileToken } = body;
+          teacherLicenseNumber, subjectsTaught, yearsExperience, qualifications } = body;
   const adminUser = c.get('user') as UserPayload;
   const appUrl = c.env.APP_URL || 'https://brilla.edu.gh';
 
-  // Verify Turnstile token
-  if (c.env.TURNSTILE_SECRET && turnstileToken) {
-    const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For');
-    const isValidTurnstile = await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET, clientIp);
-    if (!isValidTurnstile) {
-      return c.json({ success: false, error: 'Security verification failed. Please try again.' }, 400);
-    }
-  } else if (c.env.TURNSTILE_SECRET && !turnstileToken) {
-    return c.json({ success: false, error: 'Security verification required.' }, 400);
-  }
+  // No Turnstile here: this route sits behind requireAdmin, so the caller is
+  // an authenticated admin — bot verification is for public endpoints only.
 
   try {
     // Check if email already exists
