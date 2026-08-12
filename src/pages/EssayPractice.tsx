@@ -16,7 +16,7 @@ import { Card, Button, Badge } from '@/components/common';
 import { EssayEditor, EssayQuestion, EssayFeedback, ModelAnswer } from '@/components/essay';
 import { useEssayStore } from '@/stores';
 import { essayQuestions as dataEssayQuestions } from '@/data';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 import type { EssayQuestion as EssayQuestionType } from '@/types';
 
 // Transform data essay questions to match the component format
@@ -75,7 +75,7 @@ export function EssayPracticePage() {
   const fetchEssayHistory = async () => {
     setHistoryLoading(true);
     try {
-      const response = await api.get('/essays/attempts?limit=20') as Array<{
+      const res = await api.get<Array<{
         id: string;
         essay_question_id: string;
         submitted_at: string;
@@ -86,7 +86,8 @@ export function EssayPracticePage() {
           marks: number;
           subject_id: string;
         };
-      }>;
+      }>>('/essays/attempts?limit=20');
+      const response = res.success ? res.data : null;
 
       if (response && Array.isArray(response)) {
         const history: EssayAttempt[] = response.map(attempt => ({

@@ -106,10 +106,9 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   },
 
   endSession: () => {
-    const { session, score, results } = get();
+    const { session } = get();
     if (session) {
       // Session completed - could trigger API call here
-      console.log('Session ended:', { ...session, score, results, completedAt: new Date().toISOString() });
     }
     set({ session: null });
   },

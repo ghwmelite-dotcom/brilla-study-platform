@@ -612,8 +612,6 @@ export default function RevisionClassroom() {
     setSessionError('');
 
     try {
-      console.log('Starting revision session...', { userId: user.id, examType: currentExamType, subjectId, subjectName });
-
       await startRevisionSession(
         user.id,
         currentExamType,
@@ -626,11 +624,6 @@ export default function RevisionClassroom() {
 
       // Check the store state after the call
       const storeState = useRevisionClassroomStore.getState();
-      console.log('Store state after startRevisionSession:', {
-        currentSession: storeState.currentSession,
-        error: storeState.error,
-        isLoading: storeState.isLoading,
-      });
 
       if (storeState.error) {
         setSessionError(storeState.error);

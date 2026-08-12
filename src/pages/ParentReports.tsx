@@ -93,10 +93,6 @@ export function ParentReportsPage() {
         onBack={() => navigate('/parent/reports')}
         onMarkAsRead={() => markReportAsRead(currentReport.id)}
         onSubmitFeedback={(feedback) => submitReportFeedback(currentReport.id, feedback)}
-        onDownload={() => {
-          // TODO: Implement PDF download
-          console.log('Download report:', currentReport.id);
-        }}
         onPrint={() => window.print()}
       />
     );
@@ -331,10 +327,6 @@ export function ParentReportsPage() {
                       <AlertCard
                         key={alert.id}
                         alert={alert}
-                        onViewDetails={() => {
-                          // TODO: Show alert detail modal
-                          console.log('View alert:', alert.id);
-                        }}
                       />
                     ))}
                   </div>

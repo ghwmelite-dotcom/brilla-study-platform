@@ -89,7 +89,7 @@ Also on board: an **e-library** with multimedia content (R2-backed), an **intera
   <img src="docs/assets/architecture.svg" alt="Brilla system architecture" width="100%">
 </p>
 
-The frontend is a React 18 SPA (73 route pages, 49 Zustand stores) built with Vite and deployed to Cloudflare Pages. The backend is a single Cloudflare Worker running a Hono router with 28 route modules (`workers/api/index.ts`), backed by Cloudflare D1 (SQLite, 109 migrations), two R2 buckets (e-library media, whiteboard recordings), and Workers AI (Llama 3.3 70B) for all AI features. A cron trigger runs every six hours to clean up expired demo data. Email goes through Resend, sign-in supports Google OAuth, and payments run through Paystack.
+The frontend is a React 18 SPA (73 route pages, 49 Zustand stores) built with Vite and deployed to Cloudflare Pages. The backend is a single Cloudflare Worker running a Hono router with 28 route modules (`workers/api/index.ts`), backed by Cloudflare D1 (SQLite — canonical schema plus a 3-migration post-squash chain; the original 001-087 chain is archived), two R2 buckets (e-library media, whiteboard recordings), and Workers AI (Llama 3.3 70B) for all AI features. A cron trigger runs every six hours to clean up expired demo data. Email goes through Resend, sign-in supports Google OAuth, and payments run through Paystack.
 
 ## Tech Stack
 
@@ -131,14 +131,40 @@ npm run dev:all    # Both, via concurrently
 
 ### Database
 
-D1 migrations live in `database/migrations/` and are wired in `wrangler.toml`:
+The migration chain 001-087 was squashed on 2026-08-11 into a canonical
+`database/schema.sql` + `database/seed.sql`. The old files are preserved
+untouched in `database/migrations/archive/` (outside `migrations_dir`, so
+wrangler ignores them); `database/migrations/` now holds only the post-squash
+chain (`088`, `088a`, `089`).
+
+Fresh environment — single bootstrap path:
 
 ```bash
 wrangler d1 create brilla-db
-for file in database/migrations/*.sql; do
-  wrangler d1 execute brilla-db --local --file="$file"
-done
+npm run db:migrate    # schema.sql — FRESH databases only, not idempotent
+npm run db:seed       # seed.sql — idempotent, safe to re-run
+wrangler d1 execute brilla-db --local --file=database/seeds/seed_chat_rooms.sql
+npm run db:baseline   # wrangler d1 migrations apply → records 088, 088a, 089
+npm run db:verify     # gate — must be green
 ```
+
+`npm run db:verify` is the database gate (node:sqlite, zero deps): it applies
+schema + seed with `foreign_keys=ON` and checks MCQ answer format, letter-answer
+ranges, first-letter collisions, FK resolution, and duplicate subjects. Run it
+before committing anything under `database/`. No CI workflow exists yet
+(`.github/workflows` is absent) — when one is added, `db:verify` belongs in it.
+
+Windows notes:
+
+- `npm run db:backup` embeds `$(date ...)` — works in Git Bash / POSIX shells
+  only; it will not expand in cmd.exe or PowerShell.
+- `wrangler d1 execute --local --file=database/seed.sql` can crash workerd on
+  Windows (miniflare `kj HashIndex` internal error on the 4,545-row file). The
+  SQL is fine — `db:verify` proves it. Workaround: load the seed locally via
+  better-sqlite3 / `node:sqlite`, or run wrangler per-statement.
+
+Existing/production databases do NOT use the bootstrap above; follow the
+runbook in `docs/superpowers/plans/2026-08-03-fix-05-database-reckoning.md`.
 
 ### Worker secrets
 
@@ -174,7 +200,9 @@ brilla-study-platform/
 │   ├── index.ts           #   router, auth, cron handler (~10k lines)
 │   ├── revision-classroom.ts
 │   └── ...                # tutor, teambattles, payments, whiteboards, ...
-├── database/migrations/   # 109 D1 (SQLite) migrations
+├── database/            # canonical schema.sql + seed.sql; migrations/ holds
+│   │                    #   the post-squash chain (088, 088a, 089);
+│   │                    #   migrations/archive/ preserves 001-087 untouched
 ├── public/                # PWA manifest, service worker, icons, offline page
 ├── scripts/               # PWA icon/asset generators
 └── docs/                  # platform docs, user manual, README assets

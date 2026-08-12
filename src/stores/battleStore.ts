@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 import type { Battle, Question, Difficulty } from '@/types';
 import { api } from '@/lib/api';
+import { createPoller, type Poller } from '@/utils/polling';
+
+let poller: Poller | null = null;
+let polledBattleId: string | null = null;
 
 interface BattleState {
   currentBattle: Battle | null;
@@ -254,19 +258,20 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
   },
 
   startPolling: (battleId) => {
-    const interval = setInterval(async () => {
-      await get().fetchBattle(battleId);
-    }, 2000);
-
-    set({ pollingInterval: interval });
+    polledBattleId = battleId;
+    if (!poller) {
+      poller = createPoller(async () => {
+        if (polledBattleId) {
+          await get().fetchBattle(polledBattleId);
+        }
+      }, 2000);
+    }
+    poller.start(); // idempotent
   },
 
   stopPolling: () => {
-    const { pollingInterval } = get();
-    if (pollingInterval) {
-      clearInterval(pollingInterval);
-      set({ pollingInterval: null });
-    }
+    poller?.stop();
+    polledBattleId = null;
   },
 
   nextQuestion: () => {

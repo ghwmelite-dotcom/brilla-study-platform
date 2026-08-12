@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { requireAuth } from './auth-middleware';
 
 interface Env {
   DB: D1Database;
@@ -12,6 +13,9 @@ interface UserPayload {
 }
 
 const cosmeticsApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
+
+// All cosmetics routes require a verified JWT (sets user on context).
+cosmeticsApp.use('*', requireAuth);
 
 const generateId = () => `cos_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
@@ -48,7 +52,7 @@ cosmeticsApp.get('/available', async (c) => {
 
     // Get user's level and achievements for unlock checking
     const userData = await c.env.DB.prepare(
-      'SELECT level, xp FROM users WHERE id = ?'
+      'SELECT level, xp_points FROM users WHERE id = ?'
     ).bind(user.userId).first();
 
     return c.json({
@@ -333,16 +337,16 @@ cosmeticsApp.post('/:cosmeticId/purchase', async (c) => {
 
     // Check XP
     const userData = await c.env.DB.prepare(
-      'SELECT xp FROM users WHERE id = ?'
+      'SELECT xp_points FROM users WHERE id = ?'
     ).bind(user.userId).first();
 
-    if ((userData?.xp as number) < (cosmetic.xp_cost as number)) {
+    if ((userData?.xp_points as number) < (cosmetic.xp_cost as number)) {
       return c.json({ success: false, error: 'Not enough XP' }, 400);
     }
 
     // Deduct XP and grant cosmetic
     await c.env.DB.prepare(
-      'UPDATE users SET xp = xp - ? WHERE id = ?'
+      'UPDATE users SET xp_points = xp_points - ? WHERE id = ?'
     ).bind(cosmetic.xp_cost, user.userId).run();
 
     await c.env.DB.prepare(`
@@ -412,10 +416,10 @@ cosmeticsApp.post('/:cosmeticId/unlock', async (c) => {
       }
     } else if (cosmetic.unlock_method === 'streak' && unlockReq?.streak) {
       const userData = await c.env.DB.prepare(
-        'SELECT streak FROM users WHERE id = ?'
+        'SELECT streak_days FROM users WHERE id = ?'
       ).bind(user.userId).first();
 
-      if ((userData?.streak || 0) < unlockReq.streak) {
+      if ((userData?.streak_days || 0) < unlockReq.streak) {
         return c.json({ success: false, error: `Requires ${unlockReq.streak} day streak` }, 400);
       }
     } else if (cosmetic.unlock_method !== 'default') {

@@ -19,7 +19,7 @@ import {
 import { Card, Button, Badge, Input } from '@/components/common';
 import { Scoreboard, RoundDisplay, RoundSelector, RoundProgress } from '@/components/competition';
 import { cn } from '@/utils';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 import { useExamStore } from '@/stores/examStore';
 import { getExamConfig } from '@/config';
 
@@ -124,7 +124,7 @@ export function CompetitionPage() {
     const fetchCompetitionHistory = async () => {
       setHistoryLoading(true);
       try {
-        const data = await api.get('/battles/history?limit=10') as Array<{
+        const res = await api.get<Array<{
           id: string;
           status: string;
           winner_id: string | null;
@@ -132,7 +132,8 @@ export function CompetitionPage() {
           opponent_score: number;
           created_at: string;
           opponent?: { name: string };
-        }>;
+        }>>('/battles/history?limit=10');
+        const data = res.success ? res.data : null;
 
         if (data && Array.isArray(data)) {
           const history: CompetitionHistoryItem[] = data

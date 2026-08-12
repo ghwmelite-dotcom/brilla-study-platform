@@ -219,8 +219,8 @@ export function EssayFeedback({ feedback, totalMarks = 100, className }: EssayFe
               <h3 className="font-semibold text-slate-900">Strengths</h3>
             </div>
             <ul className="space-y-2">
-              {feedback.strengths.map((strength, index) => (
-                <li key={index} className="flex items-start gap-2 text-slate-700">
+              {feedback.strengths.map((strength) => (
+                <li key={strength} className="flex items-start gap-2 text-slate-700">
                   <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
                   <span className="text-sm">{strength}</span>
                 </li>
@@ -237,8 +237,8 @@ export function EssayFeedback({ feedback, totalMarks = 100, className }: EssayFe
               <h3 className="font-semibold text-slate-900">Areas for Improvement</h3>
             </div>
             <ul className="space-y-2">
-              {feedback.areasForImprovement.map((improvement: string, index: number) => (
-                <li key={index} className="flex items-start gap-2 text-slate-700">
+              {feedback.areasForImprovement.map((improvement: string) => (
+                <li key={improvement} className="flex items-start gap-2 text-slate-700">
                   <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                   <span className="text-sm">{improvement}</span>
                 </li>
@@ -259,8 +259,8 @@ export function EssayFeedback({ feedback, totalMarks = 100, className }: EssayFe
             </Badge>
           </div>
           <div className="space-y-3">
-            {feedback.grammarErrors.slice(0, 5).map((error, index) => (
-              <div key={index} className="p-3 bg-red-50 rounded-lg border border-red-100">
+            {feedback.grammarErrors.slice(0, 5).map((error) => (
+              <div key={`${error.position.start}-${error.text}`} className="p-3 bg-red-50 rounded-lg border border-red-100">
                 <div className="flex items-start gap-3">
                   <XCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                   <div>

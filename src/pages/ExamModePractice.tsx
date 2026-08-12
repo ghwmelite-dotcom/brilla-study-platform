@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { ExamLayout, ExamQuestionCard } from '@/components/exam';
 import { DailyUsageIndicator, LimitReachedModal } from '@/components/subscription';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 import { useExamStore, useThemeStore, useUsageStore } from '@/stores';
 import { cn } from '@/utils';
 import type { Question } from '@/types';
@@ -122,9 +122,8 @@ export default function ExamModePractice() {
           url += `&difficulty=${difficulty}`;
         }
 
-        console.log('Fetching questions from:', url);
-        const data = await api.get(url) as ApiQuestion[];
-        console.log('API response:', data);
+        const res = await api.get<ApiQuestion[]>(url);
+        const data = res.success ? res.data : null;
 
         if (data && Array.isArray(data) && data.length > 0) {
           setQuestions(data.map(transformQuestion));
@@ -162,26 +161,21 @@ export default function ExamModePractice() {
     try {
       // Submit answer to API (tracks usage for freemium)
       // Note: userId is taken from JWT on the server side
-      const response = await api.post(`/questions/${currentQuestion.id}/attempt`, {
-        answer,
-      }) as {
-        success: boolean;
-        data?: {
-          isCorrect: boolean;
-          correctAnswer: string;
-          explanation: string;
-          pointsEarned: number;
-          usage?: {
-            used: number;
-            limit: number;
-            remaining: number;
-            isUnlimited: boolean;
-            showUpgradePrompt: boolean;
-          };
+      const response = await api.post<{
+        isCorrect: boolean;
+        correctAnswer: string;
+        explanation: string;
+        pointsEarned: number;
+        usage?: {
+          used: number;
+          limit: number;
+          remaining: number;
+          isUnlimited: boolean;
+          showUpgradePrompt: boolean;
         };
-        code?: string;
-        error?: string;
-      };
+      }>(`/questions/${currentQuestion.id}/attempt`, {
+        answer,
+      });
 
       if (!response.success && response.code === 'LIMIT_REACHED') {
         // Daily limit reached

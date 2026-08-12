@@ -1,4 +1,6 @@
 import { Hono } from 'hono';
+import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 interface Env {
   DB: D1Database;
@@ -13,6 +15,9 @@ interface UserPayload {
 
 const activityFeedApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
 
+// All activity feed routes require a verified JWT (sets user on context).
+activityFeedApp.use('*', requireAuth);
+
 const generateId = () => `act_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
 // =============================================
@@ -23,7 +28,7 @@ const generateId = () => `act_${Date.now()}_${Math.random().toString(36).substri
 activityFeedApp.get('/', async (c) => {
   try {
     const user = c.get('user');
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
     const offset = parseInt(c.req.query('offset') || '0');
     const type = c.req.query('type'); // Optional filter by activity type
 
@@ -84,7 +89,7 @@ activityFeedApp.get('/', async (c) => {
 activityFeedApp.get('/friends', async (c) => {
   try {
     const user = c.get('user');
-    const limit = parseInt(c.req.query('limit') || '10');
+    const limit = parseLimit(c, 10);
 
     const activities = await c.env.DB.prepare(`
       SELECT
@@ -131,7 +136,7 @@ activityFeedApp.get('/user/:userId', async (c) => {
   try {
     const currentUser = c.get('user');
     const targetUserId = c.req.param('userId');
-    const limit = parseInt(c.req.query('limit') || '10');
+    const limit = parseLimit(c, 10);
 
     // Check if target user is a friend or self
     const isSelf = currentUser.userId === targetUserId;

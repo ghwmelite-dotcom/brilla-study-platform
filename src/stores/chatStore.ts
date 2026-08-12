@@ -7,7 +7,10 @@ import type {
   CreateRoomData,
   ChatRoomType,
 } from '@/types';
-import { getApiUrl, getAuthHeaders } from '../utils/api';
+import { getApiUrl, getAuthHeaders } from '@/lib/api';
+import { createPoller, type Poller } from '@/utils/polling';
+
+let poller: Poller | null = null;
 
 interface ChatState {
   // Connection state
@@ -271,7 +274,6 @@ export const useChatStore = create<ChatState>()(
           const response = await fetch(getApiUrl('/api/chat/rooms'), {
             headers: {
               ...getAuthHeaders(),
-              'x-user-id': user.id,
             },
           });
 
@@ -320,7 +322,6 @@ export const useChatStore = create<ChatState>()(
           const response = await fetch(getApiUrl(`/api/chat/rooms/${roomId}/messages`), {
             headers: {
               ...getAuthHeaders(),
-              'x-user-id': user.id,
             },
           });
 
@@ -371,7 +372,6 @@ export const useChatStore = create<ChatState>()(
               headers: {
                 'Content-Type': 'application/json',
                 ...getAuthHeaders(),
-                'x-user-id': user.id,
               },
               body: JSON.stringify(data),
             });
@@ -434,7 +434,6 @@ export const useChatStore = create<ChatState>()(
               method: 'POST',
               headers: {
                 ...getAuthHeaders(),
-                'x-user-id': user.id,
               },
             });
 
@@ -466,7 +465,6 @@ export const useChatStore = create<ChatState>()(
               method: 'POST',
               headers: {
                 ...getAuthHeaders(),
-                'x-user-id': user.id,
               },
             });
           }
@@ -500,7 +498,6 @@ export const useChatStore = create<ChatState>()(
               headers: {
                 'Content-Type': 'application/json',
                 ...getAuthHeaders(),
-                'x-user-id': currentUser.id,
               },
               body: JSON.stringify({ targetUserId: userId }),
             });
@@ -621,7 +618,6 @@ export const useChatStore = create<ChatState>()(
               headers: {
                 'Content-Type': 'application/json',
                 ...getAuthHeaders(),
-                'x-user-id': user.id,
               },
               body: JSON.stringify({
                 content: content.trim(),
@@ -685,7 +681,6 @@ export const useChatStore = create<ChatState>()(
               headers: {
                 'Content-Type': 'application/json',
                 ...getAuthHeaders(),
-                'x-user-id': user.id,
               },
               body: JSON.stringify({ content: newContent }),
             });
@@ -719,7 +714,6 @@ export const useChatStore = create<ChatState>()(
               method: 'DELETE',
               headers: {
                 ...getAuthHeaders(),
-                'x-user-id': user.id,
               },
             });
           }
@@ -811,7 +805,6 @@ export const useChatStore = create<ChatState>()(
             method: 'POST',
             headers: {
               ...getAuthHeaders(),
-              'x-user-id': user.id,
             },
           });
         } catch {
@@ -821,22 +814,14 @@ export const useChatStore = create<ChatState>()(
 
       // Polling functions
       startPolling: () => {
-        const { pollingInterval } = get();
-        if (pollingInterval) return; // Already polling
-
-        const interval = setInterval(() => {
-          get().pollForUpdates();
-        }, 3000); // Poll every 3 seconds
-
-        set({ pollingInterval: interval });
+        if (!poller) {
+          poller = createPoller(() => get().pollForUpdates(), 3000); // Poll every 3 seconds
+        }
+        poller.start(); // idempotent — dedupes the double-start the old guard prevented
       },
 
       stopPolling: () => {
-        const { pollingInterval } = get();
-        if (pollingInterval) {
-          clearInterval(pollingInterval);
-          set({ pollingInterval: null });
-        }
+        poller?.stop();
       },
 
       pollForUpdates: async () => {
@@ -853,7 +838,6 @@ export const useChatStore = create<ChatState>()(
             {
               headers: {
                 ...getAuthHeaders(),
-                'x-user-id': user.id,
               },
             }
           );

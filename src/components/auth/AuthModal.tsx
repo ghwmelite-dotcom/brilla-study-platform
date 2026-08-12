@@ -307,7 +307,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
 
     try {
       if (mode === 'login') {
-        // Use store login which handles demo accounts and pending user checks
+        // Store login authenticates against the API (surfaces account status errors)
         await login(email, password, turnstile.token);
         onClose();
       } else {
@@ -1160,7 +1160,8 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                 )}
               </button>
 
-              {mode === 'login' && (
+              {/* Demo login section — dev builds only, tree-shaken from production */}
+              {mode === 'login' && import.meta.env.DEV && (
                 <>
                   <div className="relative my-4">
                     <div className="absolute inset-0 flex items-center">

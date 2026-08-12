@@ -1,20 +1,20 @@
 import { Hono } from 'hono';
-import { verify } from 'hono/jwt';
+import { requireAuth } from './auth-middleware';
+import type { AuthPayload } from './auth-middleware';
 import { DAILY_QUESTION_LIMIT, CORE_SUBJECTS } from './usage-limits';
 
 // Types for Cloudflare bindings
 interface Env {
   DB: D1Database;
   JWT_SECRET: string;
-  APP_URL: string;
 }
 
-// Demo user mappings (must match actual database IDs)
-const demoUsers: Record<string, { id: string; role: string }> = {
-  'student': { id: 'student_1766327981521', role: 'student' },
-  'teacher': { id: 'teacher_1766327981453', role: 'teacher' },
-  'admin': { id: 'admin_prod_001', role: 'admin' },
-};
+// Context variables set by requireAuth
+interface AuthVars {
+  userId: string;
+  userRole: string;
+  user: AuthPayload;
+}
 
 // Trial task definitions
 const TRIAL_TASKS = [
@@ -38,40 +38,18 @@ const TRIAL_TASKS = [
 // SUBSCRIPTIONS API
 // =============================================
 
-export const subscriptionsApp = new Hono<{ Bindings: Env }>();
+export const subscriptionsApp = new Hono<{ Bindings: Env; Variables: AuthVars }>();
 
-// Authentication middleware
+// Authentication middleware (shared requireAuth from ./auth-middleware).
+// GET /plans stays public: the pricing page fetches it pre-login and the
+// handler already tolerates a missing userId (defaults to the student view).
+// Every other route requires a verified JWT + active DB user.
 subscriptionsApp.use('*', async (c, next) => {
-  const authHeader = c.req.header('Authorization');
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'No authorization header' }, 401);
-  }
-
-  const token = authHeader.replace('Bearer ', '');
-
-  // Handle demo tokens
-  if (token.endsWith('_demo_token')) {
-    const tokenPrefix = token.replace('_demo_token', '');
-    const demoUser = demoUsers[tokenPrefix];
-
-    if (demoUser) {
-      c.set('userId', demoUser.id);
-      c.set('userRole', demoUser.role);
-      return next();
-    }
-  }
-
-  // Verify JWT token
-  try {
-    const payload = await verify(token, c.env.JWT_SECRET);
-    c.set('userId', payload.userId as string);
-    c.set('userRole', payload.role as string);
+  const url = new URL(c.req.url);
+  if (url.pathname.endsWith('/plans')) {
     return next();
-  } catch (error) {
-    console.error('Token verification error:', error);
-    return c.json({ success: false, error: 'Invalid token' }, 401);
   }
+  return requireAuth(c, next);
 });
 
 // Get subscription plans
@@ -473,23 +451,31 @@ subscriptionsApp.post('/trial/bonus-week', async (c) => {
 // Check and update expired trials (can be called by cron)
 subscriptionsApp.post('/trial/check-expiry', async (c) => {
   try {
-    // Find and expire trials
+    // Find and expire trials (ISO lexicographic comparison against a bound
+    // JS ISO parameter — never datetime('now') against ISO columns).
+    // LIMIT 400 keeps the batch under D1's 1000-statement cap: 400 trials ×
+    // 2 statements (expire + downgrade) = 800, leaving headroom. Remaining
+    // backlog drains on subsequent invocations.
+    const nowIso = new Date().toISOString();
     const { results: expiredTrials } = await c.env.DB.prepare(`
       SELECT id, user_id FROM user_trials
-      WHERE status = 'active' AND expires_at < datetime('now')
-    `).all();
+      WHERE status = 'active' AND expires_at < ?
+      LIMIT 400
+    `).bind(nowIso).all();
 
-    for (const trial of expiredTrials) {
-      await c.env.DB.prepare(`
-        UPDATE user_trials SET status = 'expired' WHERE id = ?
-      `).bind(trial.id).run();
-
-      // Downgrade user to free tier
-      await c.env.DB.prepare(`
-        UPDATE users
-        SET subscription_tier_id = 'tier_free'
-        WHERE id = ? AND subscription_tier_id IS NULL
-      `).bind(trial.user_id).run();
+    if (expiredTrials.length > 0) {
+      const statements = expiredTrials.flatMap((trial) => [
+        c.env.DB.prepare(`
+          UPDATE user_trials SET status = 'expired' WHERE id = ?
+        `).bind(trial.id),
+        // Downgrade user to free tier
+        c.env.DB.prepare(`
+          UPDATE users
+          SET subscription_tier_id = 'tier_free'
+          WHERE id = ? AND subscription_tier_id IS NULL
+        `).bind(trial.user_id),
+      ]);
+      await c.env.DB.batch(statements);
     }
 
     return c.json({

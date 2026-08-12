@@ -13,7 +13,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 import { cn } from '@/utils';
 
 interface AnswerResult {
@@ -43,12 +43,6 @@ interface AttemptResult {
   submitted_at: string;
 }
 
-interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
 export default function PaperResults() {
   const { attemptId } = useParams<{ attemptId: string }>();
   const navigate = useNavigate();
@@ -66,7 +60,7 @@ export default function PaperResults() {
     const fetchResults = async () => {
       try {
         setIsLoading(true);
-        const response = await api.get(`/papers/attempts/${attemptId}/results?userId=${user.id}`) as ApiResponse<{ attempt: AttemptResult; answers: AnswerResult[] }>;
+        const response = await api.get<{ attempt: AttemptResult; answers: AnswerResult[] }>(`/papers/attempts/${attemptId}/results?userId=${user.id}`);
         if (response.success && response.data) {
           setAttempt(response.data.attempt);
           setAnswers(response.data.answers || []);

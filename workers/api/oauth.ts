@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { sign } from 'hono/jwt';
+import { parseJsonBody } from './http';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -17,6 +18,11 @@ interface UserPayload {
   email: string;
   role: 'student' | 'teacher' | 'admin' | 'parent';
 }
+
+// Roles a caller may self-select during registration. Anything else
+// (e.g. 'admin') is rejected with 400 at account creation.
+// Typed as readonly string[] so .includes() accepts an arbitrary caller string.
+export const ALLOWED_SELF_SERVE_ROLES: readonly string[] = ['student', 'teacher', 'parent'];
 
 interface GoogleTokenResponse {
   access_token: string;
@@ -83,7 +89,7 @@ async function generateJWT(payload: UserPayload, secret: string): Promise<string
   return await sign(
     {
       ...payload,
-      exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 7 days
+      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
       iat: Math.floor(Date.now() / 1000),
     },
     secret
@@ -146,7 +152,9 @@ export const oauthApp = new Hono<{ Bindings: Env }>();
 // Initiates Google OAuth flow
 // =============================================
 oauthApp.post('/google/init', async (c) => {
-  const { intent, role, registrationData, turnstileToken } = await c.req.json();
+  const body = await parseJsonBody(c);
+  if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+  const { intent, role, registrationData, turnstileToken } = body;
 
   // Validate intent
   if (!['login', 'register', 'link'].includes(intent)) {
@@ -218,16 +226,18 @@ oauthApp.post('/google/init', async (c) => {
 // Handles Google OAuth callback
 // =============================================
 oauthApp.post('/google/callback', async (c) => {
-  const { code, state } = await c.req.json();
+  const body = await parseJsonBody(c);
+  if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+  const { code, state } = body;
 
   if (!code || !state) {
     return c.json({ success: false, error: 'Missing code or state' }, 400);
   }
 
-  // Validate state and retrieve stored data
+  // Validate state and retrieve stored data (ISO comparison against bound JS ISO now)
   const storedState = await c.env.DB.prepare(`
-    SELECT * FROM oauth_states WHERE state = ? AND expires_at > datetime('now')
-  `).bind(state).first();
+    SELECT * FROM oauth_states WHERE state = ? AND expires_at > ?
+  `).bind(state, new Date().toISOString()).first();
 
   if (!storedState) {
     return c.json({ success: false, error: 'Invalid or expired state. Please try again.' }, 400);
@@ -395,6 +405,9 @@ oauthApp.post('/google/callback', async (c) => {
 
     // Create new user
     const userId = `user_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
+    if (role && !ALLOWED_SELF_SERVE_ROLES.includes(role)) {
+      return c.json({ success: false, error: 'Invalid role' }, 400);
+    }
     const userRole = role || 'student';
 
     // Parse registration data
@@ -409,64 +422,75 @@ oauthApp.post('/google/callback', async (c) => {
     const selectedTierId = registrationData?.selectedTierId || 'tier_free';
     const primaryExamTypeId = registrationData?.primaryExamTypeId || null;
 
-    // Google users are auto-approved
-    const status = 'approved';
+    // Students are auto-approved (Google has verified their email);
+    // teachers/parents require admin approval, matching the pending-approval model.
+    const status = userRole === 'student' ? 'approved' : 'pending';
 
     // Generate a random password hash (user cannot know this password)
     // This satisfies the NOT NULL constraint while keeping the account OAuth-only
     const randomPasswordHash = await generateRandomPasswordHash();
 
-    await c.env.DB.prepare(`
-      INSERT INTO users (
-        id, email, name, role, status, password_hash,
-        school_level, year_group, school_name, house,
-        teacher_license_number, subjects_taught, years_experience, qualifications,
-        subscription_tier_id, primary_exam_type_id,
-        email_verified, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
-    `).bind(
-      userId,
-      googleUser.email,
-      googleUser.name,
-      userRole,
-      status,
-      randomPasswordHash,
-      schoolLevel,
-      yearGroup,
-      schoolName,
-      house,
-      teacherLicenseNumber,
-      subjectsTaught,
-      yearsExperience,
-      qualifications,
-      selectedTierId,
-      primaryExamTypeId
-    ).run();
+    // Batch the user + provider + preference writes so a mid-sequence
+    // failure cannot leave a partial account behind.
+    const statements = [
+      c.env.DB.prepare(`
+        INSERT INTO users (
+          id, email, name, role, status, password_hash,
+          school_level, year_group, school_name, house,
+          teacher_license_number, subjects_taught, years_experience, qualifications,
+          subscription_tier_id, primary_exam_type_id,
+          email_verified, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
+      `).bind(
+        userId,
+        googleUser.email,
+        googleUser.name,
+        userRole,
+        status,
+        randomPasswordHash,
+        schoolLevel,
+        yearGroup,
+        schoolName,
+        house,
+        teacherLicenseNumber,
+        subjectsTaught,
+        yearsExperience,
+        qualifications,
+        selectedTierId,
+        primaryExamTypeId
+      ),
+    ];
 
     // Link Google provider
     const oauthId = `oauth_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
-    await c.env.DB.prepare(`
-      INSERT INTO user_oauth_providers (id, user_id, provider, provider_user_id, provider_email, provider_name, provider_avatar_url)
-      VALUES (?, ?, 'google', ?, ?, ?, ?)
-    `).bind(
-      oauthId,
-      userId,
-      googleUser.sub,
-      googleUser.email,
-      googleUser.name,
-      googleUser.picture || null
-    ).run();
+    statements.push(
+      c.env.DB.prepare(`
+        INSERT INTO user_oauth_providers (id, user_id, provider, provider_user_id, provider_email, provider_name, provider_avatar_url)
+        VALUES (?, ?, 'google', ?, ?, ?, ?)
+      `).bind(
+        oauthId,
+        userId,
+        googleUser.sub,
+        googleUser.email,
+        googleUser.name,
+        googleUser.picture || null
+      )
+    );
 
     // Handle exam types if provided
     if (registrationData?.examTypeIds && Array.isArray(registrationData.examTypeIds)) {
       for (const examTypeId of registrationData.examTypeIds) {
         const prefId = `pref_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
-        await c.env.DB.prepare(`
-          INSERT OR IGNORE INTO user_exam_preferences (id, user_id, exam_type_id, is_primary)
-          VALUES (?, ?, ?, ?)
-        `).bind(prefId, userId, examTypeId, examTypeId === primaryExamTypeId ? 1 : 0).run();
+        statements.push(
+          c.env.DB.prepare(`
+            INSERT OR IGNORE INTO user_exam_preferences (id, user_id, exam_type_id, is_primary)
+            VALUES (?, ?, ?, ?)
+          `).bind(prefId, userId, examTypeId, examTypeId === primaryExamTypeId ? 1 : 0)
+        );
       }
     }
+
+    await c.env.DB.batch(statements);
 
     user = {
       id: userId,
@@ -581,7 +605,7 @@ oauthApp.post('/google/callback', async (c) => {
       token,
       isNewUser,
       accountLinked,
-      requiresApproval: false, // Google users are auto-approved
+      requiresApproval: user.status !== 'approved', // students are auto-approved; teachers/parents go pending
     }
   });
 });

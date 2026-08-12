@@ -17,7 +17,7 @@ interface QuestState {
   fetchDailyQuests: () => Promise<void>;
   fetchWeeklyQuests: () => Promise<void>;
   fetchWeeklyChallenge: () => Promise<void>;
-  claimReward: (questId: string) => Promise<{ xp: number; coins?: number } | null>;
+  claimReward: (questId: string) => Promise<{ xp: number } | null>;
   updateQuestProgress: (requirementType: string, amount: number) => void;
   refreshQuests: () => Promise<void>;
   clearError: () => void;
@@ -207,7 +207,6 @@ export const useQuestStore = create<QuestState>((set, get) => ({
     try {
       const response = await api.post<{
         xp: number;
-        coins?: number;
       }>(`/quests/${questId}/claim`);
 
       if (!response.success || !response.data) {

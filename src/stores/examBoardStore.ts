@@ -151,13 +151,9 @@ export const useExamBoardStore = create<ExamBoardState>()(
       fetchExamBoards: async () => {
         set({ isLoading: true, error: null });
         try {
-          console.log('[ExamBoardStore] Fetching exam boards from /exam-boards...');
           const response = await api.get('/exam-boards');
-          console.log('[ExamBoardStore] Response:', JSON.stringify(response, null, 2));
-          console.log('[ExamBoardStore] success:', response.success, 'data:', response.data);
           if (response.success && response.data) {
             set({ examBoards: response.data as ExamBoard[], isLoading: false });
-            console.log('[ExamBoardStore] Loaded', (response.data as ExamBoard[]).length, 'exam boards');
           } else {
             console.error('[ExamBoardStore] Error response - success:', response.success, 'error:', response.error);
             throw new Error(response.error || 'Failed to fetch exam boards');

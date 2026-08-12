@@ -52,9 +52,8 @@ export function AmbientSounds({ sound, volume }: AmbientSoundsProps) {
         gainNodeRef.current = audioContextRef.current.createGain();
         source.connect(gainNodeRef.current);
         gainNodeRef.current.connect(audioContextRef.current.destination);
-      } catch (err) {
+      } catch {
         // Fallback to direct volume control
-        console.log('Web Audio API not available, using direct volume');
       }
     }
 
@@ -78,8 +77,8 @@ export function AmbientSounds({ sound, volume }: AmbientSoundsProps) {
         }
 
         await audio.play();
-      } catch (err) {
-        console.log('Audio playback blocked by browser');
+      } catch {
+        // Audio playback blocked by browser
       }
     };
 

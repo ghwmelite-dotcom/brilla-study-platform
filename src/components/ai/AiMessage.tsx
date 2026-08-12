@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Sparkles, User, FileText, ExternalLink } from 'lucide-react';
 import type { ChatMessage } from '@/stores/aiTutorStore';
+import { formatInline } from '@/utils/html';
 
 interface AiMessageProps {
   message: ChatMessage;
@@ -85,15 +86,13 @@ export function AiMessage({ message, isNew = false, onTypingComplete }: AiMessag
     };
   }, [showCursor]);
 
-  // Simple markdown-like formatting
+  // Simple markdown-like formatting (HTML is escaped by formatInline
+  // before any formatting regex runs, so the output is safe to inject).
   const formatContent = (content: string) => {
     return content
       .split('\n')
       .map((line, i) => {
-        // Bold
-        let formatted = line.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>');
-        // Code
-        formatted = formatted.replace(/`(.*?)`/g, '<code class="bg-neutral-200/50 px-1.5 py-0.5 rounded text-sm font-mono">$1</code>');
+        const formatted = formatInline(line);
 
         // Lists
         if (line.startsWith('- ') || line.startsWith('* ')) {

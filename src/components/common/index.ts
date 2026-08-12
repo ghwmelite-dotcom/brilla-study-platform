@@ -10,3 +10,4 @@ export { LoadingScreen, PageLoader } from './LoadingScreen';
 export { ThemeToggle } from './ThemeToggle';
 export { OptimizedImage, Avatar, BackgroundImage } from './OptimizedImage';
 export { SkipLink, VisuallyHidden, FocusTrap, LiveRegion } from './SkipLink';
+export { ErrorBoundary } from './ErrorBoundary';

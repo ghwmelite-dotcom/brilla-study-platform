@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { getDemoDataFlags, isDemoUserId } from './demoUtils';
+import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -43,9 +45,12 @@ interface ChatRoom {
 // Create Hono app
 const chatApp = new Hono<{ Bindings: Env }>();
 
+// All chat routes require a verified JWT (sets userId/userRole on context).
+chatApp.use('*', requireAuth);
+
 // Helper functions
 function getUserId(c: Context): string | undefined {
-  return c.get('userId') || c.req.header('x-user-id');
+  return c.get('userId');
 }
 
 function generateId(prefix: string): string {
@@ -65,78 +70,82 @@ chatApp.get('/rooms', async (c) => {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
 
-    // Get all rooms user is a member of
+    // Single query: last-message and DM other-user details come from
+    // correlated subqueries (same pattern as member_count/unread_count), so
+    // the route issues exactly 1 query instead of 1 + 2 per room.
+    //
+    // Bind order (positional, by appearance in the SQL):
+    //   1. unread_count sender_id != ?        -> userId
+    //   2. dm_other_id     m.user_id != ?     -> userId
+    //   3. dm_other_name   m.user_id != ?     -> userId
+    //   4. dm_other_avatar m.user_id != ?     -> userId
+    //   5. join            crm.user_id = ?    -> userId
     const rooms = await c.env.DB.prepare(`
       SELECT
         cr.id, cr.name, cr.description, cr.type, cr.subject_id, cr.avatar_url,
         cr.is_archived, cr.max_members, cr.created_by, cr.created_at, cr.updated_at,
         crm.role as my_role, crm.last_read_at,
         (SELECT COUNT(*) FROM chat_room_members WHERE room_id = cr.id) as member_count,
-        (SELECT COUNT(*) FROM chat_messages WHERE room_id = cr.id AND created_at > crm.last_read_at AND sender_id != ?) as unread_count
+        (SELECT COUNT(*) FROM chat_messages WHERE room_id = cr.id AND created_at > crm.last_read_at AND sender_id != ?) as unread_count,
+        (SELECT cm.content FROM chat_messages cm
+          WHERE cm.room_id = cr.id AND cm.is_deleted = 0
+          ORDER BY cm.created_at DESC LIMIT 1) as last_message_content,
+        (SELECT cm.created_at FROM chat_messages cm
+          WHERE cm.room_id = cr.id AND cm.is_deleted = 0
+          ORDER BY cm.created_at DESC LIMIT 1) as last_message_at,
+        (SELECT u.name FROM chat_messages cm JOIN users u ON u.id = cm.sender_id
+          WHERE cm.room_id = cr.id AND cm.is_deleted = 0
+          ORDER BY cm.created_at DESC LIMIT 1) as last_message_sender_name,
+        (SELECT u.id FROM chat_room_members m JOIN users u ON u.id = m.user_id
+          WHERE m.room_id = cr.id AND m.user_id != ? AND cr.type = 'dm' LIMIT 1) as dm_other_id,
+        (SELECT u.name FROM chat_room_members m JOIN users u ON u.id = m.user_id
+          WHERE m.room_id = cr.id AND m.user_id != ? AND cr.type = 'dm' LIMIT 1) as dm_other_name,
+        (SELECT u.avatar_url FROM chat_room_members m JOIN users u ON u.id = m.user_id
+          WHERE m.room_id = cr.id AND m.user_id != ? AND cr.type = 'dm' LIMIT 1) as dm_other_avatar
       FROM chat_rooms cr
       INNER JOIN chat_room_members crm ON cr.id = crm.room_id AND crm.user_id = ?
       WHERE cr.is_archived = 0
       ORDER BY cr.updated_at DESC
       LIMIT 100
-    `).bind(userId, userId).all();
+    `).bind(userId, userId, userId, userId, userId).all();
 
-    // For each room, get last message and other user (for DMs)
-    const roomsWithDetails = await Promise.all(
-      rooms.results.map(async (room: Record<string, unknown>) => {
-        // Get last message
-        const lastMessage = await c.env.DB.prepare(`
-          SELECT cm.content, cm.created_at, u.name as sender_name
-          FROM chat_messages cm
-          LEFT JOIN users u ON cm.sender_id = u.id
-          WHERE cm.room_id = ? AND cm.is_deleted = 0
-          ORDER BY cm.created_at DESC
-          LIMIT 1
-        `).bind(room.id).first();
+    // Reshape flat rows into the existing response shape (client contract unchanged).
+    const roomsWithDetails = rooms.results.map((room: Record<string, unknown>) => {
+      const hasLastMessage = room.last_message_at != null;
+      const otherUser =
+        room.type === 'dm' && room.dm_other_id != null
+          ? {
+              id: room.dm_other_id,
+              name: room.dm_other_name,
+              avatarUrl: room.dm_other_avatar,
+            }
+          : null;
 
-        // For DMs, get the other user
-        let otherUser = null;
-        if (room.type === 'dm') {
-          const other = await c.env.DB.prepare(`
-            SELECT u.id, u.name, u.avatar_url
-            FROM chat_room_members crm
-            JOIN users u ON crm.user_id = u.id
-            WHERE crm.room_id = ? AND crm.user_id != ?
-            LIMIT 1
-          `).bind(room.id, userId).first();
-
-          if (other) {
-            otherUser = {
-              id: other.id,
-              name: other.name,
-              avatarUrl: other.avatar_url,
-            };
-          }
-        }
-
-        return {
-          id: room.id,
-          name: room.name,
-          description: room.description,
-          type: room.type,
-          subjectId: room.subject_id,
-          avatarUrl: room.avatar_url,
-          isArchived: !!room.is_archived,
-          maxMembers: room.max_members,
-          createdBy: room.created_by,
-          createdAt: room.created_at,
-          updatedAt: room.updated_at,
-          myRole: room.my_role,
-          memberCount: room.member_count,
-          unreadCount: room.unread_count || 0,
-          lastMessage: lastMessage ? {
-            content: lastMessage.content,
-            senderName: lastMessage.sender_name,
-            createdAt: lastMessage.created_at,
-          } : null,
-          otherUser,
-        };
-      })
-    );
+      return {
+        id: room.id,
+        name: room.name,
+        description: room.description,
+        type: room.type,
+        subjectId: room.subject_id,
+        avatarUrl: room.avatar_url,
+        isArchived: !!room.is_archived,
+        maxMembers: room.max_members,
+        createdBy: room.created_by,
+        createdAt: room.created_at,
+        updatedAt: room.updated_at,
+        myRole: room.my_role,
+        memberCount: room.member_count,
+        unreadCount: room.unread_count || 0,
+        lastMessage: hasLastMessage
+          ? {
+              content: room.last_message_content,
+              senderName: room.last_message_sender_name,
+              createdAt: room.last_message_at,
+            }
+          : null,
+        otherUser,
+      };
+    });
 
     return c.json({ success: true, data: roomsWithDetails });
   } catch (error) {
@@ -617,59 +626,60 @@ chatApp.get('/dm', async (c) => {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
 
+    // Single query: other-user, last-message and unread-count come from
+    // correlated subqueries (same pattern as GET /rooms), so the route
+    // issues exactly 1 query instead of 1 + 3 per DM.
+    //
+    // Bind order (positional, by appearance in the SQL):
+    //   1. unread_count    sender_id != ?   -> userId
+    //   2. other_user_id   m.user_id != ?   -> userId
+    //   3. other_user_name m.user_id != ?   -> userId
+    //   4. other_avatar    m.user_id != ?   -> userId
+    //   5. join            crm.user_id = ?  -> userId
     const dms = await c.env.DB.prepare(`
       SELECT
         cr.id, cr.created_at, cr.updated_at,
-        crm.last_read_at
+        crm.last_read_at,
+        (SELECT u.id FROM chat_room_members m JOIN users u ON u.id = m.user_id
+          WHERE m.room_id = cr.id AND m.user_id != ? LIMIT 1) as other_user_id,
+        (SELECT u.name FROM chat_room_members m JOIN users u ON u.id = m.user_id
+          WHERE m.room_id = cr.id AND m.user_id != ? LIMIT 1) as other_user_name,
+        (SELECT u.avatar_url FROM chat_room_members m JOIN users u ON u.id = m.user_id
+          WHERE m.room_id = cr.id AND m.user_id != ? LIMIT 1) as other_user_avatar,
+        (SELECT cm.content FROM chat_messages cm
+          WHERE cm.room_id = cr.id AND cm.is_deleted = 0
+          ORDER BY cm.created_at DESC LIMIT 1) as last_message_content,
+        (SELECT cm.sender_id FROM chat_messages cm
+          WHERE cm.room_id = cr.id AND cm.is_deleted = 0
+          ORDER BY cm.created_at DESC LIMIT 1) as last_message_sender_id,
+        (SELECT cm.created_at FROM chat_messages cm
+          WHERE cm.room_id = cr.id AND cm.is_deleted = 0
+          ORDER BY cm.created_at DESC LIMIT 1) as last_message_at,
+        (SELECT COUNT(*) FROM chat_messages
+          WHERE room_id = cr.id AND created_at > crm.last_read_at AND sender_id != ?) as unread_count
       FROM chat_rooms cr
       INNER JOIN chat_room_members crm ON cr.id = crm.room_id AND crm.user_id = ?
       WHERE cr.type = 'dm' AND cr.is_archived = 0
       ORDER BY cr.updated_at DESC
       LIMIT 50
-    `).bind(userId).all();
+    `).bind(userId, userId, userId, userId, userId).all();
 
-    // Get other user and last message for each DM
-    const dmsWithDetails = await Promise.all(
-      dms.results.map(async (dm: Record<string, unknown>) => {
-        const otherUser = await c.env.DB.prepare(`
-          SELECT u.id, u.name, u.avatar_url
-          FROM chat_room_members crm
-          JOIN users u ON crm.user_id = u.id
-          WHERE crm.room_id = ? AND crm.user_id != ?
-          LIMIT 1
-        `).bind(dm.id, userId).first();
-
-        const lastMessage = await c.env.DB.prepare(`
-          SELECT content, sender_id, created_at
-          FROM chat_messages
-          WHERE room_id = ? AND is_deleted = 0
-          ORDER BY created_at DESC
-          LIMIT 1
-        `).bind(dm.id).first();
-
-        const unreadCount = await c.env.DB.prepare(`
-          SELECT COUNT(*) as count
-          FROM chat_messages
-          WHERE room_id = ? AND created_at > ? AND sender_id != ?
-        `).bind(dm.id, dm.last_read_at, userId).first();
-
-        return {
-          roomId: dm.id,
-          otherUser: otherUser ? {
-            id: otherUser.id,
-            name: otherUser.name,
-            avatarUrl: otherUser.avatar_url,
-          } : null,
-          lastMessage: lastMessage ? {
-            content: lastMessage.content,
-            isFromMe: lastMessage.sender_id === userId,
-            createdAt: lastMessage.created_at,
-          } : null,
-          unreadCount: unreadCount?.count || 0,
-          updatedAt: dm.updated_at,
-        };
-      })
-    );
+    // Reshape flat rows into the existing response shape (client contract unchanged).
+    const dmsWithDetails = dms.results.map((dm: Record<string, unknown>) => ({
+      roomId: dm.id,
+      otherUser: dm.other_user_id != null ? {
+        id: dm.other_user_id,
+        name: dm.other_user_name,
+        avatarUrl: dm.other_user_avatar,
+      } : null,
+      lastMessage: dm.last_message_at != null ? {
+        content: dm.last_message_content,
+        isFromMe: dm.last_message_sender_id === userId,
+        createdAt: dm.last_message_at,
+      } : null,
+      unreadCount: dm.unread_count || 0,
+      updatedAt: dm.updated_at,
+    }));
 
     return c.json({ success: true, data: dmsWithDetails });
   } catch (error) {
@@ -701,7 +711,7 @@ chatApp.get('/rooms/:id/messages', async (c) => {
       return c.json({ success: false, error: 'Not a member of this room' }, 403);
     }
 
-    const limit = parseInt(c.req.query('limit') || '50');
+    const limit = parseLimit(c, 50);
     const before = c.req.query('before'); // For pagination
 
     let query = `
@@ -727,26 +737,61 @@ chatApp.get('/rooms/:id/messages', async (c) => {
 
     const messages = await c.env.DB.prepare(query).bind(...params).all();
 
+    const messageRows = messages.results as Record<string, unknown>[];
+    const messageIds = messageRows.map((m) => m.id as string);
+    const replyToIds = [
+      ...new Set(
+        messageRows
+          .map((m) => m.reply_to_id as string | null)
+          .filter((id): id is string => id != null)
+      ),
+    ];
+
+    // Two batched lookups replace the per-message reaction/reply queries:
+    // one grouped reactions query over all message ids, one reply lookup
+    // over all distinct reply_to ids. Stitched back in JS below.
+    const reactionsByMessage = new Map<string, Record<string, unknown>[]>();
+    const repliesById = new Map<string, Record<string, unknown>>();
+
+    if (messageIds.length > 0) {
+      const msgPlaceholders = messageIds.map(() => '?').join(',');
+      const reactions = await c.env.DB.prepare(`
+        SELECT message_id, emoji, COUNT(*) as count,
+          GROUP_CONCAT(user_id) as user_ids
+        FROM chat_message_reactions
+        WHERE message_id IN (${msgPlaceholders})
+        GROUP BY message_id, emoji
+      `).bind(...messageIds).all();
+
+      for (const r of reactions.results as Record<string, unknown>[]) {
+        const list = reactionsByMessage.get(r.message_id as string) || [];
+        list.push(r);
+        reactionsByMessage.set(r.message_id as string, list);
+      }
+    }
+
+    if (replyToIds.length > 0) {
+      const replyPlaceholders = replyToIds.map(() => '?').join(',');
+      const replies = await c.env.DB.prepare(`
+        SELECT cm.id, cm.content, u.name as sender_name
+        FROM chat_messages cm
+        LEFT JOIN users u ON cm.sender_id = u.id
+        WHERE cm.id IN (${replyPlaceholders})
+      `).bind(...replyToIds).all();
+
+      for (const r of replies.results as Record<string, unknown>[]) {
+        repliesById.set(r.id as string, r);
+      }
+    }
+
     // Get reactions for messages
-    const messagesWithReactions = await Promise.all(
-      messages.results.map(async (msg: Record<string, unknown>) => {
-        const reactions = await c.env.DB.prepare(`
-          SELECT emoji, COUNT(*) as count,
-            GROUP_CONCAT(user_id) as user_ids
-          FROM chat_message_reactions
-          WHERE message_id = ?
-          GROUP BY emoji
-        `).bind(msg.id).all();
+    const messagesWithReactions = messageRows.map((msg: Record<string, unknown>) => {
+        const reactions = reactionsByMessage.get(msg.id as string) || [];
 
         // Get reply-to message if exists
         let replyTo = null;
         if (msg.reply_to_id) {
-          const reply = await c.env.DB.prepare(`
-            SELECT cm.id, cm.content, u.name as sender_name
-            FROM chat_messages cm
-            LEFT JOIN users u ON cm.sender_id = u.id
-            WHERE cm.id = ?
-          `).bind(msg.reply_to_id).first();
+          const reply = repliesById.get(msg.reply_to_id as string);
 
           if (reply) {
             replyTo = {
@@ -776,15 +821,14 @@ chatApp.get('/rooms/:id/messages', async (c) => {
             avatarUrl: msg.sender_avatar,
           },
           replyTo,
-          reactions: reactions.results.map((r: Record<string, unknown>) => ({
+          reactions: reactions.map((r: Record<string, unknown>) => ({
             emoji: r.emoji,
             count: r.count,
             userIds: (r.user_ids as string)?.split(',') || [],
             hasReacted: (r.user_ids as string)?.includes(userId),
           })),
         };
-      })
-    );
+      });
 
     // Update last read timestamp
     await c.env.DB.prepare(`
@@ -1073,25 +1117,40 @@ chatApp.get('/users/search', async (c) => {
       LIMIT 20
     `).bind(userId, `%${query}%`, userId, userId).all();
 
-    // Check if DM already exists with each user
-    const usersWithDmStatus = await Promise.all(
-      users.results.map(async (user: Record<string, unknown>) => {
-        const existingDm = await c.env.DB.prepare(`
-          SELECT cr.id FROM chat_rooms cr
-          WHERE cr.type = 'dm'
-          AND EXISTS (SELECT 1 FROM chat_room_members WHERE room_id = cr.id AND user_id = ?)
-          AND EXISTS (SELECT 1 FROM chat_room_members WHERE room_id = cr.id AND user_id = ?)
-        `).bind(userId, user.id).first();
+    // Check if DM already exists with each user: one batched lookup over the
+    // (≤20) candidate ids instead of one EXISTS query per user.
+    const dmRoomByUser = new Map<string, string>();
+    if (users.results.length > 0) {
+      const candidateIds = users.results.map(
+        (u: Record<string, unknown>) => u.id as string
+      );
+      const placeholders = candidateIds.map(() => '?').join(',');
+      const existingDms = await c.env.DB.prepare(`
+        SELECT crm2.user_id, cr.id as room_id
+        FROM chat_rooms cr
+        JOIN chat_room_members crm2 ON crm2.room_id = cr.id
+        WHERE cr.type = 'dm'
+        AND crm2.user_id IN (${placeholders})
+        AND EXISTS (
+          SELECT 1 FROM chat_room_members WHERE room_id = cr.id AND user_id = ?
+        )
+      `).bind(...candidateIds, userId).all();
 
-        return {
-          id: user.id,
-          name: user.name,
-          avatarUrl: user.avatar_url,
-          schoolLevel: user.school_level,
-          existingDmId: existingDm?.id || null,
-        };
-      })
-    );
+      for (const row of existingDms.results as Record<string, unknown>[]) {
+        // First match wins, mirroring the per-user LIMIT-1 lookup.
+        if (!dmRoomByUser.has(row.user_id as string)) {
+          dmRoomByUser.set(row.user_id as string, row.room_id as string);
+        }
+      }
+    }
+
+    const usersWithDmStatus = users.results.map((user: Record<string, unknown>) => ({
+      id: user.id,
+      name: user.name,
+      avatarUrl: user.avatar_url,
+      schoolLevel: user.school_level,
+      existingDmId: dmRoomByUser.get(user.id as string) || null,
+    }));
 
     return c.json({ success: true, data: usersWithDmStatus });
   } catch (error) {

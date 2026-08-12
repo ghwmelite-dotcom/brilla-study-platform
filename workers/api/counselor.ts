@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { getDemoDataFlags, isDemoUserId } from './demoUtils';
+import { requireAuth } from './auth-middleware';
+import { checkRateLimit } from './rate-limit';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -124,13 +126,16 @@ Student Context:
 // Counselor routes
 const counselorApp = new Hono<{ Bindings: Env }>();
 
+// All counselor routes require a verified JWT (sets userId/userRole on context).
+counselorApp.use('*', requireAuth);
+
 // Helper functions
 function getUserId(c: Context): string | undefined {
-  return c.get('userId') || c.req.header('x-user-id');
+  return c.get('userId');
 }
 
 function getUserRole(c: Context): string | undefined {
-  return c.get('userRole') || c.req.header('x-user-role');
+  return c.get('userRole');
 }
 
 // Call Claude API for counselor response
@@ -463,6 +468,17 @@ counselorApp.post('/chat', async (c) => {
       return c.json({ success: false, error: 'Message is required' }, 400);
     }
 
+    // COST CONTROL: per-user daily AI quota (shared 'ai' bucket with /ai/explain and /ai/chat)
+    const quota = await checkRateLimit(c.env.DB, userId, 'ai');
+    if (!quota.allowed) {
+      return c.json({
+        success: false,
+        error: 'Daily AI limit reached. Try again tomorrow.',
+        code: 'AI_LIMIT_REACHED',
+        retryAfter: quota.retryAfter,
+      }, 429);
+    }
+
     // Get or create conversation
     let conversation;
     let isNewConversation = false;
@@ -505,9 +521,10 @@ counselorApp.post('/chat', async (c) => {
       WHERE user_id = ? AND created_at >= datetime('now', '-7 days')
     `).bind(userId).first();
 
-    // Get streak info
+    // Get streak info — user-level streak lives on users.streak_days
+    // (the old `user_streaks` table never existed; see fix/audit-remediation wave).
     const streakInfo = await c.env.DB.prepare(`
-      SELECT current_streak FROM user_streaks WHERE user_id = ?
+      SELECT streak_days AS current_streak FROM users WHERE id = ?
     `).bind(userId).first();
 
     const studentContext: StudentContext = {
@@ -827,9 +844,18 @@ counselorApp.post('/reports/generate', async (c) => {
       WHERE cc.user_id = ? AND DATE(cc.created_at) BETWEEN ? AND ?
     `).bind(studentId, startDate, endDate).first();
 
-    // Streak info
+    // Streak info — user-level streak lives on users.streak_days (the old
+    // `user_streaks` table never existed). No user-level longest-streak column
+    // exists, so longest falls back to the best per-subject longest streak
+    // (subject_streaks, migration 062), then to the current streak.
     const streak = await c.env.DB.prepare(`
-      SELECT current_streak, longest_streak FROM user_streaks WHERE user_id = ?
+      SELECT
+        u.streak_days AS current_streak,
+        COALESCE(
+          (SELECT MAX(longest_streak) FROM subject_streaks WHERE user_id = u.id),
+          u.streak_days
+        ) AS longest_streak
+      FROM users u WHERE u.id = ?
     `).bind(studentId).first();
 
     // Generate report content using Claude

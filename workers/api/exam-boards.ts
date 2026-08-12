@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { verify } from 'hono/jwt';
+import { requireAdmin, requireAuth } from './auth-middleware';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -20,31 +20,8 @@ type Variables = {
 
 export const examBoardsApp = new Hono<{ Bindings: Env; Variables: Variables }>();
 
-// JWT Authentication middleware for /user/* routes
-examBoardsApp.use('/user/*', async (c, next) => {
-  const authHeader = c.req.header('Authorization');
-
-  // Skip auth for OPTIONS requests (CORS preflight)
-  if (c.req.method === 'OPTIONS') {
-    return next();
-  }
-
-  // Check for Authorization header
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized - No token provided' }, 401);
-  }
-
-  const token = authHeader.substring(7);
-
-  try {
-    const payload = await verify(token, c.env.JWT_SECRET) as UserPayload;
-    c.set('user', payload);
-    return next();
-  } catch (error) {
-    console.error('JWT verification failed:', error);
-    return c.json({ success: false, error: 'Invalid or expired token' }, 401);
-  }
-});
+// JWT Authentication middleware for /user/* routes (public endpoints below stay public)
+examBoardsApp.use('/user/*', requireAuth);
 
 // =============================================
 // PUBLIC ENDPOINTS (No auth required)
@@ -582,43 +559,35 @@ examBoardsApp.post('/user/syllabus-progress', async (c) => {
 });
 
 // =============================================
-// ADMIN SEED ENDPOINT (Protected by secret key)
+// ADMIN SEED ENDPOINT (requireAdmin: verified JWT + admin role from DB)
 // =============================================
 
 // POST /seed-questions - Seed O/A Level questions (Admin only)
-examBoardsApp.post('/seed-questions', async (c) => {
+examBoardsApp.post('/seed-questions', requireAdmin, async (c) => {
   const db = c.env.DB;
   const body = await c.req.json();
-  const { secretKey, questions } = body;
-
-  // Simple secret key check (should match JWT_SECRET for admin access)
-  if (secretKey !== c.env.JWT_SECRET) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
-  }
+  const { questions } = body;
 
   if (!questions || !Array.isArray(questions) || questions.length === 0) {
     return c.json({ success: false, error: 'Questions array is required' }, 400);
   }
 
   try {
-    let inserted = 0;
-    for (const q of questions) {
-      await db
-        .prepare(`
-          INSERT OR IGNORE INTO questions (
-            id, topic_id, subject_id, exam_type_id, question_text, question_type,
-            options, correct_answer, explanation, difficulty, points, marks,
-            syllabus_topic_id, exam_board_id, command_word
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `)
-        .bind(
-          q.id, q.topic_id, q.subject_id, q.exam_type_id, q.question_text, q.question_type,
-          q.options || null, q.correct_answer, q.explanation, q.difficulty, q.points || 3, q.marks || 1,
-          q.syllabus_topic_id || null, q.exam_board_id || null, q.command_word || null
-        )
-        .run();
-      inserted++;
-    }
+    const stmts = questions.map((q) =>
+      db.prepare(`
+        INSERT OR IGNORE INTO questions (
+          id, topic_id, subject_id, exam_type_id, question_text, question_type,
+          options, correct_answer, explanation, difficulty, points, marks,
+          syllabus_topic_id, exam_board_id, command_word
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        q.id, q.topic_id, q.subject_id, q.exam_type_id, q.question_text, q.question_type,
+        q.options || null, q.correct_answer, q.explanation, q.difficulty, q.points || 3, q.marks || 1,
+        q.syllabus_topic_id || null, q.exam_board_id || null, q.command_word || null,
+      ),
+    );
+    const results = await db.batch(stmts);
+    const inserted = results.reduce((n, r) => n + (r.meta.changes || 0), 0);
 
     return c.json({ success: true, message: `Inserted ${inserted} questions` });
   } catch (error) {

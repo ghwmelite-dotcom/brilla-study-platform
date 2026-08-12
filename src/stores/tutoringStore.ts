@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 import type {
   TeacherDirectoryCard,
   TeacherDirectoryProfile,
@@ -113,8 +113,7 @@ export const useTutoringStore = create<TutoringState>((set, get) => ({
 
   loadDirectory: async (filters?: DirectoryFilters, append = false) => {
     set({ isLoadingDirectory: true, error: null });
-    try {
-      const currentFilters = filters || get().filters;
+    const currentFilters = filters || get().filters;
       const page = currentFilters.page || 1;
 
       const queryParams = new URLSearchParams();
@@ -131,7 +130,7 @@ export const useTutoringStore = create<TutoringState>((set, get) => ({
       queryParams.set('pageSize', (currentFilters.pageSize || 12).toString());
 
       const query = queryParams.toString();
-      const response = await api.get<{
+      const res = await api.get<{
         teachers: TeacherDirectoryCard[];
         total: number;
         page: number;
@@ -139,48 +138,49 @@ export const useTutoringStore = create<TutoringState>((set, get) => ({
         hasMore: boolean;
       }>(`/tutoring/directory${query ? `?${query}` : ''}`);
 
-      set({
-        teachers: append ? [...get().teachers, ...response.teachers] : response.teachers,
-        totalTeachers: response.total,
-        hasMore: response.hasMore,
-        filters: currentFilters,
-        isLoadingDirectory: false,
-      });
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'Failed to load teachers',
-        isLoadingDirectory: false,
-      });
-    }
+      if (res.success && res.data) {
+        set({
+          teachers: append ? [...get().teachers, ...res.data.teachers] : res.data.teachers,
+          totalTeachers: res.data.total,
+          hasMore: res.data.hasMore,
+          filters: currentFilters,
+          isLoadingDirectory: false,
+        });
+      } else {
+        set({
+          error: res.error || 'Failed to load teachers',
+          isLoadingDirectory: false,
+        });
+      }
   },
 
   loadTeacherProfile: async (id: string) => {
     set({ isLoadingProfile: true, error: null, selectedTeacher: null });
-    try {
-      const profile = await api.get<TeacherDirectoryProfile>(`/tutoring/directory/${id}`);
-      set({ selectedTeacher: profile, isLoadingProfile: false });
-    } catch (error) {
+    const res = await api.get<TeacherDirectoryProfile>(`/tutoring/directory/${id}`);
+    if (res.success && res.data) {
+      set({ selectedTeacher: res.data, isLoadingProfile: false });
+    } else {
       set({
-        error: error instanceof Error ? error.message : 'Failed to load teacher profile',
+        error: res.error || 'Failed to load teacher profile',
         isLoadingProfile: false,
       });
     }
   },
 
   loadTeacherReviews: async (id: string, page = 1) => {
-    try {
-      const response = await api.get<{
-        reviews: TeacherReview[];
-        total: number;
-        page: number;
-        hasMore: boolean;
-      }>(`/tutoring/directory/${id}/reviews?page=${page}`);
+    const res = await api.get<{
+      reviews: TeacherReview[];
+      total: number;
+      page: number;
+      hasMore: boolean;
+    }>(`/tutoring/directory/${id}/reviews?page=${page}`);
 
+    if (res.success && res.data) {
       set({
-        teacherReviews: page === 1 ? response.reviews : [...get().teacherReviews, ...response.reviews],
+        teacherReviews: page === 1 ? res.data.reviews : [...get().teacherReviews, ...res.data.reviews],
       });
-    } catch (error) {
-      console.error('Failed to load reviews:', error);
+    } else {
+      console.error('Failed to load reviews:', res.error);
     }
   },
 
@@ -200,62 +200,62 @@ export const useTutoringStore = create<TutoringState>((set, get) => ({
 
   createRequest: async (data: CreateTutoringRequestData) => {
     set({ error: null });
-    try {
-      const response = await api.post<{ id: string }>('/tutoring/requests', data);
-      await get().loadMyRequests();
-      return response.id;
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to create request' });
-      throw error;
+    const res = await api.post<{ id: string }>('/tutoring/requests', data);
+    if (!res.success || !res.data) {
+      const message = res.error || 'Failed to create request';
+      set({ error: message });
+      throw new Error(message);
     }
+    await get().loadMyRequests();
+    return res.data.id;
   },
 
   loadMyRequests: async (status?: string) => {
     set({ isLoadingRequests: true, error: null });
-    try {
-      const query = status ? `?status=${status}` : '';
-      const response = await api.get<{ requests: TutoringRequest[] }>(`/tutoring/requests${query}`);
-      set({ myRequests: response.requests, isLoadingRequests: false });
-    } catch (error) {
+    const query = status ? `?status=${status}` : '';
+    const res = await api.get<{ requests: TutoringRequest[] }>(`/tutoring/requests${query}`);
+    if (res.success && res.data) {
+      set({ myRequests: res.data.requests, isLoadingRequests: false });
+    } else {
       set({
-        error: error instanceof Error ? error.message : 'Failed to load requests',
+        error: res.error || 'Failed to load requests',
         isLoadingRequests: false,
       });
     }
   },
 
   cancelRequest: async (requestId: string) => {
-    try {
-      await api.post(`/tutoring/requests/${requestId}/cancel`);
-      await get().loadMyRequests();
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to cancel request' });
-      throw error;
+    const res = await api.post(`/tutoring/requests/${requestId}/cancel`);
+    if (!res.success) {
+      const message = res.error || 'Failed to cancel request';
+      set({ error: message });
+      throw new Error(message);
     }
+    await get().loadMyRequests();
   },
 
   loadMySessions: async (upcoming = false) => {
     set({ isLoadingSessions: true, error: null });
-    try {
-      const query = upcoming ? '?upcoming=true' : '';
-      const response = await api.get<{ sessions: TutoringSession[] }>(`/tutoring/sessions${query}`);
-      set({ mySessions: response.sessions, isLoadingSessions: false });
-    } catch (error) {
+    const query = upcoming ? '?upcoming=true' : '';
+    const res = await api.get<{ sessions: TutoringSession[] }>(`/tutoring/sessions${query}`);
+    if (res.success && res.data) {
+      set({ mySessions: res.data.sessions, isLoadingSessions: false });
+    } else {
       set({
-        error: error instanceof Error ? error.message : 'Failed to load sessions',
+        error: res.error || 'Failed to load sessions',
         isLoadingSessions: false,
       });
     }
   },
 
   submitReview: async (sessionId: string, data: ReviewFormData) => {
-    try {
-      await api.post(`/tutoring/sessions/${sessionId}/review`, data);
-      await get().loadMySessions();
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to submit review' });
-      throw error;
+    const res = await api.post(`/tutoring/sessions/${sessionId}/review`, data);
+    if (!res.success) {
+      const message = res.error || 'Failed to submit review';
+      set({ error: message });
+      throw new Error(message);
     }
+    await get().loadMySessions();
   },
 
   // ============================================
@@ -264,12 +264,12 @@ export const useTutoringStore = create<TutoringState>((set, get) => ({
 
   loadMyProfile: async () => {
     set({ isLoadingMyProfile: true, error: null });
-    try {
-      const profile = await api.get<TeacherDirectoryProfile | null>('/tutoring/teacher/profile');
-      set({ myProfile: profile, isLoadingMyProfile: false });
-    } catch (error) {
+    const res = await api.get<TeacherDirectoryProfile | null>('/tutoring/teacher/profile');
+    if (res.success) {
+      set({ myProfile: res.data ?? null, isLoadingMyProfile: false });
+    } else {
       set({
-        error: error instanceof Error ? error.message : 'Failed to load profile',
+        error: res.error || 'Failed to load profile',
         isLoadingMyProfile: false,
       });
     }
@@ -277,13 +277,13 @@ export const useTutoringStore = create<TutoringState>((set, get) => ({
 
   saveMyProfile: async (data: Partial<TeacherDirectoryProfile>) => {
     set({ error: null });
-    try {
-      await api.post('/tutoring/teacher/profile', data);
-      await get().loadMyProfile();
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to save profile' });
-      throw error;
+    const res = await api.post('/tutoring/teacher/profile', data);
+    if (!res.success) {
+      const message = res.error || 'Failed to save profile';
+      set({ error: message });
+      throw new Error(message);
     }
+    await get().loadMyProfile();
   },
 
   // Alias for saveMyProfile for convenience
@@ -293,60 +293,60 @@ export const useTutoringStore = create<TutoringState>((set, get) => ({
 
   submitProfileForApproval: async () => {
     set({ error: null });
-    try {
-      await api.post('/tutoring/teacher/profile/submit');
-      await get().loadMyProfile();
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to submit profile' });
-      throw error;
+    const res = await api.post('/tutoring/teacher/profile/submit');
+    if (!res.success) {
+      const message = res.error || 'Failed to submit profile';
+      set({ error: message });
+      throw new Error(message);
     }
+    await get().loadMyProfile();
   },
 
   loadIncomingRequests: async (status?: string) => {
     set({ isLoadingIncomingRequests: true, error: null });
-    try {
-      const query = status ? `?status=${status}` : '';
-      const response = await api.get<{ requests: TutoringRequest[] }>(`/tutoring/requests${query}`);
-      set({ incomingRequests: response.requests, isLoadingIncomingRequests: false });
-    } catch (error) {
+    const query = status ? `?status=${status}` : '';
+    const res = await api.get<{ requests: TutoringRequest[] }>(`/tutoring/requests${query}`);
+    if (res.success && res.data) {
+      set({ incomingRequests: res.data.requests, isLoadingIncomingRequests: false });
+    } else {
       set({
-        error: error instanceof Error ? error.message : 'Failed to load requests',
+        error: res.error || 'Failed to load requests',
         isLoadingIncomingRequests: false,
       });
     }
   },
 
   acceptRequest: async (requestId: string, response?: string, confirmedDatetime?: string) => {
-    try {
-      await api.post(`/tutoring/teacher/requests/${requestId}/accept`, {
-        response,
-        confirmedDatetime,
-      });
-      await get().loadIncomingRequests();
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to accept request' });
-      throw error;
+    const res = await api.post(`/tutoring/teacher/requests/${requestId}/accept`, {
+      response,
+      confirmedDatetime,
+    });
+    if (!res.success) {
+      const message = res.error || 'Failed to accept request';
+      set({ error: message });
+      throw new Error(message);
     }
+    await get().loadIncomingRequests();
   },
 
   declineRequest: async (requestId: string, reason?: string) => {
-    try {
-      await api.post(`/tutoring/teacher/requests/${requestId}/decline`, { reason });
-      await get().loadIncomingRequests();
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to decline request' });
-      throw error;
+    const res = await api.post(`/tutoring/teacher/requests/${requestId}/decline`, { reason });
+    if (!res.success) {
+      const message = res.error || 'Failed to decline request';
+      set({ error: message });
+      throw new Error(message);
     }
+    await get().loadIncomingRequests();
   },
 
   loadTeacherSessions: async () => {
     set({ isLoadingSessions: true, error: null });
-    try {
-      const response = await api.get<{ sessions: TutoringSession[] }>('/tutoring/sessions');
-      set({ teacherSessions: response.sessions, isLoadingSessions: false });
-    } catch (error) {
+    const res = await api.get<{ sessions: TutoringSession[] }>('/tutoring/sessions');
+    if (res.success && res.data) {
+      set({ teacherSessions: res.data.sessions, isLoadingSessions: false });
+    } else {
       set({
-        error: error instanceof Error ? error.message : 'Failed to load sessions',
+        error: res.error || 'Failed to load sessions',
         isLoadingSessions: false,
       });
     }
@@ -354,33 +354,33 @@ export const useTutoringStore = create<TutoringState>((set, get) => ({
 
   loadEarnings: async () => {
     set({ isLoadingEarnings: true, error: null });
-    try {
-      const response = await api.get<{ earnings: TeacherEarnings }>('/tutoring/teacher/earnings');
-      set({ earnings: response.earnings, isLoadingEarnings: false });
-    } catch (error) {
+    const res = await api.get<{ earnings: TeacherEarnings }>('/tutoring/teacher/earnings');
+    if (res.success && res.data) {
+      set({ earnings: res.data.earnings, isLoadingEarnings: false });
+    } else {
       set({
-        error: error instanceof Error ? error.message : 'Failed to load earnings',
+        error: res.error || 'Failed to load earnings',
         isLoadingEarnings: false,
       });
     }
   },
 
   updatePayoutDetails: async (data) => {
-    try {
-      await api.put('/tutoring/teacher/payout-details', data);
-      await get().loadEarnings();
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to update payout details' });
-      throw error;
+    const res = await api.put('/tutoring/teacher/payout-details', data);
+    if (!res.success) {
+      const message = res.error || 'Failed to update payout details';
+      set({ error: message });
+      throw new Error(message);
     }
+    await get().loadEarnings();
   },
 
   respondToReview: async (reviewId: string, response: string) => {
-    try {
-      await api.post(`/tutoring/teacher/reviews/${reviewId}/respond`, { response });
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to respond to review' });
-      throw error;
+    const res = await api.post(`/tutoring/teacher/reviews/${reviewId}/respond`, { response });
+    if (!res.success) {
+      const message = res.error || 'Failed to respond to review';
+      set({ error: message });
+      throw new Error(message);
     }
   },
 

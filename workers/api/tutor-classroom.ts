@@ -1,7 +1,37 @@
 import { Hono } from 'hono';
 import type { Env } from './index';
+import { requireAuth } from './auth-middleware';
 
-const tutorClassroom = new Hono<{ Bindings: Env }>();
+// Identity shape read by the routes below. requireAuth sets `user` to the JWT
+// payload (keyed by userId) with role refreshed from the DB; the adapter
+// middleware re-adds the legacy `id` key the routes use.
+interface TutorClassroomUser {
+  userId: string;
+  id?: string;
+  email?: string;
+  role?: string;
+}
+
+const tutorClassroom = new Hono<{ Bindings: Env; Variables: { user: TutorClassroomUser } }>();
+
+// Auth: shared middleware (HS256-pinned signature verify + per-request DB
+// status/is_active/role re-check), mounted blanket.
+// Public-route audit: every route in this module previously mounted a
+// per-route auth or teacher gate, so all 27 routes already required a
+// logged-in user (incl. the room-code join at
+// /scheduled-sessions/join/:roomCode, which additionally checks participant
+// membership). No public routes exist, so a blanket mount is behavior-
+// equivalent to the previous per-route mounts. NOTE: the old per-route
+// gates only checked c.get('user'), which nothing upstream ever set —
+// these routes 401'd unconditionally before this fix.
+tutorClassroom.use('*', requireAuth);
+// Adapter: legacy routes read c.get('user').id; the shared middleware keys the
+// JWT payload by userId, so re-add `id`.
+tutorClassroom.use('*', async (c, next) => {
+  const user = c.get('user');
+  c.set('user', { ...user, id: user.userId });
+  await next();
+});
 
 // Helper to generate unique IDs
 function generateId(): string {
@@ -10,12 +40,10 @@ function generateId(): string {
 
 // Helper to generate room codes
 function generateRoomCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 32 chars, excludes confusing ones
+  const bytes = crypto.getRandomValues(new Uint8Array(6));
+  // 256 % 32 === 0, so the modulo introduces no bias
+  return Array.from(bytes, (b) => chars.charAt(b % chars.length)).join('');
 }
 
 // Calculate struggle score from signals
@@ -45,7 +73,8 @@ function calculateStruggleScore(signals: {
   );
 }
 
-// Auth middleware - requires teacher or admin role
+// Role gate - requires teacher or admin role. Runs after the blanket
+// requireAuth + adapter above; user.role is fresh from the DB (not the JWT).
 async function teacherMiddleware(c: any, next: () => Promise<void>) {
   const user = c.get('user');
   if (!user) {
@@ -53,15 +82,6 @@ async function teacherMiddleware(c: any, next: () => Promise<void>) {
   }
   if (user.role !== 'teacher' && user.role !== 'admin') {
     return c.json({ success: false, error: 'Teacher access required' }, 403);
-  }
-  await next();
-}
-
-// Auth middleware - requires any authenticated user
-async function authMiddleware(c: any, next: () => Promise<void>) {
-  const user = c.get('user');
-  if (!user) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
   }
   await next();
 }
@@ -190,7 +210,8 @@ tutorClassroom.post('/availability/heartbeat', teacherMiddleware, async (c) => {
     await db.prepare(`
       UPDATE tutor_availability SET
         is_online = 1,
-        last_heartbeat = CURRENT_TIMESTAMP
+        last_heartbeat = CURRENT_TIMESTAMP,
+        updated_at = CURRENT_TIMESTAMP
       WHERE tutor_id = ?
     `).bind(user.id).run();
 
@@ -201,7 +222,7 @@ tutorClassroom.post('/availability/heartbeat', teacherMiddleware, async (c) => {
     `).bind(user.id).first();
 
     await db.prepare(`
-      UPDATE tutor_availability SET current_session_count = ? WHERE tutor_id = ?
+      UPDATE tutor_availability SET current_session_count = ?, updated_at = CURRENT_TIMESTAMP WHERE tutor_id = ?
     `).bind(observationCount?.count || 0, user.id).run();
 
     return c.json({ success: true });
@@ -344,7 +365,7 @@ tutorClassroom.post('/observable-sessions/:sessionId/observe', teacherMiddleware
 
     // Update session count
     await db.prepare(`
-      UPDATE tutor_availability SET current_session_count = current_session_count + 1 WHERE tutor_id = ?
+      UPDATE tutor_availability SET current_session_count = current_session_count + 1, updated_at = CURRENT_TIMESTAMP WHERE tutor_id = ?
     `).bind(user.id).run();
 
     return c.json({ success: true, observationId });
@@ -374,7 +395,7 @@ tutorClassroom.post('/observable-sessions/:sessionId/stop-observe', teacherMiddl
 
     // Update session count
     await db.prepare(`
-      UPDATE tutor_availability SET current_session_count = MAX(0, current_session_count - 1) WHERE tutor_id = ?
+      UPDATE tutor_availability SET current_session_count = MAX(0, current_session_count - 1), updated_at = CURRENT_TIMESTAMP WHERE tutor_id = ?
     `).bind(user.id).run();
 
     return c.json({ success: true });
@@ -431,7 +452,7 @@ tutorClassroom.get('/observable-sessions/:sessionId/updates', teacherMiddleware,
 // =====================================================
 
 // Suggest handoff to student (called by AI/system)
-tutorClassroom.post('/ai-sessions/:sessionId/suggest-handoff', authMiddleware, async (c) => {
+tutorClassroom.post('/ai-sessions/:sessionId/suggest-handoff', async (c) => {
   const { sessionId } = c.req.param();
   const body = await c.req.json();
   const db = c.env.DB;
@@ -441,7 +462,8 @@ tutorClassroom.post('/ai-sessions/:sessionId/suggest-handoff', authMiddleware, a
       UPDATE ai_classroom_sessions SET
         handoff_status = 'suggested',
         handoff_reason = ?,
-        handoff_suggested_at = CURRENT_TIMESTAMP
+        handoff_suggested_at = CURRENT_TIMESTAMP,
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(body.reason || 'struggling_with_concept', sessionId).run();
 
@@ -459,7 +481,7 @@ tutorClassroom.post('/ai-sessions/:sessionId/suggest-handoff', authMiddleware, a
 });
 
 // Student requests a human tutor
-tutorClassroom.post('/ai-sessions/:sessionId/request-handoff', authMiddleware, async (c) => {
+tutorClassroom.post('/ai-sessions/:sessionId/request-handoff', async (c) => {
   const user = c.get('user');
   const { sessionId } = c.req.param();
   const body = await c.req.json();
@@ -479,7 +501,8 @@ tutorClassroom.post('/ai-sessions/:sessionId/request-handoff', authMiddleware, a
       UPDATE ai_classroom_sessions SET
         handoff_status = 'requested',
         handoff_reason = ?,
-        handoff_requested_at = CURRENT_TIMESTAMP
+        handoff_requested_at = CURRENT_TIMESTAMP,
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(body.reason || 'student_requested', sessionId).run();
 
@@ -558,7 +581,8 @@ tutorClassroom.post('/handoff-requests/:sessionId/accept', teacherMiddleware, as
         tutor_name = ?,
         tutor_avatar_url = ?,
         tutor_joined_at = CURRENT_TIMESTAMP,
-        tutor_mode = ?
+        tutor_mode = ?,
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(
       user.id,
@@ -722,7 +746,7 @@ tutorClassroom.post('/ai-sessions/:sessionId/change-mode', teacherMiddleware, as
 
   try {
     await db.prepare(`
-      UPDATE ai_classroom_sessions SET tutor_mode = ? WHERE id = ? AND tutor_id = ?
+      UPDATE ai_classroom_sessions SET tutor_mode = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND tutor_id = ?
     `).bind(body.mode, sessionId, user.id).run();
 
     // Log event
@@ -751,7 +775,8 @@ tutorClassroom.post('/ai-sessions/:sessionId/leave', teacherMiddleware, async (c
         tutor_id = NULL,
         tutor_name = NULL,
         tutor_mode = NULL,
-        handoff_status = 'none'
+        handoff_status = 'none',
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ? AND tutor_id = ?
     `).bind(sessionId, user.id).run();
 
@@ -884,7 +909,8 @@ tutorClassroom.post('/scheduled-sessions/:id/start', teacherMiddleware, async (c
     await db.prepare(`
       UPDATE scheduled_classroom_sessions SET
         status = 'active',
-        started_at = CURRENT_TIMESTAMP
+        started_at = CURRENT_TIMESTAMP,
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(id).run();
 
@@ -899,7 +925,7 @@ tutorClassroom.post('/scheduled-sessions/:id/start', teacherMiddleware, async (c
 });
 
 // Join scheduled session (for both tutor and student)
-tutorClassroom.get('/scheduled-sessions/join/:roomCode', authMiddleware, async (c) => {
+tutorClassroom.get('/scheduled-sessions/join/:roomCode', async (c) => {
   const user = c.get('user');
   const { roomCode } = c.req.param();
   const db = c.env.DB;
@@ -930,7 +956,7 @@ tutorClassroom.get('/scheduled-sessions/join/:roomCode', authMiddleware, async (
 });
 
 // Request AI assistance during session
-tutorClassroom.post('/scheduled-sessions/:id/ai-assist', authMiddleware, async (c) => {
+tutorClassroom.post('/scheduled-sessions/:id/ai-assist', async (c) => {
   const user = c.get('user');
   const { id } = c.req.param();
   const body = await c.req.json();
@@ -1009,7 +1035,8 @@ Exam Type: ${session.exam_type || 'General'}`;
     // Update metrics
     await db.prepare(`
       UPDATE scheduled_classroom_sessions SET
-        ai_suggestions_given = ai_suggestions_given + 1
+        ai_suggestions_given = ai_suggestions_given + 1,
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(id).run();
 
@@ -1052,7 +1079,8 @@ tutorClassroom.post('/scheduled-sessions/:id/end', teacherMiddleware, async (c) 
         actual_duration_minutes = ?,
         session_summary = ?,
         tutor_notes = ?,
-        homework_assigned = ?
+        homework_assigned = ?,
+        updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(
       durationMinutes,
@@ -1074,7 +1102,7 @@ tutorClassroom.post('/scheduled-sessions/:id/end', teacherMiddleware, async (c) 
 // =====================================================
 
 // Get tutor updates for student's AI session
-tutorClassroom.get('/student/session/:sessionId/tutor-updates', authMiddleware, async (c) => {
+tutorClassroom.get('/student/session/:sessionId/tutor-updates', async (c) => {
   const user = c.get('user');
   const { sessionId } = c.req.param();
   const { last_event_id } = c.req.query();
@@ -1126,14 +1154,14 @@ tutorClassroom.get('/student/session/:sessionId/tutor-updates', authMiddleware, 
 });
 
 // Student declines handoff suggestion
-tutorClassroom.post('/student/session/:sessionId/decline-handoff', authMiddleware, async (c) => {
+tutorClassroom.post('/student/session/:sessionId/decline-handoff', async (c) => {
   const user = c.get('user');
   const { sessionId } = c.req.param();
   const db = c.env.DB;
 
   try {
     await db.prepare(`
-      UPDATE ai_classroom_sessions SET handoff_status = 'declined'
+      UPDATE ai_classroom_sessions SET handoff_status = 'declined', updated_at = CURRENT_TIMESTAMP
       WHERE id = ? AND student_id = ? AND handoff_status = 'suggested'
     `).bind(sessionId, user.id).run();
 

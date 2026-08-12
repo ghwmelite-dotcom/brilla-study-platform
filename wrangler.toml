@@ -1,6 +1,6 @@
 name = "brilla-api"
 main = "workers/api/index.ts"
-compatibility_date = "2024-01-01"
+compatibility_date = "2026-05-12"
 
 [vars]
 ENVIRONMENT = "production"
@@ -12,10 +12,19 @@ GOOGLE_REDIRECT_URI = "https://brillaprep.org/oauth/callback"
 NOTIFICATION_EMAILS = "brillaprepgh@gmail.com"
 
 # IMPORTANT: Set these secrets using wrangler:
-# wrangler secret put JWT_SECRET           (generate a secure random string)
-# wrangler secret put RESEND_API_KEY       (your Resend API key for emails)
-# wrangler secret put GOOGLE_CLIENT_ID     (from Google Cloud Console)
-# wrangler secret put GOOGLE_CLIENT_SECRET (from Google Cloud Console)
+# wrangler secret put JWT_SECRET               (generate a secure random string)
+# wrangler secret put SETUP_KEY                (one-shot /auth/setup key; endpoint is disabled until set)
+# wrangler secret put RESEND_API_KEY           (your Resend API key for emails)
+# wrangler secret put GOOGLE_CLIENT_ID         (from Google Cloud Console)
+# wrangler secret put GOOGLE_CLIENT_SECRET     (from Google Cloud Console)
+# wrangler secret put PAYSTACK_SECRET_KEY      (from Paystack dashboard)
+# wrangler secret put PAYSTACK_WEBHOOK_SECRET  (from Paystack dashboard)
+#                                              REQUIRED: /payments/webhook returns 500 and processes nothing without it
+# wrangler secret put TURNSTILE_SECRET         (from Cloudflare Turnstile)
+# wrangler secret put ANTHROPIC_API_KEY        (from Anthropic console, optional AI fallback)
+
+[observability]
+enabled = true
 
 # Workers AI binding - no API key needed!
 [ai]
@@ -41,37 +50,34 @@ migrations_dir = "database/migrations"
 port = 8787
 local_protocol = "http"
 
-# Production environment
-[env.production.vars]
-ENVIRONMENT = "production"
-AI_PROVIDER = "workers-ai"
-AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
-APP_URL = "https://brillaprep.org"
-FROM_EMAIL = "Brilla Study Platform <noreply@brillaprep.org>"
-GOOGLE_REDIRECT_URI = "https://brillaprep.org/oauth/callback"
-NOTIFICATION_EMAILS = "brillaprepgh@gmail.com"
-
-[env.production.ai]
-binding = "AI"
-
-[[env.production.d1_databases]]
-binding = "DB"
-database_name = "brilla-db"
-database_id = "aa806d65-d3dd-4cf9-9cac-e3ddd252f937"
-migrations_dir = "database/migrations"
-
-[[env.production.r2_buckets]]
-binding = "LIBRARY_BUCKET"
-bucket_name = "brilla-library"
-
-[[env.production.r2_buckets]]
-binding = "RECORDINGS_BUCKET"
-bucket_name = "brilla-recordings"
-
 # Cron trigger for demo data cleanup (runs every 6 hours)
 # This cleans up expired demo user data to keep production database clean
 [triggers]
 crons = ["0 */6 * * *"]
 
-[env.production.triggers]
-crons = ["0 */6 * * *"]
+# Local development environment (wrangler dev --env dev)
+[env.dev.vars]
+ENVIRONMENT = "development"
+AI_PROVIDER = "workers-ai"
+AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+APP_URL = "http://localhost:3000"
+FROM_EMAIL = "Brilla Study Platform <noreply@brillaprep.org>"
+GOOGLE_REDIRECT_URI = "http://localhost:3000/oauth/callback"
+NOTIFICATION_EMAILS = "brillaprepgh@gmail.com"
+
+[env.dev.ai]
+binding = "AI"
+
+[[env.dev.d1_databases]]
+binding = "DB"
+database_name = "brilla-db"
+database_id = "aa806d65-d3dd-4cf9-9cac-e3ddd252f937"
+migrations_dir = "database/migrations"
+
+[[env.dev.r2_buckets]]
+binding = "LIBRARY_BUCKET"
+bucket_name = "brilla-library"
+
+[[env.dev.r2_buckets]]
+binding = "RECORDINGS_BUCKET"
+bucket_name = "brilla-recordings"

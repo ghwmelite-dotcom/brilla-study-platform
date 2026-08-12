@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { verify } from 'hono/jwt';
+import { requireAuth } from './auth-middleware';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -17,63 +18,15 @@ interface UserPayload {
   exp?: number;
 }
 
-// Verify JWT token
+// Verify JWT token (used by optionalAuthMiddleware for the public directory)
 async function verifyJWT(token: string, secret: string): Promise<UserPayload | null> {
   try {
-    const payload = await verify(token, secret);
-    return payload as UserPayload;
+    const payload = await verify(token, secret, 'HS256');
+    return payload as unknown as UserPayload;
   } catch {
     return null;
   }
 }
-
-// Authentication middleware
-const authMiddleware = async (c: any, next: any) => {
-  const authHeader = c.req.header('Authorization');
-
-  if (c.req.method === 'OPTIONS') {
-    return next();
-  }
-
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
-  }
-
-  const token = authHeader.replace('Bearer ', '');
-
-  // Demo token support
-  if (token.endsWith('_demo_token')) {
-    const isDevelopment = c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev';
-    if (isDevelopment) {
-      const tokenPrefix = token.replace('_demo_token', '');
-      const demoUsers: Record<string, { id: string; role: string }> = {
-        'student': { id: 'student_1766327981521', role: 'student' },
-        'teacher': { id: 'teacher_1766327981453', role: 'teacher' },
-        'admin': { id: 'admin_prod_001', role: 'admin' },
-      };
-      const demoUser = demoUsers[tokenPrefix];
-      if (demoUser) {
-        c.set('userId', demoUser.id);
-        c.set('userRole', demoUser.role);
-        return next();
-      }
-    }
-  }
-
-  try {
-    const payload = await verifyJWT(token, c.env.JWT_SECRET);
-    if (!payload) {
-      return c.json({ success: false, error: 'Invalid token' }, 401);
-    }
-
-    c.set('userId', payload.userId);
-    c.set('userEmail', payload.email);
-    c.set('userRole', payload.role);
-    return next();
-  } catch {
-    return c.json({ success: false, error: 'Token verification failed' }, 401);
-  }
-};
 
 // Optional auth middleware (for public routes that may have auth)
 const optionalAuthMiddleware = async (c: any, next: any) => {
@@ -132,6 +85,8 @@ export const tutoringRouter = new Hono<{ Bindings: Env }>();
 // ============================================
 // PUBLIC DIRECTORY ENDPOINTS
 // ============================================
+// These three routes stay public (optional auth only): the tutor directory is
+// browsable pre-login. All other tutoring routes mount requireAuth per-route.
 
 /**
  * GET /tutoring/directory
@@ -401,7 +356,7 @@ tutoringRouter.get('/directory/:id/reviews', optionalAuthMiddleware, async (c) =
  * POST /tutoring/requests
  * Create a tutoring request (student only)
  */
-tutoringRouter.post('/requests', authMiddleware, studentMiddleware, async (c) => {
+tutoringRouter.post('/requests', requireAuth, studentMiddleware, async (c) => {
   const studentId = c.get('userId');
   const body = await c.req.json();
 
@@ -501,7 +456,7 @@ tutoringRouter.post('/requests', authMiddleware, studentMiddleware, async (c) =>
  * GET /tutoring/requests
  * Get student's tutoring requests
  */
-tutoringRouter.get('/requests', authMiddleware, async (c) => {
+tutoringRouter.get('/requests', requireAuth, async (c) => {
   const userId = c.get('userId');
   const role = c.get('userRole');
   const status = c.req.query('status');
@@ -601,7 +556,7 @@ tutoringRouter.get('/requests', authMiddleware, async (c) => {
  * POST /tutoring/requests/:id/cancel
  * Cancel a pending request (student only)
  */
-tutoringRouter.post('/requests/:id/cancel', authMiddleware, studentMiddleware, async (c) => {
+tutoringRouter.post('/requests/:id/cancel', requireAuth, studentMiddleware, async (c) => {
   const studentId = c.get('userId');
   const requestId = c.req.param('id');
 
@@ -637,7 +592,7 @@ tutoringRouter.post('/requests/:id/cancel', authMiddleware, studentMiddleware, a
  * GET /tutoring/sessions
  * Get user's tutoring sessions
  */
-tutoringRouter.get('/sessions', authMiddleware, async (c) => {
+tutoringRouter.get('/sessions', requireAuth, async (c) => {
   const userId = c.get('userId');
   const role = c.get('userRole');
   const status = c.req.query('status');
@@ -755,7 +710,7 @@ tutoringRouter.get('/sessions', authMiddleware, async (c) => {
  * POST /tutoring/sessions/:id/review
  * Submit a review for a completed session
  */
-tutoringRouter.post('/sessions/:id/review', authMiddleware, studentMiddleware, async (c) => {
+tutoringRouter.post('/sessions/:id/review', requireAuth, studentMiddleware, async (c) => {
   const studentId = c.get('userId');
   const sessionId = c.req.param('id');
   const body = await c.req.json();
@@ -848,7 +803,7 @@ tutoringRouter.post('/sessions/:id/review', authMiddleware, studentMiddleware, a
  * GET /tutoring/teacher/profile
  * Get teacher's own directory profile
  */
-tutoringRouter.get('/teacher/profile', authMiddleware, teacherMiddleware, async (c) => {
+tutoringRouter.get('/teacher/profile', requireAuth, teacherMiddleware, async (c) => {
   const teacherId = c.get('userId');
 
   try {
@@ -899,7 +854,7 @@ tutoringRouter.get('/teacher/profile', authMiddleware, teacherMiddleware, async 
  * POST /tutoring/teacher/profile
  * Create or update teacher's directory profile
  */
-tutoringRouter.post('/teacher/profile', authMiddleware, teacherMiddleware, async (c) => {
+tutoringRouter.post('/teacher/profile', requireAuth, teacherMiddleware, async (c) => {
   const teacherId = c.get('userId');
   const body = await c.req.json();
 
@@ -1026,7 +981,7 @@ tutoringRouter.post('/teacher/profile', authMiddleware, teacherMiddleware, async
  * POST /tutoring/teacher/profile/submit
  * Submit profile for admin approval
  */
-tutoringRouter.post('/teacher/profile/submit', authMiddleware, teacherMiddleware, async (c) => {
+tutoringRouter.post('/teacher/profile/submit', requireAuth, teacherMiddleware, async (c) => {
   const teacherId = c.get('userId');
 
   try {
@@ -1063,7 +1018,7 @@ tutoringRouter.post('/teacher/profile/submit', authMiddleware, teacherMiddleware
  * POST /tutoring/teacher/requests/:id/accept
  * Accept a tutoring request
  */
-tutoringRouter.post('/teacher/requests/:id/accept', authMiddleware, teacherMiddleware, async (c) => {
+tutoringRouter.post('/teacher/requests/:id/accept', requireAuth, teacherMiddleware, async (c) => {
   const teacherId = c.get('userId');
   const requestId = c.req.param('id');
   const body = await c.req.json().catch(() => ({}));
@@ -1135,7 +1090,7 @@ tutoringRouter.post('/teacher/requests/:id/accept', authMiddleware, teacherMiddl
  * POST /tutoring/teacher/requests/:id/decline
  * Decline a tutoring request
  */
-tutoringRouter.post('/teacher/requests/:id/decline', authMiddleware, teacherMiddleware, async (c) => {
+tutoringRouter.post('/teacher/requests/:id/decline', requireAuth, teacherMiddleware, async (c) => {
   const teacherId = c.get('userId');
   const requestId = c.req.param('id');
   const body = await c.req.json().catch(() => ({}));
@@ -1181,7 +1136,7 @@ tutoringRouter.post('/teacher/requests/:id/decline', authMiddleware, teacherMidd
  * GET /tutoring/teacher/earnings
  * Get teacher's earnings summary
  */
-tutoringRouter.get('/teacher/earnings', authMiddleware, teacherMiddleware, async (c) => {
+tutoringRouter.get('/teacher/earnings', requireAuth, teacherMiddleware, async (c) => {
   const teacherId = c.get('userId');
 
   try {
@@ -1260,7 +1215,7 @@ tutoringRouter.get('/teacher/earnings', authMiddleware, teacherMiddleware, async
  * PUT /tutoring/teacher/payout-details
  * Update teacher's payout details
  */
-tutoringRouter.put('/teacher/payout-details', authMiddleware, teacherMiddleware, async (c) => {
+tutoringRouter.put('/teacher/payout-details', requireAuth, teacherMiddleware, async (c) => {
   const teacherId = c.get('userId');
   const body = await c.req.json();
 
@@ -1316,7 +1271,7 @@ tutoringRouter.put('/teacher/payout-details', authMiddleware, teacherMiddleware,
  * POST /tutoring/teacher/reviews/:id/respond
  * Respond to a review
  */
-tutoringRouter.post('/teacher/reviews/:id/respond', authMiddleware, teacherMiddleware, async (c) => {
+tutoringRouter.post('/teacher/reviews/:id/respond', requireAuth, teacherMiddleware, async (c) => {
   const teacherId = c.get('userId');
   const reviewId = c.req.param('id');
   const { response } = await c.req.json();
@@ -1361,7 +1316,7 @@ tutoringRouter.post('/teacher/reviews/:id/respond', authMiddleware, teacherMiddl
  * GET /tutoring/admin/pending-profiles
  * Get profiles pending approval
  */
-tutoringRouter.get('/admin/pending-profiles', authMiddleware, adminMiddleware, async (c) => {
+tutoringRouter.get('/admin/pending-profiles', requireAuth, adminMiddleware, async (c) => {
   const page = parseInt(c.req.query('page') || '1');
   const pageSize = Math.min(parseInt(c.req.query('pageSize') || '20'), 100);
   const offset = (page - 1) * pageSize;
@@ -1427,7 +1382,7 @@ tutoringRouter.get('/admin/pending-profiles', authMiddleware, adminMiddleware, a
  * POST /tutoring/admin/profiles/:id/approve
  * Approve a teacher profile
  */
-tutoringRouter.post('/admin/profiles/:id/approve', authMiddleware, adminMiddleware, async (c) => {
+tutoringRouter.post('/admin/profiles/:id/approve', requireAuth, adminMiddleware, async (c) => {
   const profileId = c.req.param('id');
   const adminId = c.get('userId');
 
@@ -1466,7 +1421,7 @@ tutoringRouter.post('/admin/profiles/:id/approve', authMiddleware, adminMiddlewa
  * POST /tutoring/admin/profiles/:id/reject
  * Reject a teacher profile
  */
-tutoringRouter.post('/admin/profiles/:id/reject', authMiddleware, adminMiddleware, async (c) => {
+tutoringRouter.post('/admin/profiles/:id/reject', requireAuth, adminMiddleware, async (c) => {
   const profileId = c.req.param('id');
   const { reason } = await c.req.json();
 
@@ -1499,7 +1454,7 @@ tutoringRouter.post('/admin/profiles/:id/reject', authMiddleware, adminMiddlewar
  * GET /tutoring/admin/stats
  * Get tutoring platform statistics
  */
-tutoringRouter.get('/admin/stats', authMiddleware, adminMiddleware, async (c) => {
+tutoringRouter.get('/admin/stats', requireAuth, adminMiddleware, async (c) => {
   try {
     const stats = await c.env.DB.prepare(`
       SELECT
@@ -1620,7 +1575,7 @@ function generateTutoringReference(): string {
 }
 
 // Initialize payment for a tutoring session
-tutoringRouter.post('/sessions/:id/pay/initialize', authMiddleware, async (c) => {
+tutoringRouter.post('/sessions/:id/pay/initialize', requireAuth, async (c) => {
   try {
     const sessionId = c.req.param('id');
     const userId = c.get('userId') as string;
@@ -1737,7 +1692,7 @@ tutoringRouter.post('/sessions/:id/pay/initialize', authMiddleware, async (c) =>
 });
 
 // Verify payment for a tutoring session
-tutoringRouter.post('/sessions/pay/verify', authMiddleware, async (c) => {
+tutoringRouter.post('/sessions/pay/verify', requireAuth, async (c) => {
   try {
     const { reference } = await c.req.json();
     const userId = c.get('userId') as string;
@@ -1780,12 +1735,21 @@ tutoringRouter.post('/sessions/pay/verify', authMiddleware, async (c) => {
       return c.json({ success: false, error: 'Payment amount mismatch' }, 400);
     }
 
-    // Update payment status
-    await c.env.DB.prepare(`
+    // CLAIM FIRST, before any earnings side-effect: the status-guarded UPDATE
+    // atomically claims the payment. If changes = 0, a concurrent request
+    // already verified it — exit as already-verified and credit nothing.
+    const claim = await c.env.DB.prepare(`
       UPDATE tutoring_payments
       SET status = 'paid', paid_at = datetime('now'), updated_at = datetime('now')
-      WHERE id = ?
+      WHERE id = ? AND status != 'paid'
     `).bind(payment.id).run();
+
+    if (!claim.meta?.changes) {
+      return c.json({
+        success: true,
+        data: { status: 'paid', message: 'Payment already verified' }
+      });
+    }
 
     // Update teacher earnings
     await c.env.DB.prepare(`
@@ -1828,7 +1792,7 @@ tutoringRouter.post('/sessions/pay/verify', authMiddleware, async (c) => {
 });
 
 // Get payment status for a session
-tutoringRouter.get('/sessions/:id/payment', authMiddleware, async (c) => {
+tutoringRouter.get('/sessions/:id/payment', requireAuth, async (c) => {
   try {
     const sessionId = c.req.param('id');
     const userId = c.get('userId') as string;

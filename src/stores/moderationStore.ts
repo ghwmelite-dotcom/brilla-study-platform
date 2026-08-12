@@ -6,7 +6,7 @@ import type {
   ReportStatus,
   ReportResolution,
 } from '@/types';
-import { getApiUrl, getAuthHeaders } from '@/utils/api';
+import { getApiUrl, getAuthHeaders } from '@/lib/api';
 
 interface ModerationStats {
   reports: {

@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useWhiteboardStore } from '@/stores/whiteboardStore';
 import type { SavedWhiteboard } from '@/types/whiteboard';
-import { recordingsService, type RecordingData } from '@/services/api';
+import { recordingsService, type RecordingData } from '@/lib/services';
 
 type TabType = 'whiteboards' | 'recordings';
 

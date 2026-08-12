@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Star, X, Loader2 } from 'lucide-react';
-import { tutoringService } from '@/services/api';
+import { tutoringService } from '@/lib/services';
 import type { TutoringSession } from '@/types/tutoring';
 
 interface ReviewFormProps {

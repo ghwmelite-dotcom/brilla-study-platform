@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { requireAuth } from './auth-middleware';
 
 interface Env {
   DB: D1Database;
@@ -12,6 +13,9 @@ interface UserPayload {
 }
 
 const rewardsApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
+
+// All rewards routes require a verified JWT (sets user on context).
+rewardsApp.use('*', requireAuth);
 
 const generateId = () => `rwd_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
@@ -144,7 +148,7 @@ rewardsApp.post('/chests/:chestId/open', async (c) => {
     const xpAmount = Math.floor(Math.random() * (config.maxXp - config.minXp + 1)) + config.minXp;
     rewards.push({ type: 'xp', amount: xpAmount });
     await c.env.DB.prepare(
-      'UPDATE users SET xp = xp + ? WHERE id = ?'
+      'UPDATE users SET xp_points = xp_points + ? WHERE id = ?'
     ).bind(xpAmount, user.userId).run();
 
     // Chance for cosmetic
@@ -331,7 +335,7 @@ rewardsApp.post('/wheel/spin', async (c) => {
 
     if (selectedSegment.type === 'xp') {
       await c.env.DB.prepare(
-        'UPDATE users SET xp = xp + ? WHERE id = ?'
+        'UPDATE users SET xp_points = xp_points + ? WHERE id = ?'
       ).bind(selectedSegment.value, user.userId).run();
     } else if (selectedSegment.type === 'multiplier') {
       const tomorrow = new Date();

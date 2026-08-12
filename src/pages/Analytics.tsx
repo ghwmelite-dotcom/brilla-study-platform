@@ -9,7 +9,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { useAuthStore, useExamStore } from '@/stores';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 import {
   PerformanceChart,
   SubjectRadar,
@@ -86,23 +86,20 @@ export function AnalyticsPage() {
       setIsLoading(true);
 
       try {
-        const response = await api.get('/analytics/user') as {
-          success: boolean;
-          data: {
-            xp: number;
-            level: number;
-            streak: number;
-            longestStreak: number;
-            weeklyProgress: Array<{ date: string; questions_attempted: number; correct_answers: number }>;
-            subjectPerformance: Array<{ subjectId: string; accuracy: number; totalAttempted: number; avgTime: number }>;
-            topicMastery: Array<{ topic_id: string; mastery_level: number; questions_attempted: number; questions_correct: number }>;
-            recentSessions: Array<{ mode: string; questions_count: number; correct_count: number; score: number; created_at: string }>;
-            strengths: string[];
-            weaknesses: string[];
-          };
-        };
+        const response = await api.get<{
+          xp: number;
+          level: number;
+          streak: number;
+          longestStreak: number;
+          weeklyProgress: Array<{ date: string; questions_attempted: number; correct_answers: number }>;
+          subjectPerformance: Array<{ subjectId: string; accuracy: number; totalAttempted: number; avgTime: number }>;
+          topicMastery: Array<{ topic_id: string; mastery_level: number; questions_attempted: number; questions_correct: number }>;
+          recentSessions: Array<{ mode: string; questions_count: number; correct_count: number; score: number; created_at: string }>;
+          strengths: string[];
+          weaknesses: string[];
+        }>('/analytics/user');
 
-        if (response && response.data) {
+        if (response.success && response.data) {
           const data = response.data;
 
           // Set streak

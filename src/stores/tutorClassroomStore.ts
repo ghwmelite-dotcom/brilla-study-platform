@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { api } from '@/lib/api';
+import { createPoller, type Poller } from '@/utils/polling';
+
+let poller: Poller | null = null;
 
 // Helper type for API responses
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -721,39 +724,33 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
 
       // Polling Management
       startPolling: () => {
-        const { pollingInterval } = get();
-        if (pollingInterval) return;
+        if (!poller) {
+          poller = createPoller(async () => {
+            const { observations, coTeachSession } = get();
 
-        const interval = setInterval(async () => {
-          const { observations, coTeachSession } = get();
+            // Poll for each observed session
+            for (const [sessionId] of observations) {
+              await get().pollSessionUpdates(sessionId);
+            }
 
-          // Poll for each observed session
-          for (const [sessionId] of observations) {
-            await get().pollSessionUpdates(sessionId);
-          }
+            // Poll for co-teach session
+            if (coTeachSession?.isConnected) {
+              await get().pollSessionUpdates(coTeachSession.sessionId);
+            }
 
-          // Poll for co-teach session
-          if (coTeachSession?.isConnected) {
-            await get().pollSessionUpdates(coTeachSession.sessionId);
-          }
+            // Send heartbeat
+            await get().sendHeartbeat();
 
-          // Send heartbeat
-          await get().sendHeartbeat();
-
-          // Refresh handoffs and observable sessions
-          await get().fetchPendingHandoffs();
-          await get().fetchObservableSessions();
-        }, POLLING_INTERVAL);
-
-        set({ pollingInterval: interval });
+            // Refresh handoffs and observable sessions
+            await get().fetchPendingHandoffs();
+            await get().fetchObservableSessions();
+          }, POLLING_INTERVAL);
+        }
+        poller.start(); // idempotent
       },
 
       stopPolling: () => {
-        const { pollingInterval } = get();
-        if (pollingInterval) {
-          clearInterval(pollingInterval);
-          set({ pollingInterval: null });
-        }
+        poller?.stop();
       },
 
       // Utility

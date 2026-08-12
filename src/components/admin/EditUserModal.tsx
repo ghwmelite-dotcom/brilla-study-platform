@@ -23,7 +23,7 @@ import { useAuthStore, type ManagedUser } from '@/stores/authStore';
 import { cn } from '@/utils';
 import type { SchoolLevel } from '@/types';
 import { ExamTypeSelector } from '@/components/auth/ExamTypeSelector';
-import { examService } from '@/services/api';
+import { examService } from '@/lib/services';
 
 interface EditUserModalProps {
   isOpen: boolean;

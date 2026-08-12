@@ -6,6 +6,7 @@ import { cn } from '@/utils';
 const EMOJI_LIST = ['😀', '😂', '❤️', '👍', '🙏', '🎉', '🔥', '💯', '✨', '🤔', '😊', '👏'];
 
 interface AttachmentPreview {
+  id: string;
   file: File;
   preview?: string;
   type: 'image' | 'document';
@@ -69,7 +70,7 @@ export function ChatInput() {
     const newAttachments: AttachmentPreview[] = [];
 
     Array.from(files).forEach((file) => {
-      const attachment: AttachmentPreview = { file, type };
+      const attachment: AttachmentPreview = { id: crypto.randomUUID(), file, type };
 
       if (type === 'image' && file.type.startsWith('image/')) {
         const reader = new FileReader();
@@ -120,7 +121,7 @@ export function ChatInput() {
         <div className="flex gap-2 mb-2 flex-wrap">
           {attachments.map((attachment, index) => (
             <div
-              key={index}
+              key={attachment.id}
               className="relative group"
             >
               {attachment.type === 'image' && attachment.preview ? (

@@ -1,4 +1,6 @@
 import { Hono } from 'hono';
+import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 interface Env {
   DB: D1Database;
@@ -12,6 +14,9 @@ interface UserPayload {
 }
 
 const quickPlayApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
+
+// All quickplay routes require a verified JWT (sets user on context).
+quickPlayApp.use('*', requireAuth);
 
 // Helper to generate unique ID
 const generateId = () => `qp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
@@ -177,6 +182,19 @@ quickPlayApp.post('/submit', async (c) => {
     const body = await c.req.json();
     const { sessionId, answers, timeTaken } = body;
 
+    // Validate the payload before touching the DB (audit findings 4 & 6).
+    if (!Array.isArray(answers) || answers.length === 0 || answers.length > 100) {
+      return c.json({ success: false, error: 'answers must be a non-empty array (max 100)' }, 400);
+    }
+    for (const a of answers) {
+      if (!a || typeof a.questionId !== 'string' || typeof a.answer !== 'string') {
+        return c.json({ success: false, error: 'Invalid answer shape' }, 400);
+      }
+    }
+    const elapsed = typeof timeTaken === 'number' && Number.isFinite(timeTaken)
+      ? Math.min(Math.max(Math.round(timeTaken), 0), 3_600_000) // clamp 0..60min
+      : 0;
+
     // Get session
     const session = await c.env.DB.prepare(
       'SELECT * FROM quick_play_sessions WHERE id = ? AND user_id = ?'
@@ -190,33 +208,32 @@ quickPlayApp.post('/submit', async (c) => {
       return c.json({ success: false, error: 'Session already completed' }, 400);
     }
 
-    // Calculate score
+    // Calculate score — one batched query instead of a per-answer SELECT.
+    const ids = [...new Set(answers.map((a: any) => a.questionId as string))];
+    const { results: questions } = await c.env.DB.prepare(
+      `SELECT id, correct_answer, explanation FROM questions WHERE id IN (${ids.map(() => '?').join(',')})`
+    ).bind(...ids).all();
+    const byId = new Map((questions as any[]).map((q) => [q.id, q]));
+
     let correctCount = 0;
-    const results: any[] = [];
-
-    for (const answer of answers) {
-      const question = await c.env.DB.prepare(
-        'SELECT correct_answer, explanation FROM questions WHERE id = ?'
-      ).bind(answer.questionId).first();
-
-      if (question) {
-        const isCorrect = question.correct_answer === answer.answer;
-        if (isCorrect) correctCount++;
-
-        results.push({
-          questionId: answer.questionId,
-          correct: isCorrect,
-          correctAnswer: question.correct_answer,
-          explanation: question.explanation,
-        });
-      }
-    }
+    const results = answers.map((a: any) => {
+      const q = byId.get(a.questionId);
+      const isCorrect = q ? q.correct_answer === a.answer : false;
+      if (isCorrect) correctCount++;
+      return {
+        questionId: a.questionId,
+        correct: isCorrect,
+        correctAnswer: q?.correct_answer ?? null,
+        explanation: q?.explanation ?? null,
+      };
+    });
 
     // Calculate XP based on performance
     const baseXp = session.game_type === 'brain_teaser' ? 50 :
                    session.game_type === 'subject_dash' ? 75 : 50;
     const accuracyBonus = Math.round((correctCount / answers.length) * baseXp);
-    const speedBonus = timeTaken < 30000 ? 25 : timeTaken < 60000 ? 10 : 0;
+    // elapsed === 0 means missing/invalid (e.g. negative) timeTaken — no speed bonus.
+    const speedBonus = elapsed === 0 ? 0 : elapsed < 30000 ? 25 : elapsed < 60000 ? 10 : 0;
 
     // Get multiplier
     const today = new Date().toISOString().split('T')[0];
@@ -237,7 +254,7 @@ quickPlayApp.post('/submit', async (c) => {
       WHERE id = ?
     `).bind(
       answers.length, correctCount, Math.round((correctCount / answers.length) * 100),
-      timeTaken, totalXp, multiplier, sessionId
+      elapsed, totalXp, multiplier, sessionId
     ).run();
 
     // Mark multiplier as used
@@ -249,7 +266,7 @@ quickPlayApp.post('/submit', async (c) => {
 
     // Award XP to user
     await c.env.DB.prepare(
-      'UPDATE users SET xp = xp + ? WHERE id = ?'
+      'UPDATE users SET xp_points = xp_points + ? WHERE id = ?'
     ).bind(totalXp, user.userId).run();
 
     // Log activity
@@ -286,7 +303,7 @@ quickPlayApp.post('/submit', async (c) => {
 quickPlayApp.get('/history', async (c) => {
   try {
     const user = c.get('user');
-    const limit = parseInt(c.req.query('limit') || '10');
+    const limit = parseLimit(c, 10);
 
     const sessions = await c.env.DB.prepare(`
       SELECT qp.*, s.name as subject_name

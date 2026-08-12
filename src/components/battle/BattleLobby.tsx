@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Swords, Users, RefreshCw, Zap } from 'lucide-react';
 import { useBattleStore, useAuthStore } from '@/stores';
+import { usePolling } from '@/hooks/usePolling';
 import type { Battle, Difficulty } from '@/types';
 
 interface BattleLobbyProps {
@@ -26,11 +27,10 @@ export function BattleLobby({ onBattleStart }: BattleLobbyProps) {
 
   useEffect(() => {
     fetchAvailableBattles();
-
-    // Poll for new battles
-    const interval = setInterval(fetchAvailableBattles, 5000);
-    return () => clearInterval(interval);
   }, [fetchAvailableBattles]);
+
+  // Poll for new battles (pauses while the tab is hidden)
+  usePolling(fetchAvailableBattles, 5000);
 
   const handleCreateBattle = async () => {
     if (!user) return;

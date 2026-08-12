@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { jwt, sign, verify } from 'hono/jwt';
+import { jwt, sign } from 'hono/jwt';
+import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware';
+import { parseLimit, parseJsonBody } from './http';
 import type { JWTPayload } from 'hono/utils/jwt/types';
 import { libraryApp } from './library';
 import { counselorApp } from './counselor';
@@ -24,11 +26,14 @@ import { cosmeticsApp } from './cosmetics';
 import { rewardsApp } from './rewards';
 import { engagementApp } from './engagement';
 import { friendsApp } from './friends';
-import { oauthApp } from './oauth';
+import { oauthApp, ALLOWED_SELF_SERVE_ROLES } from './oauth';
+import { checkRateLimit, cleanupRateLimits, RATE_LIMITS, type RateLimitResult } from './rate-limit';
+import { validateRegistration } from './validation';
 import { examBoardsApp } from './exam-boards';
 import { revisionClassroomApp } from './revision-classroom';
 import { studyRoomsApp } from './study-rooms';
 import tutorClassroomApp from './tutor-classroom';
+import { cleanupExpiredDemoData } from './demoUtils';
 import {
   getDailyUsage,
   checkCanAnswer,
@@ -44,6 +49,7 @@ import {
 interface Env {
   DB: D1Database;
   JWT_SECRET: string;
+  SETUP_KEY?: string;
   ENVIRONMENT: string;
   ANTHROPIC_API_KEY?: string;
   AI_PROVIDER?: string;
@@ -232,8 +238,14 @@ async function verifyPassword(password: string, storedHash: string): Promise<boo
     );
 
     const hashBytes = new Uint8Array(hash);
-    if (hashBytes.length !== storedHashBytes.length) return false;
-    return hashBytes.every((byte, i) => byte === storedHashBytes[i]);
+    // Constant-time comparison: no early exit on first mismatch.
+    // Length difference is folded into the accumulator; the modulo index
+    // keeps the loop bounded when lengths differ.
+    let diff = hashBytes.length ^ storedHashBytes.length;
+    for (let i = 0; i < hashBytes.length; i++) {
+      diff |= hashBytes[i] ^ storedHashBytes[i % storedHashBytes.length];
+    }
+    return diff === 0;
   } catch {
     return false;
   }
@@ -250,179 +262,19 @@ async function generateJWT(payload: UserPayload, secret: string): Promise<string
   return await sign(
     {
       ...payload,
-      exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 7 days
+      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
       iat: Math.floor(Date.now() / 1000),
     },
     secret
   );
 }
 
-// Verify JWT token
-async function verifyJWT(token: string, secret: string): Promise<UserPayload | null> {
-  try {
-    const payload = await verify(token, secret);
-    return payload as UserPayload;
-  } catch {
-    return null;
-  }
-}
-
 // =============================================
 // RATE LIMITING
 // =============================================
-
-interface RateLimitConfig {
-  maxRequests: number;      // Max requests allowed
-  windowMs: number;         // Time window in milliseconds
-  blockDurationMs?: number; // How long to block after limit exceeded (optional)
-}
-
-interface RateLimitResult {
-  allowed: boolean;
-  remaining: number;
-  resetAt: Date;
-  retryAfter?: number;      // Seconds until retry allowed
-}
-
-// Rate limit configurations for different endpoints
-const RATE_LIMITS: Record<string, RateLimitConfig> = {
-  'login': {
-    maxRequests: 5,
-    windowMs: 15 * 60 * 1000,      // 5 attempts per 15 minutes
-    blockDurationMs: 30 * 60 * 1000 // 30 min block after exceeded
-  },
-  'login-ip': {
-    maxRequests: 20,
-    windowMs: 15 * 60 * 1000,      // 20 attempts per IP per 15 minutes
-  },
-  'register': {
-    maxRequests: 3,
-    windowMs: 60 * 60 * 1000,      // 3 registrations per hour per IP
-  },
-  'forgot-password': {
-    maxRequests: 3,
-    windowMs: 60 * 60 * 1000,      // 3 requests per hour per email
-  },
-  'forgot-password-ip': {
-    maxRequests: 10,
-    windowMs: 60 * 60 * 1000,      // 10 requests per hour per IP
-  },
-  'reset-password': {
-    maxRequests: 5,
-    windowMs: 60 * 60 * 1000,      // 5 attempts per hour
-  },
-  'set-password': {
-    maxRequests: 5,
-    windowMs: 60 * 60 * 1000,      // 5 attempts per hour
-  },
-  'change-password': {
-    maxRequests: 5,
-    windowMs: 60 * 60 * 1000,      // 5 attempts per hour
-  },
-  'demo-reset': {
-    maxRequests: 3,
-    windowMs: 60 * 60 * 1000,      // 3 attempts per hour per IP
-  },
-};
-
-async function checkRateLimit(
-  db: D1Database,
-  identifier: string,
-  endpoint: string,
-  config?: RateLimitConfig
-): Promise<RateLimitResult> {
-  const limits = config || RATE_LIMITS[endpoint] || { maxRequests: 10, windowMs: 60000 };
-  const now = new Date();
-  const windowStart = new Date(now.getTime() - limits.windowMs);
-  const windowStartISO = windowStart.toISOString();
-
-  try {
-    // Get current request count in window
-    const result = await db.prepare(`
-      SELECT SUM(request_count) as total_requests, MAX(updated_at) as last_request
-      FROM rate_limits
-      WHERE identifier = ? AND endpoint = ? AND window_start >= ?
-    `).bind(identifier, endpoint, windowStartISO).first();
-
-    const totalRequests = (result?.total_requests as number) || 0;
-    const remaining = Math.max(0, limits.maxRequests - totalRequests - 1);
-
-    // Check if blocked due to excessive attempts
-    if (limits.blockDurationMs && totalRequests >= limits.maxRequests) {
-      const lastRequest = result?.last_request ? new Date(result.last_request as string) : now;
-      const blockEnd = new Date(lastRequest.getTime() + limits.blockDurationMs);
-
-      if (now < blockEnd) {
-        const retryAfter = Math.ceil((blockEnd.getTime() - now.getTime()) / 1000);
-        return {
-          allowed: false,
-          remaining: 0,
-          resetAt: blockEnd,
-          retryAfter
-        };
-      }
-    }
-
-    // Check if limit exceeded
-    if (totalRequests >= limits.maxRequests) {
-      const resetAt = new Date(now.getTime() + limits.windowMs);
-      return {
-        allowed: false,
-        remaining: 0,
-        resetAt,
-        retryAfter: Math.ceil(limits.windowMs / 1000)
-      };
-    }
-
-    // Record this request
-    const currentWindowStart = new Date(Math.floor(now.getTime() / limits.windowMs) * limits.windowMs).toISOString();
-
-    // Try to update existing record or insert new one
-    const existing = await db.prepare(`
-      SELECT id, request_count FROM rate_limits
-      WHERE identifier = ? AND endpoint = ? AND window_start = ?
-    `).bind(identifier, endpoint, currentWindowStart).first();
-
-    if (existing) {
-      await db.prepare(`
-        UPDATE rate_limits
-        SET request_count = request_count + 1, updated_at = datetime('now')
-        WHERE id = ?
-      `).bind(existing.id).run();
-    } else {
-      await db.prepare(`
-        INSERT INTO rate_limits (identifier, endpoint, request_count, window_start)
-        VALUES (?, ?, 1, ?)
-      `).bind(identifier, endpoint, currentWindowStart).run();
-    }
-
-    return {
-      allowed: true,
-      remaining,
-      resetAt: new Date(now.getTime() + limits.windowMs)
-    };
-  } catch (error) {
-    console.error('Rate limit check error:', error);
-    // On error, allow the request but log it
-    return {
-      allowed: true,
-      remaining: limits.maxRequests,
-      resetAt: new Date(now.getTime() + limits.windowMs)
-    };
-  }
-}
-
-// Clean up old rate limit records (called periodically)
-async function cleanupRateLimits(db: D1Database): Promise<void> {
-  try {
-    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(); // 24 hours ago
-    await db.prepare(`
-      DELETE FROM rate_limits WHERE window_start < ?
-    `).bind(cutoff).run();
-  } catch (error) {
-    console.error('Rate limit cleanup error:', error);
-  }
-}
+// RateLimitConfig, RateLimitResult, RATE_LIMITS, checkRateLimit and
+// cleanupRateLimits now live in ./rate-limit (extracted in Phase 2 Task 5 so
+// counselor.ts can share them without a circular import).
 
 // Helper to get rate limit error response
 function rateLimitResponse(c: any, result: RateLimitResult) {
@@ -504,8 +356,15 @@ async function sendEmail(
   }
 }
 
+// Escape user/request-derived data before interpolating into outbound email HTML
+function escapeHtml(value: string): string {
+  return String(value).replace(/[&<>"']/g, (ch) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch] as string,
+  );
+}
+
 // Email templates
-function getVerificationEmailHTML(name: string, verificationUrl: string): string {
+export function getVerificationEmailHTML(name: string, verificationUrl: string): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -519,7 +378,7 @@ function getVerificationEmailHTML(name: string, verificationUrl: string): string
         <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to Brilla!</h1>
       </div>
       <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-        <p style="font-size: 16px;">Hello <strong>${name}</strong>,</p>
+        <p style="font-size: 16px;">Hello <strong>${escapeHtml(name)}</strong>,</p>
         <p style="font-size: 16px;">Your account has been created on the Brilla Study Platform. Click the button below to set up your password and start learning!</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${verificationUrl}" style="background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">Set Up Password</a>
@@ -533,7 +392,7 @@ function getVerificationEmailHTML(name: string, verificationUrl: string): string
   `;
 }
 
-function getPasswordResetEmailHTML(name: string, resetUrl: string): string {
+export function getPasswordResetEmailHTML(name: string, resetUrl: string): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -547,7 +406,7 @@ function getPasswordResetEmailHTML(name: string, resetUrl: string): string {
         <h1 style="color: white; margin: 0; font-size: 28px;">Password Reset</h1>
       </div>
       <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-        <p style="font-size: 16px;">Hello <strong>${name}</strong>,</p>
+        <p style="font-size: 16px;">Hello <strong>${escapeHtml(name)}</strong>,</p>
         <p style="font-size: 16px;">We received a request to reset your password. Click the button below to create a new password:</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${resetUrl}" style="background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">Reset Password</a>
@@ -561,7 +420,7 @@ function getPasswordResetEmailHTML(name: string, resetUrl: string): string {
   `;
 }
 
-function getApprovalEmailHTML(userName: string, appUrl: string, trialStarted: boolean = false): string {
+export function getApprovalEmailHTML(userName: string, appUrl: string, trialStarted: boolean = false): string {
   const trialBanner = trialStarted ? `
         <div style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
           <p style="color: white; font-size: 18px; font-weight: 600; margin: 0 0 8px 0;">🎁 Your 14-Day Premium Trial is Active!</p>
@@ -582,7 +441,7 @@ function getApprovalEmailHTML(userName: string, appUrl: string, trialStarted: bo
         <h1 style="color: white; margin: 0; font-size: 28px;">🎉 You're Approved!</h1>
       </div>
       <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-        <p style="font-size: 16px;">Hello <strong>${userName}</strong>,</p>
+        <p style="font-size: 16px;">Hello <strong>${escapeHtml(userName)}</strong>,</p>
         <p style="font-size: 16px;">Great news! Your Brilla Study Platform account has been approved. You can now log in and start your learning journey!</p>
         ${trialBanner}
         <div style="text-align: center; margin: 30px 0;">
@@ -597,7 +456,7 @@ function getApprovalEmailHTML(userName: string, appUrl: string, trialStarted: bo
   `;
 }
 
-function getRejectionEmailHTML(userName: string, reason: string | null, appUrl: string): string {
+export function getRejectionEmailHTML(userName: string, reason: string | null, appUrl: string): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -611,11 +470,11 @@ function getRejectionEmailHTML(userName: string, reason: string | null, appUrl: 
         <h1 style="color: white; margin: 0; font-size: 28px;">Registration Update</h1>
       </div>
       <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-        <p style="font-size: 16px;">Hello <strong>${userName}</strong>,</p>
+        <p style="font-size: 16px;">Hello <strong>${escapeHtml(userName)}</strong>,</p>
         <p style="font-size: 16px;">Thank you for your interest in Brilla Study Platform. Unfortunately, we were unable to approve your registration at this time.</p>
         ${reason ? `
         <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
-          <p style="margin: 0; font-size: 14px;"><strong>Reason:</strong> ${reason}</p>
+          <p style="margin: 0; font-size: 14px;"><strong>Reason:</strong> ${escapeHtml(reason)}</p>
         </div>
         ` : ''}
         <p style="font-size: 14px; color: #6b7280;">If you believe this was a mistake or would like to provide additional information, please contact us or try registering again.</p>
@@ -630,7 +489,7 @@ function getRejectionEmailHTML(userName: string, reason: string | null, appUrl: 
   `;
 }
 
-function getNewRegistrationEmailHTML(userName: string, userEmail: string, userRole: string, appUrl: string): string {
+export function getNewRegistrationEmailHTML(userName: string, userEmail: string, userRole: string, appUrl: string): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -647,9 +506,9 @@ function getNewRegistrationEmailHTML(userName: string, userEmail: string, userRo
         <p style="font-size: 16px;">Hello Admin,</p>
         <p style="font-size: 16px;">A new user has registered on Brilla Study Platform and is awaiting your approval:</p>
         <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <p style="margin: 8px 0; font-size: 15px;"><strong>Name:</strong> ${userName}</p>
-          <p style="margin: 8px 0; font-size: 15px;"><strong>Email:</strong> ${userEmail}</p>
-          <p style="margin: 8px 0; font-size: 15px;"><strong>Role:</strong> ${userRole}</p>
+          <p style="margin: 8px 0; font-size: 15px;"><strong>Name:</strong> ${escapeHtml(userName)}</p>
+          <p style="margin: 8px 0; font-size: 15px;"><strong>Email:</strong> ${escapeHtml(userEmail)}</p>
+          <p style="margin: 8px 0; font-size: 15px;"><strong>Role:</strong> ${escapeHtml(userRole)}</p>
           <p style="margin: 8px 0; font-size: 15px;"><strong>Time:</strong> ${new Date().toLocaleString()}</p>
         </div>
         <div style="text-align: center; margin: 30px 0;">
@@ -674,7 +533,7 @@ interface SecurityAlertDetails {
   country?: string;
 }
 
-function getSecurityAlertEmailHTML(details: SecurityAlertDetails, appUrl: string): string {
+export function getSecurityAlertEmailHTML(details: SecurityAlertDetails, appUrl: string): string {
   const severityColor = details.attemptCount >= 10 ? '#dc2626' : '#f59e0b'; // Red for high, amber for medium
   const severityText = details.attemptCount >= 10 ? 'HIGH' : 'MEDIUM';
 
@@ -704,11 +563,11 @@ function getSecurityAlertEmailHTML(details: SecurityAlertDetails, appUrl: string
           <table style="width: 100%; border-collapse: collapse;">
             <tr>
               <td style="padding: 8px 0; font-size: 14px; color: #6b7280; width: 140px;">Target Account:</td>
-              <td style="padding: 8px 0; font-size: 14px; font-weight: 600;">${details.targetEmail}</td>
+              <td style="padding: 8px 0; font-size: 14px; font-weight: 600;">${escapeHtml(details.targetEmail)}</td>
             </tr>
             <tr>
               <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">IP Address:</td>
-              <td style="padding: 8px 0; font-size: 14px; font-family: monospace; background: #f3f4f6; padding: 4px 8px; border-radius: 4px; display: inline-block;">${details.ipAddress}</td>
+              <td style="padding: 8px 0; font-size: 14px; font-family: monospace; background: #f3f4f6; padding: 4px 8px; border-radius: 4px; display: inline-block;">${escapeHtml(details.ipAddress)}</td>
             </tr>
             <tr>
               <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Failed Attempts:</td>
@@ -725,7 +584,7 @@ function getSecurityAlertEmailHTML(details: SecurityAlertDetails, appUrl: string
             ${details.country ? `
             <tr>
               <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Location:</td>
-              <td style="padding: 8px 0; font-size: 14px;">${details.country}</td>
+              <td style="padding: 8px 0; font-size: 14px;">${escapeHtml(details.country)}</td>
             </tr>
             ` : ''}
           </table>
@@ -843,6 +702,13 @@ async function callClaudeAPI(
 // Demo user email patterns (users with these emails are considered demo users)
 const DEMO_EMAIL_PATTERNS = ['@brillaprep.org'];
 
+// Explicit demo accounts allowed to skip Turnstile (never a domain-wide pattern)
+const TURNSTILE_EXEMPT_EMAILS = new Set([
+  'teacher@brillaprep.org',
+  'student@brillaprep.org',
+  'parent@brillaprep.org',
+]);
+
 // Excluded emails (real accounts that use demo email domain)
 const EXCLUDED_DEMO_EMAILS = ['admin@brillaprep.org'];
 
@@ -884,19 +750,21 @@ function getDemoDataFlags(userId: string): { is_demo_data: number; expires_at: s
   return { is_demo_data: 0, expires_at: null };
 }
 
-// SQL fragment for demo data columns
-function getDemoDataSQL(userId: string): string {
-  const flags = getDemoDataFlags(userId);
-  if (flags.is_demo_data) {
-    return `, is_demo_data, expires_at) VALUES (?, ?, ?, ..., 1, '${flags.expires_at}'`;
-  }
-  return `, is_demo_data, expires_at) VALUES (?, ?, ?, ..., 0, NULL`;
-}
-
 const app = new Hono<{ Bindings: Env }>();
 
 // Middleware
-app.use('*', cors());
+app.use('*', cors({
+  origin: (origin, c) => {
+    const allowed = ['https://brillaprep.org', 'https://www.brillaprep.org'];
+    if (c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev') {
+      allowed.push('http://localhost:5173', 'http://127.0.0.1:5173');
+    }
+    return allowed.includes(origin) ? origin : '';
+  },
+  allowHeaders: ['Content-Type', 'Authorization'],
+  allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  credentials: true,
+}));
 
 // Mount exam boards routes FIRST (O-Level / A-Level system) - must be before other /api routes
 app.route('/api/exam-boards', examBoardsApp);
@@ -907,100 +775,32 @@ const publicApp = new Hono<{ Bindings: Env }>();
 // Protected routes with JWT authentication middleware
 const protectedApp = new Hono<{ Bindings: Env }>();
 
-// Authentication middleware for protected routes
-protectedApp.use('*', async (c, next) => {
-  const authHeader = c.req.header('Authorization');
-
-  // Skip auth for OPTIONS requests (CORS preflight)
-  if (c.req.method === 'OPTIONS') {
-    return next();
-  }
-
-  // Check for Authorization header
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
-  }
-
-  const token = authHeader.replace('Bearer ', '');
-
-  // SECURITY: Demo tokens only allowed in development environment
-  if (token.endsWith('_demo_token')) {
-    const isDevelopment = c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev';
-    if (isDevelopment) {
-      // For demo mode, get the user based on token prefix
-      const tokenPrefix = token.replace('_demo_token', '');
-      const demoUsers: Record<string, { id: string; role: string }> = {
-        'student': { id: 'student_1766327981521', role: 'student' },
-        'teacher': { id: 'teacher_1766327981453', role: 'teacher' },
-        'admin': { id: 'admin_prod_001', role: 'admin' },
-      };
-      const demoUser = demoUsers[tokenPrefix];
-      if (demoUser) {
-        c.set('userId', demoUser.id);
-        c.set('userRole', demoUser.role);
-        c.set('isDemo', true); // Mark as demo user
-        return next();
-      }
-    }
-    // In production, demo tokens are rejected
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-
-  // Verify JWT token
-  try {
-    const payload = await verifyJWT(token, c.env.JWT_SECRET);
-    if (!payload) {
-      return c.json({ success: false, error: 'Invalid token' }, 401);
-    }
-    c.set('userId', payload.userId);
-    c.set('userRole', payload.role);
-    // Check if this is a demo user by their ID or email
-    const isDemo = isDemoUserId(payload.userId) || isDemoEmail(payload.email);
-    c.set('isDemo', isDemo);
-    return next();
-  } catch (error) {
-    console.error('Token verification error:', error);
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-});
+// Authentication middleware for protected routes: verified JWT + fresh DB
+// role/status/is_active re-check (shared middleware, sets userId/userRole/user).
+protectedApp.use('*', requireAuth);
 
 // Helper to check if current user is demo
 function isUserDemo(c: { get: (key: string) => boolean | undefined }): boolean {
   return c.get('isDemo') === true;
 }
 
-// Helper to get user from context or header (for backwards compatibility)
-function getUserId(c: { get: (key: string) => string | undefined; req: { header: (name: string) => string | undefined } }): string | undefined {
-  return c.get('userId') || c.req.header('x-user-id');
+// Identity comes only from verified JWT context (set by requireAuth).
+function getUserId(c: { get: (key: string) => string | undefined }): string | undefined {
+  return c.get('userId');
 }
 
-function getUserRole(c: { get: (key: string) => string | undefined; req: { header: (name: string) => string | undefined } }): string | undefined {
-  return c.get('userRole') || c.req.header('x-user-role');
+function getUserRole(c: { get: (key: string) => string | undefined }): string | undefined {
+  return c.get('userRole');
 }
 
 // Health check
 publicApp.get('/health', (c) => {
-  return c.json({ status: 'ok', environment: c.env.ENVIRONMENT });
+  return c.json({ success: true, data: { status: 'ok' } });
 });
 
 // =============================================
 // EXAM TYPES ENDPOINTS
 // =============================================
-
-// Get all exam types
-publicApp.get('/exam-types', async (c) => {
-  try {
-    const { results } = await c.env.DB.prepare(`
-      SELECT * FROM exam_types
-      WHERE is_active = 1
-      ORDER BY display_order
-    `).all();
-
-    return c.json({ success: true, data: results });
-  } catch (error) {
-    return c.json({ success: false, error: 'Failed to fetch exam types' }, 500);
-  }
-});
 
 // Get exam type by slug
 publicApp.get('/exam-types/:slug', async (c) => {
@@ -1063,7 +863,8 @@ publicApp.get('/exam-types/:slug/paper-types', async (c) => {
 
 // Register new user (self-registration goes to pending)
 publicApp.post('/auth/register', async (c) => {
-  const body = await c.req.json();
+  const body = await parseJsonBody(c);
+  if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
   const { email, password, name, role, schoolLevel, yearGroup, schoolName, house,
           teacherLicenseNumber, subjectsTaught, yearsExperience, qualifications,
           selectedTierId, turnstileToken, examTypeIds, primaryExamTypeId } = body;
@@ -1113,6 +914,11 @@ publicApp.post('/auth/register', async (c) => {
   }
 
   try {
+    const validationError = validateRegistration({ email, password, name });
+    if (validationError) {
+      return c.json({ success: false, error: validationError }, 400);
+    }
+
     // Check if email already exists
     const existing = await c.env.DB.prepare(
       'SELECT id FROM users WHERE email = ?'
@@ -1125,44 +931,58 @@ publicApp.post('/auth/register', async (c) => {
     // Hash password
     const passwordHash = await hashPassword(password);
     const id = `user_${Date.now()}`;
+    // Defense-in-depth: only self-serve roles may be caller-selected
+    if (role && !ALLOWED_SELF_SERVE_ROLES.includes(role)) {
+      return c.json({ success: false, error: 'Invalid role' }, 400);
+    }
     const userRole = role || 'student';
 
-    // Self-registered users go to pending status
-    await c.env.DB.prepare(`
-      INSERT INTO users (id, email, password_hash, name, role, status, email_verified,
-                         school_level, year_group, school_name, house,
-                         teacher_license_number, subjects_taught, years_experience, qualifications,
-                         selected_tier_id)
-      VALUES (?, ?, ?, ?, ?, 'pending', 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(
-      id, email, passwordHash, name, userRole,
-      schoolLevel || null, yearGroup || null, schoolName || null, house || null,
-      teacherLicenseNumber || null,
-      subjectsTaught ? JSON.stringify(subjectsTaught) : null,
-      yearsExperience || null, qualifications || null,
-      selectedTierId || null
-    ).run();
+    // Self-registered users go to pending status. The user insert, primary
+    // exam-type update and preference inserts run in one D1 batch so a
+    // failure mid-write cannot leave a user without their preferences.
+    const statements = [
+      c.env.DB.prepare(`
+        INSERT INTO users (id, email, password_hash, name, role, status, email_verified,
+                           school_level, year_group, school_name, house,
+                           teacher_license_number, subjects_taught, years_experience, qualifications,
+                           selected_tier_id)
+        VALUES (?, ?, ?, ?, ?, 'pending', 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        id, email, passwordHash, name, userRole,
+        schoolLevel || null, yearGroup || null, schoolName || null, house || null,
+        teacherLicenseNumber || null,
+        subjectsTaught ? JSON.stringify(subjectsTaught) : null,
+        yearsExperience || null, qualifications || null,
+        selectedTierId || null
+      ),
+    ];
 
     // Create exam type preferences if provided
     if (examTypeIds && Array.isArray(examTypeIds) && examTypeIds.length > 0) {
       const actualPrimaryId = primaryExamTypeId || examTypeIds[0];
 
       // Update primary_exam_type_id in users table
-      await c.env.DB.prepare(`
-        UPDATE users SET primary_exam_type_id = ? WHERE id = ?
-      `).bind(actualPrimaryId, id).run();
+      statements.push(
+        c.env.DB.prepare(`
+          UPDATE users SET primary_exam_type_id = ? WHERE id = ?
+        `).bind(actualPrimaryId, id)
+      );
 
       // Insert exam preferences
       for (const examTypeId of examTypeIds) {
         const prefId = `pref_${id}_${examTypeId}_${Date.now()}`;
         const isPrimary = examTypeId === actualPrimaryId ? 1 : 0;
 
-        await c.env.DB.prepare(`
-          INSERT INTO user_exam_preferences (id, user_id, exam_type_id, is_primary)
-          VALUES (?, ?, ?, ?)
-        `).bind(prefId, id, examTypeId, isPrimary).run();
+        statements.push(
+          c.env.DB.prepare(`
+            INSERT INTO user_exam_preferences (id, user_id, exam_type_id, is_primary)
+            VALUES (?, ?, ?, ?)
+          `).bind(prefId, id, examTypeId, isPrimary)
+        );
       }
     }
+
+    await c.env.DB.batch(statements);
 
     // Notify all admin users about the new registration
     try {
@@ -1230,13 +1050,15 @@ publicApp.post('/auth/register', async (c) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
-    return c.json({ success: false, error: 'Registration failed' }, 400);
+    return c.json({ success: false, error: 'Registration failed' }, 500);
   }
 });
 
 // Login
 publicApp.post('/auth/login', async (c) => {
-  const { email, password, turnstileToken } = await c.req.json();
+  const body = await parseJsonBody(c);
+  if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+  const { email, password, turnstileToken } = body;
   const clientInfo = getClientInfo(c);
   const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
 
@@ -1279,8 +1101,8 @@ publicApp.post('/auth/login', async (c) => {
     }
   }
 
-  // Verify Turnstile token (skip for demo users to allow easy demo access)
-  const isDemo = isDemoEmail(email);
+  // Verify Turnstile token (skip only for explicit demo accounts to allow easy demo access)
+  const isDemo = TURNSTILE_EXEMPT_EMAILS.has((email || '').toLowerCase());
   if (c.env.TURNSTILE_SECRET && !isDemo) {
     if (turnstileToken) {
       const isValidTurnstile = await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET, clientIp);
@@ -1408,9 +1230,8 @@ publicApp.post('/auth/login', async (c) => {
 
     return c.json({ success: true, data: { user, token } });
   } catch (error) {
-    console.error('Login error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({ success: false, error: `Login failed: ${errorMessage}` }, 500);
+    console.error('Login error:', error); // detail stays in logs
+    return c.json({ success: false, error: 'Login failed' }, 500);
   }
 });
 
@@ -1636,14 +1457,8 @@ publicApp.post('/auth/reset-password', async (c) => {
 });
 
 // Test notification endpoint - for testing email delivery
-// Requires JWT_SECRET as adminKey for security
-publicApp.post('/auth/test-notification', async (c) => {
-  const { adminKey } = await c.req.json();
-
-  if (adminKey !== c.env.JWT_SECRET) {
-    return c.json({ success: false, error: 'Invalid admin key' }, 401);
-  }
-
+// Requires a verified admin JWT (shared requireAdmin middleware)
+publicApp.post('/auth/test-notification', requireAdmin, async (c) => {
   if (!c.env.RESEND_API_KEY) {
     return c.json({ success: false, error: 'Email service not configured' }, 500);
   }
@@ -1734,64 +1549,93 @@ publicApp.post('/auth/test-notification', async (c) => {
   }
 });
 
-// Setup endpoint - Initialize demo users with passwords
-// This should only be called once during initial setup
+// Setup endpoint - one-shot initialization of initial users.
+// Requires the dedicated SETUP_KEY secret (separate from JWT_SECRET); the
+// endpoint returns 404 when SETUP_KEY is not configured. Rate limited to
+// 5 attempts/hour per IP, refuses to run once any admin account exists,
+// never overwrites existing users' passwords, and never creates admin
+// accounts. The caller must supply the full users array — there are no
+// built-in default credentials.
 publicApp.post('/auth/setup', async (c) => {
-  const { setupKey, users } = await c.req.json();
+  const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
 
-  // Simple security check - require a setup key that matches JWT_SECRET
-  // In production, you might use a separate SETUP_KEY secret
-  if (setupKey !== c.env.JWT_SECRET) {
+  // Rate limit this endpoint heavily
+  const ipRateLimit = await checkRateLimit(c.env.DB, clientIp, 'setup');
+  if (!ipRateLimit.allowed) {
+    return rateLimitResponse(c, ipRateLimit);
+  }
+
+  // Disabled unless the dedicated SETUP_KEY secret is configured
+  if (!c.env.SETUP_KEY) {
+    return c.json({ success: false, error: 'Not found' }, 404);
+  }
+
+  const body = await c.req.json().catch(() => null);
+  const setupKey = body?.setupKey;
+  const users = body?.users;
+
+  if (typeof setupKey !== 'string' || !constantTimeEqual(setupKey, c.env.SETUP_KEY)) {
     return c.json({ success: false, error: 'Invalid setup key' }, 401);
   }
 
   try {
+    // One-shot guard: setup can only run before any admin account exists
+    const adminCount = await c.env.DB.prepare(
+      "SELECT COUNT(*) as n FROM users WHERE role = 'admin'"
+    ).first<{ n: number }>();
+    if ((adminCount?.n ?? 0) > 0) {
+      return c.json({ success: false, error: 'Setup has already been completed' }, 403);
+    }
+
+    // The caller must supply the users to create (no default credentials)
+    if (!Array.isArray(users) || users.length === 0) {
+      return c.json({ success: false, error: 'A non-empty users array is required' }, 400);
+    }
+
+    // Role clamp: setup never creates admins (admins are seeded separately)
+    const allowedRoles = ['teacher', 'student', 'parent'];
+    for (const user of users) {
+      if (!user || typeof user.email !== 'string' || typeof user.password !== 'string' ||
+          typeof user.name !== 'string' || !allowedRoles.includes(user.role)) {
+        return c.json({ success: false, error: 'Invalid entry in users array' }, 400);
+      }
+    }
+
     const results = [];
 
-    // Default demo users if none provided
-    const demoUsers = users || [
-      { email: 'admin@brillaprep.org', password: 'Admin123!', name: 'System Admin', role: 'admin' },
-      { email: 'teacher@brillaprep.org', password: 'Teacher123!', name: 'Demo Teacher', role: 'teacher' },
-      { email: 'student@brillaprep.org', password: 'Student123!', name: 'Demo Student', role: 'student' },
-    ];
-
-    for (const user of demoUsers) {
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
       // Check if user exists
       const existing = await c.env.DB.prepare(
-        'SELECT id, password_hash FROM users WHERE email = ?'
+        'SELECT id FROM users WHERE email = ?'
       ).bind(user.email).first();
 
-      const passwordHash = await hashPassword(user.password);
-
       if (existing) {
-        // Update password if user exists
-        await c.env.DB.prepare(`
-          UPDATE users SET password_hash = ?, updated_at = datetime('now')
-          WHERE email = ?
-        `).bind(passwordHash, user.email).run();
-        results.push({ email: user.email, action: 'updated' });
-      } else {
-        // Create user if doesn't exist
-        const userId = `${user.role}_${Date.now()}`;
-        await c.env.DB.prepare(`
-          INSERT INTO users (id, email, password_hash, name, role, status, is_active, email_verified, xp_points, level, streak_days, ai_grading_credits)
-          VALUES (?, ?, ?, ?, ?, 'approved', 1, 1, 0, 1, 0, ?)
-        `).bind(
-          userId,
-          user.email,
-          passwordHash,
-          user.name,
-          user.role,
-          user.role === 'admin' ? 100 : user.role === 'teacher' ? 50 : 10
-        ).run();
-        results.push({ email: user.email, action: 'created' });
+        // Never overwrite an existing user's password
+        results.push({ email: user.email, action: 'skipped_exists' });
+        continue;
       }
+
+      const passwordHash = await hashPassword(user.password);
+      const userId = `${user.role}_${Date.now()}_${i}`;
+      await c.env.DB.prepare(`
+        INSERT INTO users (id, email, password_hash, name, role, status, is_active, email_verified, xp_points, level, streak_days, ai_grading_credits)
+        VALUES (?, ?, ?, ?, ?, 'approved', 1, 1, 0, 1, 0, ?)
+      `).bind(
+        userId,
+        user.email,
+        passwordHash,
+        user.name,
+        user.role,
+        user.role === 'teacher' ? 50 : 10
+      ).run();
+      results.push({ email: user.email, action: 'created' });
     }
 
     return c.json({ success: true, data: { message: 'Setup completed', results } });
   } catch (error) {
     console.error('Setup error:', error);
-    return c.json({ success: false, error: 'Setup failed: ' + (error instanceof Error ? error.message : 'Unknown error') }, 500);
+    return c.json({ success: false, error: 'Setup failed' }, 500);
   }
 });
 
@@ -1997,7 +1841,7 @@ publicApp.get('/questions', async (c) => {
   const topic = c.req.query('topic');
   const difficulty = c.req.query('difficulty');
   const round = c.req.query('round');
-  const limit = parseInt(c.req.query('limit') || '20');
+  const limit = parseLimit(c, 20);
   const offset = parseInt(c.req.query('offset') || '0');
 
   try {
@@ -2431,29 +2275,33 @@ protectedApp.post('/quests/:questId/claim', async (c) => {
       return c.json({ success: false, error: 'Quest not completed yet' }, 400);
     }
 
-    // Mark as claimed
-    await c.env.DB.prepare(`
+    // Atomic claim transition: only one claimant can flip completed -> claimed
+    const claim = await c.env.DB.prepare(`
       UPDATE user_quests SET status = 'claimed', claimed_at = datetime('now')
-      WHERE id = ?
-    `).bind(questId).run();
+      WHERE id = ? AND user_id = ? AND status = 'completed'
+    `).bind(questId, userId).run();
 
-    // Award XP
+    if (claim.meta.changes === 0) {
+      return c.json({ success: false, error: 'Quest not completed yet or already claimed' }, 400);
+    }
+
+    // Award + record atomically
     const xpReward = quest.xp_reward as number;
-    await c.env.DB.prepare(`
-      UPDATE users SET xp_points = xp_points + ? WHERE id = ?
-    `).bind(xpReward, userId).run();
+    await c.env.DB.batch([
+      c.env.DB.prepare(`
+        UPDATE users SET xp_points = xp_points + ? WHERE id = ?
+      `).bind(xpReward, userId),
+      c.env.DB.prepare(`
+        INSERT INTO quest_completions (id, user_id, quest_template_id, xp_earned, quest_type)
+        VALUES (?, ?, ?, ?, (SELECT quest_type FROM quest_templates WHERE id = ?))
+      `).bind(`qc_${crypto.randomUUID()}`, userId, quest.quest_template_id, xpReward, quest.quest_template_id),
+    ]);
 
-    // Record completion
-    await c.env.DB.prepare(`
-      INSERT INTO quest_completions (id, user_id, quest_template_id, xp_earned, quest_type)
-      VALUES (?, ?, ?, ?, (SELECT quest_type FROM quest_templates WHERE id = ?))
-    `).bind(`qc_${crypto.randomUUID()}`, userId, quest.quest_template_id, xpReward, quest.quest_template_id).run();
-
+    // NOTE: coin_reward is display-only; no users.coins column exists. See docs/superpowers/plans/2026-08-03-fix-03-runtime-features.md
     return c.json({
       success: true,
       data: {
         xp: xpReward,
-        coins: quest.coin_reward || 0,
       },
     });
   } catch (error) {
@@ -2736,7 +2584,7 @@ publicApp.get('/papers', async (c) => {
   const subject = c.req.query('subject');
   const year = c.req.query('year');
   const paperType = c.req.query('paper_type');
-  const limit = parseInt(c.req.query('limit') || '50');
+  const limit = parseLimit(c, 50);
   const offset = parseInt(c.req.query('offset') || '0');
 
   try {
@@ -2925,29 +2773,11 @@ publicApp.get('/houses', async (c) => {
   }
 });
 
-// Get house by ID
-publicApp.get('/houses/:id', async (c) => {
-  const id = c.req.param('id');
-
-  try {
-    const house = await c.env.DB.prepare(`
-      SELECT h.*,
-        (SELECT COUNT(*) FROM users WHERE house = h.id) as member_count,
-        COALESCE((SELECT SUM(points) FROM house_points WHERE house_id = h.id), 0) as total_points
-      FROM houses h WHERE h.id = ?
-    `).bind(id).first();
-
-    if (!house) {
-      return c.json({ success: false, error: 'House not found' }, 404);
-    }
-
-    return c.json({ success: true, data: house });
-  } catch (error) {
-    return c.json({ success: false, error: 'Failed to fetch house' }, 500);
-  }
-});
-
 // Get house standings
+// NOTE: static routes (/houses/standings, /houses/activity) must be
+// registered BEFORE the `/houses/:id` param route below — Hono resolves
+// first-registered-wins, so the param route would otherwise capture
+// id='standings' / id='activity'.
 publicApp.get('/houses/standings', async (c) => {
   const period = c.req.query('period') || 'all_time';
 
@@ -2978,30 +2808,9 @@ publicApp.get('/houses/standings', async (c) => {
   }
 });
 
-// Get house members
-publicApp.get('/houses/:id/members', async (c) => {
-  const id = c.req.param('id');
-  const limit = parseInt(c.req.query('limit') || '20');
-
-  try {
-    const { results } = await c.env.DB.prepare(`
-      SELECT u.id, u.name, u.avatar_url, u.xp_points, u.level,
-        COALESCE((SELECT SUM(points) FROM house_points WHERE user_id = u.id AND house_id = ?), 0) as house_contribution
-      FROM users u
-      WHERE u.house = ?
-      ORDER BY house_contribution DESC
-      LIMIT ?
-    `).bind(id, id, limit).all();
-
-    return c.json({ success: true, data: results });
-  } catch (error) {
-    return c.json({ success: false, error: 'Failed to fetch members' }, 500);
-  }
-});
-
 // Get recent house activity
 publicApp.get('/houses/activity', async (c) => {
-  const limit = parseInt(c.req.query('limit') || '20');
+  const limit = parseLimit(c, 20);
 
   try {
     const { results } = await c.env.DB.prepare(`
@@ -3016,6 +2825,49 @@ publicApp.get('/houses/activity', async (c) => {
     return c.json({ success: true, data: results });
   } catch (error) {
     return c.json({ success: false, error: 'Failed to fetch activity' }, 500);
+  }
+});
+
+// Get house by ID
+publicApp.get('/houses/:id', async (c) => {
+  const id = c.req.param('id');
+
+  try {
+    const house = await c.env.DB.prepare(`
+      SELECT h.*,
+        (SELECT COUNT(*) FROM users WHERE house = h.id) as member_count,
+        COALESCE((SELECT SUM(points) FROM house_points WHERE house_id = h.id), 0) as total_points
+      FROM houses h WHERE h.id = ?
+    `).bind(id).first();
+
+    if (!house) {
+      return c.json({ success: false, error: 'House not found' }, 404);
+    }
+
+    return c.json({ success: true, data: house });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch house' }, 500);
+  }
+});
+
+// Get house members
+publicApp.get('/houses/:id/members', async (c) => {
+  const id = c.req.param('id');
+  const limit = parseLimit(c, 20);
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT u.id, u.name, u.avatar_url, u.xp_points, u.level,
+        COALESCE((SELECT SUM(points) FROM house_points WHERE user_id = u.id AND house_id = ?), 0) as house_contribution
+      FROM users u
+      WHERE u.house = ?
+      ORDER BY house_contribution DESC
+      LIMIT ?
+    `).bind(id, id, limit).all();
+
+    return c.json({ success: true, data: results });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch members' }, 500);
   }
 });
 
@@ -3044,81 +2896,12 @@ publicApp.get('/battles/available', async (c) => {
   }
 });
 
-// Get battle history (must be before /battles/:id)
-publicApp.get('/battles/history', async (c) => {
-  // Get userId from auth header if present
-  const authHeader = c.req.header('Authorization');
-  let userId: string | null = null;
-
-  if (authHeader?.startsWith('Bearer ')) {
-    const token = authHeader.replace('Bearer ', '');
-    try {
-      const payload = await verifyJWT(token, c.env.JWT_SECRET);
-      if (payload) {
-        userId = payload.userId;
-      }
-    } catch {
-      // Token invalid, continue without userId
-    }
-  }
-
-  // Also check query param as fallback
-  if (!userId) {
-    userId = c.req.query('userId') || null;
-  }
-
-  if (!userId) {
-    return c.json({ success: false, error: 'Authentication required' }, 401);
-  }
-
-  const limit = parseInt(c.req.query('limit') || '20');
-
-  try {
-    const { results } = await c.env.DB.prepare(`
-      SELECT b.*,
-        c.name as challenger_name, c.avatar_url as challenger_avatar,
-        o.name as opponent_name, o.avatar_url as opponent_avatar,
-        s.name as subject_name,
-        CASE
-          WHEN b.challenger_id = ? THEN b.challenger_score
-          ELSE b.opponent_score
-        END as your_score,
-        CASE
-          WHEN b.challenger_id = ? THEN b.opponent_score
-          ELSE b.challenger_score
-        END as opponent_score,
-        CASE
-          WHEN b.challenger_id = ? THEN o.name
-          ELSE c.name
-        END as opponent_name_display
-      FROM battles b
-      JOIN users c ON b.challenger_id = c.id
-      LEFT JOIN users o ON b.opponent_id = o.id
-      LEFT JOIN subjects s ON b.subject_id = s.id
-      WHERE b.challenger_id = ? OR b.opponent_id = ?
-      ORDER BY b.created_at DESC
-      LIMIT ?
-    `).bind(userId, userId, userId, userId, userId, limit).all();
-
-    // Format results for the frontend
-    const formattedResults = results.map((battle: Record<string, unknown>) => ({
-      id: battle.id,
-      status: battle.status,
-      winner_id: battle.winner_id,
-      your_score: battle.your_score,
-      opponent_score: battle.opponent_score,
-      created_at: battle.created_at,
-      opponent: {
-        name: battle.opponent_name_display || 'Opponent',
-      },
-    }));
-
-    return c.json(formattedResults);
-  } catch (error) {
-    console.error('Failed to fetch battle history:', error);
-    return c.json({ success: false, error: 'Failed to fetch battle history' }, 500);
-  }
-});
+// NOTE: GET /battles/history is served only by the app-level requireAuth
+// route registered just before `app.route('/api', publicApp)` below
+// (JWT-derived userId). The unauthenticated publicApp duplicate was removed:
+// it let callers pass an arbitrary ?userId= to read anyone's battle history
+// (IDOR), and publicApp's `/battles/:id` param route would shadow any
+// protectedApp copy (Hono: first-registered matching route wins).
 
 // Get battle by ID
 publicApp.get('/battles/:id', async (c) => {
@@ -3186,7 +2969,7 @@ publicApp.get('/flashcards/decks/:id/cards', async (c) => {
 // Get all public flashcard decks (for browsing)
 publicApp.get('/flashcards/public', async (c) => {
   const subjectId = c.req.query('subject');
-  const limit = parseInt(c.req.query('limit') || '20');
+  const limit = parseLimit(c, 20);
 
   try {
     let query = `
@@ -3215,13 +2998,244 @@ publicApp.get('/flashcards/public', async (c) => {
   }
 });
 
+// Get user's battle history (identity from JWT only). Registered on `app`
+// BEFORE the publicApp mount: publicApp's `/battles/:id` param route is
+// registered earlier than protectedApp's routes and would otherwise shadow
+// `/battles/history` (Hono: first-registered matching route wins).
+app.get('/api/battles/history', requireAuth, async (c) => {
+  const userId = getUserId(c)!;
+  const limit = parseLimit(c, 20);
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT b.*,
+        c.name as challenger_name, c.avatar_url as challenger_avatar,
+        o.name as opponent_name, o.avatar_url as opponent_avatar,
+        s.name as subject_name,
+        CASE
+          WHEN b.challenger_id = ? THEN b.challenger_score
+          ELSE b.opponent_score
+        END as your_score,
+        CASE
+          WHEN b.challenger_id = ? THEN b.opponent_score
+          ELSE b.challenger_score
+        END as opponent_score,
+        CASE
+          WHEN b.challenger_id = ? THEN o.name
+          ELSE c.name
+        END as opponent_name_display
+      FROM battles b
+      JOIN users c ON b.challenger_id = c.id
+      LEFT JOIN users o ON b.opponent_id = o.id
+      LEFT JOIN subjects s ON b.subject_id = s.id
+      WHERE b.challenger_id = ? OR b.opponent_id = ?
+      ORDER BY b.created_at DESC
+      LIMIT ?
+    `).bind(userId, userId, userId, userId, userId, limit).all();
+
+    // Shape the rows the way the Competition page consumes them
+    // (your_score/opponent_score relative to the JWT user, opponent object).
+    const formattedResults = results.map((battle: Record<string, unknown>) => ({
+      id: battle.id,
+      status: battle.status,
+      winner_id: battle.winner_id,
+      your_score: battle.your_score,
+      opponent_score: battle.opponent_score,
+      created_at: battle.created_at,
+      opponent: {
+        name: battle.opponent_name_display || 'Opponent',
+      },
+    }));
+
+    return c.json({ success: true, data: formattedResults });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch battle history' }, 500);
+  }
+});
+
+// Get user's paper attempts history (identity from JWT only). Registered on
+// `app` BEFORE the publicApp mount: publicApp's `/papers/:id` param route is
+// registered earlier than protectedApp's routes and would otherwise shadow
+// `/papers/attempts` (Hono: first-registered matching route wins).
+app.get('/api/papers/attempts', requireAuth, async (c) => {
+  const userId = getUserId(c)!;
+  const limit = parseLimit(c, 20);
+  const status = c.req.query('status'); // Optional filter: completed, abandoned, in_progress
+
+  try {
+    let query = `
+      SELECT
+        pa.id,
+        pa.paper_id,
+        pa.status,
+        pa.time_allowed,
+        pa.time_used,
+        pa.total_score,
+        pa.percentage_score as percentage,
+        pa.started_at,
+        pa.submitted_at,
+        pp.title as paper_title,
+        pp.total_marks as max_score,
+        pt.name as paper_type
+      FROM paper_attempts pa
+      JOIN past_papers pp ON pa.paper_id = pp.id
+      LEFT JOIN paper_types pt ON pp.paper_type_id = pt.id
+      WHERE pa.user_id = ?
+    `;
+    const params: (string | number)[] = [userId];
+
+    if (status) {
+      query += ` AND pa.status = ?`;
+      params.push(status);
+    }
+
+    query += ` ORDER BY pa.started_at DESC LIMIT ?`;
+    params.push(limit);
+
+    const attempts = await c.env.DB.prepare(query).bind(...params).all();
+
+    // Transform to expected format
+    const data = attempts.results.map((attempt: Record<string, unknown>) => ({
+      id: attempt.id,
+      paper_id: attempt.paper_id,
+      status: attempt.status,
+      total_score: attempt.total_score || 0,
+      max_score: attempt.max_score || 100,
+      percentage: attempt.percentage || 0,
+      time_used: attempt.time_used || 0,
+      submitted_at: attempt.submitted_at,
+      started_at: attempt.started_at,
+      paper: {
+        title: attempt.paper_title,
+        paper_type: attempt.paper_type || 'Paper 1',
+      },
+    }));
+
+    return c.json(data);
+  } catch (error) {
+    console.error('Failed to fetch paper attempts:', error);
+    return c.json({ success: false, error: 'Failed to fetch paper attempts' }, 500);
+  }
+});
+
+// Get user's essay history (identity from JWT only). Registered on `app`
+// BEFORE the publicApp mount: publicApp's `/essays/:questionId` param route
+// is registered earlier than protectedApp's routes and would otherwise shadow
+// `/essays/history` (Hono: first-registered matching route wins).
+app.get('/api/essays/history', requireAuth, async (c) => {
+  // Self only: identity comes only from the verified JWT.
+  const userId = getUserId(c)!;
+  const limit = parseLimit(c, 20);
+
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT ea.*, q.question_text, q.marks, s.name as subject_name
+      FROM essay_attempts ea
+      JOIN questions q ON ea.question_id = q.id
+      JOIN subjects s ON q.subject_id = s.id
+      WHERE ea.user_id = ?
+      ORDER BY ea.created_at DESC
+      LIMIT ?
+    `).bind(userId, limit).all();
+
+    // Parse feedback JSON
+    const attempts = results.map((a: Record<string, unknown>) => ({
+      ...a,
+      aiFeedback: a.ai_feedback ? JSON.parse(a.ai_feedback as string) : null,
+    }));
+
+    return c.json({ success: true, data: attempts });
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to fetch essay history' }, 500);
+  }
+});
+
+// Question bank search (for question picker). Registered on `app` BEFORE
+// the publicApp mount: publicApp's `/questions/:id` param route is
+// registered earlier than protectedApp's routes and would otherwise shadow
+// `/questions/bank` (Hono: first-registered matching route wins).
+app.get('/api/questions/bank', requireAuth, async (c) => {
+  try {
+    const search = c.req.query('search');
+    const subjectId = c.req.query('subject');
+    const topicId = c.req.query('topic');
+    const difficulty = c.req.query('difficulty');
+    const questionType = c.req.query('type');
+    const limit = parseLimit(c, 20);
+    const offset = parseInt(c.req.query('offset') || '0');
+
+    let query = `
+      SELECT q.*, t.name as topic_name, s.name as subject_name
+      FROM questions q
+      LEFT JOIN topics t ON q.topic_id = t.id
+      LEFT JOIN subjects s ON q.subject_id = s.id
+      WHERE 1=1
+    `;
+    const params: unknown[] = [];
+
+    if (search) {
+      query += ' AND q.question_text LIKE ?';
+      params.push(`%${search}%`);
+    }
+    if (subjectId) {
+      query += ' AND q.subject_id = ?';
+      params.push(subjectId);
+    }
+    if (topicId) {
+      query += ' AND q.topic_id = ?';
+      params.push(topicId);
+    }
+    if (difficulty) {
+      query += ' AND q.difficulty = ?';
+      params.push(difficulty);
+    }
+    if (questionType) {
+      query += ' AND q.question_type = ?';
+      params.push(questionType);
+    }
+
+    // Count total
+    const countQuery = query.replace('SELECT q.*, t.name as topic_name, s.name as subject_name', 'SELECT COUNT(*) as count');
+    const total = await c.env.DB.prepare(countQuery).bind(...params).first();
+
+    query += ' ORDER BY q.created_at DESC LIMIT ? OFFSET ?';
+    params.push(limit, offset);
+
+    const questions = await c.env.DB.prepare(query).bind(...params).all();
+
+    return c.json({
+      success: true,
+      data: {
+        questions: questions.results.map((q: Record<string, unknown>) => ({
+          id: q.id,
+          questionText: q.question_text,
+          questionType: q.question_type,
+          options: transformQuestionOptions(q.options, q.correct_answer as string),
+          correctAnswer: q.correct_answer,
+          explanation: q.explanation,
+          difficulty: q.difficulty,
+          points: q.points,
+          topicId: q.topic_id,
+          topicName: q.topic_name,
+          subjectId: q.subject_id,
+          subjectName: q.subject_name,
+        })),
+        total: total?.count || 0,
+      },
+    });
+  } catch (error) {
+    console.error('Error searching questions:', error);
+    return c.json({ success: false, error: 'Failed to search questions' }, 500);
+  }
+});
+
 // Mount public routes
 app.route('/api', publicApp);
 
 // Get daily usage info for freemium limits
 protectedApp.get('/usage/daily', async (c) => {
-  // Get userId from JWT context (set by auth middleware)
-  const userId = c.get('userId') as string || c.req.query('userId') || 'user_demo';
+  // Identity comes only from the verified JWT (set by requireAuth).
+  const userId = getUserId(c)!;
 
   try {
     const usage = await getDailyUsage(userId, c.env.DB);
@@ -3291,13 +3305,69 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
     // Increment usage count for non-premium users
     const usageResult = await incrementUsage(userId, c.env.DB);
 
-    // Record the attempt with demo data flags
+    // Record the attempt with demo data flags, and upsert per-topic
+    // user_progress (the mastery write path feeding GET /progress) in the
+    // same atomic batch.
     const attemptId = `attempt_${Date.now()}`;
     const demoFlags = getDemoDataFlags(userId);
-    await c.env.DB.prepare(`
+    const nowIso = new Date().toISOString();
+    const attemptInsert = c.env.DB.prepare(`
       INSERT INTO question_attempts (id, user_id, question_id, user_answer, is_correct, time_taken, points_earned, is_demo_data, expires_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(attemptId, userId, questionId, answer, isCorrect ? 1 : 0, 0, pointsEarned, demoFlags.is_demo_data, demoFlags.expires_at).run();
+    `).bind(attemptId, userId, questionId, answer, isCorrect ? 1 : 0, 0, pointsEarned, demoFlags.is_demo_data, demoFlags.expires_at);
+
+    // questions.topic_id is NOT NULL in the schema, but guard anyway: with no
+    // topic there is nothing to key progress on, so skip the upsert silently.
+    const topicId = question.topic_id as string | null;
+    // NOTE: questions.exam_type_id is nullable (seed.sql inserts omit it).
+    // SQLite UNIQUE(user_id, topic_id, exam_type_id) never conflict-matches
+    // NULL, so ON CONFLICT is only safe when exam_type_id is non-null; the
+    // NULL case uses an explicit SELECT + INSERT/UPDATE instead (storing a
+    // sentinel like '' would violate the exam_types FK).
+    const examTypeId = (question.exam_type_id as string | null) ?? null;
+
+    let progressStmt = null;
+    if (topicId && examTypeId !== null) {
+      progressStmt = c.env.DB.prepare(`
+        INSERT INTO user_progress (id, user_id, topic_id, exam_type_id, questions_attempted, questions_correct, mastery_level, last_attempt_at, created_at, updated_at, is_demo_data, expires_at)
+        VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(user_id, topic_id, exam_type_id) DO UPDATE SET
+          questions_attempted = questions_attempted + 1,
+          questions_correct = questions_correct + excluded.questions_correct,
+          mastery_level = ROUND(100.0 * (questions_correct + excluded.questions_correct) / (questions_attempted + 1)),
+          last_attempt_at = excluded.last_attempt_at,
+          updated_at = excluded.updated_at
+      `).bind(
+        `progress_${Date.now()}`, userId, topicId, examTypeId,
+        isCorrect ? 1 : 0, isCorrect ? 100 : 0,
+        nowIso, nowIso, nowIso, demoFlags.is_demo_data, demoFlags.expires_at
+      );
+    } else if (topicId) {
+      const existing = await c.env.DB.prepare(`
+        SELECT id FROM user_progress
+        WHERE user_id = ? AND topic_id = ? AND exam_type_id IS NULL
+      `).bind(userId, topicId).first<{ id: string }>();
+      progressStmt = existing
+        ? c.env.DB.prepare(`
+            UPDATE user_progress SET
+              questions_attempted = questions_attempted + 1,
+              questions_correct = questions_correct + ?,
+              mastery_level = ROUND(100.0 * (questions_correct + ?) / (questions_attempted + 1)),
+              last_attempt_at = ?,
+              updated_at = ?
+            WHERE id = ?
+          `).bind(isCorrect ? 1 : 0, isCorrect ? 1 : 0, nowIso, nowIso, existing.id)
+        : c.env.DB.prepare(`
+            INSERT INTO user_progress (id, user_id, topic_id, exam_type_id, questions_attempted, questions_correct, mastery_level, last_attempt_at, created_at, updated_at, is_demo_data, expires_at)
+            VALUES (?, ?, ?, NULL, 1, ?, ?, ?, ?, ?, ?, ?)
+          `).bind(
+            `progress_${Date.now()}`, userId, topicId,
+            isCorrect ? 1 : 0, isCorrect ? 100 : 0,
+            nowIso, nowIso, nowIso, demoFlags.is_demo_data, demoFlags.expires_at
+          );
+    }
+
+    await c.env.DB.batch(progressStmt ? [attemptInsert, progressStmt] : [attemptInsert]);
 
     // Get updated usage info
     const usage = await getDailyUsage(userId, c.env.DB);
@@ -3327,7 +3397,7 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
 
 // Get user progress
 protectedApp.get('/progress', async (c) => {
-  const userId = c.req.query('userId') || 'user_demo';
+  const userId = getUserId(c)!;
 
   try {
     const { results: progress } = await c.env.DB.prepare(`
@@ -3369,7 +3439,7 @@ protectedApp.get('/practice/sessions', async (c) => {
     return c.json({ success: false, error: 'Unauthorized' }, 401);
   }
 
-  const limit = parseInt(c.req.query('limit') || '10');
+  const limit = parseLimit(c, 10);
   const offset = parseInt(c.req.query('offset') || '0');
 
   try {
@@ -3571,7 +3641,7 @@ protectedApp.get('/flashcards/due', async (c) => {
     return c.json({ success: false, error: 'Unauthorized' }, 401);
   }
 
-  const limit = parseInt(c.req.query('limit') || '20');
+  const limit = parseLimit(c, 20);
 
   try {
     // Get cards that are due for review or haven't been reviewed yet
@@ -3687,18 +3757,15 @@ protectedApp.post('/flashcards/:id/review', async (c) => {
 
 // Create custom house (admin only)
 protectedApp.post('/houses', async (c) => {
-  const { name, color, icon, description, schoolId, userId } = await c.req.json();
+  const { name, color, icon, description, schoolId } = await c.req.json();
 
-  // In production, verify user is admin
+  // Admin check uses the fresh DB role set by requireAuth, never a
+  // caller-supplied id.
+  if (getUserRole(c) !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
+  }
+
   try {
-    const user = await c.env.DB.prepare(`
-      SELECT role FROM users WHERE id = ?
-    `).bind(userId).first();
-
-    if (!user || user.role !== 'admin') {
-      return c.json({ success: false, error: 'Admin access required' }, 403);
-    }
-
     const id = `house_${Date.now()}`;
     await c.env.DB.prepare(`
       INSERT INTO houses (id, name, color, icon, description, is_default, school_id)
@@ -3711,9 +3778,15 @@ protectedApp.post('/houses', async (c) => {
   }
 });
 
-// Award house points
+// Award house points (admin or teacher only — students must not self-award)
 protectedApp.post('/houses/points', async (c) => {
-  const { houseId, userId, points, source, sourceId } = await c.req.json();
+  const { houseId, points, source, sourceId } = await c.req.json();
+  const userId = getUserId(c)!;
+  const userRole = getUserRole(c);
+
+  if (userRole !== 'admin' && userRole !== 'teacher') {
+    return c.json({ success: false, error: 'Only teachers and admins can award house points' }, 403);
+  }
 
   try {
     // Get current period (YYYY-WW format for weekly)
@@ -3734,10 +3807,15 @@ protectedApp.post('/houses/points', async (c) => {
   }
 });
 
-// Update user's house
+// Update user's house (self or admin)
 protectedApp.put('/users/:id/house', async (c) => {
   const id = c.req.param('id');
   const { houseId } = await c.req.json();
+  const userId = getUserId(c)!;
+
+  if (userId !== id && getUserRole(c) !== 'admin') {
+    return c.json({ success: false, error: 'Forbidden' }, 403);
+  }
 
   try {
     await c.env.DB.prepare(`
@@ -3756,7 +3834,8 @@ protectedApp.put('/users/:id/house', async (c) => {
 
 // Create a new battle (challenge)
 protectedApp.post('/battles', async (c) => {
-  const { userId, subjectId, difficulty, questionCount } = await c.req.json();
+  const { subjectId, difficulty, questionCount } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     // Fetch random questions for the battle
@@ -3832,7 +3911,7 @@ protectedApp.post('/battles', async (c) => {
 // Join a battle
 protectedApp.post('/battles/:id/join', async (c) => {
   const battleId = c.req.param('id');
-  const { userId } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     // Check if battle exists and is waiting
@@ -3882,7 +3961,8 @@ protectedApp.post('/battles/:id/join', async (c) => {
 // Submit answer in battle
 protectedApp.post('/battles/:id/answer', async (c) => {
   const battleId = c.req.param('id');
-  const { userId, questionIndex, answer, timeTaken } = await c.req.json();
+  const { questionIndex, answer, timeTaken } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     // Get battle
@@ -3982,7 +4062,7 @@ protectedApp.post('/battles/:id/answer', async (c) => {
 // Cancel/forfeit battle
 protectedApp.post('/battles/:id/cancel', async (c) => {
   const battleId = c.req.param('id');
-  const { userId } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     const battle = await c.env.DB.prepare(`
@@ -4014,106 +4094,23 @@ protectedApp.post('/battles/:id/cancel', async (c) => {
   }
 });
 
-// Get user's battle history
-protectedApp.get('/battles/history', async (c) => {
-  const userId = c.req.query('userId');
-  const limit = parseInt(c.req.query('limit') || '20');
-
-  if (!userId) {
-    return c.json({ success: false, error: 'userId required' }, 400);
-  }
-
-  try {
-    const { results } = await c.env.DB.prepare(`
-      SELECT b.*,
-        c.name as challenger_name, c.avatar_url as challenger_avatar,
-        o.name as opponent_name, o.avatar_url as opponent_avatar,
-        s.name as subject_name
-      FROM battles b
-      JOIN users c ON b.challenger_id = c.id
-      LEFT JOIN users o ON b.opponent_id = o.id
-      LEFT JOIN subjects s ON b.subject_id = s.id
-      WHERE b.challenger_id = ? OR b.opponent_id = ?
-      ORDER BY b.created_at DESC
-      LIMIT ?
-    `).bind(userId, userId, limit).all();
-
-    return c.json({ success: true, data: results });
-  } catch (error) {
-    return c.json({ success: false, error: 'Failed to fetch battle history' }, 500);
-  }
-});
+// Get user's battle history: served by the app-level route registered before
+// the publicApp mount (see above `app.route('/api', publicApp)`), because
+// publicApp's `/battles/:id` param route would shadow a protectedApp copy.
 
 // =============================================
 // PAPER ATTEMPT ENDPOINTS (Timed Practice)
 // =============================================
 
-// Get user's paper attempts history
-protectedApp.get('/papers/attempts', async (c) => {
-  const userId = c.req.query('userId') || c.get('userId');
-  const limit = parseInt(c.req.query('limit') || '20');
-  const status = c.req.query('status'); // Optional filter: completed, abandoned, in_progress
-
-  try {
-    let query = `
-      SELECT
-        pa.id,
-        pa.paper_id,
-        pa.status,
-        pa.time_allowed,
-        pa.time_used,
-        pa.total_score,
-        pa.percentage_score as percentage,
-        pa.started_at,
-        pa.submitted_at,
-        pp.title as paper_title,
-        pp.total_marks as max_score,
-        pt.name as paper_type
-      FROM paper_attempts pa
-      JOIN past_papers pp ON pa.paper_id = pp.id
-      LEFT JOIN paper_types pt ON pp.paper_type_id = pt.id
-      WHERE pa.user_id = ?
-    `;
-    const params: (string | number)[] = [userId];
-
-    if (status) {
-      query += ` AND pa.status = ?`;
-      params.push(status);
-    }
-
-    query += ` ORDER BY pa.started_at DESC LIMIT ?`;
-    params.push(limit);
-
-    const attempts = await c.env.DB.prepare(query).bind(...params).all();
-
-    // Transform to expected format
-    const data = attempts.results.map((attempt: Record<string, unknown>) => ({
-      id: attempt.id,
-      paper_id: attempt.paper_id,
-      status: attempt.status,
-      total_score: attempt.total_score || 0,
-      max_score: attempt.max_score || 100,
-      percentage: attempt.percentage || 0,
-      time_used: attempt.time_used || 0,
-      submitted_at: attempt.submitted_at,
-      started_at: attempt.started_at,
-      paper: {
-        title: attempt.paper_title,
-        paper_type: attempt.paper_type || 'Paper 1',
-      },
-    }));
-
-    return c.json(data);
-  } catch (error) {
-    console.error('Failed to fetch paper attempts:', error);
-    return c.json({ success: false, error: 'Failed to fetch paper attempts' }, 500);
-  }
-});
+// Get user's paper attempts history: served by the app-level route registered
+// before the publicApp mount (see above `app.route('/api', publicApp)`),
+// because publicApp's `/papers/:id` param route would shadow a protectedApp
+// copy (same pattern as /battles/history).
 
 // Start a paper attempt
 protectedApp.post('/papers/:id/attempt', async (c) => {
   const paperId = c.req.param('id');
-  const { userId } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     // Get paper info
@@ -4165,16 +4162,15 @@ protectedApp.post('/papers/:id/attempt', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Paper attempt error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({ success: false, error: `Failed to start paper attempt: ${errorMessage}` }, 500);
+    console.error('Paper attempt error:', error); // detail stays in logs
+    return c.json({ success: false, error: 'Failed to start paper attempt' }, 500);
   }
 });
 
 // Abandon existing paper attempt
 protectedApp.post('/papers/:id/abandon', async (c) => {
   const paperId = c.req.param('id');
-  const { userId } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     await c.env.DB.prepare(`
@@ -4193,7 +4189,8 @@ protectedApp.post('/papers/:id/abandon', async (c) => {
 // Save answer for paper attempt
 protectedApp.put('/papers/attempts/:attemptId/answer', async (c) => {
   const attemptId = c.req.param('attemptId');
-  const { questionId, answer, timeTaken, userId } = await c.req.json();
+  const { questionId, answer, timeTaken } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     // Verify attempt belongs to user and is in progress
@@ -4235,7 +4232,8 @@ protectedApp.put('/papers/attempts/:attemptId/answer', async (c) => {
 // Submit paper attempt
 protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
   const attemptId = c.req.param('attemptId');
-  const { userId, timeUsed } = await c.req.json();
+  const { timeUsed } = await c.req.json();
+  const userId = getUserId(c)!;
 
   try {
     // Verify attempt
@@ -4312,7 +4310,9 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
 // Get paper attempt results
 protectedApp.get('/papers/attempts/:attemptId/results', async (c) => {
   const attemptId = c.req.param('attemptId');
-  const userId = c.req.query('userId');
+  // Self-scope only (Task 10 decision): identity comes from the JWT; no admin
+  // ?userId= override — no admin UI needs support lookups here yet.
+  const userId = getUserId(c)!;
 
   try {
     const attempt = await c.env.DB.prepare(`
@@ -4355,7 +4355,10 @@ protectedApp.get('/papers/attempts/:attemptId/results', async (c) => {
 
 // Submit essay for grading
 protectedApp.post('/essays/submit', async (c) => {
-  const { userId, questionId, answerText, gradingType } = await c.req.json();
+  // Identity comes only from the verified JWT — a body-supplied userId would
+  // let a caller spend another user's AI grading credits.
+  const userId = getUserId(c)!;
+  const { questionId, answerText, gradingType } = await c.req.json();
 
   try {
     // Get user subscription info
@@ -4445,6 +4448,11 @@ protectedApp.post('/essays/:attemptId/grade', async (c) => {
 
     if (!attempt) {
       return c.json({ success: false, error: 'Essay attempt not found or not eligible for AI grading' }, 404);
+    }
+
+    // IDOR guard: only the attempt's owner (or an admin) may trigger grading.
+    if (attempt.user_id !== getUserId(c) && getUserRole(c) !== 'admin') {
+      return c.json({ success: false, error: 'Forbidden' }, 403);
     }
 
     // Update status to grading
@@ -4551,37 +4559,11 @@ Please grade this essay.`;
   }
 });
 
-// Get user's essay history
-protectedApp.get('/essays/history', async (c) => {
-  const userId = c.req.query('userId');
-  const limit = parseInt(c.req.query('limit') || '20');
-
-  if (!userId) {
-    return c.json({ success: false, error: 'userId required' }, 400);
-  }
-
-  try {
-    const { results } = await c.env.DB.prepare(`
-      SELECT ea.*, q.question_text, q.marks, s.name as subject_name
-      FROM essay_attempts ea
-      JOIN questions q ON ea.question_id = q.id
-      JOIN subjects s ON q.subject_id = s.id
-      WHERE ea.user_id = ?
-      ORDER BY ea.created_at DESC
-      LIMIT ?
-    `).bind(userId, limit).all();
-
-    // Parse feedback JSON
-    const attempts = results.map((a: Record<string, unknown>) => ({
-      ...a,
-      aiFeedback: a.ai_feedback ? JSON.parse(a.ai_feedback as string) : null,
-    }));
-
-    return c.json({ success: true, data: attempts });
-  } catch (error) {
-    return c.json({ success: false, error: 'Failed to fetch essay history' }, 500);
-  }
-});
+// NOTE: GET /essays/history is served only by the app-level requireAuth
+// route registered just before `app.route('/api', publicApp)` above
+// (JWT-derived userId, self only). The protectedApp copy was
+// removed: publicApp's `/essays/:questionId` param route is registered
+// earlier and would shadow it (Hono: first-registered matching route wins).
 
 // =====================
 // AI TUTOR ENDPOINTS
@@ -4589,7 +4571,24 @@ protectedApp.get('/essays/history', async (c) => {
 
 // AI explain question/answer
 protectedApp.post('/ai/explain', async (c) => {
-  const { question, userAnswer, correctAnswer, isCorrect, userId, context } = await c.req.json();
+  const { question, userAnswer, correctAnswer, isCorrect, context } = await c.req.json();
+  // Identity comes only from verified JWT context (body userId was spoofable).
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  // COST CONTROL: per-user daily AI quota
+  const quota = await checkRateLimit(c.env.DB, userId, 'ai');
+  if (!quota.allowed) {
+    return c.json({
+      success: false,
+      error: 'Daily AI limit reached. Try again tomorrow.',
+      code: 'AI_LIMIT_REACHED',
+      retryAfter: quota.retryAfter,
+    }, 429);
+  }
+
   const apiKey = c.env.ANTHROPIC_API_KEY;
   const model = c.env.AI_MODEL || 'claude-3-haiku-20240307';
 
@@ -4639,7 +4638,24 @@ Please explain:
 
 // AI chat
 protectedApp.post('/ai/chat', async (c) => {
-  const { message, context, conversationHistory, userId, userName, userPersonalization } = await c.req.json();
+  const { message, context, conversationHistory, userName, userPersonalization } = await c.req.json();
+  // Identity comes only from verified JWT context (body userId was spoofable).
+  const userId = getUserId(c);
+  if (!userId) {
+    return c.json({ success: false, error: 'Unauthorized' }, 401);
+  }
+
+  // COST CONTROL: per-user daily AI quota
+  const quota = await checkRateLimit(c.env.DB, userId, 'ai');
+  if (!quota.allowed) {
+    return c.json({
+      success: false,
+      error: 'Daily AI limit reached. Try again tomorrow.',
+      code: 'AI_LIMIT_REACHED',
+      retryAfter: quota.retryAfter,
+    }, 429);
+  }
+
   const apiKey = c.env.ANTHROPIC_API_KEY;
   const model = c.env.AI_MODEL || 'claude-3-haiku-20240307';
 
@@ -4754,21 +4770,15 @@ protectedApp.post('/ai/study-plan', async (c) => {
 // USER SELF-SERVICE ENDPOINTS
 // =============================================
 
-// Middleware to verify authenticated user
+// Middleware to verify authenticated user.
+// requireAuth (protectedApp.use('*', requireAuth)) has already authenticated
+// the request and set user/userId/userRole with the DB-fresh role. Trust that
+// context instead of re-verifying the token — re-setting `user` from the raw
+// JWT payload here would overwrite the fresh DB role with the frozen JWT role.
 const userAuth = async (c: any, next: any) => {
-  const authHeader = c.req.header('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
+  if (!c.get('userId')) {
     return c.json({ success: false, error: 'Unauthorized' }, 401);
   }
-
-  const token = authHeader.slice(7);
-  const payload = await verifyJWT(token, c.env.JWT_SECRET);
-
-  if (!payload) {
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-
-  c.set('user', payload);
   await next();
 };
 
@@ -4794,6 +4804,24 @@ protectedApp.put('/users/me', userAuth, async (c) => {
   }
 });
 
+// Sniff image magic bytes — never trust client-supplied file.type/extension
+export function sniffImageType(bytes: Uint8Array): 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp' | null {
+  if (bytes.length < 12) return null;
+  if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return 'image/png';
+  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'image/jpeg';
+  if (bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x38) return 'image/gif';
+  if (bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
+      bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) return 'image/webp';
+  return null;
+}
+
+const IMAGE_EXTENSIONS: Record<string, string> = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/gif': 'gif',
+  'image/webp': 'webp',
+};
+
 // Upload avatar
 protectedApp.post('/users/me/avatar', userAuth, async (c) => {
   const user = c.get('user') as UserPayload;
@@ -4812,16 +4840,17 @@ protectedApp.post('/users/me/avatar', userAuth, async (c) => {
       return c.json({ success: false, error: 'No file provided' }, 400);
     }
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (!allowedTypes.includes(file.type)) {
-      return c.json({ success: false, error: 'Invalid file type. Please upload a JPEG, PNG, WebP, or GIF image.' }, 400);
-    }
-
-    // Validate file size (5MB max)
+    // Validate file size (5MB max) — reject before buffering the body into memory
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
       return c.json({ success: false, error: 'File too large. Maximum size is 5MB.' }, 400);
+    }
+
+    // Read the file and sniff its real type from magic bytes
+    const buffer = new Uint8Array(await file.arrayBuffer());
+    const sniffedType = sniffImageType(buffer);
+    if (!sniffedType) {
+      return c.json({ success: false, error: 'Invalid file type. Please upload a JPEG, PNG, WebP, or GIF image.' }, 400);
     }
 
     // Get current avatar URL to delete old file
@@ -4842,14 +4871,13 @@ protectedApp.post('/users/me/avatar', userAuth, async (c) => {
       }
     }
 
-    // Generate unique file key
-    const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-    const fileKey = `avatars/${user.userId}_${Date.now()}.${fileExtension}`;
+    // Generate unique file key — extension comes from the sniffed type, not the client filename
+    const fileKey = `avatars/${user.userId}_${Date.now()}.${IMAGE_EXTENSIONS[sniffedType]}`;
 
     // Upload to R2
-    await c.env.LIBRARY_BUCKET.put(fileKey, file.stream(), {
+    await c.env.LIBRARY_BUCKET.put(fileKey, buffer, {
       httpMetadata: {
-        contentType: file.type,
+        contentType: sniffedType,
       },
     });
 
@@ -5065,12 +5093,10 @@ protectedApp.post('/users/me/change-password', userAuth, async (c) => {
 
 // Generate 6-character invite code for student
 function generateInviteCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Excluding confusing chars
-  let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 32 chars, excludes confusing ones
+  const bytes = crypto.getRandomValues(new Uint8Array(6));
+  // 256 % 32 === 0, so the modulo introduces no bias
+  return Array.from(bytes, (b) => chars.charAt(b % chars.length)).join('');
 }
 
 // =============================================
@@ -5630,7 +5656,7 @@ protectedApp.get('/parents/students/:studentId/progress', userAuth, async (c) =>
 protectedApp.get('/parents/students/:studentId/activity', userAuth, async (c) => {
   const user = c.get('user') as UserPayload;
   const studentId = c.req.param('studentId');
-  const limit = parseInt(c.req.query('limit') || '30');
+  const limit = parseLimit(c, 30);
 
   if (user.role !== 'parent') {
     return c.json({ success: false, error: 'Only parents can view student activity' }, 403);
@@ -5718,7 +5744,7 @@ protectedApp.get('/parents/students/:studentId/activity', userAuth, async (c) =>
 protectedApp.get('/parents/notifications', userAuth, async (c) => {
   const user = c.get('user') as UserPayload;
   const unreadOnly = c.req.query('unreadOnly') === 'true';
-  const limit = parseInt(c.req.query('limit') || '50');
+  const limit = parseLimit(c, 50);
 
   if (user.role !== 'parent') {
     return c.json({ success: false, error: 'Only parents can view notifications' }, 403);
@@ -5899,58 +5925,17 @@ protectedApp.put('/parents/preferences', userAuth, async (c) => {
 // ADMIN USER MANAGEMENT ENDPOINTS
 // =============================================
 
-// Middleware to verify admin role with enhanced security
-const adminAuth = async (c: any, next: any) => {
-  const authHeader = c.req.header('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
-  }
-
-  const token = authHeader.slice(7);
-
-  // SECURITY: Demo tokens only allowed in development environment
-  if (token.endsWith('_demo_token')) {
-    const isDevelopment = c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev';
-    if (isDevelopment) {
-      const tokenPrefix = token.replace('_demo_token', '');
-      if (tokenPrefix === 'admin') {
-        c.set('user', { userId: 'admin_prod_001', role: 'admin', email: 'admin@brillaprep.org' });
-        c.set('userId', 'admin_prod_001');
-        c.set('userRole', 'admin');
-        return next();
-      } else {
-        return c.json({ success: false, error: 'Admin access required' }, 403);
-      }
-    }
-    // In production, demo tokens are rejected
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-
-  const payload = await verifyJWT(token, c.env.JWT_SECRET);
-
-  if (!payload) {
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-
-  if (payload.role !== 'admin') {
-    return c.json({ success: false, error: 'Admin access required' }, 403);
-  }
-
-  c.set('user', payload);
-  c.set('userId', payload.userId);
-  c.set('userRole', payload.role);
-  await next();
-};
-
-// Admin routes
+// Admin routes: shared middleware (verified JWT + fresh DB admin-role re-check,
+// sets user/userId/userRole like the old adminAuth did).
 const adminApp = new Hono<{ Bindings: Env }>();
-adminApp.use('*', adminAuth);
+adminApp.use('*', requireAdmin);
 
 // Dashboard stats
 adminApp.get('/dashboard/stats', async (c) => {
   try {
     const today = new Date().toISOString().split('T')[0];
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const nowIso = new Date().toISOString();
 
     const [
       totalUsers,
@@ -5964,8 +5949,8 @@ adminApp.get('/dashboard/stats', async (c) => {
       c.env.DB.prepare('SELECT COUNT(*) as count FROM users WHERE DATE(last_login_at) = ?').bind(today).first(),
       c.env.DB.prepare('SELECT COUNT(*) as count FROM users WHERE created_at >= ?').bind(weekAgo).first(),
       c.env.DB.prepare("SELECT COUNT(*) as count FROM users WHERE status = 'pending'").first(),
-      c.env.DB.prepare("SELECT COUNT(*) as count FROM user_trials WHERE status = 'active' AND expires_at > datetime('now')").first(),
-      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed'").first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM user_trials WHERE status = 'active' AND expires_at > ?").bind(nowIso).first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'success'").first(),
     ]);
 
     return c.json({
@@ -6141,8 +6126,8 @@ adminApp.get('/analytics', async (c) => {
 
     // Revenue stats
     const [revenueThisMonth, revenueLastMonth, activeSubs] = await Promise.all([
-      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed' AND created_at >= datetime('now', 'start of month')").first(),
-      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed' AND created_at >= datetime('now', 'start of month', '-1 month') AND created_at < datetime('now', 'start of month')").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'success' AND created_at >= datetime('now', 'start of month')").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'success' AND created_at >= datetime('now', 'start of month', '-1 month') AND created_at < datetime('now', 'start of month')").first(),
       c.env.DB.prepare("SELECT COUNT(*) as count FROM user_subscriptions WHERE status = 'active'").first(),
     ]);
 
@@ -6192,12 +6177,13 @@ adminApp.get('/analytics', async (c) => {
 // Subscription stats
 adminApp.get('/subscriptions/stats', async (c) => {
   try {
+    const nowIso = new Date().toISOString();
     const [active, trials, expiring, revenueThis, revenueLast] = await Promise.all([
       c.env.DB.prepare("SELECT COUNT(*) as count FROM user_subscriptions WHERE status = 'active'").first(),
-      c.env.DB.prepare("SELECT COUNT(*) as count FROM user_trials WHERE status = 'active' AND expires_at > datetime('now')").first(),
+      c.env.DB.prepare("SELECT COUNT(*) as count FROM user_trials WHERE status = 'active' AND expires_at > ?").bind(nowIso).first(),
       c.env.DB.prepare("SELECT COUNT(*) as count FROM user_subscriptions WHERE status = 'active' AND expires_at <= datetime('now', '+7 days')").first(),
-      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed' AND created_at >= datetime('now', 'start of month')").first(),
-      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'completed' AND created_at >= datetime('now', 'start of month', '-1 month') AND created_at < datetime('now', 'start of month')").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'success' AND created_at >= datetime('now', 'start of month')").first(),
+      c.env.DB.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payment_transactions WHERE status = 'success' AND created_at >= datetime('now', 'start of month', '-1 month') AND created_at < datetime('now', 'start of month')").first(),
     ]);
 
     const thisMonth = (revenueThis as { total: number })?.total || 0;
@@ -6428,17 +6414,25 @@ adminApp.post('/affiliates/payouts/:id/approve', async (c) => {
   }
 });
 
-// Get all users with stats
+// Get all users with stats (paginated)
 adminApp.get('/users', async (c) => {
   try {
-    const { results } = await c.env.DB.prepare(`
-      SELECT id, email, name, role, status, email_verified, is_active,
-             school_level, year_group, school_name, house,
-             teacher_license_number, subjects_taught, years_experience, qualifications,
-             xp_points, level, streak_days, last_login_at, created_at, updated_at
-      FROM users
-      ORDER BY created_at DESC
-    `).all();
+    const limit = parseLimit(c, 50);
+    const page = Math.max(1, parseInt(c.req.query('page') || '1', 10) || 1);
+    const offset = (page - 1) * limit;
+
+    const [{ results }, totalRow] = await Promise.all([
+      c.env.DB.prepare(`
+        SELECT id, email, name, role, status, email_verified, is_active,
+               school_level, year_group, school_name, house,
+               teacher_license_number, subjects_taught, years_experience, qualifications,
+               xp_points, level, streak_days, last_login_at, created_at, updated_at
+        FROM users
+        ORDER BY created_at DESC
+        LIMIT ? OFFSET ?
+      `).bind(limit, offset).all(),
+      c.env.DB.prepare('SELECT COUNT(*) as total FROM users').first(),
+    ]);
 
     // Parse JSON fields
     const users = results.map((u: Record<string, unknown>) => ({
@@ -6446,7 +6440,15 @@ adminApp.get('/users', async (c) => {
       subjectsTaught: u.subjects_taught ? JSON.parse(u.subjects_taught as string) : [],
     }));
 
-    return c.json({ success: true, data: users });
+    return c.json({
+      success: true,
+      data: {
+        users,
+        total: (totalRow as { total?: number } | null)?.total || 0,
+        page,
+        limit,
+      },
+    });
   } catch (error) {
     console.error('Get users error:', error);
     return c.json({ success: false, error: 'Failed to fetch users' }, 500);
@@ -7976,13 +7978,15 @@ protectedApp.get('/admin/subscriptions/stats', userAuth, async (c) => {
       SELECT COUNT(*) as count FROM user_trials WHERE status = 'active'
     `).first();
 
-    // Users whose trial expires in next 7 days
+    // Users whose trial expires in next 7 days (ISO comparisons against bound JS ISO params)
+    const nowIso = new Date().toISOString();
+    const weekAheadIso = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
     const expiringSoon = await c.env.DB.prepare(`
       SELECT COUNT(*) as count FROM user_trials
       WHERE status = 'active'
-      AND expires_at > datetime('now')
-      AND expires_at < datetime('now', '+7 days')
-    `).first();
+      AND expires_at > ?
+      AND expires_at < ?
+    `).bind(nowIso, weekAheadIso).first();
 
     // Revenue stats from payment_transactions
     const revenueThisMonth = await c.env.DB.prepare(`
@@ -10075,81 +10079,11 @@ protectedApp.get('/teacher/dashboard', async (c) => {
   }
 });
 
-// Question bank search (for question picker)
-protectedApp.get('/questions/bank', async (c) => {
-  try {
-    const search = c.req.query('search');
-    const subjectId = c.req.query('subject');
-    const topicId = c.req.query('topic');
-    const difficulty = c.req.query('difficulty');
-    const questionType = c.req.query('type');
-    const limit = parseInt(c.req.query('limit') || '20');
-    const offset = parseInt(c.req.query('offset') || '0');
-
-    let query = `
-      SELECT q.*, t.name as topic_name, s.name as subject_name
-      FROM questions q
-      LEFT JOIN topics t ON q.topic_id = t.id
-      LEFT JOIN subjects s ON q.subject_id = s.id
-      WHERE 1=1
-    `;
-    const params: unknown[] = [];
-
-    if (search) {
-      query += ' AND q.question_text LIKE ?';
-      params.push(`%${search}%`);
-    }
-    if (subjectId) {
-      query += ' AND q.subject_id = ?';
-      params.push(subjectId);
-    }
-    if (topicId) {
-      query += ' AND q.topic_id = ?';
-      params.push(topicId);
-    }
-    if (difficulty) {
-      query += ' AND q.difficulty = ?';
-      params.push(difficulty);
-    }
-    if (questionType) {
-      query += ' AND q.question_type = ?';
-      params.push(questionType);
-    }
-
-    // Count total
-    const countQuery = query.replace('SELECT q.*, t.name as topic_name, s.name as subject_name', 'SELECT COUNT(*) as count');
-    const total = await c.env.DB.prepare(countQuery).bind(...params).first();
-
-    query += ' ORDER BY q.created_at DESC LIMIT ? OFFSET ?';
-    params.push(limit, offset);
-
-    const questions = await c.env.DB.prepare(query).bind(...params).all();
-
-    return c.json({
-      success: true,
-      data: {
-        questions: questions.results.map((q: Record<string, unknown>) => ({
-          id: q.id,
-          questionText: q.question_text,
-          questionType: q.question_type,
-          options: transformQuestionOptions(q.options, q.correct_answer as string),
-          correctAnswer: q.correct_answer,
-          explanation: q.explanation,
-          difficulty: q.difficulty,
-          points: q.points,
-          topicId: q.topic_id,
-          topicName: q.topic_name,
-          subjectId: q.subject_id,
-          subjectName: q.subject_name,
-        })),
-        total: total?.count || 0,
-      },
-    });
-  } catch (error) {
-    console.error('Error searching questions:', error);
-    return c.json({ success: false, error: 'Failed to search questions' }, 500);
-  }
-});
+// NOTE: GET /questions/bank is served only by the app-level requireAuth
+// route registered just before `app.route('/api', publicApp)` above.
+// publicApp's `/questions/:id` param route is registered earlier than
+// protectedApp's routes and would shadow any protectedApp copy here
+// (Hono: first-registered matching route wins).
 
 // Search students (for adding to classes)
 protectedApp.get('/students/search', async (c) => {
@@ -10157,7 +10091,7 @@ protectedApp.get('/students/search', async (c) => {
     const search = c.req.query('search');
     const schoolLevel = c.req.query('schoolLevel');
     const yearGroup = c.req.query('yearGroup');
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
 
     let query = `
       SELECT id, name, email, avatar_url, school_level, year_group
@@ -10264,72 +10198,13 @@ app.notFound((c) => {
 
 // Error handler
 app.onError((err, c) => {
-  console.error('Error:', err);
-  const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-  return c.json({ success: false, error: `Internal server error: ${errorMessage}` }, 500);
+  console.error('Unhandled error:', err); // detail stays in logs
+  return c.json({ success: false, error: 'Internal server error' }, 500);
 });
 
 // =============================================
 // SCHEDULED HANDLER - Demo Data Cleanup (Cron)
 // =============================================
-
-// List of tables that need demo data cleanup
-const DEMO_DATA_TABLES = [
-  'user_progress',
-  'question_attempts',
-  'essay_attempts',
-  'paper_attempts',
-  'paper_attempt_answers',
-  'practice_sessions',
-  'user_achievements',
-  'battles',
-  'battle_answers',
-  'house_points',
-  'user_exam_preferences',
-  'user_subject_selections',
-  'chat_messages',
-  'chat_message_reactions',
-  'competitions',
-  'leaderboard',
-  'assessment_attempts',
-  'assessment_attempt_answers',
-  'parent_notifications',
-  'parent_activity_log',
-  'counselor_sessions',
-  'counselor_messages',
-  'tutor_conversations',
-  'tutor_messages',
-  'library_resources',
-  'notifications',
-];
-
-// Scheduled cleanup function
-async function cleanupExpiredDemoData(db: D1Database): Promise<{ tablesProcessed: number; rowsDeleted: number }> {
-  const now = new Date().toISOString();
-  let totalDeleted = 0;
-  let tablesProcessed = 0;
-
-  for (const table of DEMO_DATA_TABLES) {
-    try {
-      // Delete expired demo data
-      const result = await db.prepare(`
-        DELETE FROM ${table}
-        WHERE is_demo_data = 1 AND expires_at IS NOT NULL AND expires_at < ?
-      `).bind(now).run();
-
-      if (result.meta.changes > 0) {
-        console.log(`Cleaned up ${result.meta.changes} expired demo records from ${table}`);
-        totalDeleted += result.meta.changes;
-      }
-      tablesProcessed++;
-    } catch (error) {
-      // Table might not have the columns yet (migration not run)
-      console.log(`Skipping ${table}: ${error instanceof Error ? error.message : 'unknown error'}`);
-    }
-  }
-
-  return { tablesProcessed, rowsDeleted: totalDeleted };
-}
 
 // Cloudflare Worker with scheduled handler
 export default {

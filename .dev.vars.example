@@ -1,0 +1,13 @@
+# Copy to .dev.vars and fill in real values for local development.
+# Never commit .dev.vars.
+JWT_SECRET=change-me-generate-a-secure-random-string
+SETUP_KEY=
+RESEND_API_KEY=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+PAYSTACK_SECRET_KEY=
+PAYSTACK_WEBHOOK_SECRET=
+TURNSTILE_SECRET=
+ANTHROPIC_API_KEY=
+# Overrides the [vars] APP_URL from wrangler.toml during local dev
+APP_URL=http://localhost:5173

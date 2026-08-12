@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Loader2, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
@@ -18,8 +18,12 @@ export function OAuthCallback() {
   const [status, setStatus] = useState<CallbackStatus>('processing');
   const [error, setError] = useState<CallbackError | null>(null);
   const [isNewUser, setIsNewUser] = useState(false);
+  const hasExchanged = useRef(false);
 
   useEffect(() => {
+    if (hasExchanged.current) return;
+    hasExchanged.current = true;
+
     const handleCallback = async () => {
       const code = searchParams.get('code');
       const state = searchParams.get('state');

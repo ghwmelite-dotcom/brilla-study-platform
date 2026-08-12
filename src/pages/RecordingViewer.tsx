@@ -13,12 +13,12 @@ import {
 } from 'lucide-react';
 import { RecordingPlayer } from '@/components/whiteboard';
 import type { WhiteboardRecording } from '@/types/whiteboard';
-import { api } from '@/services/api';
+import { api } from '@/lib/api';
 
 // Fetch recording from API
 async function fetchRecording(id: string): Promise<WhiteboardRecording | null> {
   try {
-    const response = await api.get(`/recordings/${id}`) as {
+    const res = await api.get<{
       id: string;
       title: string;
       description?: string;
@@ -33,7 +33,8 @@ async function fetchRecording(id: string): Promise<WhiteboardRecording | null> {
       canvas_height: number;
       created_at: string;
       updated_at: string;
-    };
+    }>(`/recordings/${id}`);
+    const response = res.success ? res.data : null;
 
     if (!response || !response.id) {
       return null;

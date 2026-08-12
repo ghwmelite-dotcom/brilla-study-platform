@@ -1,5 +1,10 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
+import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
+import type { AuthPayload } from './auth-middleware';
+
+const MAX_RECORDING_BYTES = 100 * 1024 * 1024; // 100MB
 
 // Types for Cloudflare bindings
 interface Env {
@@ -7,6 +12,13 @@ interface Env {
   JWT_SECRET: string;
   RECORDINGS_BUCKET?: R2Bucket;
   APP_URL?: string;
+}
+
+// Context variables set by requireAuth
+interface AuthVars {
+  userId: string;
+  userRole: string;
+  user: AuthPayload;
 }
 
 // Recording type
@@ -32,39 +44,6 @@ interface WhiteboardRecording {
   updated_at: string;
 }
 
-// JWT verification helper
-async function verifyJWT(token: string, secret: string): Promise<{ userId: string; email: string; role: string } | null> {
-  try {
-    const [headerB64, payloadB64, signatureB64] = token.split('.');
-    if (!headerB64 || !payloadB64 || !signatureB64) return null;
-
-    const encoder = new TextEncoder();
-    const key = await crypto.subtle.importKey(
-      'raw',
-      encoder.encode(secret),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['verify']
-    );
-
-    const signatureData = Uint8Array.from(atob(signatureB64.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
-    const dataToVerify = encoder.encode(`${headerB64}.${payloadB64}`);
-
-    const isValid = await crypto.subtle.verify('HMAC', key, signatureData, dataToVerify);
-    if (!isValid) return null;
-
-    const payload = JSON.parse(atob(payloadB64.replace(/-/g, '+').replace(/_/g, '/')));
-
-    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-      return null;
-    }
-
-    return payload;
-  } catch {
-    return null;
-  }
-}
-
 // Generate unique ID
 function generateId(prefix: string): string {
   return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
@@ -77,68 +56,26 @@ function generateShareToken(): string {
 }
 
 // Recordings routes
-const recordingsApp = new Hono<{ Bindings: Env }>();
+const recordingsApp = new Hono<{ Bindings: Env; Variables: AuthVars }>();
 
-// Auth middleware
+// Auth middleware: public endpoints stay public, everything else requires a
+// verified JWT (sets userId/userRole on context).
 recordingsApp.use('*', async (c, next) => {
-  // Skip auth for public endpoints
   const url = new URL(c.req.url);
   if (url.pathname.includes('/public/') || url.pathname.includes('/files/')) {
     return next();
   }
-
-  const authHeader = c.req.header('Authorization');
-
-  if (authHeader?.startsWith('Bearer ')) {
-    const token = authHeader.replace('Bearer ', '');
-
-    // Handle demo tokens
-    if (token.endsWith('_demo_token')) {
-      const tokenPrefix = token.replace('_demo_token', '');
-      const demoUsers: Record<string, { id: string; role: string }> = {
-        'student': { id: 'demo_student_1', role: 'student' },
-        'teacher': { id: 'demo_teacher_1', role: 'teacher' },
-        'admin': { id: 'demo_admin_1', role: 'admin' },
-      };
-      const demoUser = demoUsers[tokenPrefix];
-      if (demoUser) {
-        c.set('userId', demoUser.id);
-        c.set('userRole', demoUser.role);
-      }
-    } else {
-      try {
-        const payload = await verifyJWT(token, c.env.JWT_SECRET);
-        if (payload) {
-          c.set('userId', payload.userId);
-          c.set('userRole', payload.role);
-        }
-      } catch (error) {
-        console.error('Token verification error:', error);
-      }
-    }
-  }
-
-  // Check headers as fallback
-  if (!c.get('userId')) {
-    const headerUserId = c.req.header('x-user-id');
-    const headerRole = c.req.header('x-user-role');
-    if (headerUserId) {
-      c.set('userId', headerUserId);
-      c.set('userRole', headerRole || 'student');
-    }
-  }
-
-  return next();
+  return requireAuth(c, next);
 });
 
 // Helper to get user ID from context
 function getUserId(c: Context): string | undefined {
-  return c.get('userId') || c.req.header('x-user-id');
+  return c.get('userId');
 }
 
 // Helper to check if user is teacher or admin
 function isTeacherOrAdmin(c: Context): boolean {
-  const role = c.get('userRole') || c.req.header('x-user-role');
+  const role = c.get('userRole');
   return role === 'teacher' || role === 'admin';
 }
 
@@ -262,7 +199,7 @@ recordingsApp.get('/', async (c) => {
   try {
     const status = c.req.query('status') || 'active';
     const search = c.req.query('search') || '';
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
     const offset = parseInt(c.req.query('offset') || '0');
 
     let query = `
@@ -580,8 +517,15 @@ recordingsApp.put('/upload/:recordingId/:fileType', async (c) => {
         return c.json({ success: false, error: 'Invalid file type' }, 400);
     }
 
-    // Get request body as ArrayBuffer
+    // Get request body as ArrayBuffer (capped to MAX_RECORDING_BYTES)
+    const declared = Number(c.req.header('Content-Length') || 0);
+    if (declared > MAX_RECORDING_BYTES) {
+      return c.json({ success: false, error: 'File exceeds 100MB limit' }, 413);
+    }
     const body = await c.req.arrayBuffer();
+    if (body.byteLength > MAX_RECORDING_BYTES) {
+      return c.json({ success: false, error: 'File exceeds 100MB limit' }, 413);
+    }
     const contentType = c.req.header('Content-Type') || 'application/octet-stream';
 
     // Upload to R2
@@ -594,9 +538,20 @@ recordingsApp.put('/upload/:recordingId/:fileType', async (c) => {
     // Update database with the file URL
     const publicUrl = `/api/recordings/files/${path}`;
     if (dbColumn) {
-      await c.env.DB.prepare(`
-        UPDATE whiteboard_recordings SET ${dbColumn} = ?, updated_at = datetime('now') WHERE id = ?
-      `).bind(publicUrl, recordingId).run();
+      try {
+        await c.env.DB.prepare(`
+          UPDATE whiteboard_recordings SET ${dbColumn} = ?, updated_at = datetime('now') WHERE id = ?
+        `).bind(publicUrl, recordingId).run();
+      } catch (dbError) {
+        // Best-effort compensating delete so no orphaned R2 object remains
+        try {
+          await c.env.RECORDINGS_BUCKET.delete(path);
+        } catch (deleteError) {
+          console.error(`Orphan risk: failed to link R2 object ${path}`, deleteError);
+        }
+        console.error(`Orphan risk: failed to link R2 object ${path}`, dbError);
+        return c.json({ success: false, error: 'Failed to upload file' }, 500);
+      }
     }
 
     return c.json({
@@ -709,20 +664,27 @@ recordingsApp.delete('/:id', async (c) => {
       UPDATE whiteboard_recordings SET status = 'deleted', updated_at = datetime('now') WHERE id = ?
     `).bind(recordingId).run();
 
-    // Optionally delete files from R2 (uncomment if you want hard delete)
-    // if (c.env.RECORDINGS_BUCKET) {
-    //   const filesToDelete = [
-    //     recording.canvas_events_url,
-    //     recording.audio_url,
-    //     recording.webcam_url,
-    //     recording.thumbnail_url,
-    //   ].filter(Boolean) as string[];
-    //
-    //   for (const url of filesToDelete) {
-    //     const path = url.replace('/api/recordings/files/', '');
-    //     await c.env.RECORDINGS_BUCKET.delete(path);
-    //   }
-    // }
+    // Delete files from R2 in the background so the response isn't blocked;
+    // log orphans instead of failing the request.
+    if (c.env.RECORDINGS_BUCKET) {
+      const filesToDelete = [
+        recording.canvas_events_url,
+        recording.audio_url,
+        recording.webcam_url,
+        recording.thumbnail_url,
+      ].filter(Boolean) as string[];
+
+      c.executionCtx.waitUntil((async () => {
+        for (const url of filesToDelete) {
+          const path = url.replace('/api/recordings/files/', '');
+          try {
+            await c.env.RECORDINGS_BUCKET!.delete(path);
+          } catch (err) {
+            console.error(`Orphaned R2 object ${path}:`, err);
+          }
+        }
+      })());
+    }
 
     return c.json({ success: true, data: { id: recordingId } });
   } catch (error) {

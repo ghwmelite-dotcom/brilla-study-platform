@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { getDemoDataFlags, isDemoUserId } from './demoUtils';
+import { requireAuth } from './auth-middleware';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -135,9 +136,12 @@ Student Context:
 // Create Hono app
 const tutorApp = new Hono<{ Bindings: Env }>();
 
+// All tutor routes require a verified JWT (sets userId/userRole on context).
+tutorApp.use('*', requireAuth);
+
 // Helper functions
 function getUserId(c: Context): string | undefined {
-  return c.get('userId') || c.req.header('x-user-id');
+  return c.get('userId');
 }
 
 function formatStudentContext(context: StudentContext): string {

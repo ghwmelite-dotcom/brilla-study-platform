@@ -14,7 +14,7 @@ import {
   Award,
   ArrowUp,
 } from 'lucide-react';
-import { teacherBonusService } from '@/services/api';
+import { teacherBonusService } from '@/lib/services';
 import type { TeacherBonusConfig, TeacherYearEndBonus, TeacherBonusStudent } from '@/types/tutoring';
 
 interface BonusStatusData {

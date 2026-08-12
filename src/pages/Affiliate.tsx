@@ -97,11 +97,7 @@ export default function Affiliate() {
   };
 
   const handleClaimChallenge = async (challengeId: string) => {
-    const result = await claimChallenge(challengeId);
-    if (result) {
-      // Show success toast (implement with your toast system)
-      console.log(`Claimed: ${result.xpAwarded} XP, ${result.cashAwarded} GHS`);
-    }
+    await claimChallenge(challengeId);
   };
 
   // If not an affiliate, show join page

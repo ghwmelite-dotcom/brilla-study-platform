@@ -78,8 +78,8 @@ export function ImmersiveClassroom({
           await containerRef.current.requestFullscreen();
           setIsFullscreen(true);
         }
-      } catch (err) {
-        console.log('Fullscreen not available');
+      } catch {
+        // Fullscreen not available
       }
     };
 
@@ -89,8 +89,8 @@ export function ImmersiveClassroom({
         if ('wakeLock' in navigator) {
           wakeLockRef.current = await navigator.wakeLock.request('screen');
         }
-      } catch (err) {
-        console.log('Wake lock not available');
+      } catch {
+        // Wake lock not available
       }
     };
 

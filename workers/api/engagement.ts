@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { requireAuth } from './auth-middleware';
 
 interface Env {
   DB: D1Database;
@@ -12,6 +13,9 @@ interface UserPayload {
 }
 
 const engagementApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
+
+// All engagement routes require a verified JWT (sets user on context).
+engagementApp.use('*', requireAuth);
 
 const generateId = () => `eng_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
@@ -66,14 +70,14 @@ engagementApp.get('/status', async (c) => {
 
     // Get user's streak info
     const userData = await c.env.DB.prepare(
-      'SELECT streak, streak_last_activity FROM users WHERE id = ?'
+      'SELECT streak_days, streak_last_activity FROM users WHERE id = ?'
     ).bind(user.userId).first();
 
     // Calculate streak at risk
     let streakAtRisk = false;
     let hoursUntilStreakLoss = null;
 
-    if (userData?.streak && userData.streak > 0 && userData.streak_last_activity) {
+    if (userData?.streak_days && userData.streak_days > 0 && userData.streak_last_activity) {
       const lastActivity = new Date(userData.streak_last_activity as string);
       const now = new Date();
       const hoursSinceActivity = (now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60);
@@ -84,11 +88,12 @@ engagementApp.get('/status', async (c) => {
       }
     }
 
-    // Get pending nudges
+    // Get pending nudges (ISO comparison against bound JS ISO now)
+    const nowIso = new Date().toISOString();
     const nudges = await c.env.DB.prepare(`
       SELECT * FROM engagement_nudges
       WHERE user_id = ? AND dismissed = 0
-        AND (expires_at IS NULL OR expires_at > datetime('now'))
+        AND (expires_at IS NULL OR expires_at > ?)
       ORDER BY
         CASE priority
           WHEN 'urgent' THEN 1
@@ -98,7 +103,7 @@ engagementApp.get('/status', async (c) => {
         END,
         created_at DESC
       LIMIT 5
-    `).bind(user.userId).all();
+    `).bind(user.userId, nowIso).all();
 
     // Get active comeback challenge
     const comebackChallenge = await c.env.DB.prepare(
@@ -131,7 +136,7 @@ engagementApp.get('/status', async (c) => {
     return c.json({
       success: true,
       data: {
-        streak: userData?.streak || 0,
+        streak: userData?.streak_days || 0,
         streakAtRisk,
         hoursUntilStreakLoss: hoursUntilStreakLoss ? Math.round(hoursUntilStreakLoss * 10) / 10 : null,
         daysInactive: metrics?.days_since_last_activity || 0,
@@ -337,7 +342,7 @@ engagementApp.post('/comeback/claim', async (c) => {
 
     // Award XP
     await c.env.DB.prepare(
-      'UPDATE users SET xp = xp + ? WHERE id = ?'
+      'UPDATE users SET xp_points = xp_points + ? WHERE id = ?'
     ).bind(challenge.xp_reward, user.userId).run();
 
     // Mark challenge complete
@@ -435,7 +440,7 @@ engagementApp.post('/streak/rescue', async (c) => {
     const user = c.get('user');
 
     const userData = await c.env.DB.prepare(
-      'SELECT streak, streak_protections FROM users WHERE id = ?'
+      'SELECT streak_days, streak_protections FROM users WHERE id = ?'
     ).bind(user.userId).first();
 
     if (!userData?.streak_protections || (userData.streak_protections as number) < 1) {
@@ -454,13 +459,13 @@ engagementApp.post('/streak/rescue', async (c) => {
     await c.env.DB.prepare(`
       INSERT INTO streak_rescues (id, user_id, rescue_type, streak_before, streak_after)
       VALUES (?, ?, 'main', ?, ?)
-    `).bind(generateId(), user.userId, userData.streak, userData.streak).run();
+    `).bind(generateId(), user.userId, userData.streak_days, userData.streak_days).run();
 
     return c.json({
       success: true,
       data: {
         streakSaved: true,
-        currentStreak: userData.streak,
+        currentStreak: userData.streak_days,
         protectionsRemaining: (userData.streak_protections as number) - 1,
       },
     });

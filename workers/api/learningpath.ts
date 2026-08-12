@@ -1,4 +1,6 @@
 import { Hono } from 'hono';
+import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 interface Env {
   DB: D1Database;
@@ -13,6 +15,9 @@ interface UserPayload {
 
 const learningPathApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
 
+// All learning path routes require a verified JWT (sets user on context).
+learningPathApp.use('*', requireAuth);
+
 const generateId = () => `lp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
 // =============================================
@@ -23,7 +28,7 @@ const generateId = () => `lp_${Date.now()}_${Math.random().toString(36).substrin
 learningPathApp.get('/recommendations', async (c) => {
   try {
     const user = c.get('user');
-    const limit = parseInt(c.req.query('limit') || '10');
+    const limit = parseLimit(c, 10);
 
     // Get user's topic mastery from progress
     const topicMastery = await c.env.DB.prepare(`
@@ -32,12 +37,12 @@ learningPathApp.get('/recommendations', async (c) => {
         t.name as topic_name,
         t.subject_id,
         s.name as subject_name,
-        COALESCE(AVG(CASE WHEN uq.correct THEN 100 ELSE 0 END), 0) as mastery,
-        COUNT(uq.id) as questions_attempted
+        COALESCE(AVG(CASE WHEN qa.is_correct = 1 THEN 100 ELSE 0 END), 0) as mastery,
+        COUNT(qa.id) as questions_attempted
       FROM topics t
       LEFT JOIN subjects s ON t.subject_id = s.id
       LEFT JOIN questions q ON q.topic_id = t.id
-      LEFT JOIN user_questions uq ON uq.question_id = q.id AND uq.user_id = ?
+      LEFT JOIN question_attempts qa ON qa.question_id = q.id AND qa.user_id = ?
       GROUP BY t.id
       ORDER BY mastery ASC, questions_attempted ASC
       LIMIT ?
@@ -102,49 +107,80 @@ learningPathApp.get('/exam-readiness/:examType', async (c) => {
     const subjects = await c.env.DB.prepare(`
       SELECT s.id, s.name, s.icon
       FROM subjects s
-      WHERE s.exam_type = ? OR s.exam_type IS NULL
+      LEFT JOIN exam_types et ON et.id = s.exam_type_id
+      WHERE et.slug = ? OR s.exam_type_id IS NULL
       ORDER BY s.name
     `).bind(examType).all();
 
-    const readinessData = [];
+    const subjectRows = subjects.results as any[];
 
-    for (const subject of subjects.results as any[]) {
-      // Calculate mastery per subject
-      const mastery = await c.env.DB.prepare(`
+    // Compute mastery for all subjects in a single grouped query (one round
+    // trip instead of one aggregate per subject).
+    const masteryBySubject = new Map<string, any>();
+    if (subjectRows.length > 0) {
+      const placeholders = subjectRows.map(() => '?').join(',');
+      const masteryRows = await c.env.DB.prepare(`
         SELECT
-          COUNT(DISTINCT t.id) as total_topics,
-          COUNT(DISTINCT CASE WHEN topic_mastery.mastery >= 70 THEN t.id END) as mastered_topics,
-          COALESCE(AVG(topic_mastery.mastery), 0) as avg_mastery
-        FROM topics t
+          s.id AS subject_id,
+          COUNT(DISTINCT t.id) AS total_topics,
+          COUNT(DISTINCT CASE WHEN topic_mastery.mastery >= 70 THEN t.id END) AS mastered_topics,
+          COALESCE(AVG(topic_mastery.mastery), 0) AS avg_mastery
+        FROM subjects s
+        LEFT JOIN topics t ON t.subject_id = s.id
         LEFT JOIN (
           SELECT
             q.topic_id,
-            AVG(CASE WHEN uq.correct THEN 100 ELSE 0 END) as mastery
+            AVG(CASE WHEN qa.is_correct = 1 THEN 100 ELSE 0 END) as mastery
           FROM questions q
-          LEFT JOIN user_questions uq ON uq.question_id = q.id AND uq.user_id = ?
+          LEFT JOIN question_attempts qa ON qa.question_id = q.id AND qa.user_id = ?
           GROUP BY q.topic_id
         ) topic_mastery ON topic_mastery.topic_id = t.id
-        WHERE t.subject_id = ?
-      `).bind(user.userId, subject.id).first();
+        WHERE s.id IN (${placeholders})
+        GROUP BY s.id
+      `).bind(user.userId, ...subjectRows.map((s: any) => s.id)).all();
 
-      // Get weak and strong topics
-      const topicDetails = await c.env.DB.prepare(`
+      for (const m of masteryRows.results as any[]) {
+        masteryBySubject.set(m.subject_id, m);
+      }
+    }
+
+    // Get weak and strong topics for all subjects in a single grouped query
+    // (one round trip instead of one per subject), stitched in JS below.
+    const topicsBySubject = new Map<string, any[]>();
+    if (subjectRows.length > 0) {
+      const placeholders = subjectRows.map(() => '?').join(',');
+      const topicRows = await c.env.DB.prepare(`
         SELECT
+          t.subject_id,
           t.id,
           t.name,
-          COALESCE(AVG(CASE WHEN uq.correct THEN 100 ELSE 0 END), 0) as mastery
+          COALESCE(AVG(CASE WHEN qa.is_correct = 1 THEN 100 ELSE 0 END), 0) as mastery
         FROM topics t
         LEFT JOIN questions q ON q.topic_id = t.id
-        LEFT JOIN user_questions uq ON uq.question_id = q.id AND uq.user_id = ?
-        WHERE t.subject_id = ?
+        LEFT JOIN question_attempts qa ON qa.question_id = q.id AND qa.user_id = ?
+        WHERE t.subject_id IN (${placeholders})
         GROUP BY t.id
-      `).bind(user.userId, subject.id).all();
+      `).bind(user.userId, ...subjectRows.map((s: any) => s.id)).all();
 
-      const weakTopics = topicDetails.results
+      for (const t of topicRows.results as any[]) {
+        const list = topicsBySubject.get(t.subject_id) || [];
+        list.push(t);
+        topicsBySubject.set(t.subject_id, list);
+      }
+    }
+
+    const readinessData = [];
+
+    for (const subject of subjectRows) {
+      const mastery = masteryBySubject.get(subject.id);
+
+      const topicDetails = topicsBySubject.get(subject.id) || [];
+
+      const weakTopics = topicDetails
         .filter((t: any) => t.mastery < 50)
         .map((t: any) => ({ id: t.id, name: t.name, mastery: Math.round(t.mastery) }));
 
-      const strongTopics = topicDetails.results
+      const strongTopics = topicDetails
         .filter((t: any) => t.mastery >= 70)
         .map((t: any) => ({ id: t.id, name: t.name, mastery: Math.round(t.mastery) }));
 
@@ -252,11 +288,11 @@ learningPathApp.post('/study-plan/generate', async (c) => {
         t.name,
         t.subject_id,
         s.name as subject_name,
-        COALESCE(AVG(CASE WHEN uq.correct THEN 100 ELSE 0 END), 0) as mastery
+        COALESCE(AVG(CASE WHEN qa.is_correct = 1 THEN 100 ELSE 0 END), 0) as mastery
       FROM topics t
       LEFT JOIN subjects s ON t.subject_id = s.id
       LEFT JOIN questions q ON q.topic_id = t.id
-      LEFT JOIN user_questions uq ON uq.question_id = q.id AND uq.user_id = ?
+      LEFT JOIN question_attempts qa ON qa.question_id = q.id AND qa.user_id = ?
       GROUP BY t.id
       HAVING mastery < 70
       ORDER BY mastery ASC

@@ -373,7 +373,7 @@ export const useQuickPlayStore = create<QuickPlayState>()(
                 }
               }
             } catch (apiError) {
-              console.log('Using mock questions as fallback');
+              console.error('Question API failed, using mock questions as fallback:', apiError);
             }
           }
 

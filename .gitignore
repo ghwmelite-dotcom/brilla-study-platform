@@ -10,6 +10,9 @@ node_modules
 dist
 .wrangler
 
+# D1 backup exports (db:backup)
+backups/
+
 # Environment files
 .env
 .env.local
@@ -51,4 +54,3 @@ Past Questions/
 lh-*.json
 lighthouse-report.json
 parse-*.cjs
-nul

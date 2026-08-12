@@ -15,7 +15,7 @@ import {
   CreditCard,
 } from 'lucide-react';
 import { useTutoringStore } from '@/stores/tutoringStore';
-import { tutoringService } from '@/services/api';
+import { tutoringService } from '@/lib/services';
 import { ReviewForm } from '@/components/tutoring/ReviewForm';
 import type { TutoringSession, SessionType } from '@/types/tutoring';
 

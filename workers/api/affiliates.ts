@@ -1,29 +1,12 @@
 import { Hono } from 'hono';
-import { verify } from 'hono/jwt';
+import { requireAuth } from './auth-middleware';
+import { parseLimit } from './http';
 
 // Types for Cloudflare bindings
 interface Env {
   DB: D1Database;
   JWT_SECRET: string;
   APP_URL: string;
-}
-
-// JWT payload type
-interface UserPayload {
-  userId: string;
-  email: string;
-  role: string;
-  exp?: number;
-}
-
-// Verify JWT token
-async function verifyJWT(token: string, secret: string): Promise<UserPayload | null> {
-  try {
-    const payload = await verify(token, secret);
-    return payload as UserPayload;
-  } catch {
-    return null;
-  }
 }
 
 // Rate limiting store (in-memory for single worker, use KV/Durable Objects for distributed)
@@ -46,57 +29,6 @@ function checkRateLimit(key: string, maxRequests: number, windowMs: number): boo
   record.count++;
   return true;
 }
-
-// Authentication middleware for protected routes
-const authMiddleware = async (c: any, next: any) => {
-  const authHeader = c.req.header('Authorization');
-
-  // Skip auth for OPTIONS requests (CORS preflight)
-  if (c.req.method === 'OPTIONS') {
-    return next();
-  }
-
-  // Check for Authorization header
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
-  }
-
-  const token = authHeader.replace('Bearer ', '');
-
-  // SECURITY: Demo tokens only allowed in development environment
-  if (token.endsWith('_demo_token')) {
-    const isDevelopment = c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev';
-    if (isDevelopment) {
-      const tokenPrefix = token.replace('_demo_token', '');
-      const demoUsers: Record<string, { id: string; role: string }> = {
-        'student': { id: 'student_1766327981521', role: 'student' },
-        'teacher': { id: 'teacher_1766327981453', role: 'teacher' },
-        'admin': { id: 'admin_prod_001', role: 'admin' },
-      };
-      const demoUser = demoUsers[tokenPrefix];
-      if (demoUser) {
-        c.set('userId', demoUser.id);
-        c.set('userRole', demoUser.role);
-        return next();
-      }
-    }
-    // In production, demo tokens are rejected
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-
-  // Verify JWT token
-  try {
-    const payload = await verifyJWT(token, c.env.JWT_SECRET);
-    if (!payload) {
-      return c.json({ success: false, error: 'Invalid token' }, 401);
-    }
-    c.set('userId', payload.userId);
-    c.set('userRole', payload.role);
-    return next();
-  } catch {
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-};
 
 // Generate unique referral code
 function generateReferralCode(name: string): string {
@@ -134,7 +66,7 @@ function sanitizePaginationParams(limitStr: string | undefined, offsetStr: strin
 export const affiliatesApp = new Hono<{ Bindings: Env }>();
 
 // Join affiliate program (protected)
-affiliatesApp.post('/join', authMiddleware, async (c) => {
+affiliatesApp.post('/join', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -212,7 +144,7 @@ affiliatesApp.post('/join', authMiddleware, async (c) => {
 });
 
 // Get affiliate profile (protected)
-affiliatesApp.get('/profile', authMiddleware, async (c) => {
+affiliatesApp.get('/profile', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -309,7 +241,7 @@ affiliatesApp.get('/profile', authMiddleware, async (c) => {
 });
 
 // Get affiliate dashboard stats (protected)
-affiliatesApp.get('/dashboard', authMiddleware, async (c) => {
+affiliatesApp.get('/dashboard', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -451,11 +383,11 @@ affiliatesApp.get('/dashboard', authMiddleware, async (c) => {
 });
 
 // Get referrals list (protected)
-affiliatesApp.get('/referrals', authMiddleware, async (c) => {
+affiliatesApp.get('/referrals', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const status = c.req.query('status');
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
     const offset = parseInt(c.req.query('offset') || '0');
 
     const profile = await c.env.DB.prepare(`
@@ -531,11 +463,11 @@ affiliatesApp.get('/referrals', authMiddleware, async (c) => {
 });
 
 // Get commission history (protected)
-affiliatesApp.get('/commissions', authMiddleware, async (c) => {
+affiliatesApp.get('/commissions', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const status = c.req.query('status');
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
     const offset = parseInt(c.req.query('offset') || '0');
 
     const profile = await c.env.DB.prepare(`
@@ -596,10 +528,11 @@ affiliatesApp.get('/commissions', authMiddleware, async (c) => {
 });
 
 // Get affiliate leaderboard
+// PUBLIC (no requireAuth): pre-login marketing/landing pages render the board.
 affiliatesApp.get('/leaderboard', async (c) => {
   try {
     const period = c.req.query('period') || 'monthly';
-    const limit = parseInt(c.req.query('limit') || '50');
+    const limit = parseLimit(c, 50);
 
     // Calculate period value
     let periodValue = '';
@@ -657,10 +590,11 @@ affiliatesApp.get('/leaderboard', async (c) => {
 });
 
 // Get school leaderboard
+// PUBLIC (no requireAuth): same as /leaderboard — pre-login marketing pages.
 affiliatesApp.get('/leaderboard/schools', async (c) => {
   try {
     const period = c.req.query('period') || 'monthly';
-    const limit = parseInt(c.req.query('limit') || '20');
+    const limit = parseLimit(c, 20);
 
     const { results } = await c.env.DB.prepare(`
       SELECT
@@ -700,7 +634,7 @@ affiliatesApp.get('/leaderboard/schools', async (c) => {
 });
 
 // Get affiliate challenges (protected)
-affiliatesApp.get('/challenges', authMiddleware, async (c) => {
+affiliatesApp.get('/challenges', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -760,7 +694,7 @@ affiliatesApp.get('/challenges', authMiddleware, async (c) => {
 });
 
 // Claim challenge reward (protected)
-affiliatesApp.post('/challenges/:challengeId/claim', authMiddleware, async (c) => {
+affiliatesApp.post('/challenges/:challengeId/claim', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
     const challengeId = c.req.param('challengeId');
@@ -831,7 +765,7 @@ affiliatesApp.post('/challenges/:challengeId/claim', authMiddleware, async (c) =
 });
 
 // Get affiliate achievements (protected)
-affiliatesApp.get('/achievements', authMiddleware, async (c) => {
+affiliatesApp.get('/achievements', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
 
@@ -974,22 +908,23 @@ affiliatesApp.get('/ref/:code', async (c) => {
 });
 
 // Process referral (called during user registration - internal endpoint, protected)
-affiliatesApp.post('/process-referral', authMiddleware, async (c) => {
+affiliatesApp.post('/process-referral', requireAuth, async (c) => {
   try {
-    const { referralCode, newUserId } = await c.req.json();
+    const { referralCode } = await c.req.json();
 
-    if (!referralCode || !newUserId) {
+    // SECURITY: The referred user is always the authenticated caller (JWT
+    // identity), never a body field — a body-supplied ID would let any
+    // authenticated user attach ANY user as a referral of ANY code, writing
+    // users.referred_by on the victim and hijacking their commission.
+    const newUserId = c.get('userId') as string;
+
+    if (!referralCode) {
       return c.json({ success: false, error: 'Missing required fields' }, 400);
     }
 
     // SECURITY: Validate referral code format
     if (!isValidReferralCode(referralCode)) {
       return c.json({ success: false, error: 'Invalid referral code format' }, 400);
-    }
-
-    // SECURITY: Validate newUserId format (should be a valid UUID or ID format)
-    if (typeof newUserId !== 'string' || newUserId.length < 10 || newUserId.length > 100) {
-      return c.json({ success: false, error: 'Invalid user ID format' }, 400);
     }
 
     // Get affiliate by code
@@ -1027,29 +962,25 @@ affiliatesApp.post('/process-referral', authMiddleware, async (c) => {
       return c.json({ success: false, error: 'User already referred' }, 400);
     }
 
-    // Create referral record
+    // Create referral record + update affiliate/user stats atomically
     const referralId = crypto.randomUUID();
-    await c.env.DB.prepare(`
-      INSERT INTO affiliate_referrals (id, affiliate_id, referred_user_id, status)
-      VALUES (?, ?, ?, 'pending')
-    `).bind(referralId, affiliate.id, newUserId).run();
-
-    // Update affiliate stats
-    await c.env.DB.prepare(`
-      UPDATE affiliate_profiles
-      SET total_referrals = total_referrals + 1, last_referral_at = datetime('now')
-      WHERE id = ?
-    `).bind(affiliate.id).run();
-
-    // Update referred user
-    await c.env.DB.prepare(`
-      UPDATE users SET referred_by = ? WHERE id = ?
-    `).bind(referralCode.toUpperCase(), newUserId).run();
-
-    // Award XP for referral
-    await c.env.DB.prepare(`
-      UPDATE users SET affiliate_xp = affiliate_xp + 50 WHERE id = ?
-    `).bind(affiliate.user_id).run();
+    await c.env.DB.batch([
+      c.env.DB.prepare(`
+        INSERT INTO affiliate_referrals (id, affiliate_id, referred_user_id, status)
+        VALUES (?, ?, ?, 'pending')
+      `).bind(referralId, affiliate.id, newUserId),
+      c.env.DB.prepare(`
+        UPDATE affiliate_profiles
+        SET total_referrals = total_referrals + 1, last_referral_at = datetime('now')
+        WHERE id = ?
+      `).bind(affiliate.id),
+      c.env.DB.prepare(`
+        UPDATE users SET referred_by = ? WHERE id = ?
+      `).bind(referralCode.toUpperCase(), newUserId),
+      c.env.DB.prepare(`
+        UPDATE users SET affiliate_xp = affiliate_xp + 50 WHERE id = ?
+      `).bind(affiliate.user_id),
+    ]);
 
     // Update challenge progress
     await updateChallengeProgress(c.env.DB, affiliate.user_id as string, 'referrals', 1);
@@ -1068,9 +999,10 @@ affiliatesApp.post('/process-referral', authMiddleware, async (c) => {
 });
 
 // Update referral status when user starts trial (protected)
-affiliatesApp.post('/referral/trial-started', authMiddleware, async (c) => {
+affiliatesApp.post('/referral/trial-started', requireAuth, async (c) => {
   try {
-    const { userId } = await c.req.json();
+    // SECURITY: identity from the JWT, never the request body.
+    const userId = c.get('userId') as string;
 
     await c.env.DB.prepare(`
       UPDATE affiliate_referrals
@@ -1151,6 +1083,10 @@ async function checkAffiliateAchievements(
       WHERE uaa.id IS NULL
     `).bind(userId).all();
 
+    // Collect writes for all newly-unlocked achievements and flush them in a
+    // single db.batch() instead of up to 3 round trips per achievement.
+    const statements: D1PreparedStatement[] = [];
+
     for (const ach of achievements) {
       let currentValue = 0;
 
@@ -1168,27 +1104,37 @@ async function checkAffiliateAchievements(
 
       if (currentValue >= (ach.requirement_value as number)) {
         // Unlock achievement
-        await db.prepare(`
-          INSERT INTO user_affiliate_achievements (id, user_id, achievement_id)
-          VALUES (?, ?, ?)
-        `).bind(crypto.randomUUID(), userId, ach.id).run();
+        statements.push(
+          db.prepare(`
+            INSERT INTO user_affiliate_achievements (id, user_id, achievement_id)
+            VALUES (?, ?, ?)
+          `).bind(crypto.randomUUID(), userId, ach.id)
+        );
 
         // Award XP
         if (ach.xp_reward) {
-          await db.prepare(`
-            UPDATE users SET affiliate_xp = affiliate_xp + ? WHERE id = ?
-          `).bind(ach.xp_reward, userId).run();
+          statements.push(
+            db.prepare(`
+              UPDATE users SET affiliate_xp = affiliate_xp + ? WHERE id = ?
+            `).bind(ach.xp_reward, userId)
+          );
         }
 
         // Award cash bonus
         if (ach.cash_bonus) {
-          await db.prepare(`
-            UPDATE affiliate_profiles
-            SET available_earnings = available_earnings + ?
-            WHERE user_id = ?
-          `).bind(ach.cash_bonus, userId).run();
+          statements.push(
+            db.prepare(`
+              UPDATE affiliate_profiles
+              SET available_earnings = available_earnings + ?
+              WHERE user_id = ?
+            `).bind(ach.cash_bonus, userId)
+          );
         }
       }
+    }
+
+    if (statements.length > 0) {
+      await db.batch(statements);
     }
   } catch (error) {
     console.error('Check achievements error:', error);

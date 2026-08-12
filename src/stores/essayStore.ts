@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { EssayQuestion, EssayAttempt, AIEssayFeedback } from '@/types';
+import { getAuthHeaders } from '@/lib/api';
 
 interface EssayState {
   // Current essay session
@@ -90,9 +91,7 @@ export const useEssayStore = create<EssayState>((set, get) => ({
     try {
       const response = await fetch(`${API_BASE}/essays/submit`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           questionId,
           answerText,
@@ -125,9 +124,7 @@ export const useEssayStore = create<EssayState>((set, get) => ({
     try {
       const response = await fetch(`${API_BASE}/essays/${attemptId}/grade`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
       });
 
       if (!response.ok) {
@@ -162,7 +159,9 @@ export const useEssayStore = create<EssayState>((set, get) => ({
     set({ isLoadingHistory: true, error: null });
 
     try {
-      const response = await fetch(`${API_BASE}/essays/history`);
+      const response = await fetch(`${API_BASE}/essays/history`, {
+        headers: getAuthHeaders(),
+      });
 
       if (!response.ok) {
         throw new Error('Failed to fetch essay history');

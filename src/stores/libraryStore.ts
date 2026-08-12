@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { api } from '@/utils/api';
+import { api } from '@/lib/api';
 import type {
   LibraryResource,
   LibraryCollection,
@@ -129,20 +129,21 @@ export const useLibraryStore = create<LibraryState>()(
           const currentFilters = filters || get().filters;
           const page = reset ? 1 : get().page;
 
+          const params = new URLSearchParams();
+          if (currentFilters.search) params.append('search', currentFilters.search);
+          if (currentFilters.resourceType && currentFilters.resourceType !== 'all') params.append('type', currentFilters.resourceType);
+          if (currentFilters.subjectId) params.append('subjectId', currentFilters.subjectId);
+          if (currentFilters.topicId) params.append('topicId', currentFilters.topicId);
+          if (currentFilters.schoolLevel && currentFilters.schoolLevel !== 'all') params.append('schoolLevel', currentFilters.schoolLevel);
+          if (currentFilters.accessLevel && currentFilters.accessLevel !== 'all') params.append('accessLevel', currentFilters.accessLevel);
+          if (currentFilters.sortBy) params.append('sortBy', currentFilters.sortBy);
+          params.append('page', String(page));
+          params.append('limit', String(get().pageSize));
+
           const response = await api.get<{
             resources: LibraryResource[];
             pagination: { page: number; total: number; totalPages: number; hasMore: boolean };
-          }>('/library/resources', {
-            search: currentFilters.search,
-            type: currentFilters.resourceType !== 'all' ? currentFilters.resourceType : undefined,
-            subjectId: currentFilters.subjectId,
-            topicId: currentFilters.topicId,
-            schoolLevel: currentFilters.schoolLevel !== 'all' ? currentFilters.schoolLevel : undefined,
-            accessLevel: currentFilters.accessLevel !== 'all' ? currentFilters.accessLevel : undefined,
-            sortBy: currentFilters.sortBy,
-            page,
-            limit: get().pageSize,
-          });
+          }>(`/library/resources?${params}`);
 
           if (response.success && response.data) {
             const newResources = reset
@@ -195,7 +196,7 @@ export const useLibraryStore = create<LibraryState>()(
 
       loadFeatured: async () => {
         try {
-          const response = await api.get<LibraryResource[]>('/library/featured', { limit: 6 });
+          const response = await api.get<LibraryResource[]>('/library/featured?limit=6');
           if (response.success && response.data) {
             set({ featuredResources: response.data });
           } else {
@@ -441,7 +442,7 @@ export const useLibraryStore = create<LibraryState>()(
       trackDownload: async (resourceId: string) => {
         try {
           // Increment download count on the server
-          console.log('Tracked download for:', resourceId);
+          void resourceId;
         } catch {
           console.error('Failed to track download');
         }
@@ -486,7 +487,6 @@ export const useLibraryStore = create<LibraryState>()(
           }
 
           // API failed - fall back to demo mode with local storage
-          console.log('API unavailable, using demo mode for upload');
           const file = data.get('file') as File | null;
           const contentUrl = data.get('contentUrl') as string || '';
 

@@ -19,7 +19,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useWhiteboardRecorder } from '@/hooks/useWhiteboardRecorder';
 import type { WebcamSettings, RecordingSession } from '@/types/whiteboard';
 import { DEFAULT_WEBCAM_SETTINGS } from '@/types/whiteboard';
-import { recordingsService } from '@/services/api';
+import { recordingsService } from '@/lib/services';
 
 export default function WhiteboardEditor() {
   const navigate = useNavigate();
@@ -225,14 +225,6 @@ export default function WhiteboardEditor() {
     const session = await stopRecording();
     setLastRecording(session);
 
-    console.log('Recording stopped:', {
-      id: session.id,
-      duration: session.duration,
-      events: session.events.length,
-      hasAudio: !!session.audioBlob,
-      hasWebcam: !!session.webcamBlob,
-    });
-
     // Save recording to API
     try {
       // 1. Create recording metadata
@@ -245,26 +237,21 @@ export default function WhiteboardEditor() {
         initialCanvasJSON: canvasRef.current?.toJSON() || undefined,
       });
 
-      console.log('Created recording:', recordingId);
-
       // 2. Upload canvas events
       const eventsBlob = new Blob(
         [JSON.stringify({ events: session.events })],
         { type: 'application/json' }
       );
       await recordingsService.uploadFile(recordingId, 'events', eventsBlob, 'application/json');
-      console.log('Uploaded canvas events');
 
       // 3. Upload audio if available
       if (session.audioBlob) {
         await recordingsService.uploadFile(recordingId, 'audio', session.audioBlob, 'audio/webm');
-        console.log('Uploaded audio');
       }
 
       // 4. Upload webcam if available
       if (session.webcamBlob) {
         await recordingsService.uploadFile(recordingId, 'webcam', session.webcamBlob, 'video/webm');
-        console.log('Uploaded webcam video');
       }
 
       // 5. Generate and upload thumbnail
@@ -272,10 +259,7 @@ export default function WhiteboardEditor() {
         const thumbnailDataUrl = canvasRef.current.toDataURL({ format: 'png', quality: 0.5 });
         const thumbnailBlob = await fetch(thumbnailDataUrl).then(r => r.blob());
         await recordingsService.uploadFile(recordingId, 'thumbnail', thumbnailBlob, 'image/png');
-        console.log('Uploaded thumbnail');
       }
-
-      console.log('Recording saved successfully:', recordingId);
 
       // Show success notification or navigate to recording
       alert('Recording saved successfully!');
