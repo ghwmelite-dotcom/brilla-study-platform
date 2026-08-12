@@ -113,3 +113,15 @@ Plan: docs/superpowers/plans/2026-08-12-pilot-schools-admin.md — 2 tasks + 1 f
 Landed: admin endpoints (schools create/list, ambassador provisioning with referral code, bulk assign by email list with skip reasons, individual assign/unassign — restricted to approved students); new /admin/schools "Pilot Schools" page (schools table, ambassador code + shareable link with copy, bulk assign textarea/CSV with per-row skip reasons); fixed the pre-existing deep-link gap: /?register=true&ref=CODE now actually opens the register modal (affiliate links previously landed on the homepage with no modal). Deployed (worker + site); /api/admin/schools verified 401-unauth.
 
 Founder pilot flow now: Admin → Pilot Schools → create "St John's Grammar School" (slug stjohns) → provision ambassador with code STJOHNS → copy the share link → assign students (bulk paste emails). Then flip REGISTRATION_MODE=invite + redeploy before a Monday 00:00 UTC.
+
+## TELEGRAM COMMUNITY NOTIFICATIONS (2026-08-12)
+
+Design: ~/.gstack/projects/ghwmelite-dotcom-brilla-study-platform/ozzy-main-design-20260812-telegram-v2.md (2 review rounds, 8.5/10). Plan: docs/superpowers/plans/2026-08-12-telegram-community.md — 7/7 tasks + final fix wave, reviews clean, 302 tests.
+
+Landed: migration 091 (telegram_links chat_id UNIQUE anti-farm, link tokens, school_channels, race_alert_state, points_ledger + notification_subscribe); bot webhook (secret-validated, fail-closed) with /start verified handshake awarding 100 pts exactly once (atomicity: rollback-on-fault); outbound notifiers (DM/school/platform) with stale/broken lifecycle; cron alerts (cycle start, winner announcements with channel-membership gate, position-passed, ending-soon, streak rescue) with dedup; Settings connect card; race-tab community banner; admin school-channel field on Pilot Schools page. Deployed (091 applied to prod, worker + site live). Verified inert-safe: webhook 401s without the secret; everything no-ops until configured.
+
+LIVE-CONFIG STEPS (user-gated, runbook in the plan file):
+1. `wrangler secret put TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` (openssl rand -hex 32 for the latter).
+2. wrangler.toml [vars]: TELEGRAM_BOT_USERNAME, TELEGRAM_PLATFORM_CHANNEL_ID, TELEGRAM_COMMUNITY_URL → redeploy.
+3. setWebhook: curl -X POST "https://api.telegram.org/bot$TOKEN/setWebhook" -d "url=https://brilla-api.ghwmelite.workers.dev/api/telegram/webhook" -d "secret_token=$TELEGRAM_WEBHOOK_SECRET" (NOTE: the API origin, NOT brillaprep.org).
+4. E2E: Settings → Notifications → Connect Telegram → /start → +100 XP + status {linked:true}.
