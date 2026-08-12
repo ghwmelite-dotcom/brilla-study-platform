@@ -17,6 +17,7 @@ interface GoogleSignInButtonProps {
     selectedTierId?: string;
     examTypeIds?: string[];
     primaryExamTypeId?: string;
+    referralCode?: string;
   };
   onError?: (error: string) => void;
   disabled?: boolean;

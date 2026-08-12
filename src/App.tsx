@@ -184,8 +184,10 @@ function RegisterPage() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Redirect to landing page with register modal
-  return <Navigate to="/?register=true" replace />;
+  // Redirect to landing page with register modal, preserving the affiliate
+  // referral code (/api/affiliates/ref/:code lands users on /register?ref=CODE)
+  const ref = new URLSearchParams(window.location.search).get('ref');
+  return <Navigate to={`/?register=true${ref ? `&ref=${encodeURIComponent(ref)}` : ''}`} replace />;
 }
 
 // Profile Page (placeholder)

@@ -352,6 +352,8 @@ export interface RegisterData {
   subjectsTaught?: string[];
   yearsExperience?: string;
   qualifications?: string;
+  // Affiliate referral/invite code (required when backend runs in invite mode)
+  referralCode?: string;
 }
 
 export interface CreateUserData {

@@ -23,8 +23,10 @@ import {
   Phone,
   Crown,
   Globe,
+  Ticket,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { api } from '@/lib/api';
 import { cn } from '@/utils';
 import { PlanSelectionStep } from './PlanSelectionStep';
 import { Turnstile, useTurnstile } from '@/components/common/Turnstile';
@@ -34,7 +36,7 @@ import { GoogleSignInButton } from './GoogleSignInButton';
 type AuthMode = 'login' | 'register';
 type UserRole = 'student' | 'teacher' | 'admin' | 'parent';
 type SchoolLevel = 'jss' | 'shs' | 'international';
-type RegistrationStatus = 'idle' | 'pending' | 'error';
+type RegistrationStatus = 'idle' | 'pending' | 'approved' | 'error';
 type RegistrationStep = 'role' | 'schoolLevel' | 'plan' | 'form';
 
 interface AuthModalProps {
@@ -89,12 +91,36 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
         setRegistrationStatus('idle');
         setRegistrationMessage('');
         setShowPassword(false);
+        setReferralCode('');
+        setReferralValidation('idle');
+        setReferralSchoolName(null);
+        setInviteModeDetected(false);
+        setShowCodeRequest(false);
+        setCodeReqName('');
+        setCodeReqContact('');
+        setCodeReqSchool('');
+        setCodeReqSubmitting(false);
+        setCodeReqSuccess(false);
+        setCodeReqError('');
         turnstile.reset();
         clearError();
       }, 300);
       return () => clearTimeout(timer);
     }
   }, [isOpen, clearError, turnstile]);
+
+  // Prefill the referral code from the ?ref= URL param — affiliate links
+  // (/api/affiliates/ref/:code) land users on /register?ref=CODE, which
+  // redirects here preserving the param.
+  useEffect(() => {
+    if (!isOpen) return;
+    const ref = new URLSearchParams(window.location.search).get('ref');
+    if (ref) {
+      const code = ref.trim().toUpperCase();
+      setReferralCode(code);
+      validateReferralCode(code);
+    }
+  }, [isOpen]);
 
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [selectedTierId, setSelectedTierId] = useState<string | null>(null);
@@ -134,6 +160,21 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
   const [selectedExamTypes, setSelectedExamTypes] = useState<string[]>([]);
   const [primaryExamType, setPrimaryExamType] = useState('');
 
+  // Referral / invite code (growth loop)
+  const [referralCode, setReferralCode] = useState('');
+  const [referralValidation, setReferralValidation] = useState<'idle' | 'checking' | 'valid' | 'invalid'>('idle');
+  const [referralSchoolName, setReferralSchoolName] = useState<string | null>(null);
+  // Set when the backend rejects a registration with data.codeRequired (invite mode)
+  const [inviteModeDetected, setInviteModeDetected] = useState(false);
+  // Inline "request a code" form
+  const [showCodeRequest, setShowCodeRequest] = useState(false);
+  const [codeReqName, setCodeReqName] = useState('');
+  const [codeReqContact, setCodeReqContact] = useState('');
+  const [codeReqSchool, setCodeReqSchool] = useState('');
+  const [codeReqSubmitting, setCodeReqSubmitting] = useState(false);
+  const [codeReqSuccess, setCodeReqSuccess] = useState(false);
+  const [codeReqError, setCodeReqError] = useState('');
+
   const resetForm = () => {
     setEmail('');
     setPassword('');
@@ -158,6 +199,17 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
     setRegistrationStep('role');
     setRegistrationStatus('idle');
     setRegistrationMessage('');
+    setReferralCode('');
+    setReferralValidation('idle');
+    setReferralSchoolName(null);
+    setInviteModeDetected(false);
+    setShowCodeRequest(false);
+    setCodeReqName('');
+    setCodeReqContact('');
+    setCodeReqSchool('');
+    setCodeReqSubmitting(false);
+    setCodeReqSuccess(false);
+    setCodeReqError('');
     clearError();
   };
 
@@ -211,6 +263,61 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
     resetForm();
     turnstile.reset();
     setMode(newMode);
+  };
+
+  // Live-check a referral/invite code against the public validate endpoint.
+  // Empty input skips the call and clears the state.
+  const validateReferralCode = async (code: string) => {
+    const clearReferralError = (prev: FormErrors): FormErrors => {
+      if (!prev.referralCode) return prev;
+      const next = { ...prev };
+      delete next.referralCode;
+      return next;
+    };
+    const trimmed = code.trim().toUpperCase();
+    if (!trimmed) {
+      setReferralValidation('idle');
+      setReferralSchoolName(null);
+      setFormErrors(clearReferralError);
+      return;
+    }
+    setReferralValidation('checking');
+    setReferralSchoolName(null);
+    const response = await api.get<{ valid: boolean; schoolName: string | null }>(
+      `/affiliates/validate-code/${encodeURIComponent(trimmed)}`
+    );
+    if (response.success && response.data?.valid) {
+      setReferralValidation('valid');
+      setReferralSchoolName(response.data.schoolName);
+      setFormErrors(clearReferralError);
+    } else {
+      setReferralValidation('invalid');
+      setFormErrors(prev => ({
+        ...prev,
+        referralCode: response.success ? 'This code is not valid' : (response.error || 'Could not verify the code'),
+      }));
+    }
+  };
+
+  const handleCodeRequestSubmit = async () => {
+    if (!codeReqName.trim() || !codeReqContact.trim()) {
+      setCodeReqError('Name and contact are required');
+      return;
+    }
+    setCodeReqSubmitting(true);
+    setCodeReqError('');
+    const response = await api.post('/referral-code-requests', {
+      name: codeReqName.trim(),
+      contact: codeReqContact.trim(),
+      schoolName: codeReqSchool.trim() || undefined,
+    });
+    setCodeReqSubmitting(false);
+    if (response.success) {
+      setCodeReqSuccess(true);
+    } else {
+      // Rate-limit (429) and validation errors surface here
+      setCodeReqError(response.error || 'Failed to submit request. Please try again.');
+    }
   };
 
   const validateForm = (): boolean => {
@@ -337,15 +444,31 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           primaryExamTypeId: (selectedRole === 'student' || selectedRole === 'teacher') && primaryExamType
             ? primaryExamType
             : undefined,
+          // Affiliate referral/invite code (trimmed, uppercased)
+          referralCode: referralCode.trim() ? referralCode.trim().toUpperCase() : undefined,
         });
 
-        // Show pending approval message
-        setRegistrationStatus('pending');
+        // Invite-mode registrations are auto-approved: prompt login instead
+        // of the pending-approval copy.
+        if (result.status === 'approved') {
+          setRegistrationStatus('approved');
+        } else {
+          setRegistrationStatus('pending');
+        }
         setRegistrationMessage(result.message);
       }
     } catch (err) {
       if (mode === 'register') {
         setRegistrationStatus('error');
+        // Invite mode: backend rejected with data.codeRequired — surface the
+        // request-a-code form automatically (error text renders via formErrors.submit).
+        const codeRequired =
+          (err as { codeRequired?: boolean })?.codeRequired === true ||
+          (err instanceof Error && /invite code is required/i.test(err.message));
+        if (codeRequired) {
+          setInviteModeDetected(true);
+          setShowCodeRequest(true);
+        }
       }
       setFormErrors({ submit: err instanceof Error ? err.message : 'An error occurred. Please try again.' });
       // Reset turnstile on error so user can try again
@@ -425,7 +548,24 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
-          {registrationStatus === 'pending' ? (
+          {registrationStatus === 'approved' ? (
+            <div className="text-center py-8">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-10 h-10 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-neutral-900">Your account is ready — log in</h3>
+              <p className="text-neutral-600 mt-3 max-w-sm mx-auto">
+                {registrationMessage}
+              </p>
+
+              <button
+                onClick={() => handleModeSwitch('login')}
+                className="mt-6 px-6 py-2.5 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                Sign In
+              </button>
+            </div>
+          ) : registrationStatus === 'pending' ? (
             <div className="text-center py-8">
               <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Clock className="w-10 h-10 text-amber-600" />
@@ -649,14 +789,28 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                 </>
               )}
 
-              {/* Google Sign-Up for Registration (after role selection) */}
-              {mode === 'register' && selectedRole && selectedRole !== 'admin' && (
+              {/* Google Sign-Up for Registration (after role selection).
+                  Hidden once the backend tells us invite mode is on — Google
+                  registration would hit the same codeRequired rejection. */}
+              {mode === 'register' && selectedRole && selectedRole !== 'admin' && !inviteModeDetected && (
                 <>
                   <GoogleSignInButton
                     mode="register"
                     role={selectedRole}
-                    registrationData={selectedRole === 'student' && schoolLevel ? { schoolLevel } : undefined}
-                    onError={(error) => setFormErrors({ submit: error })}
+                    registrationData={
+                      selectedRole === 'student' && schoolLevel
+                        ? { schoolLevel, ...(referralCode.trim() ? { referralCode: referralCode.trim().toUpperCase() } : {}) }
+                        : referralCode.trim()
+                          ? { referralCode: referralCode.trim().toUpperCase() }
+                          : undefined
+                    }
+                    onError={(error) => {
+                      setFormErrors({ submit: error });
+                      if (/invite code is required/i.test(error)) {
+                        setInviteModeDetected(true);
+                        setShowCodeRequest(true);
+                      }
+                    }}
                     disabled={isLoading}
                   />
                   <div className="relative my-4">
@@ -759,6 +913,110 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                       />
                     </div>
                     {formErrors.confirmPassword && <p className="text-red-500 text-xs mt-1">{formErrors.confirmPassword}</p>}
+                  </div>
+
+                  {/* Referral / Invite Code (growth loop) */}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Referral / Invite Code
+                    </label>
+                    <div className="relative">
+                      <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                      <input
+                        type="text"
+                        value={referralCode}
+                        onChange={(e) => {
+                          setReferralCode(e.target.value.toUpperCase());
+                          setReferralValidation('idle');
+                          setReferralSchoolName(null);
+                        }}
+                        onBlur={() => validateReferralCode(referralCode)}
+                        placeholder="Enter your invite code"
+                        className={cn(
+                          'w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 uppercase',
+                          formErrors.referralCode
+                            ? 'border-red-300'
+                            : referralValidation === 'valid'
+                              ? 'border-green-400'
+                              : 'border-neutral-300'
+                        )}
+                      />
+                      {referralValidation === 'checking' && (
+                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 animate-spin" />
+                      )}
+                      {referralValidation === 'valid' && (
+                        <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+                      )}
+                    </div>
+                    {formErrors.referralCode && <p className="text-red-500 text-xs mt-1">{formErrors.referralCode}</p>}
+                    {referralValidation === 'valid' && (
+                      <p className="text-green-600 text-xs mt-1">
+                        Code verified{referralSchoolName ? ` — ${referralSchoolName}` : ''}
+                      </p>
+                    )}
+                    {!showCodeRequest && (
+                      <button
+                        type="button"
+                        onClick={() => setShowCodeRequest(true)}
+                        className="text-primary text-xs font-medium mt-1 hover:underline"
+                      >
+                        Don't have a code? Request one
+                      </button>
+                    )}
+                    {showCodeRequest && (
+                      <div className="mt-2 p-3 bg-neutral-50 border border-neutral-200 rounded-lg space-y-2">
+                        {codeReqSuccess ? (
+                          <p className="text-sm text-green-700 flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                            We'll review your request and send a code.
+                          </p>
+                        ) : (
+                          <>
+                            <p className="text-xs font-medium text-neutral-700">Request an invite code</p>
+                            <input
+                              type="text"
+                              value={codeReqName}
+                              onChange={(e) => setCodeReqName(e.target.value)}
+                              placeholder="Your name"
+                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            />
+                            <input
+                              type="text"
+                              value={codeReqContact}
+                              onChange={(e) => setCodeReqContact(e.target.value)}
+                              placeholder="Email or phone number"
+                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            />
+                            <input
+                              type="text"
+                              value={codeReqSchool}
+                              onChange={(e) => setCodeReqSchool(e.target.value)}
+                              placeholder="School name (optional)"
+                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            />
+                            {codeReqError && <p className="text-red-500 text-xs">{codeReqError}</p>}
+                            <div className="flex items-center gap-3">
+                              <button
+                                type="button"
+                                onClick={handleCodeRequestSubmit}
+                                disabled={codeReqSubmitting}
+                                className="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary/90 disabled:opacity-50 flex items-center gap-1.5"
+                              >
+                                {codeReqSubmitting && <Loader2 className="w-3 h-3 animate-spin" />}
+                                Submit Request
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setShowCodeRequest(false)}
+                                className="text-neutral-600 text-xs hover:underline"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Student-specific fields */}

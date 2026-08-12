@@ -178,6 +178,8 @@ interface RegisterData {
   // Exam type preferences (for students and teachers)
   examTypeIds?: string[];
   primaryExamTypeId?: string;
+  // Affiliate referral/invite code (required when backend runs in invite mode)
+  referralCode?: string;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -263,7 +265,7 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
         try {
           // Call the API to register user
-          const response = await api.post<{ success: boolean; message: string; status?: string }>('/auth/register', {
+          const response = await api.post<{ status?: string; message?: string; codeRequired?: boolean }>('/auth/register', {
             email: data.email,
             password: data.password,
             name: data.name,
@@ -282,9 +284,21 @@ export const useAuthStore = create<AuthState>()(
             // Include exam type preferences
             examTypeIds: data.examTypeIds,
             primaryExamTypeId: data.primaryExamTypeId,
+            // Affiliate referral/invite code (growth loop; required in invite mode)
+            referralCode: data.referralCode,
           });
 
           set({ isLoading: false });
+
+          // The envelope client never throws on success:false — surface API
+          // errors (e.g. invite-mode codeRequired 400) to the caller.
+          if (!response.success) {
+            const err = new Error(response.error || 'Registration failed');
+            if (response.data?.codeRequired) {
+              (err as Error & { codeRequired?: boolean }).codeRequired = true;
+            }
+            throw err;
+          }
 
           // Return status info from API response
           return {
