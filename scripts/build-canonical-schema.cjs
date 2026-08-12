@@ -35,7 +35,13 @@ const path = require('path');
 
 const DB_DIR = path.join(__dirname, '..', 'database');
 const MIGRATIONS_DIR = path.join(DB_DIR, 'migrations', 'archive');
+const LIVE_MIGRATIONS_DIR = path.join(DB_DIR, 'migrations');
 const LEGACY_SCHEMA = path.join(DB_DIR, 'schema.sql');
+
+// Live DDL folded into the canonical schema (data-only 088/088a and the
+// 089 baseline marker stay out — an explicit list, not a directory scan,
+// so 089_baseline_marker.sql's schema_baseline INSERT can never leak in).
+const LIVE_DDL_FILES = ['090_growth_loop.sql'];
 
 const SCRATCH_RE = /(_backup|_v2|_old|_tmp)$/i;
 
@@ -410,6 +416,12 @@ fileStats.push({ file: 'schema.sql', ...processFile(LEGACY_SCHEMA, 'schema.sql')
 const migrationFiles = fs.readdirSync(MIGRATIONS_DIR).filter((f) => f.endsWith('.sql')).sort();
 for (const f of migrationFiles) {
   fileStats.push({ file: f, ...processFile(path.join(MIGRATIONS_DIR, f), `migrations/${f}`) });
+}
+
+// Live (post-archive) DDL files, applied after the archive so their ALTERs
+// merge through the same applyAlter machinery.
+for (const f of LIVE_DDL_FILES) {
+  fileStats.push({ file: f, ...processFile(path.join(LIVE_MIGRATIONS_DIR, f), `migrations/${f}`) });
 }
 
 // Retry ALTERs whose table did not exist yet (created by a later file).
@@ -816,7 +828,7 @@ const banner = `-- =============================================================
 --
 -- Sources (in application order):
 --   database/schema.sql (legacy)
-${[...migrationFiles, ...BANNER_TRAILING_FILES].map((f) => `--   database/migrations/${f}`).join('\n')}
+${[...migrationFiles, ...BANNER_TRAILING_FILES, ...LIVE_DDL_FILES].map((f) => `--   database/migrations/${f}`).join('\n')}
 --
 -- PRAGMA foreign_keys = ON;  -- enforced by db:verify and D1; a schema file
 -- cannot set PRAGMAs on D1, so this is documented here as a comment.
