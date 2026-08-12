@@ -930,6 +930,29 @@ export function LandingPage() {
     setShowAuthModal(true);
   };
 
+  // Open the auth modal for deep links: /register redirects to
+  // /?register=true (preserving ?ref= for affiliate referrals) and the
+  // OAuth callback lands on /?register=true for register intent.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const wantsRegister = params.get('register') === 'true';
+    const wantsLogin = params.get('login') === 'true';
+    if (!wantsRegister && !wantsLogin) return;
+
+    handleOpenAuth(wantsRegister ? 'register' : 'login');
+
+    // Strip only the intent params so a refresh doesn't reopen the modal;
+    // keep ?ref= so AuthModal can still prefill the referral code on open.
+    params.delete('register');
+    params.delete('login');
+    const qs = params.toString();
+    window.history.replaceState(
+      null,
+      '',
+      window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash
+    );
+  }, []);
+
   // Generate particles (memoized to prevent recreation on every render)
   const particles = useMemo(() => {
     const { count, sizeRange, durationRange } = ANIMATION_CONFIG.particles;
