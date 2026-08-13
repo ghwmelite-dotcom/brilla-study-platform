@@ -3230,7 +3230,7 @@ app.get('/api/papers/attempts', requireAuth, async (c) => {
         pa.time_allowed,
         pa.time_used,
         pa.total_score,
-        pa.percentage_score as percentage,
+        pa.percentage,
         pa.started_at,
         pa.submitted_at,
         pp.title as paper_title,
@@ -4447,7 +4447,7 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
     // Update attempt
     await c.env.DB.prepare(`
       UPDATE paper_attempts
-      SET status = 'completed', time_used = ?, total_score = ?, percentage_score = ?, submitted_at = datetime('now')
+      SET status = 'completed', time_used = ?, total_score = ?, percentage = ?, submitted_at = datetime('now')
       WHERE id = ?
     `).bind(timeUsed || 0, totalScore, percentageScore, attemptId).run();
 
@@ -4475,7 +4475,7 @@ protectedApp.get('/papers/attempts/:attemptId/results', async (c) => {
 
   try {
     const attempt = await c.env.DB.prepare(`
-      SELECT pa.*, pp.title as paper_title, pp.year, s.name as subject_name, pt.name as paper_type_name
+      SELECT pa.*, pa.percentage AS percentage_score, pp.title as paper_title, pp.year, s.name as subject_name, pt.name as paper_type_name
       FROM paper_attempts pa
       JOIN past_papers pp ON pa.paper_id = pp.id
       JOIN subjects s ON pp.subject_id = s.id
@@ -7247,7 +7247,25 @@ adminApp.delete('/users/:id', async (c) => {
   }
 
   try {
+    const target = await c.env.DB.prepare(
+      'SELECT email, role FROM users WHERE id = ?'
+    ).bind(userId).first();
+
     await c.env.DB.prepare('DELETE FROM users WHERE id = ?').bind(userId).run();
+
+    // Audit the deletion — hard-deleting an account must leave a trail.
+    await logAudit({
+      db: c.env.DB,
+      userId: adminUser.userId,
+      userEmail: adminUser.email,
+      userRole: 'admin',
+      action: 'user_delete',
+      resourceType: 'user',
+      resourceId: userId,
+      details: `Deleted user ${target?.email || 'unknown'} (role: ${target?.role || 'unknown'})`,
+      ipAddress: c.req.header('cf-connecting-ip') || 'unknown',
+      userAgent: c.req.header('user-agent') || 'unknown',
+    });
 
     return c.json({ success: true, data: { message: 'User deleted' } });
   } catch (error) {
