@@ -281,6 +281,30 @@ describe('whiteboard-teach progressive protocol', () => {
     expect(stored.steps[0].commands[0].id).toBe('s0-gen-1');
   });
 
+  it('accepts an already-parsed JSON response from the AI binding (live llama fp8-fast behavior)', async () => {
+    // Live finding (Phase B verification): when the model output is bare valid
+    // JSON, the Workers AI binding returns `response` as parsed JSON, not a
+    // string. Outline and step generation must handle both shapes.
+    const parsedJsonAi = {
+      run: async (_model: string, opts: { max_tokens?: number }) =>
+        opts.max_tokens === 300
+          ? { response: [...OUTLINE], usage: { total_tokens: 20 } }
+          : { response: generatedStep(1), usage: { total_tokens: 120 } },
+    };
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheMissHandler, writeHandler]);
+
+    const res = await teach(db, { lessonType: 'step-by-step' }, parsedJsonAi);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      data: { outline: string[]; fallback: boolean; cached: boolean; step: { commands: { id: string }[] } };
+    };
+    expect(body.data.fallback).toBe(false);
+    expect(body.data.cached).toBe(false);
+    expect(body.data.outline).toEqual(OUTLINE);
+    expect(body.data.step.commands[0].id).toBe('s0-gen-1');
+    expect(writeCalls(db).filter((c) => /INSERT/.test(c.sql))).toHaveLength(1);
+  });
+
   it('merges a newly generated step into the existing cache row via UPDATE', async () => {
     const row = {
       id: 'wb_row_1',

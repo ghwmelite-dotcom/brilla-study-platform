@@ -2183,23 +2183,23 @@ async function generateWhiteboardOutline(
       temperature: 0.5,
     });
 
-    const responseText = typeof result === 'object' && result !== null && 'response' in result
-      ? (result as { response: string }).response
-      : String(result);
+    const raw: unknown = typeof result === 'object' && result !== null && 'response' in result
+      ? (result as { response: unknown }).response
+      : result;
 
-    const jsonMatch = responseText.match(/\[[\s\S]*\]/);
-    if (jsonMatch) {
-      const parsed = JSON.parse(jsonMatch[0]) as unknown;
-      if (
-        Array.isArray(parsed) &&
-        parsed.length >= 4 &&
-        parsed.length <= 6 &&
-        parsed.every((t) => typeof t === 'string' && t.trim().length > 0)
-      ) {
-        return { outline: parsed.map((t) => (t as string).trim()), usedFallback: false };
-      }
-      console.error('Whiteboard outline failed validation — using fallback');
+    // Workers AI returns `response` as a string normally, but as ALREADY-PARSED
+    // JSON when the model output is bare valid JSON (llama fp8-fast does this).
+    const candidate = typeof raw === 'string' ? raw.match(/\[[\s\S]*\]/)?.[0] : raw;
+    const parsed = (typeof candidate === 'string' ? JSON.parse(candidate) : candidate) as unknown;
+    if (
+      Array.isArray(parsed) &&
+      parsed.length >= 4 &&
+      parsed.length <= 6 &&
+      parsed.every((t) => typeof t === 'string' && t.trim().length > 0)
+    ) {
+      return { outline: parsed.map((t) => (t as string).trim()), usedFallback: false };
     }
+    console.error('Whiteboard outline failed validation — using fallback');
 
     throw new Error('Failed to parse whiteboard outline');
   } catch (error) {
@@ -2296,18 +2296,20 @@ Canvas is 1200x800. Keep commands under 12.`;
       temperature: 0.7,
     });
 
-    const responseText = typeof result === 'object' && result !== null && 'response' in result
-      ? (result as { response: string }).response
-      : String(result);
+    const raw: unknown = typeof result === 'object' && result !== null && 'response' in result
+      ? (result as { response: unknown }).response
+      : result;
 
     const tokensUsed =
       typeof result === 'object' && result !== null && 'usage' in result
         ? ((result as { usage?: { total_tokens?: number } }).usage?.total_tokens ?? null)
         : null;
 
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      const parsed = JSON.parse(jsonMatch[0]) as unknown;
+    // Workers AI returns `response` as a string normally, but as ALREADY-PARSED
+    // JSON when the model output is bare valid JSON (llama fp8-fast does this).
+    const candidate = typeof raw === 'string' ? raw.match(/\{[\s\S]*\}/)?.[0] : raw;
+    if (candidate) {
+      const parsed = (typeof candidate === 'string' ? JSON.parse(candidate) : candidate) as unknown;
       if (isValidWhiteboardStep(parsed)) {
         return { step: prefixStepCommandIds(parsed, stepIndex), usedFallback: false, tokensUsed };
       }
