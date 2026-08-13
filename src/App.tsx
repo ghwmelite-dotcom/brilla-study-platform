@@ -303,7 +303,7 @@ function App() {
     return (
       <SplashScreen
         onComplete={handleSplashComplete}
-        duration={3500}
+        duration={1800}
       />
     );
   }
