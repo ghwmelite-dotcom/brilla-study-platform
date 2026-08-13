@@ -137,11 +137,12 @@ Frontend:
 
 Worker (`workers/api/index.ts`):
 
-- New `POST /api/admin/users/:id/set-tier`, body `{ tierId, durationDays | null }`:
-  - Validate tier exists and `is_active`; validate duration 1–1095 or null
-    (null ⇒ no expiry — lifetime/comp).
+- New `POST /api/admin/users/:id/set-tier`, body `{ tierId, durationDays }`:
+  - Validate tier exists and `is_active`; validate duration is an integer 1–3650
+    days (the UI offers 30/90/365/3650 presets; 3650 = "Comp — 10 years" stands
+    in for lifetime, since `isPremiumUser` requires a future expiry).
   - Set `users.subscription_tier_id`, `subscription_expires_at`
-    (now + durationDays, or NULL).
+    (now + durationDays).
   - If the tier's `ai_grading_quota > 0`, top up `ai_grading_credits` by that
     quota (mirrors payment crediting, `payments.ts:469-484`).
   - `logAudit` with old tier → new tier + duration, same as extend-trial.

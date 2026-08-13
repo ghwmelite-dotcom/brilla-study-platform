@@ -842,7 +842,7 @@ export default function UserManagement() {
                     </AdminButton>
                   </div>
                   <p className="text-xs text-admin-text-muted mt-2">
-                    Sets the user's tier and expiry; AI grading credits top up to the tier quota
+                    Sets the user's tier and expiry; adds the tier's AI grading credit quota on each application
                   </p>
                 </div>
               </div>
