@@ -192,6 +192,16 @@ function normalizeAnswerForComparison(
   return { userNormalized: userTrimmed, correctNormalized: correctTrimmed };
 }
 
+// Canonical school_level values are 'jhs' | 'shs' (DB CHECK constraint).
+// Clients send 'jss' (legacy UI spelling) or 'international' (O/A-level);
+// normalize to the canonical set — O/A-level students store NULL by design
+// (see database/schema.sql note on the users table).
+function normalizeSchoolLevel(value: unknown): string | null {
+  if (value === 'jss' || value === 'jhs') return 'jhs';
+  if (value === 'shs') return 'shs';
+  return null;
+}
+
 // Password hashing using Web Crypto API (PBKDF2)
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -996,7 +1006,7 @@ publicApp.post('/auth/register', async (c) => {
         VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
         id, email, passwordHash, name, userRole, initialStatus,
-        schoolLevel || null, yearGroup || null, schoolName || null, house || null,
+        normalizeSchoolLevel(schoolLevel), yearGroup || null, schoolName || null, house || null,
         teacherLicenseNumber || null,
         subjectsTaught ? JSON.stringify(subjectsTaught) : null,
         yearsExperience || null, qualifications || null,
@@ -7104,7 +7114,7 @@ adminApp.post('/users', async (c) => {
     `).bind(
       id, email, name, role || 'student',
       verificationToken, tokenExpiry,
-      schoolLevel || null, yearGroup || null, schoolName || null, house || null,
+      normalizeSchoolLevel(schoolLevel), yearGroup || null, schoolName || null, house || null,
       teacherLicenseNumber || null,
       subjectsTaught ? JSON.stringify(subjectsTaught) : null,
       yearsExperience || null, qualifications || null,
@@ -7177,7 +7187,7 @@ adminApp.put('/users/:id', async (c) => {
       WHERE id = ?
     `).bind(
       name || null, email || null,
-      schoolLevel || null, yearGroup || null, schoolName || null, house || null,
+      normalizeSchoolLevel(schoolLevel), yearGroup || null, schoolName || null, house || null,
       teacherLicenseNumber || null,
       subjectsTaught ? JSON.stringify(subjectsTaught) : null,
       yearsExperience || null, qualifications || null,

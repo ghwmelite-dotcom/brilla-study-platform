@@ -200,3 +200,29 @@ Findings:
   Chrome; the landing promo (8s timer) is suppressed via the
   brilla_promo_dismissed sessionStorage flag; each account runs in an
   isolated browser context to prevent session bleed.
+
+## P1 — Role/school-level CHECK constraint failures blocking registrations (2026-08-13 ~00:25 UTC)
+
+**Found via:** admin parent creation failing with "Failed to create user".
+
+**Root causes:**
+1. Prod `users` table CHECK allowed only ('student','teacher','admin') —
+   'parent' was never migrated in. Parent self-registration was equally
+   broken; zero parents could ever exist.
+2. Frontend sends school_level 'jss' (and 'international' for O/A-level);
+   the DB CHECK only allows ('jhs','shs'). JHS and O/A-level student
+   self-registration 500'd in prod; only SHS students could register
+   (explains how the existing 135 users got through).
+
+**Fix:**
+- Migration 092_users_parent_role.sql: rebuilt `users` with role CHECK
+  including 'parent' (create_new → copy → drop → rename under
+  PRAGMA foreign_keys=OFF; 6 indexes recreated). Rehearsed on a scratch
+  D1 instance first (local miniflare proved NOT faithful for FK/pragma
+  behavior), then applied to prod with a pre-backup at
+  backups/pre-092-parent-role.sql. Verified: 135 rows intact, 6 indexes,
+  parent insert succeeds.
+- normalizeSchoolLevel() applied at every user-write choke point
+  (register, admin create, admin update, OAuth register): 'jss'→'jhs',
+  'international'→NULL (schema comment: O/A-level students store NULL).
+- 282/282 worker tests green; worker redeployed.

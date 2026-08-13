@@ -27,6 +27,14 @@ interface UserPayload {
 // Typed as readonly string[] so .includes() accepts an arbitrary caller string.
 export const ALLOWED_SELF_SERVE_ROLES: readonly string[] = ['student', 'teacher', 'parent'];
 
+// Mirror of normalizeSchoolLevel in index.ts (oauth.ts is imported BY
+// index.ts, so it can't import back): 'jss' → 'jhs', 'international' → NULL.
+function normalizeSchoolLevel(value: unknown): string | null {
+  if (value === 'jss' || value === 'jhs') return 'jhs';
+  if (value === 'shs') return 'shs';
+  return null;
+}
+
 interface GoogleTokenResponse {
   access_token: string;
   id_token: string;
@@ -439,7 +447,7 @@ oauthApp.post('/google/callback', async (c) => {
     const userRole = role || 'student';
 
     // Parse registration data
-    const schoolLevel = registrationData?.schoolLevel || null;
+    const schoolLevel = normalizeSchoolLevel(registrationData?.schoolLevel);
     const yearGroup = registrationData?.yearGroup || null;
     const schoolName = registrationData?.schoolName || null;
     const house = registrationData?.house || null;
