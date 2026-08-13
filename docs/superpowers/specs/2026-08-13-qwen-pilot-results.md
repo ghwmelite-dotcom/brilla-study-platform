@@ -26,14 +26,14 @@ Per-prompt:
 | whiteboard-json | 13774 ms / 1086 | 11903 ms / 695 |
 | off-topic-guard | 1697 ms / 203 | 795 ms / 113 |
 
-## Critical finding: Qwen burns tokens on hidden reasoning and truncates the answer
+## Critical finding: Qwen's visible output was truncated or empty — hidden reasoning is the strongly-indicated cause
 
-Qwen3-30B is a reasoning model; under the Workers AI default it spends most of its token budget on internal reasoning before emitting the final answer. Two of six outputs were **unusable in production** despite `ok: true`:
+Qwen3-30B is a reasoning model, and the strongly-indicated explanation for what follows is that it spent most of its token budget on hidden internal reasoning before emitting the final answer (we did not inspect reasoning traces directly, so this is inference from token counts and output shape, not a proven mechanism). Two of six outputs were **unusable in production** despite `ok: true`:
 
 1. **teach-explain** — 1064 tokens used, but the entire visible output was:
    > `To solve $x^2 + 5x + 6 = 0$ by`
 
-   The reasoning consumed the completion budget and the answer was cut off mid-sentence.
+   Consistent with hidden reasoning consuming the completion budget, the answer was cut off mid-sentence.
 2. **whiteboard-json** — 1086 tokens used, **output was empty/null** (`jsonValid=false`). For the whiteboard feature — the whole point of routing chat to a strong model — Qwen returned nothing parseable.
 
 Every Qwen output also began with stray leading blank lines (artifact of the reasoning-then-answer format).
@@ -50,12 +50,20 @@ Llama returned complete, usable output on all 6 prompts, and its whiteboard JSON
 
 ## Cost/latency
 
-Qwen was ~1.9x slower on average (9549 ms vs 5028 ms) and consumed ~3.2x the tokens (791 vs 247) — with much of that spend invisible reasoning that users never see. On a latency-sensitive chat surface for SHS students on mobile connections, this is a material regression.
+Qwen was ~1.9x slower on average (9549 ms vs 5028 ms) and consumed ~3.2x the tokens (791 vs 247) — much of that spend apparently invisible reasoning that users never see. On a latency-sensitive chat surface for SHS students on mobile connections, this is a material regression.
+
+## Methodology caveat
+
+All ai-compare calls ran with `max_tokens: 1024` (hardcoded in `workers/api/index.ts` for both the Anthropic-proxy path and the Workers AI path). This is the **same budget the production chat endpoints use** — the teach/ask flows in `workers/api/revision-classroom.ts` also run at `max_tokens: 1024` — so the pilot measured fitness under real production configuration, and the verdict stands operationally regardless of mechanism. However:
+
+- A 1024-token budget structurally disadvantages reasoning-mode models like qwen3-30b-a3b, which (by design) spend tokens on hidden reasoning before producing visible output. With a larger budget, Qwen's truncated/empty outputs might have completed.
+- A retest of Qwen with a raised `max_tokens` budget, or with a non-reasoning Qwen variant, remains a legitimate option if chat quality ever needs revisiting. Such a retest would need a corresponding production-config change to be decision-relevant.
+- The hidden-reasoning explanation for Qwen's truncated outputs is the strongly-indicated reading of the token counts and output shapes observed; we did not inspect reasoning traces, so it is not a proven mechanism.
 
 ## Verdict
 
 **REVERT to llama-3.3-70b-instruct-fp8-fast as AI_MODEL_CHAT.**
 
-Qwen3-30B's reasoning-token overhead causes truncated/empty completions at default token budgets, broke the whiteboard JSON workload entirely, and roughly doubles latency at ~3x token cost. Llama is complete, accurate, faster, cheaper, and produced valid whiteboard JSON. Qwen's hook-writing was arguably the best single output, but that does not offset two production-blocking failures.
+Under the production 1024-token budget, Qwen3-30B produced truncated/empty completions (with hidden reasoning-token consumption the strongly-indicated explanation), broke the whiteboard JSON workload entirely, and roughly doubles latency at ~3x token cost. Llama is complete, accurate, faster, cheaper, and produced valid whiteboard JSON. Qwen's hook-writing was arguably the best single output, but that does not offset two production-blocking failures.
 
 Action taken: `AI_MODEL_CHAT` set back to `@cf/meta/llama-3.3-70b-instruct-fp8-fast` in `wrangler.toml` (both `[vars]` and `[env.dev.vars]`) and redeployed (Version ID `44fc0d23-a56d-4aa5-86ed-12e2ece9585d`). The env-var routing machinery and `/api/admin/ai-compare` endpoint remain in place, so a future retry of Qwen (e.g. with a raised max-tokens budget or a non-reasoning Qwen variant) is a one-line config change plus a re-run of `scripts/ai-model-pilot.cjs`.
