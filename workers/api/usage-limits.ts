@@ -172,6 +172,59 @@ export async function checkCanAnswer(
   };
 }
 
+// Daily AI interaction allowance for the revision classroom (free tier).
+// Counted from the revision_ai_interactions audit table — no schema change.
+export const DAILY_AI_INTERACTION_LIMIT = 10;
+
+export interface AiAllowanceResult {
+  allowed: boolean;
+  remaining: number; // -1 = unlimited (premium)
+  limit: number; // -1 = unlimited (premium)
+}
+
+/**
+ * Count today's AI teaching interactions (teach phases, student questions,
+ * checkpoint generations). Whiteboard interactions are excluded — the
+ * whiteboard is premium-gated separately.
+ */
+export async function getDailyAiInteractions(
+  userId: string,
+  db: D1Database
+): Promise<number> {
+  const row = await db
+    .prepare(`
+      SELECT COUNT(*) AS count FROM revision_ai_interactions
+      WHERE user_id = ?
+        AND (interaction_type LIKE 'teach_%' OR interaction_type IN ('student_question', 'checkpoint'))
+        AND date(created_at) = date('now')
+    `)
+    .bind(userId)
+    .first<{ count: number }>();
+
+  return row?.count || 0;
+}
+
+/**
+ * Check whether a user may consume another classroom AI interaction today.
+ */
+export async function checkAiAllowance(
+  userId: string,
+  db: D1Database
+): Promise<AiAllowanceResult> {
+  if (await isPremiumUser(userId, db)) {
+    return { allowed: true, remaining: -1, limit: -1 };
+  }
+
+  const used = await getDailyAiInteractions(userId, db);
+  const remaining = Math.max(0, DAILY_AI_INTERACTION_LIMIT - used);
+
+  return {
+    allowed: remaining > 0,
+    remaining,
+    limit: DAILY_AI_INTERACTION_LIMIT,
+  };
+}
+
 /**
  * Increment the daily usage count for a user
  */
