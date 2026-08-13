@@ -4,6 +4,7 @@ import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
 import { isPremiumUser, checkAiAllowance } from './usage-limits';
 import { getChatModel, getGenerationModel, getTtsModel } from './ai-models';
+import { lookupAnswer, storeAnswer } from './answer-cache';
 
 interface Env {
   DB: D1Database;
@@ -11,6 +12,9 @@ interface Env {
   AI: Ai;  // Cloudflare Workers AI binding
   AI_MODEL?: string;
   AI_MODEL_TTS?: string;
+  AI_MODEL_EMBEDDING?: string;
+  AI_CACHE_THRESHOLD?: string;
+  ANSWERS_INDEX?: VectorizeIndex;
   RECORDINGS_BUCKET?: R2Bucket;
 }
 
@@ -1074,6 +1078,7 @@ revisionClassroomApp.post('/lessons/:lessonId/ask', async (c) => {
         t.name as topic_name,
         s.name as subject_name,
         rs.exam_type,
+        rs.subject_id,
         rs.user_id
       FROM revision_lessons rl
       LEFT JOIN topics t ON rl.topic_id = t.id
@@ -1095,6 +1100,21 @@ revisionClassroomApp.post('/lessons/:lessonId/ask', async (c) => {
         aiLimitReached: true,
         remaining: 0,
       }, 403);
+    }
+
+    // Semantic answer cache: a confident same-topic hit is FREE — no AI call,
+    // no interaction row, and the allowance is NOT decremented. The cache is
+    // optional; lookupAnswer swallows all failures and returns null on a miss.
+    const cached = await lookupAnswer(c.env, (lesson as any).topic_id, question);
+    if (cached) {
+      return c.json({
+        success: true,
+        data: {
+          answer: cached.answerText,
+          cached: true,
+          remainingFreeToday: allowance.remaining,
+        },
+      });
     }
 
     // Build the prompt for answering student questions
@@ -1159,11 +1179,31 @@ The student has a question. Answer it helpfully and concisely, relating it back 
         content, question, now
       ).run();
 
+      // Store the answer for future semantic cache hits (best-effort). Prefer
+      // waitUntil so it runs off the response path; fall back to a plain await
+      // when no ExecutionContext is available (e.g. unit tests) — storeAnswer
+      // swallows its own errors, so awaiting it can never break ask.
+      const storePromise = storeAnswer(
+        c.env,
+        (lesson as any).topic_id,
+        (lesson as any).subject_id,
+        (lesson as any).exam_type,
+        question,
+        content,
+        model,
+      );
+      try {
+        c.executionCtx.waitUntil(storePromise);
+      } catch {
+        await storePromise;
+      }
+
       return c.json({
         success: true,
         data: {
           answer: content,
           interactionId,
+          cached: false,
           remainingFreeToday: allowance.remaining === -1 ? -1 : allowance.remaining - 1,
         },
       });

@@ -48,6 +48,11 @@ bucket_name = "brilla-library"
 binding = "RECORDINGS_BUCKET"
 bucket_name = "brilla-recordings"
 
+# Vectorize index for the semantic answer cache (Phase B7, prod patch 097)
+[[vectorize]]
+binding = "ANSWERS_INDEX"
+index_name = "brilla-answers"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "brilla-db"
@@ -94,3 +99,7 @@ bucket_name = "brilla-library"
 [[env.dev.r2_buckets]]
 binding = "RECORDINGS_BUCKET"
 bucket_name = "brilla-recordings"
+
+[[env.dev.vectorize]]
+binding = "ANSWERS_INDEX"
+index_name = "brilla-answers"
