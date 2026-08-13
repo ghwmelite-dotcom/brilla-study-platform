@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { verify } from 'hono/jwt';
 import { requireAuth } from './auth-middleware';
 import type { AuthPayload } from './auth-middleware';
 import { DAILY_QUESTION_LIMIT, DAILY_AI_INTERACTION_LIMIT, CORE_SUBJECTS } from './usage-limits';
@@ -57,15 +58,23 @@ subscriptionsApp.use('*', async (c, next) => {
 // Get subscription plans
 subscriptionsApp.get('/plans', async (c) => {
   try {
-    const userId = c.get('userId') as string | undefined;
-
-    // Get user role if authenticated
+    // Optional auth: /plans is public (the middleware skips requireAuth for
+    // it), but when a valid Bearer token is present we use the caller's role
+    // so admins can see every tier for user management.
     let userRole = 'student';
-    if (userId) {
-      const user = await c.env.DB.prepare(`
-        SELECT role FROM users WHERE id = ?
-      `).bind(userId).first();
-      userRole = (user?.role as string) || 'student';
+    const authHeader = c.req.header('Authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      try {
+        const payload = (await verify(authHeader.slice(7), c.env.JWT_SECRET, 'HS256')) as { userId?: string };
+        if (payload?.userId) {
+          const user = await c.env.DB.prepare(`
+            SELECT role FROM users WHERE id = ?
+          `).bind(payload.userId).first();
+          userRole = (user?.role as string) || 'student';
+        }
+      } catch {
+        // Invalid/expired token: fall back to the public student view.
+      }
     }
 
     const { results } = await c.env.DB.prepare(`
@@ -91,6 +100,8 @@ subscriptionsApp.get('/plans', async (c) => {
         userType: (plan.id as string).includes('teacher') ? 'teacher' : 'student',
       }))
       .filter((plan: Record<string, unknown>) => {
+        // Admins see every tier (user management can assign any tier)
+        if (userRole === 'admin') return true;
         // Free tier for everyone
         if (plan.id === 'tier_free') return true;
         // Show plans matching user role
