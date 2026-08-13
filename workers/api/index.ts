@@ -7260,9 +7260,10 @@ adminApp.delete('/users/:id', async (c) => {
       userEmail: adminUser.email,
       userRole: 'admin',
       action: 'user_delete',
-      resourceType: 'user',
-      resourceId: userId,
-      details: `Deleted user ${target?.email || 'unknown'} (role: ${target?.role || 'unknown'})`,
+      actionCategory: 'user_management',
+      targetType: 'user',
+      targetId: userId,
+      targetDetails: `Deleted user ${target?.email || 'unknown'} (role: ${target?.role || 'unknown'})`,
       ipAddress: c.req.header('cf-connecting-ip') || 'unknown',
       userAgent: c.req.header('user-agent') || 'unknown',
     });
