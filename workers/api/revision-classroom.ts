@@ -428,6 +428,15 @@ revisionClassroomApp.post('/sessions', async (c) => {
       return c.json({ success: false, error: 'examType and subjectId are required' }, 400);
     }
 
+    // Validate the subject exists — a bogus id otherwise dies on the FK as a
+    // 500, which the frontend cannot distinguish from a server fault.
+    const subject = await c.env.DB.prepare(
+      'SELECT id FROM subjects WHERE id = ?'
+    ).bind(subjectId).first();
+    if (!subject) {
+      return c.json({ success: false, error: 'This subject is not available yet.' }, 400);
+    }
+
     const sessionId = generateId('session');
     const now = new Date().toISOString();
 
@@ -438,6 +447,10 @@ revisionClassroomApp.post('/sessions', async (c) => {
       WHERE subject_id = ?
       ORDER BY display_order ASC
     `).bind(subjectId).all();
+
+    if (!topicId && topics.results.length === 0) {
+      return c.json({ success: false, error: 'Revision content for this subject is being prepared. Please try another subject for now.' }, 400);
+    }
 
     const totalLessons = topicId ? 1 : topics.results.length;
 

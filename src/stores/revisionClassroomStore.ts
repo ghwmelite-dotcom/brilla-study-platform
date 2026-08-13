@@ -379,6 +379,30 @@ Well done on completing this revision! You're one step closer to exam success. R
   }
 }
 
+// The API returns raw D1 rows (snake_case), while the UI works with the
+// camelCase RevisionSession shape. Normalize at the store boundary so every
+// ingress point (create/resume/list) yields the same shape; the original
+// fields are kept for code that still reads snake_case fallbacks.
+const mapSession = (raw: any): RevisionSession => ({
+  ...raw,
+  visitorId: raw.visitorId ?? raw.user_id,
+  examType: raw.examType ?? raw.exam_type,
+  subjectId: raw.subjectId ?? raw.subject_id,
+  subjectName: raw.subjectName ?? raw.subject_name,
+  topicId: raw.topicId ?? raw.topic_id ?? undefined,
+  topicName: raw.topicName ?? raw.topic_name ?? undefined,
+  sessionType: raw.sessionType ?? raw.session_type,
+  progressPercentage: raw.progressPercentage ?? raw.progress_percentage ?? 0,
+  currentLessonId: raw.currentLessonId ?? raw.current_lesson_id ?? undefined,
+  lessonsCompleted: raw.lessonsCompleted ?? raw.lessons_completed ?? 0,
+  totalLessons: raw.totalLessons ?? raw.total_lessons ?? 0,
+  masteryScore: raw.masteryScore ?? raw.mastery_score ?? 0,
+  timeSpentMinutes: raw.timeSpentMinutes ?? raw.time_spent_minutes ?? 0,
+  startedAt: raw.startedAt ?? raw.started_at,
+  lastActivityAt: raw.lastActivityAt ?? raw.last_activity_at,
+  completedAt: raw.completedAt ?? raw.completed_at ?? undefined,
+});
+
 export const useRevisionClassroomStore = create<RevisionClassroomState>()(
   persist(
     (set, get) => ({
@@ -452,7 +476,7 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
 
           // Add subject name to session for display
           const sessionWithName = {
-            ...session,
+            ...mapSession(session),
             subjectName,
             visitorId,
           };
@@ -505,17 +529,19 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
             status: 'active',
           });
 
+          const mappedSession = mapSession(session);
+
           const lessonsWithNames = lessons.map((l: any) => ({
             ...l,
             topicName: l.topic_name || l.title,
           }));
 
-          const currentLesson = session.currentLessonId
-            ? lessonsWithNames.find((l: RevisionLesson) => l.id === session.currentLessonId) || lessonsWithNames[0]
+          const currentLesson = mappedSession.currentLessonId
+            ? lessonsWithNames.find((l: RevisionLesson) => l.id === mappedSession.currentLessonId) || lessonsWithNames[0]
             : lessonsWithNames[0];
 
           set({
-            currentSession: { ...session, status: 'active' },
+            currentSession: { ...mappedSession, status: 'active' },
             lessonPlan: lessonsWithNames,
             currentLesson,
             isLoading: false,
@@ -1313,7 +1339,7 @@ Does this help? Feel free to ask more questions!`;
           const response = await api.get<{ sessions: RevisionSession[] }>(endpoint);
 
           if (response.success && response.data) {
-            set({ pastSessions: response.data.sessions, isLoading: false });
+            set({ pastSessions: response.data.sessions.map(mapSession), isLoading: false });
           } else {
             set({ isLoading: false });
           }
