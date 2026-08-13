@@ -87,6 +87,12 @@ export default function TakePaper() {
   const [showTimeWarning, setShowTimeWarning] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showStartConfirm, setShowStartConfirm] = useState(true);
+  const [ongoingAttempt, setOngoingAttempt] = useState<{
+    id: string;
+    answeredCount: number;
+    startedAt: string;
+    timeAllowed: number | null;
+  } | null>(null);
   const [showQuestionPanel, setShowQuestionPanel] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -138,9 +144,27 @@ export default function TakePaper() {
     }
 
     const errorMessage = res.error || 'Unknown error';
+    const existingAttemptId = (res as { existingAttemptId?: string }).existingAttemptId;
+    if (errorMessage.includes('ongoing attempt') && existingAttemptId) {
+      // Offer a real resume path: answers are stored server-side, so the
+      // in-progress attempt can be restored instead of abandoned.
+      const existing = await api.get<{
+        attempt: { started_at: string; time_allowed: number | null };
+        answers: { question_id: string; answer_text: string | null }[];
+      }>(`/papers/attempts/${existingAttemptId}/results`);
+      if (existing.success && existing.data) {
+        setOngoingAttempt({
+          id: existingAttemptId,
+          answeredCount: existing.data.answers.filter((a) => a.answer_text != null).length,
+          startedAt: existing.data.attempt.started_at,
+          timeAllowed: existing.data.attempt.time_allowed,
+        });
+        return;
+      }
+    }
     if (errorMessage.includes('ongoing attempt')) {
-      const resume = window.confirm('You have an ongoing attempt for this paper. Would you like to abandon it and start fresh?');
-      if (resume) {
+      const restart = window.confirm('You have an ongoing attempt for this paper. Would you like to abandon it and start fresh?');
+      if (restart) {
         const abandonRes = await api.post(`/papers/${paperId}/abandon`, { userId: user.id });
         const retryRes = abandonRes.success
           ? await api.post<{ attemptId: string }>(`/papers/${paperId}/attempt`, { userId: user.id })
@@ -157,6 +181,58 @@ export default function TakePaper() {
       return;
     }
     setError(`Failed to start attempt: ${errorMessage}`);
+  };
+
+  // Resume a detected in-progress attempt: restore saved answers and the
+  // remaining time, then continue exactly where the student left off.
+  const resumeOngoingAttempt = async () => {
+    if (!ongoingAttempt || !paper) return;
+
+    const res = await api.get<{
+      attempt: { started_at: string; time_allowed: number | null };
+      answers: { question_id: string; answer_text: string | null }[];
+    }>(`/papers/attempts/${ongoingAttempt.id}/results`);
+
+    if (!res.success || !res.data) {
+      setError('Failed to resume attempt. Please try again.');
+      return;
+    }
+
+    const restored: Record<string, string> = {};
+    const answered = new Set<string>();
+    for (const a of res.data.answers) {
+      if (a.answer_text != null) {
+        restored[a.question_id] = a.answer_text;
+        answered.add(a.question_id);
+      }
+    }
+    setAnswers(restored);
+    setAnsweredQuestions(answered);
+
+    // started_at is SQLite datetime('now') — UTC "YYYY-MM-DD HH:MM:SS"
+    const raw = res.data.attempt.started_at;
+    const iso = raw.includes('T') ? raw : raw.replace(' ', 'T');
+    const startedMs = new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(iso) ? iso : `${iso}Z`).getTime();
+    const allowedMins = res.data.attempt.time_allowed ?? paper.time_allowed;
+    const elapsedSecs = Math.max(0, Math.floor((Date.now() - startedMs) / 1000));
+    setTimeRemaining(Math.max(allowedMins * 60 - elapsedSecs, 0));
+
+    setAttemptId(ongoingAttempt.id);
+    setShowStartConfirm(false);
+    setIsTimerRunning(true);
+  };
+
+  // Abandon the detected in-progress attempt and start a fresh one.
+  const abandonOngoingAttempt = async () => {
+    if (!ongoingAttempt || !paperId || !user) return;
+
+    const abandonRes = await api.post(`/papers/${paperId}/abandon`, { userId: user.id });
+    if (!abandonRes.success) {
+      setError('Failed to restart attempt. Please try again.');
+      return;
+    }
+    setOngoingAttempt(null);
+    await startAttempt();
   };
 
   // Timer
@@ -461,15 +537,30 @@ export default function TakePaper() {
             </div>
           )}
 
-          <div className={cn(
-            "rounded-2xl p-4 mb-6 border",
-            isDark ? "bg-amber-500/10 border-amber-500/20" : "bg-amber-50 border-amber-200"
-          )}>
-            <p className={cn("text-sm", isDark ? "text-amber-300" : "text-amber-800")}>
-              <strong>Important:</strong> Once you start, the timer will begin. Make sure you have a
-              stable internet connection and enough time to complete the paper.
-            </p>
-          </div>
+          {!ongoingAttempt && (
+            <div className={cn(
+              "rounded-2xl p-4 mb-6 border",
+              isDark ? "bg-amber-500/10 border-amber-500/20" : "bg-amber-50 border-amber-200"
+            )}>
+              <p className={cn("text-sm", isDark ? "text-amber-300" : "text-amber-800")}>
+                <strong>Important:</strong> Once you start, the timer will begin. Make sure you have a
+                stable internet connection and enough time to complete the paper.
+              </p>
+            </div>
+          )}
+
+          {ongoingAttempt && (
+            <div className={cn(
+              "rounded-2xl p-4 mb-6 border",
+              isDark ? "bg-indigo-500/10 border-indigo-500/20" : "bg-indigo-50 border-indigo-200"
+            )}>
+              <p className={cn("text-sm", isDark ? "text-indigo-300" : "text-indigo-800")}>
+                <strong>Attempt in progress:</strong> You have already answered{' '}
+                {ongoingAttempt.answeredCount} of {paper.total_questions} questions. Resume to
+                continue where you left off, or start fresh with a blank paper.
+              </p>
+            </div>
+          )}
 
           <div className="flex gap-3">
             <button
@@ -483,12 +574,34 @@ export default function TakePaper() {
             >
               Cancel
             </button>
-            <button
-              onClick={startAttempt}
-              className="flex-1 py-3.5 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-medium transition-all shadow-lg hover:shadow-xl hover:scale-[1.02]"
-            >
-              Start Paper
-            </button>
+            {ongoingAttempt ? (
+              <>
+                <button
+                  onClick={abandonOngoingAttempt}
+                  className={cn(
+                    "flex-1 py-3.5 px-4 rounded-xl font-medium transition-colors border",
+                    isDark
+                      ? "bg-red-500/10 text-red-300 border-red-500/20 hover:bg-red-500/20"
+                      : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+                  )}
+                >
+                  Start Fresh
+                </button>
+                <button
+                  onClick={resumeOngoingAttempt}
+                  className="flex-1 py-3.5 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-medium transition-all shadow-lg hover:shadow-xl hover:scale-[1.02]"
+                >
+                  Resume Attempt
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={startAttempt}
+                className="flex-1 py-3.5 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 font-medium transition-all shadow-lg hover:shadow-xl hover:scale-[1.02]"
+              >
+                Start Paper
+              </button>
+            )}
           </div>
         </div>
       </div>
