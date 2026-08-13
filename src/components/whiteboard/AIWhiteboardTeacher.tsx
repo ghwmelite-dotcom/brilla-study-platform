@@ -23,6 +23,7 @@ import { cn } from '@/utils';
 import { renderPrimitive } from './whiteboardPrimitives';
 import { validateLatex, renderLatex } from './mathUtils';
 import { animateStep, cancelAnimations, stepAnimationMs } from './whiteboardAnimator';
+import { prefetchTtsAudio, playTtsAudio, releaseTtsAudioCache } from '@/utils/whiteboardTts';
 
 // Types matching the backend
 interface WhiteboardDrawCommand {
@@ -156,6 +157,13 @@ export function AIWhiteboardTeacher({
   const [progress, setProgress] = useState(0);
 
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
+  // Server TTS audio currently playing (null while speechSynthesis is the
+  // active voice). voiceGenRef discards stale async TTS plays when the step
+  // changes before the fetch resolves; isMutedRef mirrors isMuted for async
+  // callbacks.
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const voiceGenRef = useRef(0);
+  const isMutedRef = useRef(isMuted);
   const playTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const drawnObjectsRef = useRef<Map<string, fabric.Object>>(new Map());
   // Guards against re-speaking/re-timing a step when a prefetched future
@@ -531,7 +539,7 @@ export function AIWhiteboardTeacher({
     }
   }, [steps, drawCommand, clearOverlay, applyHighlights]);
 
-  // Speak the voiceover
+  // Speak the voiceover (browser fallback voice)
   const speak = useCallback((text: string) => {
     if (isMuted || !text || typeof window === 'undefined' || !window.speechSynthesis) return;
 
@@ -545,6 +553,40 @@ export function AIWhiteboardTeacher({
 
     speechRef.current = utterance;
     window.speechSynthesis.speak(utterance);
+  }, [isMuted]);
+
+  // Speak a step's voiceover: prefer the server TTS voice (Aura 2), fall
+  // back to speechSynthesis on ANY failure (non-200, network error, play()
+  // rejection). Stale async plays (step changed mid-fetch) are discarded via
+  // voiceGenRef.
+  const speakStep = useCallback((text: string) => {
+    if (isMuted || !text) return;
+    const gen = ++voiceGenRef.current;
+    audioRef.current?.pause();
+    audioRef.current = null;
+    if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
+    void (async () => {
+      const audio = await playTtsAudio(text);
+      if (voiceGenRef.current !== gen) {
+        audio?.pause();
+        return;
+      }
+      if (audio) {
+        audioRef.current = audio;
+        if (isMutedRef.current) audio.pause();
+      } else {
+        speak(text);
+      }
+    })();
+  }, [isMuted, speak]);
+
+  // Mute pauses whichever voice is active (server audio or speechSynthesis).
+  useEffect(() => {
+    isMutedRef.current = isMuted;
+    if (isMuted) {
+      audioRef.current?.pause();
+      if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
+    }
   }, [isMuted]);
 
   // Go to a specific step. Targets beyond the generated steps are requested
@@ -589,12 +631,14 @@ export function AIWhiteboardTeacher({
     const step = steps[clampedIndex];
     if (step?.voiceOver) {
       spokenStepRef.current = clampedIndex;
-      speak(step.voiceOver);
+      speakStep(step.voiceOver);
+      // Warm the TTS cache for the next step (fire-and-forget).
+      prefetchTtsAudio(steps[clampedIndex + 1]?.voiceOver);
     }
 
     // Update progress
     setProgress(((clampedIndex + 1) / totalSteps) * 100);
-  }, [steps, totalSteps, drawCommand, clearOverlay, applyHighlights, speak, onNeedStep]);
+  }, [steps, totalSteps, drawCommand, clearOverlay, applyHighlights, speakStep, onNeedStep]);
 
   // Play animation
   const play = useCallback(() => {
@@ -613,6 +657,7 @@ export function AIWhiteboardTeacher({
     }
     // Freeze mid-entrance objects at their final state.
     cancelAnimations();
+    audioRef.current?.pause();
     if (speechRef.current) {
       window.speechSynthesis?.cancel();
     }
@@ -627,9 +672,11 @@ export function AIWhiteboardTeacher({
     drawStep(currentStep, { animate: isPlaying });
     if (isPlaying && step.voiceOver && spokenStepRef.current !== currentStep) {
       spokenStepRef.current = currentStep;
-      speak(step.voiceOver);
+      speakStep(step.voiceOver);
+      // Warm the TTS cache for the next step (fire-and-forget).
+      prefetchTtsAudio(steps[currentStep + 1]?.voiceOver);
     }
-  }, [isPlaying, currentStep, steps, drawStep, speak]);
+  }, [isPlaying, currentStep, steps, drawStep, speakStep]);
 
   // Auto-advance steps when playing. The remaining time is computed from
   // when the step started, so a prefetched step arriving mid-playback does
@@ -683,8 +730,12 @@ export function AIWhiteboardTeacher({
   // Cancel speech and timers on unmount (e.g. toggling back to Chat mid-sentence)
   useEffect(() => {
     return () => {
+      voiceGenRef.current++;
       if (playTimeoutRef.current) clearTimeout(playTimeoutRef.current);
       cancelAnimations();
+      audioRef.current?.pause();
+      audioRef.current = null;
+      releaseTtsAudioCache();
       if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
     };
   }, []);

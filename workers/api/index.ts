@@ -5,7 +5,7 @@ import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware'
 import { parseLimit, parseJsonBody } from './http';
 import type { JWTPayload } from 'hono/utils/jwt/types';
 import type { BaseAiTextGenerationModels } from '@cloudflare/workers-types';
-import { getChatModel, getGenerationModel } from './ai-models';
+import { getChatModel, getGenerationModel, getTtsModel } from './ai-models';
 import { libraryApp } from './library';
 import { counselorApp } from './counselor';
 import { notificationsApp, createNotification } from './notifications';
@@ -6096,6 +6096,86 @@ protectedApp.put('/parents/preferences', userAuth, async (c) => {
 // sets user/userId/userRole like the old adminAuth did).
 const adminApp = new Hono<{ Bindings: Env }>();
 adminApp.use('*', requireAdmin);
+
+// TTS spike (kept permanently, admin-only): runs the configured Aura TTS
+// model on a short text and reports the raw response shape so response
+// handling in /api/revision-classroom/tts can be validated against reality.
+adminApp.post('/tts-spike', async (c) => {
+  try {
+    const body = await c.req.json().catch(() => ({}));
+    const text = typeof body?.text === 'string' && body.text.trim().length > 0
+      ? body.text.slice(0, 1500)
+      : 'Hello from the Brilla whiteboard teacher.';
+    const model = getTtsModel(c.env);
+    const result: unknown = await c.env.AI.run(model as never, {
+      text,
+      speaker: 'luna',
+      encoding: 'mp3',
+    } as never);
+
+    let shape = 'unknown';
+    let contentType = 'unknown';
+    let byteLength = 0;
+    let isBase64 = false;
+    let firstBytes = '';
+
+    const describeBytes = (bytes: Uint8Array) => {
+      byteLength = bytes.byteLength;
+      firstBytes = Array.from(bytes.slice(0, 16))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join(' ');
+    };
+
+    if (result instanceof ReadableStream) {
+      shape = 'ReadableStream';
+      const reader = result.getReader();
+      const chunks: Uint8Array[] = [];
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (value) chunks.push(value instanceof Uint8Array ? value : new Uint8Array(value as ArrayBuffer));
+      }
+      const total = chunks.reduce((n, ch) => n + ch.byteLength, 0);
+      const merged = new Uint8Array(total);
+      let off = 0;
+      for (const ch of chunks) { merged.set(ch, off); off += ch.byteLength; }
+      describeBytes(merged);
+    } else if (result instanceof ArrayBuffer) {
+      shape = 'ArrayBuffer';
+      describeBytes(new Uint8Array(result));
+    } else if (result instanceof Uint8Array) {
+      shape = 'Uint8Array';
+      describeBytes(result);
+    } else if (typeof result === 'string') {
+      shape = 'string';
+      contentType = 'text/base64?';
+      isBase64 = /^[A-Za-z0-9+/=\s]+$/.test(result.slice(0, 200));
+      byteLength = result.length;
+      firstBytes = result.slice(0, 32);
+    } else if (result && typeof result === 'object') {
+      const obj = result as Record<string, unknown>;
+      shape = `object(${Object.keys(obj).join(',')})`;
+      if (typeof obj.audio === 'string') {
+        isBase64 = true;
+        byteLength = obj.audio.length;
+        firstBytes = obj.audio.slice(0, 32);
+      }
+    }
+
+    return c.json({
+      success: true,
+      model,
+      shape,
+      contentType,
+      byteLength,
+      isBase64,
+      firstBytes,
+    });
+  } catch (error) {
+    console.error('TTS spike error:', error);
+    return c.json({ success: false, error: error instanceof Error ? error.message : 'TTS spike failed' }, 500);
+  }
+});
 
 // Dashboard stats
 adminApp.get('/dashboard/stats', async (c) => {

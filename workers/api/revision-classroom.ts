@@ -3,13 +3,15 @@ import type { BaseAiTextGenerationModels } from '@cloudflare/workers-types';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
 import { isPremiumUser, checkAiAllowance } from './usage-limits';
-import { getChatModel, getGenerationModel } from './ai-models';
+import { getChatModel, getGenerationModel, getTtsModel } from './ai-models';
 
 interface Env {
   DB: D1Database;
   JWT_SECRET: string;
   AI: Ai;  // Cloudflare Workers AI binding
   AI_MODEL?: string;
+  AI_MODEL_TTS?: string;
+  RECORDINGS_BUCKET?: R2Bucket;
 }
 
 interface UserPayload {
@@ -2469,6 +2471,110 @@ revisionClassroomApp.get('/whiteboard-types', async (c) => {
       ],
     },
   });
+});
+
+// =============================================
+// WHITEBOARD TTS (Deepgram Aura 2 via Workers AI)
+// =============================================
+
+const TTS_MAX_CHARS = 1500;
+const TTS_SPEAKER = 'luna';
+
+// Cache key: sha-256 hex of `${model}|${speaker}|${text}` — global across
+// users (voiceOver text is generated content, identical for everyone).
+async function ttsCacheKey(model: string, text: string): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(`${model}|${TTS_SPEAKER}|${text}`)
+  );
+  const hex = Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+  return `tts/${hex}.mp3`;
+}
+
+// Aura 2 (verified via /api/admin/tts-spike) returns a ReadableStream of raw
+// MP3 bytes. The other shapes are handled defensively so a model swap via
+// AI_MODEL_TTS doesn't silently break the endpoint.
+async function extractTtsAudio(result: unknown): Promise<Uint8Array> {
+  if (result instanceof ReadableStream) {
+    const reader = result.getReader();
+    const chunks: Uint8Array[] = [];
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) chunks.push(value instanceof Uint8Array ? value : new Uint8Array(value as ArrayBuffer));
+    }
+    const total = chunks.reduce((n, ch) => n + ch.byteLength, 0);
+    const merged = new Uint8Array(total);
+    let off = 0;
+    for (const ch of chunks) { merged.set(ch, off); off += ch.byteLength; }
+    return merged;
+  }
+  if (result instanceof ArrayBuffer) return new Uint8Array(result);
+  if (result instanceof Uint8Array) return result;
+  if (typeof result === 'string') {
+    // base64-encoded audio
+    const binary = atob(result);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+  }
+  if (result && typeof result === 'object' && typeof (result as { audio?: unknown }).audio === 'string') {
+    const binary = atob((result as { audio: string }).audio);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+  }
+  throw new Error('Unexpected TTS response shape');
+}
+
+// API Endpoint: Text-to-speech for whiteboard voiceOvers (premium-only).
+// R2-cached globally; the frontend falls back to speechSynthesis on any
+// non-audio response.
+revisionClassroomApp.post('/tts', async (c) => {
+  // Premium-only — reject before any AI cost is incurred.
+  const user = c.get('user');
+  if (!(await isPremiumUser(user.userId, c.env.DB))) {
+    return c.json({ success: false, error: 'Voice narration is a premium feature.' }, 403);
+  }
+
+  const body = await c.req.json().catch(() => null);
+  const text = typeof body?.text === 'string' ? body.text.trim() : '';
+  if (!text || text.length > TTS_MAX_CHARS) {
+    return c.json({ success: false, error: `text is required and must be at most ${TTS_MAX_CHARS} characters` }, 400);
+  }
+
+  const model = getTtsModel(c.env);
+  const key = await ttsCacheKey(model, text);
+
+  try {
+    const cached = await c.env.RECORDINGS_BUCKET?.get(key);
+    if (cached) {
+      return new Response(cached.body, {
+        headers: { 'Content-Type': 'audio/mpeg', 'X-TTS-Cache': 'hit' },
+      });
+    }
+
+    const result: unknown = await c.env.AI.run(model as never, {
+      text,
+      speaker: TTS_SPEAKER,
+      encoding: 'mp3',
+    } as never);
+    const bytes = await extractTtsAudio(result);
+    if (bytes.byteLength === 0) throw new Error('TTS returned empty audio');
+
+    await c.env.RECORDINGS_BUCKET?.put(key, bytes, {
+      httpMetadata: { contentType: 'audio/mpeg' },
+    });
+
+    return new Response(bytes, {
+      headers: { 'Content-Type': 'audio/mpeg', 'X-TTS-Cache': 'miss' },
+    });
+  } catch (error) {
+    console.error('TTS error:', error);
+    return c.json({ success: false, error: 'TTS unavailable', ttsUnavailable: true }, 502);
+  }
 });
 
 export { revisionClassroomApp };
