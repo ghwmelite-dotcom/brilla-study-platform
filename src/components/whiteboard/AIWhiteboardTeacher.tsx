@@ -237,31 +237,48 @@ export function AIWhiteboardTeacher({
     };
   }, [syncOverlay]);
 
+  // Fit the canvas to the container (zoom + dimensions). renderAll triggers
+  // 'after:render', which re-syncs the math overlay positions.
+  const reflowCanvas = useCallback(() => {
+    if (!containerRef.current || !fabricRef.current) return;
+
+    const container = containerRef.current;
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight - 120; // Leave room for controls
+
+    const scaleX = containerWidth / CANVAS_WIDTH;
+    const scaleY = containerHeight / CANVAS_HEIGHT;
+    const scale = Math.min(scaleX, scaleY, 1);
+
+    fabricRef.current.setZoom(scale);
+    fabricRef.current.setDimensions({
+      width: CANVAS_WIDTH * scale,
+      height: CANVAS_HEIGHT * scale,
+    });
+    fabricRef.current.renderAll();
+  }, []);
+
   // Resize canvas to fit container
   useEffect(() => {
-    const handleResize = () => {
-      if (!containerRef.current || !fabricRef.current) return;
+    reflowCanvas();
+    window.addEventListener('resize', reflowCanvas);
+    return () => window.removeEventListener('resize', reflowCanvas);
+  }, [reflowCanvas]);
 
-      const container = containerRef.current;
-      const containerWidth = container.clientWidth;
-      const containerHeight = container.clientHeight - 120; // Leave room for controls
-
-      const scaleX = containerWidth / CANVAS_WIDTH;
-      const scaleY = containerHeight / CANVAS_HEIGHT;
-      const scale = Math.min(scaleX, scaleY, 1);
-
-      fabricRef.current.setZoom(scale);
-      fabricRef.current.setDimensions({
-        width: CANVAS_WIDTH * scale,
-        height: CANVAS_HEIGHT * scale,
-      });
-      fabricRef.current.renderAll();
+  // Keep isFullscreen in sync with the browser (covers Esc-exit, which fires
+  // no resize event and would otherwise leave stale state) and reflow after
+  // every transition — window resize doesn't reliably fire on all browsers
+  // when entering/leaving fullscreen, so reflow explicitly (now + next frame,
+  // once the fullscreen layout has settled).
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+      reflowCanvas();
+      requestAnimationFrame(reflowCanvas);
     };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
+  }, [reflowCanvas]);
 
   // Create fabric object(s) from command. Most command types produce exactly
   // one object; a `primitive` command expands into a group of objects via the
@@ -628,17 +645,18 @@ export function AIWhiteboardTeacher({
     };
   }, []);
 
-  // Toggle fullscreen
+  // Toggle fullscreen. State is driven by the fullscreenchange listener (not
+  // set optimistically), so a rejected/unavailable requestFullscreen leaves
+  // isFullscreen untouched and the layout class never applies falsely.
   const toggleFullscreen = useCallback(() => {
     if (!containerRef.current) return;
 
-    if (!isFullscreen) {
-      containerRef.current.requestFullscreen?.();
+    if (!document.fullscreenElement) {
+      containerRef.current.requestFullscreen?.()?.catch(() => {});
     } else {
-      document.exitFullscreen?.();
+      document.exitFullscreen?.()?.catch(() => {});
     }
-    setIsFullscreen(!isFullscreen);
-  }, [isFullscreen]);
+  }, []);
 
   // Reset to beginning
   const reset = useCallback(() => {
