@@ -22,6 +22,7 @@ import 'katex/dist/katex.min.css';
 import { cn } from '@/utils';
 import { renderPrimitive } from './whiteboardPrimitives';
 import { validateLatex, renderLatex } from './mathUtils';
+import { animateStep, cancelAnimations, stepAnimationMs } from './whiteboardAnimator';
 
 // Types matching the backend
 interface WhiteboardDrawCommand {
@@ -161,6 +162,13 @@ export function AIWhiteboardTeacher({
   // step lands mid-playback (which changes the `steps` prop identity).
   const spokenStepRef = useRef(-1);
   const stepStartedAtRef = useRef(Date.now());
+  // Planned entrance-animation time (ms) for the step currently on screen.
+  // The auto-advance timer never fires before this elapses, so a step can't
+  // advance mid-animation. animatedForStepRef guards against a stale value
+  // leaking into the next step when it draws nothing new (e.g. it was
+  // already drawn instantly by goToStep).
+  const stepAnimMsRef = useRef(0);
+  const animatedForStepRef = useRef(-1);
 
   // Remove all math overlay divs (mirrors canvas.clear()).
   const clearOverlay = useCallback(() => {
@@ -460,22 +468,26 @@ export function AIWhiteboardTeacher({
   // Draw one command idempotently: each command id is drawn at most once,
   // whether it lands on the canvas or in the math overlay. Valid `math` goes
   // to the HTML overlay; everything else (incl. invalid math) becomes fabric
-  // object(s).
-  const drawCommand = useCallback((command: WhiteboardDrawCommand) => {
-    if (drawnObjectsRef.current.has(command.id) || overlayObjectsRef.current.has(command.id)) return;
-    if (command.type === 'math' && drawMath(command)) return;
+  // object(s). Returns the newly created fabric objects (empty when the
+  // command was already drawn, went to the overlay, or produced nothing).
+  const drawCommand = useCallback((command: WhiteboardDrawCommand): fabric.Object[] => {
+    if (drawnObjectsRef.current.has(command.id) || overlayObjectsRef.current.has(command.id)) return [];
+    if (command.type === 'math' && drawMath(command)) return [];
     const canvas = fabricRef.current;
-    if (!canvas) return;
+    if (!canvas) return [];
     const objs = createObject(command);
     if (objs.length > 0) {
       objs.forEach((obj) => canvas.add(obj));
       drawnObjectsRef.current.set(command.id, objs[0]);
     }
+    return objs;
   }, [createObject, drawMath]);
 
   // Draw a step — idempotent: each command id is added at most once. The
   // server prefixes ids per step, so ids never collide across steps.
-  const drawStep = useCallback((stepIndex: number) => {
+  // `animate` (playback only) runs the draw-on entrance animation for newly
+  // created objects; manual navigation via goToStep stays instant.
+  const drawStep = useCallback((stepIndex: number, opts?: { animate?: boolean }) => {
     if (!fabricRef.current) return;
 
     const step = steps[stepIndex];
@@ -490,10 +502,33 @@ export function AIWhiteboardTeacher({
       clearOverlay();
     }
 
-    step.commands.forEach(drawCommand);
+    const newObjects: fabric.Object[] = [];
+    step.commands.forEach((command) => {
+      newObjects.push(...drawCommand(command));
+    });
 
     applyHighlights(step);
     canvas.renderAll();
+
+    if (opts?.animate) {
+      if (newObjects.length > 0) {
+        animatedForStepRef.current = stepIndex;
+        const totalMs = stepAnimationMs(newObjects.length, step.duration * 1000);
+        stepAnimMsRef.current = totalMs;
+        if (totalMs > 0) {
+          // Fire-and-forget: the auto-advance timer accounts for this time
+          // via stepAnimMsRef, and cancelAnimations covers pause/skip/unmount.
+          void animateStep(newObjects, canvas, step.duration * 1000);
+        }
+      } else if (animatedForStepRef.current !== stepIndex) {
+        // Nothing new to draw for a step we haven't animated (e.g. goToStep
+        // already drew it instantly) — no animation time to account for.
+        animatedForStepRef.current = stepIndex;
+        stepAnimMsRef.current = 0;
+      }
+      // Otherwise: idempotent re-draw of the step currently animating (a
+      // prefetch landed mid-playback) — keep its pacing intact.
+    }
   }, [steps, drawCommand, clearOverlay, applyHighlights]);
 
   // Speak the voiceover
@@ -516,6 +551,9 @@ export function AIWhiteboardTeacher({
   // via onNeedStep and drawn as soon as they arrive.
   const goToStep = useCallback((stepIndex: number) => {
     if (totalSteps <= 0) return;
+
+    // Manual navigation is instant — kill any in-flight entrance animation.
+    cancelAnimations();
 
     const clampedIndex = Math.max(0, Math.min(stepIndex, totalSteps - 1));
     if (clampedIndex >= steps.length) {
@@ -573,17 +611,20 @@ export function AIWhiteboardTeacher({
     if (playTimeoutRef.current) {
       clearTimeout(playTimeoutRef.current);
     }
+    // Freeze mid-entrance objects at their final state.
+    cancelAnimations();
     if (speechRef.current) {
       window.speechSynthesis?.cancel();
     }
   }, []);
 
   // Draw the current step whenever it is (or becomes) available. Idempotent,
-  // so prefetched steps landing mid-playback cause no visual churn.
+  // so prefetched steps landing mid-playback cause no visual churn. Entrance
+  // animation runs only during playback; manual navigation stays instant.
   useEffect(() => {
     const step = steps[currentStep];
     if (!step) return;
-    drawStep(currentStep);
+    drawStep(currentStep, { animate: isPlaying });
     if (isPlaying && step.voiceOver && spokenStepRef.current !== currentStep) {
       spokenStepRef.current = currentStep;
       speak(step.voiceOver);
@@ -592,7 +633,8 @@ export function AIWhiteboardTeacher({
 
   // Auto-advance steps when playing. The remaining time is computed from
   // when the step started, so a prefetched step arriving mid-playback does
-  // not restart the current step's timer.
+  // not restart the current step's timer. The step's entrance animation time
+  // extends the wait so playback never advances mid-animation.
   useEffect(() => {
     if (!isPlaying) return;
 
@@ -604,7 +646,8 @@ export function AIWhiteboardTeacher({
     }
 
     const elapsed = Date.now() - stepStartedAtRef.current;
-    const remaining = Math.max(0, step.duration * 1000 - elapsed);
+    const stepMs = Math.max(step.duration * 1000, stepAnimMsRef.current);
+    const remaining = Math.max(0, stepMs - elapsed);
 
     playTimeoutRef.current = setTimeout(() => {
       if (currentStep < totalSteps - 1) {
@@ -641,6 +684,7 @@ export function AIWhiteboardTeacher({
   useEffect(() => {
     return () => {
       if (playTimeoutRef.current) clearTimeout(playTimeoutRef.current);
+      cancelAnimations();
       if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
     };
   }, []);
