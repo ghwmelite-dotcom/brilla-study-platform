@@ -73,6 +73,12 @@ interface WhiteboardTeachingContent {
 
 type LessonType = 'diagram' | 'step-by-step' | 'problem-solving' | 'concept-map';
 
+// fabric objects created here carry their command id for highlight lookup
+type FabricObjectWithId = fabric.Object & { customId?: string };
+
+// Matches fabric's TextAlign union (not re-exported from the package root)
+type TextAlign = 'left' | 'center' | 'right' | 'justify' | 'justify-left' | 'justify-center' | 'justify-right';
+
 interface AIWhiteboardTeacherProps {
   content?: WhiteboardTeachingContent;
   isLoading?: boolean;
@@ -123,11 +129,11 @@ export function AIWhiteboardTeacher({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [drawnObjects, setDrawnObjects] = useState<Map<string, fabric.Object>>(new Map());
   const [progress, setProgress] = useState(0);
 
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
   const playTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const drawnObjectsRef = useRef<Map<string, fabric.Object>>(new Map());
 
   // Initialize canvas
   useEffect(() => {
@@ -258,9 +264,9 @@ export function AIWhiteboardTeacher({
           top: props.top || 0,
           fontSize: props.fontSize || 24,
           fontFamily: props.fontFamily || 'Inter, sans-serif',
-          fontWeight: props.fontWeight as any || 'normal',
+          fontWeight: props.fontWeight || 'normal',
           fill: props.fill || '#000000',
-          textAlign: props.textAlign as any || 'left',
+          textAlign: (props.textAlign || 'left') as TextAlign,
           opacity: props.opacity || 1,
         });
         break;
@@ -295,14 +301,33 @@ export function AIWhiteboardTeacher({
     if (obj) {
       obj.set('selectable', false);
       obj.set('evented', false);
-      (obj as any).customId = id;
+      (obj as FabricObjectWithId).customId = id;
     }
 
     return obj;
   }, []);
 
-  // Draw a step
-  const drawStep = useCallback((stepIndex: number) => {
+  // Apply a step's highlight glow, clearing highlights from other objects.
+  const applyHighlights = (step: WhiteboardStep) => {
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+    canvas.getObjects().forEach((obj: fabric.Object) => {
+      const customId = (obj as FabricObjectWithId).customId;
+      if (customId && step.highlights && step.highlights.includes(customId)) {
+        obj.set('shadow', new fabric.Shadow({
+          color: 'rgba(59, 130, 246, 0.5)',
+          blur: 20,
+          offsetX: 0,
+          offsetY: 0,
+        }));
+      } else {
+        obj.set('shadow', null);
+      }
+    });
+  };
+
+  // Draw a step — idempotent: each command id is added at most once.
+  const drawStep = (stepIndex: number) => {
     if (!fabricRef.current || !content) return;
 
     const step = content.steps[stepIndex];
@@ -310,44 +335,24 @@ export function AIWhiteboardTeacher({
 
     const canvas = fabricRef.current;
 
-    // Clear canvas if needed
     if (step.clearPrevious) {
       canvas.clear();
       canvas.backgroundColor = content.backgroundColor;
-      setDrawnObjects(new Map());
+      drawnObjectsRef.current = new Map();
     }
 
-    // Draw commands
-    const newObjects = new Map(drawnObjects);
     step.commands.forEach((command) => {
+      if (drawnObjectsRef.current.has(command.id)) return;
       const obj = createObject(command);
       if (obj) {
         canvas.add(obj);
-        newObjects.set(command.id, obj);
+        drawnObjectsRef.current.set(command.id, obj);
       }
     });
-    setDrawnObjects(newObjects);
 
-    // Highlight objects
-    if (step.highlights && step.highlights.length > 0) {
-      canvas.getObjects().forEach((obj: fabric.Object) => {
-        const customId = (obj as any).customId;
-        if (step.highlights!.includes(customId)) {
-          // Add glow effect
-          obj.set('shadow', new fabric.Shadow({
-            color: 'rgba(59, 130, 246, 0.5)',
-            blur: 20,
-            offsetX: 0,
-            offsetY: 0,
-          }));
-        } else {
-          obj.set('shadow', null);
-        }
-      });
-    }
-
+    applyHighlights(step);
     canvas.renderAll();
-  }, [content, drawnObjects, createObject]);
+  };
 
   // Speak the voiceover
   const speak = useCallback((text: string) => {
@@ -376,21 +381,24 @@ export function AIWhiteboardTeacher({
     if (fabricRef.current) {
       fabricRef.current.clear();
       fabricRef.current.backgroundColor = content.backgroundColor;
-      setDrawnObjects(new Map());
+      drawnObjectsRef.current = new Map();
 
       for (let i = 0; i <= clampedIndex; i++) {
         const step = content.steps[i];
         if (step.clearPrevious && i < clampedIndex) {
           fabricRef.current.clear();
           fabricRef.current.backgroundColor = content.backgroundColor;
+          drawnObjectsRef.current = new Map();
         }
         step.commands.forEach((command) => {
           const obj = createObject(command);
           if (obj) {
             fabricRef.current!.add(obj);
+            drawnObjectsRef.current.set(command.id, obj);
           }
         });
       }
+      applyHighlights(content.steps[clampedIndex]);
       fabricRef.current.renderAll();
     }
 
@@ -425,7 +433,8 @@ export function AIWhiteboardTeacher({
     }
   }, []);
 
-  // Auto-advance steps when playing
+  // Auto-advance steps when playing. Deps are stable primitives only —
+  // drawStep is called imperatively so re-renders never cancel the timer.
   useEffect(() => {
     if (!isPlaying || !content) return;
 
@@ -435,13 +444,11 @@ export function AIWhiteboardTeacher({
       return;
     }
 
-    // Draw current step
     drawStep(currentStep);
     if (step.voiceOver) {
       speak(step.voiceOver);
     }
 
-    // Schedule next step
     playTimeoutRef.current = setTimeout(() => {
       if (currentStep < content.steps.length - 1) {
         setCurrentStep((prev) => prev + 1);
@@ -456,7 +463,25 @@ export function AIWhiteboardTeacher({
         clearTimeout(playTimeoutRef.current);
       }
     };
-  }, [isPlaying, currentStep, content, drawStep, speak]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPlaying, currentStep, content, speak]);
+
+  // Cancel speech and timers on unmount (e.g. toggling back to Chat mid-sentence)
+  useEffect(() => {
+    return () => {
+      if (playTimeoutRef.current) clearTimeout(playTimeoutRef.current);
+      if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
+    };
+  }, []);
+
+  // Apply content canvas size/background when content arrives after mount
+  useEffect(() => {
+    const canvas = fabricRef.current;
+    if (!canvas || !content) return;
+    canvas.backgroundColor = content.backgroundColor;
+    canvas.setDimensions({ width: content.canvasSize.width, height: content.canvasSize.height });
+    canvas.renderAll();
+  }, [content]);
 
   // Toggle fullscreen
   const toggleFullscreen = useCallback(() => {
