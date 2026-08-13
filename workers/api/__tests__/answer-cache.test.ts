@@ -123,6 +123,39 @@ describe('semantic answer cache — ask endpoint', () => {
     expect(db.calls.some((c) => /UPDATE ai_answer_cache SET hit_count/.test(c.sql))).toBe(true);
   });
 
+  it('capped free user WITH a cache hit is served (owner decision 2026-08-13: cache hits bypass the daily cap)', async () => {
+    const db = createMockD1([authHandler, lessonHandler, freeHandler, countHandler(10), cachedRowHandler('topic_1'), cacheUpdateHandler]);
+    const aiCalls: AiCall[] = [];
+    const res = await ask(db, {
+      AI: makeAi(aiCalls),
+      ANSWERS_INDEX: makeIndex([{ id: 'cache_1', score: 0.95 }]),
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      success: boolean;
+      data: { answer: string; cached: boolean; remainingFreeToday: number };
+    };
+    expect(body.success).toBe(true);
+    expect(body.data.cached).toBe(true);
+    expect(body.data.answer).toBe('Cached answer text');
+    // allowance reported (0 remaining) but never incremented/decremented
+    expect(body.data.remainingFreeToday).toBe(0);
+    expect(aiCalls.some((c) => c.payload.messages)).toBe(false);
+    expect(db.calls.some((c) => /INSERT INTO revision_ai_interactions/.test(c.sql))).toBe(false);
+  });
+
+  it('capped free user with a cache MISS still gets 403 aiLimitReached', async () => {
+    // no ANSWERS_INDEX binding → lookupAnswer returns null → miss path → gate
+    const db = createMockD1([authHandler, lessonHandler, freeHandler, countHandler(10)]);
+    const aiCalls: AiCall[] = [];
+    const res = await ask(db, { AI: makeAi(aiCalls) });
+    expect(res.status).toBe(403);
+    const body = (await res.json()) as { aiLimitReached?: boolean; remaining?: number };
+    expect(body.aiLimitReached).toBe(true);
+    expect(body.remaining).toBe(0);
+    expect(aiCalls.some((c) => c.payload.messages)).toBe(false);
+  });
+
   it('below-threshold match is a miss: generates, records interaction, stores answer', async () => {
     const db = createMockD1([
       authHandler, lessonHandler, freeHandler, countHandler(5),

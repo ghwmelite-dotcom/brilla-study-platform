@@ -299,7 +299,8 @@ regenerate. Applies to `ask` (and reusable teach-phase content where keyed).
   fold-in later, same as patches 094-096):
   `id, topic_id, subject_id, exam_type, question_text, answer_text, model,
   embedding_id, hit_count, created_at, last_hit_at`.
-- New Vectorize index `brilla-answers` (768-dim, cosine) holding one vector per
+- New Vectorize index `brilla-answers` (1024-dim, cosine — live-verified
+  against `@cf/qwen/qwen3-embedding-0.6b`) holding one vector per
   cache row, embedded with `AI_MODEL_EMBEDDING` from the normalized question +
   topic name.
 - `ask` flow: normalize question (lowercase, trim, collapse whitespace) → embed
@@ -309,6 +310,12 @@ regenerate. Applies to `ask` (and reusable teach-phase content where keyed).
   `last_hit_at`, no LLM call (and no allowance consumed — cached answers are
   free for everyone). Below threshold ⇒ normal generation, then insert into
   cache (embedding upsert + row).
+- **Ordering (owner decision, 2026-08-13): the cache lookup runs BEFORE the
+  `checkAiAllowance` gate.** Cached answers cost nothing, so they are served
+  even to free users who have exhausted today's allowance — a cache hit never
+  returns 403. The allowance is still computed (read-only) on the hit path
+  purely to report `remainingFreeToday`; the `aiLimitReached` gate applies only
+  on the cache-miss generation path.
 - Cache writes happen only for premium-generated or validated answers; a
   cached answer is keyed to topic so cross-topic bleed is impossible after
   the post-filter.

@@ -1087,20 +1087,17 @@ revisionClassroomApp.post('/lessons/:lessonId/ask', async (c) => {
       return c.json({ success: false, error: 'Lesson not found' }, 404);
     }
 
-    // Free-tier daily AI allowance (premium = unlimited)
+    // Free-tier daily AI allowance (premium = unlimited). Read-only — computed
+    // up front so a cache hit can report the remaining count without
+    // incrementing anything.
     const allowance = await checkAiAllowance(user.userId, c.env.DB);
-    if (!allowance.allowed) {
-      return c.json({
-        success: false,
-        error: "You've used today's free AI explanations. Upgrade for unlimited access, or come back tomorrow.",
-        aiLimitReached: true,
-        remaining: 0,
-      }, 403);
-    }
 
-    // Semantic answer cache: a confident same-topic hit is FREE — no AI call,
-    // no interaction row, and the allowance is NOT decremented. The cache is
-    // optional; lookupAnswer swallows all failures and returns null on a miss.
+    // Semantic answer cache: a confident same-topic hit is FREE for EVERYONE —
+    // owner decision 2026-08-13: cache hits bypass the daily free-tier cap
+    // entirely (they cost nothing), so this check runs BEFORE the allowance
+    // gate. No AI call, no interaction row, allowance NOT decremented. The
+    // cache is optional; lookupAnswer swallows all failures and returns null
+    // on a miss.
     const cached = await lookupAnswer(c.env, (lesson as any).topic_id, question);
     if (cached) {
       return c.json({
@@ -1111,6 +1108,16 @@ revisionClassroomApp.post('/lessons/:lessonId/ask', async (c) => {
           remainingFreeToday: allowance.remaining,
         },
       });
+    }
+
+    // Cache miss: generating costs an AI call, so the daily cap applies here.
+    if (!allowance.allowed) {
+      return c.json({
+        success: false,
+        error: "You've used today's free AI explanations. Upgrade for unlimited access, or come back tomorrow.",
+        aiLimitReached: true,
+        remaining: 0,
+      }, 403);
     }
 
     // Build the prompt for answering student questions
