@@ -14,6 +14,8 @@
 
 **Product owner:** Osborn M. D. K. Hodges
 
+**Recruitment companion:** [Team Recruitment and Onboarding Playbook](./2026-08-13-assessment-review-council-recruitment-playbook.md)
+
 ---
 
 ## 1. Instructions to the Implementation Agent
@@ -182,6 +184,8 @@ An active examiner may not receive assignments unless status is `active_cleared`
 ---
 
 ## 6. Eligibility and Vetting
+
+Operational recruitment, sourcing, scorecards, interview guides, calibration, references, contracting, onboarding and recruitment-portal requirements are defined in the companion [Team Recruitment and Onboarding Playbook](./2026-08-13-assessment-review-council-recruitment-playbook.md). The requirements below remain mandatory governance gates.
 
 ### 6.1 Minimum evidence
 
