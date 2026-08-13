@@ -1926,44 +1926,80 @@ function isValidWhiteboardContent(c: unknown): c is WhiteboardTeachingContent {
   return true;
 }
 
-// Global per-topic cache: whiteboard content is reused across all users and
+// Global per-topic cache: whiteboard lessons are reused across all users and
 // lessons for the same topic + lesson type. Rows live in
 // revision_ai_interactions as type `whiteboard_<lessonType>` and are only
-// ever written for validated, non-fallback content.
-async function getCachedWhiteboard(
+// ever written for validated, non-fallback content. The stored ai_message
+// holds the progressive shape `{ outline: string[], steps: WhiteboardStep[] }`
+// which fills in one step at a time; legacy rows hold a whole-lesson
+// WhiteboardTeachingContent and are still tolerated on read.
+interface CachedWhiteboardRow {
+  id: string;
+  ai_message: string;
+}
+
+interface ParsedWhiteboardCache {
+  outline: string[];
+  // Positional: index i holds step i, or null when that step has not been
+  // generated yet (or failed validation in a stored row).
+  steps: (WhiteboardStep | null)[];
+}
+
+async function getCachedWhiteboardRow(
   db: D1Database,
   topicId: string,
-  lessonType: string,
-  topicName: string
-): Promise<WhiteboardTeachingContent | null> {
-  const row = await db.prepare(`
-    SELECT rai.ai_message
+  lessonType: string
+): Promise<CachedWhiteboardRow | null> {
+  return db.prepare(`
+    SELECT rai.id, rai.ai_message
     FROM revision_ai_interactions rai
     JOIN revision_lessons rl ON rai.lesson_id = rl.id
     WHERE rl.topic_id = ? AND rai.interaction_type = ?
     ORDER BY rai.created_at DESC
     LIMIT 1
-  `).bind(topicId, `whiteboard_${lessonType}`).first<{ ai_message: string }>();
+  `).bind(topicId, `whiteboard_${lessonType}`).first<CachedWhiteboardRow>();
+}
 
-  if (!row?.ai_message) return null;
+// Guarantee command ids are unique across the whole lesson: the frontend
+// tracks drawn objects by command id, so the same id in two steps would
+// silently drop drawing commands. Highlights reference command ids, so they
+// are prefixed identically.
+function prefixStepCommandIds(step: WhiteboardStep, stepIndex: number): WhiteboardStep {
+  return {
+    ...step,
+    commands: step.commands.map((cmd) => ({ ...cmd, id: `s${stepIndex}-${cmd.id}` })),
+    highlights: step.highlights?.map((id) => `s${stepIndex}-${id}`),
+  };
+}
+
+// Parse a cached row into the progressive shape. Legacy whole-lesson rows are
+// converted on the fly (their steps carry no titles, so the outline is
+// synthesized) and their command ids are prefixed per step. Returns null for
+// corrupt/invalid rows — callers treat that as a cache miss.
+function parseCachedWhiteboard(aiMessage: string): ParsedWhiteboardCache | null {
   try {
-    const parsed = JSON.parse(row.ai_message) as unknown;
-    if (isValidWhiteboardContent(parsed)) return parsed;
-    // Tolerate the progressive { outline, steps } shape: assemble a
-    // WhiteboardTeachingContent-shaped object from its validated steps.
-    if (parsed && typeof parsed === 'object' && Array.isArray((parsed as { steps?: unknown }).steps)) {
-      const steps = (parsed as { steps: unknown[] }).steps;
-      if (steps.length > 0 && steps.every(isValidWhiteboardStep)) {
-        return {
-          title: topicName,
-          topic: topicName,
-          totalDuration: steps.reduce((sum, s) => sum + s.duration, 0),
-          canvasSize: { width: 1200, height: 800 },
-          backgroundColor: '#ffffff',
-          steps,
-          summary: '',
-        };
-      }
+    const parsed = JSON.parse(aiMessage) as unknown;
+    if (!parsed || typeof parsed !== 'object') return null;
+
+    // Progressive shape written by the per-step protocol (outline + steps;
+    // command ids were prefixed per step at write time).
+    const maybeProgressive = parsed as { outline?: unknown; steps?: unknown };
+    if (Array.isArray(maybeProgressive.outline) && Array.isArray(maybeProgressive.steps)) {
+      const steps = maybeProgressive.steps.map((s) => (isValidWhiteboardStep(s) ? s : null));
+      if (!steps.some(Boolean)) return null;
+      const outline = maybeProgressive.outline.filter(
+        (t): t is string => typeof t === 'string' && t.trim().length > 0
+      );
+      return { outline, steps };
+    }
+
+    // Legacy whole-lesson shape: convert on the fly (its steps carry no
+    // titles, so the outline is synthesized) and prefix its command ids.
+    if (isValidWhiteboardContent(parsed)) {
+      return {
+        outline: parsed.steps.map((_, i) => `Step ${i + 1}`),
+        steps: parsed.steps.map((step, i) => prefixStepCommandIds(step, i)),
+      };
     }
     return null;
   } catch {
@@ -1971,15 +2007,58 @@ async function getCachedWhiteboard(
   }
 }
 
-// Generate whiteboard teaching content
-async function generateWhiteboardContent(
-  env: Env,
-  topic: string,
-  subject: string,
-  examType: string,
-  lessonType: 'diagram' | 'step-by-step' | 'problem-solving' | 'concept-map' = 'step-by-step'
-): Promise<{ content: WhiteboardTeachingContent; usedFallback: boolean; tokensUsed: number | null }> {
-  const lessonTypeInstructions: Record<string, string> = {
+// Merge one generated step into the per-topic progressive cache row. The row
+// is created on the first successful step (keyed to the requesting lesson)
+// and updated in place as later steps fill in, so the single-row lookup
+// keeps working.
+async function upsertProgressiveWhiteboardCache(
+  db: D1Database,
+  topicId: string,
+  lessonType: string,
+  lessonId: string,
+  userId: string,
+  outline: string[],
+  stepIndex: number,
+  step: WhiteboardStep,
+  tokensUsed: number | null
+): Promise<void> {
+  const existing = await getCachedWhiteboardRow(db, topicId, lessonType);
+
+  let mergedOutline = outline;
+  let mergedSteps: (WhiteboardStep | null)[] = [];
+  if (existing) {
+    const parsed = parseCachedWhiteboard(existing.ai_message);
+    if (parsed) {
+      mergedSteps = parsed.steps;
+      if (parsed.outline.length > 0) mergedOutline = parsed.outline;
+    }
+  }
+  mergedSteps = [...mergedSteps];
+  mergedSteps[stepIndex] = step;
+
+  const payload = JSON.stringify({ outline: mergedOutline, steps: mergedSteps });
+
+  if (existing) {
+    await db.prepare(`
+      UPDATE revision_ai_interactions
+      SET ai_message = ?, tokens_used = ?
+      WHERE id = ?
+    `).bind(payload, tokensUsed, existing.id).run();
+  } else {
+    await db.prepare(`
+      INSERT INTO revision_ai_interactions (
+        id, lesson_id, user_id, interaction_type, ai_message, tokens_used, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      generateId('wb_interaction'), lessonId, userId, `whiteboard_${lessonType}`,
+      payload, tokensUsed, new Date().toISOString()
+    ).run();
+  }
+}
+
+// Per-lesson-type creative guidance, shared by the outline and step prompts.
+function getWhiteboardLessonTypeInstructions(lessonType: string, topic: string): string {
+  const instructions: Record<string, string> = {
     'diagram': `Create a labeled diagram explaining ${topic}. Include:
 - Main diagram with clear labels
 - Arrows pointing to key parts
@@ -2007,7 +2086,112 @@ async function generateWhiteboardContent(
 - Use different colors for different branches
 - Keep it organized and readable`,
   };
+  return instructions[lessonType] || instructions['step-by-step'];
+}
 
+// Generic outline used when outline generation fails — honest, and the
+// per-step fallback keeps every one of these titles renderable.
+const WHITEBOARD_FALLBACK_OUTLINE = ['Introduction', 'Core concepts', 'Worked example', 'Practice tips', 'Summary'];
+
+// Generate just the lesson outline — one small, fast AI call.
+async function generateWhiteboardOutline(
+  env: Env,
+  topic: string,
+  subject: string,
+  examType: string,
+  lessonType: string
+): Promise<{ outline: string[]; usedFallback: boolean }> {
+  try {
+    const model = getGenerationModel(env);
+
+    const result = await env.AI.run(model as BaseAiTextGenerationModels, {
+      messages: [
+        {
+          role: 'system',
+          content: `List 4-6 step titles for a ${lessonType} whiteboard lesson on the given topic. Respond with a JSON array of strings only — no prose, no markdown fences.`,
+        },
+        { role: 'user', content: `Topic: "${topic}" (${subject}, ${examType.toUpperCase()} exam).` },
+      ],
+      max_tokens: 300,
+      temperature: 0.5,
+    });
+
+    const responseText = typeof result === 'object' && result !== null && 'response' in result
+      ? (result as { response: string }).response
+      : String(result);
+
+    const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]) as unknown;
+      if (
+        Array.isArray(parsed) &&
+        parsed.length >= 4 &&
+        parsed.length <= 6 &&
+        parsed.every((t) => typeof t === 'string' && t.trim().length > 0)
+      ) {
+        return { outline: parsed.map((t) => (t as string).trim()), usedFallback: false };
+      }
+      console.error('Whiteboard outline failed validation — using fallback');
+    }
+
+    throw new Error('Failed to parse whiteboard outline');
+  } catch (error) {
+    console.error('Error generating whiteboard outline:', error);
+    return { outline: [...WHITEBOARD_FALLBACK_OUTLINE], usedFallback: true };
+  }
+}
+
+// Minimal generic step used when generation of one step fails — only that
+// step is flagged as fallback, the rest of the lesson is unaffected. Command
+// ids are prefixed by the caller like any generated step.
+function getFallbackWhiteboardStep(topic: string, outline: string[], stepIndex: number): WhiteboardStep {
+  const title = outline[stepIndex] || topic;
+  return {
+    stepNumber: stepIndex + 1,
+    explanation: `Let's look at ${title}.`,
+    voiceOver: `In this step, we'll cover ${title} as part of our lesson on ${topic}.`,
+    duration: 6,
+    commands: [
+      {
+        type: 'text',
+        id: 'heading',
+        props: {
+          left: 600,
+          top: 80,
+          text: title,
+          fontSize: 36,
+          fontWeight: 'bold',
+          fill: '#1e40af',
+          textAlign: 'center',
+        },
+      },
+      {
+        type: 'text',
+        id: 'body',
+        props: {
+          left: 150,
+          top: 200,
+          text: `Key ideas about ${topic}.`,
+          fontSize: 20,
+          fill: '#000000',
+        },
+      },
+    ],
+    highlights: [],
+    clearPrevious: false,
+  };
+}
+
+// Generate ONE whiteboard step, guided by the outline and its position.
+async function generateWhiteboardStep(
+  env: Env,
+  topic: string,
+  subject: string,
+  examType: string,
+  lessonType: 'diagram' | 'step-by-step' | 'problem-solving' | 'concept-map',
+  outline: string[],
+  stepIndex: number
+): Promise<{ step: WhiteboardStep; usedFallback: boolean; tokensUsed: number | null }> {
   const systemPrompt = `${WHITEBOARD_TEACHING_PROMPT}
 
 Context:
@@ -2016,9 +2200,22 @@ Context:
 - Exam: ${examType.toUpperCase()}
 - Lesson Type: ${lessonType}
 
-${lessonTypeInstructions[lessonType]}
+${getWhiteboardLessonTypeInstructions(lessonType, topic)}
 
-Create content appropriate for ${examType.toUpperCase()} exam preparation.`;
+You are writing step ${stepIndex + 1} of ${outline.length}: "${outline[stepIndex]}".
+Full outline: ${JSON.stringify(outline)}.
+
+Output ONE JSON step object only — not a whole lesson — in this exact format:
+{
+  "stepNumber": ${stepIndex + 1},
+  "explanation": "What the student should understand from this step",
+  "voiceOver": "What to say while showing this step",
+  "duration": 5,
+  "commands": [ { "type": "text", "id": "title1", "props": { "left": 100, "top": 50, "text": "Title Text", "fontSize": 32, "fontWeight": "bold", "fill": "#1e40af" } } ],
+  "highlights": [],
+  "clearPrevious": false
+}
+Canvas is 1200x800. Keep commands under 12.`;
 
   try {
     const model = getGenerationModel(env);
@@ -2026,9 +2223,9 @@ Create content appropriate for ${examType.toUpperCase()} exam preparation.`;
     const result = await env.AI.run(model as BaseAiTextGenerationModels, {
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Create a ${lessonType} whiteboard lesson about "${topic}" for ${subject}.` },
+        { role: 'user', content: `Write step ${stepIndex + 1} ("${outline[stepIndex]}") of the ${lessonType} whiteboard lesson about "${topic}" for ${subject}.` },
       ],
-      max_tokens: 4096,
+      max_tokens: 1200,
       temperature: 0.7,
     });
 
@@ -2041,243 +2238,37 @@ Create content appropriate for ${examType.toUpperCase()} exam preparation.`;
         ? ((result as { usage?: { total_tokens?: number } }).usage?.total_tokens ?? null)
         : null;
 
-    // Extract JSON from response
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      const parsed = JSON.parse(jsonMatch[0]) as WhiteboardTeachingContent;
-      if (isValidWhiteboardContent(parsed)) {
-        return { content: parsed, usedFallback: false, tokensUsed };
+      const parsed = JSON.parse(jsonMatch[0]) as unknown;
+      if (isValidWhiteboardStep(parsed)) {
+        return { step: prefixStepCommandIds(parsed, stepIndex), usedFallback: false, tokensUsed };
       }
-      console.error('Whiteboard content failed validation — using fallback');
+      console.error(`Whiteboard step ${stepIndex} failed validation — using fallback step`);
     }
 
-    throw new Error('Failed to parse whiteboard content');
+    throw new Error('Failed to parse whiteboard step');
   } catch (error) {
-    console.error('Error generating whiteboard content:', error);
-    // Return fallback content — flagged so the UI can be honest about it
-    return { content: getDefaultWhiteboardContent(topic, subject, examType), usedFallback: true, tokensUsed: null };
+    console.error(`Error generating whiteboard step ${stepIndex}:`, error);
+    // Flagged so the UI can be honest about this step being generic.
+    return {
+      step: prefixStepCommandIds(getFallbackWhiteboardStep(topic, outline, stepIndex), stepIndex),
+      usedFallback: true,
+      tokensUsed: null,
+    };
   }
 }
 
-// Default/fallback whiteboard content
-function getDefaultWhiteboardContent(topic: string, subject: string, examType: string): WhiteboardTeachingContent {
-  return {
-    title: `Understanding ${topic}`,
-    topic,
-    totalDuration: 30,
-    canvasSize: { width: 1200, height: 800 },
-    backgroundColor: '#ffffff',
-    steps: [
-      {
-        stepNumber: 1,
-        explanation: `Let's explore ${topic} together.`,
-        voiceOver: `Welcome! Today we're going to learn about ${topic} in ${subject}.`,
-        duration: 5,
-        commands: [
-          {
-            type: 'text',
-            id: 'title',
-            props: {
-              left: 600,
-              top: 80,
-              text: topic,
-              fontSize: 48,
-              fontWeight: 'bold',
-              fill: '#1e40af',
-              textAlign: 'center',
-            },
-          },
-          {
-            type: 'line',
-            id: 'underline',
-            props: {
-              x1: 300,
-              y1: 130,
-              x2: 900,
-              y2: 130,
-              stroke: '#1e40af',
-              strokeWidth: 3,
-            },
-          },
-        ],
-        highlights: [],
-        clearPrevious: false,
-      },
-      {
-        stepNumber: 2,
-        explanation: `Key concepts in ${topic}`,
-        voiceOver: `Let me show you the main ideas you need to understand.`,
-        duration: 8,
-        commands: [
-          {
-            type: 'text',
-            id: 'concept1-label',
-            props: {
-              left: 150,
-              top: 200,
-              text: 'Key Concept 1',
-              fontSize: 24,
-              fontWeight: 'bold',
-              fill: '#16a34a',
-            },
-          },
-          {
-            type: 'rect',
-            id: 'concept1-box',
-            props: {
-              left: 100,
-              top: 230,
-              width: 300,
-              height: 100,
-              fill: '#f0fdf4',
-              stroke: '#16a34a',
-              strokeWidth: 2,
-            },
-          },
-          {
-            type: 'text',
-            id: 'concept1-text',
-            props: {
-              left: 120,
-              top: 260,
-              text: `Understanding the basics\nof ${topic}`,
-              fontSize: 18,
-              fill: '#000000',
-            },
-          },
-        ],
-        highlights: ['concept1-box'],
-        clearPrevious: false,
-      },
-      {
-        stepNumber: 3,
-        explanation: `How this applies to your ${examType.toUpperCase()} exam`,
-        voiceOver: `This is important for your exam. Let me show you how questions are typically asked.`,
-        duration: 10,
-        commands: [
-          {
-            type: 'text',
-            id: 'exam-label',
-            props: {
-              left: 600,
-              top: 200,
-              text: `${examType.toUpperCase()} Exam Tips`,
-              fontSize: 28,
-              fontWeight: 'bold',
-              fill: '#dc2626',
-              textAlign: 'center',
-            },
-          },
-          {
-            type: 'rect',
-            id: 'exam-box',
-            props: {
-              left: 450,
-              top: 240,
-              width: 300,
-              height: 150,
-              fill: '#fef2f2',
-              stroke: '#dc2626',
-              strokeWidth: 2,
-            },
-          },
-          {
-            type: 'text',
-            id: 'exam-tip1',
-            props: {
-              left: 470,
-              top: 270,
-              text: '• Read questions carefully',
-              fontSize: 16,
-              fill: '#000000',
-            },
-          },
-          {
-            type: 'text',
-            id: 'exam-tip2',
-            props: {
-              left: 470,
-              top: 300,
-              text: '• Show all working',
-              fontSize: 16,
-              fill: '#000000',
-            },
-          },
-          {
-            type: 'text',
-            id: 'exam-tip3',
-            props: {
-              left: 470,
-              top: 330,
-              text: '• Check your answers',
-              fontSize: 16,
-              fill: '#000000',
-            },
-          },
-        ],
-        highlights: ['exam-box'],
-        clearPrevious: false,
-      },
-      {
-        stepNumber: 4,
-        explanation: 'Summary of what we learned',
-        voiceOver: `Great job! Let's summarize what we've covered about ${topic}.`,
-        duration: 7,
-        commands: [
-          {
-            type: 'rect',
-            id: 'summary-bg',
-            props: {
-              left: 100,
-              top: 450,
-              width: 1000,
-              height: 280,
-              fill: '#f8fafc',
-              stroke: '#64748b',
-              strokeWidth: 2,
-            },
-          },
-          {
-            type: 'text',
-            id: 'summary-title',
-            props: {
-              left: 600,
-              top: 480,
-              text: 'Summary',
-              fontSize: 32,
-              fontWeight: 'bold',
-              fill: '#7c3aed',
-              textAlign: 'center',
-            },
-          },
-          {
-            type: 'text',
-            id: 'summary-content',
-            props: {
-              left: 150,
-              top: 530,
-              text: `✓ We learned about ${topic}\n✓ Key concepts and definitions\n✓ How to approach ${examType.toUpperCase()} questions\n✓ Common mistakes to avoid`,
-              fontSize: 20,
-              fill: '#000000',
-            },
-          },
-        ],
-        highlights: [],
-        clearPrevious: false,
-      },
-    ],
-    summary: `In this lesson, we explored ${topic} as it relates to ${subject} for the ${examType.toUpperCase()} exam.`,
-  };
-}
-
-// API Endpoint: Generate AI whiteboard teaching content
+// API Endpoint: Generate AI whiteboard teaching content (progressive per-step protocol)
 revisionClassroomApp.post('/lessons/:lessonId/whiteboard-teach', async (c) => {
   try {
     const user = c.get('user');
     const lessonId = c.req.param('lessonId');
     const body = await c.req.json();
-    const { lessonType = 'step-by-step' } = body as {
+    const { lessonType = 'step-by-step', stepIndex, outline } = body as {
       lessonType?: 'diagram' | 'step-by-step' | 'problem-solving' | 'concept-map';
+      stepIndex?: number;
+      outline?: string[];
     };
 
     // Get lesson details
@@ -2312,18 +2303,70 @@ revisionClassroomApp.post('/lessons/:lessonId/whiteboard-teach', async (c) => {
     const subjectName = (lesson as any).subject_name || 'this subject';
     const examType = (lesson as any).exam_type || 'wassce';
 
-    // Global per-topic cache: a hit skips generation and interaction writes
-    // entirely. Topic-less lessons bypass the cache.
+    // Global per-topic cache: hits skip generation entirely and cache writes
+    // only ever store validated, non-fallback steps. Topic-less lessons
+    // bypass the cache.
     const topicId = (lesson as any).topic_id as string | null;
+
+    // --- Step request: generate (or serve) one step of a known outline ---
+    if (typeof stepIndex === 'number' && stepIndex > 0) {
+      if (
+        !Number.isInteger(stepIndex) ||
+        !Array.isArray(outline) ||
+        outline.length === 0 ||
+        !outline.every((t) => typeof t === 'string' && t.trim().length > 0) ||
+        stepIndex >= outline.length
+      ) {
+        return c.json({
+          success: false,
+          error: 'Step requests require the lesson outline and a stepIndex within it',
+        }, 400);
+      }
+      const cleanOutline = outline.map((t) => t.trim());
+
+      if (topicId) {
+        const row = await getCachedWhiteboardRow(c.env.DB, topicId, lessonType);
+        const cachedStep = row ? parseCachedWhiteboard(row.ai_message)?.steps[stepIndex] : null;
+        if (cachedStep) {
+          return c.json({
+            success: true,
+            data: { step: cachedStep, stepIndex, totalSteps: cleanOutline.length, fallback: false, cached: true },
+          });
+        }
+      }
+
+      const { step, usedFallback, tokensUsed } = await generateWhiteboardStep(
+        c.env, topicName, subjectName, examType, lessonType, cleanOutline, stepIndex
+      );
+
+      if (!usedFallback && topicId) {
+        await upsertProgressiveWhiteboardCache(
+          c.env.DB, topicId, lessonType, lessonId, user.userId, cleanOutline, stepIndex, step, tokensUsed
+        );
+      }
+
+      return c.json({
+        success: true,
+        data: { step, stepIndex, totalSteps: cleanOutline.length, fallback: usedFallback, cached: false },
+      });
+    }
+
+    // --- Outline request: outline plus step 0 in one round trip ---
     if (topicId) {
-      const cached = await getCachedWhiteboard(c.env.DB, topicId, lessonType, topicName);
-      if (cached) {
+      const row = await getCachedWhiteboardRow(c.env.DB, topicId, lessonType);
+      const cached = row ? parseCachedWhiteboard(row.ai_message) : null;
+      const firstStep = cached?.steps[0];
+      if (cached && firstStep) {
+        const cachedOutline = cached.outline.length > 0
+          ? cached.outline
+          : cached.steps.map((_, i) => `Step ${i + 1}`);
         return c.json({
           success: true,
           data: {
-            whiteboardContent: cached,
-            interactionId: null,
-            lessonType,
+            outline: cachedOutline,
+            totalSteps: cachedOutline.length,
+            step: firstStep,
+            stepIndex: 0,
             fallback: false,
             cached: true,
           },
@@ -2331,38 +2374,28 @@ revisionClassroomApp.post('/lessons/:lessonId/whiteboard-teach', async (c) => {
       }
     }
 
-    // Generate whiteboard content
-    const { content: whiteboardContent, usedFallback, tokensUsed } = await generateWhiteboardContent(
-      c.env,
-      topicName,
-      subjectName,
-      examType,
-      lessonType
+    const outlineResult = await generateWhiteboardOutline(c.env, topicName, subjectName, examType, lessonType);
+    const stepResult = await generateWhiteboardStep(
+      c.env, topicName, subjectName, examType, lessonType, outlineResult.outline, 0
     );
+    const usedFallback = outlineResult.usedFallback || stepResult.usedFallback;
 
-    // Record the interaction — only for validated, non-fallback content, so
-    // fallback lessons never poison the per-topic cache.
-    let interactionId: string | null = null;
-    if (!usedFallback) {
-      interactionId = generateId('wb_interaction');
-      const now = new Date().toISOString();
-
-      await c.env.DB.prepare(`
-        INSERT INTO revision_ai_interactions (
-          id, lesson_id, user_id, interaction_type, ai_message, tokens_used, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
-      `).bind(
-        interactionId, lessonId, user.userId, `whiteboard_${lessonType}`,
-        JSON.stringify(whiteboardContent), tokensUsed, now
-      ).run();
+    // Only fully-generated lessons enter the cache, so fallback content
+    // never poisons it.
+    if (!usedFallback && topicId) {
+      await upsertProgressiveWhiteboardCache(
+        c.env.DB, topicId, lessonType, lessonId, user.userId,
+        outlineResult.outline, 0, stepResult.step, stepResult.tokensUsed
+      );
     }
 
     return c.json({
       success: true,
       data: {
-        whiteboardContent,
-        interactionId,
-        lessonType,
+        outline: outlineResult.outline,
+        totalSteps: outlineResult.outline.length,
+        step: stepResult.step,
+        stepIndex: 0,
         fallback: usedFallback,
         cached: false,
       },

@@ -150,16 +150,6 @@ export interface WhiteboardStep {
   clearPrevious?: boolean;
 }
 
-export interface WhiteboardTeachingContent {
-  title: string;
-  topic: string;
-  totalDuration: number;
-  canvasSize: { width: number; height: number };
-  backgroundColor: string;
-  steps: WhiteboardStep[];
-  summary: string;
-}
-
 interface RevisionClassroomState {
   // Sessions
   currentSession: RevisionSession | null;
@@ -180,10 +170,17 @@ interface RevisionClassroomState {
   aiTeachingState: AITeachingState;
   aiMessages: RevisionAIMessage[];
 
-  // AI Whiteboard Teaching
-  whiteboardContent: WhiteboardTeachingContent | null;
+  // AI Whiteboard Teaching (progressive per-step protocol)
+  whiteboardOutline: string[] | null;
+  whiteboardSteps: WhiteboardStep[];
+  whiteboardTotalSteps: number;
+  whiteboardLessonType: WhiteboardLessonType | null;
   isWhiteboardLoading: boolean;
+  whiteboardStepLoading: boolean;
   whiteboardMode: boolean;
+  // Guard against duplicate/in-flight per-step fetches (values are step
+  // indices). Mutated in place — not reactive state.
+  whiteboardStepsInFlight: Set<number>;
 
   // Entitlement / usage-limit state (session-only; not persisted)
   whiteboardLocked: boolean;
@@ -262,6 +259,7 @@ interface RevisionClassroomState {
 
   // Actions - AI Whiteboard Teaching
   requestWhiteboardTeaching: (lessonType: WhiteboardLessonType) => Promise<void>;
+  fetchNextWhiteboardStep: (nextIndex: number) => Promise<void>;
   toggleWhiteboardMode: () => void;
   clearWhiteboardContent: () => void;
 
@@ -428,9 +426,14 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
         awaitingResponse: false,
       },
       aiMessages: [],
-      whiteboardContent: null,
+      whiteboardOutline: null,
+      whiteboardSteps: [],
+      whiteboardTotalSteps: 0,
+      whiteboardLessonType: null,
       isWhiteboardLoading: false,
+      whiteboardStepLoading: false,
       whiteboardMode: false,
+      whiteboardStepsInFlight: new Set<number>(),
       whiteboardLocked: false,
       whiteboardFallback: false,
       aiLimitReached: false,
@@ -1082,13 +1085,25 @@ Does this help? Feel free to ask more questions!`;
         const { currentLesson, currentSession } = get();
         if (!currentLesson || !currentSession) return;
 
-        set({ isWhiteboardLoading: true, whiteboardMode: true });
+        get().whiteboardStepsInFlight.clear();
+        set({
+          isWhiteboardLoading: true,
+          whiteboardMode: true,
+          whiteboardOutline: null,
+          whiteboardSteps: [],
+          whiteboardTotalSteps: 0,
+          whiteboardLessonType: lessonType,
+          whiteboardStepLoading: false,
+        });
 
         try {
           const response = await api.post<{
-            whiteboardContent: WhiteboardTeachingContent;
-            interactionId: string;
-            lessonType: string;
+            outline: string[];
+            totalSteps: number;
+            step: WhiteboardStep;
+            stepIndex: number;
+            fallback?: boolean;
+            cached?: boolean;
           }>(`/revision-classroom/lessons/${currentLesson.id}/whiteboard-teach`, {
             lessonType,
           });
@@ -1101,9 +1116,12 @@ Does this help? Feel free to ask more questions!`;
             throw new Error(response.error || 'Failed to generate whiteboard content');
           }
 
+          const data = response.data;
           set({
-            whiteboardContent: response.data.whiteboardContent,
-            whiteboardFallback: (response.data as { fallback?: boolean }).fallback === true,
+            whiteboardOutline: data.outline,
+            whiteboardSteps: [data.step],
+            whiteboardTotalSteps: data.totalSteps,
+            whiteboardFallback: data.fallback === true,
             isWhiteboardLoading: false,
           });
         } catch (error) {
@@ -1115,12 +1133,81 @@ Does this help? Feel free to ask more questions!`;
         }
       },
 
+      fetchNextWhiteboardStep: async (nextIndex) => {
+        const {
+          currentLesson,
+          whiteboardOutline,
+          whiteboardSteps,
+          whiteboardLessonType,
+          whiteboardStepsInFlight,
+        } = get();
+        if (!currentLesson || !whiteboardOutline || !whiteboardLessonType) return;
+        if (nextIndex < 0 || nextIndex >= whiteboardOutline.length) return;
+        // Already have it, or already fetching it.
+        if (whiteboardSteps[nextIndex] || whiteboardStepsInFlight.has(nextIndex)) return;
+
+        whiteboardStepsInFlight.add(nextIndex);
+        set({ whiteboardStepLoading: true });
+        const lessonId = currentLesson.id;
+        const outlineSnapshot = whiteboardOutline;
+
+        try {
+          const response = await api.post<{
+            step: WhiteboardStep;
+            stepIndex: number;
+            totalSteps: number;
+            fallback?: boolean;
+            cached?: boolean;
+          }>(`/revision-classroom/lessons/${lessonId}/whiteboard-teach`, {
+            lessonType: whiteboardLessonType,
+            stepIndex: nextIndex,
+            outline: whiteboardOutline,
+          });
+
+          if (!response.success || !response.data) {
+            throw new Error(response.error || 'Failed to generate whiteboard step');
+          }
+
+          // Discard if the user restarted the whiteboard (new outline) or
+          // changed lessons while this step was generating.
+          if (get().currentLesson?.id !== lessonId || get().whiteboardOutline !== outlineSnapshot) return;
+
+          const data = response.data;
+          set(state => {
+            const steps = [...state.whiteboardSteps];
+            steps[data.stepIndex] = data.step;
+            return {
+              whiteboardSteps: steps,
+              whiteboardTotalSteps: data.totalSteps || state.whiteboardTotalSteps,
+            };
+          });
+        } catch (error) {
+          console.error('Error generating whiteboard step:', error);
+          set({
+            error: error instanceof Error ? error.message : 'Failed to generate whiteboard step',
+          });
+        } finally {
+          get().whiteboardStepsInFlight.delete(nextIndex);
+          if (get().whiteboardStepsInFlight.size === 0) {
+            set({ whiteboardStepLoading: false });
+          }
+        }
+      },
+
       toggleWhiteboardMode: () => {
         set(state => ({ whiteboardMode: !state.whiteboardMode }));
       },
 
       clearWhiteboardContent: () => {
-        set({ whiteboardContent: null, whiteboardMode: false });
+        get().whiteboardStepsInFlight.clear();
+        set({
+          whiteboardOutline: null,
+          whiteboardSteps: [],
+          whiteboardTotalSteps: 0,
+          whiteboardLessonType: null,
+          whiteboardStepLoading: false,
+          whiteboardMode: false,
+        });
       },
 
       // =============================================

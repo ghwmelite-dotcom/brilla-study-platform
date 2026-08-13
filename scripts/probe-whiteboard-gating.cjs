@@ -212,9 +212,9 @@ async function api(method, path, token, body) {
       const { status, json } = await authed('POST', `/revision-classroom/lessons/${lessonId}/whiteboard-teach`,
         { lessonType: 'step-by-step' });
       const d = json?.data || {};
-      report('9. whiteboard-teach as premium', '200 content + fallback boolean',
-        `${status} hasContent=${!!d.whiteboardContent} fallback=${d.fallback}`,
-        status === 200 && !!d.whiteboardContent && typeof d.fallback === 'boolean');
+      report('9. whiteboard-teach as premium', '200 outline + step + fallback boolean',
+        `${status} hasOutline=${Array.isArray(d.outline)} hasStep=${!!d.step} fallback=${d.fallback}`,
+        status === 200 && Array.isArray(d.outline) && !!d.step && typeof d.fallback === 'boolean');
     } else {
       report('9. whiteboard-teach as premium', '200', 'skipped (no lesson)', false);
     }

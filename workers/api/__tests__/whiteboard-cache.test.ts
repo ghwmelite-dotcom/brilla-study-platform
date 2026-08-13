@@ -5,15 +5,17 @@ import { createMockD1, type MockHandler } from './helpers/mockD1';
 
 // Whiteboard Phase B Task 3: global per-topic content cache for
 // POST /api/revision-classroom/lessons/:lessonId/whiteboard-teach.
+// (Expectations updated for the Task 4 progressive protocol: outline
+// requests return { outline, totalSteps, step, stepIndex: 0, ... }.)
 //
-// (a) cache hit -> 200 with cached:true, no AI call, no interaction insert;
-// (b) cache miss -> generates; in this harness env.AI is undefined so
-//     generateWhiteboardContent catches and returns fallback content
-//     (usedFallback:true) -> 200 with fallback:true, cached:false;
+// (a) cache hit -> 200 with cached:true, no AI call, no cache writes;
+// (b) cache miss -> generates; in this harness env.AI is undefined so the
+//     generators catch and return fallback outline/step
+//     (fallback:true) -> 200 with fallback:true, cached:false;
 // (c) fallback content is NEVER written to revision_ai_interactions, so a
 //     second call still misses the cache;
-// (d) progressive { outline, steps } cache rows (Task 4 shape) are assembled
-//     into a WhiteboardTeachingContent-shaped response;
+// (d) progressive { outline, steps } cache rows are served as outline +
+//     step 0;
 // (e) corrupt/unparseable cache rows are treated as a miss;
 // (f) the premium gate still runs before the cache lookup.
 
@@ -60,11 +62,11 @@ const cacheMissHandler: MockHandler = {
 
 const cacheHitHandler = (content: unknown): MockHandler => ({
   match: /FROM revision_ai_interactions rai/,
-  first: () => ({ ai_message: JSON.stringify(content) }),
+  first: () => ({ id: 'wb_row_1', ai_message: JSON.stringify(content) }),
 });
 
-const insertHandler: MockHandler = {
-  match: /INSERT INTO revision_ai_interactions/,
+const writeHandler: MockHandler = {
+  match: /INSERT INTO revision_ai_interactions|UPDATE revision_ai_interactions/,
 };
 
 const validStep = (n: number, duration: number) => ({
@@ -102,20 +104,20 @@ async function teach(db: unknown) {
   );
 }
 
-const insertCalls = (db: { calls: { sql: string; binds: unknown[] }[] }) =>
-  db.calls.filter((c) => /INSERT INTO revision_ai_interactions/.test(c.sql));
+const writeCalls = (db: { calls: { sql: string; binds: unknown[] }[] }) =>
+  db.calls.filter((c) => /INSERT INTO revision_ai_interactions|UPDATE revision_ai_interactions/.test(c.sql));
 
 const cacheLookups = (db: { calls: { sql: string; binds: unknown[] }[] }) =>
   db.calls.filter((c) => /FROM revision_ai_interactions rai/.test(c.sql));
 
 describe('POST /lessons/:lessonId/whiteboard-teach content cache', () => {
-  it('serves a cache hit with cached:true and performs no insert', async () => {
+  it('serves a legacy whole-lesson cache hit with cached:true and performs no writes', async () => {
     const db = createMockD1([
       authHandler,
       premiumHandler,
       lessonHandler,
       cacheHitHandler(cachedWholeLesson),
-      insertHandler,
+      writeHandler,
     ]);
 
     const res = await teach(db);
@@ -123,9 +125,10 @@ describe('POST /lessons/:lessonId/whiteboard-teach content cache', () => {
     const body = (await res.json()) as {
       success: boolean;
       data: {
-        whiteboardContent: unknown;
-        interactionId: string | null;
-        lessonType: string;
+        outline: string[];
+        totalSteps: number;
+        step: { commands: { id: string }[] };
+        stepIndex: number;
         fallback: boolean;
         cached: boolean;
       };
@@ -133,12 +136,15 @@ describe('POST /lessons/:lessonId/whiteboard-teach content cache', () => {
     expect(body.success).toBe(true);
     expect(body.data.cached).toBe(true);
     expect(body.data.fallback).toBe(false);
-    expect(body.data.interactionId).toBeNull();
-    expect(body.data.lessonType).toBe('step-by-step');
-    expect(body.data.whiteboardContent).toEqual(cachedWholeLesson);
+    expect(body.data.stepIndex).toBe(0);
+    // Legacy rows carry no outline — titles are synthesized, and command ids
+    // gain the per-step prefix on the way out.
+    expect(body.data.outline).toEqual(['Step 1']);
+    expect(body.data.totalSteps).toBe(1);
+    expect(body.data.step.commands[0].id).toBe('s0-t1');
 
     // Cache hits are free: no interaction row is written.
-    expect(insertCalls(db)).toHaveLength(0);
+    expect(writeCalls(db)).toHaveLength(0);
 
     // The lookup scoped to the lesson's topic and lesson type.
     const lookup = cacheLookups(db);
@@ -152,23 +158,23 @@ describe('POST /lessons/:lessonId/whiteboard-teach content cache', () => {
       premiumHandler,
       lessonHandler,
       cacheMissHandler,
-      insertHandler,
+      writeHandler,
     ]);
 
     const res = await teach(db);
     expect(res.status).toBe(200);
     const body = (await res.json()) as {
       success: boolean;
-      data: { fallback: boolean; cached: boolean; interactionId: string | null };
+      data: { outline: string[]; fallback: boolean; cached: boolean };
     };
     expect(body.success).toBe(true);
     // env.AI is undefined in tests, so generation falls back.
     expect(body.data.fallback).toBe(true);
     expect(body.data.cached).toBe(false);
-    expect(body.data.interactionId).toBeNull();
+    expect(body.data.outline).toEqual(['Introduction', 'Core concepts', 'Worked example', 'Practice tips', 'Summary']);
 
     // Fallback content must never enter the cache.
-    expect(insertCalls(db)).toHaveLength(0);
+    expect(writeCalls(db)).toHaveLength(0);
   });
 
   it('a second call after a fallback miss still misses the cache', async () => {
@@ -177,7 +183,7 @@ describe('POST /lessons/:lessonId/whiteboard-teach content cache', () => {
       premiumHandler,
       lessonHandler,
       cacheMissHandler,
-      insertHandler,
+      writeHandler,
     ]);
 
     const first = await teach(db);
@@ -190,12 +196,12 @@ describe('POST /lessons/:lessonId/whiteboard-teach content cache', () => {
 
     // Both calls looked the cache up; neither wrote a fallback row.
     expect(cacheLookups(db)).toHaveLength(2);
-    expect(insertCalls(db)).toHaveLength(0);
+    expect(writeCalls(db)).toHaveLength(0);
   });
 
-  it('assembles a progressive { outline, steps } cache row into teaching content', async () => {
+  it('serves outline + step 0 from a progressive { outline, steps } cache row', async () => {
     const progressive = {
-      outline: { title: 'ignored — title comes from the topic' },
+      outline: ['Intro', 'Details'],
       steps: [validStep(1, 5), validStep(2, 7)],
     };
     const db = createMockD1([
@@ -203,7 +209,7 @@ describe('POST /lessons/:lessonId/whiteboard-teach content cache', () => {
       premiumHandler,
       lessonHandler,
       cacheHitHandler(progressive),
-      insertHandler,
+      writeHandler,
     ]);
 
     const res = await teach(db);
@@ -211,27 +217,19 @@ describe('POST /lessons/:lessonId/whiteboard-teach content cache', () => {
     const body = (await res.json()) as {
       data: {
         cached: boolean;
-        whiteboardContent: {
-          title: string;
-          topic: string;
-          totalDuration: number;
-          canvasSize: { width: number; height: number };
-          backgroundColor: string;
-          steps: unknown[];
-          summary: string;
-        };
+        outline: string[];
+        totalSteps: number;
+        step: unknown;
+        stepIndex: number;
       };
     };
     expect(body.data.cached).toBe(true);
-    const wc = body.data.whiteboardContent;
-    expect(wc.title).toBe('Photosynthesis');
-    expect(wc.topic).toBe('Photosynthesis');
-    expect(wc.totalDuration).toBe(12);
-    expect(wc.canvasSize).toEqual({ width: 1200, height: 800 });
-    expect(wc.backgroundColor).toBe('#ffffff');
-    expect(wc.steps).toHaveLength(2);
-    expect(wc.summary).toBe('');
-    expect(insertCalls(db)).toHaveLength(0);
+    // Progressive rows are served as stored (ids were prefixed at write time).
+    expect(body.data.outline).toEqual(['Intro', 'Details']);
+    expect(body.data.totalSteps).toBe(2);
+    expect(body.data.stepIndex).toBe(0);
+    expect(body.data.step).toEqual(validStep(1, 5));
+    expect(writeCalls(db)).toHaveLength(0);
   });
 
   it('treats an unparseable cache row as a miss', async () => {
@@ -239,8 +237,8 @@ describe('POST /lessons/:lessonId/whiteboard-teach content cache', () => {
       authHandler,
       premiumHandler,
       lessonHandler,
-      { match: /FROM revision_ai_interactions rai/, first: () => ({ ai_message: '{not json' }) },
-      insertHandler,
+      { match: /FROM revision_ai_interactions rai/, first: () => ({ id: 'wb_row_1', ai_message: '{not json' }) },
+      writeHandler,
     ]);
 
     const res = await teach(db);
@@ -248,7 +246,7 @@ describe('POST /lessons/:lessonId/whiteboard-teach content cache', () => {
     const body = (await res.json()) as { data: { fallback: boolean; cached: boolean } };
     expect(body.data.cached).toBe(false);
     expect(body.data.fallback).toBe(true);
-    expect(insertCalls(db)).toHaveLength(0);
+    expect(writeCalls(db)).toHaveLength(0);
   });
 
   it('rejects non-premium users before any cache lookup', async () => {
@@ -265,7 +263,7 @@ describe('POST /lessons/:lessonId/whiteboard-teach content cache', () => {
       },
       lessonHandler,
       cacheHitHandler(cachedWholeLesson),
-      insertHandler,
+      writeHandler,
     ]);
 
     const res = await teach(db);
@@ -274,8 +272,8 @@ describe('POST /lessons/:lessonId/whiteboard-teach content cache', () => {
     expect(body.success).toBe(false);
     expect(body.upgradeRequired).toBe(true);
 
-    // The gate runs first: no cache lookup, no insert.
+    // The gate runs first: no cache lookup, no writes.
     expect(cacheLookups(db)).toHaveLength(0);
-    expect(insertCalls(db)).toHaveLength(0);
+    expect(writeCalls(db)).toHaveLength(0);
   });
 });

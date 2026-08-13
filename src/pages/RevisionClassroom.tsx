@@ -531,7 +531,10 @@ export default function RevisionClassroom() {
     lessonPlan,
     aiTeachingState,
     aiMessages,
-    whiteboardContent,
+    whiteboardOutline,
+    whiteboardSteps,
+    whiteboardTotalSteps,
+    whiteboardStepLoading,
     isWhiteboardLoading,
     whiteboardMode,
     whiteboardLocked,
@@ -553,6 +556,7 @@ export default function RevisionClassroom() {
     respondToAI,
     askQuestion,
     requestWhiteboardTeaching,
+    fetchNextWhiteboardStep,
     toggleWhiteboardMode,
     answerCheckpoint,
     fetchStats,
@@ -1201,9 +1205,13 @@ export default function RevisionClassroom() {
                 </div>
               ) : (
                 <AIWhiteboardTeacher
-                  content={whiteboardContent || undefined}
+                  outline={whiteboardOutline}
+                  steps={whiteboardSteps}
+                  totalSteps={whiteboardTotalSteps}
                   isLoading={isWhiteboardLoading}
+                  stepLoading={whiteboardStepLoading}
                   onRequestContent={requestWhiteboardTeaching}
+                  onNeedStep={fetchNextWhiteboardStep}
                   fallback={whiteboardFallback}
                   className="h-full"
                 />

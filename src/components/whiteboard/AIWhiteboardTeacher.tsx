@@ -61,17 +61,12 @@ interface WhiteboardStep {
   clearPrevious?: boolean;
 }
 
-interface WhiteboardTeachingContent {
-  title: string;
-  topic: string;
-  totalDuration: number;
-  canvasSize: { width: number; height: number };
-  backgroundColor: string;
-  steps: WhiteboardStep[];
-  summary: string;
-}
-
 type LessonType = 'diagram' | 'step-by-step' | 'problem-solving' | 'concept-map';
+
+// The progressive protocol renders every lesson on the worker's fixed canvas.
+const CANVAS_WIDTH = 1200;
+const CANVAS_HEIGHT = 800;
+const CANVAS_BACKGROUND = '#ffffff';
 
 // fabric objects created here carry their command id for highlight lookup
 type FabricObjectWithId = fabric.Object & { customId?: string };
@@ -80,9 +75,17 @@ type FabricObjectWithId = fabric.Object & { customId?: string };
 type TextAlign = 'left' | 'center' | 'right' | 'justify' | 'justify-left' | 'justify-center' | 'justify-right';
 
 interface AIWhiteboardTeacherProps {
-  content?: WhiteboardTeachingContent;
+  // Lesson outline (step titles); null until the outline request returns.
+  outline?: string[] | null;
+  // Steps generated so far — steps[i] may be missing while it generates.
+  steps?: WhiteboardStep[];
+  totalSteps?: number;
   isLoading?: boolean;
+  // True while a follow-up step is being generated in the background.
+  stepLoading?: boolean;
   onRequestContent?: (lessonType: LessonType) => void;
+  // Called when the renderer needs a step it doesn't have yet (prefetch).
+  onNeedStep?: (stepIndex: number) => void;
   fallback?: boolean;
   className?: string;
 }
@@ -115,9 +118,13 @@ const LESSON_TYPE_INFO = {
 };
 
 export function AIWhiteboardTeacher({
-  content,
+  outline = null,
+  steps = [],
+  totalSteps = 0,
   isLoading = false,
+  stepLoading = false,
   onRequestContent,
+  onNeedStep,
   fallback = false,
   className,
 }: AIWhiteboardTeacherProps) {
@@ -134,15 +141,19 @@ export function AIWhiteboardTeacher({
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
   const playTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const drawnObjectsRef = useRef<Map<string, fabric.Object>>(new Map());
+  // Guards against re-speaking/re-timing a step when a prefetched future
+  // step lands mid-playback (which changes the `steps` prop identity).
+  const spokenStepRef = useRef(-1);
+  const stepStartedAtRef = useRef(Date.now());
 
   // Initialize canvas
   useEffect(() => {
     if (!canvasRef.current || fabricRef.current) return;
 
     const canvas = new fabric.Canvas(canvasRef.current, {
-      width: content?.canvasSize.width || 1200,
-      height: content?.canvasSize.height || 800,
-      backgroundColor: content?.backgroundColor || '#ffffff',
+      width: CANVAS_WIDTH,
+      height: CANVAS_HEIGHT,
+      backgroundColor: CANVAS_BACKGROUND,
       selection: false,
       renderOnAddRemove: true,
     });
@@ -153,25 +164,25 @@ export function AIWhiteboardTeacher({
       canvas.dispose();
       fabricRef.current = null;
     };
-  }, [content?.canvasSize, content?.backgroundColor]);
+  }, []);
 
   // Resize canvas to fit container
   useEffect(() => {
     const handleResize = () => {
-      if (!containerRef.current || !fabricRef.current || !content) return;
+      if (!containerRef.current || !fabricRef.current) return;
 
       const container = containerRef.current;
       const containerWidth = container.clientWidth;
       const containerHeight = container.clientHeight - 120; // Leave room for controls
 
-      const scaleX = containerWidth / content.canvasSize.width;
-      const scaleY = containerHeight / content.canvasSize.height;
+      const scaleX = containerWidth / CANVAS_WIDTH;
+      const scaleY = containerHeight / CANVAS_HEIGHT;
       const scale = Math.min(scaleX, scaleY, 1);
 
       fabricRef.current.setZoom(scale);
       fabricRef.current.setDimensions({
-        width: content.canvasSize.width * scale,
-        height: content.canvasSize.height * scale,
+        width: CANVAS_WIDTH * scale,
+        height: CANVAS_HEIGHT * scale,
       });
       fabricRef.current.renderAll();
     };
@@ -179,7 +190,7 @@ export function AIWhiteboardTeacher({
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [content]);
+  }, []);
 
   // Create fabric object from command
   const createObject = useCallback((command: WhiteboardDrawCommand): fabric.Object | null => {
@@ -308,7 +319,7 @@ export function AIWhiteboardTeacher({
   }, []);
 
   // Apply a step's highlight glow, clearing highlights from other objects.
-  const applyHighlights = (step: WhiteboardStep) => {
+  const applyHighlights = useCallback((step: WhiteboardStep) => {
     const canvas = fabricRef.current;
     if (!canvas) return;
     canvas.getObjects().forEach((obj: fabric.Object) => {
@@ -324,20 +335,21 @@ export function AIWhiteboardTeacher({
         obj.set('shadow', null);
       }
     });
-  };
+  }, []);
 
-  // Draw a step — idempotent: each command id is added at most once.
-  const drawStep = (stepIndex: number) => {
-    if (!fabricRef.current || !content) return;
+  // Draw a step — idempotent: each command id is added at most once. The
+  // server prefixes ids per step, so ids never collide across steps.
+  const drawStep = useCallback((stepIndex: number) => {
+    if (!fabricRef.current) return;
 
-    const step = content.steps[stepIndex];
+    const step = steps[stepIndex];
     if (!step) return;
 
     const canvas = fabricRef.current;
 
     if (step.clearPrevious) {
       canvas.clear();
-      canvas.backgroundColor = content.backgroundColor;
+      canvas.backgroundColor = CANVAS_BACKGROUND;
       drawnObjectsRef.current = new Map();
     }
 
@@ -352,7 +364,7 @@ export function AIWhiteboardTeacher({
 
     applyHighlights(step);
     canvas.renderAll();
-  };
+  }, [steps, createObject, applyHighlights]);
 
   // Speak the voiceover
   const speak = useCallback((text: string) => {
@@ -370,24 +382,31 @@ export function AIWhiteboardTeacher({
     window.speechSynthesis.speak(utterance);
   }, [isMuted]);
 
-  // Go to a specific step
+  // Go to a specific step. Targets beyond the generated steps are requested
+  // via onNeedStep and drawn as soon as they arrive.
   const goToStep = useCallback((stepIndex: number) => {
-    if (!content) return;
+    if (totalSteps <= 0) return;
 
-    const clampedIndex = Math.max(0, Math.min(stepIndex, content.steps.length - 1));
+    const clampedIndex = Math.max(0, Math.min(stepIndex, totalSteps - 1));
+    if (clampedIndex >= steps.length) {
+      onNeedStep?.(clampedIndex);
+    }
     setCurrentStep(clampedIndex);
+    stepStartedAtRef.current = Date.now();
 
-    // Clear and redraw all steps up to this one
-    if (fabricRef.current) {
+    // Clear and redraw all generated steps up to this one
+    const lastDrawable = Math.min(clampedIndex, steps.length - 1);
+    if (fabricRef.current && lastDrawable >= 0) {
       fabricRef.current.clear();
-      fabricRef.current.backgroundColor = content.backgroundColor;
+      fabricRef.current.backgroundColor = CANVAS_BACKGROUND;
       drawnObjectsRef.current = new Map();
 
-      for (let i = 0; i <= clampedIndex; i++) {
-        const step = content.steps[i];
-        if (step.clearPrevious && i < clampedIndex) {
+      for (let i = 0; i <= lastDrawable; i++) {
+        const step = steps[i];
+        if (!step) continue;
+        if (step.clearPrevious && i < lastDrawable) {
           fabricRef.current.clear();
-          fabricRef.current.backgroundColor = content.backgroundColor;
+          fabricRef.current.backgroundColor = CANVAS_BACKGROUND;
           drawnObjectsRef.current = new Map();
         }
         step.commands.forEach((command) => {
@@ -398,29 +417,29 @@ export function AIWhiteboardTeacher({
           }
         });
       }
-      applyHighlights(content.steps[clampedIndex]);
+      applyHighlights(steps[lastDrawable]);
       fabricRef.current.renderAll();
     }
 
     // Speak current step
-    const step = content.steps[clampedIndex];
+    const step = steps[clampedIndex];
     if (step?.voiceOver) {
+      spokenStepRef.current = clampedIndex;
       speak(step.voiceOver);
     }
 
     // Update progress
-    setProgress(((clampedIndex + 1) / content.steps.length) * 100);
-  }, [content, createObject, speak]);
+    setProgress(((clampedIndex + 1) / totalSteps) * 100);
+  }, [steps, totalSteps, createObject, applyHighlights, speak, onNeedStep]);
 
   // Play animation
   const play = useCallback(() => {
-    if (!content || currentStep >= content.steps.length - 1) {
-      if (currentStep >= content!.steps.length - 1) {
-        goToStep(0);
-      }
+    if (totalSteps === 0) return;
+    if (currentStep >= totalSteps - 1) {
+      goToStep(0);
     }
     setIsPlaying(true);
-  }, [content, currentStep, goToStep]);
+  }, [totalSteps, currentStep, goToStep]);
 
   // Pause animation
   const pause = useCallback(() => {
@@ -433,38 +452,64 @@ export function AIWhiteboardTeacher({
     }
   }, []);
 
-  // Auto-advance steps when playing. Deps are stable primitives only —
-  // drawStep is called imperatively so re-renders never cancel the timer.
+  // Draw the current step whenever it is (or becomes) available. Idempotent,
+  // so prefetched steps landing mid-playback cause no visual churn.
   useEffect(() => {
-    if (!isPlaying || !content) return;
+    const step = steps[currentStep];
+    if (!step) return;
+    drawStep(currentStep);
+    if (isPlaying && step.voiceOver && spokenStepRef.current !== currentStep) {
+      spokenStepRef.current = currentStep;
+      speak(step.voiceOver);
+    }
+  }, [isPlaying, currentStep, steps, drawStep, speak]);
 
-    const step = content.steps[currentStep];
+  // Auto-advance steps when playing. The remaining time is computed from
+  // when the step started, so a prefetched step arriving mid-playback does
+  // not restart the current step's timer.
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const step = steps[currentStep];
     if (!step) {
-      setIsPlaying(false);
+      // Waiting for this step to be generated.
+      if (currentStep < totalSteps) onNeedStep?.(currentStep);
       return;
     }
 
-    drawStep(currentStep);
-    if (step.voiceOver) {
-      speak(step.voiceOver);
-    }
+    const elapsed = Date.now() - stepStartedAtRef.current;
+    const remaining = Math.max(0, step.duration * 1000 - elapsed);
 
     playTimeoutRef.current = setTimeout(() => {
-      if (currentStep < content.steps.length - 1) {
-        setCurrentStep((prev) => prev + 1);
-        setProgress(((currentStep + 2) / content.steps.length) * 100);
+      if (currentStep < totalSteps - 1) {
+        const next = currentStep + 1;
+        if (next < steps.length) {
+          stepStartedAtRef.current = Date.now();
+          setCurrentStep(next);
+          setProgress(((next + 1) / totalSteps) * 100);
+        } else {
+          // Next step not ready yet — request it; when it lands this
+          // effect re-runs (steps changed) and advances.
+          onNeedStep?.(next);
+        }
       } else {
         setIsPlaying(false);
       }
-    }, step.duration * 1000);
+    }, remaining);
 
     return () => {
       if (playTimeoutRef.current) {
         clearTimeout(playTimeoutRef.current);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, currentStep, content, speak]);
+  }, [isPlaying, currentStep, steps, totalSteps, onNeedStep]);
+
+  // Client-driven prefetch: always keep the next step in flight.
+  useEffect(() => {
+    if (steps.length > 0 && steps.length < totalSteps) {
+      onNeedStep?.(steps.length);
+    }
+  }, [steps.length, totalSteps, onNeedStep]);
 
   // Cancel speech and timers on unmount (e.g. toggling back to Chat mid-sentence)
   useEffect(() => {
@@ -473,15 +518,6 @@ export function AIWhiteboardTeacher({
       if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
     };
   }, []);
-
-  // Apply content canvas size/background when content arrives after mount
-  useEffect(() => {
-    const canvas = fabricRef.current;
-    if (!canvas || !content) return;
-    canvas.backgroundColor = content.backgroundColor;
-    canvas.setDimensions({ width: content.canvasSize.width, height: content.canvasSize.height });
-    canvas.renderAll();
-  }, [content]);
 
   // Toggle fullscreen
   const toggleFullscreen = useCallback(() => {
@@ -501,15 +537,23 @@ export function AIWhiteboardTeacher({
     goToStep(0);
   }, [pause, goToStep]);
 
-  // Initial draw when content changes
+  // A new outline means a new lesson — restart from step 0. Steps arriving
+  // for the CURRENT outline must not reset playback.
   useEffect(() => {
-    if (content && content.steps.length > 0) {
+    if (outline && steps.length > 0) {
+      spokenStepRef.current = -1;
       goToStep(0);
     }
-  }, [content]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outline]);
+
+  const hasContent = steps.length > 0;
+  const step = steps[currentStep];
+  // Honest partial-lesson state: the step the user is on hasn't arrived yet.
+  const waitingForStep = hasContent && (!step || stepLoading);
 
   // Show lesson type selector if no content
-  if (!content && !isLoading) {
+  if (!hasContent && !isLoading) {
     return (
       <div className={cn('flex flex-col items-center justify-center p-8', className)}>
         <div className="text-center mb-8">
@@ -562,8 +606,6 @@ export function AIWhiteboardTeacher({
     );
   }
 
-  const step = content?.steps[currentStep];
-
   return (
     <div
       ref={containerRef}
@@ -578,8 +620,8 @@ export function AIWhiteboardTeacher({
         <div className="flex items-center gap-3">
           <Sparkles className="w-5 h-5" />
           <div>
-            <h3 className="font-semibold">{content?.title}</h3>
-            <p className="text-sm text-violet-200">Step {currentStep + 1} of {content?.steps.length}</p>
+            <h3 className="font-semibold">{outline?.[currentStep] || 'AI Whiteboard Lesson'}</h3>
+            <p className="text-sm text-violet-200">Step {currentStep + 1} of {totalSteps}</p>
           </div>
         </div>
         <button
@@ -599,14 +641,22 @@ export function AIWhiteboardTeacher({
       )}
 
       {/* Canvas area */}
-      <div className="flex-1 flex items-center justify-center bg-gray-100 dark:bg-gray-800 p-4 overflow-hidden">
+      <div className="relative flex-1 flex items-center justify-center bg-gray-100 dark:bg-gray-800 p-4 overflow-hidden">
         <canvas ref={canvasRef} className="shadow-lg rounded-lg" />
+        {waitingForStep && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white/90 dark:bg-gray-900/90 rounded-full shadow-lg">
+              <div className="w-4 h-4 rounded-full border-2 border-violet-200 dark:border-violet-900 border-t-violet-500 animate-spin" />
+              <span className="text-sm text-gray-600 dark:text-gray-300">Preparing next step…</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Explanation panel */}
       <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
         <p className="text-gray-700 dark:text-gray-300 text-sm min-h-[2.5rem]">
-          {step?.explanation || 'Loading...'}
+          {step?.explanation || (waitingForStep ? 'Preparing next step…' : 'Loading...')}
         </p>
       </div>
 
@@ -663,7 +713,7 @@ export function AIWhiteboardTeacher({
 
           <button
             onClick={() => goToStep(currentStep + 1)}
-            disabled={currentStep >= (content?.steps.length || 1) - 1}
+            disabled={currentStep >= totalSteps - 1}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -679,23 +729,15 @@ export function AIWhiteboardTeacher({
             <SkipBack className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </button>
           <button
-            onClick={() => goToStep((content?.steps.length || 1) - 1)}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            onClick={() => goToStep(steps.length - 1)}
+            disabled={steps.length <= 1}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             title="Go to end"
           >
             <SkipForward className="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </button>
         </div>
       </div>
-
-      {/* Summary (shown at end) */}
-      {currentStep === (content?.steps.length || 1) - 1 && !isPlaying && content?.summary && (
-        <div className="px-4 py-3 bg-violet-50 dark:bg-violet-900/20 border-t border-violet-200 dark:border-violet-800">
-          <p className="text-sm text-violet-700 dark:text-violet-300">
-            <strong>Summary:</strong> {content.summary}
-          </p>
-        </div>
-      )}
     </div>
   );
 }
