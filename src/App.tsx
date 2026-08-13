@@ -1,11 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, useState } from 'react';
 import { Layout } from '@/components/layout';
 import { useAuthStore } from '@/stores';
 import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/guide';
 import { ToastContainer } from '@/components/toast';
 import { PageLoader, ErrorBoundary } from '@/components/common';
-import { GoogleSignInButton } from '@/components/auth';
 import { SplashScreen } from '@/components/SplashScreen';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
 
@@ -128,52 +127,20 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// Login Page (placeholder)
+// Login Page - Redirects to the landing page with the full auth modal
+// (email/password + Google). Previously this was a placeholder offering
+// only a Google button — a dead end for credential users, made worse by
+// ProtectedRoute and the 401 handler both sending users here.
 function LoginPage() {
-  const { isLoading, error, isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
 
   // Redirect if already authenticated
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  return (
-    <main className="min-h-screen flex items-center justify-center bg-neutral-50">
-      <div className="max-w-md w-full p-8 bg-white rounded-xl shadow-card">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-ghana flex items-center justify-center">
-            <span className="text-white font-bold text-2xl">B</span>
-          </div>
-          <h1 className="text-2xl font-display font-bold text-neutral-900">Welcome to Brilla</h1>
-          <p className="text-neutral-500">Sign in to continue training</p>
-        </div>
-
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
-
-        {/* Google Sign-In */}
-        <div className="mb-6">
-          <GoogleSignInButton
-            mode="login"
-            onError={(err) => console.error('Google login error:', err)}
-            disabled={isLoading}
-          />
-        </div>
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-neutral-500">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-primary underline hover:no-underline">
-              Sign up
-            </Link>
-          </p>
-        </div>
-      </div>
-    </main>
-  );
+  const ref = new URLSearchParams(window.location.search).get('ref');
+  return <Navigate to={`/?login=true${ref ? `&ref=${encodeURIComponent(ref)}` : ''}`} replace />;
 }
 
 // Register Page - Redirects to landing page with registration modal
