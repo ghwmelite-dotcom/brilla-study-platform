@@ -27,7 +27,8 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useAuthStore, type ManagedUser, type UserSubscriptionDetails } from '@/stores/authStore';
-import { AddUserModal, EditUserModal, AdminCard, AdminButton, AdminModal, AdminInput } from '@/components/admin';
+import { api } from '@/lib/api';
+import { AddUserModal, EditUserModal, AdminCard, AdminButton, AdminModal, AdminInput, AdminSelect } from '@/components/admin';
 import { cn } from '@/utils';
 
 type RoleFilter = 'all' | 'student' | 'teacher' | 'admin';
@@ -45,6 +46,7 @@ export default function UserManagement() {
     extendUserTrial,
     addUserCredits,
     getUserSubscriptionDetails,
+    setUserTier,
   } = useAuthStore();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,6 +67,9 @@ export default function UserManagement() {
   const [extendDays, setExtendDays] = useState('7');
   const [addCreditsAmount, setAddCreditsAmount] = useState('10');
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [selectedTierId, setSelectedTierId] = useState('tier_student_monthly');
+  const [tierDuration, setTierDuration] = useState('30');
+  const [availableTiers, setAvailableTiers] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
     loadAllUsers();
@@ -141,6 +146,17 @@ export default function UserManagement() {
     setAddCreditsAmount('10');
     setOpenDropdown(null);
 
+    // Load tier options for the Set Tier section (data is a plain array)
+    api.get<{ id: string; name: string }[]>('/subscriptions/plans')
+      .then((r) => {
+        const list = Array.isArray(r.data) ? r.data : [];
+        setAvailableTiers(list.map((t) => ({ id: t.id, name: t.name })));
+        if (list.length > 0 && !list.some((t) => t.id === selectedTierId)) {
+          setSelectedTierId(list[0].id);
+        }
+      })
+      .catch(() => setAvailableTiers([]));
+
     try {
       const details = await getUserSubscriptionDetails(u.id);
       setSubscriptionDetails(details);
@@ -186,6 +202,26 @@ export default function UserManagement() {
       setTimeout(() => setActionSuccess(null), 3000);
     } catch (error) {
       console.error('Failed to add credits:', error);
+    } finally {
+      setSubscriptionLoading(false);
+    }
+  };
+
+  const handleSetTier = async () => {
+    if (!subscriptionUser) return;
+    const days = parseInt(tierDuration);
+    if (isNaN(days) || days < 1 || days > 3650) return;
+
+    setSubscriptionLoading(true);
+    try {
+      const result = await setUserTier(subscriptionUser.id, selectedTierId, days);
+      setActionSuccess(`Tier set to ${result.tierName} (${days} days)!`);
+      // Refresh subscription details
+      const details = await getUserSubscriptionDetails(subscriptionUser.id);
+      setSubscriptionDetails(details);
+      setTimeout(() => setActionSuccess(null), 3000);
+    } catch (error) {
+      console.error('Failed to set tier:', error);
     } finally {
       setSubscriptionLoading(false);
     }
@@ -766,6 +802,47 @@ export default function UserManagement() {
                   </div>
                   <p className="text-xs text-admin-text-muted mt-2">
                     Enter 1-1000 credits to add
+                  </p>
+                </div>
+
+                {/* Set Subscription Tier */}
+                <div className="p-4 bg-admin-bg rounded-lg border border-admin-border md:col-span-2">
+                  <h4 className="font-medium text-admin-text mb-3 flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-admin-accent-purple" />
+                    Set Subscription Tier
+                  </h4>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="flex-1">
+                      <AdminSelect
+                        value={selectedTierId}
+                        onChange={(e) => setSelectedTierId(e.target.value)}
+                        options={availableTiers.map((t) => ({ value: t.id, label: t.name }))}
+                      />
+                    </div>
+                    <div className="sm:w-48">
+                      <AdminSelect
+                        value={tierDuration}
+                        onChange={(e) => setTierDuration(e.target.value)}
+                        options={[
+                          { value: '30', label: '30 days' },
+                          { value: '90', label: '90 days' },
+                          { value: '365', label: '365 days' },
+                          { value: '3650', label: 'Comp — 10 years' },
+                        ]}
+                      />
+                    </div>
+                    <AdminButton
+                      variant="primary"
+                      onClick={handleSetTier}
+                      disabled={subscriptionLoading || availableTiers.length === 0}
+                      isLoading={subscriptionLoading}
+                      leftIcon={<CheckCircle2 className="w-4 h-4" />}
+                    >
+                      Apply Tier
+                    </AdminButton>
+                  </div>
+                  <p className="text-xs text-admin-text-muted mt-2">
+                    Sets the user's tier and expiry; AI grading credits top up to the tier quota
                   </p>
                 </div>
               </div>

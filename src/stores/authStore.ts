@@ -122,6 +122,7 @@ interface AuthState {
   extendUserTrial: (userId: string, days: number) => Promise<{ newExpiryDate: string; daysAdded: number }>;
   addUserCredits: (userId: string, credits: number) => Promise<{ newTotal: number; creditsAdded: number }>;
   getUserSubscriptionDetails: (userId: string) => Promise<UserSubscriptionDetails | null>;
+  setUserTier: (userId: string, tierId: string, durationDays: number) => Promise<{ tierName: string; expiresAt: string; creditsAdded: number }>;
 }
 
 // User subscription details for admin view
@@ -851,6 +852,28 @@ export const useAuthStore = create<AuthState>()(
           };
         } catch (error) {
           throw error instanceof Error ? error : new Error('Failed to add credits');
+        }
+      },
+
+      setUserTier: async (userId: string, tierId: string, durationDays: number) => {
+        const { user } = get();
+        if (!user || user.role !== 'admin') {
+          throw new Error('Only admins can set subscription tiers');
+        }
+
+        try {
+          const response = await api.post<{ tierName: string; expiresAt: string; creditsAdded: number }>(
+            `/admin/users/${userId}/set-tier`,
+            { tierId, durationDays }
+          );
+
+          if (!response.success || !response.data) {
+            throw new Error(response.error || 'Failed to set subscription tier');
+          }
+
+          return response.data;
+        } catch (error) {
+          throw error instanceof Error ? error : new Error('Failed to set subscription tier');
         }
       },
 
