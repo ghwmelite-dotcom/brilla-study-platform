@@ -77,6 +77,7 @@ interface AIWhiteboardTeacherProps {
   content?: WhiteboardTeachingContent;
   isLoading?: boolean;
   onRequestContent?: (lessonType: LessonType) => void;
+  fallback?: boolean;
   className?: string;
 }
 
@@ -111,6 +112,7 @@ export function AIWhiteboardTeacher({
   content,
   isLoading = false,
   onRequestContent,
+  fallback = false,
   className,
 }: AIWhiteboardTeacherProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -562,6 +564,14 @@ export function AIWhiteboardTeacher({
           {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
         </button>
       </div>
+
+      {fallback && (
+        <div className="px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800">
+          <p className="text-xs text-amber-700 dark:text-amber-300">
+            Custom visual unavailable for this lesson — showing a generic overview instead.
+          </p>
+        </div>
+      )}
 
       {/* Canvas area */}
       <div className="flex-1 flex items-center justify-center bg-gray-100 dark:bg-gray-800 p-4 overflow-hidden">

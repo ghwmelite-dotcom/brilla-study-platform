@@ -33,6 +33,7 @@ import {
   Flame,
   Star,
   Timer,
+  Lock,
 } from 'lucide-react';
 import { AIWhiteboardTeacher } from '@/components/whiteboard/AIWhiteboardTeacher';
 import { VoiceConversation } from '@/components/voice/VoiceConversation';
@@ -42,6 +43,7 @@ import {
   useRevisionClassroomStore,
 } from '@/stores';
 import type { ExamTypeSlug } from '@/types';
+import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { subjects as examSubjects, examTypes } from '@/data/examData';
 import type { TeachingPhase } from '@/stores/revisionClassroomStore';
 
@@ -532,6 +534,10 @@ export default function RevisionClassroom() {
     whiteboardContent,
     isWhiteboardLoading,
     whiteboardMode,
+    whiteboardLocked,
+    whiteboardFallback,
+    aiLimitReached,
+    freeAiRemaining,
     isLoading,
     error,
     stats,
@@ -557,6 +563,22 @@ export default function RevisionClassroom() {
     acceptHandoffSuggestion,
     declineHandoffSuggestion,
   } = useRevisionClassroomStore();
+
+  const { getFeatureAccess } = useSubscriptionStore();
+  const [whiteboardAllowed, setWhiteboardAllowed] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    getFeatureAccess().then((access) => {
+      setWhiteboardAllowed(access.features.whiteboard === true);
+    });
+  }, [user, getFeatureAccess]);
+
+  // Badge shows whenever access is not positively confirmed (incl. loading);
+  // the upgrade card only renders once we know the feature is denied or locked,
+  // so the whiteboard never flashes a paywall while entitlements load.
+  const whiteboardAccessible = whiteboardAllowed === true && !whiteboardLocked;
+  const showWhiteboardUpgradeCard = whiteboardAllowed === false || whiteboardLocked;
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showSubjectSelector, setShowSubjectSelector] = useState(!currentSession);
@@ -1062,6 +1084,12 @@ export default function RevisionClassroom() {
               <span className="text-neutral-600">{currentSession.lessonsCompleted}/{currentSession.totalLessons} lessons</span>
             </div>
 
+            {freeAiRemaining !== null && freeAiRemaining >= 0 && (
+              <span className="hidden md:inline text-xs text-neutral-500 bg-neutral-100 px-2 py-1 rounded-full">
+                {freeAiRemaining} free explanations left today
+              </span>
+            )}
+
             {/* Mode toggle */}
             <div className="flex items-center gap-1 bg-neutral-100 p-1 rounded-lg">
               <button
@@ -1085,6 +1113,7 @@ export default function RevisionClassroom() {
               >
                 <Presentation className="w-4 h-4" />
                 <span className="hidden sm:inline">Whiteboard</span>
+                {!whiteboardAccessible && <Lock className="w-3 h-3 text-amber-500" />}
               </button>
             </div>
 
@@ -1146,20 +1175,64 @@ export default function RevisionClassroom() {
         <div className="flex-1 bg-white rounded-xl border border-neutral-200 overflow-hidden" style={{ height: 'calc(100vh - 140px)' }}>
           {currentLesson ? (
             whiteboardMode ? (
-              <AIWhiteboardTeacher
-                content={whiteboardContent || undefined}
-                isLoading={isWhiteboardLoading}
-                onRequestContent={requestWhiteboardTeaching}
-                className="h-full"
-              />
+              showWhiteboardUpgradeCard ? (
+                <div className="flex flex-col items-center justify-center h-full text-center p-8">
+                  <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4">
+                    <Presentation className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-neutral-900 mb-2">AI Whiteboard Teacher</h3>
+                  <p className="text-neutral-600 max-w-md mb-6">
+                    Watch the AI teacher draw diagrams, worked examples and concept maps while
+                    explaining your topic — a premium feature.
+                  </p>
+                  <div className="grid grid-cols-2 gap-3 w-full max-w-md mb-6 opacity-50 pointer-events-none" aria-hidden="true">
+                    {['Labeled Diagram', 'Step-by-Step', 'Worked Example', 'Concept Map'].map((name) => (
+                      <div key={name} className="flex items-center justify-center gap-2 p-3 rounded-xl bg-neutral-100 text-neutral-500 text-sm font-medium">
+                        <Lock className="w-4 h-4" /> {name}
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => navigate('/pricing')}
+                    className="px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-medium hover:from-violet-700 hover:to-purple-700 transition-all shadow-lg"
+                  >
+                    Upgrade to unlock
+                  </button>
+                </div>
+              ) : (
+                <AIWhiteboardTeacher
+                  content={whiteboardContent || undefined}
+                  isLoading={isWhiteboardLoading}
+                  onRequestContent={requestWhiteboardTeaching}
+                  fallback={whiteboardFallback}
+                  className="h-full"
+                />
+              )
             ) : (
-              <AITeachingDisplay
-                aiState={aiTeachingState}
-                messages={aiMessages}
-                onRespond={handleCheckpointResponse}
-                onAskQuestion={askQuestion}
-                onContinue={handleContinue}
-              />
+              <div className="flex flex-col h-full">
+                {aiLimitReached && (
+                  <div className="p-4 bg-amber-50 border-b border-amber-200 flex items-center justify-between gap-3">
+                    <p className="text-sm text-amber-800">
+                      You've used today's 10 free AI explanations. Upgrade for unlimited, or come back tomorrow.
+                    </p>
+                    <button
+                      onClick={() => navigate('/pricing')}
+                      className="text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 px-3 py-1.5 rounded-lg"
+                    >
+                      Upgrade
+                    </button>
+                  </div>
+                )}
+                <div className="flex-1 min-h-0">
+                  <AITeachingDisplay
+                    aiState={aiTeachingState}
+                    messages={aiMessages}
+                    onRespond={handleCheckpointResponse}
+                    onAskQuestion={askQuestion}
+                    onContinue={handleContinue}
+                  />
+                </div>
+              </div>
             )
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center p-8">
