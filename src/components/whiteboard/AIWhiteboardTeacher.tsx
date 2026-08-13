@@ -231,28 +231,6 @@ export function AIWhiteboardTeacher({
     return true;
   }, [syncOverlay]);
 
-  // Initialize canvas
-  useEffect(() => {
-    if (!canvasRef.current || fabricRef.current) return;
-
-    const canvas = new fabric.Canvas(canvasRef.current, {
-      width: CANVAS_WIDTH,
-      height: CANVAS_HEIGHT,
-      backgroundColor: CANVAS_BACKGROUND,
-      selection: false,
-      renderOnAddRemove: true,
-    });
-
-    fabricRef.current = canvas;
-    canvas.on('after:render', syncOverlay);
-
-    return () => {
-      canvas.off('after:render', syncOverlay);
-      canvas.dispose();
-      fabricRef.current = null;
-    };
-  }, [syncOverlay]);
-
   // Fit the canvas to the container (zoom + dimensions). renderAll triggers
   // 'after:render', which re-syncs the math overlay positions.
   const reflowCanvas = useCallback(() => {
@@ -272,6 +250,42 @@ export function AIWhiteboardTeacher({
       height: CANVAS_HEIGHT * scale,
     });
     fabricRef.current.renderAll();
+  }, []);
+
+  // Initialize (or re-bind) the fabric canvas. The canvas element only exists
+  // once a lesson has content — the selector and loading views return different
+  // JSX — so this effect MUST re-run when content arrives; a mount-only effect
+  // returns early on the selector view and leaves fabricRef null forever.
+  useEffect(() => {
+    const el = canvasRef.current;
+    const existing = fabricRef.current;
+    if (existing) {
+      if (!el || existing.getElement() === el) return;
+      // A view switch replaced the canvas element — re-bind to the live one.
+      existing.dispose();
+      fabricRef.current = null;
+    }
+    if (!el) return;
+
+    const canvas = new fabric.Canvas(el, {
+      width: CANVAS_WIDTH,
+      height: CANVAS_HEIGHT,
+      backgroundColor: CANVAS_BACKGROUND,
+      selection: false,
+      renderOnAddRemove: true,
+    });
+
+    fabricRef.current = canvas;
+    canvas.on('after:render', syncOverlay);
+    reflowCanvas();
+  }, [syncOverlay, reflowCanvas, steps.length, isLoading]);
+
+  // Dispose only on unmount — the re-runs above must never wipe the canvas.
+  useEffect(() => {
+    return () => {
+      fabricRef.current?.dispose();
+      fabricRef.current = null;
+    };
   }, []);
 
   // Resize canvas to fit container
