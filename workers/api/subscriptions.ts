@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
 import type { AuthPayload } from './auth-middleware';
-import { DAILY_QUESTION_LIMIT, CORE_SUBJECTS } from './usage-limits';
+import { DAILY_QUESTION_LIMIT, DAILY_AI_INTERACTION_LIMIT, CORE_SUBJECTS } from './usage-limits';
 import { awardPoints } from './points';
 import { getDemoDataFlags } from './demoUtils';
 
@@ -580,6 +580,10 @@ subscriptionsApp.get('/features', async (c) => {
       coreSubjectsOnly: !hasAccess, // Free users can only access core subjects
       allSubjects: hasAccess, // Premium users can access all subjects
       coreSubjectsList: CORE_SUBJECTS, // List of core subjects per exam type
+
+      // AI revision classroom
+      whiteboard: hasAccess, // AI whiteboard is premium-only
+      dailyAiLimit: hasAccess ? -1 : DAILY_AI_INTERACTION_LIMIT, // free chat allowance per day
 
       // Existing features
       aiGrading: hasAccess,
