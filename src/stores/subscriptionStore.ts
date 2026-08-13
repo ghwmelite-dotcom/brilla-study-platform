@@ -35,7 +35,11 @@ interface SubscriptionState {
     isSubscribed: boolean;
     isTrial: boolean;
     hasAccess: boolean;
-    features: Record<string, boolean | number>;
+    isPremium?: boolean;
+    features: Record<string, boolean | number> & {
+      whiteboard?: boolean;
+      dailyAiLimit?: number;
+    };
   }>;
   reset: () => void;
 }

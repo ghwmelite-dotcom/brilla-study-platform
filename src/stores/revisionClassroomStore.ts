@@ -185,6 +185,12 @@ interface RevisionClassroomState {
   isWhiteboardLoading: boolean;
   whiteboardMode: boolean;
 
+  // Entitlement / usage-limit state (session-only; not persisted)
+  whiteboardLocked: boolean;
+  whiteboardFallback: boolean;
+  aiLimitReached: boolean;
+  freeAiRemaining: number | null; // -1 = unlimited; null = unknown
+
   // Tutor Integration
   tutorPresence: {
     isConnected: boolean;
@@ -425,6 +431,10 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
       whiteboardContent: null,
       isWhiteboardLoading: false,
       whiteboardMode: false,
+      whiteboardLocked: false,
+      whiteboardFallback: false,
+      aiLimitReached: false,
+      freeAiRemaining: null,
       tutorPresence: null,
       struggleSignals: {
         consecutiveWrongAnswers: 0,
@@ -831,10 +841,21 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
           });
 
           if (!response.success || !response.data) {
+            if ((response as { aiLimitReached?: boolean }).aiLimitReached) {
+              set({
+                aiLimitReached: true,
+                freeAiRemaining: 0,
+                aiTeachingState: { ...get().aiTeachingState, isThinking: false, isTeaching: false },
+              });
+              return;
+            }
             throw new Error(response.error || 'Failed to get AI response');
           }
 
           const content = response.data.content;
+
+          const remainingTeach = (response.data as { remainingFreeToday?: number }).remainingFreeToday;
+          if (remainingTeach !== undefined) set({ freeAiRemaining: remainingTeach });
 
           const message: RevisionAIMessage = {
             id: response.data.interactionId || generateLocalId('msg'),
@@ -986,10 +1007,21 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
           });
 
           if (!apiResponse.success || !apiResponse.data) {
+            if ((apiResponse as { aiLimitReached?: boolean }).aiLimitReached) {
+              set({
+                aiLimitReached: true,
+                freeAiRemaining: 0,
+                aiTeachingState: { ...get().aiTeachingState, isThinking: false, isTeaching: false },
+              });
+              return;
+            }
             throw new Error(apiResponse.error || 'Failed to get AI response');
           }
 
           const answer = apiResponse.data.answer;
+
+          const remainingAsk = (apiResponse.data as { remainingFreeToday?: number }).remainingFreeToday;
+          if (remainingAsk !== undefined) set({ freeAiRemaining: remainingAsk });
 
           const aiMessage: RevisionAIMessage = {
             id: apiResponse.data.interactionId || generateLocalId('msg'),
@@ -1062,11 +1094,16 @@ Does this help? Feel free to ask more questions!`;
           });
 
           if (!response.success || !response.data) {
+            if ((response as { upgradeRequired?: boolean }).upgradeRequired) {
+              set({ whiteboardLocked: true, isWhiteboardLoading: false });
+              return;
+            }
             throw new Error(response.error || 'Failed to generate whiteboard content');
           }
 
           set({
             whiteboardContent: response.data.whiteboardContent,
+            whiteboardFallback: (response.data as { fallback?: boolean }).fallback === true,
             isWhiteboardLoading: false,
           });
         } catch (error) {
