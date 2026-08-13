@@ -42,6 +42,14 @@ const ACCOUNTS = [
     forbidden: ['/admin/users', '/parents/students', '/admin/dashboard/stats'],
     selfScopedEmpty: [],
   },
+  {
+    role: 'parent',
+    email: 'kwamedoe@gmail.com',
+    password: 'Parent123!',
+    allowed: ['/parents/students', '/parents/notifications', '/parents/preferences'],
+    forbidden: ['/admin/users', '/admin/dashboard/stats'],
+    selfScopedEmpty: [],
+  },
 ];
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
@@ -74,6 +82,7 @@ async function run() {
   });
 
   const results = [];
+  const tokens = {};
   let pass = 0, fail = 0;
   const record = (name, ok, detail = '') => {
     results.push({ name, ok, detail });
@@ -171,6 +180,7 @@ async function run() {
       await page.screenshot({ path: path.join(OUT, `${acct.role}-dashboard.png`), fullPage: false });
 
       const token = await page.evaluate(() => localStorage.getItem('brilla_token'));
+      tokens[acct.role] = token;
 
       // API role matrix
       for (const ep of acct.allowed) {
@@ -215,6 +225,39 @@ async function run() {
   }
 
   await browser.close();
+
+  // ── Parent↔Student invite-link flow (pure API, uses both tokens) ──
+  if (tokens.student && tokens.parent) {
+    console.log('\n=== PARENT LINK FLOW (student invite → parent redeem) ===');
+    const post = async (ep, tk, body) => {
+      const res = await fetch(`${API}${ep}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${tk}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      let j = null; try { j = await res.json(); } catch { /* */ }
+      return { status: res.status, body: j };
+    };
+
+    const inv = await post('/students/parent-invite', tokens.student, {});
+    const code = inv.body?.data?.code;
+    record('student generates parent invite code', inv.status === 200 && !!code, code || `HTTP ${inv.status}`);
+
+    if (code) {
+      const link = await post('/parents/link', tokens.parent, { inviteCode: code });
+      record('parent redeems invite code', link.status === 200 && link.body?.success, `HTTP ${link.status}`);
+
+      const list = await apiGet('/parents/students', tokens.parent);
+      const kids = Array.isArray(list.data) ? list.data : (list.data?.students || []);
+      record('parent sees linked student (John Doe)', kids.length > 0, `${kids.length} linked`);
+    }
+
+    // Negative: student token cannot redeem parent links
+    const badLink = await post('/parents/link', tokens.student, { inviteCode: 'XXXXXX' });
+    record('student token blocked from /parents/link', badLink.status === 403, `HTTP ${badLink.status}`);
+  } else {
+    record('parent link flow', false, 'missing student or parent token');
+  }
 
   console.log(`\n=========================================`);
   console.log(`E2E RESULT: ${pass} passed, ${fail} failed`);

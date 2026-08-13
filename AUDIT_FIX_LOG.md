@@ -226,3 +226,20 @@ Findings:
   (register, admin create, admin update, OAuth register): 'jss'→'jhs',
   'international'→NULL (schema comment: O/A-level students store NULL).
 - 282/282 worker tests green; worker redeployed.
+
+## Parent role live + invite-link flow verified (2026-08-13 ~00:45 UTC)
+
+- Admin panel now offers Parent in user creation (amber option);
+  POST /admin/users whitelists the four canonical roles.
+- P1 fix: POST /students/parent-invite 500'd — the handler inserted
+  parent_id='' (no such user → FK violation). Migration
+  093_parent_links_nullable_parent.sql rebuilt parent_student_links with
+  nullable parent_id (0 rows; proven 092 pattern) and the handler now
+  inserts NULL. schema.sql canonical updated to match.
+- Full E2E (scripts/e2e-roles.cjs) now covers all four roles: student,
+  teacher, parent UI logins + API matrices + the complete parent link
+  flow (student generates invite code → parent redeems → parent sees
+  linked child → student token 403'd from /parents/link). 46/46 green.
+- Test accounts (passwords set directly in D1, email_verified flipped):
+  johndoe@gmail.com (student), janetdoe@gmail.com (teacher),
+  kwamedoe@gmail.com (parent, linked to John Doe).

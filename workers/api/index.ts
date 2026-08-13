@@ -5471,7 +5471,7 @@ protectedApp.post('/students/parent-invite', userAuth, async (c) => {
 
     await c.env.DB.prepare(`
       INSERT INTO parent_student_links (id, parent_id, student_id, invite_code, invite_code_expires_at, status)
-      VALUES (?, '', ?, ?, ?, 'pending')
+      VALUES (?, NULL, ?, ?, ?, 'pending')
     `).bind(id, user.userId, inviteCode, expiresAt).run();
 
     return c.json({

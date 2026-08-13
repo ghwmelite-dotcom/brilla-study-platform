@@ -737,7 +737,9 @@ CREATE TABLE IF NOT EXISTS chat_teacher_assignments (
 -- migration into student_parent_links (out of scope for the reckoning).
 CREATE TABLE IF NOT EXISTS parent_student_links (
     id TEXT PRIMARY KEY,
-    parent_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    -- Nullable: the student generates the invite before any parent exists;
+    -- parent_id is filled in when the parent redeems the code.
+    parent_id TEXT REFERENCES users(id) ON DELETE CASCADE,
     student_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     invite_code TEXT UNIQUE,
     invite_code_expires_at TEXT,
