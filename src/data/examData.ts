@@ -372,7 +372,7 @@ export const subjects: Subject[] = [
     questionCount: 170,
   },
   {
-    id: 'subj_wassce_elective_math',
+    id: 'subj_wassce_elect_math',
     name: 'Elective Mathematics',
     slug: 'elective-mathematics',
     icon: 'Sigma',
@@ -419,7 +419,7 @@ export const subjects: Subject[] = [
     questionCount: 130,
   },
   {
-    id: 'subj_wassce_business_mgt',
+    id: 'subj_wassce_bus_mgmt',
     name: 'Business Management',
     slug: 'business-management',
     icon: 'Briefcase',
@@ -722,7 +722,7 @@ export const subjects: Subject[] = [
     questionCount: 50,
   },
   {
-    id: 'subj_bece_ghanaian_lang',
+    id: 'subj_bece_gh_lang',
     name: 'Ghanaian Language',
     slug: 'ghanaian-language',
     icon: 'MessageCircle',

@@ -1081,8 +1081,8 @@ export const pastPapers: Partial<PastPaper>[] = [
   // =============================================
   // WASSCE Past Papers - Elective Mathematics
   // =============================================
-  { id: 'pp_wassce_emath_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_elective_math', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 40, totalMarks: 40, timeAllowed: 60, isComplete: true },
-  { id: 'pp_wassce_emath_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_elective_math', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 40, totalMarks: 40, timeAllowed: 60, isComplete: true },
+  { id: 'pp_wassce_emath_2024_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_elect_math', paperTypeId: 'paper_wassce_1', year: 2024, month: 'May-June', totalQuestions: 40, totalMarks: 40, timeAllowed: 60, isComplete: true },
+  { id: 'pp_wassce_emath_2023_1', examTypeId: 'exam_wassce', subjectId: 'subj_wassce_elect_math', paperTypeId: 'paper_wassce_1', year: 2023, month: 'May-June', totalQuestions: 40, totalMarks: 40, timeAllowed: 60, isComplete: true },
 
   // =============================================
   // WASSCE Past Papers - Economics (Business)
