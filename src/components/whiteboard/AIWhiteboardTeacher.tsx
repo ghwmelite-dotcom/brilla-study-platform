@@ -19,10 +19,11 @@ import {
   GitBranch,
 } from 'lucide-react';
 import { cn } from '@/utils';
+import { renderPrimitive } from './whiteboardPrimitives';
 
 // Types matching the backend
 interface WhiteboardDrawCommand {
-  type: 'rect' | 'circle' | 'line' | 'arrow' | 'text' | 'path' | 'polygon' | 'group';
+  type: 'rect' | 'circle' | 'line' | 'arrow' | 'text' | 'path' | 'polygon' | 'group' | 'primitive' | 'math';
   id: string;
   props: {
     left?: number;
@@ -48,6 +49,10 @@ interface WhiteboardDrawCommand {
     angle?: number;
     scaleX?: number;
     scaleY?: number;
+    // Primitive / math commands
+    name?: string;
+    params?: Record<string, unknown>;
+    latex?: string;
   };
 }
 
@@ -196,9 +201,24 @@ export function AIWhiteboardTeacher({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Create fabric object from command
-  const createObject = useCallback((command: WhiteboardDrawCommand): fabric.Object | null => {
+  // Create fabric object(s) from command. Most command types produce exactly
+  // one object; a `primitive` command expands into a group of objects via the
+  // primitives engine. Returns an empty array when nothing should be drawn
+  // (unknown/invalid command, or `math` until its renderer lands).
+  const createObject = useCallback((command: WhiteboardDrawCommand): fabric.Object[] => {
     const { type, id, props } = command;
+
+    if (type === 'primitive') {
+      // The first object carries the bare command id so applyHighlights (exact
+      // string match) still lights up the group; the rest get suffixed ids.
+      const objs = renderPrimitive(props.name ?? '', props.params ?? {});
+      objs.forEach((obj, i) => {
+        obj.set('selectable', false);
+        obj.set('evented', false);
+        (obj as FabricObjectWithId).customId = i === 0 ? id : `${id}-p${i}`;
+      });
+      return objs;
+    }
 
     let obj: fabric.Object | null = null;
 
@@ -317,9 +337,10 @@ export function AIWhiteboardTeacher({
       obj.set('selectable', false);
       obj.set('evented', false);
       (obj as FabricObjectWithId).customId = id;
+      return [obj];
     }
 
-    return obj;
+    return [];
   }, []);
 
   // Apply a step's highlight glow, clearing highlights from other objects.
@@ -359,10 +380,10 @@ export function AIWhiteboardTeacher({
 
     step.commands.forEach((command) => {
       if (drawnObjectsRef.current.has(command.id)) return;
-      const obj = createObject(command);
-      if (obj) {
-        canvas.add(obj);
-        drawnObjectsRef.current.set(command.id, obj);
+      const objs = createObject(command);
+      if (objs.length > 0) {
+        objs.forEach((obj) => canvas.add(obj));
+        drawnObjectsRef.current.set(command.id, objs[0]);
       }
     });
 
@@ -414,10 +435,10 @@ export function AIWhiteboardTeacher({
           drawnObjectsRef.current = new Map();
         }
         step.commands.forEach((command) => {
-          const obj = createObject(command);
-          if (obj) {
-            fabricRef.current!.add(obj);
-            drawnObjectsRef.current.set(command.id, obj);
+          const objs = createObject(command);
+          if (objs.length > 0) {
+            objs.forEach((obj) => fabricRef.current!.add(obj));
+            drawnObjectsRef.current.set(command.id, objs[0]);
           }
         });
       }

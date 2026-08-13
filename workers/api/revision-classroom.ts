@@ -1769,7 +1769,7 @@ revisionClassroomApp.get('/stats', async (c) => {
 
 // Types for whiteboard drawing commands
 interface WhiteboardDrawCommand {
-  type: 'rect' | 'circle' | 'line' | 'arrow' | 'text' | 'path' | 'polygon' | 'group';
+  type: 'rect' | 'circle' | 'line' | 'arrow' | 'text' | 'path' | 'polygon' | 'group' | 'primitive' | 'math';
   id: string;
   props: {
     // Position
@@ -1803,6 +1803,11 @@ interface WhiteboardDrawCommand {
     angle?: number;
     scaleX?: number;
     scaleY?: number;
+    // Primitive commands: renderPrimitive(name, params) on the frontend
+    name?: string;
+    params?: Record<string, unknown>;
+    // Math commands: LaTeX source rendered by the frontend math renderer
+    latex?: string;
   };
 }
 
@@ -1859,6 +1864,17 @@ COLOR PALETTE:
 - #000000 (black) - for general text/lines
 - #6b7280 (gray) - for secondary elements
 
+VISUAL PRIMITIVES (prefer these over raw shapes whenever one fits):
+Use { "type": "primitive", "id": "...", "props": { "name": "<name>", "params": { ... } } }.
+All primitives take a bounding box and compute every coordinate internally — never hand-place their parts.
+- axes — params: { left, top, width, height, xLabel?, yLabel?, xMin?, xMax?, yMin?, yMax? } → arrowed axes + ticks + labels.
+- functionPlot — axes params + { fn, color? }; fn is like "2x^2 - 3x + 1" or "sin(x)" (supports + - * / ^, parentheses, sin/cos/tan).
+- numberLine — params: { left, top, width, min, max, marks?: number[] } → line + ticks + dots at marks.
+- fractionBar — params: { left, top, width, height, numerator, denominator, color? } → bar split into denominator cells, first numerator shaded, "n/d" label. denominator 1-12, 0 <= numerator <= denominator.
+- triangleFigure — params: { left, top, width, height, labels?: { angles?: [string,string,string], sides?: [string,string,string] } } → labeled triangle.
+- tableGrid — params: { left, top, width, height, rows: string[][] } → grid with cell texts.
+Math expressions go in "math" commands with LaTeX: { "type": "math", "id": "...", "props": { "left": 100, "top": 100, "latex": "\\frac{3}{4}" } } (latex max 200 chars).
+
 RESPOND WITH VALID JSON ONLY in this exact format:
 {
   "title": "Lesson title",
@@ -1896,7 +1912,7 @@ RESPOND WITH VALID JSON ONLY in this exact format:
 // Structural validation of AI-generated whiteboard content. The model's JSON
 // is untrusted: it must have the fields the renderer dereferences, every
 // command must be a known type, and every numeric prop must be finite.
-const WHITEBOARD_COMMAND_TYPES = new Set(['rect', 'circle', 'line', 'arrow', 'text', 'path', 'polygon']);
+const WHITEBOARD_COMMAND_TYPES = new Set(['rect', 'circle', 'line', 'arrow', 'text', 'path', 'polygon', 'primitive', 'math']);
 
 function isValidWhiteboardStep(step: unknown): step is WhiteboardStep {
   if (!step || typeof step !== 'object') return false;
@@ -1908,6 +1924,15 @@ function isValidWhiteboardStep(step: unknown): step is WhiteboardStep {
     if (!cmd.props || typeof cmd.props !== 'object') return false;
     for (const v of Object.values(cmd.props)) {
       if (typeof v === 'number' && !Number.isFinite(v)) return false;
+    }
+    // Primitive commands must name the primitive and carry a params object.
+    if (cmd.type === 'primitive') {
+      if (typeof cmd.props.name !== 'string' || cmd.props.name.length === 0) return false;
+      if (!cmd.props.params || typeof cmd.props.params !== 'object' || Array.isArray(cmd.props.params)) return false;
+    }
+    // Math commands carry bounded LaTeX source.
+    if (cmd.type === 'math') {
+      if (typeof cmd.props.latex !== 'string' || cmd.props.latex.length === 0 || cmd.props.latex.length > 200) return false;
     }
   }
   return true;
