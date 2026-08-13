@@ -18,8 +18,10 @@ import {
   Calculator,
   GitBranch,
 } from 'lucide-react';
+import 'katex/dist/katex.min.css';
 import { cn } from '@/utils';
 import { renderPrimitive } from './whiteboardPrimitives';
+import { validateLatex, renderLatex } from './mathUtils';
 
 // Types matching the backend
 interface WhiteboardDrawCommand {
@@ -46,6 +48,7 @@ interface WhiteboardDrawCommand {
     fontFamily?: string;
     fontWeight?: string;
     textAlign?: string;
+    color?: string;
     angle?: number;
     scaleX?: number;
     scaleY?: number;
@@ -140,6 +143,10 @@ export function AIWhiteboardTeacher({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricRef = useRef<fabric.Canvas | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  // KaTeX math overlay: an HTML layer over the canvas (math doesn't render
+  // well as fabric objects). Parallel to drawnObjectsRef, keyed by command id.
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const overlayObjectsRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -155,6 +162,59 @@ export function AIWhiteboardTeacher({
   const spokenStepRef = useRef(-1);
   const stepStartedAtRef = useRef(Date.now());
 
+  // Remove all math overlay divs (mirrors canvas.clear()).
+  const clearOverlay = useCallback(() => {
+    overlayObjectsRef.current.forEach((el) => el.remove());
+    overlayObjectsRef.current = new Map();
+  }, []);
+
+  // Re-position every math overlay div to match the canvas viewport (zoom
+  // from resize/fullscreen). Runs on canvas 'after:render'.
+  const syncOverlay = useCallback(() => {
+    const canvas = fabricRef.current;
+    const layer = overlayRef.current;
+    if (!canvas || !layer || overlayObjectsRef.current.size === 0) return;
+
+    const vpt = canvas.viewportTransform ?? [1, 0, 0, 1, 0, 0];
+    const scale = vpt[0];
+    const canvasRect = canvas.getElement().getBoundingClientRect();
+    const layerRect = layer.getBoundingClientRect();
+    const offsetX = canvasRect.left - layerRect.left;
+    const offsetY = canvasRect.top - layerRect.top;
+
+    overlayObjectsRef.current.forEach((el) => {
+      const left = Number(el.dataset.left ?? 0);
+      const top = Number(el.dataset.top ?? 0);
+      el.style.transform = `translate(${offsetX + left * scale + vpt[4]}px, ${offsetY + top * scale + vpt[5]}px) scale(${scale})`;
+    });
+  }, []);
+
+  // Render a valid `math` command into the HTML overlay layer. Returns false
+  // when overlay rendering isn't possible (no layer yet, missing/invalid
+  // latex) so the caller degrades to the fabric.Text fallback instead.
+  const drawMath = useCallback((command: WhiteboardDrawCommand): boolean => {
+    const layer = overlayRef.current;
+    const latex = command.props.latex;
+    if (!layer || !latex || !validateLatex(latex)) return false;
+
+    const el = document.createElement('div');
+    el.innerHTML = renderLatex(latex);
+    el.style.position = 'absolute';
+    el.style.left = '0';
+    el.style.top = '0';
+    el.style.transformOrigin = '0 0';
+    el.style.pointerEvents = 'none';
+    el.style.whiteSpace = 'nowrap';
+    el.style.fontSize = `${command.props.fontSize ?? 28}px`;
+    el.style.color = command.props.color ?? command.props.fill ?? '#000000';
+    el.dataset.left = String(command.props.left ?? 0);
+    el.dataset.top = String(command.props.top ?? 0);
+    layer.appendChild(el);
+    overlayObjectsRef.current.set(command.id, el);
+    syncOverlay();
+    return true;
+  }, [syncOverlay]);
+
   // Initialize canvas
   useEffect(() => {
     if (!canvasRef.current || fabricRef.current) return;
@@ -168,12 +228,14 @@ export function AIWhiteboardTeacher({
     });
 
     fabricRef.current = canvas;
+    canvas.on('after:render', syncOverlay);
 
     return () => {
+      canvas.off('after:render', syncOverlay);
       canvas.dispose();
       fabricRef.current = null;
     };
-  }, []);
+  }, [syncOverlay]);
 
   // Resize canvas to fit container
   useEffect(() => {
@@ -204,7 +266,9 @@ export function AIWhiteboardTeacher({
   // Create fabric object(s) from command. Most command types produce exactly
   // one object; a `primitive` command expands into a group of objects via the
   // primitives engine. Returns an empty array when nothing should be drawn
-  // (unknown/invalid command, or `math` until its renderer lands).
+  // (unknown/invalid command). Valid `math` commands never reach here — they
+  // render in the HTML overlay via drawMath; only invalid LaTeX falls through
+  // to the plain-text fallback below.
   const createObject = useCallback((command: WhiteboardDrawCommand): fabric.Object[] => {
     const { type, id, props } = command;
 
@@ -306,6 +370,20 @@ export function AIWhiteboardTeacher({
         });
         break;
 
+      case 'math':
+        // Fallback only: drawMath intercepts valid LaTeX before createObject
+        // runs. Reaching here means invalid/missing LaTeX — degrade to plain
+        // text (never crash).
+        obj = new fabric.Text(props.latex || '', {
+          left: props.left || 0,
+          top: props.top || 0,
+          fontSize: props.fontSize || 24,
+          fontFamily: props.fontFamily || 'Inter, sans-serif',
+          fill: props.color || props.fill || '#000000',
+          opacity: props.opacity || 1,
+        });
+        break;
+
       case 'polygon':
         if (props.points && props.points.length > 0) {
           obj = new fabric.Polygon(props.points, {
@@ -362,6 +440,22 @@ export function AIWhiteboardTeacher({
     });
   }, []);
 
+  // Draw one command idempotently: each command id is drawn at most once,
+  // whether it lands on the canvas or in the math overlay. Valid `math` goes
+  // to the HTML overlay; everything else (incl. invalid math) becomes fabric
+  // object(s).
+  const drawCommand = useCallback((command: WhiteboardDrawCommand) => {
+    if (drawnObjectsRef.current.has(command.id) || overlayObjectsRef.current.has(command.id)) return;
+    if (command.type === 'math' && drawMath(command)) return;
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+    const objs = createObject(command);
+    if (objs.length > 0) {
+      objs.forEach((obj) => canvas.add(obj));
+      drawnObjectsRef.current.set(command.id, objs[0]);
+    }
+  }, [createObject, drawMath]);
+
   // Draw a step — idempotent: each command id is added at most once. The
   // server prefixes ids per step, so ids never collide across steps.
   const drawStep = useCallback((stepIndex: number) => {
@@ -376,20 +470,14 @@ export function AIWhiteboardTeacher({
       canvas.clear();
       canvas.backgroundColor = CANVAS_BACKGROUND;
       drawnObjectsRef.current = new Map();
+      clearOverlay();
     }
 
-    step.commands.forEach((command) => {
-      if (drawnObjectsRef.current.has(command.id)) return;
-      const objs = createObject(command);
-      if (objs.length > 0) {
-        objs.forEach((obj) => canvas.add(obj));
-        drawnObjectsRef.current.set(command.id, objs[0]);
-      }
-    });
+    step.commands.forEach(drawCommand);
 
     applyHighlights(step);
     canvas.renderAll();
-  }, [steps, createObject, applyHighlights]);
+  }, [steps, drawCommand, clearOverlay, applyHighlights]);
 
   // Speak the voiceover
   const speak = useCallback((text: string) => {
@@ -425,6 +513,7 @@ export function AIWhiteboardTeacher({
       fabricRef.current.clear();
       fabricRef.current.backgroundColor = CANVAS_BACKGROUND;
       drawnObjectsRef.current = new Map();
+      clearOverlay();
 
       for (let i = 0; i <= lastDrawable; i++) {
         const step = steps[i];
@@ -433,14 +522,9 @@ export function AIWhiteboardTeacher({
           fabricRef.current.clear();
           fabricRef.current.backgroundColor = CANVAS_BACKGROUND;
           drawnObjectsRef.current = new Map();
+          clearOverlay();
         }
-        step.commands.forEach((command) => {
-          const objs = createObject(command);
-          if (objs.length > 0) {
-            objs.forEach((obj) => fabricRef.current!.add(obj));
-            drawnObjectsRef.current.set(command.id, objs[0]);
-          }
-        });
+        step.commands.forEach(drawCommand);
       }
       applyHighlights(steps[lastDrawable]);
       fabricRef.current.renderAll();
@@ -455,7 +539,7 @@ export function AIWhiteboardTeacher({
 
     // Update progress
     setProgress(((clampedIndex + 1) / totalSteps) * 100);
-  }, [steps, totalSteps, createObject, applyHighlights, speak, onNeedStep]);
+  }, [steps, totalSteps, drawCommand, clearOverlay, applyHighlights, speak, onNeedStep]);
 
   // Play animation
   const play = useCallback(() => {
@@ -668,6 +752,9 @@ export function AIWhiteboardTeacher({
       {/* Canvas area */}
       <div className="relative flex-1 flex items-center justify-center bg-gray-100 dark:bg-gray-800 p-4 overflow-hidden">
         <canvas ref={canvasRef} className="shadow-lg rounded-lg" />
+        {/* KaTeX math overlay: empty, absolutely positioned and pointer-events-none,
+            so zero footprint when a lesson has no math commands. */}
+        <div ref={overlayRef} className="absolute inset-0 pointer-events-none overflow-hidden" />
         {waitingForStep && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             {stepError && !stepLoading ? (
