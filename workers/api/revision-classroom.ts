@@ -1898,6 +1898,21 @@ RESPOND WITH VALID JSON ONLY in this exact format:
 // command must be a known type, and every numeric prop must be finite.
 const WHITEBOARD_COMMAND_TYPES = new Set(['rect', 'circle', 'line', 'arrow', 'text', 'path', 'polygon']);
 
+function isValidWhiteboardStep(step: unknown): step is WhiteboardStep {
+  if (!step || typeof step !== 'object') return false;
+  const s = step as Partial<WhiteboardStep>;
+  if (typeof s.explanation !== 'string' || typeof s.duration !== 'number') return false;
+  if (!Array.isArray(s.commands) || s.commands.length === 0) return false;
+  for (const cmd of s.commands) {
+    if (!cmd || typeof cmd.id !== 'string' || !WHITEBOARD_COMMAND_TYPES.has(cmd.type)) return false;
+    if (!cmd.props || typeof cmd.props !== 'object') return false;
+    for (const v of Object.values(cmd.props)) {
+      if (typeof v === 'number' && !Number.isFinite(v)) return false;
+    }
+  }
+  return true;
+}
+
 function isValidWhiteboardContent(c: unknown): c is WhiteboardTeachingContent {
   if (!c || typeof c !== 'object') return false;
   const content = c as Partial<WhiteboardTeachingContent>;
@@ -1906,17 +1921,54 @@ function isValidWhiteboardContent(c: unknown): c is WhiteboardTeachingContent {
   if (typeof content.backgroundColor !== 'string') return false;
   if (!Array.isArray(content.steps) || content.steps.length === 0) return false;
   for (const step of content.steps) {
-    if (!step || typeof step.explanation !== 'string' || typeof step.duration !== 'number') return false;
-    if (!Array.isArray(step.commands) || step.commands.length === 0) return false;
-    for (const cmd of step.commands) {
-      if (!cmd || typeof cmd.id !== 'string' || !WHITEBOARD_COMMAND_TYPES.has(cmd.type)) return false;
-      if (!cmd.props || typeof cmd.props !== 'object') return false;
-      for (const v of Object.values(cmd.props)) {
-        if (typeof v === 'number' && !Number.isFinite(v)) return false;
-      }
-    }
+    if (!isValidWhiteboardStep(step)) return false;
   }
   return true;
+}
+
+// Global per-topic cache: whiteboard content is reused across all users and
+// lessons for the same topic + lesson type. Rows live in
+// revision_ai_interactions as type `whiteboard_<lessonType>` and are only
+// ever written for validated, non-fallback content.
+async function getCachedWhiteboard(
+  db: D1Database,
+  topicId: string,
+  lessonType: string,
+  topicName: string
+): Promise<WhiteboardTeachingContent | null> {
+  const row = await db.prepare(`
+    SELECT rai.ai_message
+    FROM revision_ai_interactions rai
+    JOIN revision_lessons rl ON rai.lesson_id = rl.id
+    WHERE rl.topic_id = ? AND rai.interaction_type = ?
+    ORDER BY rai.created_at DESC
+    LIMIT 1
+  `).bind(topicId, `whiteboard_${lessonType}`).first<{ ai_message: string }>();
+
+  if (!row?.ai_message) return null;
+  try {
+    const parsed = JSON.parse(row.ai_message) as unknown;
+    if (isValidWhiteboardContent(parsed)) return parsed;
+    // Tolerate the progressive { outline, steps } shape: assemble a
+    // WhiteboardTeachingContent-shaped object from its validated steps.
+    if (parsed && typeof parsed === 'object' && Array.isArray((parsed as { steps?: unknown }).steps)) {
+      const steps = (parsed as { steps: unknown[] }).steps;
+      if (steps.length > 0 && steps.every(isValidWhiteboardStep)) {
+        return {
+          title: topicName,
+          topic: topicName,
+          totalDuration: steps.reduce((sum, s) => sum + s.duration, 0),
+          canvasSize: { width: 1200, height: 800 },
+          backgroundColor: '#ffffff',
+          steps,
+          summary: '',
+        };
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 // Generate whiteboard teaching content
@@ -2260,6 +2312,25 @@ revisionClassroomApp.post('/lessons/:lessonId/whiteboard-teach', async (c) => {
     const subjectName = (lesson as any).subject_name || 'this subject';
     const examType = (lesson as any).exam_type || 'wassce';
 
+    // Global per-topic cache: a hit skips generation and interaction writes
+    // entirely. Topic-less lessons bypass the cache.
+    const topicId = (lesson as any).topic_id as string | null;
+    if (topicId) {
+      const cached = await getCachedWhiteboard(c.env.DB, topicId, lessonType, topicName);
+      if (cached) {
+        return c.json({
+          success: true,
+          data: {
+            whiteboardContent: cached,
+            interactionId: null,
+            lessonType,
+            fallback: false,
+            cached: true,
+          },
+        });
+      }
+    }
+
     // Generate whiteboard content
     const { content: whiteboardContent, usedFallback, tokensUsed } = await generateWhiteboardContent(
       c.env,
@@ -2269,18 +2340,22 @@ revisionClassroomApp.post('/lessons/:lessonId/whiteboard-teach', async (c) => {
       lessonType
     );
 
-    // Record the interaction
-    const interactionId = generateId('wb_interaction');
-    const now = new Date().toISOString();
+    // Record the interaction — only for validated, non-fallback content, so
+    // fallback lessons never poison the per-topic cache.
+    let interactionId: string | null = null;
+    if (!usedFallback) {
+      interactionId = generateId('wb_interaction');
+      const now = new Date().toISOString();
 
-    await c.env.DB.prepare(`
-      INSERT INTO revision_ai_interactions (
-        id, lesson_id, user_id, interaction_type, ai_message, tokens_used, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).bind(
-      interactionId, lessonId, user.userId, `whiteboard_${lessonType}`,
-      JSON.stringify(whiteboardContent), tokensUsed, now
-    ).run();
+      await c.env.DB.prepare(`
+        INSERT INTO revision_ai_interactions (
+          id, lesson_id, user_id, interaction_type, ai_message, tokens_used, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        interactionId, lessonId, user.userId, `whiteboard_${lessonType}`,
+        JSON.stringify(whiteboardContent), tokensUsed, now
+      ).run();
+    }
 
     return c.json({
       success: true,
@@ -2289,6 +2364,7 @@ revisionClassroomApp.post('/lessons/:lessonId/whiteboard-teach', async (c) => {
         interactionId,
         lessonType,
         fallback: usedFallback,
+        cached: false,
       },
     });
   } catch (error) {
