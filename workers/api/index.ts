@@ -7550,52 +7550,130 @@ adminApp.post('/users/:id/add-credits', async (c) => {
   }
 });
 
+// Manually set a user's subscription tier (admin comp/upgrade)
+adminApp.post('/users/:id/set-tier', async (c) => {
+  const userId = c.req.param('id');
+  const { tierId, durationDays } = await c.req.json();
+  const adminUser = c.get('user') as UserPayload;
+  const clientInfo = getClientInfo(c);
+
+  if (!tierId || typeof tierId !== 'string') {
+    return c.json({ success: false, error: 'tierId is required' }, 400);
+  }
+  if (typeof durationDays !== 'number' || !Number.isInteger(durationDays) || durationDays < 1 || durationDays > 3650) {
+    return c.json({ success: false, error: 'durationDays must be an integer between 1 and 3650' }, 400);
+  }
+
+  try {
+    const tier = await c.env.DB.prepare(
+      'SELECT id, name, slug, ai_grading_quota FROM subscription_tiers WHERE id = ? AND is_active = 1'
+    ).bind(tierId).first();
+
+    if (!tier) {
+      return c.json({ success: false, error: 'Tier not found or inactive' }, 404);
+    }
+
+    const user = await c.env.DB.prepare(
+      'SELECT id, email, subscription_tier_id FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    const expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        subscription_tier_id = ?,
+        subscription_expires_at = ?,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(tierId, expiresAt, userId).run();
+
+    // Top up grading credits per tier quota (mirrors payment crediting)
+    const quota = (tier.ai_grading_quota as number) || 0;
+    let creditsAdded = 0;
+    if (quota > 0) {
+      creditsAdded = quota;
+      await c.env.DB.prepare(`
+        UPDATE users SET
+          ai_grading_credits = COALESCE(ai_grading_credits, 0) + ?,
+          updated_at = datetime('now')
+        WHERE id = ?
+      `).bind(quota, userId).run();
+    }
+
+    await logAudit({
+      db: c.env.DB,
+      userId: adminUser.userId,
+      userEmail: adminUser.email,
+      userRole: adminUser.role,
+      action: 'set_subscription_tier',
+      actionCategory: 'user_management',
+      targetType: 'user',
+      targetId: userId,
+      targetDetails: `Set tier ${tier.name} (${tierId}) for ${user.email} (was ${user.subscription_tier_id || 'none'}). Expires: ${expiresAt.split('T')[0]} (+${durationDays}d). Credits added: ${creditsAdded}`,
+      ...clientInfo,
+    });
+
+    return c.json({
+      success: true,
+      data: {
+        message: `Subscription set to ${tier.name} for ${durationDays} days`,
+        tierId,
+        tierName: tier.name,
+        expiresAt,
+        creditsAdded,
+      },
+    });
+  } catch (error) {
+    console.error('Set tier error:', error);
+    return c.json({ success: false, error: 'Failed to set subscription tier' }, 500);
+  }
+});
+
 // Get user subscription/trial details (admin view)
 adminApp.get('/users/:id/subscription', async (c) => {
   const userId = c.req.param('id');
 
   try {
-    // Get user details
+    // There is no user_subscriptions table — the tier lives on the user row.
     const user = await c.env.DB.prepare(`
-      SELECT id, email, name, role, ai_grading_credits, trial_started_at, trial_expires_at
-      FROM users WHERE id = ?
+      SELECT
+        u.id, u.email, u.name, u.role, u.ai_grading_credits,
+        u.trial_started_at, u.trial_expires_at,
+        u.subscription_tier_id, u.subscription_expires_at,
+        st.name as plan_name, st.slug as plan_slug,
+        st.ai_grading_quota, st.price_monthly, st.price_yearly
+      FROM users u
+      LEFT JOIN subscription_tiers st ON u.subscription_tier_id = st.id
+      WHERE u.id = ?
     `).bind(userId).first();
 
     if (!user) {
       return c.json({ success: false, error: 'User not found' }, 404);
     }
 
-    // Get trial details
     const trial = await c.env.DB.prepare(`
       SELECT id, started_at, expires_at, status, tasks_completed, discount_percent
       FROM user_trials WHERE user_id = ?
     `).bind(userId).first();
 
-    // Get active subscription
-    const subscription = await c.env.DB.prepare(`
-      SELECT us.*, st.name as plan_name, st.price_monthly, st.price_yearly, st.ai_grading_quota
-      FROM user_subscriptions us
-      LEFT JOIN subscription_tiers st ON us.tier_id = st.id
-      WHERE us.user_id = ? AND us.status = 'active'
-      ORDER BY us.created_at DESC
-      LIMIT 1
-    `).bind(userId).first();
+    const now = new Date();
 
-    // Calculate days remaining
     let trialDaysRemaining = 0;
-    let subscriptionDaysRemaining = 0;
-
     if (trial && trial.status === 'active') {
       const expiresAt = new Date(trial.expires_at as string);
-      const now = new Date();
       trialDaysRemaining = Math.max(0, Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
     }
 
-    if (subscription) {
-      const expiresAt = new Date(subscription.expires_at as string);
-      const now = new Date();
-      subscriptionDaysRemaining = Math.max(0, Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
-    }
+    const hasPaidTier = user.subscription_tier_id && user.subscription_tier_id !== 'tier_free';
+    const subExpiresAt = user.subscription_expires_at ? new Date(user.subscription_expires_at as string) : null;
+    const subActive = hasPaidTier && subExpiresAt ? subExpiresAt > now : false;
+    const subscriptionDaysRemaining = subExpiresAt
+      ? Math.max(0, Math.ceil((subExpiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
+      : 0;
 
     return c.json({
       success: true,
@@ -7615,13 +7693,13 @@ adminApp.get('/users/:id/subscription', async (c) => {
           daysRemaining: trialDaysRemaining,
           tasksCompleted: JSON.parse((trial.tasks_completed as string) || '[]').length,
         } : null,
-        subscription: subscription ? {
-          planName: subscription.plan_name,
-          status: subscription.status,
-          billingCycle: subscription.billing_cycle,
-          expiresAt: subscription.expires_at,
+        subscription: hasPaidTier ? {
+          planName: user.plan_name || user.subscription_tier_id,
+          status: subActive ? 'active' : 'expired',
+          billingCycle: (user.plan_slug as string || '').endsWith('yearly') ? 'yearly' : 'monthly',
+          expiresAt: user.subscription_expires_at,
           daysRemaining: subscriptionDaysRemaining,
-          aiGradingQuota: subscription.ai_grading_quota,
+          aiGradingQuota: user.ai_grading_quota || 0,
         } : null,
       }
     });
