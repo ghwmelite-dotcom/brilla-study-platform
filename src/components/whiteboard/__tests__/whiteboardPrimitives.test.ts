@@ -87,6 +87,16 @@ describe('compileFunction', () => {
     expect(compileFunction('x & 1')).toBeNull();
     expect(compileFunction('(x+1')).toBeNull();
   });
+
+  it('rejects prototype-chain identifiers exactly like unknown functions', () => {
+    // Regression: `name in FN_FUNCTIONS` also matched Object.prototype members.
+    for (const src of ['constructor(x)', 'toString(x)', 'valueOf(x)', '__proto__(x)', 'hasOwnProperty(x)']) {
+      expect(compileFunction(src)).toBeNull();
+      expect(
+        renderPrimitive('functionPlot', { left: 0, top: 0, width: 100, height: 100, fn: src })
+      ).toEqual([]);
+    }
+  });
 });
 
 describe('renderPrimitive safety', () => {
@@ -178,14 +188,29 @@ describe('functionPlot', () => {
     }
   });
 
-  it('skips non-finite samples (1/x has an asymptote at 0) and still plots', () => {
-    const objs = renderPrimitive('functionPlot', { ...box, fn: '1/x', xMin: -5, xMax: 5 });
-    expect(objs).toHaveLength(1);
-    const poly = objs[0] as fabric.Polyline;
-    for (const p of poly.points) {
-      expect(Number.isFinite(p.x)).toBe(true);
-      expect(Number.isFinite(p.y)).toBe(true);
+  it('breaks the plot into separate segments at an asymptote', () => {
+    // 1/(x-1) over [0,3]: sample i=33 lands exactly on x=1 → Infinity there.
+    const objs = renderPrimitive('functionPlot', {
+      ...box, fn: '1/(x-1)', xMin: 0, xMax: 3, yMin: -10, yMax: 10,
+    });
+    expect(objs).toHaveLength(2);
+    const segs = objs as fabric.Polyline[];
+    const asymptotePx = (1 / 3) * box.width; // x=1 → px 100 (box.left = 0)
+    const [left, right] = segs[0].points[0].x < segs[1].points[0].x ? segs : [segs[1], segs[0]];
+    // 99 finite points total; no segment spans the asymptote.
+    expect(left.points.length + right.points.length).toBe(99);
+    expect(Math.max(...left.points.map((p) => p.x))).toBeLessThan(asymptotePx);
+    expect(Math.min(...right.points.map((p) => p.x))).toBeGreaterThan(asymptotePx);
+    for (const seg of segs) {
+      for (const p of seg.points) {
+        expect(Number.isFinite(p.x)).toBe(true);
+        expect(Number.isFinite(p.y)).toBe(true);
+      }
     }
+  });
+
+  it('returns [] when every sample is non-finite (0/0)', () => {
+    expect(renderPrimitive('functionPlot', { ...box, fn: '0/0' })).toEqual([]);
   });
 
   it('returns [] for an invalid fn', () => {

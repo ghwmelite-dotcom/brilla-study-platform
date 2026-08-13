@@ -97,7 +97,9 @@ function tokenizeFn(src: string): Token[] | null {
       while (j < src.length && ((src[j] >= 'a' && src[j] <= 'z') || (src[j] >= 'A' && src[j] <= 'Z'))) j++;
       const name = src.slice(i, j).toLowerCase();
       if (name === 'x') tokens.push({ kind: 'var' });
-      else if (name in FN_FUNCTIONS) tokens.push({ kind: 'func', name });
+      // Own-property check: `in` would also match prototype members
+      // (constructor, toString, __proto__, ...), violating the whitelist.
+      else if (Object.prototype.hasOwnProperty.call(FN_FUNCTIONS, name)) tokens.push({ kind: 'func', name });
       else return null; // unknown identifier
       i = j;
       continue;
@@ -438,7 +440,8 @@ function renderAxes(params: Record<string, unknown>): fabric.Object[] {
 }
 
 // ---------------------------------------------------------------------------
-// Primitive: functionPlot — axes params + { fn, color? } → one Polyline
+// Primitive: functionPlot — axes params + { fn, color? } → Polyline segments
+// (the plot breaks at non-finite samples so asymptotes draw no joining line)
 // ---------------------------------------------------------------------------
 
 const PLOT_SAMPLES = 100;
@@ -458,22 +461,32 @@ function renderFunctionPlot(params: Record<string, unknown>): fabric.Object[] {
   const color = asString(params.color) ?? DEFAULT_PLOT_COLOR;
 
   const m = makeAxisMapping(box, xMin, xMax, yMin, yMax);
-  const points: { x: number; y: number }[] = [];
+  // Non-finite samples (asymptotes, e.g. 1/x or tan(x)) break the plot into
+  // separate segments so no spurious near-vertical line spans the gap.
+  const segments: { x: number; y: number }[][] = [];
+  let current: { x: number; y: number }[] = [];
   for (let i = 0; i < PLOT_SAMPLES; i++) {
     const x = xMin + (i / (PLOT_SAMPLES - 1)) * (xMax - xMin);
     const y = fn(x);
-    if (!Number.isFinite(y)) continue; // asymptotes / gaps are skipped
-    points.push({ x: m.xToPx(x), y: clamp(m.yToPx(y), box.top, box.top + box.height) });
+    if (!Number.isFinite(y)) {
+      if (current.length > 0) segments.push(current);
+      current = [];
+      continue;
+    }
+    current.push({ x: m.xToPx(x), y: clamp(m.yToPx(y), box.top, box.top + box.height) });
   }
-  if (points.length < 2) return [];
+  if (current.length > 0) segments.push(current);
 
-  return [
-    new fabric.Polyline(points, {
-      stroke: color,
-      strokeWidth: 2.5,
-      fill: 'transparent',
-    }),
-  ];
+  return segments
+    .filter((points) => points.length >= 2)
+    .map(
+      (points) =>
+        new fabric.Polyline(points, {
+          stroke: color,
+          strokeWidth: 2.5,
+          fill: 'transparent',
+        })
+    );
 }
 
 // ---------------------------------------------------------------------------
