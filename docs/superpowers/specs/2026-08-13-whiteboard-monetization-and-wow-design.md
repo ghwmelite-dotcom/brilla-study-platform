@@ -197,6 +197,25 @@ Frontend:
 
 ## Phase B — Wow Pass
 
+### B0. Model routing + cost architecture (new — 2026-08-13 amendment)
+
+One model (`@cf/meta/llama-3.3-70b-instruct-fp8-fast`, $0.293/M in, $2.253/M out)
+currently serves every feature. Phase B introduces per-task routing, configured
+via wrangler vars so models can be swapped without deploys:
+
+- `AI_MODEL_GENERATION` — whiteboard lessons, essay grading (quality-critical,
+  globally cached ⇒ pay for the best, once). Default: keep llama-3.3-70b.
+- `AI_MODEL_CHAT` — teach/ask/checkpoint (highest volume). Pilot
+  `@cf/qwen/qwen3-30b-a3b-fp8` ($0.051/M in, $0.335/M out — ~6× cheaper) with a
+  quality A/B before switching traffic; fallback stays llama-3.3-70b.
+- `AI_MODEL_EMBEDDING` — `@cf/qwen/qwen3-embedding-0.6b` for the semantic cache
+  (B7).
+- `AI_MODEL_TTS` — `@cf/deepgram/aura-2-en` (B5).
+
+The pilot is a **measurement task, not a vibe**: run both models on ~20 real
+teach/ask prompts + 5 whiteboard lessons, compare answer quality and JSON
+validity rate, then set the vars.
+
 ### B1. Progressive per-step generation (replaces one-shot blocking call)
 
 - Change the contract: `POST .../whiteboard-teach` takes `{ lessonType, stepIndex }`
@@ -251,14 +270,16 @@ the model can be *wrong pedagogically* but never *visually broken*.
 
 ### B5. Real voice (TTS)
 
-- Replace browser `speechSynthesis` with server-generated audio. First task is a
-  spike: verify a TTS model available to this account via Workers AI
-  (e.g. Deepgram Aura class) and its latency/cost.
+- **Spike resolved (2026-08-13):** `@cf/deepgram/aura-2-en` is live on Workers AI
+  ([model docs](https://developers.cloudflare.com/workers-ai/models/aura-2-en/)) —
+  context-aware TTS with named speakers (default `luna`), `mp3` encoding, `ogg`
+  container support. Remaining spike work: confirm the exact `env.AI.run`
+  request/response shape on our account (binary vs base64) and latency.
 - Endpoint `POST /revision-classroom/tts` (premium-only) → audio bytes;
   frontend plays via `Audio`, highlighting the active step.
+- Generated audio is cached in R2 (`RECORDINGS_BUCKET`) keyed by content hash —
+  a step's voiceover is synthesized once globally.
 - `speechSynthesis` remains as automatic fallback if TTS is unavailable/fails.
-- If the spike shows no viable TTS on our stack, B5 degrades to: best-available
-  neural browser voice + tuned rate/pitch, and the real-voice item moves to C.
 
 ### B6. Whiteboard content cache
 
@@ -269,7 +290,34 @@ the model can be *wrong pedagogically* but never *visually broken*.
 - Effect: repeat views are instant and free; AI cost per *new* topic/lesson-type
   is paid once globally, not per student.
 
-### B7. Phase B tests
+### B7. Semantic answer cache (new — 2026-08-13 amendment)
+
+Students ask near-identical questions; the platform should learn not to
+regenerate. Applies to `ask` (and reusable teach-phase content where keyed).
+
+- New D1 table `ai_answer_cache` (additive prod patch 097; canonical schema
+  fold-in later, same as patches 094-096):
+  `id, topic_id, subject_id, exam_type, question_text, answer_text, model,
+  embedding_id, hit_count, created_at, last_hit_at`.
+- New Vectorize index `brilla-answers` (768-dim, cosine) holding one vector per
+  cache row, embedded with `AI_MODEL_EMBEDDING` from the normalized question +
+  topic name.
+- `ask` flow: normalize question (lowercase, trim, collapse whitespace) → embed
+  → Vectorize query with `topK: 1` filtered... (Vectorize has no per-column
+  filter on our plan; overfetch `topK: 3` and post-filter by topic_id from the
+  D1 row) → cosine ≥ **0.92** ⇒ serve cached answer, `hit_count++`,
+  `last_hit_at`, no LLM call (and no allowance consumed — cached answers are
+  free for everyone). Below threshold ⇒ normal generation, then insert into
+  cache (embedding upsert + row).
+- Cache writes happen only for premium-generated or validated answers; a
+  cached answer is keyed to topic so cross-topic bleed is impossible after
+  the post-filter.
+- The daily allowance counts only *generated* interactions (cache hits don't
+  insert `student_question` rows with generation... they insert with a
+  `cache_hit` suffix type? No: cache hits insert NO interaction row, keeping
+  the allowance query unchanged).
+
+### B8. Phase B tests
 
 - Unit: command validator (whitelist, clamps, math fallback), primitive
   renderers (params → expected fabric object counts), progressive step
@@ -299,12 +347,19 @@ the model can be *wrong pedagogically* but never *visually broken*.
 
 ## Risks / open items
 
-- **TTS availability** on our Cloudflare account is unverified (B5 spike first).
+- **TTS availability**: model exists in the catalog (`@cf/deepgram/aura-2-en`);
+  the remaining unknown is the exact binding response shape on our account
+  (B5 spike confirms on day one).
 - **`revision_ai_interactions` count query** per AI call adds a read; table is
   small today. If it grows hot, add `(user_id, created_at)` index via prod patch
   (canonical schema is generator-owned — fold later, as with patches 094-096).
 - **KaTeX overlay vs canvas zoom/fullscreen**: overlay positions must track
   canvas transforms; covered by B3 implementation + QA, but it is the most
   fiddly frontend piece in B.
-- Canonical schema drift: this design deliberately makes **zero schema changes**
-  (allowance reuses `revision_ai_interactions`; set-tier uses existing columns).
+- **Schema footprint**: Phase A made zero schema changes. Phase B adds exactly
+  one additive table (`ai_answer_cache`, prod patch 097) and one Vectorize
+  index (`brilla-answers`) — both new objects, no alteration of existing
+  tables; canonical schema/seed fold-in remains a separate decision.
+- **Semantic cache false positives**: a 0.92 cosine threshold plus topic
+  post-filter keeps near-miss answers from crossing topics; the threshold is a
+  wrangler var (`AI_CACHE_THRESHOLD`) so it can be tuned without a deploy.
