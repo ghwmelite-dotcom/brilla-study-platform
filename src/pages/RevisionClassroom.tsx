@@ -535,6 +535,7 @@ export default function RevisionClassroom() {
     whiteboardSteps,
     whiteboardTotalSteps,
     whiteboardStepLoading,
+    whiteboardStepError,
     isWhiteboardLoading,
     whiteboardMode,
     whiteboardLocked,
@@ -1210,6 +1211,7 @@ export default function RevisionClassroom() {
                   totalSteps={whiteboardTotalSteps}
                   isLoading={isWhiteboardLoading}
                   stepLoading={whiteboardStepLoading}
+                  stepError={whiteboardStepError}
                   onRequestContent={requestWhiteboardTeaching}
                   onNeedStep={fetchNextWhiteboardStep}
                   fallback={whiteboardFallback}

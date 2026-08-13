@@ -83,6 +83,9 @@ interface AIWhiteboardTeacherProps {
   isLoading?: boolean;
   // True while a follow-up step is being generated in the background.
   stepLoading?: boolean;
+  // Set when a step fetch failed (after the one automatic retry) — shows a
+  // Retry button in the waiting state.
+  stepError?: string | null;
   onRequestContent?: (lessonType: LessonType) => void;
   // Called when the renderer needs a step it doesn't have yet (prefetch).
   onNeedStep?: (stepIndex: number) => void;
@@ -123,6 +126,7 @@ export function AIWhiteboardTeacher({
   totalSteps = 0,
   isLoading = false,
   stepLoading = false,
+  stepError = null,
   onRequestContent,
   onNeedStep,
   fallback = false,
@@ -645,10 +649,24 @@ export function AIWhiteboardTeacher({
         <canvas ref={canvasRef} className="shadow-lg rounded-lg" />
         {waitingForStep && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="flex items-center gap-2 px-4 py-2 bg-white/90 dark:bg-gray-900/90 rounded-full shadow-lg">
-              <div className="w-4 h-4 rounded-full border-2 border-violet-200 dark:border-violet-900 border-t-violet-500 animate-spin" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">Preparing next step…</span>
-            </div>
+            {stepError && !stepLoading ? (
+              <div className="flex items-center gap-3 px-4 py-2 bg-white/95 dark:bg-gray-900/95 rounded-full shadow-lg pointer-events-auto">
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Couldn't prepare the next step
+                </span>
+                <button
+                  onClick={() => onNeedStep?.(currentStep)}
+                  className="text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 px-3 py-1 rounded-full transition-colors"
+                >
+                  Retry
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-4 py-2 bg-white/90 dark:bg-gray-900/90 rounded-full shadow-lg">
+                <div className="w-4 h-4 rounded-full border-2 border-violet-200 dark:border-violet-900 border-t-violet-500 animate-spin" />
+                <span className="text-sm text-gray-600 dark:text-gray-300">Preparing next step…</span>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -656,7 +674,12 @@ export function AIWhiteboardTeacher({
       {/* Explanation panel */}
       <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
         <p className="text-gray-700 dark:text-gray-300 text-sm min-h-[2.5rem]">
-          {step?.explanation || (waitingForStep ? 'Preparing next step…' : 'Loading...')}
+          {step?.explanation ||
+            (waitingForStep
+              ? stepError && !stepLoading
+                ? "Couldn't prepare the next step — tap Retry to try again."
+                : 'Preparing next step…'
+              : 'Loading...')}
         </p>
       </div>
 

@@ -177,10 +177,15 @@ interface RevisionClassroomState {
   whiteboardLessonType: WhiteboardLessonType | null;
   isWhiteboardLoading: boolean;
   whiteboardStepLoading: boolean;
+  // Distinct per-step fetch failure — drives the component's Retry button.
+  whiteboardStepError: string | null;
   whiteboardMode: boolean;
   // Guard against duplicate/in-flight per-step fetches (values are step
   // indices). Mutated in place — not reactive state.
   whiteboardStepsInFlight: Set<number>;
+  // Step indices that already used their one automatic retry. Mutated in
+  // place — not reactive state.
+  whiteboardStepsAutoRetried: Set<number>;
 
   // Entitlement / usage-limit state (session-only; not persisted)
   whiteboardLocked: boolean;
@@ -432,8 +437,10 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
       whiteboardLessonType: null,
       isWhiteboardLoading: false,
       whiteboardStepLoading: false,
+      whiteboardStepError: null,
       whiteboardMode: false,
       whiteboardStepsInFlight: new Set<number>(),
+      whiteboardStepsAutoRetried: new Set<number>(),
       whiteboardLocked: false,
       whiteboardFallback: false,
       aiLimitReached: false,
@@ -1086,6 +1093,7 @@ Does this help? Feel free to ask more questions!`;
         if (!currentLesson || !currentSession) return;
 
         get().whiteboardStepsInFlight.clear();
+        get().whiteboardStepsAutoRetried.clear();
         set({
           isWhiteboardLoading: true,
           whiteboardMode: true,
@@ -1094,6 +1102,7 @@ Does this help? Feel free to ask more questions!`;
           whiteboardTotalSteps: 0,
           whiteboardLessonType: lessonType,
           whiteboardStepLoading: false,
+          whiteboardStepError: null,
         });
 
         try {
@@ -1147,7 +1156,7 @@ Does this help? Feel free to ask more questions!`;
         if (whiteboardSteps[nextIndex] || whiteboardStepsInFlight.has(nextIndex)) return;
 
         whiteboardStepsInFlight.add(nextIndex);
-        set({ whiteboardStepLoading: true });
+        set({ whiteboardStepLoading: true, whiteboardStepError: null });
         const lessonId = currentLesson.id;
         const outlineSnapshot = whiteboardOutline;
 
@@ -1179,13 +1188,32 @@ Does this help? Feel free to ask more questions!`;
             return {
               whiteboardSteps: steps,
               whiteboardTotalSteps: data.totalSteps || state.whiteboardTotalSteps,
+              whiteboardStepError: null,
             };
           });
         } catch (error) {
           console.error('Error generating whiteboard step:', error);
-          set({
-            error: error instanceof Error ? error.message : 'Failed to generate whiteboard step',
-          });
+          const message = error instanceof Error ? error.message : 'Failed to generate whiteboard step';
+          set({ error: message, whiteboardStepError: message });
+
+          // One bounded automatic retry — guarded so it only fires if the
+          // step is still needed and this outline/lesson is still current.
+          // If the retry also fails, the component's Retry button is the
+          // recovery path; no further auto-retries are scheduled.
+          if (!get().whiteboardStepsAutoRetried.has(nextIndex)) {
+            get().whiteboardStepsAutoRetried.add(nextIndex);
+            setTimeout(() => {
+              const s = get();
+              if (
+                s.currentLesson?.id === lessonId &&
+                s.whiteboardOutline === outlineSnapshot &&
+                !s.whiteboardSteps[nextIndex] &&
+                !s.whiteboardStepsInFlight.has(nextIndex)
+              ) {
+                void s.fetchNextWhiteboardStep(nextIndex);
+              }
+            }, 3000);
+          }
         } finally {
           get().whiteboardStepsInFlight.delete(nextIndex);
           if (get().whiteboardStepsInFlight.size === 0) {
@@ -1200,12 +1228,14 @@ Does this help? Feel free to ask more questions!`;
 
       clearWhiteboardContent: () => {
         get().whiteboardStepsInFlight.clear();
+        get().whiteboardStepsAutoRetried.clear();
         set({
           whiteboardOutline: null,
           whiteboardSteps: [],
           whiteboardTotalSteps: 0,
           whiteboardLessonType: null,
           whiteboardStepLoading: false,
+          whiteboardStepError: null,
           whiteboardMode: false,
         });
       },
