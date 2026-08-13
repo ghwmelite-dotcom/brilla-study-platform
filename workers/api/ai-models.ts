@@ -6,6 +6,7 @@
 const DEFAULT_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const DEFAULT_EMBEDDING_MODEL = '@cf/qwen/qwen3-embedding-0.6b';
 const DEFAULT_TTS_MODEL = '@cf/deepgram/aura-2-en';
+const DEFAULT_VISION_MODEL = '@cf/meta/llama-4-scout-17b-16e-instruct';
 const DEFAULT_CACHE_THRESHOLD = 0.92;
 
 interface ModelEnv {
@@ -14,6 +15,7 @@ interface ModelEnv {
   AI_MODEL_GENERATION?: string;
   AI_MODEL_EMBEDDING?: string;
   AI_MODEL_TTS?: string;
+  AI_MODEL_VISION?: string;
   AI_CACHE_THRESHOLD?: string;
 }
 
@@ -31,6 +33,15 @@ export function getEmbeddingModel(env: ModelEnv): string {
 
 export function getTtsModel(env: ModelEnv): string {
   return env.AI_MODEL_TTS || DEFAULT_TTS_MODEL;
+}
+
+/**
+ * Vision model routing deliberately does NOT fall back to AI_MODEL — that var
+ * holds a text-only model which would fail on image input. Chain: var →
+ * built-in vision default only.
+ */
+export function getVisionModel(env: ModelEnv): string {
+  return env.AI_MODEL_VISION || DEFAULT_VISION_MODEL;
 }
 
 export function getCacheThreshold(env: ModelEnv): number {

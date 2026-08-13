@@ -5,7 +5,8 @@ import { sign } from 'hono/jwt';
 import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware';
 import { parseLimit, parseJsonBody } from './http';
 import type { JWTPayload } from 'hono/utils/jwt/types';
-import { getChatModel, getGenerationModel, getTtsModel } from './ai-models';
+import type { BaseAiTextGenerationModels } from '@cloudflare/workers-types';
+import { getChatModel, getGenerationModel, getTtsModel, getVisionModel, unwrapAiText } from './ai-models';
 import { formatUntrustedAiData, normalizeAiGradingFeedback, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
 import { libraryApp } from './library';
 import { counselorApp } from './counselor';
@@ -6123,6 +6124,79 @@ adminApp.post('/tts-spike', async (c) => {
   } catch (error) {
     console.error('TTS spike error:', error);
     return c.json({ success: false, error: error instanceof Error ? error.message : 'TTS spike failed' }, 500);
+  }
+});
+
+// Vision model spike (admin eval tool — verifies image input shape + quality
+// for the "AI sees student work" feature). Accepts a base64 PNG/JPEG and a
+// prompt, runs the configured vision model, and reports the runtime response
+// shape so unwrapAiText behavior is observed, plus latency and output text.
+// `inputShape` lets the spike iterate candidate request shapes without
+// redeploying (whitelisted). Default is `openai-image-url` — the shape
+// verified live on this account (see
+// docs/superpowers/specs/2026-08-13-vision-spike-results.md). `guidedJson`
+// (optional, schema object) is passed through to test guided_json conformance.
+adminApp.post('/vision-spike', async (c) => {
+  const { imageBase64, prompt, model, inputShape, guidedJson } = await c.req.json();
+
+  if (!imageBase64 || typeof imageBase64 !== 'string' || imageBase64.length > 700_000) {
+    return c.json({ success: false, error: 'imageBase64 is required (max ~500KB binary)' }, 400);
+  }
+  if (!prompt || typeof prompt !== 'string' || prompt.length > 2000) {
+    return c.json({ success: false, error: 'prompt is required (max 2000 chars)' }, 400);
+  }
+
+  const chosenModel = typeof model === 'string' && model.startsWith('@cf/')
+    ? model
+    : getVisionModel(c.env);
+  const SHAPES = [
+    'message-image-array',
+    'message-image-base64',
+    'content-parts',
+    'content-parts-base64',
+    'toplevel-array',
+    'openai-image-url',
+  ];
+  const shape = SHAPES.includes(inputShape) ? inputShape as string : 'openai-image-url';
+  const started = Date.now();
+
+  try {
+    const base64 = imageBase64.replace(/^data:[^,]+,/, '');
+    const bytes = Uint8Array.from(atob(base64), (ch) => ch.charCodeAt(0));
+    const imageArray = [...bytes];
+    let request: Record<string, unknown>;
+    if (shape === 'message-image-base64') {
+      request = { messages: [{ role: 'user', content: prompt, image: base64 }] };
+    } else if (shape === 'content-parts') {
+      request = { messages: [{ role: 'user', content: [{ type: 'text', text: prompt }, { type: 'image', image: imageArray }] }] };
+    } else if (shape === 'content-parts-base64') {
+      request = { messages: [{ role: 'user', content: [{ type: 'text', text: prompt }, { type: 'image', image: base64 }] }] };
+    } else if (shape === 'toplevel-array') {
+      request = { prompt, image: imageArray };
+    } else if (shape === 'openai-image-url') {
+      request = { messages: [{ role: 'user', content: [{ type: 'text', text: prompt }, { type: 'image_url', image_url: { url: `data:image/png;base64,${base64}` } }] }] };
+    } else {
+      request = { messages: [{ role: 'user', content: prompt, image: imageArray }] };
+    }
+    request.max_tokens = 1024;
+    if (guidedJson && typeof guidedJson === 'object' && JSON.stringify(guidedJson).length <= 4000) {
+      request.guided_json = guidedJson;
+    }
+    const result = await c.env.AI.run(chosenModel as any, request);
+    const rawShape = result === null ? 'null'
+      : typeof result === 'string' ? 'string'
+      : 'response' in (result as object)
+        ? `object-with-response-${typeof (result as any).response}`
+        : `object-keys:${Object.keys(result as object).join('|')}`;
+    return c.json({
+      success: true,
+      data: { model: chosenModel, inputShape: shape, ok: true, latencyMs: Date.now() - started, rawShape, output: unwrapAiText(result) },
+    });
+  } catch (error) {
+    return c.json({
+      success: true,
+      data: { model: chosenModel, inputShape: shape, ok: false, latencyMs: Date.now() - started, rawShape: 'error', output: '', error: error instanceof Error ? error.message : String(error) },
+    });
   }
 });
 
