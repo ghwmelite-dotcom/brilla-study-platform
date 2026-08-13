@@ -37,3 +37,21 @@ export function getCacheThreshold(env: ModelEnv): number {
   const parsed = parseFloat(env.AI_CACHE_THRESHOLD || '');
   return Number.isFinite(parsed) && parsed > 0 && parsed <= 1 ? parsed : DEFAULT_CACHE_THRESHOLD;
 }
+
+/**
+ * Unwrap a Workers AI text-generation result to a string. The binding usually
+ * returns `{ response: string }`, but returns `response` as ALREADY-PARSED JSON
+ * (object/array) when the model output is bare valid JSON — observed live with
+ * `@cf/meta/llama-3.3-70b-instruct-fp8-fast` (whiteboard Phase B verification).
+ * Any caller that string-processes the result (`.match`, `.trim`, …) MUST go
+ * through this; a raw cast throws `TypeError` on parsed-JSON responses and the
+ * surrounding catch then silently serves fallback content.
+ */
+export function unwrapAiText(result: unknown): string {
+  const raw =
+    typeof result === 'object' && result !== null && 'response' in result
+      ? (result as { response: unknown }).response
+      : result;
+  if (raw === null || raw === undefined) return '';
+  return typeof raw === 'string' ? raw : JSON.stringify(raw);
+}

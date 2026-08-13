@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { getDemoDataFlags, isDemoUserId } from './demoUtils';
 import { requireAuth } from './auth-middleware';
-import { getChatModel } from './ai-models';
+import { getChatModel, unwrapAiText } from './ai-models';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -360,10 +360,9 @@ async function getTutorResponse(
       temperature: 0.7,  // Balanced creativity for educational content
     });
 
-    // Handle the response - Workers AI returns { response: string } for text generation
-    const content = typeof result === 'object' && result !== null && 'response' in result
-      ? (result as { response: string }).response
-      : String(result);
+    // Handle the response - Workers AI usually returns { response: string },
+    // but may return `response` as parsed JSON; unwrapAiText tolerates both.
+    const content = unwrapAiText(result);
 
     if (!content || content.trim() === '') {
       console.error('Empty response from Workers AI');

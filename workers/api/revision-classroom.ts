@@ -3,7 +3,7 @@ import type { BaseAiTextGenerationModels } from '@cloudflare/workers-types';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
 import { isPremiumUser, checkAiAllowance } from './usage-limits';
-import { getChatModel, getGenerationModel, getTtsModel } from './ai-models';
+import { getChatModel, getGenerationModel, getTtsModel, unwrapAiText } from './ai-models';
 import { lookupAnswer, storeAnswer } from './answer-cache';
 
 interface Env {
@@ -218,10 +218,8 @@ ${PHASE_PROMPTS[phase]}`;
       temperature: 0.7,
     });
 
-    // Handle the response
-    const content = typeof result === 'object' && result !== null && 'response' in result
-      ? (result as { response: string }).response
-      : String(result);
+    // Handle the response (unwrapAiText tolerates parsed-JSON responses)
+    const content = unwrapAiText(result);
 
     if (!content || content.trim() === '') {
       console.error('Empty response from Workers AI');
@@ -298,9 +296,7 @@ RESPOND IN THIS EXACT JSON FORMAT:
       temperature: 0.8,
     });
 
-    const content = typeof result === 'object' && result !== null && 'response' in result
-      ? (result as { response: string }).response
-      : String(result);
+    const content = unwrapAiText(result);
 
     // Try to parse JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -1152,9 +1148,7 @@ The student has a question. Answer it helpfully and concisely, relating it back 
         temperature: 0.7,
       });
 
-      const content = typeof result === 'object' && result !== null && 'response' in result
-        ? (result as { response: string }).response
-        : String(result);
+      const content = unwrapAiText(result);
 
       if (!content || content.trim() === '') {
         return c.json({
