@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import type { BaseAiTextGenerationModels } from '@cloudflare/workers-types';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
+import { isPremiumUser, checkAiAllowance } from './usage-limits';
 
 interface Env {
   DB: D1Database;
@@ -879,6 +880,17 @@ revisionClassroomApp.post('/lessons/:lessonId/teach', async (c) => {
       return c.json({ success: false, error: 'Lesson not found' }, 404);
     }
 
+    // Free-tier daily AI allowance (premium = unlimited)
+    const allowance = await checkAiAllowance(user.userId, c.env.DB);
+    if (!allowance.allowed) {
+      return c.json({
+        success: false,
+        error: "You've used today's free AI explanations. Upgrade for unlimited access, or come back tomorrow.",
+        aiLimitReached: true,
+        remaining: 0,
+      }, 403);
+    }
+
     // Build teaching context
     const context: TeachingContext = {
       topicName: (lesson as any).topic_name || 'this topic',
@@ -925,6 +937,7 @@ revisionClassroomApp.post('/lessons/:lessonId/teach', async (c) => {
           subjectName: context.subjectName,
           examType: context.examType,
         },
+        remainingFreeToday: allowance.remaining === -1 ? -1 : allowance.remaining - 1,
       },
     });
   } catch (error) {
@@ -959,6 +972,17 @@ revisionClassroomApp.post('/lessons/:lessonId/checkpoint/generate', async (c) =>
 
     if (!lesson) {
       return c.json({ success: false, error: 'Lesson not found' }, 404);
+    }
+
+    // Free-tier daily AI allowance (premium = unlimited)
+    const allowance = await checkAiAllowance(user.userId, c.env.DB);
+    if (!allowance.allowed) {
+      return c.json({
+        success: false,
+        error: "You've used today's free AI explanations. Upgrade for unlimited access, or come back tomorrow.",
+        aiLimitReached: true,
+        remaining: 0,
+      }, 403);
     }
 
     // Build context
@@ -1000,6 +1024,14 @@ revisionClassroomApp.post('/lessons/:lessonId/checkpoint/generate', async (c) =>
       now
     ).run();
 
+    await c.env.DB.prepare(`
+      INSERT INTO revision_ai_interactions (
+        id, lesson_id, user_id, interaction_type, ai_message, created_at
+      ) VALUES (?, ?, ?, 'checkpoint', ?, ?)
+    `).bind(
+      generateId('interaction'), lessonId, user.userId, checkpoint.question, now
+    ).run();
+
     return c.json({
       success: true,
       data: {
@@ -1008,6 +1040,7 @@ revisionClassroomApp.post('/lessons/:lessonId/checkpoint/generate', async (c) =>
         options: checkpoint.options,
         difficulty,
         // Don't send correctAnswer to frontend - validate on submit
+        remainingFreeToday: allowance.remaining === -1 ? -1 : allowance.remaining - 1,
       },
     });
   } catch (error) {
@@ -1048,6 +1081,17 @@ revisionClassroomApp.post('/lessons/:lessonId/ask', async (c) => {
 
     if (!lesson) {
       return c.json({ success: false, error: 'Lesson not found' }, 404);
+    }
+
+    // Free-tier daily AI allowance (premium = unlimited)
+    const allowance = await checkAiAllowance(user.userId, c.env.DB);
+    if (!allowance.allowed) {
+      return c.json({
+        success: false,
+        error: "You've used today's free AI explanations. Upgrade for unlimited access, or come back tomorrow.",
+        aiLimitReached: true,
+        remaining: 0,
+      }, 403);
     }
 
     // Build the prompt for answering student questions
@@ -1117,6 +1161,7 @@ The student has a question. Answer it helpfully and concisely, relating it back 
         data: {
           answer: content,
           interactionId,
+          remainingFreeToday: allowance.remaining === -1 ? -1 : allowance.remaining - 1,
         },
       });
     } catch (aiError) {
@@ -1847,6 +1892,32 @@ RESPOND WITH VALID JSON ONLY in this exact format:
   "summary": "Key takeaways from this visual lesson"
 }`;
 
+// Structural validation of AI-generated whiteboard content. The model's JSON
+// is untrusted: it must have the fields the renderer dereferences, every
+// command must be a known type, and every numeric prop must be finite.
+const WHITEBOARD_COMMAND_TYPES = new Set(['rect', 'circle', 'line', 'arrow', 'text', 'path', 'polygon']);
+
+function isValidWhiteboardContent(c: unknown): c is WhiteboardTeachingContent {
+  if (!c || typeof c !== 'object') return false;
+  const content = c as Partial<WhiteboardTeachingContent>;
+  if (typeof content.title !== 'string') return false;
+  if (!content.canvasSize || typeof content.canvasSize.width !== 'number' || typeof content.canvasSize.height !== 'number') return false;
+  if (typeof content.backgroundColor !== 'string') return false;
+  if (!Array.isArray(content.steps) || content.steps.length === 0) return false;
+  for (const step of content.steps) {
+    if (!step || typeof step.explanation !== 'string' || typeof step.duration !== 'number') return false;
+    if (!Array.isArray(step.commands) || step.commands.length === 0) return false;
+    for (const cmd of step.commands) {
+      if (!cmd || typeof cmd.id !== 'string' || !WHITEBOARD_COMMAND_TYPES.has(cmd.type)) return false;
+      if (!cmd.props || typeof cmd.props !== 'object') return false;
+      for (const v of Object.values(cmd.props)) {
+        if (typeof v === 'number' && !Number.isFinite(v)) return false;
+      }
+    }
+  }
+  return true;
+}
+
 // Generate whiteboard teaching content
 async function generateWhiteboardContent(
   env: Env,
@@ -1854,7 +1925,7 @@ async function generateWhiteboardContent(
   subject: string,
   examType: string,
   lessonType: 'diagram' | 'step-by-step' | 'problem-solving' | 'concept-map' = 'step-by-step'
-): Promise<WhiteboardTeachingContent> {
+): Promise<{ content: WhiteboardTeachingContent; usedFallback: boolean; tokensUsed: number | null }> {
   const lessonTypeInstructions: Record<string, string> = {
     'diagram': `Create a labeled diagram explaining ${topic}. Include:
 - Main diagram with clear labels
@@ -1912,18 +1983,26 @@ Create content appropriate for ${examType.toUpperCase()} exam preparation.`;
       ? (result as { response: string }).response
       : String(result);
 
+    const tokensUsed =
+      typeof result === 'object' && result !== null && 'usage' in result
+        ? ((result as { usage?: { total_tokens?: number } }).usage?.total_tokens ?? null)
+        : null;
+
     // Extract JSON from response
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]) as WhiteboardTeachingContent;
-      return parsed;
+      if (isValidWhiteboardContent(parsed)) {
+        return { content: parsed, usedFallback: false, tokensUsed };
+      }
+      console.error('Whiteboard content failed validation — using fallback');
     }
 
     throw new Error('Failed to parse whiteboard content');
   } catch (error) {
     console.error('Error generating whiteboard content:', error);
-    // Return fallback content
-    return getDefaultWhiteboardContent(topic, subject, examType);
+    // Return fallback content — flagged so the UI can be honest about it
+    return { content: getDefaultWhiteboardContent(topic, subject, examType), usedFallback: true, tokensUsed: null };
   }
 }
 
@@ -2167,12 +2246,21 @@ revisionClassroomApp.post('/lessons/:lessonId/whiteboard-teach', async (c) => {
       return c.json({ success: false, error: 'Lesson not found' }, 404);
     }
 
+    // Premium-only feature — reject before any AI generation cost is incurred.
+    if (!(await isPremiumUser(user.userId, c.env.DB))) {
+      return c.json({
+        success: false,
+        error: 'The AI Whiteboard is a premium feature. Upgrade to watch the teacher draw and explain.',
+        upgradeRequired: true,
+      }, 403);
+    }
+
     const topicName = (lesson as any).topic_name || 'this topic';
     const subjectName = (lesson as any).subject_name || 'this subject';
     const examType = (lesson as any).exam_type || 'wassce';
 
     // Generate whiteboard content
-    const whiteboardContent = await generateWhiteboardContent(
+    const { content: whiteboardContent, usedFallback, tokensUsed } = await generateWhiteboardContent(
       c.env,
       topicName,
       subjectName,
@@ -2186,11 +2274,11 @@ revisionClassroomApp.post('/lessons/:lessonId/whiteboard-teach', async (c) => {
 
     await c.env.DB.prepare(`
       INSERT INTO revision_ai_interactions (
-        id, lesson_id, user_id, interaction_type, ai_message, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?)
+        id, lesson_id, user_id, interaction_type, ai_message, tokens_used, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `).bind(
       interactionId, lessonId, user.userId, `whiteboard_${lessonType}`,
-      JSON.stringify(whiteboardContent), now
+      JSON.stringify(whiteboardContent), tokensUsed, now
     ).run();
 
     return c.json({
@@ -2199,6 +2287,7 @@ revisionClassroomApp.post('/lessons/:lessonId/whiteboard-teach', async (c) => {
         whiteboardContent,
         interactionId,
         lessonType,
+        fallback: usedFallback,
       },
     });
   } catch (error) {
