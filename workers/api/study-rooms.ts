@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { Env } from './index';
 import { requireAuth } from './auth-middleware';
+import { getChatModel } from './ai-models';
 
 // Identity shape read by the routes below. requireAuth sets `user` to the JWT
 // payload keyed by userId; the adapter middleware re-adds the legacy `id` key.
@@ -496,7 +497,7 @@ Student's question: ${body.question}
 
 Provide a clear, educational response. Be encouraging and helpful. If the question is about a specific concept, explain it step by step. Keep your response concise but comprehensive.`;
 
-    const aiResponse = await c.env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
+    const aiResponse = await c.env.AI.run(getChatModel(c.env) as BaseAiTextGenerationModels, {
       messages: [
         { role: 'system', content: 'You are Brilla AI, a helpful and encouraging study tutor.' },
         { role: 'user', content: prompt }

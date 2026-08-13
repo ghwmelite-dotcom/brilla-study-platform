@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { getDemoDataFlags, isDemoUserId } from './demoUtils';
 import { requireAuth } from './auth-middleware';
+import { getChatModel } from './ai-models';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -350,8 +351,8 @@ async function getTutorResponse(
   messages.push({ role: 'user', content: userMessage });
 
   try {
-    // Use the configured model or default to Llama 3.3 70B
-    const model = env.AI_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+    // Use the configured chat model (env-var routed via ai-models.ts)
+    const model = getChatModel(env);
 
     const result = await env.AI.run(model as BaseAiTextGenerationModels, {
       messages,

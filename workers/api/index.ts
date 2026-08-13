@@ -4,6 +4,8 @@ import { jwt, sign } from 'hono/jwt';
 import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware';
 import { parseLimit, parseJsonBody } from './http';
 import type { JWTPayload } from 'hono/utils/jwt/types';
+import type { BaseAiTextGenerationModels } from '@cloudflare/workers-types';
+import { getChatModel, getGenerationModel } from './ai-models';
 import { libraryApp } from './library';
 import { counselorApp } from './counselor';
 import { notificationsApp, createNotification } from './notifications';
@@ -58,6 +60,12 @@ interface Env {
   ANTHROPIC_API_KEY?: string;
   AI_PROVIDER?: string;
   AI_MODEL?: string;
+  AI_MODEL_CHAT?: string;
+  AI_MODEL_GENERATION?: string;
+  AI_MODEL_EMBEDDING?: string;
+  AI_MODEL_TTS?: string;
+  AI_CACHE_THRESHOLD?: string;
+  AI: Ai;  // Cloudflare Workers AI binding
   RESEND_API_KEY?: string;
   APP_URL?: string;
   FROM_EMAIL?: string;
@@ -4591,7 +4599,7 @@ protectedApp.post('/essays/submit', async (c) => {
 protectedApp.post('/essays/:attemptId/grade', async (c) => {
   const attemptId = c.req.param('attemptId');
   const apiKey = c.env.ANTHROPIC_API_KEY;
-  const model = c.env.AI_MODEL || 'claude-3-haiku-20240307';
+  const model = getGenerationModel(c.env);
 
   try {
     // Get essay attempt with question details
@@ -4749,7 +4757,7 @@ protectedApp.post('/ai/explain', async (c) => {
   }
 
   const apiKey = c.env.ANTHROPIC_API_KEY;
-  const model = c.env.AI_MODEL || 'claude-3-haiku-20240307';
+  const model = getChatModel(c.env);
 
   try {
     const exam = getExamContext(context);
@@ -4816,7 +4824,7 @@ protectedApp.post('/ai/chat', async (c) => {
   }
 
   const apiKey = c.env.ANTHROPIC_API_KEY;
-  const model = c.env.AI_MODEL || 'claude-3-haiku-20240307';
+  const model = getChatModel(c.env);
 
   try {
     const exam = getExamContext(context);
@@ -7631,6 +7639,43 @@ adminApp.post('/users/:id/set-tier', async (c) => {
     console.error('Set tier error:', error);
     return c.json({ success: false, error: 'Failed to set subscription tier' }, 500);
   }
+});
+
+// Compare AI models side by side (admin eval tool)
+adminApp.post('/ai-compare', async (c) => {
+  const { prompt, systemPrompt, models } = await c.req.json();
+
+  if (!prompt || typeof prompt !== 'string' || prompt.length > 8000) {
+    return c.json({ success: false, error: 'prompt is required (max 8000 chars)' }, 400);
+  }
+
+  const modelList: string[] = Array.isArray(models) && models.length > 0
+    ? models.slice(0, 3).filter((m: unknown) => typeof m === 'string' && m.startsWith('@cf/'))
+    : [getChatModel(c.env), getGenerationModel(c.env)];
+
+  const results = await Promise.all(modelList.map(async (model: string) => {
+    const started = Date.now();
+    try {
+      const messages = [
+        ...(systemPrompt ? [{ role: 'system' as const, content: String(systemPrompt).slice(0, 4000) }] : []),
+        { role: 'user' as const, content: prompt },
+      ];
+      const result = await c.env.AI.run(model as BaseAiTextGenerationModels, {
+        messages, max_tokens: 1024, temperature: 0.7,
+      });
+      const output = typeof result === 'object' && result !== null && 'response' in result
+        ? (result as { response: string }).response
+        : String(result);
+      const tokensUsed = typeof result === 'object' && result !== null && 'usage' in result
+        ? ((result as { usage?: { total_tokens?: number } }).usage?.total_tokens ?? null)
+        : null;
+      return { model, ok: true, latencyMs: Date.now() - started, output, tokensUsed };
+    } catch (error) {
+      return { model, ok: false, latencyMs: Date.now() - started, output: '', tokensUsed: null, error: error instanceof Error ? error.message : String(error) };
+    }
+  }));
+
+  return c.json({ success: true, data: { results } });
 });
 
 // Get user subscription/trial details (admin view)

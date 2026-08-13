@@ -3,6 +3,7 @@ import type { BaseAiTextGenerationModels } from '@cloudflare/workers-types';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
 import { isPremiumUser, checkAiAllowance } from './usage-limits';
+import { getChatModel, getGenerationModel } from './ai-models';
 
 interface Env {
   DB: D1Database;
@@ -203,7 +204,7 @@ ${PHASE_PROMPTS[phase]}`;
   messages.push({ role: 'user', content: userMessage });
 
   try {
-    const model = env.AI_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+    const model = getChatModel(env);
 
     const result = await env.AI.run(model as BaseAiTextGenerationModels, {
       messages,
@@ -280,7 +281,7 @@ RESPOND IN THIS EXACT JSON FORMAT:
 }`;
 
   try {
-    const model = env.AI_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+    const model = getChatModel(env);
 
     const result = await env.AI.run(model as BaseAiTextGenerationModels, {
       messages: [
@@ -1121,7 +1122,7 @@ The student has a question. Answer it helpfully and concisely, relating it back 
     messages.push({ role: 'user', content: question });
 
     try {
-      const model = c.env.AI_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+      const model = getChatModel(c.env);
 
       const result = await c.env.AI.run(model as BaseAiTextGenerationModels, {
         messages,
@@ -1968,7 +1969,7 @@ ${lessonTypeInstructions[lessonType]}
 Create content appropriate for ${examType.toUpperCase()} exam preparation.`;
 
   try {
-    const model = env.AI_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+    const model = getGenerationModel(env);
 
     const result = await env.AI.run(model as BaseAiTextGenerationModels, {
       messages: [

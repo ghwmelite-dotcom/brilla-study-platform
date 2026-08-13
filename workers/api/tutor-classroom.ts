@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import type { Env } from './index';
 import { requireAuth } from './auth-middleware';
+import { getChatModel } from './ai-models';
 
 // Identity shape read by the routes below. requireAuth sets `user` to the JWT
 // payload (keyed by userId) with role refreshed from the DB; the adapter
@@ -1005,7 +1006,7 @@ Exam Type: ${session.exam_type || 'General'}`;
     }
 
     // Call AI
-    const aiResponse = await AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
+    const aiResponse = await AI.run(getChatModel(c.env) as BaseAiTextGenerationModels, {
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
