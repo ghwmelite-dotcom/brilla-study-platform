@@ -789,40 +789,8 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                 </>
               )}
 
-              {/* Google Sign-Up for Registration (after role selection).
-                  Hidden once the backend tells us invite mode is on — Google
-                  registration would hit the same codeRequired rejection. */}
-              {mode === 'register' && selectedRole && selectedRole !== 'admin' && !inviteModeDetected && (
-                <>
-                  <GoogleSignInButton
-                    mode="register"
-                    role={selectedRole}
-                    registrationData={
-                      selectedRole === 'student' && schoolLevel
-                        ? { schoolLevel, ...(referralCode.trim() ? { referralCode: referralCode.trim().toUpperCase() } : {}) }
-                        : referralCode.trim()
-                          ? { referralCode: referralCode.trim().toUpperCase() }
-                          : undefined
-                    }
-                    onError={(error) => {
-                      setFormErrors({ submit: error });
-                      if (/invite code is required/i.test(error)) {
-                        setInviteModeDetected(true);
-                        setShowCodeRequest(true);
-                      }
-                    }}
-                    disabled={isLoading}
-                  />
-                  <div className="relative my-4">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-neutral-200" />
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="px-3 bg-white text-neutral-500">or register with email</span>
-                    </div>
-                  </div>
-                </>
-              )}
+              {/* Google Sign-Up moved to just above the submit button so every
+                  choice made on this form is captured into the OAuth data. */}
 
               {mode === 'register' && (
                 <div>
@@ -1393,6 +1361,52 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                   mode === 'login' ? 'Sign In' : 'Create Account'
                 )}
               </button>
+
+              {/* Google Sign-Up (register mode only). Placed AFTER the form
+                  fields so everything the user has chosen — plan, year group,
+                  exam types, referral code, teacher credentials — is captured
+                  into the OAuth registration data. Hidden in invite mode once
+                  detected: Google registration hits the same codeRequired
+                  rejection. Turnstile is not needed here; the worker skips it
+                  for OAuth because Google verifies humanity. */}
+              {mode === 'register' && selectedRole && selectedRole !== 'admin' && !inviteModeDetected && (
+                <>
+                  <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-neutral-200" />
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-3 bg-white text-neutral-500">or</span>
+                    </div>
+                  </div>
+                  <GoogleSignInButton
+                    mode="register"
+                    role={selectedRole}
+                    registrationData={{
+                      ...(selectedRole === 'student' && schoolLevel ? { schoolLevel } : {}),
+                      ...(selectedRole === 'student' && yearGroup ? { yearGroup: parseInt(yearGroup) } : {}),
+                      ...(schoolName.trim() ? { schoolName: schoolName.trim() } : {}),
+                      ...(selectedRole === 'student' && house ? { house } : {}),
+                      ...(selectedRole === 'teacher' && teacherLicenseNumber.trim() ? { teacherLicenseNumber: teacherLicenseNumber.trim() } : {}),
+                      ...(selectedRole === 'teacher' && subjectsTaught.length > 0 ? { subjectsTaught } : {}),
+                      ...(selectedRole === 'teacher' && yearsExperience ? { yearsExperience } : {}),
+                      ...(selectedRole === 'teacher' && qualifications.trim() ? { qualifications: qualifications.trim() } : {}),
+                      ...(selectedTierId ? { selectedTierId } : {}),
+                      ...(selectedExamTypes.length > 0 ? { examTypeIds: selectedExamTypes } : {}),
+                      ...(primaryExamType ? { primaryExamTypeId: primaryExamType } : {}),
+                      ...(referralCode.trim() ? { referralCode: referralCode.trim().toUpperCase() } : {}),
+                    }}
+                    onError={(error) => {
+                      setFormErrors({ submit: error });
+                      if (/invite code is required/i.test(error)) {
+                        setInviteModeDetected(true);
+                        setShowCodeRequest(true);
+                      }
+                    }}
+                    disabled={isLoading}
+                  />
+                </>
+              )}
 
               <div className="text-center pt-2">
                 <p className="text-neutral-600 text-sm">
