@@ -352,9 +352,10 @@ export function ImmersiveClassroom({
           />
 
           {/* Interactive Whiteboard - The main focus */}
+          {/* isAiDrawing intentionally not passed: the AI canvas layer receives
+              no data yet (Phase C) — showing the indicator would be theater. */}
           <ImmersiveWhiteboard
             aiContent={aiTeachingState.currentMessage}
-            isAiDrawing={aiTeachingState.isThinking}
             onDrawingAdd={handleDrawingAdd}
             onQuestionMark={() => {
               askQuestion("Can you explain what's at this point on the whiteboard?");

@@ -202,8 +202,8 @@ export function ImmersiveWhiteboard({
 
       let x, y;
       if ('touches' in e) {
-        x = e.touches[0].clientX - rect.left;
-        y = e.touches[0].clientY - rect.top;
+        x = e.changedTouches[0].clientX - rect.left;
+        y = e.changedTouches[0].clientY - rect.top;
       } else {
         x = e.clientX - rect.left;
         y = e.clientY - rect.top;
@@ -256,9 +256,19 @@ export function ImmersiveWhiteboard({
     let touchStartX = 0;
     let touchStartY = 0;
 
+    let twoFingerTapCenter: { x: number; y: number } | null = null;
+
     const handleTouchStart = (e: TouchEvent) => {
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
+      // Two fingers down together = question-mark tap (record center now;
+      // changedTouches at touchend only holds the lifted finger).
+      if (e.touches.length === 2) {
+        twoFingerTapCenter = {
+          x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+          y: (e.touches[0].clientY + e.touches[1].clientY) / 2,
+        };
+      }
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
@@ -277,11 +287,10 @@ export function ImmersiveWhiteboard({
         }
       }
 
-      // Detect two-finger tap (question mark)
-      if (e.changedTouches.length === 2) {
-        const centerX = (e.changedTouches[0].clientX + e.changedTouches[1].clientX) / 2;
-        const centerY = (e.changedTouches[0].clientY + e.changedTouches[1].clientY) / 2;
-        addQuestionMark(centerX, centerY);
+      // Fire the recorded two-finger tap
+      if (twoFingerTapCenter) {
+        addQuestionMark(twoFingerTapCenter.x, twoFingerTapCenter.y);
+        twoFingerTapCenter = null;
       }
     };
 
@@ -299,7 +308,6 @@ export function ImmersiveWhiteboard({
       ref={containerRef}
       className={cn("relative w-full h-full", className)}
       onDoubleClick={handleDoubleTap as any}
-      onTouchEnd={handleDoubleTap as any}
     >
       {/* AI Canvas Layer (background) */}
       <canvas
