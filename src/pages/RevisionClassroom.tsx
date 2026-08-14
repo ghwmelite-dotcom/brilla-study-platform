@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   BookOpen,
   Brain,
@@ -46,6 +46,7 @@ import type { ExamTypeSlug } from '@/types';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { subjects as examSubjects, examTypes } from '@/data/examData';
 import type { TeachingPhase } from '@/stores/revisionClassroomStore';
+import { GUIDANCE_EXAM_OPTIONS, getGuidanceSubjects } from '@/lib/guidanceExamCatalog';
 
 // Beautiful AI Typing Indicator Component
 function AITypingIndicator({ phase }: { phase?: TeachingPhase }) {
@@ -522,6 +523,7 @@ function AITeachingDisplay({
 // Main Revision Classroom component
 export default function RevisionClassroom() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuthStore();
   const { currentExamType } = useExamStore();
   const {
@@ -548,7 +550,6 @@ export default function RevisionClassroom() {
     struggleSignals,
     handoffState,
     currentCheckpoints,
-    topicMasteries,
     startRevisionSession,
     resumeSession,
     pauseSession,
@@ -589,10 +590,11 @@ export default function RevisionClassroom() {
   const [showSubjectSelector, setShowSubjectSelector] = useState(!currentSession);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isVoiceProcessing, setIsVoiceProcessing] = useState(false);
-  const [dueTopics, setDueTopics] = useState<typeof topicMasteries[string][]>([]);
+  const [dueTopics, setDueTopics] = useState<ReturnType<typeof useRevisionClassroomStore.getState>['topicMasteries'][string][]>([]);
   const [pendingVoiceInput, setPendingVoiceInput] = useState<string>('');
   const [checkpointFeedback, setCheckpointFeedback] = useState<{isCorrect: boolean; feedback: string} | null>(null);
   const lastResponseTimeRef = useRef<number>(Date.now());
+  const deepLinkFiredRef = useRef(false);
 
   // Fetch stats and past sessions on mount
   useEffect(() => {
@@ -626,7 +628,13 @@ export default function RevisionClassroom() {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   // Handle subject selection
-  const handleSelectSubject = async (subjectId: string, subjectName: string) => {
+  const handleSelectSubject = useCallback(async (
+    subjectId: string,
+    subjectName: string,
+    topicId?: string,
+    topicName?: string,
+    examTypeOverride?: ExamTypeSlug,
+  ) => {
     // Check if user is logged in - API requires authentication
     if (!user) {
       setShowLoginPrompt(true);
@@ -641,9 +649,12 @@ export default function RevisionClassroom() {
     try {
       await startRevisionSession(
         user.id,
-        currentExamType,
+        examTypeOverride ?? currentExamType,
         subjectId,
-        subjectName
+        subjectName,
+        topicId ? 'topic_review' : 'full_revision',
+        topicId,
+        topicName,
       );
 
       // Wait a moment for state to update
@@ -670,7 +681,34 @@ export default function RevisionClassroom() {
     } finally {
       setIsStartingSession(false);
     }
-  };
+  }, [currentExamType, startRevisionSession, user]);
+
+  // Treat Counselor Brie roadmap query parameters as untrusted input. Only a
+  // catalog exam/subject pair and bounded identifiers may auto-start.
+  useEffect(() => {
+    if (deepLinkFiredRef.current || currentSession || !user) return;
+    const subjectId = searchParams.get('subject')?.trim() ?? '';
+    const rawExam = searchParams.get('exam')?.trim() ?? '';
+    if (!subjectId || !rawExam || !/^[A-Za-z0-9_-]{1,128}$/.test(subjectId)) return;
+
+    const examOption = GUIDANCE_EXAM_OPTIONS.find(
+      (exam) => exam.apiId === rawExam || exam.slug === rawExam,
+    );
+    if (!examOption) return;
+    const subject = getGuidanceSubjects(examOption.slug).find((item) => item.id === subjectId);
+    if (!subject) return;
+
+    const rawTopicId = searchParams.get('topic')?.trim() ?? '';
+    const topicId = /^[A-Za-z0-9_-]{1,128}$/.test(rawTopicId) ? rawTopicId : undefined;
+    const rawTopicName = searchParams.get('topicName')?.trim();
+    const topicName = rawTopicName && rawTopicName.length <= 160 ? rawTopicName : undefined;
+
+    deepLinkFiredRef.current = true;
+    if (examOption.slug !== currentExamType) {
+      useExamStore.getState().setExamType(examOption.slug);
+    }
+    void handleSelectSubject(subject.id, subject.name, topicId, topicName, examOption.slug);
+  }, [currentExamType, currentSession, handleSelectSubject, searchParams, user]);
 
   // Handle continue button
   const handleContinue = () => {

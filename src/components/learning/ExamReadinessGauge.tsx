@@ -75,7 +75,7 @@ export function ExamReadinessGauge({ examType = 'wassce', className, compact = f
     return null;
   }
 
-  const { overallReadiness, subjectReadiness, predictedScore, recommendedFocus } = examReadiness;
+  const { overallReadiness, subjectReadiness, recommendedFocus } = examReadiness;
 
   // Determine readiness status
   const getReadinessStatus = (value: number) => {
@@ -95,13 +95,13 @@ export function ExamReadinessGauge({ examType = 'wassce', className, compact = f
           <CircularProgress value={overallReadiness} size={60} variant="primary" />
           <div>
             <div className="flex items-center gap-2">
-              <h4 className="font-semibold text-neutral-900">{examReadiness.examName} Ready</h4>
+              <h4 className="font-semibold text-neutral-900">{examReadiness.examName} readiness</h4>
               <span className={cn('px-2 py-0.5 rounded-full text-xs font-medium', status.bg, status.color)}>
                 {status.label}
               </span>
             </div>
             <p className="text-sm text-neutral-500 mt-0.5">
-              Predicted score: {predictedScore.low}-{predictedScore.high}%
+              Provisional estimate: {overallReadiness}/100
             </p>
           </div>
         </div>
@@ -145,7 +145,7 @@ export function ExamReadinessGauge({ examType = 'wassce', className, compact = f
           <div className="absolute inset-0 flex items-center justify-center">
             <div>
               <div className="text-3xl font-bold text-neutral-900">{overallReadiness}%</div>
-              <div className="text-xs text-neutral-500">Overall</div>
+              <div className="text-xs text-neutral-500">Provisional</div>
             </div>
           </div>
         </div>
@@ -155,14 +155,8 @@ export function ExamReadinessGauge({ examType = 'wassce', className, compact = f
           <span className={cn('font-medium text-sm', status.color)}>{status.label}</span>
         </div>
 
-        {/* Predicted Score */}
         <div className="mt-4 p-3 bg-neutral-50 rounded-xl">
-          <p className="text-xs text-neutral-500 mb-1">Predicted Score Range</p>
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-lg font-bold text-neutral-700">{predictedScore.low}%</span>
-            <span className="text-neutral-400">-</span>
-            <span className="text-lg font-bold text-neutral-700">{predictedScore.high}%</span>
-          </div>
+          <p className="text-xs text-neutral-600">Study-readiness estimate, not a predicted exam grade. It updates as you practise.</p>
         </div>
       </div>
 

@@ -21,6 +21,7 @@ import { teacherBonusesRouter } from './teacher-bonuses';
 import { tutoringRouter } from './tutoring';
 import { quickPlayApp } from './quickplay';
 import { learningPathApp } from './learningpath';
+import { guidanceApp } from './guidance';
 import { activityFeedApp } from './activityfeed';
 import { eventsApp } from './events';
 import { teamBattlesApp } from './teambattles';
@@ -41,6 +42,8 @@ import { PENDING_APPROVAL_MESSAGE, SELF_REGISTRATION_STATUS } from './registrati
 import { raceApp, runRaceCycleMaintenance } from './race';
 import { telegramWebhookApp } from './telegram';
 import { runTelegramRaceAlerts } from './race-alerts';
+import { recordAttemptProgress } from './attempt-progress';
+import { getParentGuidance } from './parent-guidance';
 import {
   getDailyUsage,
   checkCanAnswer,
@@ -3465,71 +3468,17 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
     const pointsEarned = isCorrect ? (question.points as number) : 0;
 
     // Increment usage count for non-premium users
-    const usageResult = await incrementUsage(userId, c.env.DB);
-
-    // Record the attempt with demo data flags, and upsert per-topic
-    // user_progress (the mastery write path feeding GET /progress) in the
-    // same atomic batch.
-    const attemptId = `attempt_${Date.now()}`;
-    const demoFlags = getDemoDataFlags(userId);
-    const nowIso = new Date().toISOString();
-    const attemptInsert = c.env.DB.prepare(`
-      INSERT INTO question_attempts (id, user_id, question_id, user_answer, is_correct, time_taken, points_earned, is_demo_data, expires_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(attemptId, userId, questionId, answer, isCorrect ? 1 : 0, 0, pointsEarned, demoFlags.is_demo_data, demoFlags.expires_at);
-
-    // questions.topic_id is NOT NULL in the schema, but guard anyway: with no
-    // topic there is nothing to key progress on, so skip the upsert silently.
-    const topicId = question.topic_id as string | null;
-    // NOTE: questions.exam_type_id is nullable (seed.sql inserts omit it).
-    // SQLite UNIQUE(user_id, topic_id, exam_type_id) never conflict-matches
-    // NULL, so ON CONFLICT is only safe when exam_type_id is non-null; the
-    // NULL case uses an explicit SELECT + INSERT/UPDATE instead (storing a
-    // sentinel like '' would violate the exam_types FK).
-    const examTypeId = (question.exam_type_id as string | null) ?? null;
-
-    let progressStmt = null;
-    if (topicId && examTypeId !== null) {
-      progressStmt = c.env.DB.prepare(`
-        INSERT INTO user_progress (id, user_id, topic_id, exam_type_id, questions_attempted, questions_correct, mastery_level, last_attempt_at, created_at, updated_at, is_demo_data, expires_at)
-        VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?)
-        ON CONFLICT(user_id, topic_id, exam_type_id) DO UPDATE SET
-          questions_attempted = questions_attempted + 1,
-          questions_correct = questions_correct + excluded.questions_correct,
-          mastery_level = ROUND(100.0 * (questions_correct + excluded.questions_correct) / (questions_attempted + 1)),
-          last_attempt_at = excluded.last_attempt_at,
-          updated_at = excluded.updated_at
-      `).bind(
-        `progress_${Date.now()}`, userId, topicId, examTypeId,
-        isCorrect ? 1 : 0, isCorrect ? 100 : 0,
-        nowIso, nowIso, nowIso, demoFlags.is_demo_data, demoFlags.expires_at
-      );
-    } else if (topicId) {
-      const existing = await c.env.DB.prepare(`
-        SELECT id FROM user_progress
-        WHERE user_id = ? AND topic_id = ? AND exam_type_id IS NULL
-      `).bind(userId, topicId).first<{ id: string }>();
-      progressStmt = existing
-        ? c.env.DB.prepare(`
-            UPDATE user_progress SET
-              questions_attempted = questions_attempted + 1,
-              questions_correct = questions_correct + ?,
-              mastery_level = ROUND(100.0 * (questions_correct + ?) / (questions_attempted + 1)),
-              last_attempt_at = ?,
-              updated_at = ?
-            WHERE id = ?
-          `).bind(isCorrect ? 1 : 0, isCorrect ? 1 : 0, nowIso, nowIso, existing.id)
-        : c.env.DB.prepare(`
-            INSERT INTO user_progress (id, user_id, topic_id, exam_type_id, questions_attempted, questions_correct, mastery_level, last_attempt_at, created_at, updated_at, is_demo_data, expires_at)
-            VALUES (?, ?, ?, NULL, 1, ?, ?, ?, ?, ?, ?, ?)
-          `).bind(
-            `progress_${Date.now()}`, userId, topicId,
-            isCorrect ? 1 : 0, isCorrect ? 100 : 0,
-            nowIso, nowIso, nowIso, demoFlags.is_demo_data, demoFlags.expires_at
-          );
-    }
-
-    await c.env.DB.batch(progressStmt ? [attemptInsert, progressStmt] : [attemptInsert]);
+    await incrementUsage(userId, c.env.DB);
+    await recordAttemptProgress(c.env.DB, {
+      userId,
+      questionId,
+      topicId: (question.topic_id as string | null) ?? null,
+      examTypeId: (question.exam_type_id as string | null) ?? null,
+      userAnswer: answer,
+      isCorrect,
+      timeTaken: 0,
+      points: (question.points as number | null) ?? 3,
+    });
 
     // Get updated usage info
     const usage = await getDailyUsage(userId, c.env.DB);
@@ -5755,6 +5704,9 @@ protectedApp.get('/parents/students/:studentId/progress', userAuth, async (c) =>
       SELECT MAX(streak_days) as longest_streak FROM users WHERE id = ?
     `).bind(studentId).first();
 
+    // Authorization and the student's opt-out above remain the privacy boundary.
+    const guidance = await getParentGuidance(c.env.DB, studentId);
+
     // Log parent access
     const logId = `pal_${Date.now()}`;
     await c.env.DB.prepare(`
@@ -5806,6 +5758,7 @@ protectedApp.get('/parents/students/:studentId/progress', userAuth, async (c) =>
           unlockedAt: a.unlocked_at,
         })),
         lastActiveAt: student.last_activity_date,
+        guidance,
       },
     });
   } catch (error) {
@@ -11124,6 +11077,7 @@ app.route('/api/quickplay', quickPlayApp);
 app.route('/api/learning', learningPathApp);
 app.route('/api/activity', activityFeedApp);
 app.route('/api/events', eventsApp);
+app.route('/api/guidance', guidanceApp);
 app.route('/api/team-battles', teamBattlesApp);
 app.route('/api/cosmetics', cosmeticsApp);
 app.route('/api/rewards', rewardsApp);

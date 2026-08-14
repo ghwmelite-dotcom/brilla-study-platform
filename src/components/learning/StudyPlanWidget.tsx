@@ -1,35 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import {
-  Calendar,
-  CheckCircle2,
-  Circle,
-  Star,
-  ChevronRight,
-  RefreshCw,
-  Sparkles,
-} from 'lucide-react';
-import { cn } from '@/utils';
-import { Card, Button } from '@/components/common';
-import { useLearningPathStore, type RecommendationPriority } from '@/stores/learningPathStore';
+import { motion, useReducedMotion } from 'framer-motion';
+import { AlertCircle, ArrowRight, CalendarDays, Clock3, Compass, RefreshCw, Sparkles } from 'lucide-react';
+import { subjects as examSubjects } from '@/data/examData';
 import { useExamStore } from '@/stores/examStore';
+import { useGuidanceStore, type RoadmapNode, type UserGoal } from '@/stores/guidanceStore';
+import { fromGuidanceExamType, getGuidanceSubjects, toGuidanceExamType } from '@/lib/guidanceExamCatalog';
 
-const priorityColors: Record<RecommendationPriority, string> = {
-  critical: 'bg-red-500',
-  high: 'bg-orange-500',
-  medium: 'bg-blue-500',
-  low: 'bg-green-500',
-};
-
-const dayLabels: Record<string, string> = {
-  monday: 'Mon',
-  tuesday: 'Tue',
-  wednesday: 'Wed',
-  thursday: 'Thu',
-  friday: 'Fri',
-  saturday: 'Sat',
-  sunday: 'Sun',
+const priorityClasses: Record<RoadmapNode['priority'], string> = {
+  critical: 'bg-red-500', high: 'bg-amber-500', medium: 'bg-blue-500', low: 'bg-emerald-500',
 };
 
 interface StudyPlanWidgetProps {
@@ -37,255 +16,125 @@ interface StudyPlanWidgetProps {
   showWeekView?: boolean;
 }
 
-export function StudyPlanWidget({ className, showWeekView = false }: StudyPlanWidgetProps) {
-  const { studyPlan, isLoading, generateStudyPlan, markTopicComplete } = useLearningPathStore();
-  const { currentExamType } = useExamStore();
-  const previousExamType = useRef(currentExamType);
+function revisionHref(goal: UserGoal, node: RoadmapNode): string {
+  const subjectName = getGuidanceSubjects(fromGuidanceExamType(goal.examType)).find((subject) => subject.id === goal.subjectId)?.name ?? examSubjects.find((subject) => subject.id === goal.subjectId)?.name ?? 'Revision';
+  const params = new URLSearchParams({
+    exam: goal.examType, subject: goal.subjectId, topic: node.topicId,
+    subjectName, topicName: node.topicName,
+  });
+  return `/revision-classroom?${params.toString()}`;
+}
 
-  // Generate study plan on mount or when exam type changes
+export function StudyPlanWidget({ className = '', showWeekView = false }: StudyPlanWidgetProps) {
+  const reduceMotion = useReducedMotion();
+  const currentExamType = useExamStore((state) => state.currentExamType);
+  const { plan, isLoading, error, fetchGoals, fetchPlan } = useGuidanceStore();
+  const [activeGoal, setActiveGoal] = useState<UserGoal | null>(null);
+
   useEffect(() => {
-    // Always regenerate when exam type changes
-    if (previousExamType.current !== currentExamType) {
-      previousExamType.current = currentExamType;
-      generateStudyPlan();
-    } else if (studyPlan.length === 0) {
-      // Generate on initial mount if no plan exists
-      generateStudyPlan();
-    }
-  }, [studyPlan.length, generateStudyPlan, currentExamType]);
+    let active = true;
+    void fetchGoals().then((loadedGoals) => {
+      if (!active) return;
+      const canonicalExam = toGuidanceExamType(currentExamType);
+      setActiveGoal(loadedGoals.find((goal) => goal.examType === canonicalExam) ?? loadedGoals[0] ?? null);
+    });
+    return () => { active = false; };
+  }, [currentExamType, fetchGoals]);
 
-  const today = new Date().toISOString().split('T')[0];
-  const todayPlan = studyPlan.find((p) => p.date === today);
-  const upcomingPlans = studyPlan.filter((p) => p.date > today).slice(0, 3);
+  useEffect(() => {
+    if (!activeGoal) return;
+    void fetchPlan(activeGoal.examType, activeGoal.subjectId);
+  }, [activeGoal, fetchPlan]);
 
-  const totalXpTarget = studyPlan.reduce((sum, p) => sum + p.xpTarget, 0);
-  const totalXpEarned = studyPlan.reduce((sum, p) => sum + p.xpEarned, 0);
-  const weekProgress = totalXpTarget > 0 ? Math.round((totalXpEarned / totalXpTarget) * 100) : 0;
+  const refresh = () => {
+    if (activeGoal) void fetchPlan(activeGoal.examType, activeGoal.subjectId);
+  };
 
   return (
-    <Card className={cn('overflow-hidden', className)}>
-      {/* Header */}
-      <div className="p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
-        <div className="flex items-center justify-between">
+    <section className={`overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm ${className}`} aria-labelledby="study-plan-widget-title">
+      <header className="bg-gradient-to-r from-violet-700 to-indigo-700 p-4 text-white">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-              <Calendar className="w-5 h-5" />
-            </div>
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15"><Compass className="h-5 w-5" aria-hidden="true" /></span>
             <div>
-              <h3 className="font-bold">Study Plan</h3>
-              <p className="text-white/70 text-sm">Your weekly learning schedule</p>
+              <h2 id="study-plan-widget-title" className="font-bold">This Week</h2>
+              <p className="text-sm text-violet-100">Counselor Brie's next three moves</p>
             </div>
           </div>
-
           <button
-            onClick={() => generateStudyPlan()}
-            disabled={isLoading}
-            className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
-            aria-label="Refresh study plan"
+            type="button"
+            onClick={refresh}
+            disabled={isLoading || !activeGoal}
+            className="flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-white/15 hover:bg-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white disabled:opacity-50"
+            aria-label="Refresh this week's study plan"
           >
-            <RefreshCw className={cn('w-4 h-4', isLoading && 'animate-spin')} />
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin motion-reduce:animate-none' : ''}`} aria-hidden="true" />
           </button>
         </div>
+        {plan && activeGoal && (
+          <p className="mt-4 border-t border-white/15 pt-3 text-sm text-violet-100">
+            Provisional readiness <strong className="text-white">{Math.round(plan.readiness)}%</strong>
+            {plan.confidence ? ` - ${plan.confidence} confidence` : ''}
+          </p>
+        )}
+      </header>
 
-        {/* Week Progress */}
-        <div className="mt-4 pt-3 border-t border-white/20">
-          <div className="flex items-center justify-between text-sm mb-2">
-            <span className="text-white/70">Weekly Progress</span>
-            <span className="font-semibold">{totalXpEarned}/{totalXpTarget} XP</span>
-          </div>
-          <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-white rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${weekProgress}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
+      {error && (
+        <div role="alert" className="flex items-start gap-2 border-b border-red-200 bg-red-50 p-4 text-sm text-red-800">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" /> {error}
         </div>
-      </div>
+      )}
 
-      {/* Today's Plan */}
-      <div className="p-4 border-b border-neutral-100">
-        <h4 className="text-xs font-medium text-neutral-500 uppercase tracking-wide mb-3 flex items-center gap-2">
-          <Sparkles className="w-3 h-3" />
-          Today's Focus
-        </h4>
-
-        {isLoading && !todayPlan ? (
-          <div className="py-4 text-center">
-            <RefreshCw className="w-6 h-6 text-neutral-300 mx-auto animate-spin" />
+      <div className="p-4">
+        {isLoading && !plan ? (
+          <div role="status" className="flex items-center justify-center gap-2 py-8 text-sm text-neutral-500">
+            <RefreshCw className="h-5 w-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> Loading your plan...
           </div>
-        ) : todayPlan ? (
-          <div className="space-y-2">
-            {todayPlan.topics.map((topic) => (
-              <motion.div
-                key={topic.topicId}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className={cn(
-                  'flex items-center gap-3 p-3 rounded-lg transition-colors',
-                  topic.completed ? 'bg-emerald-50' : 'bg-neutral-50 hover:bg-neutral-100'
-                )}
+        ) : !activeGoal ? (
+          <div className="py-7 text-center">
+            <Sparkles className="mx-auto h-9 w-9 text-violet-300" aria-hidden="true" />
+            <p className="mt-3 font-semibold text-neutral-900">Set your goal to unlock this week</p>
+            <Link to="/my-plan" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-violet-700 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-800">Meet Counselor Brie</Link>
+          </div>
+        ) : plan?.thisWeek.length ? (
+          <ol className="space-y-3">
+            {plan.thisWeek.map((node, index) => (
+              <motion.li
+                key={node.topicId}
+                initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: reduceMotion ? 0 : 0.2, delay: reduceMotion ? 0 : index * 0.04 }}
+                className="rounded-xl border border-neutral-200 p-3"
               >
-                <button
-                  onClick={() => markTopicComplete(todayPlan.id, topic.topicId)}
-                  className="flex-shrink-0"
-                  disabled={topic.completed}
-                >
-                  {topic.completed ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                  ) : (
-                    <Circle className="w-5 h-5 text-neutral-300 hover:text-primary transition-colors" />
-                  )}
-                </button>
-
-                <div className="flex-1 min-w-0">
-                  <p
-                    className={cn(
-                      'font-medium text-sm',
-                      topic.completed ? 'text-emerald-700 line-through' : 'text-neutral-700'
-                    )}
-                  >
-                    {topic.topicName}
-                  </p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className={cn('w-2 h-2 rounded-full', priorityColors[topic.priority])} />
-                    <span className="text-xs text-neutral-400">
-                      ~{topic.estimatedMinutes} min
-                    </span>
+                <div className="flex items-start gap-3">
+                  <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${priorityClasses[node.priority]}`} aria-hidden="true" />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-neutral-900">{node.topicName}</p>
+                    <p className="mt-1 flex items-center gap-1 text-xs text-neutral-500"><Clock3 className="h-3.5 w-3.5" aria-hidden="true" /> {node.estimatedTime} min - {node.masteryScore}% mastery</p>
                   </div>
+                  <Link
+                    to={revisionHref(activeGoal, node)}
+                    className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl text-violet-700 hover:bg-violet-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600"
+                    aria-label={`Start ${node.topicName}`}
+                  ><ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
                 </div>
-
-                <Link
-                  to={`/practice?subject=${topic.subjectId}&topic=${topic.topicId}`}
-                  className={cn(
-                    'p-2 rounded-lg transition-colors',
-                    topic.completed
-                      ? 'text-neutral-300 cursor-not-allowed'
-                      : 'text-neutral-400 hover:text-primary hover:bg-primary-50'
-                  )}
-                  onClick={(e) => topic.completed && e.preventDefault()}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
-              </motion.div>
+              </motion.li>
             ))}
-
-            {/* Today's XP */}
-            <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg mt-3">
-              <div className="flex items-center gap-2 text-amber-700">
-                <Star className="w-4 h-4" />
-                <span className="text-sm font-medium">Today's XP</span>
-              </div>
-              <span className="text-sm font-bold text-amber-700">
-                {todayPlan.xpEarned}/{todayPlan.xpTarget}
-              </span>
-            </div>
-          </div>
+          </ol>
         ) : (
-          <div className="py-6 text-center">
-            <CheckCircle2 className="w-10 h-10 text-emerald-300 mx-auto mb-2" />
-            <p className="text-neutral-500 font-medium">No study plan for today</p>
-            <p className="text-sm text-neutral-400 mt-1">Check back tomorrow!</p>
+          <div className="py-7 text-center text-neutral-600">
+            <CalendarDays className="mx-auto h-9 w-9 text-neutral-300" aria-hidden="true" />
+            <p className="mt-3 font-medium">No focus topics are available yet.</p>
           </div>
         )}
-      </div>
 
-      {/* Week View (Optional) */}
-      {showWeekView && (
-        <div className="p-4 border-b border-neutral-100">
-          <h4 className="text-xs font-medium text-neutral-500 uppercase tracking-wide mb-3">
-            This Week
-          </h4>
-
-          <div className="flex gap-2">
-            {studyPlan.slice(0, 7).map((day) => {
-              const isToday = day.date === today;
-              const completionPercent =
-                day.topics.length > 0
-                  ? Math.round(
-                      (day.topics.filter((t) => t.completed).length / day.topics.length) * 100
-                    )
-                  : 0;
-
-              return (
-                <div
-                  key={day.id}
-                  className={cn(
-                    'flex-1 p-2 rounded-lg text-center',
-                    isToday ? 'bg-primary text-white' : 'bg-neutral-50'
-                  )}
-                >
-                  <p className={cn('text-xs font-medium', isToday ? 'text-white/70' : 'text-neutral-500')}>
-                    {dayLabels[day.day]}
-                  </p>
-                  <p className={cn('text-lg font-bold mt-1', isToday ? 'text-white' : 'text-neutral-900')}>
-                    {completionPercent}%
-                  </p>
-                  <div
-                    className={cn(
-                      'h-1 rounded-full mt-1',
-                      isToday ? 'bg-white/30' : 'bg-neutral-200'
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        'h-full rounded-full transition-all',
-                        isToday ? 'bg-white' : 'bg-emerald-500',
-                        day.completed && 'bg-emerald-500'
-                      )}
-                      style={{ width: `${completionPercent}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Upcoming Days */}
-      {upcomingPlans.length > 0 && (
-        <div className="p-4">
-          <h4 className="text-xs font-medium text-neutral-500 uppercase tracking-wide mb-3">
-            Coming Up
-          </h4>
-
-          <div className="space-y-2">
-            {upcomingPlans.map((day) => (
-              <div
-                key={day.id}
-                className="flex items-center gap-3 p-2 rounded-lg bg-neutral-50"
-              >
-                <div className="w-10 h-10 rounded-lg bg-neutral-200 flex items-center justify-center text-neutral-600">
-                  <span className="text-xs font-bold">{dayLabels[day.day]}</span>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-neutral-700">
-                    {day.topics.length} topic{day.topics.length !== 1 ? 's' : ''}
-                  </p>
-                  <p className="text-xs text-neutral-400">
-                    {day.topics.map((t) => t.topicName).join(', ')}
-                  </p>
-                </div>
-                <div className="flex items-center gap-1 text-amber-500">
-                  <Star className="w-3 h-3" />
-                  <span className="text-xs font-medium">{day.xpTarget}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* View Full Plan */}
-      <div className="p-4 bg-neutral-50 border-t border-neutral-100">
-        <Link to="/practice">
-          <Button variant="outline" fullWidth size="sm" rightIcon={<ChevronRight className="w-4 h-4" />}>
-            Start Learning
-          </Button>
+        <Link
+          to="/my-plan"
+          className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-800 hover:bg-violet-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600"
+        >
+          {showWeekView ? 'Open complete roadmap' : 'View My Plan'} <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </div>
-    </Card>
+    </section>
   );
 }

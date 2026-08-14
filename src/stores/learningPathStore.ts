@@ -1,18 +1,17 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { useProgressStore } from './progressStore';
-import { useExamStore } from './examStore';
+import { subjects as examSubjects } from '@/data/examData';
+import {
+  GUIDANCE_EXAM_OPTIONS,
+  toGuidanceExamType,
+  type GuidanceExamType,
+} from '@/lib/guidanceExamCatalog';
 import type { ExamTypeSlug } from '@/types';
+import { useExamStore } from './examStore';
+import { useGuidanceStore, type BriePlan, type RoadmapNode, type UserGoal } from './guidanceStore';
 
-// Types
 export type RecommendationPriority = 'critical' | 'high' | 'medium' | 'low';
-export type RecommendationReason =
-  | 'weak_area'
-  | 'not_started'
-  | 'review_needed'
-  | 'exam_focus'
-  | 'streak_building'
-  | 'trending_topic';
+export type RecommendationReason = RoadmapNode['reason'] | 'exam_focus' | 'streak_building' | 'trending_topic';
 
 export interface RecommendedTopic {
   topicId: string;
@@ -23,22 +22,18 @@ export interface RecommendedTopic {
   reason: RecommendationReason;
   reasonText: string;
   mastery: number;
-  estimatedTime: number; // minutes
+  estimatedTime: number;
   questionCount: number;
   lastAttemptedAt?: string;
-  examWeight?: number; // How important for exam (0-100)
+  examWeight?: number;
 }
 
 export interface ExamReadiness {
   examType: string;
   examName: string;
-  overallReadiness: number; // 0-100
+  overallReadiness: number;
   subjectReadiness: SubjectReadiness[];
-  predictedScore: {
-    low: number;
-    mid: number;
-    high: number;
-  };
+  predictedScore: { low: number; mid: number; high: number };
   daysUntilExam?: number;
   recommendedFocus: string[];
 }
@@ -85,7 +80,6 @@ export interface LearningGoal {
 }
 
 interface LearningPathState {
-  // Data
   recommendedTopics: RecommendedTopic[];
   examReadiness: ExamReadiness | null;
   studyPlan: StudyPlanItem[];
@@ -93,8 +87,6 @@ interface LearningPathState {
   isLoading: boolean;
   error: string | null;
   lastUpdated: string | null;
-
-  // Actions
   generateRecommendations: () => Promise<void>;
   calculateExamReadiness: (examType: string) => Promise<void>;
   generateStudyPlan: (daysCount?: number) => Promise<void>;
@@ -102,521 +94,149 @@ interface LearningPathState {
   markStudyPlanItemComplete: (itemId: string) => void;
   markTopicComplete: (itemId: string, topicId: string) => void;
   refreshAll: () => Promise<void>;
-
-  // Utils
   clearError: () => void;
 }
 
-// Subject data by exam type
-type SubjectData = Record<string, { name: string; topics: { id: string; name: string; weight: number }[] }>;
 
-// BECE subjects - Junior High School level (Grades 7-9)
-const BECE_SUBJECTS: SubjectData = {
-  mathematics: {
-    name: 'Mathematics',
-    topics: [
-      { id: 'number_operations', name: 'Number Operations', weight: 20 },
-      { id: 'fractions_decimals', name: 'Fractions & Decimals', weight: 20 },
-      { id: 'basic_algebra', name: 'Basic Algebra', weight: 15 },
-      { id: 'geometry_shapes', name: 'Shapes & Geometry', weight: 15 },
-      { id: 'measurement', name: 'Measurement', weight: 15 },
-      { id: 'data_handling', name: 'Data Handling', weight: 15 },
-    ],
-  },
-  english: {
-    name: 'English Language',
-    topics: [
-      { id: 'reading_comprehension', name: 'Reading Comprehension', weight: 25 },
-      { id: 'grammar_usage', name: 'Grammar & Usage', weight: 25 },
-      { id: 'composition', name: 'Composition Writing', weight: 20 },
-      { id: 'vocabulary_spelling', name: 'Vocabulary & Spelling', weight: 15 },
-      { id: 'summary_writing', name: 'Summary Writing', weight: 15 },
-    ],
-  },
-  integrated_science: {
-    name: 'Integrated Science',
-    topics: [
-      { id: 'living_things', name: 'Living Things', weight: 20 },
-      { id: 'matter_energy', name: 'Matter & Energy', weight: 20 },
-      { id: 'human_body', name: 'Human Body', weight: 20 },
-      { id: 'environment', name: 'Environment', weight: 20 },
-      { id: 'simple_machines', name: 'Simple Machines', weight: 20 },
-    ],
-  },
-  social_studies: {
-    name: 'Social Studies',
-    topics: [
-      { id: 'ghana_history', name: 'History of Ghana', weight: 25 },
-      { id: 'government', name: 'Government & Civics', weight: 20 },
-      { id: 'geography', name: 'Geography', weight: 20 },
-      { id: 'environment_society', name: 'Environment & Society', weight: 20 },
-      { id: 'culture', name: 'Culture & Identity', weight: 15 },
-    ],
-  },
-  ict: {
-    name: 'ICT',
-    topics: [
-      { id: 'computer_basics', name: 'Computer Basics', weight: 25 },
-      { id: 'word_processing', name: 'Word Processing', weight: 20 },
-      { id: 'spreadsheets', name: 'Spreadsheets', weight: 20 },
-      { id: 'internet_basics', name: 'Internet Basics', weight: 20 },
-      { id: 'digital_safety', name: 'Digital Safety', weight: 15 },
-    ],
-  },
-};
+const DAY_NAMES: StudyPlanItem['day'][] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
-// WASSCE subjects - Senior High School level
-const WASSCE_SUBJECTS: SubjectData = {
-  mathematics: {
-    name: 'Core Mathematics',
-    topics: [
-      { id: 'algebra', name: 'Algebra', weight: 20 },
-      { id: 'geometry', name: 'Geometry', weight: 15 },
-      { id: 'trigonometry', name: 'Trigonometry', weight: 15 },
-      { id: 'calculus', name: 'Calculus', weight: 20 },
-      { id: 'statistics', name: 'Statistics', weight: 15 },
-      { id: 'probability', name: 'Probability', weight: 15 },
-    ],
-  },
-  physics: {
-    name: 'Physics',
-    topics: [
-      { id: 'mechanics', name: 'Mechanics', weight: 25 },
-      { id: 'waves', name: 'Waves & Optics', weight: 20 },
-      { id: 'electricity', name: 'Electricity', weight: 20 },
-      { id: 'magnetism', name: 'Magnetism', weight: 15 },
-      { id: 'thermodynamics', name: 'Thermodynamics', weight: 10 },
-      { id: 'modern_physics', name: 'Modern Physics', weight: 10 },
-    ],
-  },
-  chemistry: {
-    name: 'Chemistry',
-    topics: [
-      { id: 'atomic_structure', name: 'Atomic Structure', weight: 15 },
-      { id: 'bonding', name: 'Chemical Bonding', weight: 15 },
-      { id: 'organic', name: 'Organic Chemistry', weight: 25 },
-      { id: 'reactions', name: 'Chemical Reactions', weight: 20 },
-      { id: 'acids_bases', name: 'Acids & Bases', weight: 15 },
-      { id: 'equilibrium', name: 'Chemical Equilibrium', weight: 10 },
-    ],
-  },
-  biology: {
-    name: 'Biology',
-    topics: [
-      { id: 'cell_biology', name: 'Cell Biology', weight: 20 },
-      { id: 'genetics', name: 'Genetics', weight: 20 },
-      { id: 'ecology', name: 'Ecology', weight: 15 },
-      { id: 'human_biology', name: 'Human Biology', weight: 20 },
-      { id: 'plant_biology', name: 'Plant Biology', weight: 15 },
-      { id: 'evolution', name: 'Evolution', weight: 10 },
-    ],
-  },
-  english: {
-    name: 'English Language',
-    topics: [
-      { id: 'comprehension', name: 'Comprehension', weight: 25 },
-      { id: 'grammar', name: 'Grammar', weight: 20 },
-      { id: 'essay_writing', name: 'Essay Writing', weight: 25 },
-      { id: 'literature', name: 'Literature', weight: 20 },
-      { id: 'vocabulary', name: 'Vocabulary', weight: 10 },
-    ],
-  },
-};
+function getSubjectName(subjectId: string): string {
+  return examSubjects.find((subject) => subject.id === subjectId)?.name ?? 'Your subject';
+}
 
-// NSMQ subjects - Science and Mathematics focus
-const NSMQ_SUBJECTS: SubjectData = {
-  mathematics: {
-    name: 'Mathematics',
-    topics: [
-      { id: 'algebra', name: 'Algebra', weight: 20 },
-      { id: 'calculus', name: 'Calculus', weight: 20 },
-      { id: 'geometry', name: 'Geometry', weight: 15 },
-      { id: 'trigonometry', name: 'Trigonometry', weight: 15 },
-      { id: 'number_theory', name: 'Number Theory', weight: 15 },
-      { id: 'combinatorics', name: 'Combinatorics', weight: 15 },
-    ],
-  },
-  physics: {
-    name: 'Physics',
-    topics: [
-      { id: 'mechanics', name: 'Mechanics', weight: 25 },
-      { id: 'waves_optics', name: 'Waves & Optics', weight: 20 },
-      { id: 'electricity_magnetism', name: 'Electricity & Magnetism', weight: 20 },
-      { id: 'thermodynamics', name: 'Thermodynamics', weight: 15 },
-      { id: 'modern_physics', name: 'Modern Physics', weight: 20 },
-    ],
-  },
-  chemistry: {
-    name: 'Chemistry',
-    topics: [
-      { id: 'atomic_structure', name: 'Atomic Structure', weight: 15 },
-      { id: 'bonding', name: 'Chemical Bonding', weight: 15 },
-      { id: 'organic', name: 'Organic Chemistry', weight: 25 },
-      { id: 'reactions', name: 'Chemical Reactions', weight: 20 },
-      { id: 'equilibrium', name: 'Chemical Equilibrium', weight: 15 },
-      { id: 'electrochemistry', name: 'Electrochemistry', weight: 10 },
-    ],
-  },
-  biology: {
-    name: 'Biology',
-    topics: [
-      { id: 'cell_biology', name: 'Cell Biology', weight: 20 },
-      { id: 'genetics', name: 'Genetics', weight: 25 },
-      { id: 'biochemistry', name: 'Biochemistry', weight: 20 },
-      { id: 'human_physiology', name: 'Human Physiology', weight: 20 },
-      { id: 'ecology', name: 'Ecology', weight: 15 },
-    ],
-  },
-};
+function getExamName(examType: string): string {
+  return examType.replace(/_/g, ' ').replace(/\b\w/g, (letter: string) => letter.toUpperCase())
+    .replace('Nsmq', 'NSMQ').replace('Wassce', 'WASSCE').replace('Bece', 'BECE').replace('Igcse', 'IGCSE');
+}
 
-// Get subjects for current exam type
-function getSubjectsForExam(examType: ExamTypeSlug): SubjectData {
-  switch (examType) {
-    case 'bece':
-      return BECE_SUBJECTS;
-    case 'wassce':
-      return WASSCE_SUBJECTS;
-    case 'nsmq':
-      return NSMQ_SUBJECTS;
-    default:
-      return WASSCE_SUBJECTS;
+function reasonText(node: RoadmapNode): string {
+  switch (node.reason) {
+    case 'weak_area': return `${node.masteryScore}% mastery - this is the fastest place to gain ground`;
+    case 'not_started': return 'A syllabus topic you have not attempted yet';
+    case 'review_needed': return 'Review now to strengthen what you already know';
+    case 'maintain': return 'Keep this strong topic fresh';
   }
 }
 
-// Helper function to get priority based on mastery
-const getPriority = (mastery: number, examWeight: number): RecommendationPriority => {
-  if (mastery < 30 && examWeight > 15) return 'critical';
-  if (mastery < 50) return 'high';
-  if (mastery < 70) return 'medium';
-  return 'low';
-};
+async function getGuidancePlan(examType?: string): Promise<{ goal: UserGoal; plan: BriePlan }> {
+  const guidance = useGuidanceStore.getState();
+  const goals = guidance.goals.length > 0 ? guidance.goals : await guidance.fetchGoals();
+  const requestedExam = examType ?? useExamStore.getState().currentExamType;
+  const wantedExam = GUIDANCE_EXAM_OPTIONS.some((exam) => exam.apiId === requestedExam)
+    ? requestedExam as GuidanceExamType
+    : toGuidanceExamType(requestedExam as ExamTypeSlug);
+  const goal = goals.find((candidate) => candidate.examType === wantedExam) ?? goals[0];
+  if (!goal) throw new Error('Set a goal with Counselor Brie to create your study plan.');
+  await useGuidanceStore.getState().fetchPlan(goal.examType, goal.subjectId);
+  const plan = useGuidanceStore.getState().plan;
+  if (!plan) throw new Error(useGuidanceStore.getState().error ?? 'Your study plan is not available yet.');
+  return { goal, plan };
+}
 
-// Helper function to get reason text
-const getReasonText = (reason: RecommendationReason, mastery: number): string => {
-  switch (reason) {
-    case 'weak_area':
-      return `Only ${mastery}% mastery - needs improvement`;
-    case 'not_started':
-      return 'You haven\'t started this topic yet';
-    case 'review_needed':
-      return 'Last practiced over 7 days ago';
-    case 'exam_focus':
-      return 'High-weight topic for your exam';
-    case 'streak_building':
-      return 'Keep your learning streak going!';
-    case 'trending_topic':
-      return 'Popular topic this week';
-    default:
-      return 'Recommended for you';
-  }
-};
+function roadmapToRecommendations(goal: UserGoal, roadmap: RoadmapNode[]): RecommendedTopic[] {
+  return roadmap.map((node) => ({
+    topicId: node.topicId, topicName: node.topicName, subjectId: goal.subjectId,
+    subjectName: getSubjectName(goal.subjectId), priority: node.priority, reason: node.reason,
+    reasonText: reasonText(node), mastery: node.masteryScore, estimatedTime: node.estimatedTime,
+    questionCount: node.questionsAttempted,
+  }));
+}
 
-// Helper to get estimated time based on mastery
-const getEstimatedTime = (mastery: number): number => {
-  if (mastery === 0) return 30;
-  if (mastery < 30) return 25;
-  if (mastery < 50) return 20;
-  if (mastery < 70) return 15;
-  return 10;
-};
+function roadmapToStudyPlan(goal: UserGoal, plan: BriePlan): StudyPlanItem[] {
+  if (plan.thisWeek.length === 0) return [];
+  const today = new Date();
+  return [{
+    id: `guidance-week-${goal.id}`, day: DAY_NAMES[today.getDay()] ?? 'monday', date: today.toISOString().slice(0, 10),
+    topics: plan.thisWeek.map((node) => ({
+      topicId: node.topicId, topicName: node.topicName, subjectId: goal.subjectId,
+      estimatedMinutes: node.estimatedTime, completed: false, priority: node.priority,
+    })),
+    completed: false, xpTarget: 0, xpEarned: 0,
+  }];
+}
+
+function planToReadiness(goal: UserGoal, plan: BriePlan): ExamReadiness {
+  const weakTopics = plan.roadmap.filter((node) => node.masteryScore < 50).map((node) => node.topicName);
+  const strongTopics = plan.roadmap.filter((node) => node.masteryScore >= 70).map((node) => node.topicName);
+  const readiness = Math.round(plan.readiness);
+  const examDate = goal.examYear === null ? null : Date.UTC(goal.examYear, goal.examMonth ?? 12, 0, 23, 59, 59);
+  const daysUntilExam = examDate === null ? undefined : Math.max(0, Math.ceil((examDate - Date.now()) / 86_400_000));
+  return {
+    examType: goal.examType, examName: getExamName(goal.examType), overallReadiness: readiness,
+    subjectReadiness: [{
+      subjectId: goal.subjectId, subjectName: getSubjectName(goal.subjectId), readiness,
+      topicsCompleted: strongTopics.length, totalTopics: plan.roadmap.length, weakTopics, strongTopics,
+    }],
+    predictedScore: { low: readiness, mid: readiness, high: readiness },
+    daysUntilExam, recommendedFocus: weakTopics.slice(0, 3),
+  };
+}
 
 export const useLearningPathStore = create<LearningPathState>()(
   persist(
     (set, get) => ({
-      // Initial state
-      recommendedTopics: [],
-      examReadiness: null,
-      studyPlan: [],
-      learningGoals: [],
-      isLoading: false,
-      error: null,
-      lastUpdated: null,
+      recommendedTopics: [], examReadiness: null, studyPlan: [], learningGoals: [],
+      isLoading: false, error: null, lastUpdated: null,
 
-      // Generate personalized recommendations
       generateRecommendations: async () => {
         set({ isLoading: true, error: null });
-
         try {
-          // Get progress data
-          const progressStore = useProgressStore.getState();
-          const { topicProgress } = progressStore;
-
-          // Get current exam type
-          const examStore = useExamStore.getState();
-          const SUBJECTS = getSubjectsForExam(examStore.currentExamType);
-
-          const recommendations: RecommendedTopic[] = [];
-
-          // Process each subject
-          Object.entries(SUBJECTS).forEach(([subjectId, subject]) => {
-            subject.topics.forEach((topic) => {
-              const progress = topicProgress[`${subjectId}_${topic.id}`];
-              const mastery = progress?.masteryLevel || 0;
-              const lastAttempted = progress?.lastAttemptAt;
-
-              // Determine if this topic needs attention
-              let reason: RecommendationReason | null = null;
-
-              if (mastery === 0) {
-                reason = 'not_started';
-              } else if (mastery < 50) {
-                reason = 'weak_area';
-              } else if (lastAttempted) {
-                const daysSinceAttempt = Math.floor(
-                  (Date.now() - new Date(lastAttempted).getTime()) / (1000 * 60 * 60 * 24)
-                );
-                if (daysSinceAttempt > 7) {
-                  reason = 'review_needed';
-                }
-              }
-
-              // Include topic if it needs attention or is high-weight
-              if (reason || topic.weight >= 20) {
-                if (!reason && topic.weight >= 20 && mastery < 80) {
-                  reason = 'exam_focus';
-                }
-
-                if (reason) {
-                  recommendations.push({
-                    topicId: topic.id,
-                    topicName: topic.name,
-                    subjectId,
-                    subjectName: subject.name,
-                    priority: getPriority(mastery, topic.weight),
-                    reason,
-                    reasonText: getReasonText(reason, mastery),
-                    mastery,
-                    estimatedTime: getEstimatedTime(mastery),
-                    questionCount: Math.max(5, Math.round((100 - mastery) / 10)),
-                    lastAttemptedAt: lastAttempted,
-                    examWeight: topic.weight,
-                  });
-                }
-              }
-            });
-          });
-
-          // Sort by priority (critical > high > medium > low), then by mastery (lowest first)
-          const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-          recommendations.sort((a, b) => {
-            const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
-            if (priorityDiff !== 0) return priorityDiff;
-            return a.mastery - b.mastery;
-          });
-
-          // Take top 10 recommendations
-          set({
-            recommendedTopics: recommendations.slice(0, 10),
-            isLoading: false,
-            lastUpdated: new Date().toISOString(),
-          });
+          const { goal, plan } = await getGuidancePlan();
+          set({ recommendedTopics: roadmapToRecommendations(goal, plan.roadmap), isLoading: false, lastUpdated: new Date().toISOString() });
         } catch (error) {
-          set({ error: 'Failed to generate recommendations', isLoading: false });
+          set({ error: error instanceof Error ? error.message : 'Failed to load recommendations', isLoading: false });
         }
       },
 
-      // Calculate exam readiness
-      calculateExamReadiness: async (examType: string) => {
+      calculateExamReadiness: async (examType) => {
         set({ isLoading: true, error: null });
-
         try {
-          const progressStore = useProgressStore.getState();
-          const { topicProgress } = progressStore;
-
-          // Get subjects for the specified exam type
-          const SUBJECTS = getSubjectsForExam(examType as ExamTypeSlug);
-
-          const subjectReadiness: SubjectReadiness[] = [];
-          let totalReadiness = 0;
-          let totalWeight = 0;
-
-          Object.entries(SUBJECTS).forEach(([subjectId, subject]) => {
-            let subjectTotal = 0;
-            let topicsCompleted = 0;
-            const weakTopics: string[] = [];
-            const strongTopics: string[] = [];
-
-            subject.topics.forEach((topic) => {
-              const progress = topicProgress[`${subjectId}_${topic.id}`];
-              const mastery = progress?.masteryLevel || 0;
-              const weightedMastery = mastery * (topic.weight / 100);
-
-              subjectTotal += weightedMastery;
-              totalWeight += topic.weight;
-
-              if (mastery >= 70) {
-                topicsCompleted++;
-                if (mastery >= 85) strongTopics.push(topic.name);
-              } else if (mastery < 50) {
-                weakTopics.push(topic.name);
-              }
-            });
-
-            const readiness = Math.round(subjectTotal);
-            subjectReadiness.push({
-              subjectId,
-              subjectName: subject.name,
-              readiness,
-              topicsCompleted,
-              totalTopics: subject.topics.length,
-              weakTopics,
-              strongTopics,
-            });
-
-            totalReadiness += readiness;
-          });
-
-          const overallReadiness = Math.round(totalReadiness / Object.keys(SUBJECTS).length);
-
-          // Calculate predicted scores based on readiness
-          const predictedScore = {
-            low: Math.max(0, overallReadiness - 15),
-            mid: overallReadiness,
-            high: Math.min(100, overallReadiness + 10),
-          };
-
-          // Get recommended focus areas (subjects with lowest readiness)
-          const recommendedFocus = subjectReadiness
-            .sort((a, b) => a.readiness - b.readiness)
-            .slice(0, 3)
-            .map((s) => s.subjectName);
-
-          set({
-            examReadiness: {
-              examType,
-              examName: examType === 'wassce' ? 'WASSCE' : examType === 'bece' ? 'BECE' : 'NSMQ',
-              overallReadiness,
-              subjectReadiness,
-              predictedScore,
-              recommendedFocus,
-            },
-            isLoading: false,
-          });
+          const { goal, plan } = await getGuidancePlan(examType);
+          set({ examReadiness: planToReadiness(goal, plan), isLoading: false, lastUpdated: new Date().toISOString() });
         } catch (error) {
-          set({ error: 'Failed to calculate exam readiness', isLoading: false });
+          set({ error: error instanceof Error ? error.message : 'Failed to load exam readiness', isLoading: false });
         }
       },
 
-      // Generate study plan
-      generateStudyPlan: async (daysCount = 7) => {
+      // Backwards-compatible action: maps Brie's `thisWeek`; never creates a second daily schedule.
+      generateStudyPlan: async () => {
         set({ isLoading: true, error: null });
-
         try {
-          // Always regenerate recommendations to ensure they match current exam type
-          await get().generateRecommendations();
-
-          const topics = get().recommendedTopics;
-          const days: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[] =
-            ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-
-          const today = new Date();
-          const studyPlan: StudyPlanItem[] = [];
-
-          for (let i = 0; i < daysCount; i++) {
-            const date = new Date(today);
-            date.setDate(today.getDate() + i);
-            const dayIndex = date.getDay();
-            const dayName = days[(dayIndex + 6) % 7]; // Adjust for Monday start
-
-            // Assign 2-3 topics per day based on priority
-            const dayTopics = topics
-              .slice(i * 2, i * 2 + 3)
-              .map((topic) => ({
-                topicId: topic.topicId,
-                topicName: topic.topicName,
-                subjectId: topic.subjectId,
-                estimatedMinutes: topic.estimatedTime,
-                completed: false,
-                priority: topic.priority,
-              }));
-
-            if (dayTopics.length > 0) {
-              studyPlan.push({
-                id: `plan_${date.toISOString().split('T')[0]}`,
-                day: dayName,
-                date: date.toISOString().split('T')[0],
-                topics: dayTopics,
-                completed: false,
-                xpTarget: dayTopics.length * 50,
-                xpEarned: 0,
-              });
-            }
-          }
-
+          const { goal, plan } = await getGuidancePlan();
           set({
-            studyPlan,
-            isLoading: false,
+            recommendedTopics: roadmapToRecommendations(goal, plan.roadmap),
+            examReadiness: planToReadiness(goal, plan), studyPlan: roadmapToStudyPlan(goal, plan),
+            isLoading: false, lastUpdated: new Date().toISOString(),
           });
         } catch (error) {
-          set({ error: 'Failed to generate study plan', isLoading: false });
+          set({ error: error instanceof Error ? error.message : 'Failed to load your study plan', isLoading: false });
         }
       },
 
-      // Update goal progress
-      updateGoalProgress: (goalId: string, progress: number) => {
-        const { learningGoals } = get();
-        const updatedGoals = learningGoals.map((goal) =>
-          goal.id === goalId
-            ? { ...goal, progress, completed: progress >= goal.target }
-            : goal
-        );
-        set({ learningGoals: updatedGoals });
-      },
+      updateGoalProgress: (goalId, progress) => set((state) => ({
+        learningGoals: state.learningGoals.map((goal) => goal.id === goalId
+          ? { ...goal, progress, completed: progress >= goal.target } : goal),
+      })),
 
-      // Mark study plan item complete
-      markStudyPlanItemComplete: (itemId: string) => {
-        const { studyPlan } = get();
-        const updatedPlan = studyPlan.map((item) =>
-          item.id === itemId
-            ? {
-                ...item,
-                completed: true,
-                topics: item.topics.map((t) => ({ ...t, completed: true })),
-              }
-            : item
-        );
-        set({ studyPlan: updatedPlan });
-      },
+      markStudyPlanItemComplete: (itemId) => set((state) => ({
+        studyPlan: state.studyPlan.map((item) => item.id === itemId
+          ? { ...item, completed: true, topics: item.topics.map((topic) => ({ ...topic, completed: true })) } : item),
+      })),
 
-      // Mark individual topic complete
-      markTopicComplete: (itemId: string, topicId: string) => {
-        const { studyPlan } = get();
-        const updatedPlan = studyPlan.map((item) => {
+      markTopicComplete: (itemId, topicId) => set((state) => ({
+        studyPlan: state.studyPlan.map((item) => {
           if (item.id !== itemId) return item;
+          const topics = item.topics.map((topic) => topic.topicId === topicId ? { ...topic, completed: true } : topic);
+          return { ...item, topics, completed: topics.every((topic) => topic.completed) };
+        }),
+      })),
 
-          const updatedTopics = item.topics.map((t) =>
-            t.topicId === topicId ? { ...t, completed: true } : t
-          );
-          const allComplete = updatedTopics.every((t) => t.completed);
-
-          return {
-            ...item,
-            topics: updatedTopics,
-            completed: allComplete,
-            xpEarned: updatedTopics.filter((t) => t.completed).length * 50,
-          };
-        });
-        set({ studyPlan: updatedPlan });
-      },
-
-      // Refresh all data
-      refreshAll: async () => {
-        await get().generateRecommendations();
-        await get().calculateExamReadiness('wassce');
-        await get().generateStudyPlan();
-      },
-
-      // Clear error
+      refreshAll: async () => { await get().generateStudyPlan(); },
       clearError: () => set({ error: null }),
     }),
     {
-      name: 'brilla-learning-path',
-      version: 1,
-      partialize: (state) => ({
-        studyPlan: state.studyPlan,
-        learningGoals: state.learningGoals,
-        lastUpdated: state.lastUpdated,
-      }),
-    }
-  )
+      name: 'brilla-learning-path', version: 2,
+      partialize: (state) => ({ learningGoals: state.learningGoals, lastUpdated: state.lastUpdated }),
+    },
+  ),
 );

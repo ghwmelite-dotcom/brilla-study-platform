@@ -1357,6 +1357,17 @@ export interface StudentProgressSummary {
   lastActiveAt?: string;
   // Exam preferences
   primaryExamType?: string;
+  guidance: StudentGuidanceSummary | null;
+}
+
+export interface StudentGuidanceSummary {
+  examType: string;
+  subjectId: string;
+  targetGrade: string | null;
+  examYear: number | null;
+  examMonth: number | null;
+  readinessScore: number | null;
+  lastCalculated: string | null;
 }
 
 export interface TopicMastery {

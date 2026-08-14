@@ -3,10 +3,14 @@ import { Suspense, useState } from 'react';
 import { Layout } from '@/components/layout';
 import { useAuthStore } from '@/stores';
 import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/guide';
+import { CounselorBrieTrigger, CounselorBrieWizard } from '@/components/guidance';
 import { ToastContainer } from '@/components/toast';
 import { PageLoader, ErrorBoundary } from '@/components/common';
 import { SplashScreen } from '@/components/SplashScreen';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
+import type { UserRole } from '@/types';
+
+const counselorBrieAutoOnboardingEnabled = import.meta.env.VITE_COUNSELOR_BRIE_ENABLED === 'true';
 
 // Wrapper for lazy-loaded components
 function LazyPage({ children }: { children: React.ReactNode }) {
@@ -76,6 +80,7 @@ const StudyGroupsPage = lazyWithRetry(() => import('@/pages/StudyGroupsPage'));
 const LeaderboardPage = lazyWithRetry(() => import('@/pages/Leaderboard'));
 const LibraryPage = lazyWithRetry(() => import('@/pages/Library').then(m => ({ default: m.LibraryPage })));
 const CounselorPage = lazyWithRetry(() => import('@/pages/Counselor').then(m => ({ default: m.CounselorPage })));
+const MyPlanPage = lazyWithRetry(() => import('@/pages/MyPlan').then(m => ({ default: m.MyPlan })));
 const ModerationDashboard = lazyWithRetry(() => import('@/pages/ModerationDashboard'));
 const PricingPage = lazyWithRetry(() => import('@/pages/Pricing'));
 const AffiliatePage = lazyWithRetry(() => import('@/pages/Affiliate'));
@@ -117,12 +122,19 @@ const StudyRooms = lazyWithRetry(() => import('@/pages/StudyRooms'));
 const ImmersiveLearning = lazyWithRetry(() => import('@/pages/ImmersiveLearning'));
 
 // Protected Route wrapper
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuthStore();
+function ProtectedRoute({
+  children,
+  allowedRoles,
+}: {
+  children: React.ReactNode;
+  allowedRoles?: UserRole[];
+}) {
+  const { isAuthenticated, user } = useAuthStore();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
+  if (allowedRoles && (!user || !allowedRoles.includes(user.role))) return <Navigate to="/dashboard" replace />;
 
   return <>{children}</>;
 }
@@ -554,6 +566,15 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="my-plan"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <LazyPage><MyPlanPage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+
 
           <Route
             path="community"
@@ -872,8 +893,14 @@ function App() {
       </ErrorBoundary>
 
       {/* Global Guide Components */}
-      <OnboardingTrigger />
-      <OnboardingModal />
+      {!counselorBrieAutoOnboardingEnabled && (
+        <>
+          <OnboardingTrigger />
+          <OnboardingModal />
+        </>
+      )}
+      <CounselorBrieTrigger />
+      <CounselorBrieWizard />
       <FeatureTour />
 
       {/* Global Toast Notifications */}

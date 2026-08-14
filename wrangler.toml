@@ -4,6 +4,7 @@ compatibility_date = "2026-05-12"
 
 [vars]
 ENVIRONMENT = "production"
+COUNSELOR_BRIE_ENABLED = "true"
 AI_PROVIDER = "workers-ai"
 AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 AI_MODEL_CHAT = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"

@@ -72,6 +72,20 @@ export type {
   LessonStatus,
   ConfidenceLevel,
 } from './revisionClassroomStore';
+export { useGuidanceStore } from './guidanceStore';
+export type {
+  AnswerResult,
+  AssessmentDone,
+  AssessmentStartResult,
+  BriePlan,
+  GuidanceConfidence,
+  GuidanceEvidence,
+  PublicQuestion,
+  RoadmapNode,
+  SaveGoalInput,
+  TopicCoverage,
+  UserGoal,
+} from './guidanceStore';
 export { useTutorClassroomStore } from './tutorClassroomStore';
 export type {
   TutorAvailability,
