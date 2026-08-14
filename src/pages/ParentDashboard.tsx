@@ -25,6 +25,26 @@ import { cn } from '@/utils';
 import type { ParentStudentLink, StudentProgressSummary, CounselorReport, WellbeingAlert } from '@/types';
 import { CONCERN_LEVEL_CONFIG } from '@/types/counselorReports';
 
+const EXAM_MONTH_LABELS = [
+  'January', 'February', 'March', 'April',
+  'May', 'June', 'July', 'August',
+  'September', 'October', 'November', 'December',
+];
+
+function formatGuidanceGoal(guidance: NonNullable<StudentProgressSummary['guidance']>): string {
+  const goalParts: string[] = [];
+  if (guidance.targetGrade) goalParts.push(guidance.targetGrade);
+  const examLabel = guidance.examType.replace(/_/g, ' ').toUpperCase();
+  goalParts.push(examLabel);
+
+  if (guidance.examYear) {
+    const month = guidance.examMonth ? EXAM_MONTH_LABELS[guidance.examMonth - 1] : null;
+    goalParts.push(month ? `${month} ${guidance.examYear}` : String(guidance.examYear));
+  }
+  if (guidance.readinessScore !== null) goalParts.push(`Readiness ${Math.round(guidance.readinessScore)}/100`);
+  return goalParts.join(' | ');
+}
+
 // Student Card Component
 function StudentCard({
   link,
@@ -340,14 +360,14 @@ export function ParentDashboardPage() {
       setIsInitialLoad(false);
     };
     loadData();
-  }, []);
+  }, [fetchLinkedStudents, fetchNotifications, loadAlerts, loadReports]);
 
   // Fetch progress when student is selected
   useEffect(() => {
     if (selectedStudentId) {
       fetchStudentProgress(selectedStudentId);
     }
-  }, [selectedStudentId]);
+  }, [fetchStudentProgress, selectedStudentId]);
 
   const selectedStudent = linkedStudents.find(l => l.studentId === selectedStudentId);
   const currentProgress = selectedStudentId ? studentProgress[selectedStudentId] : null;
@@ -530,6 +550,15 @@ export function ParentDashboardPage() {
                   </Link>
                 }
               />
+              {currentProgress?.guidance && (
+                <div className="mb-5 flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-neutral-700">
+                  <BookOpen className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <p>
+                    <span className="font-semibold text-neutral-900">Goal:</span>{' '}
+                    {formatGuidanceGoal(currentProgress.guidance)}
+                  </p>
+                </div>
+              )}
               <div className="flex items-center gap-8">
                 <CircularProgress
                   value={currentProgress?.overallAccuracy || 0}
