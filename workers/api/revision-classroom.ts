@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
 import { isPremiumUser, checkAiAllowance } from './usage-limits';
-import { getChatModel, getGenerationModel, getTtsModel, unwrapAiText } from './ai-models';
+import { getChatModel, getGenerationModel, getTtsModel, getVisionModel, unwrapAiText } from './ai-models';
 import { lookupAnswer, storeAnswer } from './answer-cache';
 import { formatUntrustedAiData, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
 
@@ -13,6 +13,7 @@ interface Env {
   AI_MODEL?: string;
   AI_MODEL_TTS?: string;
   AI_MODEL_EMBEDDING?: string;
+  AI_MODEL_VISION?: string;
   AI_CACHE_THRESHOLD?: string;
   ANSWERS_INDEX?: VectorizeIndex;
   RECORDINGS_BUCKET?: R2Bucket;
@@ -2474,6 +2475,293 @@ revisionClassroomApp.post('/lessons/:lessonId/whiteboard-teach', async (c) => {
   } catch (error) {
     console.error('Error generating whiteboard content:', error);
     return c.json({ success: false, error: 'Failed to generate whiteboard content' }, 500);
+  }
+});
+
+// =============================================
+// CHECK MY WORK (Phase C) — vision grading with spatial annotations
+// =============================================
+
+type CheckWorkVerdict = 'correct' | 'partial' | 'incorrect' | 'unknown';
+
+interface CheckWorkAnnotation {
+  type: 'circle' | 'arrow' | 'text' | 'rect';
+  id: string;
+  props: Record<string, unknown>;
+}
+
+interface CheckWorkGrade {
+  verdict: CheckWorkVerdict;
+  explanation: string;
+  voiceOver: string;
+  annotations: CheckWorkAnnotation[];
+}
+
+const CHECK_WORK_MAX_IMAGE_CHARS = 700_000;
+const CHECK_WORK_ANNOTATION_TYPES = new Set(['circle', 'arrow', 'text', 'rect']);
+// Canvas-space props: clamped in place after validation (never rejected).
+const CHECK_WORK_X_PROPS = new Set(['left', 'x1', 'x2', 'cx']);
+const CHECK_WORK_Y_PROPS = new Set(['top', 'y1', 'y2', 'cy']);
+const CHECK_WORK_W_PROPS = new Set(['width', 'radius']);
+const CHECK_WORK_H_PROPS = new Set(['height']);
+
+// Honest payload served whenever vision grading is unavailable or the model
+// output fails validation — never a fabricated verdict.
+const CHECK_WORK_FALLBACK: CheckWorkGrade = {
+  verdict: 'unknown',
+  explanation: "I couldn't read the work clearly — try darker ink or a clearer photo of the page.",
+  voiceOver: '',
+  annotations: [],
+};
+
+// guided_json is verified honored by the vision model (vision spike results),
+// so the annotation schema is passed alongside the prompt.
+const CHECK_WORK_GUIDED_SCHEMA = {
+  type: 'object',
+  properties: {
+    verdict: { type: 'string', enum: ['correct', 'partial', 'incorrect'] },
+    explanation: { type: 'string' },
+    voiceOver: { type: 'string' },
+    annotations: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          type: { type: 'string', enum: ['circle', 'arrow', 'text', 'rect'] },
+          id: { type: 'string' },
+          props: { type: 'object' },
+        },
+        required: ['type', 'id', 'props'],
+      },
+    },
+  },
+  required: ['verdict', 'explanation', 'voiceOver', 'annotations'],
+};
+
+// Structural validation of the model's grading JSON. Verdict must be a known
+// enum (not 'unknown' — that value is reserved for the honest fallback);
+// annotations are capped at 8, whitelisted to circle/arrow/text/rect, every
+// numeric prop must be finite. Coordinate props are then CLAMPED in place to
+// the 1200x800 canvas (clamping, not rejection, for out-of-bounds values).
+function isValidAnnotationSet(v: unknown): v is CheckWorkGrade {
+  if (!v || typeof v !== 'object') return false;
+  const g = v as Partial<CheckWorkGrade>;
+  if (g.verdict !== 'correct' && g.verdict !== 'partial' && g.verdict !== 'incorrect') return false;
+  if (typeof g.explanation !== 'string' || typeof g.voiceOver !== 'string') return false;
+  if (!Array.isArray(g.annotations) || g.annotations.length > 8) return false;
+
+  for (const ann of g.annotations) {
+    if (!ann || typeof ann !== 'object') return false;
+    if (!CHECK_WORK_ANNOTATION_TYPES.has(ann.type)) return false;
+    if (typeof ann.id !== 'string' || ann.id.trim().length === 0) return false;
+    if (!ann.props || typeof ann.props !== 'object' || Array.isArray(ann.props)) return false;
+    for (const val of Object.values(ann.props)) {
+      if (typeof val === 'number' && !Number.isFinite(val)) return false;
+    }
+  }
+
+  for (const ann of g.annotations) {
+    for (const [key, val] of Object.entries(ann.props)) {
+      if (typeof val !== 'number') continue;
+      if (CHECK_WORK_X_PROPS.has(key) || CHECK_WORK_W_PROPS.has(key)) {
+        ann.props[key] = Math.min(1200, Math.max(0, val));
+      } else if (CHECK_WORK_Y_PROPS.has(key) || CHECK_WORK_H_PROPS.has(key)) {
+        ann.props[key] = Math.min(800, Math.max(0, val));
+      }
+    }
+  }
+  return true;
+}
+
+// Server-side id prefix: annotations render on the lesson canvas as a
+// transient layer tracked by the `annot-` prefix (auto-cleared by the
+// frontend). Duplicates are suffixed so every command id is unique.
+function prefixAnnotationIds(annotations: CheckWorkAnnotation[]): void {
+  const seen = new Set<string>();
+  for (const ann of annotations) {
+    let id = ann.id.startsWith('annot-') ? ann.id : `annot-${ann.id}`;
+    while (seen.has(id)) id = `${id}-x`;
+    seen.add(id);
+    ann.id = id;
+  }
+}
+
+async function sha256Hex(input: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+// The current step's explanation is the problem context for the marking
+// prompt. It comes from the progressive whiteboard cache row (any lesson
+// type) when one exists for this topic; absence is fine.
+async function getWhiteboardStepContext(
+  db: D1Database,
+  topicId: string,
+  stepIndex: number
+): Promise<string | null> {
+  const row = await db.prepare(`
+    SELECT rai.ai_message
+    FROM revision_ai_interactions rai
+    JOIN revision_lessons rl ON rai.lesson_id = rl.id
+    WHERE rl.topic_id = ? AND rai.interaction_type LIKE 'whiteboard_%'
+    ORDER BY rai.created_at DESC
+    LIMIT 1
+  `).bind(topicId).first<{ ai_message: string }>();
+  if (!row) return null;
+  return parseCachedWhiteboard(row.ai_message)?.steps[stepIndex]?.explanation ?? null;
+}
+
+// API Endpoint: Grade a snapshot of the student's work on the whiteboard
+// (premium-only). Only correct verdicts are cached — keyed by the image hash
+// in user_response — because wrong-work feedback is unique per attempt.
+revisionClassroomApp.post('/lessons/:lessonId/check-work', async (c) => {
+  // Premium-only feature — reject before any AI generation cost is incurred.
+  const user = c.get('user');
+  if (!(await isPremiumUser(user.userId, c.env.DB))) {
+    return c.json({
+      success: false,
+      error: 'Checking your work with the AI teacher is a premium feature. Upgrade to have your work marked.',
+      upgradeRequired: true,
+    }, 403);
+  }
+
+  const lessonId = c.req.param('lessonId');
+  const body = await c.req.json().catch(() => null);
+  const imageBase64 = body?.imageBase64;
+  if (!imageBase64 || typeof imageBase64 !== 'string') {
+    return c.json({ success: false, error: 'imageBase64 is required' }, 400);
+  }
+  if (imageBase64.length > CHECK_WORK_MAX_IMAGE_CHARS) {
+    return c.json({ success: false, error: 'Image too large (max ~500KB)' }, 413);
+  }
+  const stepIndex = typeof body?.stepIndex === 'number' && Number.isInteger(body.stepIndex) && body.stepIndex >= 0
+    ? (body.stepIndex as number)
+    : undefined;
+
+  // Same lesson join as whiteboard-teach: topic/subject/exam from the row.
+  const lesson = await c.env.DB.prepare(`
+    SELECT
+      rl.*,
+      t.name as topic_name,
+      s.name as subject_name,
+      rs.exam_type,
+      rs.user_id
+    FROM revision_lessons rl
+    LEFT JOIN topics t ON rl.topic_id = t.id
+    LEFT JOIN revision_sessions rs ON rl.session_id = rs.id
+    LEFT JOIN subjects s ON rs.subject_id = s.id
+    WHERE rl.id = ? AND rs.user_id = ?
+  `).bind(lessonId, user.userId).first();
+
+  if (!lesson) {
+    return c.json({ success: false, error: 'Lesson not found' }, 404);
+  }
+
+  const topicName = (lesson as any).topic_name || 'this topic';
+  const subjectName = (lesson as any).subject_name || 'this subject';
+  const examType = (lesson as any).exam_type || 'wassce';
+  const topicId = (lesson as any).topic_id as string | null;
+
+  // Correct-verdict cache: identical work already marked correct is served
+  // without an AI call. Incorrect/partial verdicts are never cached.
+  const imageHash = await sha256Hex(imageBase64);
+  const cachedRow = await c.env.DB.prepare(`
+    SELECT ai_message FROM revision_ai_interactions
+    WHERE lesson_id = ? AND interaction_type = 'checkwork_correct' AND user_response = ?
+    ORDER BY created_at DESC
+    LIMIT 1
+  `).bind(lessonId, 'checkwork_correct', imageHash).first<{ ai_message: string }>();
+
+  if (cachedRow) {
+    try {
+      const cachedPayload = JSON.parse(cachedRow.ai_message) as CheckWorkGrade;
+      return c.json({
+        success: true,
+        data: { ...cachedPayload, cached: true, fallback: false },
+      });
+    } catch {
+      // Corrupt cache row — fall through to a fresh grading call.
+    }
+  }
+
+  const stepContext = topicId !== null && stepIndex !== undefined
+    ? await getWhiteboardStepContext(c.env.DB, topicId, stepIndex).catch(() => null)
+    : null;
+
+  const prompt = `You are an expert ${examType.toUpperCase()} teacher marking a student's handwritten work on "${topicName}" (${subjectName}).
+${stepContext ? `The current lesson step is about: "${stepContext}". Use it as the problem context.` : ''}
+The attached image is a 1200x800 whiteboard snapshot: the lesson content plus the student's own handwritten work on it.
+
+CRITICAL: Read the student's WRITTEN work verbatim — transcribe exactly what is written, even where it is mathematically wrong. Do NOT auto-correct what you read toward the right answer; mark what is actually on the page.
+
+Mark the work and respond with ONLY JSON in this exact shape:
+{
+  "verdict": "correct" | "partial" | "incorrect",
+  "explanation": "at most 80 words, warm teacher tone",
+  "voiceOver": "at most 40 words of spoken feedback",
+  "annotations": [
+    { "type": "circle" | "arrow" | "text" | "rect", "id": "a1", "props": { "...canvas coordinates..." } }
+  ]
+}
+Annotations must point AT the work: circle the exact wrong term ({ left, top, radius, stroke }), arrow to the line where the error starts ({ x1, y1, x2, y2, stroke }), text labels of at most 4 words ({ left, top, text, fontSize, fill }), rect around a whole region ({ left, top, width, height, stroke }). The canvas is 1200x800. Provide 2-6 annotations (use 0 only when nothing useful can be marked).`;
+
+  try {
+    const model = getVisionModel(c.env);
+    const result: unknown = await c.env.AI.run(model as never, {
+      messages: [
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: `data:image/png;base64,${imageBase64}` } },
+          ],
+        },
+      ],
+      max_tokens: 1200,
+      guided_json: CHECK_WORK_GUIDED_SCHEMA,
+    } as never);
+
+    // The runtime shape is { response: string } — always unwrap, never cast.
+    const text = unwrapAiText(result);
+    const candidate = text.match(/\{[\s\S]*\}/)?.[0];
+    const parsed = candidate ? (JSON.parse(candidate) as unknown) : null;
+
+    if (!parsed || !isValidAnnotationSet(parsed)) {
+      console.error('Check-work output failed validation — serving honest fallback');
+      throw new Error('Invalid check-work response');
+    }
+
+    prefixAnnotationIds(parsed.annotations);
+    const grade: CheckWorkGrade = {
+      verdict: parsed.verdict,
+      explanation: parsed.explanation,
+      voiceOver: parsed.voiceOver,
+      annotations: parsed.annotations,
+    };
+
+    if (grade.verdict === 'correct') {
+      await c.env.DB.prepare(`
+        INSERT INTO revision_ai_interactions (
+          id, lesson_id, user_id, interaction_type, ai_message, user_response, tokens_used, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        generateId('checkwork'), lessonId, user.userId, 'checkwork_correct',
+        JSON.stringify(grade), imageHash, null, new Date().toISOString()
+      ).run();
+    }
+
+    return c.json({
+      success: true,
+      data: { ...grade, cached: false, fallback: false },
+    });
+  } catch (error) {
+    console.error('Check-work vision grading failed:', error);
+    return c.json({
+      success: true,
+      data: { ...CHECK_WORK_FALLBACK, cached: false, fallback: true },
+    });
   }
 });
 
