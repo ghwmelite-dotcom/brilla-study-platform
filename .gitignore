@@ -54,3 +54,6 @@ Past Questions/
 lh-*.json
 lighthouse-report.json
 parse-*.cjs
+
+# Visual QA evidence artifacts
+qa-shots/
