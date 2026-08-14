@@ -17,6 +17,7 @@ import {
   PenTool,
   PenLine,
   ClipboardCheck,
+  HelpCircle,
   Calculator,
   GitBranch,
 } from 'lucide-react';
@@ -91,6 +92,14 @@ interface CheckWorkResult {
   annotations: CheckWorkAnnotation[];
 }
 
+// Phase C "Point-and-ask": the vision answer about the tapped spot. The
+// optional annotation is a circle highlighting the spot (transient layer,
+// rendered as a pulsing highlight for a few seconds).
+interface AskAboutResult {
+  answer: string;
+  annotation: CheckWorkAnnotation | null;
+}
+
 // The progressive protocol renders every lesson on the worker's fixed canvas.
 const CANVAS_WIDTH = 1200;
 const CANVAS_HEIGHT = 800;
@@ -123,6 +132,11 @@ interface AIWhiteboardTeacherProps {
   onCheckWork?: (imageBase64: string, stepIndex: number) => void;
   checkWorkResult?: CheckWorkResult | null;
   checkWorkLoading?: boolean;
+  // Phase C "Point-and-ask": the component supplies the composite snapshot
+  // and the tapped point in 1200x800 canvas coordinates.
+  onAskAboutPoint?: (imageBase64: string, x: number, y: number) => void;
+  askAboutResult?: AskAboutResult | null;
+  askAboutLoading?: boolean;
   className?: string;
 }
 
@@ -187,6 +201,9 @@ export function AIWhiteboardTeacher({
   onCheckWork,
   checkWorkResult = null,
   checkWorkLoading = false,
+  onAskAboutPoint,
+  askAboutResult = null,
+  askAboutLoading = false,
   className,
 }: AIWhiteboardTeacherProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -212,6 +229,9 @@ export function AIWhiteboardTeacher({
   const inkByStepRef = useRef<Map<string | number, string>>(new Map());
   const inkSnapshotRef = useRef<(() => string) | null>(null);
   const inkClearRef = useRef<(() => void) | null>(null);
+  // Phase C "Point-and-ask": when armed, the next tap on the canvas asks the
+  // vision model about that spot; the tool disarms after one use.
+  const [askArmed, setAskArmed] = useState(false);
   const handleInkStrokesChange = useCallback((key: string | number, json: string) => {
     inkByStepRef.current.set(key, json);
   }, []);
@@ -762,6 +782,66 @@ export function AIWhiteboardTeacher({
     onCheckWork?.(snapshot, currentStep);
   }, [onCheckWork, checkWorkLoading, currentStep]);
 
+  // Phase C "Point-and-ask": a tap on the armed canvas converts the click to
+  // 1200x800 canvas coordinates (the inverse viewportTransform accounts for
+  // the resize/fullscreen zoom), snapshots the composite and asks the store.
+  const handleAskTap = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const canvas = fabricRef.current;
+    if (!canvas || askAboutLoading) return;
+    setAskArmed(false);
+    const snapshot = inkSnapshotRef.current?.();
+    if (!snapshot) return;
+    const vpt = canvas.viewportTransform ?? [1, 0, 0, 1, 0, 0];
+    const inv = fabric.util.invertTransform(vpt);
+    const rect = canvas.getElement().getBoundingClientRect();
+    const point = fabric.util.transformPoint(
+      new fabric.Point(e.clientX - rect.left, e.clientY - rect.top),
+      inv
+    );
+    const x = Math.min(CANVAS_WIDTH, Math.max(0, Math.round(point.x)));
+    const y = Math.min(CANVAS_HEIGHT, Math.max(0, Math.round(point.y)));
+    onAskAboutPoint?.(snapshot, x, y);
+  }, [onAskAboutPoint, askAboutLoading]);
+
+  // Point-and-ask highlight: the annotation (if any) renders as a pulsing
+  // circle on the transient annot- layer for ~3s, then auto-clears.
+  useEffect(() => {
+    const ann = askAboutResult?.annotation;
+    if (!ann) return;
+    clearAnnotations();
+    const objects = drawCommand({
+      ...ann,
+      id: ann.id.startsWith('annot-') ? ann.id : `annot-${ann.id}`,
+    } as WhiteboardDrawCommand);
+    const canvas = fabricRef.current;
+    canvas?.renderAll();
+
+    let cancelled = false;
+    if (canvas && objects.length > 0) {
+      const pulse = (to: number) => {
+        if (cancelled) return;
+        objects.forEach((obj) =>
+          obj.animate({ opacity: to }, {
+            duration: 450,
+            easing: fabric.util.ease.easeInOutSine,
+            onChange: () => canvas.renderAll(),
+            onComplete: () => pulse(to === 1 ? 0.25 : 1),
+          })
+        );
+      };
+      pulse(0.25);
+    }
+
+    const timer = setTimeout(() => {
+      cancelled = true;
+      clearAnnotations();
+    }, 3000);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [askAboutResult, clearAnnotations, drawCommand]);
+
   // Play animation
   const play = useCallback(() => {
     if (totalSteps === 0) return;
@@ -971,7 +1051,10 @@ export function AIWhiteboardTeacher({
           </div>
         </div>
         <button
-          onClick={() => setInkEnabled((v) => !v)}
+          onClick={() => {
+            setInkEnabled((v) => !v);
+            setAskArmed(false);
+          }}
           className={cn(
             'p-2 hover:bg-white/20 rounded-lg transition-colors',
             inkEnabled && 'bg-white/30'
@@ -993,6 +1076,24 @@ export function AIWhiteboardTeacher({
               <ClipboardCheck className="w-4 h-4" />
             )}
             <span>{checkWorkLoading ? 'Checking…' : 'Check my work'}</span>
+          </button>
+        )}
+        {inkEnabled && onAskAboutPoint && (
+          <button
+            onClick={() => setAskArmed((v) => !v)}
+            disabled={askAboutLoading}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed',
+              askArmed && 'bg-white/40 ring-2 ring-white/70'
+            )}
+            title={askArmed ? 'Tap a spot on the whiteboard to ask about it' : 'Ask about a spot on the whiteboard'}
+          >
+            {askAboutLoading ? (
+              <div className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+            ) : (
+              <HelpCircle className="w-4 h-4" />
+            )}
+            <span>{askAboutLoading ? 'Asking…' : askArmed ? 'Tap a spot…' : 'Ask about this'}</span>
           </button>
         )}
         <button
@@ -1045,6 +1146,14 @@ export function AIWhiteboardTeacher({
             inkClearRef.current = fn;
           }}
         />
+        {/* Point-and-ask tap catcher: sits above the ink layer only while the
+            "?" tool is armed, so one tap asks instead of drawing ink. */}
+        {askArmed && (
+          <div
+            className="absolute inset-0 z-10 cursor-help"
+            onClick={handleAskTap}
+          />
+        )}
         {waitingForStep && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             {stepError && !stepLoading ? (
@@ -1072,7 +1181,8 @@ export function AIWhiteboardTeacher({
       {/* Explanation panel */}
       <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
         <p className="text-gray-700 dark:text-gray-300 text-sm min-h-[2.5rem]">
-          {checkWorkResult?.explanation ||
+          {askAboutResult?.answer ||
+            checkWorkResult?.explanation ||
             step?.explanation ||
             (waitingForStep
               ? stepError && !stepLoading
