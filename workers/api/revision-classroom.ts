@@ -2542,8 +2542,10 @@ const CHECK_WORK_GUIDED_SCHEMA = {
 // enum (not 'unknown' — that value is reserved for the honest fallback);
 // annotations are capped at 8, whitelisted to circle/arrow/text/rect, every
 // numeric prop must be finite. Coordinate props are then CLAMPED in place to
-// the 1200x800 canvas (clamping, not rejection, for out-of-bounds values).
-function isValidAnnotationSet(v: unknown): v is CheckWorkGrade {
+// the image bounds (clamping, not rejection, for out-of-bounds values). The
+// bounds default to the 1200x800 whiteboard canvas; photos of paper work
+// pass their own pixel dims (Task 5).
+function isValidAnnotationSet(v: unknown, imageWidth = 1200, imageHeight = 800): v is CheckWorkGrade {
   if (!v || typeof v !== 'object') return false;
   const g = v as Partial<CheckWorkGrade>;
   if (g.verdict !== 'correct' && g.verdict !== 'partial' && g.verdict !== 'incorrect') return false;
@@ -2564,9 +2566,9 @@ function isValidAnnotationSet(v: unknown): v is CheckWorkGrade {
     for (const [key, val] of Object.entries(ann.props)) {
       if (typeof val !== 'number') continue;
       if (CHECK_WORK_X_PROPS.has(key) || CHECK_WORK_W_PROPS.has(key)) {
-        ann.props[key] = Math.min(1200, Math.max(0, val));
+        ann.props[key] = Math.min(imageWidth, Math.max(0, val));
       } else if (CHECK_WORK_Y_PROPS.has(key) || CHECK_WORK_H_PROPS.has(key)) {
-        ann.props[key] = Math.min(800, Math.max(0, val));
+        ann.props[key] = Math.min(imageHeight, Math.max(0, val));
       }
     }
   }
@@ -2639,6 +2641,15 @@ revisionClassroomApp.post('/lessons/:lessonId/check-work', async (c) => {
   const stepIndex = typeof body?.stepIndex === 'number' && Number.isInteger(body.stepIndex) && body.stepIndex >= 0
     ? (body.stepIndex as number)
     : undefined;
+  // Photos of paper work (Task 5) declare their own pixel dims; annotations
+  // for them live in that coordinate space instead of the 1200x800 canvas.
+  const isPhoto = body?.imageWidth !== undefined || body?.imageHeight !== undefined;
+  const imageWidth = body?.imageWidth === undefined ? 1200 : body.imageWidth;
+  const imageHeight = body?.imageHeight === undefined ? 800 : body.imageHeight;
+  if (!Number.isInteger(imageWidth) || imageWidth < 100 || imageWidth > 2000 ||
+      !Number.isInteger(imageHeight) || imageHeight < 100 || imageHeight > 2000) {
+    return c.json({ success: false, error: 'imageWidth/imageHeight must be integers between 100 and 2000' }, 400);
+  }
 
   // Same lesson join as whiteboard-teach: topic/subject/exam from the row.
   const lesson = await c.env.DB.prepare(`
@@ -2690,9 +2701,13 @@ revisionClassroomApp.post('/lessons/:lessonId/check-work', async (c) => {
     ? await getWhiteboardStepContext(c.env.DB, topicId, stepIndex).catch(() => null)
     : null;
 
+  const imageDescription = isPhoto
+    ? `The attached image is a ${imageWidth}x${imageHeight} px photo of the student's handwritten work on paper.`
+    : `The attached image is a 1200x800 whiteboard snapshot: the lesson content plus the student's own handwritten work on it.`;
+
   const prompt = `You are an expert ${examType.toUpperCase()} teacher marking a student's handwritten work on "${topicName}" (${subjectName}).
 ${stepContext ? `The current lesson step is about: "${stepContext}". Use it as the problem context.` : ''}
-The attached image is a 1200x800 whiteboard snapshot: the lesson content plus the student's own handwritten work on it.
+${imageDescription}
 
 CRITICAL: Read the student's WRITTEN work verbatim — transcribe exactly what is written, even where it is mathematically wrong. Do NOT auto-correct what you read toward the right answer; mark what is actually on the page.
 
@@ -2705,7 +2720,7 @@ Mark the work and respond with ONLY JSON in this exact shape:
     { "type": "circle" | "arrow" | "text" | "rect", "id": "a1", "props": { "...canvas coordinates..." } }
   ]
 }
-Annotations must point AT the work: circle the exact wrong term ({ left, top, radius, stroke }), arrow to the line where the error starts ({ x1, y1, x2, y2, stroke }), text labels of at most 4 words ({ left, top, text, fontSize, fill }), rect around a whole region ({ left, top, width, height, stroke }). The canvas is 1200x800. Provide 2-6 annotations (use 0 only when nothing useful can be marked).`;
+Annotations must point AT the work: circle the exact wrong term ({ left, top, radius, stroke }), arrow to the line where the error starts ({ x1, y1, x2, y2, stroke }), text labels of at most 4 words ({ left, top, text, fontSize, fill }), rect around a whole region ({ left, top, width, height, stroke }). The image is ${imageWidth}x${imageHeight} px — annotate in that coordinate space. Provide 2-6 annotations (use 0 only when nothing useful can be marked).`;
 
   try {
     const model = getVisionModel(c.env);
@@ -2728,7 +2743,7 @@ Annotations must point AT the work: circle the exact wrong term ({ left, top, ra
     const candidate = text.match(/\{[\s\S]*\}/)?.[0];
     const parsed = candidate ? (JSON.parse(candidate) as unknown) : null;
 
-    if (!parsed || !isValidAnnotationSet(parsed)) {
+    if (!parsed || !isValidAnnotationSet(parsed, imageWidth, imageHeight)) {
       console.error('Check-work output failed validation — serving honest fallback');
       throw new Error('Invalid check-work response');
     }

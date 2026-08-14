@@ -18,6 +18,7 @@ import {
   PenLine,
   ClipboardCheck,
   HelpCircle,
+  Camera,
   Calculator,
   GitBranch,
 } from 'lucide-react';
@@ -27,6 +28,7 @@ import { validateLatex, renderLatex } from './mathUtils';
 import { animateStep, cancelAnimations, stepAnimationMs } from './whiteboardAnimator';
 import { prefetchTtsAudio, playTtsAudio, releaseTtsAudioCache } from '@/utils/whiteboardTts';
 import { StudentInkLayer } from './StudentInkLayer';
+import { downscalePhoto, type DownscaledPhoto } from './photoDownscale';
 
 // Types matching the backend
 interface WhiteboardDrawCommand {
@@ -137,6 +139,11 @@ interface AIWhiteboardTeacherProps {
   onAskAboutPoint?: (imageBase64: string, x: number, y: number) => void;
   askAboutResult?: AskAboutResult | null;
   askAboutLoading?: boolean;
+  // Phase C "Photo-of-paper work": the component supplies the downscaled
+  // JPEG and its pixel dims (annotations come back in that space).
+  onPhotoCheckWork?: (imageBase64: string, imageWidth: number, imageHeight: number, stepIndex: number) => void;
+  // Clears a stale check-work result (used when a photo flow starts/ends).
+  onClearCheckWork?: () => void;
   className?: string;
 }
 
@@ -188,6 +195,75 @@ const CHECK_WORK_BANNER: Record<CheckWorkResult['verdict'], { label: string; cla
   },
 };
 
+// Photo result annotations are in the photo's pixel space; they render as SVG
+// over the preview <img> (viewBox = photo dims), not on the lesson canvas.
+const annNum = (v: unknown, d = 0) => (typeof v === 'number' && Number.isFinite(v) ? v : d);
+const annStr = (v: unknown, d: string) => (typeof v === 'string' && v.length > 0 ? v : d);
+
+function PhotoAnnotationOverlay({ annotations }: { annotations: CheckWorkAnnotation[] }) {
+  return (
+    <>
+      {annotations.map((ann) => {
+        const p = ann.props;
+        switch (ann.type) {
+          case 'circle':
+            return (
+              <circle
+                key={ann.id}
+                cx={annNum(p.left)}
+                cy={annNum(p.top)}
+                r={annNum(p.radius)}
+                fill="none"
+                stroke={annStr(p.stroke, '#dc2626')}
+                strokeWidth={5}
+              />
+            );
+          case 'rect':
+            return (
+              <rect
+                key={ann.id}
+                x={annNum(p.left)}
+                y={annNum(p.top)}
+                width={annNum(p.width)}
+                height={annNum(p.height)}
+                fill="none"
+                stroke={annStr(p.stroke, '#dc2626')}
+                strokeWidth={5}
+              />
+            );
+          case 'arrow':
+            return (
+              <line
+                key={ann.id}
+                x1={annNum(p.x1)}
+                y1={annNum(p.y1)}
+                x2={annNum(p.x2)}
+                y2={annNum(p.y2)}
+                stroke={annStr(p.stroke, '#dc2626')}
+                strokeWidth={5}
+                markerEnd="url(#photo-arrowhead)"
+              />
+            );
+          case 'text':
+            return (
+              <text
+                key={ann.id}
+                x={annNum(p.left)}
+                y={annNum(p.top)}
+                fontSize={annNum(p.fontSize, 32)}
+                fill={annStr(p.fill, '#dc2626')}
+              >
+                {annStr(p.text, '')}
+              </text>
+            );
+          default:
+            return null;
+        }
+      })}
+    </>
+  );
+}
+
 export function AIWhiteboardTeacher({
   outline = null,
   steps = [],
@@ -204,6 +280,8 @@ export function AIWhiteboardTeacher({
   onAskAboutPoint,
   askAboutResult = null,
   askAboutLoading = false,
+  onPhotoCheckWork,
+  onClearCheckWork,
   className,
 }: AIWhiteboardTeacherProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -232,6 +310,10 @@ export function AIWhiteboardTeacher({
   // Phase C "Point-and-ask": when armed, the next tap on the canvas asks the
   // vision model about that spot; the tool disarms after one use.
   const [askArmed, setAskArmed] = useState(false);
+  // Phase C "Photo-of-paper work": the downscaled photo awaiting confirmation
+  // or being marked; non-null while the photo modal is open.
+  const [photo, setPhoto] = useState<DownscaledPhoto | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const handleInkStrokesChange = useCallback((key: string | number, json: string) => {
     inkByStepRef.current.set(key, json);
   }, []);
@@ -756,18 +838,22 @@ export function AIWhiteboardTeacher({
   // Phase C "Check my work": render the grading annotations onto the lesson
   // canvas as a transient layer (ordinary validated commands, `annot-` ids)
   // and speak the verdict through the same TTS path as step voiceOvers.
+  // Photo results are the exception: their annotations are in photo pixel
+  // space and render on the photo modal's SVG overlay instead.
   useEffect(() => {
     clearAnnotations();
     if (!checkWorkResult) return;
-    checkWorkResult.annotations.forEach((ann) => {
-      drawCommand({
-        ...ann,
-        id: ann.id.startsWith('annot-') ? ann.id : `annot-${ann.id}`,
-      } as WhiteboardDrawCommand);
-    });
-    fabricRef.current?.renderAll();
+    if (!photo) {
+      checkWorkResult.annotations.forEach((ann) => {
+        drawCommand({
+          ...ann,
+          id: ann.id.startsWith('annot-') ? ann.id : `annot-${ann.id}`,
+        } as WhiteboardDrawCommand);
+      });
+      fabricRef.current?.renderAll();
+    }
     if (checkWorkResult.voiceOver) speakStep(checkWorkResult.voiceOver);
-  }, [checkWorkResult, clearAnnotations, drawCommand, speakStep]);
+  }, [checkWorkResult, photo, clearAnnotations, drawCommand, speakStep]);
 
   // Annotations never survive a step change — they mark work on THIS step.
   useEffect(() => {
@@ -841,6 +927,45 @@ export function AIWhiteboardTeacher({
       clearTimeout(timer);
     };
   }, [askAboutResult, clearAnnotations, drawCommand]);
+
+  // Phase C "Photo-of-paper work": read the picked file, downscale it
+  // client-side (longest edge ≤1600, JPEG), and open the preview modal. Any
+  // stale check-work result is cleared so its annotations never land on the
+  // new photo.
+  const handlePhotoFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-selecting the same file
+    if (!file) return;
+    onClearCheckWork?.();
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          setPhoto(downscalePhoto(img, img.naturalWidth, img.naturalHeight));
+        } catch {
+          // Undecodable image — the user can pick another.
+        }
+      };
+      img.src = String(reader.result);
+    };
+    reader.readAsDataURL(file);
+  }, [onClearCheckWork]);
+
+  const handleUsePhoto = useCallback(() => {
+    if (!photo || checkWorkLoading) return;
+    onPhotoCheckWork?.(photo.base64, photo.width, photo.height, currentStep);
+  }, [photo, checkWorkLoading, onPhotoCheckWork, currentStep]);
+
+  const handleClosePhoto = useCallback(() => {
+    setPhoto(null);
+    onClearCheckWork?.();
+  }, [onClearCheckWork]);
+
+  const handleRetakePhoto = useCallback(() => {
+    handleClosePhoto();
+    photoInputRef.current?.click();
+  }, [handleClosePhoto]);
 
   // Play animation
   const play = useCallback(() => {
@@ -1096,6 +1221,16 @@ export function AIWhiteboardTeacher({
             <span>{askAboutLoading ? 'Asking…' : askArmed ? 'Tap a spot…' : 'Ask about this'}</span>
           </button>
         )}
+        {onPhotoCheckWork && (
+          <button
+            onClick={() => photoInputRef.current?.click()}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-sm font-medium"
+            title="Photograph your paper work for the AI teacher to mark"
+          >
+            <Camera className="w-4 h-4" />
+            <span>Snap your work</span>
+          </button>
+        )}
         <button
           onClick={toggleFullscreen}
           className="p-2 hover:bg-white/20 rounded-lg transition-colors"
@@ -1270,6 +1405,91 @@ export function AIWhiteboardTeacher({
           </button>
         </div>
       </div>
+
+      {/* Photo-of-paper work: hidden picker (camera on phones) + preview modal */}
+      <input
+        ref={photoInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={handlePhotoFile}
+      />
+      {photo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-2xl w-full max-h-full overflow-auto p-4">
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-3">Your photo</h4>
+            <div className="relative">
+              <img src={photo.dataUrl} alt="Your handwritten work" className="w-full rounded-lg" />
+              {checkWorkResult && (
+                <svg
+                  className="absolute inset-0 w-full h-full pointer-events-none"
+                  viewBox={`0 0 ${photo.width} ${photo.height}`}
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <marker
+                      id="photo-arrowhead"
+                      markerWidth="10"
+                      markerHeight="10"
+                      refX="8"
+                      refY="3"
+                      orient="auto"
+                      markerUnits="strokeWidth"
+                    >
+                      <path d="M0,0 L0,6 L9,3 z" fill="#dc2626" />
+                    </marker>
+                  </defs>
+                  <PhotoAnnotationOverlay annotations={checkWorkResult.annotations} />
+                </svg>
+              )}
+            </div>
+
+            {checkWorkLoading ? (
+              <div className="flex items-center justify-center gap-2 py-4">
+                <div className="w-4 h-4 rounded-full border-2 border-violet-200 dark:border-violet-900 border-t-violet-500 animate-spin" />
+                <span className="text-sm text-gray-600 dark:text-gray-300">The AI teacher is marking your photo…</span>
+              </div>
+            ) : checkWorkResult ? (
+              <div className="mt-3">
+                <div className={cn('px-3 py-2 rounded-lg border', CHECK_WORK_BANNER[checkWorkResult.verdict].classes)}>
+                  <p className="text-sm font-medium">{CHECK_WORK_BANNER[checkWorkResult.verdict].label}</p>
+                </div>
+                <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">{checkWorkResult.explanation}</p>
+                <div className="flex justify-end gap-2 mt-4">
+                  <button
+                    onClick={handleRetakePhoto}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  >
+                    Retake
+                  </button>
+                  <button
+                    onClick={handleClosePhoto}
+                    className="px-4 py-2 text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors"
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  onClick={handleRetakePhoto}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  Retake
+                </button>
+                <button
+                  onClick={handleUsePhoto}
+                  className="px-4 py-2 text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors"
+                >
+                  Use this photo
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

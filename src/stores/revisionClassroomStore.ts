@@ -301,6 +301,9 @@ interface RevisionClassroomState {
   // Actions - Check my work (Phase C vision grading). The component owns the
   // ink snapshot, so the composite base64 PNG is passed in by the caller.
   checkMyWork: (imageBase64: string, stepIndex?: number) => Promise<void>;
+  // Actions - Photo-of-paper work (Phase C Task 5): same check-work endpoint,
+  // but the photo declares its own pixel dims for the annotation space.
+  checkPhotoWork: (imageBase64: string, imageWidth?: number, imageHeight?: number, stepIndex?: number) => Promise<void>;
   clearCheckWorkResult: () => void;
 
   // Actions - Point-and-ask (Phase C). The component supplies the composite
@@ -1299,6 +1302,12 @@ Does this help? Feel free to ask more questions!`;
       },
 
       checkMyWork: async (imageBase64, stepIndex) => {
+        // Ink snapshots carry no declared dims — the worker defaults to the
+        // 1200x800 canvas annotation space.
+        await get().checkPhotoWork(imageBase64, undefined, undefined, stepIndex);
+      },
+
+      checkPhotoWork: async (imageBase64, imageWidth, imageHeight, stepIndex) => {
         const { currentLesson } = get();
         if (!currentLesson || get().checkWorkLoading) return;
 
@@ -1308,7 +1317,13 @@ Does this help? Feel free to ask more questions!`;
         try {
           const response = await api.post<CheckWorkResult & { cached?: boolean; fallback?: boolean }>(
             `/revision-classroom/lessons/${currentLesson.id}/check-work`,
-            { imageBase64, stepIndex }
+            {
+              imageBase64,
+              stepIndex,
+              ...(imageWidth !== undefined && imageHeight !== undefined
+                ? { imageWidth, imageHeight }
+                : {}),
+            }
           );
 
           if (!response.success || !response.data) {
