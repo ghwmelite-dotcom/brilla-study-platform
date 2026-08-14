@@ -542,6 +542,8 @@ export default function RevisionClassroom() {
     whiteboardFallback,
     checkWorkResult,
     checkWorkLoading,
+    askAboutResult,
+    askAboutLoading,
     aiLimitReached,
     freeAiRemaining,
     isLoading,
@@ -561,6 +563,7 @@ export default function RevisionClassroom() {
     requestWhiteboardTeaching,
     fetchNextWhiteboardStep,
     checkMyWork,
+    askAboutPoint,
     toggleWhiteboardMode,
     answerCheckpoint,
     fetchStats,
@@ -1221,6 +1224,9 @@ export default function RevisionClassroom() {
                   onCheckWork={checkMyWork}
                   checkWorkResult={checkWorkResult}
                   checkWorkLoading={checkWorkLoading}
+                  onAskAboutPoint={askAboutPoint}
+                  askAboutResult={askAboutResult}
+                  askAboutLoading={askAboutLoading}
                   className="h-full"
                 />
               )

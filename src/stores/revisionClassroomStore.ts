@@ -165,6 +165,13 @@ export interface CheckWorkResult {
   annotations: CheckWorkAnnotation[];
 }
 
+// Phase C "Point-and-ask": the vision answer about the tapped spot. The
+// optional annotation is a circle highlighting the spot (transient layer).
+export interface AskAboutResult {
+  answer: string;
+  annotation: CheckWorkAnnotation | null;
+}
+
 interface RevisionClassroomState {
   // Sessions
   currentSession: RevisionSession | null;
@@ -211,6 +218,10 @@ interface RevisionClassroomState {
   // Phase C "Check my work" (session-only; not persisted)
   checkWorkResult: CheckWorkResult | null;
   checkWorkLoading: boolean;
+
+  // Phase C "Point-and-ask" (session-only; not persisted)
+  askAboutResult: AskAboutResult | null;
+  askAboutLoading: boolean;
 
   // Tutor Integration
   tutorPresence: {
@@ -291,6 +302,11 @@ interface RevisionClassroomState {
   // ink snapshot, so the composite base64 PNG is passed in by the caller.
   checkMyWork: (imageBase64: string, stepIndex?: number) => Promise<void>;
   clearCheckWorkResult: () => void;
+
+  // Actions - Point-and-ask (Phase C). The component supplies the composite
+  // snapshot and the tapped point in 1200x800 canvas coordinates.
+  askAboutPoint: (imageBase64: string, x: number, y: number, question?: string) => Promise<void>;
+  clearAskAboutResult: () => void;
 
   // Actions - Checkpoints
   answerCheckpoint: (checkpointId: string, answer: string, timeTaken?: number) => Promise<CheckpointResponse>;
@@ -469,6 +485,8 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
       whiteboardFallback: false,
       checkWorkResult: null,
       checkWorkLoading: false,
+      askAboutResult: null,
+      askAboutLoading: false,
       aiLimitReached: false,
       freeAiRemaining: null,
       tutorPresence: null,
@@ -1265,6 +1283,8 @@ Does this help? Feel free to ask more questions!`;
           whiteboardMode: false,
           checkWorkResult: null,
           checkWorkLoading: false,
+          askAboutResult: null,
+          askAboutLoading: false,
         });
       },
 
@@ -1306,6 +1326,45 @@ Does this help? Feel free to ask more questions!`;
       },
 
       clearCheckWorkResult: () => set({ checkWorkResult: null }),
+
+      askAboutPoint: async (imageBase64, x, y, question) => {
+        const { currentLesson } = get();
+        if (!currentLesson || get().askAboutLoading) return;
+
+        // A new question replaces the previous answer (and its highlight).
+        set({ askAboutLoading: true, askAboutResult: null });
+
+        try {
+          const response = await api.post<AskAboutResult & { fallback?: boolean }>(
+            `/revision-classroom/lessons/${currentLesson.id}/ask-about`,
+            { imageBase64, x, y, question }
+          );
+
+          if (!response.success || !response.data) {
+            if ((response as { upgradeRequired?: boolean }).upgradeRequired) {
+              set({ whiteboardLocked: true, askAboutLoading: false });
+              return;
+            }
+            throw new Error(response.error || 'Failed to ask about that spot');
+          }
+
+          const { answer, annotation } = response.data;
+          // A fallback:true payload still sets the result — it renders as the
+          // honest "couldn't make out that spot" answer, not an error.
+          set({
+            askAboutResult: { answer, annotation: annotation ?? null },
+            askAboutLoading: false,
+          });
+        } catch (error) {
+          console.error('Error asking about point:', error);
+          set({
+            askAboutLoading: false,
+            error: error instanceof Error ? error.message : 'Failed to ask about that spot',
+          });
+        }
+      },
+
+      clearAskAboutResult: () => set({ askAboutResult: null }),
 
       // =============================================
       // TUTOR INTEGRATION ACTIONS

@@ -2765,6 +2765,183 @@ Annotations must point AT the work: circle the exact wrong term ({ left, top, ra
   }
 });
 
+// =============================================
+// POINT-AND-ASK (Phase C) — "what does THIS mean?"
+// =============================================
+
+interface AskAboutAnnotation {
+  type: 'circle';
+  id: string;
+  props: Record<string, unknown>;
+}
+
+interface AskAboutAnswer {
+  answer: string;
+  annotation: AskAboutAnnotation | null;
+}
+
+const ASK_ABOUT_MAX_QUESTION_CHARS = 300;
+
+// Honest payload served whenever the vision call is unavailable or the model
+// output fails validation.
+const ASK_ABOUT_FALLBACK: AskAboutAnswer = {
+  answer: "I couldn't make out that spot — try asking in chat instead.",
+  annotation: null,
+};
+
+// guided_json is verified honored by the vision model (vision spike results).
+const ASK_ABOUT_GUIDED_SCHEMA = {
+  type: 'object',
+  properties: {
+    answer: { type: 'string' },
+    annotation: {
+      type: 'object',
+      properties: {
+        type: { type: 'string', enum: ['circle'] },
+        id: { type: 'string' },
+        props: { type: 'object' },
+      },
+      required: ['type', 'id', 'props'],
+    },
+  },
+  required: ['answer'],
+};
+
+// Structural validation of the model's answer JSON. The annotation is
+// optional but, when present, must be a circle with a non-empty id and finite
+// numeric props. Coordinate props are then CLAMPED in place to the 1200x800
+// canvas (same clamping-not-rejection rule as check-work).
+function isValidAskAboutResponse(v: unknown): v is { answer: string; annotation?: AskAboutAnnotation } {
+  if (!v || typeof v !== 'object') return false;
+  const r = v as { answer?: unknown; annotation?: unknown };
+  if (typeof r.answer !== 'string' || r.answer.trim().length === 0) return false;
+  if (r.annotation === undefined || r.annotation === null) return true;
+
+  const ann = r.annotation as Partial<AskAboutAnnotation>;
+  if (!ann || typeof ann !== 'object') return false;
+  if (ann.type !== 'circle') return false;
+  if (typeof ann.id !== 'string' || ann.id.trim().length === 0) return false;
+  if (!ann.props || typeof ann.props !== 'object' || Array.isArray(ann.props)) return false;
+  for (const val of Object.values(ann.props)) {
+    if (typeof val === 'number' && !Number.isFinite(val)) return false;
+  }
+  for (const [key, val] of Object.entries(ann.props)) {
+    if (typeof val !== 'number') continue;
+    if (CHECK_WORK_X_PROPS.has(key) || CHECK_WORK_W_PROPS.has(key)) {
+      ann.props[key] = Math.min(1200, Math.max(0, val));
+    } else if (CHECK_WORK_Y_PROPS.has(key) || CHECK_WORK_H_PROPS.has(key)) {
+      ann.props[key] = Math.min(800, Math.max(0, val));
+    }
+  }
+  return true;
+}
+
+// API Endpoint: Answer a question about the exact spot the student tapped on
+// the whiteboard (premium-only). Never cached — every tap/question is unique.
+revisionClassroomApp.post('/lessons/:lessonId/ask-about', async (c) => {
+  // Premium-only feature — reject before any AI generation cost is incurred.
+  const user = c.get('user');
+  if (!(await isPremiumUser(user.userId, c.env.DB))) {
+    return c.json({
+      success: false,
+      error: 'Asking the AI teacher about a spot on the board is a premium feature. Upgrade to point and ask.',
+      upgradeRequired: true,
+    }, 403);
+  }
+
+  const lessonId = c.req.param('lessonId');
+  const body = await c.req.json().catch(() => null);
+  const imageBase64 = body?.imageBase64;
+  if (!imageBase64 || typeof imageBase64 !== 'string') {
+    return c.json({ success: false, error: 'imageBase64 is required' }, 400);
+  }
+  if (imageBase64.length > CHECK_WORK_MAX_IMAGE_CHARS) {
+    return c.json({ success: false, error: 'Image too large (max ~500KB)' }, 413);
+  }
+  if (typeof body?.x !== 'number' || !Number.isFinite(body.x) ||
+      typeof body?.y !== 'number' || !Number.isFinite(body.y)) {
+    return c.json({ success: false, error: 'x and y must be finite numbers' }, 400);
+  }
+  // Taps outside the canvas are clamped, never rejected.
+  const x = Math.round(Math.min(1200, Math.max(0, body.x)));
+  const y = Math.round(Math.min(800, Math.max(0, body.y)));
+  const question = typeof body?.question === 'string' && body.question.trim().length > 0
+    ? body.question.trim().slice(0, ASK_ABOUT_MAX_QUESTION_CHARS)
+    : undefined;
+
+  // Same lesson join as whiteboard-teach: topic/subject/exam from the row.
+  const lesson = await c.env.DB.prepare(`
+    SELECT
+      rl.*,
+      t.name as topic_name,
+      s.name as subject_name,
+      rs.exam_type,
+      rs.user_id
+    FROM revision_lessons rl
+    LEFT JOIN topics t ON rl.topic_id = t.id
+    LEFT JOIN revision_sessions rs ON rl.session_id = rs.id
+    LEFT JOIN subjects s ON rs.subject_id = s.id
+    WHERE rl.id = ? AND rs.user_id = ?
+  `).bind(lessonId, user.userId).first();
+
+  if (!lesson) {
+    return c.json({ success: false, error: 'Lesson not found' }, 404);
+  }
+
+  const topicName = (lesson as any).topic_name || 'this topic';
+  const subjectName = (lesson as any).subject_name || 'this subject';
+  const examType = (lesson as any).exam_type || 'wassce';
+
+  const prompt = `You are an expert ${examType.toUpperCase()} teacher helping a student with "${topicName}" (${subjectName}).
+The attached image is a 1200x800 whiteboard lesson snapshot.
+The student tapped point (${x}, ${y}) on this image. Their question: "${question ?? 'what does this part mean?'}"
+Answer concisely (at most 60 words), referencing what is at or near that point.
+Respond with ONLY JSON in this exact shape:
+{ "answer": "...", "annotation": { "type": "circle", "id": "tap-highlight", "props": { "left": ${x}, "top": ${y}, "radius": 60, "stroke": "#7c3aed" } } }
+The annotation is optional — include it only when circling the tapped spot helps. It must be a circle centered near (${x}, ${y}); the canvas is 1200x800.`;
+
+  try {
+    const model = getVisionModel(c.env);
+    const result: unknown = await c.env.AI.run(model as never, {
+      messages: [
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: `data:image/png;base64,${imageBase64}` } },
+          ],
+        },
+      ],
+      max_tokens: 400,
+      guided_json: ASK_ABOUT_GUIDED_SCHEMA,
+    } as never);
+
+    // The runtime shape is { response: string } — always unwrap, never cast.
+    const text = unwrapAiText(result);
+    const candidate = text.match(/\{[\s\S]*\}/)?.[0];
+    const parsed = candidate ? (JSON.parse(candidate) as unknown) : null;
+
+    if (!parsed || !isValidAskAboutResponse(parsed)) {
+      console.error('Ask-about output failed validation — serving honest fallback');
+      throw new Error('Invalid ask-about response');
+    }
+
+    const annotation = parsed.annotation ?? null;
+    if (annotation) prefixAnnotationIds([annotation]);
+
+    return c.json({
+      success: true,
+      data: { answer: parsed.answer, annotation, fallback: false },
+    });
+  } catch (error) {
+    console.error('Ask-about vision call failed:', error);
+    return c.json({
+      success: true,
+      data: { ...ASK_ABOUT_FALLBACK, fallback: true },
+    });
+  }
+});
+
 // API Endpoint: Get available whiteboard lesson types
 revisionClassroomApp.get('/whiteboard-types', async (c) => {
   return c.json({
