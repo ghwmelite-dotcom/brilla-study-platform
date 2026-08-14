@@ -18,7 +18,6 @@ import {
   Calculator,
   GitBranch,
 } from 'lucide-react';
-import 'katex/dist/katex.min.css';
 import { cn } from '@/utils';
 import { renderPrimitive } from './whiteboardPrimitives';
 import { validateLatex, renderLatex } from './mathUtils';

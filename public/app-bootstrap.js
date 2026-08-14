@@ -7,10 +7,6 @@ var fontLink = document.getElementById('google-fonts');
 if (fontLink) {
   fontLink.media = 'all';
 }
-var katexLink = document.getElementById('katex-css');
-if (katexLink) {
-  katexLink.rel = 'stylesheet';
-}
 
 // Service Worker Registration (moved verbatim from the old inline script —
 // non-blocking update banner, no confirm(), no console output)
