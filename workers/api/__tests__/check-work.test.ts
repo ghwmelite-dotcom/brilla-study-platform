@@ -180,7 +180,9 @@ describe('check-work endpoint', () => {
     const row = { ai_message: JSON.stringify(seededPayload) };
     const cacheHandler: MockHandler = {
       match: /FROM revision_ai_interactions\s+WHERE lesson_id/,
-      first: (binds) => (binds[2] === sha256Hex(image) ? row : null),
+      // Binds: (lesson_id, user_response=image hash) — the interaction_type
+      // is a SQL literal, not a bound parameter.
+      first: (binds) => (binds[1] === sha256Hex(image) ? row : null),
     };
     const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheHandler, whiteboardRowHandler(null), writeHandler]);
 
@@ -375,5 +377,40 @@ describe('check-work endpoint', () => {
 
     // Bounds run before the lesson lookup.
     expect(db.calls.filter((c) => /revision_lessons/.test(c.sql))).toHaveLength(0);
+  });
+
+  // Regression (live probe): a failing cache lookup must degrade to a fresh
+  // grading attempt, never a 500. mockD1 throws on bind() when no handler
+  // matches the cache SELECT — standing in for a D1 error.
+  it('degrades to fresh grading (never 500) when the cache lookup throws', async () => {
+    const mockAi = {
+      run: async () => ({
+        response: JSON.stringify({
+          verdict: 'partial',
+          explanation: 'Good start — check the last line.',
+          voiceOver: 'Almost there.',
+          annotations: [],
+        }),
+      }),
+    };
+    // No checkworkCacheHandler: the cache SELECT throws inside bind().
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler, whiteboardRowHandler(null), writeHandler]);
+
+    const res = await checkWork(db, { imageBase64: 'aW1hZ2U=', stepIndex: 0 }, mockAi);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { data: { verdict: string; fallback: boolean; cached: boolean } };
+    expect(body.data.verdict).toBe('partial');
+    expect(body.data.fallback).toBe(false);
+    expect(body.data.cached).toBe(false);
+  });
+
+  it('serves the honest fallback (never 500) when the cache lookup throws and no AI is bound', async () => {
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler, whiteboardRowHandler(null), writeHandler]);
+
+    const res = await checkWork(db, { imageBase64: 'aW1hZ2U=', stepIndex: 0 });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { data: { verdict: string; fallback: boolean } };
+    expect(body.data.fallback).toBe(true);
+    expect(body.data.verdict).toBe('unknown');
   });
 });
