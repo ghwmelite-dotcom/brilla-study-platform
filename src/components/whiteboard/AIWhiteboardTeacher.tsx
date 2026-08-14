@@ -15,6 +15,7 @@ import {
   Sparkles,
   Presentation,
   PenTool,
+  PenLine,
   Calculator,
   GitBranch,
 } from 'lucide-react';
@@ -23,6 +24,7 @@ import { renderPrimitive } from './whiteboardPrimitives';
 import { validateLatex, renderLatex } from './mathUtils';
 import { animateStep, cancelAnimations, stepAnimationMs } from './whiteboardAnimator';
 import { prefetchTtsAudio, playTtsAudio, releaseTtsAudioCache } from '@/utils/whiteboardTts';
+import { StudentInkLayer } from './StudentInkLayer';
 
 // Types matching the backend
 interface WhiteboardDrawCommand {
@@ -155,6 +157,19 @@ export function AIWhiteboardTeacher({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  // Phase C: student ink layer. Ink JSON is kept per step in a ref (drawing
+  // shouldn't re-render the teacher); canvasZoom mirrors the scale computed
+  // by reflowCanvas so the ink layer re-syncs on every resize/fullscreen.
+  // inkSnapshotRef/inkClearRef are consumed by the Phase C vision tasks.
+  const [inkEnabled, setInkEnabled] = useState(false);
+  const [canvasZoom, setCanvasZoom] = useState(1);
+  const inkByStepRef = useRef<Map<string | number, string>>(new Map());
+  const inkSnapshotRef = useRef<(() => string) | null>(null);
+  const inkClearRef = useRef<(() => void) | null>(null);
+  const handleInkStrokesChange = useCallback((key: string | number, json: string) => {
+    inkByStepRef.current.set(key, json);
+  }, []);
+
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
   // Server TTS audio currently playing (null while speechSynthesis is the
   // active voice). voiceGenRef discards stale async TTS plays when the step
@@ -249,6 +264,8 @@ export function AIWhiteboardTeacher({
       height: CANVAS_HEIGHT * scale,
     });
     fabricRef.current.renderAll();
+    // Keep the student ink layer's geometry in lockstep with the canvas.
+    setCanvasZoom(scale);
   }, []);
 
   // Initialize (or re-bind) the fabric canvas. The canvas element only exists
@@ -777,6 +794,8 @@ export function AIWhiteboardTeacher({
   useEffect(() => {
     if (outline && steps.length > 0) {
       spokenStepRef.current = -1;
+      // New lesson — previous lesson's ink is meaningless.
+      inkByStepRef.current = new Map();
       goToStep(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -860,6 +879,16 @@ export function AIWhiteboardTeacher({
           </div>
         </div>
         <button
+          onClick={() => setInkEnabled((v) => !v)}
+          className={cn(
+            'p-2 hover:bg-white/20 rounded-lg transition-colors',
+            inkEnabled && 'bg-white/30'
+          )}
+          title={inkEnabled ? 'Hide ink tools' : 'Draw on the whiteboard'}
+        >
+          <PenLine className="w-5 h-5" />
+        </button>
+        <button
           onClick={toggleFullscreen}
           className="p-2 hover:bg-white/20 rounded-lg transition-colors"
         >
@@ -881,6 +910,26 @@ export function AIWhiteboardTeacher({
         {/* KaTeX math overlay: empty, absolutely positioned and pointer-events-none,
             so zero footprint when a lesson has no math commands. */}
         <div ref={overlayRef} className="absolute inset-0 pointer-events-none overflow-hidden" />
+        {/* Student ink layer (Phase C): absolutely over the lesson canvas at
+            the same effective CSS size; re-syncs via canvasZoom whenever
+            reflowCanvas runs (resize/fullscreen). Only mounted in the content
+            view, so ink is inert while the selector/loading views show. */}
+        <StudentInkLayer
+          width={CANVAS_WIDTH}
+          height={CANVAS_HEIGHT}
+          zoom={canvasZoom}
+          stepKey={currentStep}
+          enabled={inkEnabled}
+          strokes={inkByStepRef.current.get(currentStep) ?? null}
+          lessonCanvasRef={canvasRef}
+          onStrokesChange={handleInkStrokesChange}
+          registerSnapshotFn={(fn) => {
+            inkSnapshotRef.current = fn;
+          }}
+          registerClearFn={(fn) => {
+            inkClearRef.current = fn;
+          }}
+        />
         {waitingForStep && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             {stepError && !stepLoading ? (

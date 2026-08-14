@@ -21,5 +21,8 @@
     }
   },
   "include": ["src"],
+  // Test files are executed by vitest (transpile-only); they are excluded from
+  // the production type-check so test-only typing idioms don't gate the build.
+  "exclude": ["src/**/__tests__", "src/**/*.test.ts", "src/**/*.test.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
