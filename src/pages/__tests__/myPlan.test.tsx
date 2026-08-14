@@ -10,7 +10,7 @@ import type { BriePlan } from '@/stores/guidanceStore';
 const fetchGoals = vi.fn(async () => []);
 const fetchPlan = vi.fn(async () => undefined);
 const regeneratePlan = vi.fn(async () => 'ok' as const);
-const startAssessment = vi.fn(async () => 'quiz' as const);
+const startAssessment = vi.fn(async (): Promise<'quiz' | 'complete' | 'skip' | 'cooldown' | 'error'> => 'quiz');
 const openWizard = vi.fn();
 const resetQuiz = vi.fn();
 
@@ -105,6 +105,7 @@ describe('MyPlan', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    startAssessment.mockResolvedValue('quiz');
     container = document.createElement('div');
     document.body.appendChild(container);
     root = createRoot(container);
@@ -139,18 +140,32 @@ describe('MyPlan', () => {
     expect(algebraLink?.getAttribute('href')).not.toContain('untrusted-path');
   });
 
-  it('starts an explicitly forced level-check retake', async () => {
-    const retake = Array.from(container.querySelectorAll('button')).find((button) =>
-      button.textContent?.includes('Retake level check'),
+  it('resumes an active level check before considering a forced retake', async () => {
+    const levelCheck = Array.from(container.querySelectorAll('button')).find((button) =>
+      button.textContent?.includes('Continue or retake level check'),
     );
-    expect(retake).toBeTruthy();
+    expect(levelCheck).toBeTruthy();
 
-    await act(async () => retake?.click());
+    await act(async () => levelCheck?.click());
 
     expect(resetQuiz).toHaveBeenCalledOnce();
     expect(openWizard).toHaveBeenCalledOnce();
-    expect(startAssessment).toHaveBeenCalledWith('wassce', 'subj_wassce_core_math', {
+    expect(startAssessment).toHaveBeenCalledOnce();
+    expect(startAssessment).toHaveBeenCalledWith('wassce', 'subj_wassce_core_math');
+  });
+
+  it('requests a forced retake only after the current assessment is complete', async () => {
+    startAssessment.mockResolvedValueOnce('complete').mockResolvedValueOnce('quiz');
+    const levelCheck = Array.from(container.querySelectorAll('button')).find((button) =>
+      button.textContent?.includes('Continue or retake level check'),
+    );
+
+    await act(async () => levelCheck?.click());
+
+    expect(startAssessment).toHaveBeenNthCalledWith(1, 'wassce', 'subj_wassce_core_math');
+    expect(startAssessment).toHaveBeenNthCalledWith(2, 'wassce', 'subj_wassce_core_math', {
       forceRetake: true,
     });
+    expect(openWizard).toHaveBeenCalledOnce();
   });
 });
