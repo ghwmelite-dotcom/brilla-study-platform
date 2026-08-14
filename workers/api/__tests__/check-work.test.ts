@@ -318,4 +318,62 @@ describe('check-work endpoint', () => {
     expect(body.data.explanation).toContain("couldn't read the work clearly");
     expect(writeCalls(db)).toHaveLength(0);
   });
+
+  // Task 5: photos of paper work declare their own pixel dims; the prompt
+  // must name them and annotations clamp to them, not to 1200x800.
+  it('photo path: prompt carries the declared dims and annotations clamp to them', async () => {
+    let capturedPrompt = '';
+    const mockAi = {
+      run: async (_model: string, opts: Record<string, unknown>) => {
+        capturedPrompt = (opts.messages as { content: { text?: string }[] }[])[0].content[0].text!;
+        return {
+          response: JSON.stringify({
+            verdict: 'partial',
+            explanation: 'Good start — check the last line.',
+            voiceOver: 'Almost, look at the last line.',
+            annotations: [
+              // Both coords out of bounds — clamped to the PHOTO dims.
+              { type: 'circle', id: 'a1', props: { left: 5000, top: 5000, radius: 40, stroke: '#dc2626' } },
+            ],
+          }),
+        };
+      },
+    };
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler, checkworkCacheHandler(null), whiteboardRowHandler(null), writeHandler]);
+
+    const res = await checkWork(
+      db,
+      { imageBase64: 'cGhvdG8td29yaw==', stepIndex: 0, imageWidth: 1000, imageHeight: 1400 },
+      mockAi,
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      data: { verdict: string; fallback: boolean; annotations: { props: Record<string, unknown> }[] };
+    };
+    expect(body.data.fallback).toBe(false);
+    expect(body.data.verdict).toBe('partial');
+    expect(body.data.annotations[0].props.left).toBe(1000);
+    expect(body.data.annotations[0].props.top).toBe(1400);
+    expect(capturedPrompt).toContain('1000x1400 px photo');
+    expect(capturedPrompt).toContain('The image is 1000x1400 px — annotate in that coordinate space.');
+  });
+
+  it('returns 400 for out-of-range or non-integer image dimensions', async () => {
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler, checkworkCacheHandler(null), whiteboardRowHandler(null), writeHandler]);
+
+    const tooSmall = await checkWork(db, { imageBase64: 'aW1hZ2U=', imageWidth: 50 });
+    expect(tooSmall.status).toBe(400);
+
+    const tooBig = await checkWork(db, { imageBase64: 'aW1hZ2U=', imageHeight: 2001 });
+    expect(tooBig.status).toBe(400);
+
+    const wrongType = await checkWork(db, { imageBase64: 'aW1hZ2U=', imageWidth: '1000' });
+    expect(wrongType.status).toBe(400);
+
+    const nonInteger = await checkWork(db, { imageBase64: 'aW1hZ2U=', imageWidth: 1000.5 });
+    expect(nonInteger.status).toBe(400);
+
+    // Bounds run before the lesson lookup.
+    expect(db.calls.filter((c) => /revision_lessons/.test(c.sql))).toHaveLength(0);
+  });
 });

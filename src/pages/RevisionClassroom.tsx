@@ -563,6 +563,8 @@ export default function RevisionClassroom() {
     requestWhiteboardTeaching,
     fetchNextWhiteboardStep,
     checkMyWork,
+    checkPhotoWork,
+    clearCheckWorkResult,
     askAboutPoint,
     toggleWhiteboardMode,
     answerCheckpoint,
@@ -1227,6 +1229,8 @@ export default function RevisionClassroom() {
                   onAskAboutPoint={askAboutPoint}
                   askAboutResult={askAboutResult}
                   askAboutLoading={askAboutLoading}
+                  onPhotoCheckWork={checkPhotoWork}
+                  onClearCheckWork={clearCheckWorkResult}
                   className="h-full"
                 />
               )
