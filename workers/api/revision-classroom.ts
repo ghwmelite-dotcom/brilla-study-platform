@@ -2204,7 +2204,7 @@ Output ONE JSON object only — the lesson outline AND its first step together �
     "clearPrevious": false
   }
 }
-The first step teaches the first outline title. Canvas is 1200x800. Keep commands under 12.`;
+The first step ONLY opens the lesson for the first outline title — keep it light: at most 6 commands (a title plus a few elements). Later steps carry the detail. Canvas is 1200x800.`;
 
   try {
     const model = getGenerationModel(env);
