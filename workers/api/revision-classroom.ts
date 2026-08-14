@@ -2726,14 +2726,21 @@ revisionClassroomApp.post('/lessons/:lessonId/check-work', async (c) => {
   const topicId = (lesson as any).topic_id as string | null;
 
   // Correct-verdict cache: identical work already marked correct is served
-  // without an AI call. Incorrect/partial verdicts are never cached.
+  // without an AI call. Incorrect/partial verdicts are never cached. A cache
+  // lookup failure degrades to a fresh grading call — it must never 500 the
+  // endpoint.
   const imageHash = await sha256Hex(imageBase64);
-  const cachedRow = await c.env.DB.prepare(`
-    SELECT ai_message FROM revision_ai_interactions
-    WHERE lesson_id = ? AND interaction_type = 'checkwork_correct' AND user_response = ?
-    ORDER BY created_at DESC
-    LIMIT 1
-  `).bind(lessonId, 'checkwork_correct', imageHash).first<{ ai_message: string }>();
+  let cachedRow: { ai_message: string } | null = null;
+  try {
+    cachedRow = await c.env.DB.prepare(`
+      SELECT ai_message FROM revision_ai_interactions
+      WHERE lesson_id = ? AND interaction_type = 'checkwork_correct' AND user_response = ?
+      ORDER BY created_at DESC
+      LIMIT 1
+    `).bind(lessonId, imageHash).first<{ ai_message: string }>();
+  } catch (error) {
+    console.error('Check-work cache lookup failed — grading fresh:', error);
+  }
 
   if (cachedRow) {
     try {
