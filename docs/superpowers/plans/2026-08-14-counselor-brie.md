@@ -12,6 +12,60 @@
 
 ## Global Constraints
 
+## Approved Implementation Corrections (binding, 2026-08-14)
+
+The product owner approved the following corrections after the repository-level
+implementation review. These rules supersede conflicting detail later in this
+document.
+
+- **One plan, not two:** Counselor Brie's roadmap and `thisWeek` slice are the
+  user study plan. `learningPathStore` and `StudyPlanWidget` consume the
+  guidance plan; they do not call the legacy daily schedule generator.
+- **One mastery write path:** extract the existing atomic `question_attempts` +
+  `user_progress` behavior and use it from normal practice and guidance.
+  Readiness derives from those sources, not the separately maintained
+  `topic_mastery` table.
+- **Canonical exam catalog:** validate exam/subject compatibility server-side
+  and map frontend slugs in one helper. Supported database ids are `wassce`,
+  `bece`, `nsmq`, `igcse`, `cambridge_as`, `cambridge_a2`, `edexcel_igcse`,
+  `edexcel_as`, and `edexcel_a2`. Edexcel IGCSE uses `9-1`; Edexcel AS/A-Level
+  uses `A*-E`. A combined exam month/year cannot be in the past.
+- **Objective v1 diagnostic:** eligible questions are internally consistent
+  `multiple_choice` or `true_false` rows only, constrained by exam and subject
+  and stratified across topics. Free-text mathematics is not exact-string
+  graded.
+- **Honest result:** assessment and plan payloads include evidence count, topic
+  coverage, freshness, `confidence`, `algorithmVersion`, and
+  `completedEarly`. UI copy calls this a provisional readiness estimate.
+- **Atomic/idempotent answers:** sessions carry a version and algorithm version;
+  `guidance_session_answers` enforces one answer per session ordinal and stores
+  an idempotency key plus the linked `question_attempts` id. Writes use an
+  atomic D1 batch/CAS shape. A partial unique index permits only one active
+  session per user/exam/subject.
+- **Retakes are real:** `forceRetake` is server-authorized, cooldown-limited,
+  abandons any old active session, and bypasses the returning-user skip.
+- **Fresh returning evidence:** automatic skip requires at least 20 recent
+  subject attempts. Stale evidence offers a new check instead.
+- **Privacy-safe narrative cache:** shared cached prose is generic to prompt
+  version, exam, subject, band, and confidence. Student grade and topic names
+  are composed deterministically after lookup and never stored in shared prose.
+- **Migration safety:** migration 094 uses explicit copy columns, preserves
+  `idx_exam_readiness_user`, preflights enum compatibility, and does not drop
+  `learning_recommendations`. Disposable migration tests verify rows, indexes,
+  constraints, active-session uniqueness, and answer idempotency.
+- **Student-only resumable UI:** the auto-trigger is student-only, resumes an
+  incomplete session even after goal save, uses a polite user/exam/subject
+  dismissal cooldown, and implements focus management, Escape, accessible
+  labels, reduced motion, and an "AI academic guide, not a human counselor"
+  notice.
+- **Feature flags and rollout:** API availability uses
+  `COUNSELOR_BRIE_ENABLED`; automatic onboarding uses
+  `VITE_COUNSELOR_BRIE_ENABLED`. Local tests/build/migration-on-copy/visual QA
+  are in scope. Remote migration, entitlement mutation, production probes,
+  deployment, and wildcard cache deletion require separate authorization.
+- **No premature council work:** the deferred Assessment Review Council remains
+  disabled and outside this implementation.
+
 - **Gating:** everything is **free for all authenticated users** EXCEPT `POST /api/guidance/plan/regenerate`, which is premium-only via `isPremiumUser` (403 `{ success:false, upgradeRequired:true }`, same pattern as `whiteboard-teach`). `GET /plan` is free INCLUDING one AI narrative per band.
 - **Grade enums** (validated server-side in `POST /goals`): wassce → `['A1','B2','B3','C4','C5','C6','D7','E8','F9']`; bece → `['1','2','3','4','5','6','7','8','9']`; igcse → `['A*','A','B','C','D','E','F','G']`; cambridge-a-level → `['A*','A','B','C','D','E']`; edexcel-as/edexcel-a-level → `['9','8','7','6','5','4','3','2','1']`; nsmq → `target_grade` optional (NULL — competition, no grade scale). `exam_year` integer in `[currentYear, currentYear+5]`, `exam_month` integer 1–12 (both optional).
 - **Quiz mechanics:** target **9 questions** (spec range 8–10; finish early with an honesty flag if the bank runs dry below 8). Start `medium`; correct → step up, wrong → step down; capped at `easy`/`expert`. One question per topic where possible, topics walked in `display_order` ASC (syllabus progression). Must tolerate ~600 untagged questions via subject-level fallback (`topic_id IS NULL` or exhausted topic → any unused question in the subject).
@@ -183,15 +237,18 @@ const generateId = (prefix: string) =>
 // GOALS — target grade + exam date per exam/subject
 // =============================================
 
-// Grade scales per exam type (Global Constraints). nsmq has no grades —
-// target_grade must be omitted for it.
+// Grade scales per exam type (Global Constraints). Keys are the canonical DB
+// slugs (exam_types.id, same set revision_sessions documents). Scales match
+// the seeded exam_types rows: igcse A*-G, cambridge_as/a2 A*-E, edexcel_as/a2
+// A*-E. nsmq has no grades — target_grade must be omitted for it.
 const TARGET_GRADES: Record<string, string[]> = {
   wassce: ['A1', 'B2', 'B3', 'C4', 'C5', 'C6', 'D7', 'E8', 'F9'],
   bece: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
   igcse: ['A*', 'A', 'B', 'C', 'D', 'E', 'F', 'G'],
-  'cambridge-a-level': ['A*', 'A', 'B', 'C', 'D', 'E'],
-  'edexcel-as': ['9', '8', '7', '6', '5', '4', '3', '2', '1'],
-  'edexcel-a-level': ['9', '8', '7', '6', '5', '4', '3', '2', '1'],
+  cambridge_as: ['A*', 'A', 'B', 'C', 'D', 'E'],
+  cambridge_a2: ['A*', 'A', 'B', 'C', 'D', 'E'],
+  edexcel_as: ['A*', 'A', 'B', 'C', 'D', 'E'],
+  edexcel_a2: ['A*', 'A', 'B', 'C', 'D', 'E'],
 };
 
 interface GoalInput {

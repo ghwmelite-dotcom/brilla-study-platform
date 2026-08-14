@@ -31,6 +31,7 @@ import {
   Heart,
   Crown,
   Gift,
+  Compass,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { useAuthStore, useExamStore, useChatStore, useProgressStore, useParentStore, useGradingStore } from '@/stores';
@@ -97,6 +98,7 @@ const examSpecificItems: Record<GhanaExamTypeSlug, { path: string; label: string
 // Learning Resources navigation items
 const resourcesNavItems = [
   { path: '/revision-classroom', label: 'AI Revision Classroom', icon: Brain, auth: true, badge: 'NEW', highlight: true },
+  { path: '/my-plan', label: 'Counselor Brie', icon: Compass, auth: true, badge: 'NEW', highlight: true },
   { path: '/library', label: 'E-Library', icon: Library },
   { path: '/counselor', label: 'AI Counselor', icon: Heart, auth: true },
 ];
@@ -420,6 +422,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <ul className="space-y-1">
               {resourcesNavItems.map((item) => {
                 if ('auth' in item && item.auth && !isAuthenticated) return null;
+                if (item.path === '/my-plan' && user?.role !== 'student') return null;
 
                 return (
                   <li key={item.path}>

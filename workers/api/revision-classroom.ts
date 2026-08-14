@@ -451,12 +451,19 @@ revisionClassroomApp.post('/sessions', async (c) => {
       FROM topics
       WHERE subject_id = ?
       ORDER BY display_order ASC
-    `).bind(subjectId).all();
+    `).bind(subjectId).all<{ id: string; name: string; display_order: number }>();
 
     if (!topicId && topics.results.length === 0) {
       return c.json({ success: false, error: 'Revision content for this subject is being prepared. Please try another subject for now.' }, 400);
     }
 
+
+    const selectedTopic = topicId
+      ? topics.results.find((topic) => topic.id === topicId)
+      : null;
+    if (topicId && !selectedTopic) {
+      return c.json({ success: false, error: 'This topic is not available for the selected subject.' }, 400);
+    }
     const totalLessons = topicId ? 1 : topics.results.length;
 
     // Create the session
@@ -472,9 +479,7 @@ revisionClassroomApp.post('/sessions', async (c) => {
     ).run();
 
     // Create lessons for each topic
-    const lessonsToCreate = topicId
-      ? topics.results.filter((t: any) => t.id === topicId)
-      : topics.results;
+    const lessonsToCreate = selectedTopic ? [selectedTopic] : topics.results;
 
     for (let i = 0; i < lessonsToCreate.length; i++) {
       const topic = lessonsToCreate[i] as any;
