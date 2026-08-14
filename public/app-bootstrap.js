@@ -5,11 +5,11 @@
 // Async stylesheet swaps (previously inline onload attributes)
 var fontLink = document.getElementById('google-fonts');
 if (fontLink) {
-  fontLink.addEventListener('load', function () { fontLink.media = 'all'; });
+  fontLink.media = 'all';
 }
 var katexLink = document.getElementById('katex-css');
 if (katexLink) {
-  katexLink.addEventListener('load', function () { katexLink.rel = 'stylesheet'; });
+  katexLink.rel = 'stylesheet';
 }
 
 // Service Worker Registration (moved verbatim from the old inline script —
