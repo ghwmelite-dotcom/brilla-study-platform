@@ -238,9 +238,12 @@ export function MyPlan() {
     setIsRetaking(true);
     resetQuiz();
     try {
-      const result = await startAssessment(selectedGoal.examType, selectedGoal.subjectId, {
-        forceRetake: true,
-      });
+      let result = await startAssessment(selectedGoal.examType, selectedGoal.subjectId);
+      if (result === 'skip' || result === 'complete') {
+        result = await startAssessment(selectedGoal.examType, selectedGoal.subjectId, {
+          forceRetake: true,
+        });
+      }
       if (result === 'quiz') {
         openWizard();
       } else if (result === 'skip' || result === 'complete') {
@@ -427,7 +430,7 @@ export function MyPlan() {
               className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-violet-300 bg-white px-5 py-3 font-semibold text-violet-800 hover:bg-violet-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
             >
               <RotateCcw className={`h-4 w-4 ${isRetaking ? 'animate-spin motion-reduce:animate-none' : ''}`} aria-hidden="true" />
-              {isRetaking ? 'Starting retake…' : 'Retake level check'}
+              {isRetaking ? 'Opening level check...' : 'Continue or retake level check'}
             </button>
             <button
               type="button"
