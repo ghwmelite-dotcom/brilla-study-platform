@@ -3,6 +3,7 @@ import { act, createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { BriePlan } from '@/stores/guidanceStore';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -79,7 +80,7 @@ const guidanceState = {
         href: '/untrusted-path',
       },
     ],
-    thisWeek: [] as typeof guidanceState.plan.roadmap,
+    thisWeek: [] as BriePlan['roadmap'],
   },
   isLoading: false,
   error: null,
