@@ -16,6 +16,7 @@ import {
   Presentation,
   PenTool,
   PenLine,
+  ClipboardCheck,
   Calculator,
   GitBranch,
 } from 'lucide-react';
@@ -75,6 +76,22 @@ interface WhiteboardStep {
 
 type LessonType = 'diagram' | 'step-by-step' | 'problem-solving' | 'concept-map';
 
+// Phase C "Check my work": vision grading result from the worker. Annotations
+// are ordinary validated draw commands with server-prefixed `annot-` ids,
+// rendered as a transient layer over the lesson canvas.
+interface CheckWorkAnnotation {
+  type: 'circle' | 'arrow' | 'text' | 'rect';
+  id: string;
+  props: Record<string, unknown>;
+}
+
+interface CheckWorkResult {
+  verdict: 'correct' | 'partial' | 'incorrect' | 'unknown';
+  explanation: string;
+  voiceOver: string;
+  annotations: CheckWorkAnnotation[];
+}
+
 // The progressive protocol renders every lesson on the worker's fixed canvas.
 const CANVAS_WIDTH = 1200;
 const CANVAS_HEIGHT = 800;
@@ -102,6 +119,11 @@ interface AIWhiteboardTeacherProps {
   // Called when the renderer needs a step it doesn't have yet (prefetch).
   onNeedStep?: (stepIndex: number) => void;
   fallback?: boolean;
+  // Phase C "Check my work": the parent passes the store action; the
+  // component supplies the composite ink snapshot and current step index.
+  onCheckWork?: (imageBase64: string, stepIndex: number) => void;
+  checkWorkResult?: CheckWorkResult | null;
+  checkWorkLoading?: boolean;
   className?: string;
 }
 
@@ -132,6 +154,27 @@ const LESSON_TYPE_INFO = {
   },
 };
 
+// Verdict banner styling for "Check my work" results. 'unknown' is the honest
+// fallback (unreadable work) and stays neutral — never dressed up as a verdict.
+const CHECK_WORK_BANNER: Record<CheckWorkResult['verdict'], { label: string; classes: string }> = {
+  correct: {
+    label: 'Correct — great work!',
+    classes: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300',
+  },
+  partial: {
+    label: 'Almost there',
+    classes: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300',
+  },
+  incorrect: {
+    label: "Let's look at this again",
+    classes: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300',
+  },
+  unknown: {
+    label: "Couldn't check your work",
+    classes: 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300',
+  },
+};
+
 export function AIWhiteboardTeacher({
   outline = null,
   steps = [],
@@ -142,6 +185,9 @@ export function AIWhiteboardTeacher({
   onRequestContent,
   onNeedStep,
   fallback = false,
+  onCheckWork,
+  checkWorkResult = null,
+  checkWorkLoading = false,
   className,
 }: AIWhiteboardTeacherProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -522,6 +568,23 @@ export function AIWhiteboardTeacher({
     return objs;
   }, [createObject, drawMath]);
 
+  // Remove the transient check-work annotation layer (all `annot-` prefixed
+  // objects) from the lesson canvas. Annotations live in drawnObjectsRef like
+  // any other command, so they must be evicted there too.
+  const clearAnnotations = useCallback(() => {
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+    let removed = false;
+    drawnObjectsRef.current.forEach((obj, id) => {
+      if (id.startsWith('annot-')) {
+        canvas.remove(obj);
+        drawnObjectsRef.current.delete(id);
+        removed = true;
+      }
+    });
+    if (removed) canvas.renderAll();
+  }, []);
+
   // Draw a step — idempotent: each command id is added at most once. The
   // server prefixes ids per step, so ids never collide across steps.
   // `animate` (playback only) runs the draw-on entrance animation for newly
@@ -670,6 +733,35 @@ export function AIWhiteboardTeacher({
     // Update progress
     setProgress(((clampedIndex + 1) / totalSteps) * 100);
   }, [steps, totalSteps, drawCommand, clearOverlay, applyHighlights, speakStep, onNeedStep]);
+
+  // Phase C "Check my work": render the grading annotations onto the lesson
+  // canvas as a transient layer (ordinary validated commands, `annot-` ids)
+  // and speak the verdict through the same TTS path as step voiceOvers.
+  useEffect(() => {
+    clearAnnotations();
+    if (!checkWorkResult) return;
+    checkWorkResult.annotations.forEach((ann) => {
+      drawCommand({
+        ...ann,
+        id: ann.id.startsWith('annot-') ? ann.id : `annot-${ann.id}`,
+      } as WhiteboardDrawCommand);
+    });
+    fabricRef.current?.renderAll();
+    if (checkWorkResult.voiceOver) speakStep(checkWorkResult.voiceOver);
+  }, [checkWorkResult, clearAnnotations, drawCommand, speakStep]);
+
+  // Annotations never survive a step change — they mark work on THIS step.
+  useEffect(() => {
+    clearAnnotations();
+  }, [currentStep, clearAnnotations]);
+
+  // Snapshot the composite (lesson + ink) canvas and hand it to the store
+  // action via the parent. Disabled while a check is in flight.
+  const handleCheckWork = useCallback(() => {
+    const snapshot = inkSnapshotRef.current?.();
+    if (!snapshot || checkWorkLoading) return;
+    onCheckWork?.(snapshot, currentStep);
+  }, [onCheckWork, checkWorkLoading, currentStep]);
 
   // Play animation
   const play = useCallback(() => {
@@ -889,6 +981,21 @@ export function AIWhiteboardTeacher({
         >
           <PenLine className="w-5 h-5" />
         </button>
+        {inkEnabled && onCheckWork && (
+          <button
+            onClick={handleCheckWork}
+            disabled={checkWorkLoading}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+            title="Have the AI teacher mark the work you drew"
+          >
+            {checkWorkLoading ? (
+              <div className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+            ) : (
+              <ClipboardCheck className="w-4 h-4" />
+            )}
+            <span>{checkWorkLoading ? 'Checking…' : 'Check my work'}</span>
+          </button>
+        )}
         <button
           onClick={toggleFullscreen}
           className="p-2 hover:bg-white/20 rounded-lg transition-colors"
@@ -901,6 +1008,14 @@ export function AIWhiteboardTeacher({
         <div className="px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800">
           <p className="text-xs text-amber-700 dark:text-amber-300">
             Custom visual unavailable for this lesson — showing a generic overview instead.
+          </p>
+        </div>
+      )}
+
+      {checkWorkResult && (
+        <div className={cn('px-4 py-2 border-b', CHECK_WORK_BANNER[checkWorkResult.verdict].classes)}>
+          <p className="text-sm font-medium">
+            {CHECK_WORK_BANNER[checkWorkResult.verdict].label}
           </p>
         </div>
       )}
@@ -958,7 +1073,8 @@ export function AIWhiteboardTeacher({
       {/* Explanation panel */}
       <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
         <p className="text-gray-700 dark:text-gray-300 text-sm min-h-[2.5rem]">
-          {step?.explanation ||
+          {checkWorkResult?.explanation ||
+            step?.explanation ||
             (waitingForStep
               ? stepError && !stepLoading
                 ? "Couldn't prepare the next step — tap Retry to try again."

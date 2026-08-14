@@ -150,6 +150,21 @@ export interface WhiteboardStep {
   clearPrevious?: boolean;
 }
 
+// Phase C "Check my work": the vision grading result. 'unknown' is the honest
+// fallback verdict (server could not read the work) — never fabricated.
+export interface CheckWorkAnnotation {
+  type: 'circle' | 'arrow' | 'text' | 'rect';
+  id: string;
+  props: Record<string, unknown>;
+}
+
+export interface CheckWorkResult {
+  verdict: 'correct' | 'partial' | 'incorrect' | 'unknown';
+  explanation: string;
+  voiceOver: string;
+  annotations: CheckWorkAnnotation[];
+}
+
 interface RevisionClassroomState {
   // Sessions
   currentSession: RevisionSession | null;
@@ -192,6 +207,10 @@ interface RevisionClassroomState {
   whiteboardFallback: boolean;
   aiLimitReached: boolean;
   freeAiRemaining: number | null; // -1 = unlimited; null = unknown
+
+  // Phase C "Check my work" (session-only; not persisted)
+  checkWorkResult: CheckWorkResult | null;
+  checkWorkLoading: boolean;
 
   // Tutor Integration
   tutorPresence: {
@@ -267,6 +286,11 @@ interface RevisionClassroomState {
   fetchNextWhiteboardStep: (nextIndex: number) => Promise<void>;
   toggleWhiteboardMode: () => void;
   clearWhiteboardContent: () => void;
+
+  // Actions - Check my work (Phase C vision grading). The component owns the
+  // ink snapshot, so the composite base64 PNG is passed in by the caller.
+  checkMyWork: (imageBase64: string, stepIndex?: number) => Promise<void>;
+  clearCheckWorkResult: () => void;
 
   // Actions - Checkpoints
   answerCheckpoint: (checkpointId: string, answer: string, timeTaken?: number) => Promise<CheckpointResponse>;
@@ -443,6 +467,8 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
       whiteboardStepsAutoRetried: new Set<number>(),
       whiteboardLocked: false,
       whiteboardFallback: false,
+      checkWorkResult: null,
+      checkWorkLoading: false,
       aiLimitReached: false,
       freeAiRemaining: null,
       tutorPresence: null,
@@ -1237,8 +1263,49 @@ Does this help? Feel free to ask more questions!`;
           whiteboardStepLoading: false,
           whiteboardStepError: null,
           whiteboardMode: false,
+          checkWorkResult: null,
+          checkWorkLoading: false,
         });
       },
+
+      checkMyWork: async (imageBase64, stepIndex) => {
+        const { currentLesson } = get();
+        if (!currentLesson || get().checkWorkLoading) return;
+
+        // A new check replaces the previous result (and its annotations).
+        set({ checkWorkLoading: true, checkWorkResult: null });
+
+        try {
+          const response = await api.post<CheckWorkResult & { cached?: boolean; fallback?: boolean }>(
+            `/revision-classroom/lessons/${currentLesson.id}/check-work`,
+            { imageBase64, stepIndex }
+          );
+
+          if (!response.success || !response.data) {
+            if ((response as { upgradeRequired?: boolean }).upgradeRequired) {
+              set({ whiteboardLocked: true, checkWorkLoading: false });
+              return;
+            }
+            throw new Error(response.error || 'Failed to check your work');
+          }
+
+          const { verdict, explanation, voiceOver, annotations } = response.data;
+          // A fallback:true payload (verdict 'unknown') still sets the result —
+          // it renders as the honest "couldn't read it" state, not an error.
+          set({
+            checkWorkResult: { verdict, explanation, voiceOver, annotations: annotations ?? [] },
+            checkWorkLoading: false,
+          });
+        } catch (error) {
+          console.error('Error checking work:', error);
+          set({
+            checkWorkLoading: false,
+            error: error instanceof Error ? error.message : 'Failed to check your work',
+          });
+        }
+      },
+
+      clearCheckWorkResult: () => set({ checkWorkResult: null }),
 
       // =============================================
       // TUTOR INTEGRATION ACTIONS
