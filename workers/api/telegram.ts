@@ -42,8 +42,8 @@ export async function telegramApi(
       body: JSON.stringify(payload),
     });
     return { ok: res.ok, status: res.status, result: await res.json().catch(() => null) };
-  } catch (e) {
-    console.error(`telegramApi ${method} failed:`, e);
+  } catch {
+    console.error(`telegramApi ${method} failed`);
     return { ok: false };
   }
 }
@@ -122,13 +122,13 @@ telegramWebhookApp.post('/webhook', async (c) => {
         source: 'notification_subscribe',
         sourceRef: chatId,
       });
-    } catch (e) {
-      console.error('telegram webhook: connect-points award failed — rolling back fresh link:', e);
+    } catch {
+      console.error('telegram webhook: connect-points award failed; rolling back fresh link');
       try {
         await db.prepare('DELETE FROM telegram_links WHERE user_id = ?').bind(row.user_id).run();
-      } catch (e2) {
-        // Double fault: linked without points. Log loudly for manual repair.
-        console.error(`telegram webhook: link rollback failed for ${row.user_id} (linked without points):`, e2);
+      } catch {
+        // Double fault: linked without points. Log loudly without identifiers.
+        console.error('telegram webhook: link rollback failed; manual reconciliation required');
       }
       await reply('Something went wrong connecting your Telegram. Generate a new link code in Settings and try again.');
       return c.json({ ok: true });
@@ -162,14 +162,14 @@ export async function notifyUser(db: D1Database, env: TelegramEnv, userId: strin
     if (!res.ok) {
       if (res.status === 403) {
         await db.prepare('UPDATE telegram_links SET stale = 1 WHERE user_id = ?').bind(userId).run();
-        console.error(`notifyUser: user ${userId} blocked the bot — marked stale`);
+        console.error('notifyUser: recipient blocked the bot; link marked stale');
       } else {
-        console.error(`notifyUser: sendMessage failed for ${userId} (status ${res.status})`);
+        console.error(`notifyUser: sendMessage failed with status ${res.status}`);
       }
       return false;
     }
     return true;
-  } catch (e) { console.error('notifyUser failed:', e); return false; }
+  } catch { console.error('notifyUser failed'); return false; }
 }
 
 export async function notifySchoolChannel(db: D1Database, env: TelegramEnv, schoolId: string, text: string): Promise<boolean> {
@@ -189,11 +189,11 @@ export async function notifySchoolChannel(db: D1Database, env: TelegramEnv, scho
             { icon: 'alert-triangle', link: '/admin/schools' });
         }
       }
-      console.error(`notifySchoolChannel: post failed for ${schoolId} (status ${res.status})`);
+      console.error(`notifySchoolChannel: post failed with status ${res.status}`);
       return false;
     }
     return true;
-  } catch (e) { console.error('notifySchoolChannel failed:', e); return false; }
+  } catch { console.error('notifySchoolChannel failed'); return false; }
 }
 
 export async function notifyPlatformChannel(env: TelegramEnv, text: string): Promise<boolean> {
@@ -202,5 +202,5 @@ export async function notifyPlatformChannel(env: TelegramEnv, text: string): Pro
     const res = await telegramApi(env, 'sendMessage', { chat_id: env.TELEGRAM_PLATFORM_CHANNEL_ID, text });
     if (!res.ok) console.error(`notifyPlatformChannel: post failed (status ${res.status})`);
     return res.ok;
-  } catch (e) { console.error('notifyPlatformChannel failed:', e); return false; }
+  } catch { console.error('notifyPlatformChannel failed'); return false; }
 }

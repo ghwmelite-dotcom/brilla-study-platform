@@ -14,6 +14,15 @@ interface UserPayload {
   role: string;
 }
 
+interface UserRewardStatsRow {
+  weekly_wheel_spins: number;
+  week_start: string | null;
+  last_wheel_spin: string | null;
+  total_chests_opened: number;
+  total_wheel_spins: number;
+  surprise_challenges_completed: number;
+}
+
 const rewardsApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
 
 // All rewards routes require a verified JWT (sets user on context).
@@ -263,7 +272,7 @@ rewardsApp.get('/wheel/status', async (c) => {
 
     const stats = await c.env.DB.prepare(
       'SELECT * FROM user_reward_stats WHERE user_id = ?'
-    ).bind(user.userId).first();
+    ).bind(user.userId).first<UserRewardStatsRow>();
 
     const now = new Date();
     const weekStart = new Date(now);
@@ -307,7 +316,7 @@ rewardsApp.post('/wheel/spin', async (c) => {
     // Check eligibility
     const stats = await c.env.DB.prepare(
       'SELECT * FROM user_reward_stats WHERE user_id = ?'
-    ).bind(user.userId).first();
+    ).bind(user.userId).first<UserRewardStatsRow>();
 
     const now = new Date();
     const weekStart = new Date(now);
@@ -339,7 +348,7 @@ rewardsApp.post('/wheel/spin', async (c) => {
     }
 
     // Apply reward
-    let rewardValue: any = selectedSegment.value;
+    const rewardValue: number | string = selectedSegment.value;
 
     if (selectedSegment.type === 'xp') {
       const demoFlags = getDemoDataFlags(user.userId);
@@ -441,7 +450,7 @@ rewardsApp.get('/stats', async (c) => {
 
     const stats = await c.env.DB.prepare(
       'SELECT * FROM user_reward_stats WHERE user_id = ?'
-    ).bind(user.userId).first();
+    ).bind(user.userId).first<UserRewardStatsRow>();
 
     return c.json({
       success: true,

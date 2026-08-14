@@ -16,7 +16,11 @@ import {
   Loader2,
   X,
 } from 'lucide-react';
-import { useTutorClassroomStore } from '@/stores/tutorClassroomStore';
+import {
+  useTutorClassroomStore,
+  type HandoffRequest,
+  type ObservableSession,
+} from '@/stores/tutorClassroomStore';
 import { TutorAvailabilitySettings } from '@/components/tutor-classroom/TutorAvailabilitySettings';
 import { cn } from '@/utils';
 
@@ -27,7 +31,7 @@ function ObservableSessionCard({
   onStartObserving,
   onStopObserving,
 }: {
-  session: any;
+  session: ObservableSession;
   isObserving: boolean;
   onStartObserving: () => void;
   onStopObserving: () => void;
@@ -193,7 +197,7 @@ function HandoffRequestCard({
   onAccept,
   onDecline,
 }: {
-  request: any;
+  request: HandoffRequest;
   onAccept: () => void;
   onDecline: () => void;
 }) {

@@ -15,6 +15,7 @@ import {
 import { useNotificationStore } from '@/stores';
 import type { NotificationType } from '@/stores/notificationStore';
 import { cn } from '@/utils';
+import { toSafeInternalPath } from '@/utils/navigation';
 
 interface NotificationDropdownProps {
   isOpen: boolean;
@@ -83,7 +84,7 @@ export function NotificationDropdown({ isOpen, onClose }: NotificationDropdownPr
       await markAsRead(notification.id);
     }
     if (notification.link) {
-      navigate(notification.link);
+      navigate(toSafeInternalPath(notification.link, '/notifications'));
       onClose();
     }
   };

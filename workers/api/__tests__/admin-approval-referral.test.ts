@@ -29,7 +29,7 @@ function createDb(options: { approvalChanges?: number; existingAward?: boolean }
           calls.push({ sql, args });
           return {
             first: async () => {
-              if (sql.includes('role, status, is_active FROM users')) {
+              if (sql.includes('role, status, is_active, session_version FROM users')) {
                 return { role: 'admin', status: 'approved', is_active: 1 };
               }
               if (sql.includes("SELECT * FROM users WHERE id = ? AND status = 'pending'")) {

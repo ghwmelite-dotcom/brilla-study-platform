@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
 import type { Env } from './index';
 import { requireAuth } from './auth-middleware';
-import { getChatModel } from './ai-models';
+import { getChatModel, unwrapAiText } from './ai-models';
+import { formatUntrustedAiData, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
 
 // Identity shape read by the routes below. requireAuth sets `user` to the JWT
 // payload (keyed by userId) with role refreshed from the DB; the adapter
@@ -11,6 +12,15 @@ interface TutorClassroomUser {
   id?: string;
   email?: string;
   role?: string;
+}
+
+interface TutorAvailabilityRow {
+  preferred_subjects: string | null;
+  preferred_exam_types: string | null;
+  preferred_difficulty_levels: string | null;
+  max_observed_sessions: number;
+  current_session_count: number;
+  [key: string]: unknown;
 }
 
 const tutorClassroom = new Hono<{ Bindings: Env; Variables: { user: TutorClassroomUser } }>();
@@ -47,33 +57,6 @@ function generateRoomCode(): string {
   return Array.from(bytes, (b) => chars.charAt(b % chars.length)).join('');
 }
 
-// Calculate struggle score from signals
-function calculateStruggleScore(signals: {
-  consecutiveWrongAnswers: number;
-  timeStuckSeconds: number;
-  repeatedQuestionsCount: number;
-  clarificationRequestsCount: number;
-}): number {
-  const weights = {
-    consecutiveWrong: 0.25,
-    timeStuck: 0.25,
-    repeatedQuestions: 0.20,
-    clarifications: 0.30,
-  };
-
-  const normalizedWrong = Math.min(signals.consecutiveWrongAnswers * 25, 100);
-  const normalizedTime = Math.min(signals.timeStuckSeconds / 3, 100); // 5 min = 100
-  const normalizedRepeated = Math.min(signals.repeatedQuestionsCount * 20, 100);
-  const normalizedClarifications = Math.min(signals.clarificationRequestsCount * 25, 100);
-
-  return (
-    normalizedWrong * weights.consecutiveWrong +
-    normalizedTime * weights.timeStuck +
-    normalizedRepeated * weights.repeatedQuestions +
-    normalizedClarifications * weights.clarifications
-  );
-}
-
 // Role gate - requires teacher or admin role. Runs after the blanket
 // requireAuth + adapter above; user.role is fresh from the DB (not the JWT).
 async function teacherMiddleware(c: any, next: () => Promise<void>) {
@@ -99,7 +82,7 @@ tutorClassroom.get('/availability', teacherMiddleware, async (c) => {
   try {
     const availability = await db.prepare(`
       SELECT * FROM tutor_availability WHERE tutor_id = ?
-    `).bind(user.id).first();
+    `).bind(user.id).first<TutorAvailabilityRow>();
 
     if (!availability) {
       // Return defaults if no settings exist
@@ -244,11 +227,6 @@ tutorClassroom.get('/observable-sessions', teacherMiddleware, async (c) => {
   const { subject_id, exam_type, min_struggle_score, page = '1', limit = '20' } = c.req.query();
 
   try {
-    // Get tutor's preferences
-    const availability = await db.prepare(`
-      SELECT preferred_subjects, preferred_exam_types FROM tutor_availability WHERE tutor_id = ?
-    `).bind(user.id).first();
-
     let query = `
       SELECT
         acs.*,
@@ -299,7 +277,7 @@ tutorClassroom.get('/observable-sessions/:sessionId', teacherMiddleware, async (
 
   try {
     const session = await db.prepare(`
-      SELECT * FROM ai_classroom_sessions WHERE id = ?
+      SELECT * FROM ai_classroom_sessions WHERE id = ? AND visibility = 'public' AND is_active = 1
     `).bind(sessionId).first();
 
     if (!session) {
@@ -332,6 +310,12 @@ tutorClassroom.post('/observable-sessions/:sessionId/observe', teacherMiddleware
   const db = c.env.DB;
 
   try {
+    const observable = await db.prepare(`
+      SELECT 1 FROM ai_classroom_sessions
+      WHERE id = ? AND visibility = 'public' AND is_active = 1
+    `).bind(sessionId).first();
+    if (!observable) return c.json({ success: false, error: 'Session not found' }, 404);
+
     // Check if already observing
     const existing = await db.prepare(`
       SELECT id FROM tutor_observations
@@ -345,7 +329,7 @@ tutorClassroom.post('/observable-sessions/:sessionId/observe', teacherMiddleware
     // Check max observations limit
     const availability = await db.prepare(`
       SELECT max_observed_sessions, current_session_count FROM tutor_availability WHERE tutor_id = ?
-    `).bind(user.id).first();
+    `).bind(user.id).first<TutorAvailabilityRow>();
 
     if (availability && availability.current_session_count >= availability.max_observed_sessions) {
       return c.json({ success: false, error: 'Maximum observation limit reached' }, 400);
@@ -408,17 +392,24 @@ tutorClassroom.post('/observable-sessions/:sessionId/stop-observe', teacherMiddl
 
 // Poll for updates on observed session
 tutorClassroom.get('/observable-sessions/:sessionId/updates', teacherMiddleware, async (c) => {
+  const user = c.get('user');
   const { sessionId } = c.req.param();
   const { last_event_id } = c.req.query();
   const db = c.env.DB;
 
   try {
-    // Get session state
+    // Only the tutor actively observing this session may poll its private events.
     const session = await db.prepare(`
-      SELECT struggle_score, current_phase, lesson_progress_percent, handoff_status,
-             last_ai_message, last_student_response, last_activity_at
-      FROM ai_classroom_sessions WHERE id = ?
-    `).bind(sessionId).first();
+      SELECT acs.struggle_score, acs.current_phase, acs.lesson_progress_percent, acs.handoff_status,
+             acs.last_ai_message, acs.last_student_response, acs.last_activity_at
+      FROM ai_classroom_sessions acs
+      JOIN tutor_observations observation
+        ON observation.ai_session_id = acs.id
+       AND observation.tutor_id = ?
+       AND observation.is_active = 1
+      WHERE acs.id = ? AND acs.is_active = 1
+    `).bind(user.id, sessionId).first();
+    if (!session) return c.json({ success: false, error: 'Session not found' }, 404);
 
     // Get new events since last poll
     let eventsQuery = `
@@ -454,19 +445,21 @@ tutorClassroom.get('/observable-sessions/:sessionId/updates', teacherMiddleware,
 
 // Suggest handoff to student (called by AI/system)
 tutorClassroom.post('/ai-sessions/:sessionId/suggest-handoff', async (c) => {
+  const user = c.get('user');
   const { sessionId } = c.req.param();
   const body = await c.req.json();
   const db = c.env.DB;
 
   try {
-    await db.prepare(`
+    const update = await db.prepare(`
       UPDATE ai_classroom_sessions SET
         handoff_status = 'suggested',
         handoff_reason = ?,
         handoff_suggested_at = CURRENT_TIMESTAMP,
         updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `).bind(body.reason || 'struggling_with_concept', sessionId).run();
+      WHERE id = ? AND student_id = ? AND is_active = 1
+    `).bind(body.reason || 'struggling_with_concept', sessionId, user.id).run();
+    if (update.meta.changes !== 1) return c.json({ success: false, error: 'Session not found' }, 404);
 
     // Log event
     await db.prepare(`
@@ -529,7 +522,7 @@ tutorClassroom.get('/handoff-requests', teacherMiddleware, async (c) => {
     // Get tutor preferences
     const availability = await db.prepare(`
       SELECT preferred_subjects, preferred_exam_types FROM tutor_availability WHERE tutor_id = ?
-    `).bind(user.id).first();
+    `).bind(user.id).first<TutorAvailabilityRow>();
 
     // Get sessions with handoff requested that match preferences
     let query = `
@@ -575,7 +568,7 @@ tutorClassroom.post('/handoff-requests/:sessionId/accept', teacherMiddleware, as
     `).bind(user.id).first();
 
     // Update session with tutor
-    await db.prepare(`
+    const accepted = await db.prepare(`
       UPDATE ai_classroom_sessions SET
         handoff_status = 'connected',
         tutor_id = ?,
@@ -585,6 +578,9 @@ tutorClassroom.post('/handoff-requests/:sessionId/accept', teacherMiddleware, as
         tutor_mode = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
+        AND tutor_id IS NULL
+        AND is_active = 1
+        AND handoff_status IN ('requested', 'suggested')
     `).bind(
       user.id,
       tutor?.name || 'Tutor',
@@ -592,6 +588,9 @@ tutorClassroom.post('/handoff-requests/:sessionId/accept', teacherMiddleware, as
       body.mode || 'observe',
       sessionId
     ).run();
+    if (accepted.meta.changes !== 1) {
+      return c.json({ success: false, error: 'Handoff is no longer available' }, 409);
+    }
 
     // Log event
     await db.prepare(`
@@ -689,6 +688,8 @@ tutorClassroom.post('/ai-sessions/:sessionId/add-annotation', teacherMiddleware,
   const db = c.env.DB;
 
   try {
+    const connected = await db.prepare('SELECT 1 FROM ai_classroom_sessions WHERE id = ? AND tutor_id = ? AND is_active = 1').bind(sessionId, user.id).first();
+    if (!connected) return c.json({ success: false, error: 'Not connected to this session' }, 403);
     const eventId = generateId();
     await db.prepare(`
       INSERT INTO tutor_classroom_events (
@@ -718,6 +719,8 @@ tutorClassroom.post('/ai-sessions/:sessionId/guide-ai', teacherMiddleware, async
   const db = c.env.DB;
 
   try {
+    const connected = await db.prepare('SELECT 1 FROM ai_classroom_sessions WHERE id = ? AND tutor_id = ? AND is_active = 1').bind(sessionId, user.id).first();
+    if (!connected) return c.json({ success: false, error: 'Not connected to this session' }, 403);
     const eventId = generateId();
     await db.prepare(`
       INSERT INTO tutor_classroom_events (
@@ -966,8 +969,9 @@ tutorClassroom.post('/scheduled-sessions/:id/ai-assist', async (c) => {
 
   try {
     const session = await db.prepare(`
-      SELECT * FROM scheduled_classroom_sessions WHERE id = ?
-    `).bind(id).first();
+      SELECT * FROM scheduled_classroom_sessions
+      WHERE id = ? AND (tutor_id = ? OR student_id = ?)
+    `).bind(id, user.id, user.id).first();
 
     if (!session) {
       return c.json({ success: false, error: 'Session not found' }, 404);
@@ -978,9 +982,7 @@ tutorClassroom.post('/scheduled-sessions/:id/ai-assist', async (c) => {
 
     // Build AI prompt based on request type
     let systemPrompt = `You are an AI teaching assistant helping in a live tutoring session.
-Subject: ${session.subject_name || 'General'}
-Topic: ${session.topic_name || 'General'}
-Exam Type: ${session.exam_type || 'General'}`;
+${UNTRUSTED_AI_DATA_INSTRUCTION}`;
 
     let userPrompt = body.prompt || '';
 
@@ -1006,15 +1008,18 @@ Exam Type: ${session.exam_type || 'General'}`;
     }
 
     // Call AI
-    const aiResponse = await AI.run(getChatModel(c.env) as BaseAiTextGenerationModels, {
+    const aiResponse = await AI.run(getChatModel(c.env), {
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
+        { role: 'user', content: formatUntrustedAiData('Tutoring session and request context', {
+          session: { subject: session.subject_name, topic: session.topic_name, examType: session.exam_type },
+          request: userPrompt,
+        }) }
       ],
       max_tokens: 1000
     });
 
-    const responseText = aiResponse.response || 'Unable to generate response';
+    const responseText = unwrapAiText(aiResponse) || 'Unable to generate response';
 
     // Log the interaction
     await db.prepare(`
@@ -1062,7 +1067,7 @@ tutorClassroom.post('/scheduled-sessions/:id/end', teacherMiddleware, async (c) 
   try {
     const session = await db.prepare(`
       SELECT started_at FROM scheduled_classroom_sessions WHERE id = ? AND tutor_id = ?
-    `).bind(id, user.id).first();
+    `).bind(id, user.id).first<{ started_at: string }>();
 
     if (!session) {
       return c.json({ success: false, error: 'Session not found' }, 404);

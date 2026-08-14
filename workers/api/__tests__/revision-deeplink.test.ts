@@ -9,7 +9,7 @@ describe('revision classroom Counselor Brie deep links', () => {
   it('rejects a topic that does not belong to the selected subject before session creation', async () => {
     const db = createMockD1([
       {
-        match: /SELECT role, status, is_active FROM users/,
+        match: /SELECT role, status, is_active, session_version FROM users/,
         first: () => ({ role: 'student', status: 'approved', is_active: 1 }),
       },
       { match: /SELECT id FROM subjects WHERE id/, first: () => ({ id: 'subject_1' }) },

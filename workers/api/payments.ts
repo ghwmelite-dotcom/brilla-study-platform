@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
 import { awardPoints } from './points';
+import { applyFailedTransferRefund } from './payment-webhooks';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -781,8 +782,7 @@ paymentsApp.post('/webhook', async (c) => {
         console.log('Webhook: charge.success', event.data.reference);
         break;
 
-      case 'transfer.success':
-        // Payout successful
+      case 'transfer.success': {
         const transferCode = event.data.transfer_code;
         if (transferCode && typeof transferCode === 'string') {
           await c.env.DB.prepare(`
@@ -792,34 +792,18 @@ paymentsApp.post('/webhook', async (c) => {
           `).bind(transferCode).run();
         }
         break;
+      }
 
-      case 'transfer.failed':
-        // Payout failed - refund the affiliate's balance
-        const failedTransferCode = event.data.transfer_code;
-        if (failedTransferCode && typeof failedTransferCode === 'string') {
-          // Get payout details
-          const payout = await c.env.DB.prepare(`
-            SELECT * FROM affiliate_payouts
-            WHERE paystack_transfer_code = ? AND status = 'processing'
-          `).bind(failedTransferCode).first();
-
-          if (payout) {
-            // Refund the balance
-            await c.env.DB.prepare(`
-              UPDATE affiliate_profiles
-              SET available_earnings = available_earnings + ?
-              WHERE id = ?
-            `).bind(payout.amount, payout.affiliate_id).run();
-
-            // Update payout status
-            await c.env.DB.prepare(`
-              UPDATE affiliate_payouts
-              SET status = 'failed', failure_reason = ?
-              WHERE paystack_transfer_code = ?
-            `).bind(event.data.reason || 'Transfer failed', failedTransferCode).run();
-          }
+      case 'transfer.failed': {
+        const transferCode = event.data.transfer_code;
+        if (typeof transferCode === 'string' && transferCode.length > 0 && transferCode.length <= 200) {
+          const reason = typeof event.data.reason === 'string'
+            ? event.data.reason.trim().slice(0, 1000) || 'Transfer failed'
+            : 'Transfer failed';
+          await applyFailedTransferRefund(c.env.DB, transferCode, reason);
         }
         break;
+      }
 
       default:
         console.log('Unhandled webhook event:', event.event);

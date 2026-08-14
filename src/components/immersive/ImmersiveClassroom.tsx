@@ -213,7 +213,7 @@ export function ImmersiveClassroom({
   }, [askQuestion, aiMessages]);
 
   // Handle drawing added
-  const handleDrawingAdd = useCallback((drawing: any) => {
+  const handleDrawingAdd = useCallback((drawing: { type?: string }) => {
     setSessionStats(prev => ({ ...prev, drawingsCreated: prev.drawingsCreated + 1 }));
 
     // If it's a question mark, trigger AI explanation

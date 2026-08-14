@@ -279,7 +279,7 @@ learningPathApp.post('/study-plan/generate', async (c) => {
   try {
     const user = c.get('user');
     const body = await c.req.json();
-    const { examType, daysPerWeek = 5, minutesPerDay = 60 } = body;
+    const { minutesPerDay = 60 } = body;
 
     // Get weak topics that need focus
     const weakTopics = await c.env.DB.prepare(`

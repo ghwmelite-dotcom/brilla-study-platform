@@ -792,8 +792,6 @@ libraryApp.post('/upload', async (c) => {
     const userId = getUserId(c);
     const userRole = c.get('userRole');
 
-    console.log('Upload request - userId:', userId, 'userRole:', userRole);
-
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
@@ -805,8 +803,8 @@ libraryApp.post('/upload', async (c) => {
     let formData;
     try {
       formData = await c.req.formData();
-    } catch (formError) {
-      console.error('FormData parsing error:', formError);
+    } catch {
+      console.error('FormData parsing error');
       return c.json({ success: false, error: 'Failed to parse form data' }, 400);
     }
     const file = formData.get('file') as File | null;
@@ -837,8 +835,6 @@ libraryApp.post('/upload', async (c) => {
         const fileExtension = file.name.split('.').pop();
         const fileKey = `resources/${Date.now()}_${crypto.randomUUID()}.${fileExtension}`;
 
-        console.log('Uploading file to R2:', fileKey, 'size:', file.size);
-
         await c.env.LIBRARY_BUCKET.put(fileKey, file.stream(), {
           httpMetadata: {
             contentType: file.type,
@@ -848,9 +844,8 @@ libraryApp.post('/upload', async (c) => {
         // Use our API to serve files from R2
         contentUrl = `https://brilla-api.ghwmelite.workers.dev/api/library/files/${fileKey}`;
         fileSize = file.size;
-        console.log('File uploaded successfully:', contentUrl);
-      } catch (r2Error) {
-        console.error('R2 upload error:', r2Error);
+      } catch {
+        console.error('R2 upload error');
         return c.json({ success: false, error: 'Failed to upload file to storage' }, 500);
       }
     } else if (file && !c.env.LIBRARY_BUCKET) {
@@ -864,32 +859,15 @@ libraryApp.post('/upload', async (c) => {
 
     const resourceId = `res_${Date.now()}`;
 
-    // Verify user exists in database, or find matching user by role
-    let actualUserId = userId;
-    try {
-      const userExists = await c.env.DB.prepare(
-        'SELECT id FROM users WHERE id = ?'
-      ).bind(userId).first();
+    // requireAuth already verifies the JWT and account status. Recheck that
+    // the exact subject still exists so an upload can never be attributed to a
+    // different same-role account or to a synthetic fallback identity.
+    const uploader = await c.env.DB.prepare(
+      "SELECT id FROM users WHERE id = ? AND is_active = 1 AND status = 'approved'"
+    ).bind(userId).first<{ id: string }>();
 
-      if (!userExists) {
-        // User ID from session doesn't exist - try to find a matching user
-        console.log(`User ${userId} not found in database, looking for matching user...`);
-        const matchingUser = await c.env.DB.prepare(
-          'SELECT id FROM users WHERE role = ? LIMIT 1'
-        ).bind(userRole).first();
-
-        if (matchingUser) {
-          actualUserId = matchingUser.id as string;
-          console.log(`Using matching user ID: ${actualUserId}`);
-        } else {
-          // No matching user found - use a system ID
-          actualUserId = 'system_upload';
-          console.log('No matching user found, using system_upload');
-        }
-      }
-    } catch (userCheckError) {
-      console.error('Error checking user:', userCheckError);
-      // Continue with original userId
+    if (!uploader) {
+      return c.json({ success: false, error: 'Authenticated user not found' }, 403);
     }
 
     try {
@@ -911,25 +889,22 @@ libraryApp.post('/upload', async (c) => {
         schoolLevel || null,
         accessLevel,
         tags ? JSON.stringify(tags.split(',').map((t: string) => t.trim())) : null,
-        actualUserId,
+        uploader.id,
         isDownloadable ? 1 : 0
       ).run();
 
-      console.log('Resource saved to database:', resourceId);
-    } catch (dbError) {
-      console.error('Database insert error:', dbError);
-      const errMsg = dbError instanceof Error ? dbError.message : 'Unknown error';
-      return c.json({ success: false, error: `Failed to save resource to database: ${errMsg}` }, 500);
+    } catch {
+      console.error('Database insert error');
+      return c.json({ success: false, error: 'Failed to save resource to database' }, 500);
     }
 
     return c.json({
       success: true,
       data: { id: resourceId, contentUrl },
     });
-  } catch (error) {
-    console.error('Error uploading resource:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({ success: false, error: `Failed to upload resource: ${errorMessage}` }, 500);
+  } catch {
+    console.error('Error uploading resource');
+    return c.json({ success: false, error: 'Failed to upload resource' }, 500);
   }
 });
 

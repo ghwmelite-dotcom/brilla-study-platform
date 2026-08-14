@@ -22,10 +22,17 @@ import {
   Users,
   Sparkles,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/utils';
 
 // Types
 type ToolType = 'select' | 'pan' | 'pencil' | 'highlighter' | 'rectangle' | 'circle' | 'text' | 'eraser' | 'question' | 'checkmark' | 'xmark';
+
+type CollaborativeFabricObject = fabric.Object & {
+  id?: string;
+  userId?: string;
+  userName?: string;
+};
 
 interface DrawingObject {
   id: string;
@@ -261,7 +268,7 @@ export function InteractiveWhiteboard({
         });
         break;
 
-      case 'text':
+      case 'text': {
         const text = prompt('Enter text:');
         if (text) {
           obj = new fabric.IText(text, {
@@ -272,12 +279,15 @@ export function InteractiveWhiteboard({
           });
         }
         break;
+      }
     }
 
     if (obj) {
-      // Tag with user info
-      (obj as any).userId = userId;
-      (obj as any).userName = userName;
+      // Tag with user info using explicit collaboration metadata.
+      const collaborativeObject = obj as CollaborativeFabricObject;
+      collaborativeObject.id = collaborativeObject.id || crypto.randomUUID();
+      collaborativeObject.userId = userId;
+      collaborativeObject.userName = userName;
       canvas.add(obj);
       canvas.setActiveObject(obj);
       canvas.renderAll();
@@ -285,7 +295,7 @@ export function InteractiveWhiteboard({
       // Notify parent
       if (onDrawingAdd) {
         onDrawingAdd({
-          id: (obj as any).id || Math.random().toString(36).substr(2, 9),
+          id: collaborativeObject.id,
           userId,
           userName,
           objectData: JSON.stringify(obj.toJSON()),
@@ -310,8 +320,9 @@ export function InteractiveWhiteboard({
         if (activeObj) {
           canvas.remove(activeObj);
           canvas.renderAll();
-          if (onDrawingDelete && (activeObj as any).id) {
-            onDrawingDelete((activeObj as any).id);
+          const drawingId = (activeObj as CollaborativeFabricObject).id;
+          if (onDrawingDelete && drawingId) {
+            onDrawingDelete(drawingId);
           }
         }
       }
@@ -378,7 +389,7 @@ export function InteractiveWhiteboard({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [undo, redo]);
 
-  const ToolButton = ({ tool, icon: Icon, label }: { tool: ToolType; icon: any; label: string }) => (
+  const ToolButton = ({ tool, icon: Icon, label }: { tool: ToolType; icon: LucideIcon; label: string }) => (
     <button
       onClick={() => handleToolClick(tool)}
       disabled={readOnly}

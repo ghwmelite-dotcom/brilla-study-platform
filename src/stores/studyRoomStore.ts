@@ -106,7 +106,7 @@ interface StudyRoomState {
   removeParticipant: (participantId: string) => void;
 
   // Whiteboard sync
-  sendDrawingEvent: (event: any) => Promise<void>;
+  sendDrawingEvent: (event: Record<string, unknown>) => Promise<void>;
 
   // Polling
   startPolling: () => void;
@@ -183,8 +183,8 @@ export const useStudyRoomStore = create<StudyRoomState>()(
           get().startPolling();
 
           return session;
-        } catch (error: any) {
-          set({ isConnecting: false, connectionError: error.message });
+        } catch (error: unknown) {
+          set({ isConnecting: false, connectionError: error instanceof Error && error.message ? error.message : 'Study room request failed' });
           throw error;
         }
       },
@@ -218,8 +218,8 @@ export const useStudyRoomStore = create<StudyRoomState>()(
 
           // Start polling
           get().startPolling();
-        } catch (error: any) {
-          set({ isConnecting: false, connectionError: error.message });
+        } catch (error: unknown) {
+          set({ isConnecting: false, connectionError: error instanceof Error && error.message ? error.message : 'Study room request failed' });
           throw error;
         }
       },

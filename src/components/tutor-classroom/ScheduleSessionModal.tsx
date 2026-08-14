@@ -127,8 +127,8 @@ export function ScheduleSessionModal({
       });
 
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'Failed to schedule session');
+    } catch (err: unknown) {
+      setError(err instanceof Error && err.message ? err.message : 'Failed to schedule session');
     } finally {
       setIsSubmitting(false);
     }

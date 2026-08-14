@@ -1,8 +1,8 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
-import { getDemoDataFlags, isDemoUserId } from './demoUtils';
 import { requireAuth } from './auth-middleware';
 import { getChatModel, unwrapAiText } from './ai-models';
+import { formatUntrustedAiData, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -13,7 +13,6 @@ interface Env {
 }
 
 // Types
-type TutorContext = 'general' | 'question_help' | 'topic_study' | 'exam_prep';
 type MessageType = 'chat' | 'explanation' | 'hint' | 'step_by_step';
 type MessageRole = 'user' | 'assistant' | 'system';
 
@@ -63,8 +62,7 @@ Guidelines:
 - Celebrate understanding and progress
 - Reference the Ghanaian/West African educational context
 
-Student Context:
-{studentContext}`,
+${UNTRUSTED_AI_DATA_INSTRUCTION}`,
 
   question_explainer: `You are an AI tutor specializing in explaining quiz questions and answers for Brilla Study Platform.
 
@@ -82,11 +80,7 @@ Guidelines:
 - Keep explanations concise but thorough
 - End with a key takeaway or study tip
 
-Question Context:
-{questionContext}
-
-Student Context:
-{studentContext}`,
+${UNTRUSTED_AI_DATA_INSTRUCTION}`,
 
   hint_provider: `You are an AI tutor providing hints for quiz questions on Brilla Study Platform.
 
@@ -105,11 +99,7 @@ Guidelines:
 
 Current Hint Level: {hintLevel}
 
-Question Context:
-{questionContext}
-
-Student Context:
-{studentContext}`,
+${UNTRUSTED_AI_DATA_INSTRUCTION}`,
 
   step_by_step: `You are an AI tutor providing step-by-step problem solving guidance on Brilla Study Platform.
 
@@ -127,11 +117,7 @@ Guidelines:
 - For word problems, identify given information first
 - Check and verify the final answer
 
-Question Context:
-{questionContext}
-
-Student Context:
-{studentContext}`,
+${UNTRUSTED_AI_DATA_INSTRUCTION}`,
 };
 
 // Create Hono app
@@ -143,43 +129,6 @@ tutorApp.use('*', requireAuth);
 // Helper functions
 function getUserId(c: Context): string | undefined {
   return c.get('userId');
-}
-
-function formatStudentContext(context: StudentContext): string {
-  return `
-Name: ${context.name}
-Grade: ${context.gradeLevel || 'Not specified'}
-School Level: ${context.schoolLevel || 'Not specified'}
-Exam Preparing For: ${context.examType || 'General'}
-Current Topic: ${context.currentTopic || 'Not specified'}
-Subjects: ${context.subjects?.join(', ') || 'Not specified'}
-Recent Performance: ${context.recentPerformance ? `${context.recentPerformance.accuracy}% accuracy, ${context.recentPerformance.trend}` : 'No data'}
-Learning Style: ${context.learningStyle || 'Not specified'}
-Areas to Improve: ${context.weakAreas?.join(', ') || 'Not specified'}`;
-}
-
-function formatQuestionContext(question: QuestionContext): string {
-  let context = `
-Subject: ${question.subject}
-Topic: ${question.topic}
-Question: ${question.questionText}`;
-
-  if (question.options) {
-    context += `\nOptions:\n${question.options.map((opt, i) => `  ${String.fromCharCode(65 + i)}. ${opt}`).join('\n')}`;
-  }
-
-  context += `\nCorrect Answer: ${question.correctAnswer}`;
-
-  if (question.userAnswer !== undefined) {
-    context += `\nStudent's Answer: ${question.userAnswer}`;
-    context += `\nResult: ${question.isCorrect ? 'Correct!' : 'Incorrect'}`;
-  }
-
-  if (question.explanation) {
-    context += `\nReference Explanation: ${question.explanation}`;
-  }
-
-  return context;
 }
 
 // File attachment type for vision API
@@ -202,7 +151,7 @@ async function analyzeImageWithVision(
       ? imageBase64
       : `data:${mimeType};base64,${imageBase64}`;
 
-    const result = await env.AI.run('@cf/meta/llama-3.2-11b-vision-instruct' as BaseAiTextGenerationModels, {
+    const result = await env.AI.run('@cf/meta/llama-3.2-11b-vision-instruct', {
       messages: [
         { role: 'system', content: 'You are an expert educational assistant helping students understand images, diagrams, and documents. Provide clear, detailed explanations suitable for secondary school students.' },
         { role: 'user', content: prompt }
@@ -271,46 +220,35 @@ async function getTutorResponse(
     return getMockResponse(message, messageType, questionContext);
   }
 
-  // Build system prompt based on message type
+  // Build the privileged instruction separately from all student-controlled data.
   let systemPrompt: string;
-  const studentContextStr = formatStudentContext(studentContext);
 
   switch (messageType) {
     case 'explanation':
-      if (!questionContext) {
-        throw new Error('Question context required for explanation');
-      }
-      systemPrompt = TUTOR_PROMPTS.question_explainer
-        .replace('{questionContext}', formatQuestionContext(questionContext))
-        .replace('{studentContext}', studentContextStr);
+      if (!questionContext) throw new Error('Question context required for explanation');
+      systemPrompt = TUTOR_PROMPTS.question_explainer;
       break;
-
     case 'hint':
-      if (!questionContext) {
-        throw new Error('Question context required for hint');
-      }
-      systemPrompt = TUTOR_PROMPTS.hint_provider
-        .replace('{hintLevel}', String(hintLevel || 1))
-        .replace('{questionContext}', formatQuestionContext(questionContext))
-        .replace('{studentContext}', studentContextStr);
+      if (!questionContext) throw new Error('Question context required for hint');
+      systemPrompt = TUTOR_PROMPTS.hint_provider.replace('{hintLevel}', String(hintLevel || 1));
       break;
-
     case 'step_by_step':
-      if (!questionContext) {
-        throw new Error('Question context required for step-by-step');
-      }
-      systemPrompt = TUTOR_PROMPTS.step_by_step
-        .replace('{questionContext}', formatQuestionContext(questionContext))
-        .replace('{studentContext}', studentContextStr);
+      if (!questionContext) throw new Error('Question context required for step-by-step');
+      systemPrompt = TUTOR_PROMPTS.step_by_step;
       break;
-
     default:
-      systemPrompt = TUTOR_PROMPTS.general.replace('{studentContext}', studentContextStr);
+      systemPrompt = TUTOR_PROMPTS.general;
   }
 
-  // Build messages for Workers AI
   const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
-    { role: 'system', content: systemPrompt }
+    { role: 'system', content: systemPrompt },
+    {
+      role: 'user',
+      content: formatUntrustedAiData('Student and question context', {
+        studentContext,
+        questionContext: questionContext ?? null,
+      }),
+    },
   ];
 
   // Add conversation history
@@ -354,7 +292,7 @@ async function getTutorResponse(
     // Use the configured chat model (env-var routed via ai-models.ts)
     const model = getChatModel(env);
 
-    const result = await env.AI.run(model as BaseAiTextGenerationModels, {
+    const result = await env.AI.run(model, {
       messages,
       max_tokens: 8192,  // High limit for comprehensive, detailed explanations
       temperature: 0.7,  // Balanced creativity for educational content

@@ -49,8 +49,11 @@ interface CustomSpeechRecognition {
   onstart: (() => void) | null;
 }
 
-// Use any for the window speech recognition to avoid type conflicts
 type SpeechRecognitionConstructor = new () => CustomSpeechRecognition;
+type SpeechRecognitionWindow = Window & typeof globalThis & {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
+};
 
 interface VoiceConversationProps {
   onTranscript: (text: string, isFinal: boolean) => void;
@@ -106,7 +109,8 @@ export function VoiceConversation({
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const speechWindow = window as SpeechRecognitionWindow;
+    const SpeechRecognitionAPI = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
 
     if (!SpeechRecognitionAPI) {
       setError('Speech recognition is not supported in this browser');

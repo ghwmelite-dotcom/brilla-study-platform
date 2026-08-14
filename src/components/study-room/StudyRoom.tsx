@@ -421,7 +421,7 @@ export function StudyRoom({
                 ].map(tab => (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
+                    onClick={() => setActiveTab(tab.id as 'chat' | 'participants' | 'ai')}
                     className={cn(
                       "flex-1 flex items-center justify-center gap-2 p-3 transition-colors",
                       activeTab === tab.id

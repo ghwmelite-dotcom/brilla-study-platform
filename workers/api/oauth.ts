@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { sign } from 'hono/jwt';
 import { parseJsonBody } from './http';
+import { requireAuth, type AuthPayload } from './auth-middleware';
 import { isValidReferralCode, attributeReferral } from './affiliates';
 import { PENDING_APPROVAL_MESSAGE, SELF_REGISTRATION_STATUS } from './registration-policy';
 
@@ -16,10 +17,16 @@ interface Env {
   REGISTRATION_MODE?: string; // Growth loop (Task 5): open | invite
 }
 
-interface UserPayload {
-  userId: string;
+interface UserPayload extends AuthPayload {
   email: string;
   role: 'student' | 'teacher' | 'admin' | 'parent';
+  sessionVersion: number;
+}
+
+interface AuthVars {
+  userId: string;
+  userRole: string;
+  user: AuthPayload;
 }
 
 // Roles a caller may self-select during registration. Anything else
@@ -69,7 +76,7 @@ async function generateCodeChallenge(verifier: string): Promise<string> {
 }
 
 function base64UrlEncode(buffer: Uint8Array): string {
-  let base64 = btoa(String.fromCharCode(...buffer));
+  const base64 = btoa(String.fromCharCode(...buffer));
   // Convert to URL-safe base64
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
@@ -156,7 +163,7 @@ async function verifyTurnstile(token: string, secret: string, ip?: string): Prom
   }
 }
 
-export const oauthApp = new Hono<{ Bindings: Env }>();
+export const oauthApp = new Hono<{ Bindings: Env; Variables: AuthVars }>();
 
 // =============================================
 // POST /auth/oauth/google/init
@@ -179,8 +186,16 @@ oauthApp.post('/google/init', async (c) => {
 
   const redirectUri = c.env.GOOGLE_REDIRECT_URI || 'https://brillaprep.org/oauth/callback';
 
-  // Note: Turnstile verification is skipped for OAuth flows
-  // Google already verifies the user is human through their own security measures
+  if (c.env.TURNSTILE_SECRET) {
+    if (!turnstileToken) {
+      return c.json({ success: false, error: 'Security verification required.' }, 400);
+    }
+    const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || '';
+    const verified = await verifyTurnstile(String(turnstileToken), c.env.TURNSTILE_SECRET, clientIp);
+    if (!verified) {
+      return c.json({ success: false, error: 'Security verification failed. Please try again.' }, 400);
+    }
+  }
 
   // Generate PKCE parameters
   const codeVerifier = generateCodeVerifier();
@@ -276,8 +291,7 @@ oauthApp.post('/google/callback', async (c) => {
   });
 
   if (!tokenResponse.ok) {
-    const errorText = await tokenResponse.text();
-    console.error('Google token exchange failed:', errorText);
+    console.error(`Google token exchange failed with status ${tokenResponse.status}`);
     return c.json({ success: false, error: 'Failed to exchange code. Please try again.' }, 400);
   }
 
@@ -299,7 +313,7 @@ oauthApp.post('/google/callback', async (c) => {
   const existingOAuth = await c.env.DB.prepare(`
     SELECT uop.*, u.id as user_id, u.email, u.name, u.role, u.status, u.house,
            u.year_group, u.school_level, u.school_name, u.xp_points, u.level,
-           u.streak_days, u.ai_grading_credits
+           u.streak_days, u.ai_grading_credits, u.session_version
     FROM user_oauth_providers uop
     JOIN users u ON uop.user_id = u.id
     WHERE uop.provider = 'google' AND uop.provider_user_id = ?
@@ -332,6 +346,7 @@ oauthApp.post('/google/callback', async (c) => {
         level: existingOAuth.level,
         streakDays: existingOAuth.streak_days,
         aiGradingCredits: existingOAuth.ai_grading_credits,
+        sessionVersion: existingOAuth.session_version,
       };
 
       // Update last_used_at
@@ -368,6 +383,7 @@ oauthApp.post('/google/callback', async (c) => {
         level: existingUser.level,
         streakDays: existingUser.streak_days,
         aiGradingCredits: existingUser.ai_grading_credits,
+        sessionVersion: existingUser.session_version,
       };
       accountLinked = true;
 
@@ -547,6 +563,7 @@ oauthApp.post('/google/callback', async (c) => {
       level: 1,
       streakDays: 0,
       aiGradingCredits: 0,
+      sessionVersion: 0,
     };
     isNewUser = true;
 
@@ -616,6 +633,7 @@ oauthApp.post('/google/callback', async (c) => {
       level: linkedUser.level,
       streakDays: linkedUser.streak_days,
       aiGradingCredits: linkedUser.ai_grading_credits,
+      sessionVersion: linkedUser.session_version,
     };
     accountLinked = true;
   }
@@ -645,6 +663,7 @@ oauthApp.post('/google/callback', async (c) => {
       userId: user.id as string,
       email: user.email as string,
       role: user.role as 'student' | 'teacher' | 'admin' | 'parent',
+      sessionVersion: Number(user.sessionVersion ?? 0),
     },
     c.env.JWT_SECRET
   );
@@ -670,38 +689,20 @@ oauthApp.post('/google/callback', async (c) => {
 // GET /auth/oauth/providers (protected)
 // Lists linked OAuth providers for current user
 // =============================================
-oauthApp.get('/providers', async (c) => {
-  // This endpoint needs authentication - check Authorization header
-  const authHeader = c.req.header('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
-  }
-
-  const token = authHeader.slice(7);
-  let payload: UserPayload | null = null;
-
-  try {
-    const { verify } = await import('hono/jwt');
-    payload = await verify(token, c.env.JWT_SECRET) as UserPayload;
-  } catch {
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-
-  if (!payload) {
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
+oauthApp.get('/providers', requireAuth, async (c) => {
+  const userId = c.get('userId');
 
   // Get linked providers
   const providers = await c.env.DB.prepare(`
     SELECT provider, provider_email, linked_at, last_used_at
     FROM user_oauth_providers
     WHERE user_id = ?
-  `).bind(payload.userId).all();
+  `).bind(userId).all();
 
   // Check if user has password
   const user = await c.env.DB.prepare(`
     SELECT password_hash FROM users WHERE id = ?
-  `).bind(payload.userId).first();
+  `).bind(userId).first();
 
   return c.json({
     success: true,
@@ -721,31 +722,13 @@ oauthApp.get('/providers', async (c) => {
 // DELETE /auth/oauth/unlink/google (protected)
 // Unlinks Google account
 // =============================================
-oauthApp.delete('/unlink/google', async (c) => {
-  // Check authentication
-  const authHeader = c.req.header('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
-  }
-
-  const token = authHeader.slice(7);
-  let payload: UserPayload | null = null;
-
-  try {
-    const { verify } = await import('hono/jwt');
-    payload = await verify(token, c.env.JWT_SECRET) as UserPayload;
-  } catch {
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-
-  if (!payload) {
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
+oauthApp.delete('/unlink/google', requireAuth, async (c) => {
+  const userId = c.get('userId');
 
   // Check if user has password (prevent lockout)
   const user = await c.env.DB.prepare(`
     SELECT password_hash FROM users WHERE id = ?
-  `).bind(payload.userId).first();
+  `).bind(userId).first();
 
   if (!user?.password_hash) {
     return c.json({
@@ -758,7 +741,7 @@ oauthApp.delete('/unlink/google', async (c) => {
   // Delete the provider link
   const result = await c.env.DB.prepare(`
     DELETE FROM user_oauth_providers WHERE user_id = ? AND provider = 'google'
-  `).bind(payload.userId).run();
+  `).bind(userId).run();
 
   if (result.meta.changes === 0) {
     return c.json({
@@ -777,31 +760,13 @@ oauthApp.delete('/unlink/google', async (c) => {
 // POST /auth/oauth/google/link/init (protected)
 // Initiates Google OAuth flow for linking
 // =============================================
-oauthApp.post('/google/link/init', async (c) => {
-  // Check authentication
-  const authHeader = c.req.header('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return c.json({ success: false, error: 'Unauthorized' }, 401);
-  }
-
-  const token = authHeader.slice(7);
-  let payload: UserPayload | null = null;
-
-  try {
-    const { verify } = await import('hono/jwt');
-    payload = await verify(token, c.env.JWT_SECRET) as UserPayload;
-  } catch {
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
-
-  if (!payload) {
-    return c.json({ success: false, error: 'Invalid token' }, 401);
-  }
+oauthApp.post('/google/link/init', requireAuth, async (c) => {
+  const userId = c.get('userId');
 
   // Check if already linked
   const existingLink = await c.env.DB.prepare(`
     SELECT * FROM user_oauth_providers WHERE user_id = ? AND provider = 'google'
-  `).bind(payload.userId).first();
+  `).bind(userId).first();
 
   if (existingLink) {
     return c.json({
@@ -836,7 +801,7 @@ oauthApp.post('/google/link/init', async (c) => {
     stateId,
     state,
     codeVerifier,
-    payload.userId,
+    userId,
     ip,
     userAgent,
     expiresAt

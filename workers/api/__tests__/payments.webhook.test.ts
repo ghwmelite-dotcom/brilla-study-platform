@@ -19,6 +19,9 @@ function createMockDb(row: Record<string, unknown> | null = null) {
         },
       };
     },
+    async batch(statements: Array<{ run(): Promise<unknown> }>) {
+      return Promise.all(statements.map((statement) => statement.run()));
+    },
   } as unknown as D1Database;
   return { db, queries };
 }
@@ -94,6 +97,9 @@ describe('POST /payments/webhook', () => {
     expect(res.status).toBe(200);
     const refund = queries.find((q) => q.sql.includes('affiliate_profiles') && q.sql.includes('available_earnings'));
     expect(refund).toBeDefined();
-    expect(refund!.params).toEqual([100, 'ap_1']);
+    expect(refund!.sql).toMatch(/SELECT ap\.amount/);
+    expect(refund!.sql).toMatch(/refund_applied_at IS NULL/);
+    expect(refund!.params).toEqual(['TRF_real', 'TRF_real']);
+    expect(queries.some((q) => q.sql.includes('SELECT * FROM affiliate_payouts'))).toBe(false);
   });
 });

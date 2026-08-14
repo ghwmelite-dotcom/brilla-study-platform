@@ -278,7 +278,7 @@ async function jwtFor(userId: string) {
 
 function notifDb(extra: { linkRow?: unknown } = {}) {
   return createMockD1([
-    { match: /SELECT role, status, is_active FROM users/, first: () => ACTIVE_USER },
+    { match: /SELECT role, status, is_active, session_version FROM users/, first: () => ACTIVE_USER },
     { match: /INSERT INTO telegram_link_tokens/, run: () => ({ success: true, meta: { changes: 1 } }) },
     { match: /FROM telegram_links WHERE user_id/, first: () => extra.linkRow ?? null },
   ]);

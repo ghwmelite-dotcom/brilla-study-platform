@@ -45,7 +45,7 @@ function makeDb(opts: { xp: number; maxParticipants: number | null; entryFee: nu
 
   const db = createMockD1([
     // requireAuth user lookup
-    { match: /role, status, is_active FROM users/, first: () => STUDENT },
+    { match: /role, status, is_active, session_version FROM users/, first: () => STUDENT },
     { match: /SELECT \* FROM tournaments/, first: () => tournament },
     // Fast-path membership check: always misses (models the race; the
     // conditional INSERT is the real guard).

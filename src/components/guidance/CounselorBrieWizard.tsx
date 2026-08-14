@@ -6,6 +6,7 @@ import { useExamPreferencesStore } from '@/stores/examPreferencesStore';
 import { useExamStore } from '@/stores/examStore';
 import { useGuidanceStore } from '@/stores/guidanceStore';
 import type { ExamTypeSlug } from '@/types';
+import { toSafeInternalPath } from '@/utils/navigation';
 import {
   GUIDANCE_EXAM_OPTIONS,
   getGuidanceGradeScale,
@@ -165,7 +166,7 @@ export function CounselorBrieWizard() {
   const startRoute = () => {
     const href = plan?.thisWeek[0]?.href ?? '/my-plan';
     dismiss();
-    navigate(href);
+    navigate(toSafeInternalPath(href, '/my-plan'));
   };
 
   return (

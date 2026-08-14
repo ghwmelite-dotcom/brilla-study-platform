@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
-import { getDemoDataFlags, isDemoUserId } from './demoUtils';
+import { getDemoDataFlags } from './demoUtils';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
 
@@ -11,37 +11,6 @@ interface Env {
 }
 
 // Types
-type ChatRoomType = 'dm' | 'public' | 'private' | 'subject';
-type ChatMemberRole = 'owner' | 'moderator' | 'member';
-type ChatContentType = 'text' | 'image' | 'file' | 'system';
-
-interface ChatRoom {
-  id: string;
-  name?: string;
-  description?: string;
-  type: ChatRoomType;
-  subjectId?: string;
-  examTypeId?: string;
-  avatarUrl?: string;
-  isArchived: boolean;
-  maxMembers: number;
-  createdBy: string;
-  createdAt: string;
-  updatedAt: string;
-  memberCount?: number;
-  unreadCount?: number;
-  lastMessage?: {
-    content: string;
-    senderName: string;
-    createdAt: string;
-  };
-  otherUser?: {
-    id: string;
-    name: string;
-    avatarUrl?: string;
-  };
-}
-
 // Create Hono app
 const chatApp = new Hono<{ Bindings: Env }>();
 

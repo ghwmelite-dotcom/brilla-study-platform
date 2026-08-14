@@ -16,7 +16,7 @@ export default defineConfig({
         manualChunks: {
           // React core
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          // Icons library (large)
+          // Icons library (large; isolated to keep the main app chunk smaller)
           'vendor-icons': ['lucide-react'],
           // State management
           'vendor-state': ['zustand'],

@@ -5,6 +5,7 @@ export interface AuthPayload {
   userId: string;
   email?: string;
   role?: string;
+  sessionVersion?: number;
 }
 
 interface AuthBindings {
@@ -56,13 +57,19 @@ export const requireAuth = async (
 
   // Per-request re-check: role/status/is_active are NOT trusted from the JWT.
   const user = await c.env.DB.prepare(
-    'SELECT role, status, is_active FROM users WHERE id = ?',
+    'SELECT role, status, is_active, session_version FROM users WHERE id = ?',
   )
     .bind(payload.userId)
-    .first<{ role: string; status: string; is_active: number }>();
+    .first<{ role: string; status: string; is_active: number; session_version: number }>();
 
   if (!user || user.is_active !== 1 || user.status !== 'approved') {
     return c.json({ success: false, error: 'Account is not active' }, 403);
+  }
+
+  const tokenSessionVersion = payload.sessionVersion ?? 0;
+  const currentSessionVersion = user.session_version ?? 0;
+  if (tokenSessionVersion !== currentSessionVersion) {
+    return c.json({ success: false, error: 'Session is no longer valid' }, 401);
   }
 
   c.set('userId', payload.userId);
@@ -100,13 +107,19 @@ export const requireAdmin = async (
   }
 
   const user = await c.env.DB.prepare(
-    'SELECT role, status, is_active FROM users WHERE id = ?',
+    'SELECT role, status, is_active, session_version FROM users WHERE id = ?',
   )
     .bind(payload.userId)
-    .first<{ role: string; status: string; is_active: number }>();
+    .first<{ role: string; status: string; is_active: number; session_version: number }>();
 
   if (!user || user.is_active !== 1 || user.status !== 'approved') {
     return c.json({ success: false, error: 'Account is not active' }, 403);
+  }
+
+  const tokenSessionVersion = payload.sessionVersion ?? 0;
+  const currentSessionVersion = user.session_version ?? 0;
+  if (tokenSessionVersion !== currentSessionVersion) {
+    return c.json({ success: false, error: 'Session is no longer valid' }, 401);
   }
 
   if (user.role !== 'admin') {

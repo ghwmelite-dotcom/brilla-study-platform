@@ -1158,6 +1158,10 @@ tutoringRouter.get('/teacher/earnings', requireAuth, teacherMiddleware, async (c
       `).bind(teacherId).first();
     }
 
+    if (!earnings) {
+      throw new Error('Teacher earnings record could not be initialized');
+    }
+
     // Get recent completed sessions
     const recentSessions = await c.env.DB.prepare(`
       SELECT

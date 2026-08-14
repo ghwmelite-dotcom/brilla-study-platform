@@ -137,7 +137,7 @@ export type WhiteboardLessonType = 'diagram' | 'step-by-step' | 'problem-solving
 export interface WhiteboardDrawCommand {
   type: 'rect' | 'circle' | 'line' | 'arrow' | 'text' | 'path' | 'polygon' | 'group';
   id: string;
-  props: Record<string, any>;
+  props: Record<string, unknown>;
 }
 
 export interface WhiteboardStep {
@@ -392,7 +392,17 @@ Well done on completing this revision! You're one step closer to exam success. R
 // camelCase RevisionSession shape. Normalize at the store boundary so every
 // ingress point (create/resume/list) yields the same shape; the original
 // fields are kept for code that still reads snake_case fallbacks.
-const mapSession = (raw: any): RevisionSession => ({
+type RawRevisionSession = RevisionSession & {
+  user_id?: string; exam_type?: ExamTypeSlug; subject_id?: string; subject_name?: string;
+  topic_id?: string; topic_name?: string; session_type?: RevisionSessionType;
+  progress_percentage?: number; current_lesson_id?: string; lessons_completed?: number;
+  total_lessons?: number; mastery_score?: number; time_spent_minutes?: number;
+  started_at?: string; last_activity_at?: string; completed_at?: string;
+};
+
+type RawRevisionLesson = RevisionLesson & { topic_name?: string };
+
+const mapSession = (raw: RawRevisionSession): RevisionSession => ({
   ...raw,
   visitorId: raw.visitorId ?? raw.user_id,
   examType: raw.examType ?? raw.exam_type,
@@ -502,7 +512,7 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
           };
 
           // Add topic names to lessons
-          const lessonsWithNames = lessons.map((l: any) => ({
+          const lessonsWithNames = lessons.map((l: RawRevisionLesson) => ({
             ...l,
             topicName: l.topic_name || l.title,
           }));
@@ -551,7 +561,7 @@ export const useRevisionClassroomStore = create<RevisionClassroomState>()(
 
           const mappedSession = mapSession(session);
 
-          const lessonsWithNames = lessons.map((l: any) => ({
+          const lessonsWithNames = lessons.map((l: RawRevisionLesson) => ({
             ...l,
             topicName: l.topic_name || l.title,
           }));
@@ -1298,9 +1308,9 @@ Does this help? Feel free to ask more questions!`;
               requestedAt: new Date().toISOString(),
             },
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to request tutor:', error);
-          set({ error: error.message || 'Failed to request tutor' });
+          set({ error: error instanceof Error && error.message ? error.message : 'Failed to request tutor' });
         }
       },
 
@@ -1319,7 +1329,7 @@ Does this help? Feel free to ask more questions!`;
               requestedAt: new Date().toISOString(),
             },
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to accept handoff:', error);
         }
       },
@@ -1343,7 +1353,7 @@ Does this help? Feel free to ask more questions!`;
             tutorPresence: null,
             handoffState: { status: 'none' },
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to dismiss tutor:', error);
         }
       },

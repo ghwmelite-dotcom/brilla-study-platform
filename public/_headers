@@ -5,7 +5,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
   # Note: ambient sounds stream from assets.mixkit.co; blob: covers server-TTS audio (whiteboard voiceOver) played from blob URLs; data: in font-src covers KaTeX's embedded fonts.
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://brilla-api.ghwmelite.workers.dev; connect-src 'self' https://brilla-api.ghwmelite.workers.dev https://challenges.cloudflare.com; worker-src 'self' https://unpkg.com; frame-src https://challenges.cloudflare.com https://phet.colorado.edu; media-src 'self' blob: https://assets.mixkit.co; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://brilla-api.ghwmelite.workers.dev; connect-src 'self' https://brilla-api.ghwmelite.workers.dev https://challenges.cloudflare.com; worker-src 'self' blob:; frame-src https://challenges.cloudflare.com https://phet.colorado.edu; media-src 'self' blob: https://assets.mixkit.co; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
 
 /index.html
   Cache-Control: public, max-age=0, must-revalidate

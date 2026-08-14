@@ -1,11 +1,12 @@
 import { Hono } from 'hono';
+import type { MiddlewareHandler } from 'hono';
 import { cors } from 'hono/cors';
-import { jwt, sign } from 'hono/jwt';
+import { sign } from 'hono/jwt';
 import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware';
 import { parseLimit, parseJsonBody } from './http';
 import type { JWTPayload } from 'hono/utils/jwt/types';
-import type { BaseAiTextGenerationModels } from '@cloudflare/workers-types';
 import { getChatModel, getGenerationModel, getTtsModel } from './ai-models';
+import { formatUntrustedAiData, normalizeAiGradingFeedback, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
 import { libraryApp } from './library';
 import { counselorApp } from './counselor';
 import { notificationsApp, createNotification } from './notifications';
@@ -44,19 +45,17 @@ import { telegramWebhookApp } from './telegram';
 import { runTelegramRaceAlerts } from './race-alerts';
 import { recordAttemptProgress } from './attempt-progress';
 import { getParentGuidance } from './parent-guidance';
+import { parseEssaySubmission } from './essay-content';
 import {
   getDailyUsage,
   checkCanAnswer,
   incrementUsage,
-  isCoreSubject,
   getCoreSubjects,
-  canAccessSubject,
   DAILY_QUESTION_LIMIT,
-  CORE_SUBJECTS,
 } from './usage-limits';
 
 // Types for Cloudflare bindings
-interface Env {
+export interface Env {
   DB: D1Database;
   JWT_SECRET: string;
   SETUP_KEY?: string;
@@ -98,7 +97,17 @@ interface UserPayload extends JWTPayload {
   userId: string;
   email: string;
   role: 'student' | 'teacher' | 'admin' | 'parent';
+  sessionVersion: number;
 }
+
+interface AppVariables {
+  userId: string;
+  userRole: string;
+  user: UserPayload;
+  jwtPayload: UserPayload;
+}
+
+type AppEnv = { Bindings: Env; Variables: AppVariables };
 
 // =============================================
 // UTILITY FUNCTIONS
@@ -671,7 +680,7 @@ async function sendSecurityAlertToAdmins(
     ).all();
 
     // Combine admin emails with additional notification emails
-    const adminEmails = (admins || []).map((a: { email: string }) => a.email);
+    const adminEmails = (admins as Array<{ email: string }>).map((a) => a.email);
     const allRecipients = [...new Set([...adminEmails, ...additionalEmails])]; // Dedupe
 
     if (allRecipients.length === 0) {
@@ -777,7 +786,7 @@ function getDemoDataFlags(userId: string): { is_demo_data: number; expires_at: s
   return { is_demo_data: 0, expires_at: null };
 }
 
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono<AppEnv>();
 
 // Middleware
 app.use('*', cors({
@@ -797,19 +806,14 @@ app.use('*', cors({
 app.route('/api/exam-boards', examBoardsApp);
 
 // Public routes (no auth required)
-const publicApp = new Hono<{ Bindings: Env }>();
+const publicApp = new Hono<AppEnv>();
 
 // Protected routes with JWT authentication middleware
-const protectedApp = new Hono<{ Bindings: Env }>();
+const protectedApp = new Hono<AppEnv>();
 
 // Authentication middleware for protected routes: verified JWT + fresh DB
 // role/status/is_active re-check (shared middleware, sets userId/userRole/user).
 protectedApp.use('*', requireAuth);
-
-// Helper to check if current user is demo
-function isUserDemo(c: { get: (key: string) => boolean | undefined }): boolean {
-  return c.get('isDemo') === true;
-}
 
 // Identity comes only from verified JWT context (set by requireAuth).
 function getUserId(c: { get: (key: string) => string | undefined }): string | undefined {
@@ -1333,7 +1337,8 @@ publicApp.post('/auth/login', async (c) => {
     const token = await generateJWT({
       userId: result.id as string,
       email: result.email as string,
-      role: result.role as 'student' | 'teacher' | 'admin',
+      role: result.role as 'student' | 'teacher' | 'admin' | 'parent',
+      sessionVersion: Number(result.session_version ?? 0),
     }, c.env.JWT_SECRET);
 
     // Update last login
@@ -1421,6 +1426,7 @@ publicApp.post('/auth/set-password', async (c) => {
     await c.env.DB.prepare(`
       UPDATE users SET
         password_hash = ?,
+        session_version = session_version + 1,
         email_verified = 1,
         verification_token = NULL,
         verification_token_expires_at = NULL,
@@ -1584,6 +1590,7 @@ publicApp.post('/auth/reset-password', async (c) => {
     await c.env.DB.prepare(`
       UPDATE users SET
         password_hash = ?,
+        session_version = session_version + 1,
         password_reset_token = NULL,
         password_reset_expires_at = NULL,
         updated_at = datetime('now')
@@ -1605,14 +1612,13 @@ publicApp.post('/auth/test-notification', requireAdmin, async (c) => {
   }
 
   try {
-    const appUrl = c.env.APP_URL || 'https://brillaprep.org';
     const fromEmail = c.env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>';
 
     // Get admin emails
     const { results: admins } = await c.env.DB.prepare(
       "SELECT email FROM users WHERE role = 'admin' AND status = 'approved' AND is_active = 1"
     ).all();
-    const adminEmails = (admins || []).map((a: { email: string }) => a.email);
+    const adminEmails = (admins as Array<{ email: string }>).map((a) => a.email);
 
     // Get additional notification emails
     const additionalEmails = getAdditionalNotificationEmails(c.env);
@@ -1818,7 +1824,7 @@ publicApp.post('/auth/reset-demo-passwords', async (c) => {
 
       if (existing) {
         await c.env.DB.prepare(`
-          UPDATE users SET password_hash = ?, updated_at = datetime('now')
+          UPDATE users SET password_hash = ?, session_version = session_version + 1, updated_at = datetime('now')
           WHERE email = ?
         `).bind(passwordHash, user.email).run();
         results.push({ email: user.email, status: 'password_reset' });
@@ -2162,7 +2168,6 @@ publicApp.get('/leaderboard', async (c) => {
 // Get user's specific rank
 publicApp.get('/leaderboard/user/:userId', async (c) => {
   const userId = c.req.param('userId');
-  const period = c.req.query('period') || 'weekly';
 
   try {
     // Get user's score
@@ -3840,7 +3845,6 @@ protectedApp.post('/flashcards/:id/review', async (c) => {
     nextReview.setDate(nextReview.getDate() + interval);
 
     const reviewId = `fr_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    const demoFlags = getDemoDataFlags(userId);
 
     await c.env.DB.prepare(`
       INSERT INTO flashcard_reviews (id, user_id, flashcard_id, deck_id, ease_rating, ease_factor, interval_days, repetitions, next_review_at)
@@ -4142,7 +4146,7 @@ protectedApp.post('/battles/:id/answer', async (c) => {
       // Get final scores
       const updatedBattle = await c.env.DB.prepare(`
         SELECT challenger_score, opponent_score, challenger_id, opponent_id FROM battles WHERE id = ?
-      `).bind(battleId).first();
+      `).bind(battleId).first<{ challenger_score: number; opponent_score: number; challenger_id: string; opponent_id: string }>();
 
       const winnerId = updatedBattle!.challenger_score > updatedBattle!.opponent_score
         ? updatedBattle!.challenger_id
@@ -4469,7 +4473,12 @@ protectedApp.post('/essays/submit', async (c) => {
   // Identity comes only from the verified JWT — a body-supplied userId would
   // let a caller spend another user's AI grading credits.
   const userId = getUserId(c)!;
-  const { questionId, answerText, gradingType } = await c.req.json();
+  const body = await parseJsonBody(c);
+  const submission = parseEssaySubmission(body);
+  if (!submission) {
+    return c.json({ success: false, error: 'Invalid essay submission' }, 400);
+  }
+  const { questionId, answerText, gradingType, wordCount } = submission;
 
   try {
     // Get user subscription info
@@ -4497,9 +4506,6 @@ protectedApp.post('/essays/submit', async (c) => {
         upgradeRequired: true,
       }, 403);
     }
-
-    // Count words
-    const wordCount = answerText.trim().split(/\s+/).filter((w: string) => w.length > 0).length;
 
     const attemptId = `ea_${Date.now()}`;
     const demoFlags = getDemoDataFlags(userId);
@@ -4566,25 +4572,30 @@ protectedApp.post('/essays/:attemptId/grade', async (c) => {
       return c.json({ success: false, error: 'Forbidden' }, 403);
     }
 
-    // Update status to grading
-    await c.env.DB.prepare(`
-      UPDATE essay_attempts SET grading_status = 'grading' WHERE id = ?
+    if (!apiKey) {
+      return c.json({ success: false, error: 'AI grading is temporarily unavailable' }, 503);
+    }
+
+    // Atomically claim the pending attempt so concurrent requests cannot grade it twice.
+    const gradingClaim = await c.env.DB.prepare(`
+      UPDATE essay_attempts SET grading_status = 'grading'
+      WHERE id = ? AND grading_status = 'pending'
     `).bind(attemptId).run();
+    if (gradingClaim.meta.changes !== 1) {
+      return c.json({ success: false, error: 'Essay grading is already in progress' }, 409);
+    }
 
     let aiFeedback: Record<string, unknown>;
     let aiScore: number;
 
-    if (apiKey) {
+    {
       // Use Claude for grading
       const markingScheme = attempt.marking_scheme
         ? JSON.parse(attempt.marking_scheme as string)
         : null;
 
-      const systemPrompt = `You are an experienced WAEC examiner grading a ${attempt.subject_name} essay.
-Grade fairly and constructively. Provide specific feedback with examples from the student's work.
-Total marks available: ${attempt.marks}
-${markingScheme ? `Marking criteria: ${JSON.stringify(markingScheme)}` : ''}
-Word limits: ${attempt.word_limit_min || 'None'} - ${attempt.word_limit_max || 'None'} words
+      const systemPrompt = `You are an experienced WAEC examiner. Grade fairly and constructively. Provide specific feedback grounded in the student's work.
+${UNTRUSTED_AI_DATA_INSTRUCTION}
 
 Return your assessment as a JSON object with this structure:
 {
@@ -4596,12 +4607,17 @@ Return your assessment as a JSON object with this structure:
   "suggestions": ["string"]
 }`;
 
-      const userPrompt = `Question: ${attempt.question_text}
+      const userPrompt = `${formatUntrustedAiData('Essay grading inputs', {
+        subject: attempt.subject_name,
+        totalMarks: attempt.marks,
+        markingScheme,
+        wordLimits: { min: attempt.word_limit_min, max: attempt.word_limit_max },
+        question: attempt.question_text,
+        answer: attempt.answer_text,
+        wordCount: attempt.word_count,
+      })}
 
-Student's Answer (${attempt.word_count} words):
-${attempt.answer_text}
-
-Please grade this essay.`;
+Grade the essay using only the supplied data.`;
 
       const response = await callClaudeAPI(apiKey, model, systemPrompt, userPrompt);
 
@@ -4609,39 +4625,14 @@ Please grade this essay.`;
         // Extract JSON from response
         const jsonMatch = response.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-          aiFeedback = JSON.parse(jsonMatch[0]);
-          aiScore = (aiFeedback as { overallScore: number }).overallScore;
+          aiFeedback = normalizeAiGradingFeedback(JSON.parse(jsonMatch[0]), attempt.marks);
+          aiScore = aiFeedback.overallScore as number;
         } else {
           throw new Error('No JSON in response');
         }
       } catch {
-        // Fallback if JSON parsing fails
-        aiFeedback = {
-          overallScore: Math.floor((attempt.marks as number) * 0.7),
-          overallFeedback: response,
-          criteriaScores: [],
-          strengths: ['Essay submitted successfully'],
-          areasForImprovement: ['Review feedback for detailed assessment'],
-          suggestions: [],
-        };
-        aiScore = (aiFeedback as { overallScore: number }).overallScore;
+        throw new Error('Invalid AI grading response');
       }
-    } else {
-      // Mock grading
-      const mockScore = Math.floor((attempt.marks as number) * (0.5 + Math.random() * 0.4));
-      aiFeedback = {
-        overallScore: mockScore,
-        overallFeedback: 'This is a mock grading response. Configure ANTHROPIC_API_KEY for real AI grading.',
-        criteriaScores: [
-          { criterionName: 'Content', score: Math.floor(mockScore * 0.4), maxScore: Math.floor((attempt.marks as number) * 0.4), feedback: 'Good content coverage.' },
-          { criterionName: 'Organization', score: Math.floor(mockScore * 0.3), maxScore: Math.floor((attempt.marks as number) * 0.3), feedback: 'Well organized structure.' },
-          { criterionName: 'Language', score: Math.floor(mockScore * 0.3), maxScore: Math.floor((attempt.marks as number) * 0.3), feedback: 'Good language use.' },
-        ],
-        strengths: ['Clear introduction', 'Good use of examples'],
-        areasForImprovement: ['Could include more specific details', 'Check grammar and spelling'],
-        suggestions: ['Review similar past paper answers', 'Practice essay structure'],
-      };
-      aiScore = mockScore;
     }
 
     // Update attempt with grading results
@@ -4707,7 +4698,8 @@ protectedApp.post('/ai/explain', async (c) => {
     const exam = getExamContext(context);
     const systemPrompt = `You are Brilla AI, a helpful tutor for ${exam.examDescription} preparation.
 You specialize in ${exam.subjects}.
-Be concise (2-3 paragraphs max), encouraging, and focus on helping students understand concepts for their ${exam.examType.toUpperCase()} exams.`;
+Be concise (2-3 paragraphs max), encouraging, and focus on helping students understand concepts for their ${exam.examType.toUpperCase()} exams.
+${UNTRUSTED_AI_DATA_INSTRUCTION}`;
 
     const userPrompt = `Question: ${question}
 ${userAnswer ? `Student's Answer: ${userAnswer}` : ''}
@@ -4749,7 +4741,7 @@ Please explain:
 
 // AI chat
 protectedApp.post('/ai/chat', async (c) => {
-  const { message, context, conversationHistory, userName, userPersonalization } = await c.req.json();
+  const { message, context, userName, userPersonalization } = await c.req.json();
   // Identity comes only from verified JWT context (body userId was spoofable).
   const userId = getUserId(c);
   if (!userId) {
@@ -4779,7 +4771,7 @@ You specialize in ${exam.subjects}.
 
 PERSONALITY & COMMUNICATION STYLE:
 - Be warm, friendly, and genuinely caring - like a supportive older sibling or favorite teacher
-- Use the student's name naturally in conversation${displayName ? ` (their name is ${displayName})` : ''}
+- Use the student's name naturally when it is supplied in the untrusted profile data
 - Be encouraging but authentic - celebrate their efforts and progress
 - Show genuine interest in helping them succeed
 - Use casual, approachable language while maintaining educational value
@@ -4792,16 +4784,24 @@ RESPONSE GUIDELINES:
 - Reference their progress or previous topics when relevant
 - Be patient with repeated questions - explain differently each time
 
-${context ? `Current context: ${context}` : ''}
-${userPersonalization?.weakAreas ? `Areas to focus on: ${userPersonalization.weakAreas.join(', ')}` : ''}
-${userPersonalization?.strengths ? `Student's strengths: ${userPersonalization.strengths.join(', ')}` : ''}`;
+${UNTRUSTED_AI_DATA_INSTRUCTION}`;
+
+    const userPrompt = `${formatUntrustedAiData('Student profile and current context', {
+      displayName: displayName || null,
+      context: context || null,
+      weakAreas: userPersonalization?.weakAreas || [],
+      strengths: userPersonalization?.strengths || [],
+    })}
+
+Student message:
+${String(message || '').slice(0, 4000)}`;
 
     let response: string;
     let provider: string;
 
     if (apiKey) {
       // Use Claude API
-      response = await callClaudeAPI(apiKey, model, systemPrompt, message);
+      response = await callClaudeAPI(apiKey, model, systemPrompt, userPrompt);
       provider = 'anthropic';
     } else {
       // Fallback to mock response
@@ -4826,7 +4826,7 @@ ${userPersonalization?.strengths ? `Student's strengths: ${userPersonalization.s
 
 // AI hint for current question
 protectedApp.post('/ai/hint', async (c) => {
-  const { question, hintLevel, userId } = await c.req.json();
+  const { question, hintLevel } = await c.req.json();
 
   try {
     // hintLevel: 1 = subtle hint, 2 = moderate hint, 3 = strong hint
@@ -4847,7 +4847,7 @@ protectedApp.post('/ai/hint', async (c) => {
 
 // AI study plan generation
 protectedApp.post('/ai/study-plan', async (c) => {
-  const { userId, weakTopics, strongTopics, targetDate, context } = await c.req.json();
+  const { weakTopics, context } = await c.req.json();
 
   try {
     const exam = getExamContext(context);
@@ -4886,7 +4886,7 @@ protectedApp.post('/ai/study-plan', async (c) => {
 // the request and set user/userId/userRole with the DB-fresh role. Trust that
 // context instead of re-verifying the token — re-setting `user` from the raw
 // JWT payload here would overwrite the fresh DB role with the frozen JWT role.
-const userAuth = async (c: any, next: any) => {
+const userAuth: MiddlewareHandler<AppEnv> = async (c, next) => {
   if (!c.get('userId')) {
     return c.json({ success: false, error: 'Unauthorized' }, 401);
   }
@@ -5187,6 +5187,7 @@ protectedApp.post('/users/me/change-password', userAuth, async (c) => {
     await c.env.DB.prepare(`
       UPDATE users SET
         password_hash = ?,
+        session_version = session_version + 1,
         updated_at = datetime('now')
       WHERE id = ?
     `).bind(newHash, user.userId).run();
@@ -6042,7 +6043,7 @@ protectedApp.put('/parents/preferences', userAuth, async (c) => {
 
 // Admin routes: shared middleware (verified JWT + fresh DB admin-role re-check,
 // sets user/userId/userRole like the old adminAuth did).
-const adminApp = new Hono<{ Bindings: Env }>();
+const adminApp = new Hono<AppEnv>();
 adminApp.use('*', requireAdmin);
 
 // TTS spike (kept permanently, admin-only): runs the configured Aura TTS
@@ -6257,7 +6258,11 @@ adminApp.get('/system/health', async (c) => {
     // Check storage (R2)
     let storageStatus: 'healthy' | 'degraded' | 'down' = 'healthy';
     try {
-      await c.env.LIBRARY_BUCKET.list({ limit: 1 });
+      if (!c.env.LIBRARY_BUCKET) {
+        storageStatus = 'degraded';
+      } else {
+        await c.env.LIBRARY_BUCKET.list({ limit: 1 });
+      }
     } catch {
       storageStatus = 'degraded';
     }
@@ -7182,10 +7187,10 @@ adminApp.post('/users', async (c) => {
       );
 
       if (!emailSent) {
-        console.error('Failed to send verification email to:', email);
+        console.error('Failed to send verification email');
       }
     } else {
-      console.log('RESEND_API_KEY not configured. Verification token:', verificationToken);
+      console.warn('RESEND_API_KEY not configured; verification token was not logged');
     }
 
     return c.json({
@@ -7380,14 +7385,13 @@ adminApp.post('/test-notification', async (c) => {
   }
 
   try {
-    const appUrl = c.env.APP_URL || 'https://brillaprep.org';
     const fromEmail = c.env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>';
 
     // Get admin emails
     const { results: admins } = await c.env.DB.prepare(
       "SELECT email FROM users WHERE role = 'admin' AND status = 'approved' AND is_active = 1"
     ).all();
-    const adminEmails = (admins || []).map((a: { email: string }) => a.email);
+    const adminEmails = (admins as Array<{ email: string }>).map((a) => a.email);
 
     // Get additional notification emails
     const additionalEmails = getAdditionalNotificationEmails(c.env);
@@ -7701,7 +7705,7 @@ adminApp.post('/ai-compare', async (c) => {
         ...(systemPrompt ? [{ role: 'system' as const, content: String(systemPrompt).slice(0, 4000) }] : []),
         { role: 'user' as const, content: prompt },
       ];
-      const result = await c.env.AI.run(model as BaseAiTextGenerationModels, {
+      const result = await c.env.AI.run(model, {
         messages, max_tokens: 1024, temperature: 0.7,
       });
       const output = typeof result === 'object' && result !== null && 'response' in result
@@ -8265,7 +8269,7 @@ function getExamContext(context?: string): { examType: string; examName: string;
 }
 
 // Helper functions for mock responses
-function generateMockExplanation(question: string, correctAnswer: string, isCorrect?: boolean, userAnswer?: string, context?: string): string {
+function generateMockExplanation(_question: string, correctAnswer: string, isCorrect?: boolean, userAnswer?: string, context?: string): string {
   const exam = getExamContext(context);
 
   if (isCorrect) {
@@ -8308,7 +8312,7 @@ function generateMockChatResponse(message: string, context?: string, userName?: 
   return `${greeting ? `Thanks for reaching out, ${greeting}` : ''}That's a great question! I'm here to help you prepare for ${exam.examName}. Feel free to ask me about:\n\n- Specific topics in ${exam.subjects}\n- Formula explanations and derivations\n- Study tips and strategies\n- Help understanding your wrong answers\n\nWhat would you like to explore?${personalTouch}`;
 }
 
-function generateMockHint(question: string, level: number): string {
+function generateMockHint(_question: string, level: number): string {
   const hints = [
     "Think about the fundamental concepts involved in this question. What principles might apply?",
     "Consider breaking down the problem into smaller parts. What information do you already have?",
@@ -8430,8 +8434,8 @@ protectedApp.get('/admin/audit/logs', userAuth, async (c) => {
     const search = c.req.query('search');
 
     // Build query dynamically
-    let whereConditions: string[] = [];
-    let params: (string | number)[] = [];
+    const whereConditions: string[] = [];
+    const params: (string | number)[] = [];
 
     if (userId) {
       whereConditions.push('al.user_id = ?');
@@ -8538,8 +8542,8 @@ protectedApp.get('/admin/audit/security-events', userAuth, async (c) => {
     const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100);
     const offset = (page - 1) * limit;
 
-    let whereConditions: string[] = [];
-    let params: (string | number)[] = [];
+    const whereConditions: string[] = [];
+    const params: (string | number)[] = [];
 
     if (unresolvedOnly) {
       whereConditions.push('se.is_resolved = 0');
@@ -8657,8 +8661,8 @@ protectedApp.get('/admin/audit/login-attempts', userAuth, async (c) => {
     const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100);
     const offset = (page - 1) * limit;
 
-    let whereConditions: string[] = [];
-    let params: (string | number)[] = [];
+    const whereConditions: string[] = [];
+    const params: (string | number)[] = [];
 
     if (email) {
       whereConditions.push('email LIKE ?');
@@ -8718,8 +8722,8 @@ protectedApp.get('/admin/audit/data-changes', userAuth, async (c) => {
     const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100);
     const offset = (page - 1) * limit;
 
-    let whereConditions: string[] = [];
-    let params: (string | number)[] = [];
+    const whereConditions: string[] = [];
+    const params: (string | number)[] = [];
 
     if (tableName) {
       whereConditions.push('dcl.table_name = ?');
@@ -9262,7 +9266,7 @@ protectedApp.post('/admin/affiliates/payouts/:id/approve', async (c) => {
     await c.env.DB.prepare(`
       INSERT INTO audit_log (id, user_id, action, action_category, target_type, target_id, status, created_at)
       VALUES (?, ?, 'approve_payout', 'financial', 'affiliate_payout', ?, 'success', datetime('now'))
-    `).bind(crypto.randomUUID(), user.userId, payoutId).run();
+    `).bind(crypto.randomUUID(), userId, payoutId).run();
 
     return c.json({ success: true, message: 'Payout approved successfully' });
   } catch (error) {
@@ -11120,7 +11124,7 @@ export default {
   fetch: app.fetch,
 
   // Scheduled handler for Cron triggers
-  async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+  async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
     console.log(`Scheduled cleanup triggered at ${new Date().toISOString()}`);
 
     try {

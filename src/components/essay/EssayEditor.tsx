@@ -13,6 +13,7 @@ import {
   Type,
 } from 'lucide-react';
 import { cn } from '@/utils';
+import { sanitizeRichTextHtml } from '@/utils/richText';
 
 interface EssayEditorProps {
   value: string;
@@ -74,8 +75,9 @@ export function EssayEditor({
   // Sync value to editor
   useEffect(() => {
     if (editorRef.current && !isInternalChange.current) {
-      if (editorRef.current.innerHTML !== value) {
-        editorRef.current.innerHTML = value;
+      const sanitized = sanitizeRichTextHtml(value);
+      if (editorRef.current.innerHTML !== sanitized) {
+        editorRef.current.innerHTML = sanitized;
       }
     }
     isInternalChange.current = false;
@@ -85,7 +87,9 @@ export function EssayEditor({
   const handleInput = useCallback(() => {
     if (editorRef.current) {
       isInternalChange.current = true;
-      onChange(editorRef.current.innerHTML);
+      const sanitized = sanitizeRichTextHtml(editorRef.current.innerHTML);
+      if (editorRef.current.innerHTML !== sanitized) editorRef.current.innerHTML = sanitized;
+      onChange(sanitized);
     }
   }, [onChange]);
 

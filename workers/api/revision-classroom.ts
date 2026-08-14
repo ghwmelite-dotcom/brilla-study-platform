@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
-import type { BaseAiTextGenerationModels } from '@cloudflare/workers-types';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
 import { isPremiumUser, checkAiAllowance } from './usage-limits';
 import { getChatModel, getGenerationModel, getTtsModel, unwrapAiText } from './ai-models';
 import { lookupAnswer, storeAnswer } from './answer-cache';
+import { formatUntrustedAiData, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
 
 interface Env {
   DB: D1Database;
@@ -154,16 +154,18 @@ async function generateTeachingContent(
 ): Promise<{ content: string; tokensUsed?: number }> {
   const systemPrompt = `${TEACHING_SYSTEM_PROMPT}
 
-Current Context:
-- Topic: ${context.topicName}
-- Subject: ${context.subjectName}
-- Exam: ${context.examType.toUpperCase()}${context.examBoard ? ` (${context.examBoard})` : ''}
-${context.masteryLevel !== undefined ? `- Student's mastery level: ${context.masteryLevel}%` : ''}
-
-${PHASE_PROMPTS[phase]}`;
+${PHASE_PROMPTS[phase]}
+${UNTRUSTED_AI_DATA_INSTRUCTION}`;
 
   const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
     { role: 'system', content: systemPrompt },
+    { role: 'user', content: formatUntrustedAiData('Lesson context', {
+      topic: context.topicName,
+      subject: context.subjectName,
+      examType: context.examType,
+      examBoard: context.examBoard,
+      masteryLevel: context.masteryLevel,
+    }) },
   ];
 
   // Add conversation history if available
@@ -212,7 +214,7 @@ ${PHASE_PROMPTS[phase]}`;
   try {
     const model = getChatModel(env);
 
-    const result = await env.AI.run(model as BaseAiTextGenerationModels, {
+    const result = await env.AI.run(model, {
       messages,
       max_tokens: 1024,
       temperature: 0.7,
@@ -267,12 +269,7 @@ async function generateCheckpointQuestion(
   explanation: string;
 }> {
   const systemPrompt = `You are creating exam-style questions for the Brilla Study Platform.
-
-Context:
-- Topic: ${context.topicName}
-- Subject: ${context.subjectName}
-- Exam: ${context.examType.toUpperCase()}
-- Difficulty: ${difficulty}
+${UNTRUSTED_AI_DATA_INSTRUCTION}
 
 Generate a multiple choice question with 4 options (A, B, C, D).
 
@@ -287,10 +284,15 @@ RESPOND IN THIS EXACT JSON FORMAT:
   try {
     const model = getChatModel(env);
 
-    const result = await env.AI.run(model as BaseAiTextGenerationModels, {
+    const result = await env.AI.run(model, {
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Generate a ${difficulty} difficulty multiple choice question about "${context.topicName}".` },
+        { role: 'user', content: formatUntrustedAiData('Question generation context', {
+          topic: context.topicName,
+          subject: context.subjectName,
+          examType: context.examType,
+          difficulty,
+        }) },
       ],
       max_tokens: 512,
       temperature: 0.8,
@@ -950,8 +952,7 @@ revisionClassroomApp.post('/lessons/:lessonId/teach', async (c) => {
     });
   } catch (error) {
     console.error('Error generating teaching content:', error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    return c.json({ success: false, error: `Failed to generate teaching content: ${errorMessage}` }, 500);
+    return c.json({ success: false, error: 'Failed to generate teaching content' }, 500);
   }
 });
 
@@ -1128,15 +1129,16 @@ revisionClassroomApp.post('/lessons/:lessonId/ask', async (c) => {
     // Build the prompt for answering student questions
     const systemPrompt = `${TEACHING_SYSTEM_PROMPT}
 
-Current Context:
-- Topic: ${(lesson as any).topic_name || 'General'}
-- Subject: ${(lesson as any).subject_name || 'General'}
-- Exam: ${((lesson as any).exam_type || 'wassce').toUpperCase()}
-
-The student has a question. Answer it helpfully and concisely, relating it back to the current topic when relevant. If the question is off-topic, gently guide them back while still being helpful.`;
+The student has a question. Answer it helpfully and concisely, relating it back to the current topic when relevant. If the question is off-topic, gently guide them back while still being helpful.
+${UNTRUSTED_AI_DATA_INSTRUCTION}`;
 
     const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
       { role: 'system', content: systemPrompt },
+      { role: 'user', content: formatUntrustedAiData('Current lesson context', {
+        topic: (lesson as any).topic_name || 'General',
+        subject: (lesson as any).subject_name || 'General',
+        examType: (lesson as any).exam_type || 'wassce',
+      }) },
     ];
 
     // Add conversation history
@@ -1154,7 +1156,7 @@ The student has a question. Answer it helpfully and concisely, relating it back 
     try {
       const model = getChatModel(c.env);
 
-      const result = await c.env.AI.run(model as BaseAiTextGenerationModels, {
+      const result = await c.env.AI.run(model, {
         messages,
         max_tokens: 1024,
         temperature: 0.7,
@@ -2130,29 +2132,29 @@ async function upsertProgressiveWhiteboardCache(
 }
 
 // Per-lesson-type creative guidance, shared by the outline and step prompts.
-function getWhiteboardLessonTypeInstructions(lessonType: string, topic: string): string {
+function getWhiteboardLessonTypeInstructions(lessonType: string): string {
   const instructions: Record<string, string> = {
-    'diagram': `Create a labeled diagram explaining ${topic}. Include:
+    'diagram': `Create a labeled diagram explaining the supplied topic. Include:
 - Main diagram with clear labels
 - Arrows pointing to key parts
 - Brief text explanations for each component
 - A title and summary`,
 
-    'step-by-step': `Create a step-by-step visual explanation of ${topic}. Include:
+    'step-by-step': `Create a step-by-step visual explanation of the supplied topic. Include:
 - Start with the concept name/title
 - Break down into 4-6 clear steps
 - Each step builds on the previous
 - Use shapes and arrows to show progression
 - End with a summary/key points`,
 
-    'problem-solving': `Create a worked example solving a problem related to ${topic}. Include:
+    'problem-solving': `Create a worked example solving a problem related to the supplied topic. Include:
 - The problem statement at the top
 - Step-by-step solution with calculations
 - Highlight each step as you work through
 - Use colors to distinguish steps
 - Show the final answer prominently`,
 
-    'concept-map': `Create a concept map/mind map for ${topic}. Include:
+    'concept-map': `Create a concept map/mind map for the supplied topic. Include:
 - Central concept in the middle
 - Related sub-concepts branching out
 - Connecting lines with relationship labels
@@ -2177,13 +2179,13 @@ async function generateWhiteboardOutline(
   try {
     const model = getGenerationModel(env);
 
-    const result = await env.AI.run(model as BaseAiTextGenerationModels, {
+    const result = await env.AI.run(model, {
       messages: [
         {
           role: 'system',
-          content: `List 4-6 step titles for a ${lessonType} whiteboard lesson on the given topic. Respond with a JSON array of strings only — no prose, no markdown fences.`,
+          content: `List 4-6 step titles for a ${lessonType} whiteboard lesson on the given topic. ${UNTRUSTED_AI_DATA_INSTRUCTION} Respond with a JSON array of strings only — no prose, no markdown fences.`,
         },
-        { role: 'user', content: `Topic: "${topic}" (${subject}, ${examType.toUpperCase()} exam).` },
+        { role: 'user', content: formatUntrustedAiData('Whiteboard outline context', { topic, subject, examType }) },
       ],
       max_tokens: 300,
       temperature: 0.5,
@@ -2267,16 +2269,8 @@ async function generateWhiteboardStep(
 ): Promise<{ step: WhiteboardStep; usedFallback: boolean; tokensUsed: number | null }> {
   const systemPrompt = `${WHITEBOARD_TEACHING_PROMPT}
 
-Context:
-- Subject: ${subject}
-- Topic: ${topic}
-- Exam: ${examType.toUpperCase()}
-- Lesson Type: ${lessonType}
-
-${getWhiteboardLessonTypeInstructions(lessonType, topic)}
-
-You are writing step ${stepIndex + 1} of ${outline.length}: "${outline[stepIndex]}".
-Full outline: ${JSON.stringify(outline)}.
+${getWhiteboardLessonTypeInstructions(lessonType)}
+${UNTRUSTED_AI_DATA_INSTRUCTION}
 
 Output ONE JSON step object only — not a whole lesson — in this exact format:
 {
@@ -2293,10 +2287,12 @@ Canvas is 1200x800. Keep commands under 12.`;
   try {
     const model = getGenerationModel(env);
 
-    const result = await env.AI.run(model as BaseAiTextGenerationModels, {
+    const result = await env.AI.run(model, {
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Write step ${stepIndex + 1} ("${outline[stepIndex]}") of the ${lessonType} whiteboard lesson about "${topic}" for ${subject}.` },
+        { role: 'user', content: formatUntrustedAiData('Whiteboard step context', {
+          topic, subject, examType, lessonType, outline, stepIndex,
+        }) },
       ],
       max_tokens: 1200,
       temperature: 0.7,
@@ -2477,8 +2473,7 @@ revisionClassroomApp.post('/lessons/:lessonId/whiteboard-teach', async (c) => {
     });
   } catch (error) {
     console.error('Error generating whiteboard content:', error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    return c.json({ success: false, error: `Failed to generate whiteboard content: ${errorMessage}` }, 500);
+    return c.json({ success: false, error: 'Failed to generate whiteboard content' }, 500);
   }
 });
 

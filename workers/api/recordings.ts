@@ -137,7 +137,7 @@ recordingsApp.get('/public/:shareToken', async (c) => {
     }
 
     // Check view limit
-    if (share.max_views && (share.current_views as number) >= share.max_views) {
+    if (share.max_views && (share.current_views as number) >= (share.max_views as number)) {
       return c.json({ success: false, error: 'Share link view limit reached' }, 410);
     }
 

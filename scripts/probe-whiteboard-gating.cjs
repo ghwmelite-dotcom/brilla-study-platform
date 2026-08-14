@@ -26,9 +26,23 @@ const puppeteer = require('puppeteer-core');
 
 const API = 'https://brilla-api.ghwmelite.workers.dev/api';
 
+function requiredEnv(name) {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value;
+}
+
 const ACCOUNTS = {
-  johndoe: { email: 'johndoe@gmail.com', password: 'Student123!' },
-  admin: { email: 'admintest@brillaprep.org', password: 'Admin123!' },
+  johndoe: {
+    email: requiredEnv('BRILLA_E2E_STUDENT_EMAIL'),
+    password: requiredEnv('BRILLA_E2E_STUDENT_PASSWORD'),
+  },
+  admin: {
+    email: requiredEnv('BRILLA_E2E_ADMIN_EMAIL'),
+    password: requiredEnv('BRILLA_E2E_ADMIN_PASSWORD'),
+  },
 };
 
 let failures = 0;

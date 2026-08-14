@@ -1,7 +1,9 @@
 import { Hono } from 'hono';
 import { Env } from './index';
 import { requireAuth } from './auth-middleware';
-import { getChatModel } from './ai-models';
+import { getChatModel, unwrapAiText } from './ai-models';
+import { formatUntrustedAiData, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
+import { hashRoomPassword, verifyRoomPassword } from './room-access';
 
 // Identity shape read by the routes below. requireAuth sets `user` to the JWT
 // payload keyed by userId; the adapter middleware re-adds the legacy `id` key.
@@ -125,14 +127,19 @@ studyRoomsApp.post('/', async (c) => {
     const sessionId = crypto.randomUUID();
     const roomCode = body.roomCode || generateRoomCode();
     const participantColor = getRandomColor();
+    const password = typeof body.password === 'string' ? body.password : '';
+    if (password && (password.length < 8 || password.length > 128)) {
+      return c.json({ success: false, error: 'Room password must be between 8 and 128 characters' }, 400);
+    }
+    const passwordHash = password ? await hashRoomPassword(password) : null;
 
     // Create session
     await c.env.DB.prepare(`
       INSERT INTO study_sessions (
         id, owner_id, room_code, title, description, subject_id, topic_id,
         exam_type, max_participants, voice_enabled, whiteboard_enabled,
-        ai_tutor_enabled, recording_enabled, is_public, status, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'waiting', datetime('now'))
+        ai_tutor_enabled, recording_enabled, is_public, password_hash, status, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'waiting', datetime('now'))
     `).bind(
       sessionId,
       user.id,
@@ -147,7 +154,8 @@ studyRoomsApp.post('/', async (c) => {
       body.whiteboardEnabled !== false ? 1 : 0,
       body.aiEnabled !== false ? 1 : 0,
       body.recordingEnabled ? 1 : 0,
-      body.isPublic !== false ? 1 : 0
+      body.isPublic !== false ? 1 : 0,
+      passwordHash
     ).run();
 
     // Add creator as host participant
@@ -209,6 +217,7 @@ studyRoomsApp.post('/:roomCode/join', async (c) => {
   const roomCode = c.req.param('roomCode').toUpperCase();
 
   try {
+    const body = await c.req.json<{ password?: string }>();
     // Find session
     const session = await c.env.DB.prepare(`
       SELECT
@@ -228,6 +237,13 @@ studyRoomsApp.post('/:roomCode/join', async (c) => {
 
     if ((session as any).status === 'ended') {
       return c.json({ success: false, error: 'This session has ended' }, 400);
+    }
+
+    if ((session as any).password_hash) {
+      const suppliedPassword = typeof body.password === 'string' ? body.password : '';
+      if (!await verifyRoomPassword(suppliedPassword, (session as any).password_hash as string)) {
+        return c.json({ success: false, error: 'Invalid room password' }, 403);
+      }
     }
 
     if ((session as any).participant_count >= ((session as any).max_participants || 5)) {
@@ -418,8 +434,11 @@ studyRoomsApp.post('/:roomCode/messages', async (c) => {
 
     // Find session
     const session = await c.env.DB.prepare(`
-      SELECT id FROM study_sessions WHERE room_code = ?
-    `).bind(roomCode).first();
+      SELECT ss.id FROM study_sessions ss
+      JOIN study_session_participants ssp
+        ON ssp.session_id = ss.id AND ssp.user_id = ? AND ssp.is_active = 1
+      WHERE ss.room_code = ?
+    `).bind(user.id, roomCode).first();
 
     if (!session) {
       return c.json({ success: false, error: 'Room not found' }, 404);
@@ -456,9 +475,12 @@ studyRoomsApp.post('/:roomCode/ask-ai', async (c) => {
 
     // Find session
     const session = await c.env.DB.prepare(`
-      SELECT id, subject_id, topic_id, exam_type, ai_tutor_enabled
-      FROM study_sessions WHERE room_code = ?
-    `).bind(roomCode).first();
+      SELECT ss.id, ss.subject_id, ss.topic_id, ss.exam_type, ss.ai_tutor_enabled
+      FROM study_sessions ss
+      JOIN study_session_participants ssp
+        ON ssp.session_id = ss.id AND ssp.user_id = ? AND ssp.is_active = 1
+      WHERE ss.room_code = ?
+    `).bind(user.id, roomCode).first();
 
     if (!session) {
       return c.json({ success: false, error: 'Room not found' }, 404);
@@ -489,23 +511,20 @@ studyRoomsApp.post('/:roomCode/ask-ai', async (c) => {
     context += `Exam: ${(session as any).exam_type || 'General'}`;
 
     // Generate AI response
-    const prompt = `You are Brilla AI, a helpful study tutor for Ghanaian students. You are helping in a collaborative study room.
+    const prompt = formatUntrustedAiData('Study room question context', {
+      context,
+      question: String(body.question || '').slice(0, 4000),
+    });
 
-Context: ${context}
-
-Student's question: ${body.question}
-
-Provide a clear, educational response. Be encouraging and helpful. If the question is about a specific concept, explain it step by step. Keep your response concise but comprehensive.`;
-
-    const aiResponse = await c.env.AI.run(getChatModel(c.env) as BaseAiTextGenerationModels, {
+    const aiResponse = await c.env.AI.run(getChatModel(c.env), {
       messages: [
-        { role: 'system', content: 'You are Brilla AI, a helpful and encouraging study tutor.' },
+        { role: 'system', content: `You are Brilla AI, a helpful and encouraging study tutor. Provide a clear, concise, step-by-step educational response when appropriate. ${UNTRUSTED_AI_DATA_INSTRUCTION}` },
         { role: 'user', content: prompt }
       ],
       max_tokens: 500,
     });
 
-    const response = (aiResponse as any).response || 'I apologize, but I could not generate a response. Please try again.';
+    const response = unwrapAiText(aiResponse) || 'I apologize, but I could not generate a response. Please try again.';
 
     // Save the interaction
     await c.env.DB.prepare(`
@@ -534,8 +553,11 @@ studyRoomsApp.get('/:roomCode/updates', async (c) => {
   try {
     // Find session
     const session = await c.env.DB.prepare(`
-      SELECT id, status FROM study_sessions WHERE room_code = ?
-    `).bind(roomCode).first();
+      SELECT ss.id, ss.status FROM study_sessions ss
+      JOIN study_session_participants ssp
+        ON ssp.session_id = ss.id AND ssp.user_id = ? AND ssp.is_active = 1
+      WHERE ss.room_code = ?
+    `).bind(user.id, roomCode).first();
 
     if (!session) {
       return c.json({ success: false, error: 'Room not found' }, 404);
@@ -632,8 +654,11 @@ studyRoomsApp.post('/:roomCode/drawing', async (c) => {
 
     // Find session
     const session = await c.env.DB.prepare(`
-      SELECT id FROM study_sessions WHERE room_code = ?
-    `).bind(roomCode).first();
+      SELECT ss.id FROM study_sessions ss
+      JOIN study_session_participants ssp
+        ON ssp.session_id = ss.id AND ssp.user_id = ? AND ssp.is_active = 1
+      WHERE ss.room_code = ?
+    `).bind(user.id, roomCode).first();
 
     if (!session) {
       return c.json({ success: false, error: 'Room not found' }, 404);

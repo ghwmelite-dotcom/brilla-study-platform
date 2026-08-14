@@ -740,7 +740,7 @@ teacherBonusesRouter.post('/admin/:id/payout', adminMiddleware, async (c) => {
     `).bind(
       payoutId,
       affiliateProfileId || bonus.teacher_id,
-      bonus.bonus_amount * 100, // Convert to pesewas
+      (bonus.bonus_amount as number) * 100, // Convert to pesewas
       bonus.mobile_money_number,
       bonus.mobile_money_provider || 'mtn',
       `Year-end bonus for ${bonus.year}`

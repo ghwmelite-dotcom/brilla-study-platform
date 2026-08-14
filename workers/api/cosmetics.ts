@@ -53,7 +53,7 @@ cosmeticsApp.get('/available', async (c) => {
     // Get user's level and achievements for unlock checking
     const userData = await c.env.DB.prepare(
       'SELECT level, xp_points FROM users WHERE id = ?'
-    ).bind(user.userId).first();
+    ).bind(user.userId).first<{ level: number; xp_points: number }>();
 
     return c.json({
       success: true,

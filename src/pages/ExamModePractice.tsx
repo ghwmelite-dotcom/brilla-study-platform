@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import type { ComponentProps } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { ExamLayout, ExamQuestionCard } from '@/components/exam';
@@ -419,7 +420,7 @@ export default function ExamModePractice() {
       <ExamQuestionCard
         questionNumber={currentIndex + 1}
         questionText={currentQuestion.questionText}
-        questionType={currentQuestion.questionType as any}
+        questionType={currentQuestion.questionType as ComponentProps<typeof ExamQuestionCard>['questionType']}
         options={currentQuestion.options?.map((opt, i) => ({
           id: `opt_${i}`,
           text: typeof opt === 'string' ? opt : opt.text,
