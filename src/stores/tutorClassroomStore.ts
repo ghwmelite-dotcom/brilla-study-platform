@@ -106,11 +106,11 @@ export interface TutorClassroomEvent {
   tutorId?: string;
   studentId?: string;
   eventType: string;
-  eventData?: any;
+  eventData?: unknown;
   content?: string;
   contentType?: string;
   annotationType?: AnnotationType;
-  annotationData?: any;
+  annotationData?: unknown;
   annotationColor?: string;
   isVisibleToStudent: boolean;
   createdAt: string;
@@ -266,7 +266,7 @@ interface TutorClassroomState {
 
   // Actions - Co-Teaching
   sendMessage: (sessionId: string, content: string, isVisibleToStudent?: boolean) => Promise<void>;
-  addAnnotation: (sessionId: string, annotation: any) => Promise<void>;
+  addAnnotation: (sessionId: string, annotation: Record<string, unknown>) => Promise<void>;
   guideAI: (sessionId: string, guidance: string) => Promise<void>;
   changeMode: (sessionId: string, mode: TutorMode) => Promise<void>;
   leaveSession: (sessionId: string) => Promise<void>;
@@ -278,7 +278,7 @@ interface TutorClassroomState {
   cancelScheduledSession: (sessionId: string) => Promise<void>;
   startLiveSession: (sessionId: string) => Promise<void>;
   joinLiveSession: (roomCode: string) => Promise<ScheduledSession>;
-  requestAIAssist: (sessionId: string, requestType: string, context?: any) => Promise<string>;
+  requestAIAssist: (sessionId: string, requestType: string, context?: Record<string, unknown>) => Promise<string>;
   endLiveSession: (sessionId: string, summary?: string) => Promise<void>;
 
   // Actions - Polling Management
@@ -289,6 +289,9 @@ interface TutorClassroomState {
   clearError: () => void;
   reset: () => void;
 }
+
+const getErrorMessage = (error: unknown, fallback: string): string =>
+  error instanceof Error && error.message ? error.message : fallback;
 
 const POLLING_INTERVAL = 3000; // 3 seconds
 
@@ -328,9 +331,9 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
           if (response.data?.availability) {
             set({ availability: response.data.availability });
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to fetch availability:', error);
-          set({ error: error.message || 'Failed to fetch availability' });
+          set({ error: getErrorMessage(error, 'Failed to fetch availability') });
         }
       },
 
@@ -342,10 +345,10 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
             availability: response.data?.availability || null,
             isUpdatingAvailability: false
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to update availability:', error);
           set({
-            error: error.message || 'Failed to update availability',
+            error: getErrorMessage(error, 'Failed to update availability'),
             isUpdatingAvailability: false
           });
         }
@@ -377,10 +380,10 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
             observableSessions: response.data?.sessions || [],
             isLoadingObservable: false
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to fetch observable sessions:', error);
           set({
-            error: error.message || 'Failed to fetch sessions',
+            error: getErrorMessage(error, 'Failed to fetch sessions'),
             isLoadingObservable: false
           });
         }
@@ -402,9 +405,9 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
           observedSessionEvents.set(sessionId, response.data?.recentEvents || []);
 
           set({ observations, observedSessionDetails, observedSessionEvents });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to start observing:', error);
-          set({ error: error.message || 'Failed to start observation' });
+          set({ error: getErrorMessage(error, 'Failed to start observation') });
         }
       },
 
@@ -418,7 +421,7 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
           observedSessionEvents.delete(sessionId);
 
           set({ observations, observedSessionDetails, observedSessionEvents });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to stop observing:', error);
         }
       },
@@ -471,10 +474,10 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
             pendingHandoffs: response.data?.requests || [],
             isLoadingHandoffs: false
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to fetch handoffs:', error);
           set({
-            error: error.message || 'Failed to fetch handoff requests',
+            error: getErrorMessage(error, 'Failed to fetch handoff requests'),
             isLoadingHandoffs: false
           });
         }
@@ -502,9 +505,9 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
               lastStudentResponse: response.data?.session?.lastStudentResponse,
             }
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to accept handoff:', error);
-          set({ error: error.message || 'Failed to accept handoff' });
+          set({ error: getErrorMessage(error, 'Failed to accept handoff') });
         }
       },
 
@@ -515,7 +518,7 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
           set({
             pendingHandoffs: pendingHandoffs.filter(h => h.sessionId !== sessionId)
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to decline handoff:', error);
         }
       },
@@ -542,9 +545,9 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
 
             set({ observedSessionEvents });
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to send message:', error);
-          set({ error: error.message || 'Failed to send message' });
+          set({ error: getErrorMessage(error, 'Failed to send message') });
         }
       },
 
@@ -560,18 +563,18 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
             observedSessionEvents.set(sessionId, events);
             set({ observedSessionEvents });
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to add annotation:', error);
-          set({ error: error.message || 'Failed to add annotation' });
+          set({ error: getErrorMessage(error, 'Failed to add annotation') });
         }
       },
 
       guideAI: async (sessionId, guidance) => {
         try {
           await api.post(`/tutor-classroom/ai-sessions/${sessionId}/guide-ai`, { guidance });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to guide AI:', error);
-          set({ error: error.message || 'Failed to guide AI' });
+          set({ error: getErrorMessage(error, 'Failed to guide AI') });
         }
       },
 
@@ -583,9 +586,9 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
           if (coTeachSession?.sessionId === sessionId) {
             set({ coTeachSession: { ...coTeachSession, tutorMode: mode } });
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to change mode:', error);
-          set({ error: error.message || 'Failed to change mode' });
+          set({ error: getErrorMessage(error, 'Failed to change mode') });
         }
       },
 
@@ -597,7 +600,7 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
           if (coTeachSession?.sessionId === sessionId) {
             set({ coTeachSession: null });
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to leave session:', error);
         }
       },
@@ -611,10 +614,10 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
             scheduledSessions: response.data?.sessions || [],
             isLoadingScheduled: false
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to fetch scheduled sessions:', error);
           set({
-            error: error.message || 'Failed to fetch scheduled sessions',
+            error: getErrorMessage(error, 'Failed to fetch scheduled sessions'),
             isLoadingScheduled: false
           });
         }
@@ -626,9 +629,9 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
           const { scheduledSessions } = get();
           set({ scheduledSessions: [...scheduledSessions, response.data?.session] });
           return response.data?.session;
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to create scheduled session:', error);
-          set({ error: error.message || 'Failed to create session' });
+          set({ error: getErrorMessage(error, 'Failed to create session') });
           throw error;
         }
       },
@@ -642,9 +645,9 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
               s.id === sessionId ? response.data?.session : s
             )
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to update session:', error);
-          set({ error: error.message || 'Failed to update session' });
+          set({ error: getErrorMessage(error, 'Failed to update session') });
         }
       },
 
@@ -655,9 +658,9 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
           set({
             scheduledSessions: scheduledSessions.filter(s => s.id !== sessionId)
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to cancel session:', error);
-          set({ error: error.message || 'Failed to cancel session' });
+          set({ error: getErrorMessage(error, 'Failed to cancel session') });
         }
       },
 
@@ -673,9 +676,9 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
               s.id === sessionId ? updatedSession : s
             )
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to start session:', error);
-          set({ error: error.message || 'Failed to start session' });
+          set({ error: getErrorMessage(error, 'Failed to start session') });
         }
       },
 
@@ -684,9 +687,9 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
           const response = await api.post<ApiData>('/tutor-classroom/scheduled-sessions/join', { roomCode });
           set({ activeLiveSession: response.data?.session });
           return response.data?.session;
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to join session:', error);
-          set({ error: error.message || 'Failed to join session' });
+          set({ error: getErrorMessage(error, 'Failed to join session') });
           throw error;
         }
       },
@@ -698,9 +701,9 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
             context,
           });
           return response.data?.aiResponse;
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to get AI assist:', error);
-          set({ error: error.message || 'Failed to get AI assistance' });
+          set({ error: getErrorMessage(error, 'Failed to get AI assistance') });
           throw error;
         }
       },
@@ -716,9 +719,9 @@ export const useTutorClassroomStore = create<TutorClassroomState>()(
               s.id === sessionId ? response.data?.session : s
             )
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to end session:', error);
-          set({ error: error.message || 'Failed to end session' });
+          set({ error: getErrorMessage(error, 'Failed to end session') });
         }
       },
 

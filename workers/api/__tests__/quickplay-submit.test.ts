@@ -19,7 +19,7 @@ async function token(payload: object) {
 }
 
 const authHandler: MockHandler = {
-  match: /SELECT role, status, is_active FROM users/,
+  match: /SELECT role, status, is_active, session_version FROM users/,
   first: () => ({ role: 'student', status: 'approved', is_active: 1 }),
 };
 

@@ -504,6 +504,7 @@ CREATE TABLE IF NOT EXISTS users (
     -- Account status
     is_active INTEGER DEFAULT 1,
     last_login_at TEXT,
+    session_version INTEGER NOT NULL DEFAULT 0,
     created_by TEXT REFERENCES users(id),
     approved_by TEXT REFERENCES users(id),
     approved_at TEXT,
@@ -1289,6 +1290,7 @@ CREATE TABLE IF NOT EXISTS wellbeing_alerts (
     student_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     alert_type TEXT NOT NULL CHECK (alert_type IN ('stress', 'mood_decline', 'inactivity', 'concerning_content', 'academic_struggle')),
     severity TEXT NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'urgent')),
+    title TEXT,
     description TEXT NOT NULL,
     triggered_by TEXT, -- What triggered the alert (e.g., 'conversation_analysis', 'wellbeing_log', 'pattern_detection')
     source_id TEXT, -- Reference to the source (conversation_id, wellbeing_log_id, etc.)
@@ -2599,10 +2601,23 @@ CREATE TABLE IF NOT EXISTS affiliate_payouts (
   paystack_transfer_code TEXT,
   paystack_recipient_code TEXT,
   failure_reason TEXT,
+  refund_applied_at TEXT,
   requested_at TEXT DEFAULT (datetime('now')),
   processed_at TEXT,
   admin_notes TEXT
 );
+
+-- Source: migrations/096_atomic_failed_transfer_refunds.sql
+CREATE TABLE IF NOT EXISTS payment_webhook_receipts (
+  id TEXT PRIMARY KEY,
+  event_type TEXT NOT NULL,
+  event_key TEXT NOT NULL UNIQUE,
+  transfer_code TEXT,
+  processed_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_payment_webhook_receipts_transfer
+ON payment_webhook_receipts(transfer_code, event_type);
 
 -- Source: migrations/021_subscription_affiliate_system.sql
 CREATE TABLE IF NOT EXISTS affiliate_clicks (
@@ -4415,6 +4430,7 @@ CREATE INDEX IF NOT EXISTS idx_parent_links_student ON parent_student_links(stud
 CREATE INDEX IF NOT EXISTS idx_parent_links_code ON parent_student_links(invite_code);
 CREATE INDEX IF NOT EXISTS idx_parent_links_status ON parent_student_links(status);
 CREATE INDEX IF NOT EXISTS idx_parent_links_active ON parent_student_links(status, student_opted_out);
+CREATE INDEX IF NOT EXISTS idx_parent_links_access ON parent_student_links(parent_id, student_id, status, student_opted_out);
 CREATE INDEX IF NOT EXISTS idx_parent_notifications_parent ON parent_notifications(parent_id);
 CREATE INDEX IF NOT EXISTS idx_parent_notifications_student ON parent_notifications(student_id);
 CREATE INDEX IF NOT EXISTS idx_parent_notifications_unread ON parent_notifications(parent_id, is_read);
@@ -4583,6 +4599,7 @@ CREATE INDEX IF NOT EXISTS idx_chat_student_mods_room ON chat_student_moderators
 CREATE INDEX IF NOT EXISTS idx_class_members_class ON class_members(class_id);
 CREATE INDEX IF NOT EXISTS idx_class_members_student ON class_members(student_id);
 CREATE INDEX IF NOT EXISTS idx_class_members_active ON class_members(class_id, is_active);
+CREATE INDEX IF NOT EXISTS idx_class_members_student_active ON class_members(student_id, is_active, class_id);
 CREATE INDEX IF NOT EXISTS idx_assessment_assignments_assessment ON assessment_assignments(assessment_id);
 CREATE INDEX IF NOT EXISTS idx_assessment_assignments_student ON assessment_assignments(student_id);
 CREATE INDEX IF NOT EXISTS idx_assessment_assignments_class ON assessment_assignments(class_id);
@@ -4648,6 +4665,8 @@ CREATE INDEX IF NOT EXISTS idx_affiliate_referrals_referred ON affiliate_referra
 CREATE INDEX IF NOT EXISTS idx_affiliate_referrals_status ON affiliate_referrals(status);
 CREATE INDEX IF NOT EXISTS idx_affiliate_payouts_affiliate ON affiliate_payouts(affiliate_id);
 CREATE INDEX IF NOT EXISTS idx_affiliate_payouts_status ON affiliate_payouts(status);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_affiliate_payouts_transfer_code
+ON affiliate_payouts(paystack_transfer_code) WHERE paystack_transfer_code IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_affiliate_clicks_affiliate ON affiliate_clicks(affiliate_id);
 CREATE INDEX IF NOT EXISTS idx_affiliate_clicks_date ON affiliate_clicks(clicked_at);
 CREATE INDEX IF NOT EXISTS idx_affiliate_leaderboard_period ON affiliate_leaderboard(period, period_value);

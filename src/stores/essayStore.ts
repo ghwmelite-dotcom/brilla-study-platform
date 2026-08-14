@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { EssayQuestion, EssayAttempt, AIEssayFeedback } from '@/types';
 import { getAuthHeaders, fetchWithAuth } from '@/lib/api';
+import { richTextToPlainText } from '@/utils/richText';
 
 interface EssayState {
   // Current essay session
@@ -94,7 +95,7 @@ export const useEssayStore = create<EssayState>((set, get) => ({
         headers: getAuthHeaders(),
         body: JSON.stringify({
           questionId,
-          answerText,
+          answerText: richTextToPlainText(answerText),
         }),
       });
 

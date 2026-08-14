@@ -1,5 +1,9 @@
 import { useEffect, useRef } from 'react';
 
+type AudioContextWindow = Window & typeof globalThis & {
+  webkitAudioContext?: typeof AudioContext;
+};
+
 interface AmbientSoundsProps {
   sound: 'none' | 'rain' | 'library' | 'lofi';
   volume: number;
@@ -47,7 +51,9 @@ export function AmbientSounds({ sound, volume }: AmbientSoundsProps) {
     // Set up Web Audio API for smooth volume control
     if (!audioContextRef.current) {
       try {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const AudioContextConstructor = window.AudioContext || (window as AudioContextWindow).webkitAudioContext;
+        if (!AudioContextConstructor) return;
+        audioContextRef.current = new AudioContextConstructor();
         const source = audioContextRef.current.createMediaElementSource(audio);
         gainNodeRef.current = audioContextRef.current.createGain();
         source.connect(gainNodeRef.current);

@@ -6,7 +6,7 @@ type Query = { sql: string; params: unknown[] };
 
 // Row returned for the requireAdmin per-request users lookup.
 const ADMIN_ROW = { role: 'admin', status: 'approved', is_active: 1 };
-const isAuthLookup = (sql: string) => sql.includes('role, status, is_active FROM users');
+const isAuthLookup = (sql: string) => sql.includes('role, status, is_active, session_version FROM users');
 
 const USER_ROW = {
   id: 'user_1',

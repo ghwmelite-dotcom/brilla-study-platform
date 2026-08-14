@@ -25,7 +25,7 @@ async function authToken(): Promise<string> {
 }
 
 const authHandler: MockHandler = {
-  match: /SELECT role, status, is_active FROM users/,
+  match: /SELECT role, status, is_active, session_version FROM users/,
   first: () => ({ role: 'student', status: 'approved', is_active: 1 }),
 };
 
@@ -221,7 +221,7 @@ describe('Counselor Brie route contracts', () => {
 
   it('rejects non-student roles before any guidance data access', async () => {
     const db = createMockD1([{
-      match: /SELECT role, status, is_active FROM users/,
+      match: /SELECT role, status, is_active, session_version FROM users/,
       first: () => ({ role: 'parent', status: 'approved', is_active: 1 }),
     }]);
     const response = await guidanceRequest(db, '/goals');

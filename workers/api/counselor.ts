@@ -1,8 +1,19 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
-import { getDemoDataFlags, isDemoUserId } from './demoUtils';
 import { requireAuth } from './auth-middleware';
 import { checkRateLimit } from './rate-limit';
+import { parseCounselorReportContent } from './counselor-report-schema';
+import { formatUntrustedAiData, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
+import {
+  FAMILY_STAFF_ACCESS,
+  PARENT_ADMIN_ACCESS,
+  PARENT_ONLY_ACCESS,
+  REPORT_ACCESS,
+  STAFF_ACCESS,
+  buildStudentAccessPredicate,
+  hasStudentAccess,
+  isRoleAllowed,
+} from './counselor-authorization';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -15,7 +26,6 @@ interface Env {
 type CounselorType = 'academic' | 'career' | 'wellbeing' | 'general';
 type MessageRole = 'user' | 'counselor' | 'system';
 type Sentiment = 'positive' | 'neutral' | 'concerned' | 'urgent';
-type ReportType = 'weekly_summary' | 'monthly_progress' | 'incident_report' | 'milestone_achievement' | 'intervention_needed';
 
 interface StudentContext {
   name: string;
@@ -57,8 +67,7 @@ Guidelines:
 - Suggest using platform features (practice quizzes, past papers, study groups)
 - If a student expresses severe distress, gently recommend speaking with a trusted adult
 
-Student Context:
-{studentContext}`,
+${UNTRUSTED_AI_DATA_INSTRUCTION}`,
 
   career: `You are a career guidance counselor for Brilla Study Platform, helping Ghanaian JHS and SHS students explore future opportunities.
 
@@ -77,8 +86,7 @@ Guidelines:
 - Provide specific, actionable next steps for career exploration
 - Consider the Ghanaian job market and emerging industries
 
-Student Context:
-{studentContext}`,
+${UNTRUSTED_AI_DATA_INSTRUCTION}`,
 
   wellbeing: `You are a supportive wellness counselor for Brilla Study Platform, focused on the mental health and emotional wellbeing of Ghanaian secondary school students.
 
@@ -99,8 +107,7 @@ Guidelines:
 
 IMPORTANT: If a student mentions self-harm, abuse, or thoughts of hurting themselves or others, immediately and compassionately encourage them to speak with a trusted adult and provide information about support resources.
 
-Student Context:
-{studentContext}`,
+${UNTRUSTED_AI_DATA_INSTRUCTION}`,
 
   general: `You are a friendly school counselor for Brilla Study Platform, ready to help Ghanaian secondary school students with any questions or concerns.
 
@@ -119,8 +126,7 @@ Guidelines:
 - Use encouraging language that builds confidence
 - Know when to recommend speaking with teachers, parents, or professionals
 
-Student Context:
-{studentContext}`,
+${UNTRUSTED_AI_DATA_INSTRUCTION}`,
 };
 
 // Counselor routes
@@ -152,24 +158,16 @@ async function getCounselorResponse(
     throw new Error('ANTHROPIC_API_KEY not configured');
   }
 
-  // Build system prompt with student context
-  const contextString = `
-Name: ${studentContext.name}
-Grade: ${studentContext.gradeLevel || 'Not specified'}
-School Level: ${studentContext.schoolLevel || 'Not specified'}
-Subjects: ${studentContext.subjects?.join(', ') || 'Not specified'}
-Recent Performance: ${studentContext.recentPerformance ? `${studentContext.recentPerformance.accuracy}% accuracy, ${studentContext.recentPerformance.trend}` : 'No recent data'}
-Current Streak: ${studentContext.streakDays ?? 0} days
-Study Hours This Week: ${studentContext.studyHoursThisWeek ?? 0} hours
-Goals: ${studentContext.goals?.join(', ') || 'No goals set'}`;
+  const systemPrompt = COUNSELOR_PROMPTS[counselorType];
 
-  const systemPrompt = COUNSELOR_PROMPTS[counselorType].replace('{studentContext}', contextString);
-
-  // Build messages for Claude
-  const messages = conversationHistory.map(msg => ({
-    role: msg.role === 'counselor' ? 'assistant' as const : 'user' as const,
-    content: msg.content,
-  }));
+  // Keep profile fields out of the privileged system prompt. They are data, not instructions.
+  const messages: Array<{ role: 'user' | 'assistant'; content: string }> = [
+    { role: 'user', content: formatUntrustedAiData('Student profile', studentContext) },
+    ...conversationHistory.map(msg => ({
+      role: msg.role === 'counselor' ? 'assistant' as const : 'user' as const,
+      content: msg.content,
+    })),
+  ];
 
   messages.push({ role: 'user', content: message });
 
@@ -190,8 +188,7 @@ Goals: ${studentContext.goals?.join(', ') || 'No goals set'}`;
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Claude API error:', errorText);
+      console.error(`Claude API request failed with status ${response.status}`);
       throw new Error(`Claude API error: ${response.status}`);
     }
 
@@ -209,7 +206,7 @@ Goals: ${studentContext.goals?.join(', ') || 'No goals set'}`;
 
     return { content, sentiment, resources };
   } catch (error) {
-    console.error('Error calling Claude API:', error);
+    console.error('Claude API request failed');
     throw error;
   }
 }
@@ -568,8 +565,8 @@ counselorApp.post('/chat', async (c) => {
         studentContext,
         conversation.counselor_type as CounselorType
       );
-    } catch (error) {
-      console.error('AI response error:', error);
+    } catch {
+      console.error('Counselor AI response generation failed');
       // Fallback response
       aiResponse = {
         content: "I'm sorry, I'm having trouble responding right now. Please try again in a moment, or if this continues, let a teacher or parent know.",
@@ -611,7 +608,7 @@ counselorApp.post('/chat', async (c) => {
 
       // Create wellbeing alert
       await c.env.DB.prepare(`
-        INSERT INTO wellbeing_alerts (id, student_id, alert_type, severity, title, description, trigger_source, created_at)
+        INSERT INTO wellbeing_alerts (id, student_id, alert_type, severity, title, description, triggered_by, created_at)
         VALUES (?, ?, 'emotional_concern', 'high', 'Urgent Support Needed', ?, 'counselor_chat', datetime('now'))
       `).bind(
         `alert_${Date.now()}`,
@@ -718,7 +715,7 @@ counselorApp.post('/wellbeing/log', async (c) => {
     if (stressLevel && stressLevel >= 4) {
       try {
         await c.env.DB.prepare(`
-          INSERT INTO wellbeing_alerts (id, student_id, alert_type, severity, title, description, trigger_source, created_at)
+          INSERT INTO wellbeing_alerts (id, student_id, alert_type, severity, title, description, triggered_by, created_at)
           VALUES (?, ?, 'stress_indicator', ?, 'High Stress Level Reported', ?, 'wellbeing_checkin', datetime('now'))
         `).bind(
           `alert_${Date.now()}`,
@@ -802,6 +799,10 @@ counselorApp.post('/reports/generate', async (c) => {
 
     if (!studentId) {
       return c.json({ success: false, error: 'Student ID is required' }, 400);
+    }
+
+    if (!await hasStudentAccess(c.env.DB, userRole, userId, studentId, STAFF_ACCESS)) {
+      return c.json({ success: false, error: 'Student not found' }, 404);
     }
 
     // Get student info
@@ -941,26 +942,9 @@ async function generateReportWithClaude(
     throw new Error('ANTHROPIC_API_KEY not configured. AI-generated reports require a valid API key.');
   }
 
-  const prompt = `Generate a comprehensive counselor report for a student. Use the data provided to create insightful observations and recommendations.
+  const prompt = `${formatUntrustedAiData('Student report data', data)}
 
-Student: ${data.studentName}
-School Level: ${data.schoolLevel || 'Not specified'}
-Year Group: ${data.yearGroup || 'Not specified'}
-Report Period: ${data.dateRange.start} to ${data.dateRange.end}
-
-Academic Data:
-- Total practice attempts: ${data.performance.totalAttempts}
-- Average accuracy: ${data.performance.accuracy}%
-- Current study streak: ${data.streak.current} days
-- Longest streak: ${data.streak.longest} days
-
-Wellbeing Data:
-- Average stress level: ${data.wellbeing.avgStress ?? 'No data'}/5
-- Average study satisfaction: ${data.wellbeing.avgSatisfaction ?? 'No data'}/5
-- Counselor sessions this period: ${data.sessions.count}
-- Session types: ${data.sessions.types.join(', ') || 'None'}
-
-Please provide a JSON response with the following structure:
+Analyze the supplied data and return a JSON response with this structure:
 {
   "summary": "A 2-3 sentence overall summary",
   "academicPerformance": {
@@ -982,7 +966,7 @@ Please provide a JSON response with the following structure:
   "goals": [
     {"goal": "text", "targetDate": "${new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0]}", "status": "suggested", "milestones": ["milestone1"]}
   ],
-  "concernLevel": "none|low|moderate|high"
+  "concernLevel": "none|low|medium|high|urgent"
 }`;
 
   try {
@@ -996,14 +980,14 @@ Please provide a JSON response with the following structure:
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 2048,
+        system: `You generate evidence-grounded counselor reports for Brilla. Do not infer sensitive facts that are not present in the supplied data. ${UNTRUSTED_AI_DATA_INSTRUCTION}`,
         messages: [{ role: 'user', content: prompt }],
       }),
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Claude API error for report generation:', errorText);
-      throw new Error(`Claude API error: ${response.status} - Failed to generate AI report`);
+      await response.text();
+      throw new Error(`Claude API error: ${response.status}`);
     }
 
     const result = await response.json() as {
@@ -1015,12 +999,13 @@ Please provide a JSON response with the following structure:
     // Extract JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+      const parsed = parseCounselorReportContent(JSON.parse(jsonMatch[0]));
+      if (parsed) return parsed;
     }
 
-    throw new Error('Failed to parse AI response - invalid JSON format');
+    throw new Error('Failed to parse AI response');
   } catch (error) {
-    console.error('Error generating report with Claude:', error);
+    console.error('Counselor report generation failed');
     throw error;
   }
 }
@@ -1035,49 +1020,31 @@ counselorApp.get('/reports', async (c) => {
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
-
-    let studentIds: string[] = [];
-
-    if (userRole === 'parent') {
-      // Get linked students
-      const links = await c.env.DB.prepare(`
-        SELECT student_id FROM student_parent_links WHERE parent_id = ? AND status = 'active'
-      `).bind(userId).all();
-      studentIds = links.results.map((l: Record<string, unknown>) => l.student_id as string);
-    } else if (userRole === 'student') {
-      studentIds = [userId];
-    } else if (['admin', 'teacher'].includes(userRole as string)) {
-      // Can view all reports
-      const studentId = c.req.query('studentId');
-      if (studentId) {
-        studentIds = [studentId];
-      }
+    if (!isRoleAllowed(userRole, REPORT_ACCESS)) {
+      return c.json({ success: false, error: 'Permission denied' }, 403);
     }
 
-    if (studentIds.length === 0 && !['admin', 'teacher'].includes(userRole as string)) {
-      return c.json({ success: true, data: [] });
-    }
-
+    const scope = buildStudentAccessPredicate(userRole, userId, 'cr.student_id', REPORT_ACCESS);
+    const requestedStudentId = c.req.query('studentId');
+    const params = [...scope.binds];
     let query = `
       SELECT
         cr.*,
         u.name as student_name,
-        c.name as counselor_name
+        counselor_user.name as counselor_name
       FROM counselor_reports cr
       LEFT JOIN users u ON cr.student_id = u.id
-      LEFT JOIN users c ON cr.counselor_id = c.id
+      LEFT JOIN users counselor_user ON cr.counselor_id = counselor_user.id
+      WHERE ${scope.sql}
     `;
 
-    if (studentIds.length > 0) {
-      query += ` WHERE cr.student_id IN (${studentIds.map(() => '?').join(',')})`;
+    if (requestedStudentId) {
+      query += ' AND cr.student_id = ?';
+      params.push(requestedStudentId);
     }
+    query += ' ORDER BY cr.created_at DESC LIMIT 50';
 
-    query += ` ORDER BY cr.created_at DESC LIMIT 50`;
-
-    const reports = studentIds.length > 0
-      ? await c.env.DB.prepare(query).bind(...studentIds).all()
-      : await c.env.DB.prepare(query).all();
-
+    const reports = await c.env.DB.prepare(query).bind(...params).all();
     return c.json({
       success: true,
       data: reports.results.map((r: Record<string, unknown>) => ({
@@ -1111,34 +1078,24 @@ counselorApp.get('/reports/:id', async (c) => {
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
+    if (!isRoleAllowed(userRole, REPORT_ACCESS)) {
+      return c.json({ success: false, error: 'Permission denied' }, 403);
+    }
 
+    const scope = buildStudentAccessPredicate(userRole, userId, 'cr.student_id', REPORT_ACCESS);
     const report = await c.env.DB.prepare(`
       SELECT
         cr.*,
         u.name as student_name,
-        c.name as counselor_name
+        counselor_user.name as counselor_name
       FROM counselor_reports cr
       LEFT JOIN users u ON cr.student_id = u.id
-      LEFT JOIN users c ON cr.counselor_id = c.id
-      WHERE cr.id = ?
-    `).bind(reportId).first();
+      LEFT JOIN users counselor_user ON cr.counselor_id = counselor_user.id
+      WHERE cr.id = ? AND ${scope.sql}
+    `).bind(reportId, ...scope.binds).first();
 
     if (!report) {
       return c.json({ success: false, error: 'Report not found' }, 404);
-    }
-
-    // Verify access
-    if (userRole === 'parent') {
-      const hasAccess = await c.env.DB.prepare(`
-        SELECT 1 FROM student_parent_links
-        WHERE parent_id = ? AND student_id = ? AND status = 'active'
-      `).bind(userId, report.student_id).first();
-
-      if (!hasAccess) {
-        return c.json({ success: false, error: 'Access denied' }, 403);
-      }
-    } else if (userRole === 'student' && report.student_id !== userId) {
-      return c.json({ success: false, error: 'Access denied' }, 403);
     }
 
     return c.json({
@@ -1176,22 +1133,30 @@ counselorApp.post('/reports/:id/read', async (c) => {
   try {
     const reportId = c.req.param('id');
     const userId = getUserId(c);
+    const userRole = getUserRole(c);
 
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
+    if (!isRoleAllowed(userRole, PARENT_ONLY_ACCESS)) {
+      return c.json({ success: false, error: 'Permission denied' }, 403);
+    }
 
-    await c.env.DB.prepare(`
-      UPDATE counselor_reports
+    const scope = buildStudentAccessPredicate(userRole, userId, 'cr.student_id', PARENT_ONLY_ACCESS);
+    const result = await c.env.DB.prepare(`
+      UPDATE counselor_reports AS cr
       SET is_read_by_parent = 1, read_at = datetime('now')
-      WHERE id = ?
-    `).bind(reportId).run();
+      WHERE cr.id = ? AND ${scope.sql}
+    `).bind(reportId, ...scope.binds).run();
 
-    // Log access
+    if (result.meta.changes === 0) {
+      return c.json({ success: false, error: 'Report not found' }, 404);
+    }
+
     await c.env.DB.prepare(`
       INSERT INTO report_access_logs (id, report_id, accessed_by, action, accessed_at)
       VALUES (?, ?, ?, 'read', datetime('now'))
-    `).bind(`log_${Date.now()}`, reportId, userId).run();
+    `).bind(`log_${crypto.randomUUID()}`, reportId, userId).run();
 
     return c.json({ success: true, message: 'Report marked as read' });
   } catch (error) {
@@ -1205,24 +1170,31 @@ counselorApp.post('/reports/:id/feedback', async (c) => {
   try {
     const reportId = c.req.param('id');
     const userId = getUserId(c);
+    const userRole = getUserRole(c);
 
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
+    if (!isRoleAllowed(userRole, PARENT_ONLY_ACCESS)) {
+      return c.json({ success: false, error: 'Permission denied' }, 403);
+    }
 
     const body = await c.req.json();
-    const { feedback } = body;
-
-    if (!feedback?.trim()) {
+    const feedback = typeof body.feedback === 'string' ? body.feedback.trim() : '';
+    if (!feedback) {
       return c.json({ success: false, error: 'Feedback is required' }, 400);
     }
 
-    await c.env.DB.prepare(`
-      UPDATE counselor_reports
+    const scope = buildStudentAccessPredicate(userRole, userId, 'cr.student_id', PARENT_ONLY_ACCESS);
+    const result = await c.env.DB.prepare(`
+      UPDATE counselor_reports AS cr
       SET parent_feedback = ?, updated_at = datetime('now')
-      WHERE id = ?
-    `).bind(feedback.trim(), reportId).run();
+      WHERE cr.id = ? AND ${scope.sql}
+    `).bind(feedback, reportId, ...scope.binds).run();
 
+    if (result.meta.changes === 0) {
+      return c.json({ success: false, error: 'Report not found' }, 404);
+    }
     return c.json({ success: true, message: 'Feedback submitted' });
   } catch (error) {
     console.error('Error submitting feedback:', error);
@@ -1243,38 +1215,26 @@ counselorApp.get('/alerts', async (c) => {
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
-
-    let studentIds: string[] = [];
-
-    if (userRole === 'parent') {
-      const links = await c.env.DB.prepare(`
-        SELECT student_id FROM student_parent_links WHERE parent_id = ? AND status = 'active'
-      `).bind(userId).all();
-      studentIds = links.results.map((l: Record<string, unknown>) => l.student_id as string);
-
-      if (studentIds.length === 0) {
-        return c.json({ success: true, data: [] });
-      }
+    if (!isRoleAllowed(userRole, FAMILY_STAFF_ACCESS)) {
+      return c.json({ success: false, error: 'Permission denied' }, 403);
     }
 
+    const scope = buildStudentAccessPredicate(userRole, userId, 'wa.student_id', FAMILY_STAFF_ACCESS);
+    const requestedStudentId = c.req.query('studentId');
+    const params = [...scope.binds];
     let query = `
-      SELECT
-        wa.*,
-        u.name as student_name
+      SELECT wa.*, u.name as student_name
       FROM wellbeing_alerts wa
       JOIN users u ON wa.student_id = u.id
+      WHERE ${scope.sql}
     `;
-
-    if (studentIds.length > 0) {
-      query += ` WHERE wa.student_id IN (${studentIds.map(() => '?').join(',')})`;
+    if (requestedStudentId) {
+      query += ' AND wa.student_id = ?';
+      params.push(requestedStudentId);
     }
+    query += ' ORDER BY wa.created_at DESC LIMIT 50';
 
-    query += ` ORDER BY wa.created_at DESC LIMIT 50`;
-
-    const alerts = studentIds.length > 0
-      ? await c.env.DB.prepare(query).bind(...studentIds).all()
-      : await c.env.DB.prepare(query).all();
-
+    const alerts = await c.env.DB.prepare(query).bind(...params).all();
     return c.json({
       success: true,
       data: alerts.results.map((a: Record<string, unknown>) => ({
@@ -1283,9 +1243,9 @@ counselorApp.get('/alerts', async (c) => {
         studentName: a.student_name,
         alertType: a.alert_type,
         severity: a.severity,
-        title: a.title,
+        title: a.title || 'Wellbeing alert',
         description: a.description,
-        triggerSource: a.trigger_source,
+        triggerSource: a.triggered_by,
         isResolved: !!a.is_resolved,
         resolvedAt: a.resolved_at,
         resolvedBy: a.resolved_by,
@@ -1309,20 +1269,27 @@ counselorApp.post('/alerts/:id/resolve', async (c) => {
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
-
-    if (!['admin', 'teacher', 'parent'].includes(userRole as string)) {
+    if (!isRoleAllowed(userRole, FAMILY_STAFF_ACCESS)) {
       return c.json({ success: false, error: 'Permission denied' }, 403);
     }
 
     const body = await c.req.json();
-    const { resolutionNotes } = body;
+    const resolutionNotes = typeof body.resolutionNotes === 'string'
+      ? body.resolutionNotes.trim().slice(0, 2000)
+      : null;
+    const scope = buildStudentAccessPredicate(userRole, userId, 'wa.student_id', FAMILY_STAFF_ACCESS);
+    const result = await c.env.DB.prepare(`
+      UPDATE wellbeing_alerts AS wa
+      SET is_resolved = 1,
+          resolved_at = datetime('now'),
+          resolved_by = ?,
+          resolution_notes = ?
+      WHERE wa.id = ? AND ${scope.sql}
+    `).bind(userId, resolutionNotes || null, alertId, ...scope.binds).run();
 
-    await c.env.DB.prepare(`
-      UPDATE wellbeing_alerts
-      SET is_resolved = 1, resolved_at = datetime('now'), resolved_by = ?, resolution_notes = ?
-      WHERE id = ?
-    `).bind(userId, resolutionNotes || null, alertId).run();
-
+    if (result.meta.changes === 0) {
+      return c.json({ success: false, error: 'Alert not found' }, 404);
+    }
     return c.json({ success: true, message: 'Alert resolved' });
   } catch (error) {
     console.error('Error resolving alert:', error);
@@ -1334,60 +1301,19 @@ counselorApp.post('/alerts/:id/resolve', async (c) => {
 // PARENT-STUDENT LINKING
 // =============================================
 
-// Link parent to student
+// Deprecated duplicate parent-link flow. The canonical student-generated invite
+// flow is POST /students/parent-invite followed by POST /parents/link.
 counselorApp.post('/link-student', async (c) => {
-  try {
-    const userId = getUserId(c);
-    const userRole = getUserRole(c);
-
-    if (!userId || userRole !== 'parent') {
-      return c.json({ success: false, error: 'Parent authentication required' }, 401);
-    }
-
-    const body = await c.req.json();
-    const { studentEmail, relationship } = body;
-
-    if (!studentEmail) {
-      return c.json({ success: false, error: 'Student email is required' }, 400);
-    }
-
-    // Find student
-    const student = await c.env.DB.prepare(`
-      SELECT id, name FROM users WHERE email = ? AND role = 'student'
-    `).bind(studentEmail.toLowerCase()).first();
-
-    if (!student) {
-      return c.json({ success: false, error: 'Student not found' }, 404);
-    }
-
-    // Check if already linked
-    const existing = await c.env.DB.prepare(`
-      SELECT id FROM student_parent_links WHERE parent_id = ? AND student_id = ?
-    `).bind(userId, student.id).first();
-
-    if (existing) {
-      return c.json({ success: false, error: 'Already linked to this student' }, 400);
-    }
-
-    // Create link (pending approval)
-    const linkId = `link_${Date.now()}`;
-    await c.env.DB.prepare(`
-      INSERT INTO student_parent_links (id, student_id, parent_id, relationship, status, created_at)
-      VALUES (?, ?, ?, ?, 'pending', datetime('now'))
-    `).bind(linkId, student.id, userId, relationship || 'parent').run();
-
-    return c.json({
-      success: true,
-      data: {
-        linkId,
-        studentName: student.name,
-        status: 'pending',
-      },
-    });
-  } catch (error) {
-    console.error('Error linking student:', error);
-    return c.json({ success: false, error: 'Failed to link student' }, 500);
+  const userId = getUserId(c);
+  const userRole = getUserRole(c);
+  if (!userId || userRole !== 'parent') {
+    return c.json({ success: false, error: 'Parent authentication required' }, 403);
   }
+  return c.json({
+    success: false,
+    error: 'This linking method is no longer available. Ask the student for a parent invite code.',
+    code: 'USE_PARENT_INVITE',
+  }, 410);
 });
 
 // Get linked students (for parent)
@@ -1395,22 +1321,23 @@ counselorApp.get('/linked-students', async (c) => {
   try {
     const userId = getUserId(c);
     const userRole = getUserRole(c);
-
     if (!userId || userRole !== 'parent') {
-      return c.json({ success: false, error: 'Parent authentication required' }, 401);
+      return c.json({ success: false, error: 'Parent authentication required' }, 403);
     }
 
     const links = await c.env.DB.prepare(`
       SELECT
-        spl.*,
+        psl.*,
         u.name as student_name,
         u.email as student_email,
         u.school_level,
         u.year_group
-      FROM student_parent_links spl
-      JOIN users u ON spl.student_id = u.id
-      WHERE spl.parent_id = ?
-      ORDER BY spl.created_at DESC
+      FROM parent_student_links psl
+      JOIN users u ON psl.student_id = u.id
+      WHERE psl.parent_id = ?
+        AND psl.status = 'active'
+        AND psl.student_opted_out = 0
+      ORDER BY psl.created_at DESC
     `).bind(userId).all();
 
     return c.json({
@@ -1422,7 +1349,7 @@ counselorApp.get('/linked-students', async (c) => {
         studentEmail: l.student_email,
         schoolLevel: l.school_level,
         yearGroup: l.year_group,
-        relationship: l.relationship,
+        relationship: l.relationship_type,
         status: l.status,
         createdAt: l.created_at,
       })),
@@ -1442,40 +1369,33 @@ counselorApp.get('/parent-messages', async (c) => {
   try {
     const userId = getUserId(c);
     const userRole = getUserRole(c);
-
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
-
-    const studentId = c.req.query('studentId');
-
-    let query = `
-      SELECT
-        pcm.*,
-        sender.name as sender_name,
-        sender.role as sender_role
-      FROM parent_counselor_messages pcm
-      LEFT JOIN users sender ON pcm.sender_id = sender.id
-      WHERE 1=1
-    `;
-    const params: string[] = [];
-
-    if (userRole === 'parent') {
-      // Parent sees messages they sent or received
-      query += ` AND (pcm.sender_id = ? OR pcm.parent_id = ?)`;
-      params.push(userId, userId);
-    } else if (['admin', 'teacher'].includes(userRole as string)) {
-      // Staff can filter by student
-      if (studentId) {
-        query += ` AND pcm.student_id = ?`;
-        params.push(studentId);
-      }
+    if (!isRoleAllowed(userRole, FAMILY_STAFF_ACCESS)) {
+      return c.json({ success: false, error: 'Permission denied' }, 403);
     }
 
-    query += ` ORDER BY pcm.created_at DESC LIMIT 100`;
+    const scope = buildStudentAccessPredicate(userRole, userId, 'pcm.student_id', FAMILY_STAFF_ACCESS);
+    const studentId = c.req.query('studentId');
+    const params = [...scope.binds];
+    let query = `
+      SELECT pcm.*, sender.name as sender_name, sender.role as sender_role
+      FROM parent_counselor_messages pcm
+      LEFT JOIN users sender ON pcm.sender_id = sender.id
+      WHERE ${scope.sql}
+    `;
+    if (userRole === 'parent') {
+      query += ' AND pcm.parent_id = ?';
+      params.push(userId);
+    }
+    if (studentId) {
+      query += ' AND pcm.student_id = ?';
+      params.push(studentId);
+    }
+    query += ' ORDER BY pcm.created_at DESC LIMIT 100';
 
     const messages = await c.env.DB.prepare(query).bind(...params).all();
-
     return c.json({
       success: true,
       data: messages.results.map((m: Record<string, unknown>) => ({
@@ -1503,54 +1423,64 @@ counselorApp.post('/parent-messages', async (c) => {
   try {
     const userId = getUserId(c);
     const userRole = getUserRole(c);
-
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
+    if (!isRoleAllowed(userRole, FAMILY_STAFF_ACCESS)) {
+      return c.json({ success: false, error: 'Permission denied' }, 403);
+    }
 
     const body = await c.req.json();
-    const { reportId, studentId, content } = body;
-
-    if (!content?.trim()) {
-      return c.json({ success: false, error: 'Message content is required' }, 400);
+    const reportId = typeof body.reportId === 'string' ? body.reportId : null;
+    const studentId = typeof body.studentId === 'string' ? body.studentId : '';
+    const content = typeof body.content === 'string' ? body.content.trim() : '';
+    if (!studentId) {
+      return c.json({ success: false, error: 'Student ID is required' }, 400);
+    }
+    if (!content || content.length > 5000) {
+      return c.json({ success: false, error: 'Message content must be between 1 and 5000 characters' }, 400);
+    }
+    if (!await hasStudentAccess(c.env.DB, userRole, userId, studentId, FAMILY_STAFF_ACCESS)) {
+      return c.json({ success: false, error: 'Student not found' }, 404);
     }
 
-    // Determine parent_id based on sender role
-    let parentId = userId;
-    if (userRole !== 'parent') {
-      // Staff is sending to parent - need to find the parent
-      if (!studentId) {
-        return c.json({ success: false, error: 'Student ID is required' }, 400);
+    if (reportId) {
+      const report = await c.env.DB.prepare(
+        'SELECT 1 FROM counselor_reports WHERE id = ? AND student_id = ?',
+      ).bind(reportId, studentId).first();
+      if (!report) {
+        return c.json({ success: false, error: 'Report not found' }, 404);
       }
-      const link = await c.env.DB.prepare(`
-        SELECT parent_id FROM student_parent_links
-        WHERE student_id = ? AND status = 'active' LIMIT 1
-      `).bind(studentId).first();
-      parentId = link?.parent_id as string;
     }
 
-    const messageId = `pmsg_${Date.now()}`;
+    let parentId = userRole === 'parent' ? userId : '';
+    if (!parentId) {
+      const link = await c.env.DB.prepare(`
+        SELECT parent_id
+        FROM parent_student_links
+        WHERE student_id = ?
+          AND status = 'active'
+          AND student_opted_out = 0
+          AND parent_id IS NOT NULL
+        ORDER BY verified_at ASC
+        LIMIT 1
+      `).bind(studentId).first<{ parent_id: string }>();
+      parentId = link?.parent_id || '';
+    }
+    if (!parentId) {
+      return c.json({ success: false, error: 'No active parent link found' }, 409);
+    }
 
+    const messageId = `pmsg_${crypto.randomUUID()}`;
     await c.env.DB.prepare(`
-      INSERT INTO parent_counselor_messages (id, report_id, student_id, parent_id, sender_id, content, is_read, created_at)
+      INSERT INTO parent_counselor_messages
+        (id, report_id, student_id, parent_id, sender_id, content, is_read, created_at)
       VALUES (?, ?, ?, ?, ?, ?, 0, datetime('now'))
-    `).bind(
-      messageId,
-      reportId || null,
-      studentId || null,
-      parentId,
-      userId,
-      content.trim()
-    ).run();
+    `).bind(messageId, reportId, studentId, parentId, userId, content).run();
 
     return c.json({
       success: true,
-      data: {
-        id: messageId,
-        content: content.trim(),
-        senderId: userId,
-        createdAt: new Date().toISOString(),
-      },
+      data: { id: messageId, content, senderId: userId, createdAt: new Date().toISOString() },
     });
   } catch (error) {
     console.error('Error sending parent message:', error);
@@ -1558,22 +1488,37 @@ counselorApp.post('/parent-messages', async (c) => {
   }
 });
 
-// Mark parent message as read
+// Mark a message as read only from the recipient side of the conversation.
 counselorApp.post('/parent-messages/:id/read', async (c) => {
   try {
     const messageId = c.req.param('id');
     const userId = getUserId(c);
-
+    const userRole = getUserRole(c);
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
+    if (!isRoleAllowed(userRole, FAMILY_STAFF_ACCESS)) {
+      return c.json({ success: false, error: 'Permission denied' }, 403);
+    }
 
-    await c.env.DB.prepare(`
-      UPDATE parent_counselor_messages
+    const scope = buildStudentAccessPredicate(userRole, userId, 'pcm.student_id', FAMILY_STAFF_ACCESS);
+    const params: string[] = [messageId, ...scope.binds];
+    let recipientPredicate: string;
+    if (userRole === 'parent') {
+      recipientPredicate = 'pcm.parent_id = ? AND pcm.sender_id != pcm.parent_id';
+      params.push(userId);
+    } else {
+      recipientPredicate = 'pcm.sender_id = pcm.parent_id';
+    }
+
+    const result = await c.env.DB.prepare(`
+      UPDATE parent_counselor_messages AS pcm
       SET is_read = 1, read_at = datetime('now')
-      WHERE id = ?
-    `).bind(messageId).run();
-
+      WHERE pcm.id = ? AND ${scope.sql} AND ${recipientPredicate}
+    `).bind(...params).run();
+    if (result.meta.changes === 0) {
+      return c.json({ success: false, error: 'Message not found' }, 404);
+    }
     return c.json({ success: true, message: 'Message marked as read' });
   } catch (error) {
     console.error('Error marking message as read:', error);
@@ -1590,40 +1535,28 @@ counselorApp.get('/schedules', async (c) => {
   try {
     const userId = getUserId(c);
     const userRole = getUserRole(c);
-
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
-
-    let query = `
-      SELECT
-        rs.*,
-        u.name as student_name
-      FROM report_schedules rs
-      LEFT JOIN users u ON rs.student_id = u.id
-      WHERE 1=1
-    `;
-    const params: string[] = [];
-
-    if (userRole === 'parent') {
-      // Get schedules for linked students
-      const links = await c.env.DB.prepare(`
-        SELECT student_id FROM student_parent_links WHERE parent_id = ? AND status = 'active'
-      `).bind(userId).all();
-      const studentIds = links.results.map((l: Record<string, unknown>) => l.student_id as string);
-
-      if (studentIds.length === 0) {
-        return c.json({ success: true, data: [] });
-      }
-
-      query += ` AND rs.student_id IN (${studentIds.map(() => '?').join(',')})`;
-      params.push(...studentIds);
+    if (!isRoleAllowed(userRole, PARENT_ADMIN_ACCESS)) {
+      return c.json({ success: false, error: 'Permission denied' }, 403);
     }
 
-    query += ` ORDER BY rs.created_at DESC`;
+    const scope = buildStudentAccessPredicate(userRole, userId, 'rs.student_id', PARENT_ADMIN_ACCESS);
+    const params = [...scope.binds];
+    let query = `
+      SELECT rs.*, u.name as student_name
+      FROM report_schedules rs
+      LEFT JOIN users u ON rs.student_id = u.id
+      WHERE ${scope.sql}
+    `;
+    if (userRole === 'parent') {
+      query += ' AND rs.parent_id = ?';
+      params.push(userId);
+    }
+    query += ' ORDER BY rs.created_at DESC';
 
     const schedules = await c.env.DB.prepare(query).bind(...params).all();
-
     return c.json({
       success: true,
       data: schedules.results.map((s: Record<string, unknown>) => ({
@@ -1643,54 +1576,35 @@ counselorApp.get('/schedules', async (c) => {
   }
 });
 
-// Create report schedule
+// Create report schedule. Schedules are owned by the linked parent.
 counselorApp.post('/schedules', async (c) => {
   try {
     const userId = getUserId(c);
     const userRole = getUserRole(c);
-
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
+    }
+    if (!isRoleAllowed(userRole, PARENT_ONLY_ACCESS)) {
+      return c.json({ success: false, error: 'Permission denied' }, 403);
     }
 
     const body = await c.req.json();
     const { studentId, reportType, frequency } = body;
-
-    if (!studentId || !reportType || !frequency) {
-      return c.json({ success: false, error: 'studentId, reportType, and frequency are required' }, 400);
+    if (typeof studentId !== 'string'
+      || !['weekly_summary', 'monthly_progress', 'semester'].includes(reportType)
+      || !['daily', 'weekly', 'monthly'].includes(frequency)) {
+      return c.json({ success: false, error: 'Invalid schedule request' }, 400);
+    }
+    if (!await hasStudentAccess(c.env.DB, userRole, userId, studentId, PARENT_ONLY_ACCESS)) {
+      return c.json({ success: false, error: 'Student not found' }, 404);
     }
 
-    // Verify parent has access to student
-    if (userRole === 'parent') {
-      const hasAccess = await c.env.DB.prepare(`
-        SELECT 1 FROM student_parent_links WHERE parent_id = ? AND student_id = ? AND status = 'active'
-      `).bind(userId, studentId).first();
-
-      if (!hasAccess) {
-        return c.json({ success: false, error: 'Access denied' }, 403);
-      }
-    }
-
-    // Calculate next scheduled date based on frequency
-    let nextScheduled: Date;
-    switch (frequency) {
-      case 'daily':
-        nextScheduled = new Date(Date.now() + 24 * 60 * 60 * 1000);
-        break;
-      case 'weekly':
-        nextScheduled = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-        break;
-      case 'monthly':
-        nextScheduled = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-        break;
-      default:
-        nextScheduled = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    }
-
-    const scheduleId = `sched_${Date.now()}`;
-
+    const intervalDays = frequency === 'daily' ? 1 : frequency === 'weekly' ? 7 : 30;
+    const nextScheduled = new Date(Date.now() + intervalDays * 24 * 60 * 60 * 1000);
+    const scheduleId = `sched_${crypto.randomUUID()}`;
     await c.env.DB.prepare(`
-      INSERT INTO report_schedules (id, student_id, parent_id, report_type, frequency, next_scheduled_at, is_active, created_at)
+      INSERT INTO report_schedules
+        (id, student_id, parent_id, report_type, frequency, next_scheduled_at, is_active, created_at)
       VALUES (?, ?, ?, ?, ?, ?, 1, datetime('now'))
     `).bind(
       scheduleId,
@@ -1698,7 +1612,7 @@ counselorApp.post('/schedules', async (c) => {
       userId,
       reportType,
       frequency,
-      nextScheduled.toISOString()
+      nextScheduled.toISOString(),
     ).run();
 
     return c.json({
@@ -1723,37 +1637,48 @@ counselorApp.put('/schedules/:id', async (c) => {
   try {
     const scheduleId = c.req.param('id');
     const userId = getUserId(c);
-
+    const userRole = getUserRole(c);
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
+    }
+    if (!isRoleAllowed(userRole, PARENT_ADMIN_ACCESS)) {
+      return c.json({ success: false, error: 'Permission denied' }, 403);
     }
 
     const body = await c.req.json();
     const { isActive, frequency } = body;
-
+    if (frequency !== undefined && !['daily', 'weekly', 'monthly'].includes(frequency)) {
+      return c.json({ success: false, error: 'Invalid frequency' }, 400);
+    }
     const updates: string[] = [];
     const params: (string | number)[] = [];
-
-    if (isActive !== undefined) {
+    if (typeof isActive === 'boolean') {
       updates.push('is_active = ?');
       params.push(isActive ? 1 : 0);
     }
-
-    if (frequency) {
+    if (typeof frequency === 'string') {
       updates.push('frequency = ?');
       params.push(frequency);
     }
-
     if (updates.length === 0) {
       return c.json({ success: false, error: 'No updates provided' }, 400);
     }
 
-    params.push(scheduleId);
-
-    await c.env.DB.prepare(`
-      UPDATE report_schedules SET ${updates.join(', ')} WHERE id = ?
+    const scope = buildStudentAccessPredicate(userRole, userId, 'rs.student_id', PARENT_ADMIN_ACCESS);
+    params.push(scheduleId, ...scope.binds);
+    let ownerPredicate = '';
+    if (userRole === 'parent') {
+      ownerPredicate = ' AND rs.parent_id = ?';
+      params.push(userId);
+    }
+    const result = await c.env.DB.prepare(`
+      UPDATE report_schedules AS rs
+      SET ${updates.join(', ')}, updated_at = datetime('now')
+      WHERE rs.id = ? AND ${scope.sql}${ownerPredicate}
     `).bind(...params).run();
-
+    if (result.meta.changes === 0) {
+      return c.json({ success: false, error: 'Schedule not found' }, 404);
+    }
     return c.json({ success: true, message: 'Schedule updated' });
   } catch (error) {
     console.error('Error updating schedule:', error);
@@ -1766,15 +1691,28 @@ counselorApp.delete('/schedules/:id', async (c) => {
   try {
     const scheduleId = c.req.param('id');
     const userId = getUserId(c);
-
+    const userRole = getUserRole(c);
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
+    if (!isRoleAllowed(userRole, PARENT_ADMIN_ACCESS)) {
+      return c.json({ success: false, error: 'Permission denied' }, 403);
+    }
 
-    await c.env.DB.prepare(`
-      DELETE FROM report_schedules WHERE id = ?
-    `).bind(scheduleId).run();
-
+    const scope = buildStudentAccessPredicate(userRole, userId, 'rs.student_id', PARENT_ADMIN_ACCESS);
+    const params = [scheduleId, ...scope.binds];
+    let ownerPredicate = '';
+    if (userRole === 'parent') {
+      ownerPredicate = ' AND rs.parent_id = ?';
+      params.push(userId);
+    }
+    const result = await c.env.DB.prepare(`
+      DELETE FROM report_schedules AS rs
+      WHERE rs.id = ? AND ${scope.sql}${ownerPredicate}
+    `).bind(...params).run();
+    if (result.meta.changes === 0) {
+      return c.json({ success: false, error: 'Schedule not found' }, 404);
+    }
     return c.json({ success: true, message: 'Schedule deleted' });
   } catch (error) {
     console.error('Error deleting schedule:', error);
@@ -1791,31 +1729,22 @@ counselorApp.get('/session-summaries', async (c) => {
   try {
     const userId = getUserId(c);
     const userRole = getUserRole(c);
-
     if (!userId) {
       return c.json({ success: false, error: 'Authentication required' }, 401);
     }
-
-    const studentId = c.req.query('studentId');
-
-    // For students, use their own ID
-    let targetStudentId = studentId;
-    if (userRole === 'student') {
-      targetStudentId = userId;
+    if (!isRoleAllowed(userRole, REPORT_ACCESS)) {
+      return c.json({ success: false, error: 'Permission denied' }, 403);
     }
 
-    // For parents, verify access
-    if (userRole === 'parent' && studentId) {
-      const hasAccess = await c.env.DB.prepare(`
-        SELECT 1 FROM student_parent_links WHERE parent_id = ? AND student_id = ? AND status = 'active'
-      `).bind(userId, studentId).first();
-
-      if (!hasAccess) {
-        return c.json({ success: false, error: 'Access denied' }, 403);
-      }
+    const requestedStudentId = c.req.query('studentId');
+    const targetStudentId = userRole === 'student' ? userId : requestedStudentId;
+    if (!targetStudentId) {
+      return c.json({ success: false, error: 'Student ID is required' }, 400);
+    }
+    if (!await hasStudentAccess(c.env.DB, userRole, userId, targetStudentId, REPORT_ACCESS)) {
+      return c.json({ success: false, error: 'Student not found' }, 404);
     }
 
-    // Get conversations with summary info
     const sessions = await c.env.DB.prepare(`
       SELECT
         cc.id,

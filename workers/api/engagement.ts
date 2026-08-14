@@ -73,7 +73,7 @@ engagementApp.get('/status', async (c) => {
     // Get user's streak info
     const userData = await c.env.DB.prepare(
       'SELECT streak_days, streak_last_activity FROM users WHERE id = ?'
-    ).bind(user.userId).first();
+    ).bind(user.userId).first<{ streak_days: number; streak_last_activity: string | null }>();
 
     // Calculate streak at risk
     let streakAtRisk = false;
@@ -186,7 +186,7 @@ engagementApp.post('/check-comeback', async (c) => {
     }
 
     // Check if user qualifies for comeback challenge (3+ days inactive)
-    const daysInactive = metrics?.days_since_last_activity || 0;
+    const daysInactive = (metrics?.days_since_last_activity as number | undefined) || 0;
     if (daysInactive < 3) {
       return c.json({
         success: true,

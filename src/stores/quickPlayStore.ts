@@ -6,6 +6,22 @@ import { fetchWithAuth } from '@/lib/api';
 export type QuickPlayGameType = 'speed_blitz' | 'brain_teaser' | 'subject_dash';
 
 // Custom question type for Quick Play (simplified for fast games)
+interface QuickPlayApiOption {
+  text: string;
+  isCorrect?: boolean;
+}
+
+interface QuickPlayApiQuestion {
+  id: string;
+  questionText: string;
+  options?: Array<string | QuickPlayApiOption>;
+  correctAnswer?: string;
+  explanation?: string;
+  subjectId?: string;
+  topicId?: string;
+  difficulty?: QuickPlayQuestion['difficulty'];
+}
+
 export interface QuickPlayQuestion {
   id: string;
   text: string;
@@ -360,11 +376,11 @@ export const useQuickPlayStore = create<QuickPlayState>()(
                   sessionId = data.data.sessionId;
                   // multiplier is available in data.data.multiplier if needed
                   if (data.data.questions?.length > 0) {
-                    questions = data.data.questions.map((q: any) => ({
+                    questions = data.data.questions.map((q: QuickPlayApiQuestion) => ({
                       id: q.id,
                       text: q.questionText,
-                      options: q.options?.map((o: any) => typeof o === 'string' ? o : o.text) || [],
-                      correctAnswer: q.options?.find((o: any) => o.isCorrect)?.text || q.correctAnswer || '',
+                      options: q.options?.map((o: string | QuickPlayApiOption) => typeof o === 'string' ? o : o.text) || [],
+                      correctAnswer: q.options?.find((o: string | QuickPlayApiOption): o is QuickPlayApiOption => typeof o !== 'string' && o.isCorrect === true)?.text || q.correctAnswer || '',
                       explanation: q.explanation || '',
                       subjectId: q.subjectId || subjectId || '',
                       topicId: q.topicId || '',

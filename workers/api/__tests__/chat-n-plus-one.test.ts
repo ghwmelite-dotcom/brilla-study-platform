@@ -11,7 +11,7 @@ import { createMockD1 } from './helpers/mockD1';
 
 const JWT_SECRET = 'test-secret-that-is-long-enough';
 const USER_ID = 'user_1';
-const AUTH_SQL = /role, status, is_active FROM users/;
+const AUTH_SQL = /role, status, is_active, session_version FROM users/;
 
 const ACTIVE_USER = { role: 'student', status: 'approved', is_active: 1 };
 const authHandler = { match: AUTH_SQL, first: () => ACTIVE_USER };

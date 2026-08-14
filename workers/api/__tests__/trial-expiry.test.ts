@@ -34,7 +34,7 @@ const JWT_SECRET = 'test-secret';
 
 // Row returned for the requireAuth per-request users lookup (Phase 1 auth unification).
 const ACTIVE_USER = { role: 'student', status: 'approved', is_active: 1 };
-const isAuthLookup = (sql: string) => sql.includes('role, status, is_active FROM users');
+const isAuthLookup = (sql: string) => sql.includes('role, status, is_active, session_version FROM users');
 
 async function authHeader(userId: string) {
   const token = await sign(

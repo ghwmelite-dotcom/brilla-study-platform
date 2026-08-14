@@ -200,7 +200,7 @@ quickPlayApp.post('/submit', async (c) => {
     // Get session
     const session = await c.env.DB.prepare(
       'SELECT * FROM quick_play_sessions WHERE id = ? AND user_id = ?'
-    ).bind(sessionId, user.userId).first();
+    ).bind(sessionId, user.userId).first<{ game_type: string; completed_at: string | null }>();
 
     if (!session) {
       return c.json({ success: false, error: 'Session not found' }, 404);
@@ -242,7 +242,7 @@ quickPlayApp.post('/submit', async (c) => {
     const multiplierRecord = await c.env.DB.prepare(`
       SELECT id, multiplier FROM daily_multipliers
       WHERE user_id = ? AND date = ? AND used = 0
-    `).bind(user.userId, today).first();
+    `).bind(user.userId, today).first<{ id: string; multiplier: number | null }>();
 
     const multiplier = multiplierRecord?.multiplier || 1.0;
     const totalXp = Math.round((baseXp + accuracyBonus + speedBonus) * multiplier);
@@ -358,14 +358,17 @@ quickPlayApp.get('/stats', async (c) => {
         SUM(questions_answered) as total_questions
       FROM quick_play_sessions
       WHERE user_id = ? AND completed_at IS NOT NULL
-    `).bind(user.userId).first();
+    `).bind(user.userId).first<{ total_games: number; total_xp: number; avg_score: number; total_correct: number; total_questions: number }>();
 
     const today = new Date().toISOString().split('T')[0];
     const todayStats = await c.env.DB.prepare(`
       SELECT COUNT(*) as games_today, SUM(xp_earned) as xp_today
       FROM quick_play_sessions
       WHERE user_id = ? AND DATE(completed_at) = ?
-    `).bind(user.userId, today).first();
+    `).bind(user.userId, today).first<{ games_today: number; xp_today: number }>();
+
+    const totalQuestions = stats?.total_questions ?? 0;
+    const totalCorrect = stats?.total_correct ?? 0;
 
     return c.json({
       success: true,
@@ -373,8 +376,8 @@ quickPlayApp.get('/stats', async (c) => {
         totalGames: stats?.total_games || 0,
         totalXp: stats?.total_xp || 0,
         avgScore: Math.round(stats?.avg_score || 0),
-        accuracy: stats?.total_questions > 0
-          ? Math.round((stats.total_correct / stats.total_questions) * 100)
+        accuracy: totalQuestions > 0
+          ? Math.round((totalCorrect / totalQuestions) * 100)
           : 0,
         gamesToday: todayStats?.games_today || 0,
         xpToday: todayStats?.xp_today || 0,

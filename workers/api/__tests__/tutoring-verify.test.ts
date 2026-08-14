@@ -12,7 +12,7 @@ const baseEnv = {
 
 // Row returned for the requireAuth per-request users lookup (Phase 1 auth unification).
 const authHandler = {
-  match: /role, status, is_active FROM users/,
+  match: /role, status, is_active, session_version FROM users/,
   first: () => ({ role: 'student', status: 'approved', is_active: 1 }),
 };
 

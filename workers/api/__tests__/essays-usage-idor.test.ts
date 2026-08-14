@@ -105,7 +105,7 @@ describe('essays/usage IDOR fixes', () => {
     expect(calls.some((c) => c.sql.includes('UPDATE essay_attempts'))).toBe(false);
   });
 
-  it('POST /api/essays/:attemptId/grade allows the owner to grade their own attempt', async () => {
+  it('POST /api/essays/:attemptId/grade fails closed when the AI provider is not configured', async () => {
     const { db } = makeDb(STUDENT, [], (sql) => {
       if (sql.includes('FROM essay_attempts ea')) {
         return {
@@ -128,9 +128,9 @@ describe('essays/usage IDOR fixes', () => {
         method: 'POST',
         headers: { Authorization: `Bearer ${t}` },
       }),
-      { DB: db, JWT_SECRET }, // no ANTHROPIC_API_KEY → mock grading path
+      { DB: db, JWT_SECRET },
     );
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(503);
   });
 
   it('GET /api/essays/history ignores ?userId= for students and binds the JWT identity', async () => {

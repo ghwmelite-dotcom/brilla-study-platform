@@ -394,7 +394,7 @@ export function StudyRoomsPage() {
                       </div>
                       <input
                         type="checkbox"
-                        checked={(createForm as any)[feature.key]}
+                        checked={Boolean(createForm[feature.key as 'aiEnabled' | 'whiteboardEnabled' | 'voiceEnabled' | 'isPublic'])}
                         onChange={(e) => setCreateForm({ ...createForm, [feature.key]: e.target.checked })}
                         className="w-5 h-5 rounded accent-violet-500"
                       />

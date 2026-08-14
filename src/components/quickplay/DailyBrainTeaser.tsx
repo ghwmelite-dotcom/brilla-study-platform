@@ -23,7 +23,7 @@ export function DailyBrainTeaser({ isOpen, onClose }: DailyBrainTeaserProps) {
   const {
     dailyChallenge,
     fetchDailyChallenge,
-    useDailyHint,
+    useDailyHint: consumeDailyHint,
     submitDailyAnswer,
   } = useQuickPlayStore();
 
@@ -64,7 +64,7 @@ export function DailyBrainTeaser({ isOpen, onClose }: DailyBrainTeaserProps) {
   }, [isOpen, dailyChallenge?.completed, showResult]);
 
   const handleUseHint = () => {
-    const hint = useDailyHint();
+    const hint = consumeDailyHint();
     if (hint) {
       setCurrentHint(hint);
     }

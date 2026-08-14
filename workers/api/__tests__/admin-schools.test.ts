@@ -66,7 +66,7 @@ function makeDb(opts: DbOptions = {}) {
     sql,
     args,
     first: vi.fn().mockImplementation(() => {
-      if (sql.includes('role, status, is_active FROM users')) {
+      if (sql.includes('role, status, is_active, session_version FROM users')) {
         return Promise.resolve(
           (opts.authRole ?? 'admin') === 'admin'
             ? { role: 'admin', status: 'approved', is_active: 1 }

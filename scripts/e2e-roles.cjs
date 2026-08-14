@@ -21,11 +21,19 @@ const API = 'https://brilla-api.ghwmelite.workers.dev/api';
 const OUT = path.join(os.tmpdir(), 'brilla-e2e');
 fs.mkdirSync(OUT, { recursive: true });
 
+function requiredEnv(name) {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value;
+}
+
 const ACCOUNTS = [
   {
     role: 'student',
-    email: 'johndoe@gmail.com',
-    password: 'Student123!',
+    email: requiredEnv('BRILLA_E2E_STUDENT_EMAIL'),
+    password: requiredEnv('BRILLA_E2E_STUDENT_PASSWORD'),
     allowed: ['/progress', '/subscriptions/status', '/quests/daily', '/race/current',
       '/engagement/status', '/notifications/telegram/status', '/streak/info'],
     forbidden: ['/admin/users', '/parents/students'],
@@ -35,8 +43,8 @@ const ACCOUNTS = [
   },
   {
     role: 'teacher',
-    email: 'janetdoe@gmail.com',
-    password: 'Teacher123!',
+    email: requiredEnv('BRILLA_E2E_TEACHER_EMAIL'),
+    password: requiredEnv('BRILLA_E2E_TEACHER_PASSWORD'),
     allowed: ['/teacher/dashboard', '/classes', '/assessments', '/tutoring/teacher/earnings',
       '/teacher-bonuses/my-status'],
     forbidden: ['/admin/users', '/parents/students', '/admin/dashboard/stats'],
@@ -44,8 +52,8 @@ const ACCOUNTS = [
   },
   {
     role: 'parent',
-    email: 'kwamedoe@gmail.com',
-    password: 'Parent123!',
+    email: requiredEnv('BRILLA_E2E_PARENT_EMAIL'),
+    password: requiredEnv('BRILLA_E2E_PARENT_PASSWORD'),
     allowed: ['/parents/students', '/parents/notifications', '/parents/preferences'],
     forbidden: ['/admin/users', '/admin/dashboard/stats'],
     selfScopedEmpty: [],

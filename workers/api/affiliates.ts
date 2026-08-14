@@ -83,13 +83,6 @@ export async function attributeReferral(
   return referralId;
 }
 
-// Sanitize and validate pagination parameters
-function sanitizePaginationParams(limitStr: string | undefined, offsetStr: string | undefined): { limit: number; offset: number } {
-  const limit = Math.min(Math.max(1, parseInt(limitStr || '20') || 20), 100);
-  const offset = Math.max(0, parseInt(offsetStr || '0') || 0);
-  return { limit, offset };
-}
-
 // =============================================
 // AFFILIATES API
 // =============================================
@@ -217,7 +210,7 @@ affiliatesApp.get('/profile', requireAuth, async (c) => {
     }
 
     // Calculate conversion rate
-    const conversionRate = profile.total_referrals > 0
+    const conversionRate = (profile.total_referrals as number) > 0
       ? ((profile.successful_conversions as number) / (profile.total_referrals as number)) * 100
       : 0;
 
@@ -367,7 +360,7 @@ affiliatesApp.get('/dashboard', requireAuth, async (c) => {
           totalEarnings: profile.total_earnings,
           pendingEarnings: profile.pending_earnings,
           availableEarnings: profile.available_earnings,
-          conversionRate: profile.total_referrals > 0
+          conversionRate: (profile.total_referrals as number) > 0
             ? Math.round(((profile.successful_conversions as number) / (profile.total_referrals as number)) * 1000) / 10
             : 0,
         },

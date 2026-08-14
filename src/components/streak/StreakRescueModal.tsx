@@ -23,7 +23,7 @@ export function StreakRescueModal({ isOpen, onClose }: StreakRescueModalProps) {
     streakInfo,
     streakRescue,
     hoursUntilStreakEnds,
-    useStreakRescue,
+    useStreakRescue: rescueStreak,
   } = useStreakStore();
 
   const [isRescuing, setIsRescuing] = useState(false);
@@ -31,7 +31,7 @@ export function StreakRescueModal({ isOpen, onClose }: StreakRescueModalProps) {
 
   const handleRescue = async () => {
     setIsRescuing(true);
-    const success = await useStreakRescue();
+    const success = await rescueStreak();
     setIsRescuing(false);
 
     if (success) {

@@ -307,7 +307,7 @@ export function ImmersiveWhiteboard({
     <div
       ref={containerRef}
       className={cn("relative w-full h-full", className)}
-      onDoubleClick={handleDoubleTap as any}
+      onDoubleClick={handleDoubleTap}
     >
       {/* AI Canvas Layer (background) */}
       <canvas
@@ -359,7 +359,7 @@ export function ImmersiveWhiteboard({
             ].map((tool) => (
               <button
                 key={tool.id}
-                onClick={() => setCurrentTool(tool.id as any)}
+                onClick={() => setCurrentTool(tool.id as 'draw' | 'highlight' | 'question' | 'check' | 'x')}
                 className={cn(
                   "w-12 h-12 rounded-xl flex items-center justify-center text-xl transition-all",
                   currentTool === tool.id
