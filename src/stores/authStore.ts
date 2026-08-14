@@ -114,6 +114,8 @@ interface AuthState {
     error?: string;
     code?: string;
     isNewUser?: boolean;
+    requiresApproval?: boolean;
+    message?: string;
   }>;
   getLinkedProviders: () => Promise<{ hasPassword: boolean; providers: Array<{ provider: string; email: string }> }>;
   unlinkGoogle: () => Promise<void>;
@@ -720,13 +722,31 @@ export const useAuthStore = create<AuthState>()(
               streakDays?: number;
               aiGradingCredits?: number;
             };
-            token: string;
+            token?: string;
             isNewUser: boolean;
+            requiresApproval: boolean;
+            message?: string;
           }
           const response = await api.post<OAuthCallbackResponse>('/auth/oauth/google/callback', { code, state });
 
           if (response.success && response.data) {
-            const { user: apiUser, token, isNewUser } = response.data;
+            const { user: apiUser, token, isNewUser, requiresApproval, message } = response.data;
+
+            if (requiresApproval) {
+              set({
+                user: null,
+                token: null,
+                isAuthenticated: false,
+                isLoading: false,
+                error: null,
+              });
+              api.setToken(null);
+              return { success: true, isNewUser, requiresApproval: true, message };
+            }
+
+            if (!token) {
+              return { success: false, error: 'Authentication token was not issued' };
+            }
 
             // Map API user to local user format
             const user: ManagedUser = {

@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Loader2, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 
-type CallbackStatus = 'processing' | 'success' | 'error' | 'needs_registration';
+type CallbackStatus = 'processing' | 'success' | 'error' | 'needs_registration' | 'pending_approval';
 
 interface CallbackError {
   message: string;
@@ -18,6 +18,7 @@ export function OAuthCallback() {
   const [status, setStatus] = useState<CallbackStatus>('processing');
   const [error, setError] = useState<CallbackError | null>(null);
   const [isNewUser, setIsNewUser] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState('Your registration is awaiting administrator approval.');
   const hasExchanged = useRef(false);
 
   useEffect(() => {
@@ -57,12 +58,17 @@ export function OAuthCallback() {
 
         if (result.success) {
           setIsNewUser(result.isNewUser || false);
-          setStatus('success');
 
-          // Clear stored state
+          // Clear stored state once the one-time callback is consumed.
           sessionStorage.removeItem('oauth_state');
 
-          // Redirect after brief delay to show success
+          if (result.requiresApproval) {
+            setPendingMessage(result.message || 'Your registration is awaiting administrator approval.');
+            setStatus('pending_approval');
+            return;
+          }
+
+          setStatus('success');
           setTimeout(() => {
             navigate('/dashboard', { replace: true });
           }, 1500);
@@ -131,6 +137,25 @@ export function OAuthCallback() {
             <p className="text-sm text-gray-500 mt-4">
               Redirecting to dashboard...
             </p>
+          </>
+        )}
+
+        {status === 'pending_approval' && (
+          <>
+            <div className="w-16 h-16 mx-auto mb-6 bg-amber-100 rounded-full flex items-center justify-center">
+              <AlertTriangle className="w-8 h-8 text-amber-600" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Registration received
+            </h1>
+            <p className="text-gray-600 mb-6">{pendingMessage}</p>
+            <button
+              type="button"
+              onClick={() => navigate('/', { replace: true })}
+              className="w-full min-h-12 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 transition-colors"
+            >
+              Return home
+            </button>
           </>
         )}
 

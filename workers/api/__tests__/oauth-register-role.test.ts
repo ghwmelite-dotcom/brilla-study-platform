@@ -2,8 +2,8 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { oauthApp } from '../oauth';
 
 // Tests the OAuth register role/status hardening in the /google/callback
-// handler: caller-supplied roles are whitelisted, and non-student roles
-// register as 'pending' instead of 'approved'.
+// handler: caller-supplied roles are whitelisted and every self-serve role
+// registers as pending without receiving an authentication token.
 //
 // Approach: full callback test — global fetch is stubbed to fake Google's
 // token exchange (the ID token payload is decoded without signature
@@ -147,7 +147,7 @@ describe('OAuth register role hardening', () => {
     expect(captured.usersInsertArgs?.[4]).toBe('pending');
   });
 
-  it("inserts role: 'student' with status 'approved'", async () => {
+  it("inserts role: 'student' with status 'pending' and returns no token", async () => {
     stubGoogleTokenExchange();
     const captured: Captured = { usersInsertArgs: null, runs: [] };
     const res = await oauthApp.fetch(
@@ -156,14 +156,18 @@ describe('OAuth register role hardening', () => {
     );
     expect(res.status).toBe(200);
     expect(captured.usersInsertArgs?.[3]).toBe('student');
-    expect(captured.usersInsertArgs?.[4]).toBe('approved');
+    expect(captured.usersInsertArgs?.[4]).toBe('pending');
+    const body = await res.json();
+    expect(body.data.requiresApproval).toBe(true);
+    expect(body.data.token).toBeUndefined();
+    expect(captured.runs.some((r) => r.sql.includes('last_login_at'))).toBe(false);
   });
 });
 
 // Growth loop (Task 5, fix round 1): the OAuth register path must validate a
 // client-supplied referralCode exactly like /auth/register — previously any
-// non-empty string bypassed invite mode and got an auto-approved student
-// account.
+// non-empty string previously bypassed invite-mode validation. The callback
+// now validates codes and still leaves every new account pending.
 const AFFILIATE = { id: 'aff_1', user_id: 'user_AFF', referral_code: 'ABC123XY' };
 
 describe('OAuth register — invite-mode referral code validation', () => {
@@ -210,7 +214,7 @@ describe('OAuth register — invite-mode referral code validation', () => {
     expect(captured.usersInsertArgs).toBeNull();
   });
 
-  it('valid code → referred_by on the user insert + attribution + signup points', async () => {
+  it('valid code → pending user + attribution, without token or signup points', async () => {
     stubGoogleTokenExchange();
     const captured: Captured = { usersInsertArgs: null, runs: [] };
     const res = await oauthApp.fetch(
@@ -221,6 +225,9 @@ describe('OAuth register — invite-mode referral code validation', () => {
       }),
     );
     expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.data.requiresApproval).toBe(true);
+    expect(body.data.token).toBeUndefined();
 
     // referred_by is the last bind on INSERT INTO users (uppercased code).
     expect(captured.usersInsertArgs).not.toBeNull();
@@ -232,12 +239,7 @@ describe('OAuth register — invite-mode referral code validation', () => {
     expect(referralInsert!.args[1]).toBe('aff_1');
     expect(referralInsert!.args[2]).toBe(captured.usersInsertArgs![0]); // new user id
 
-    // referral_signup points awarded to the referrer, sourced to the new user.
-    const ledger = captured.runs.find((r) => r.sql.includes('INSERT INTO points_ledger'));
-    expect(ledger).toBeDefined();
-    expect(ledger!.args[1]).toBe('user_AFF');
-    expect(ledger!.args[2]).toBe(100);
-    expect(ledger!.args[3]).toBe('referral_signup');
-    expect(ledger!.args[4]).toBe(captured.usersInsertArgs![0]);
+    // Referral rewards wait for explicit administrator approval.
+    expect(captured.runs.some((r) => r.sql.includes('INSERT INTO points_ledger'))).toBe(false);
   });
 });

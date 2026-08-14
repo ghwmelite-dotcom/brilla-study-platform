@@ -37,6 +37,7 @@ import { studyRoomsApp } from './study-rooms';
 import tutorClassroomApp from './tutor-classroom';
 import { cleanupExpiredDemoData } from './demoUtils';
 import { awardPoints } from './points';
+import { PENDING_APPROVAL_MESSAGE, SELF_REGISTRATION_STATUS } from './registration-policy';
 import { raceApp, runRaceCycleMaintenance } from './race';
 import { telegramWebhookApp } from './telegram';
 import { runTelegramRaceAlerts } from './race-alerts';
@@ -884,12 +885,16 @@ publicApp.get('/exam-types/:slug/paper-types', async (c) => {
 // AUTHENTICATION ROUTES
 // =============================================
 
-// Growth loop (Task 5): referral_signup points fire when a valid referral
-// code is present — the code IS the approval. Called inline at register (both
-// modes) and on OAuth register; the admin approve handler calls it as a
-// backstop for users whose referred_by was set without a referral row.
-// 100 points = default, tune with pilot data.
+// Referral signup rewards are issued only after an administrator approves the
+// referred account. The ledger check makes approval retries idempotent.
 async function awardReferralSignupPoints(db: D1Database, affiliateUserId: string, newUserId: string): Promise<void> {
+  const existingAward = await db.prepare(`
+    SELECT id FROM points_ledger
+    WHERE user_id = ? AND source = 'referral_signup' AND source_ref = ?
+    LIMIT 1
+  `).bind(affiliateUserId, newUserId).first();
+  if (existingAward) return;
+
   await awardPoints(db, {
     userId: affiliateUserId,
     points: 100,
@@ -898,8 +903,8 @@ async function awardReferralSignupPoints(db: D1Database, affiliateUserId: string
   });
 }
 
-// Register new user (self-registration goes to pending, unless a valid
-// referral code approves immediately — growth loop Task 5)
+// Register new user. Every self-registration remains pending until an
+// administrator approves it; referral codes never grant access.
 publicApp.post('/auth/register', async (c) => {
   const body = await parseJsonBody(c);
   if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
@@ -998,13 +1003,10 @@ publicApp.post('/auth/register', async (c) => {
     }
     const userRole = role || 'student';
 
-    // Self-registered users go to pending status — unless they arrived with a
-    // valid referral code, which IS the approval for pilot students. The user
-    // insert, primary exam-type update and preference inserts run in one D1
-    // batch so a failure mid-write cannot leave a user without their
-    // preferences. referred_by is always in the column list (NULL without a
-    // code) to keep a single INSERT shape.
-    const initialStatus = referralAffiliate ? 'approved' : 'pending';
+    // The user insert, primary exam-type update and preference inserts run in
+    // one D1 batch so a failure mid-write cannot leave a partial account.
+    // referred_by is attribution metadata only and never affects access.
+    const initialStatus = SELF_REGISTRATION_STATUS;
     const statements = [
       c.env.DB.prepare(`
         INSERT INTO users (id, email, password_hash, name, role, status, email_verified,
@@ -1050,14 +1052,9 @@ publicApp.post('/auth/register', async (c) => {
 
     await c.env.DB.batch(statements);
 
-    // Growth loop: a valid code IS the approval in either mode — attribute
-    // (creates the affiliate_referrals row; re-sets referred_by to the same
-    // value, harmlessly) and award referral_signup points now, exactly once.
-    // The admin approve handler's backstop only fires for referred users with
-    // no referral row, so it can never double-award.
+    // Attribute the referral now, but defer its reward until admin approval.
     if (referralAffiliate) {
       await attributeReferral(c.env.DB, referralAffiliate, id, referralAffiliate.referral_code);
-      await awardReferralSignupPoints(c.env.DB, referralAffiliate.user_id, id);
     }
 
     // Notify all admin users about the new registration
@@ -1121,9 +1118,7 @@ publicApp.post('/auth/register', async (c) => {
       success: true,
       data: {
         status: initialStatus,
-        message: initialStatus === 'approved'
-          ? 'Your account is ready — you can log in now.'
-          : 'Your registration is pending approval. You will be notified once an administrator reviews your application.',
+        message: PENDING_APPROVAL_MESSAGE,
       }
     });
   } catch (error) {
@@ -6770,28 +6765,41 @@ adminApp.post('/users/:id/approve', async (c) => {
       return c.json({ success: false, error: 'User not found or not pending' }, 404);
     }
 
-    await c.env.DB.prepare(`
+    const approvalResult = await c.env.DB.prepare(`
       UPDATE users SET
         status = 'approved',
         email_verified = 1,
         approved_by = ?,
         approved_at = datetime('now'),
         updated_at = datetime('now')
-      WHERE id = ?
+      WHERE id = ? AND status = 'pending'
     `).bind(adminUser.userId, userId).run();
 
-    // Growth loop (Task 5): referral_signup points fire on approval only.
-    // Register-time codes are already attributed (affiliate_referrals row
-    // exists) and invite-mode ones already awarded, so this only backstops a
-    // user whose referred_by was set without a referral row (legacy/edge).
+    // Only one concurrent approval request may own the transition and its
+    // side effects, including referral rewards and trial creation.
+    if ((approvalResult.meta.changes ?? 0) !== 1) {
+      return c.json({
+        success: false,
+        error: 'User is no longer pending approval',
+      }, 409);
+    }
+
+    // Referral points fire only after approval. Resolve an existing
+    // attribution first; legacy referred_by-only records are backfilled.
     const referredBy = user.referred_by as string | null;
     if (referredBy) {
       try {
-        const existingReferral = await c.env.DB.prepare(
-          'SELECT id FROM affiliate_referrals WHERE referred_user_id = ?'
-        ).bind(userId).first();
+        const existingReferral = await c.env.DB.prepare(`
+          SELECT ar.id, ap.user_id AS affiliate_user_id
+          FROM affiliate_referrals ar
+          JOIN affiliate_profiles ap ON ap.id = ar.affiliate_id
+          WHERE ar.referred_user_id = ?
+          LIMIT 1
+        `).bind(userId).first<{ id: string; affiliate_user_id: string }>();
 
-        if (!existingReferral) {
+        if (existingReferral) {
+          await awardReferralSignupPoints(c.env.DB, existingReferral.affiliate_user_id, userId);
+        } else {
           const affiliate = await c.env.DB.prepare(`
             SELECT id, user_id, referral_code FROM affiliate_profiles
             WHERE referral_code = ? AND is_active = 1
@@ -7886,7 +7894,7 @@ adminApp.patch('/race/cycles/:id', async (c) => {
 // Pilot schools admin (Task 1): school CRUD-lite, ambassador provisioning,
 // and student assignment. Ambassador accounts are system-owned users with an
 // unusable password sentinel; their affiliate profile's referral_code doubles
-// as the school's invite code (a valid code IS the approval — see register).
+// as the school's invite code; registration still requires admin approval.
 // ---------------------------------------------------------------------------
 
 interface SchoolRow {

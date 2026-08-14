@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { sign } from 'hono/jwt';
 import { parseJsonBody } from './http';
 import { isValidReferralCode, attributeReferral } from './affiliates';
-import { awardPoints } from './points';
+import { PENDING_APPROVAL_MESSAGE, SELF_REGISTRATION_STATUS } from './registration-policy';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -458,9 +458,8 @@ oauthApp.post('/google/callback', async (c) => {
     const selectedTierId = registrationData?.selectedTierId || 'tier_free';
     const primaryExamTypeId = registrationData?.primaryExamTypeId || null;
 
-    // Students are auto-approved (Google has verified their email);
-    // teachers/parents require admin approval, matching the pending-approval model.
-    const status = userRole === 'student' ? 'approved' : 'pending';
+    // Verified identity is not authorization: every self-registration waits.
+    const status = SELF_REGISTRATION_STATUS;
 
     // Generate a random password hash (user cannot know this password)
     // This satisfies the NOT NULL constraint while keeping the account OAuth-only
@@ -529,18 +528,9 @@ oauthApp.post('/google/callback', async (c) => {
 
     await c.env.DB.batch(statements);
 
-    // Growth loop (Task 5): valid code IS the approval — attribute and award
-    // referral_signup points immediately, exactly like /auth/register. (Uses
-    // awardPoints directly; the shared awardReferralSignupPoints helper lives
-    // in index.ts and importing it would be circular.)
+    // Referral codes only attribute; rewards are issued on admin approval.
     if (referralAffiliate) {
       await attributeReferral(c.env.DB, referralAffiliate, userId, referralAffiliate.referral_code);
-      await awardPoints(c.env.DB, {
-        userId: referralAffiliate.user_id,
-        points: 100,
-        source: 'referral_signup',
-        sourceRef: userId,
-      });
     }
 
     user = {
@@ -634,6 +624,21 @@ oauthApp.post('/google/callback', async (c) => {
     return c.json({ success: false, error: 'Authentication failed' }, 500);
   }
 
+  // Pending accounts are registration records, not authenticated sessions.
+  // Do not issue a JWT or update last_login_at until an administrator approves.
+  if (user.status !== 'approved') {
+    return c.json({
+      success: true,
+      data: {
+        user,
+        isNewUser,
+        accountLinked,
+        requiresApproval: true,
+        message: PENDING_APPROVAL_MESSAGE,
+      },
+    });
+  }
+
   // Generate JWT token
   const token = await generateJWT(
     {
@@ -656,7 +661,7 @@ oauthApp.post('/google/callback', async (c) => {
       token,
       isNewUser,
       accountLinked,
-      requiresApproval: user.status !== 'approved', // students are auto-approved; teachers/parents go pending
+      requiresApproval: false,
     }
   });
 });
