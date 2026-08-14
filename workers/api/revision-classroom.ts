@@ -2162,51 +2162,104 @@ function getWhiteboardLessonTypeInstructions(lessonType: string, topic: string):
 // per-step fallback keeps every one of these titles renderable.
 const WHITEBOARD_FALLBACK_OUTLINE = ['Introduction', 'Core concepts', 'Worked example', 'Practice tips', 'Summary'];
 
-// Generate just the lesson outline — one small, fast AI call.
-async function generateWhiteboardOutline(
+// Outline shape rule: 4-6 non-empty titles, trimmed.
+function parseWhiteboardOutline(v: unknown): string[] | null {
+  if (!Array.isArray(v) || v.length < 4 || v.length > 6) return null;
+  if (!v.every((t) => typeof t === 'string' && t.trim().length > 0)) return null;
+  return v.map((t) => (t as string).trim());
+}
+
+// Fused cold-path generation (Phase C Task 6): ONE AI call produces both the
+// lesson outline and its first step, halving cold TTFS. On partial failure
+// (valid outline, broken step) step 0 is retried with a dedicated second
+// call; on total failure the generic fallback outline + fallback step are
+// returned (flagged, never cached).
+async function generateWhiteboardOutlineAndFirstStep(
   env: Env,
   topic: string,
   subject: string,
   examType: string,
-  lessonType: string
-): Promise<{ outline: string[]; usedFallback: boolean }> {
+  lessonType: 'diagram' | 'step-by-step' | 'problem-solving' | 'concept-map'
+): Promise<{ outline: string[]; step: WhiteboardStep; usedFallback: boolean; tokensUsed: number | null }> {
+  const systemPrompt = `${WHITEBOARD_TEACHING_PROMPT}
+
+Context:
+- Subject: ${subject}
+- Topic: ${topic}
+- Exam: ${examType.toUpperCase()}
+- Lesson Type: ${lessonType}
+
+${getWhiteboardLessonTypeInstructions(lessonType, topic)}
+
+Output ONE JSON object only — the lesson outline AND its first step together — in this exact format:
+{
+  "outline": ["4-6 step titles"],
+  "firstStep": {
+    "stepNumber": 1,
+    "explanation": "What the student should understand from this step",
+    "voiceOver": "What to say while showing this step",
+    "duration": 5,
+    "commands": [ { "type": "text", "id": "title1", "props": { "left": 100, "top": 50, "text": "Title Text", "fontSize": 32, "fontWeight": "bold", "fill": "#1e40af" } } ],
+    "highlights": [],
+    "clearPrevious": false
+  }
+}
+The first step teaches the first outline title. Canvas is 1200x800. Keep commands under 12.`;
+
   try {
     const model = getGenerationModel(env);
 
     const result = await env.AI.run(model as BaseAiTextGenerationModels, {
       messages: [
-        {
-          role: 'system',
-          content: `List 4-6 step titles for a ${lessonType} whiteboard lesson on the given topic. Respond with a JSON array of strings only — no prose, no markdown fences.`,
-        },
-        { role: 'user', content: `Topic: "${topic}" (${subject}, ${examType.toUpperCase()} exam).` },
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Plan the ${lessonType} whiteboard lesson about "${topic}" for ${subject} and write its first step.` },
       ],
-      max_tokens: 300,
-      temperature: 0.5,
+      max_tokens: 1600,
+      temperature: 0.7,
     });
 
     const raw: unknown = typeof result === 'object' && result !== null && 'response' in result
       ? (result as { response: unknown }).response
       : result;
 
+    const tokensUsed =
+      typeof result === 'object' && result !== null && 'usage' in result
+        ? ((result as { usage?: { total_tokens?: number } }).usage?.total_tokens ?? null)
+        : null;
+
     // Workers AI returns `response` as a string normally, but as ALREADY-PARSED
     // JSON when the model output is bare valid JSON (llama fp8-fast does this).
-    const candidate = typeof raw === 'string' ? raw.match(/\[[\s\S]*\]/)?.[0] : raw;
-    const parsed = (typeof candidate === 'string' ? JSON.parse(candidate) : candidate) as unknown;
-    if (
-      Array.isArray(parsed) &&
-      parsed.length >= 4 &&
-      parsed.length <= 6 &&
-      parsed.every((t) => typeof t === 'string' && t.trim().length > 0)
-    ) {
-      return { outline: parsed.map((t) => (t as string).trim()), usedFallback: false };
-    }
-    console.error('Whiteboard outline failed validation — using fallback');
+    const candidate = typeof raw === 'string' ? raw.match(/\{[\s\S]*\}/)?.[0] : raw;
+    const parsed = candidate
+      ? ((typeof candidate === 'string' ? JSON.parse(candidate) : candidate) as { outline?: unknown; firstStep?: unknown })
+      : null;
 
-    throw new Error('Failed to parse whiteboard outline');
+    const outline = parseWhiteboardOutline(parsed?.outline);
+    if (outline) {
+      if (isValidWhiteboardStep(parsed?.firstStep)) {
+        return { outline, step: prefixStepCommandIds(parsed.firstStep, 0), usedFallback: false, tokensUsed };
+      }
+      // Partial failure: the outline is good — retry only step 0 with the
+      // dedicated per-step call before resorting to the fallback step.
+      console.error('Fused outline+step: first step failed validation — generating it separately');
+      const stepResult = await generateWhiteboardStep(env, topic, subject, examType, lessonType, outline, 0);
+      const combinedTokens = tokensUsed !== null || stepResult.tokensUsed !== null
+        ? (tokensUsed ?? 0) + (stepResult.tokensUsed ?? 0)
+        : null;
+      return { outline, step: stepResult.step, usedFallback: stepResult.usedFallback, tokensUsed: combinedTokens };
+    }
+
+    console.error('Fused outline+step failed validation — using fallback');
+    throw new Error('Failed to parse fused whiteboard outline');
   } catch (error) {
-    console.error('Error generating whiteboard outline:', error);
-    return { outline: [...WHITEBOARD_FALLBACK_OUTLINE], usedFallback: true };
+    console.error('Error generating fused whiteboard outline+first step:', error);
+    const outline = [...WHITEBOARD_FALLBACK_OUTLINE];
+    return {
+      outline,
+      step: prefixStepCommandIds(getFallbackWhiteboardStep(topic, outline, 0), 0),
+      usedFallback: true,
+      tokensUsed: null,
+    };
   }
 }
 
@@ -2445,29 +2498,26 @@ revisionClassroomApp.post('/lessons/:lessonId/whiteboard-teach', async (c) => {
       }
     }
 
-    const outlineResult = await generateWhiteboardOutline(c.env, topicName, subjectName, examType, lessonType);
-    const stepResult = await generateWhiteboardStep(
-      c.env, topicName, subjectName, examType, lessonType, outlineResult.outline, 0
-    );
-    const usedFallback = outlineResult.usedFallback || stepResult.usedFallback;
+    // Cold path: ONE fused AI call produces the outline and step 0 together.
+    const fused = await generateWhiteboardOutlineAndFirstStep(c.env, topicName, subjectName, examType, lessonType);
 
     // Only fully-generated lessons enter the cache, so fallback content
     // never poisons it.
-    if (!usedFallback && topicId) {
+    if (!fused.usedFallback && topicId) {
       await upsertProgressiveWhiteboardCache(
         c.env.DB, topicId, lessonType, lessonId, user.userId,
-        outlineResult.outline, 0, stepResult.step, stepResult.tokensUsed
+        fused.outline, 0, fused.step, fused.tokensUsed
       );
     }
 
     return c.json({
       success: true,
       data: {
-        outline: outlineResult.outline,
-        totalSteps: outlineResult.outline.length,
-        step: stepResult.step,
+        outline: fused.outline,
+        totalSteps: fused.outline.length,
+        step: fused.step,
         stepIndex: 0,
-        fallback: usedFallback,
+        fallback: fused.usedFallback,
         cached: false,
       },
     });

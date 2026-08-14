@@ -5,6 +5,8 @@ import { createMockD1, type MockHandler } from './helpers/mockD1';
 
 // Whiteboard Phase B Task 4: progressive per-step protocol for
 // POST /api/revision-classroom/lessons/:lessonId/whiteboard-teach.
+// Extended in Phase C Task 6: the cold outline path is a FUSED call
+// (max_tokens:1600) returning { outline, firstStep } in one round trip.
 //
 // Covered here:
 // (a) outline request with no AI binding -> fallback outline (5 generic
@@ -14,10 +16,17 @@ import { createMockD1, type MockHandler } from './helpers/mockD1';
 // (c) stepIndex > 0 without a valid outline -> 400, no generation;
 // (d) cache-hit step requests are served from the merged row without any AI
 //     call and without touching the cache row;
-// (e) a successful outline request upserts one progressive cache row
-//     ({ outline, steps: [step0] }) with server-prefixed command ids;
+// (e) a successful fused outline request upserts one progressive cache row
+//     ({ outline, steps: [step0] }) with server-prefixed command ids, the
+//     response contract is exactly
+//     { outline, totalSteps, step, stepIndex: 0, fallback, cached }, and
+//     exactly ONE AI call is made;
 // (f) a successful step request merges the new step into the existing row
-//     via UPDATE (never a second row).
+//     via UPDATE (never a second row);
+// (g) fused partial failure (valid outline, broken firstStep) retries step 0
+//     with the dedicated per-step call and still caches on success;
+// (h) fused total failure (unparseable output) -> generic fallback outline +
+//     fallback step, fallback:true, never cached.
 
 const JWT_SECRET = 'test-secret-that-is-long-enough';
 
@@ -102,11 +111,12 @@ const generatedStep = (n: number) => ({
   clearPrevious: false,
 });
 
-// Outline calls are the small max_tokens:300 ones; step calls use 1200.
+// Fused cold-path calls use max_tokens:1600 and return { outline, firstStep }
+// together; per-step calls use 1200 and return one step object.
 const mockAi = {
   run: async (_model: string, opts: { max_tokens?: number }) =>
-    opts.max_tokens === 300
-      ? { response: JSON.stringify(OUTLINE), usage: { total_tokens: 20 } }
+    opts.max_tokens === 1600
+      ? { response: JSON.stringify({ outline: OUTLINE, firstStep: generatedStep(1) }), usage: { total_tokens: 140 } }
       : { response: JSON.stringify(generatedStep(1)), usage: { total_tokens: 120 } },
 };
 
@@ -247,10 +257,17 @@ describe('whiteboard-teach progressive protocol', () => {
     expect(writeCalls(db)).toHaveLength(0);
   });
 
-  it('upserts one progressive cache row after a successful outline request', async () => {
+  it('upserts one progressive cache row after a successful outline request (ONE fused AI call)', async () => {
+    let aiCalls = 0;
+    const countingAi = {
+      run: async (model: string, opts: { max_tokens?: number }) => {
+        aiCalls++;
+        return mockAi.run(model, opts);
+      },
+    };
     const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheMissHandler, writeHandler]);
 
-    const res = await teach(db, { lessonType: 'step-by-step' }, mockAi);
+    const res = await teach(db, { lessonType: 'step-by-step' }, countingAi);
     expect(res.status).toBe(200);
     const body = (await res.json()) as {
       data: {
@@ -260,6 +277,12 @@ describe('whiteboard-teach progressive protocol', () => {
         cached: boolean;
       };
     };
+    // The fused cold path makes exactly one AI call (halved TTFS).
+    expect(aiCalls).toBe(1);
+    // Response contract unchanged: exactly these fields.
+    expect(Object.keys(body.data).sort()).toEqual(
+      ['cached', 'fallback', 'outline', 'step', 'stepIndex', 'totalSteps'].sort()
+    );
     expect(body.data.fallback).toBe(false);
     expect(body.data.cached).toBe(false);
     expect(body.data.outline).toEqual(OUTLINE);
@@ -281,14 +304,65 @@ describe('whiteboard-teach progressive protocol', () => {
     expect(stored.steps[0].commands[0].id).toBe('s0-gen-1');
   });
 
+  it('fused partial failure (valid outline, broken firstStep) retries step 0 with a second call and caches on success', async () => {
+    let aiCalls = 0;
+    const partialAi = {
+      run: async (_model: string, opts: { max_tokens?: number }) => {
+        aiCalls++;
+        return opts.max_tokens === 1600
+          ? { response: JSON.stringify({ outline: OUTLINE, firstStep: { broken: true } }), usage: { total_tokens: 140 } }
+          : { response: JSON.stringify(generatedStep(1)), usage: { total_tokens: 120 } };
+      },
+    };
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheMissHandler, writeHandler]);
+
+    const res = await teach(db, { lessonType: 'step-by-step' }, partialAi);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      data: { outline: string[]; step: { commands: { id: string }[] }; fallback: boolean; cached: boolean };
+    };
+    // Two calls: the fused one plus the dedicated step-0 retry.
+    expect(aiCalls).toBe(2);
+    expect(body.data.fallback).toBe(false);
+    expect(body.data.cached).toBe(false);
+    expect(body.data.outline).toEqual(OUTLINE);
+    expect(body.data.step.commands[0].id).toBe('s0-gen-1');
+
+    // Fully generated (outline from call 1, step from call 2) -> cached.
+    const inserts = writeCalls(db).filter((c) => /INSERT/.test(c.sql));
+    expect(inserts).toHaveLength(1);
+    const stored = JSON.parse(inserts[0].binds[4] as string) as { outline: string[] };
+    expect(stored.outline).toEqual(OUTLINE);
+  });
+
+  it('fused total failure (unparseable output) falls back generically and is never cached', async () => {
+    const garbageAi = {
+      run: async () => ({ response: 'Sorry, I cannot plan that lesson.' }),
+    };
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheMissHandler, writeHandler]);
+
+    const res = await teach(db, { lessonType: 'step-by-step' }, garbageAi);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      data: { outline: string[]; step: { commands: { id: string }[] }; fallback: boolean; cached: boolean };
+    };
+    expect(body.data.fallback).toBe(true);
+    expect(body.data.cached).toBe(false);
+    expect(body.data.outline).toEqual(['Introduction', 'Core concepts', 'Worked example', 'Practice tips', 'Summary']);
+    for (const cmd of body.data.step.commands) {
+      expect(cmd.id.startsWith('s0-')).toBe(true);
+    }
+    expect(writeCalls(db)).toHaveLength(0);
+  });
+
   it('accepts an already-parsed JSON response from the AI binding (live llama fp8-fast behavior)', async () => {
     // Live finding (Phase B verification): when the model output is bare valid
     // JSON, the Workers AI binding returns `response` as parsed JSON, not a
     // string. Outline and step generation must handle both shapes.
     const parsedJsonAi = {
       run: async (_model: string, opts: { max_tokens?: number }) =>
-        opts.max_tokens === 300
-          ? { response: [...OUTLINE], usage: { total_tokens: 20 } }
+        opts.max_tokens === 1600
+          ? { response: { outline: [...OUTLINE], firstStep: generatedStep(1) }, usage: { total_tokens: 140 } }
           : { response: generatedStep(1), usage: { total_tokens: 120 } },
     };
     const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheMissHandler, writeHandler]);
