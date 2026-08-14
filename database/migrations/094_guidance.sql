@@ -1,6 +1,7 @@
 -- Migration 094: Counselor Brie guidance foundation.
 -- Safety properties:
 --   * preflight the existing exam_readiness enum before rebuilding;
+--   * use D1-compatible deferred foreign keys and persistent guard tables;
 --   * copy columns explicitly and assert row-count parity;
 --   * preserve idx_exam_readiness_user;
 --   * retain learning_recommendations (it is not owned by this feature).
@@ -70,9 +71,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_guidance_sessions_one_active
 CREATE INDEX IF NOT EXISTS idx_guidance_answers_session
     ON guidance_session_answers(session_id, ordinal);
 
-PRAGMA foreign_keys = OFF;
+PRAGMA defer_foreign_keys = ON;
 
-CREATE TEMP TABLE _094_exam_readiness_enum_preflight (
+CREATE TABLE _094_exam_readiness_enum_preflight (
     exam_type TEXT NOT NULL CHECK (exam_type IN (
         'wassce', 'bece', 'nsmq', 'igcse', 'cambridge_as', 'cambridge_a2',
         'edexcel_igcse', 'edexcel_as', 'edexcel_a2'
@@ -109,7 +110,7 @@ SELECT
     topics_total, weak_topics, strong_topics, last_calculated, created_at
 FROM exam_readiness;
 
-CREATE TEMP TABLE _094_exam_readiness_count_check (
+CREATE TABLE _094_exam_readiness_count_check (
     delta INTEGER NOT NULL CHECK (delta = 0)
 );
 INSERT INTO _094_exam_readiness_count_check (delta)
@@ -121,4 +122,4 @@ DROP TABLE exam_readiness;
 ALTER TABLE exam_readiness_new RENAME TO exam_readiness;
 CREATE INDEX IF NOT EXISTS idx_exam_readiness_user ON exam_readiness(user_id);
 
-PRAGMA foreign_keys = ON;
+PRAGMA defer_foreign_keys = OFF;
