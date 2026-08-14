@@ -10,6 +10,8 @@ import { SplashScreen } from '@/components/SplashScreen';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
 import type { UserRole } from '@/types';
 
+const counselorBrieAutoOnboardingEnabled = import.meta.env.VITE_COUNSELOR_BRIE_ENABLED === 'true';
+
 // Wrapper for lazy-loaded components
 function LazyPage({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<PageLoader />}>{children}</Suspense>;
@@ -891,8 +893,12 @@ function App() {
       </ErrorBoundary>
 
       {/* Global Guide Components */}
-      <OnboardingTrigger />
-      <OnboardingModal />
+      {!counselorBrieAutoOnboardingEnabled && (
+        <>
+          <OnboardingTrigger />
+          <OnboardingModal />
+        </>
+      )}
       <CounselorBrieTrigger />
       <CounselorBrieWizard />
       <FeatureTour />

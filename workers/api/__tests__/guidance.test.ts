@@ -5,6 +5,7 @@ import { sign } from 'hono/jwt';
 import { createMockD1, type MockHandler } from './helpers/mockD1';
 import {
   ASSESSMENT_TARGET,
+  GUIDANCE_ANSWER_INSERT_SQL,
   TARGET_GRADES,
   computeConfidence,
   computeWeightedReadiness,
@@ -316,6 +317,46 @@ describe('Counselor Brie route contracts', () => {
   });
 
 
+  it('returns the completed assessment unless an explicit cooldown-protected retake is requested', async () => {
+    const db = createMockD1([
+      authHandler,
+      subjectHandler,
+      {
+        match: /status = 'in_progress'/,
+        first: () => null,
+      },
+      {
+        match: /status = 'completed'/,
+        first: () => ({
+          id: 'gs_done', user_id: 'user_1', exam_type: 'wassce', subject_id: 'subject_1',
+          status: 'completed', version: 10, algorithm_version: 'brie-readiness-v1',
+          questions: JSON.stringify({
+            asked: [{ questionId: 'q_1', topicId: 'topic_1', difficulty: 'medium', isCorrect: 1, timeTaken: 4 }],
+            topicQueue: [], currentDifficulty: 'hard', pendingQuestionId: null, pendingOrdinal: 1,
+          }),
+          readiness_score: 100, completed_early: 1,
+          created_at: '2026-08-14T00:00:00Z', updated_at: '2026-08-14T00:01:00Z',
+          completed_at: '2026-08-14T00:01:00Z',
+        }),
+      },
+      {
+        match: /MAX/,
+        first: () => ({ count: 1, freshness: '2026-08-14T00:01:00Z' }),
+      },
+      {
+        match: /covered/,
+        first: () => ({ total: 2, covered: 1 }),
+      },
+    ]);
+    const response = await guidanceRequest(db, '/assessment/start', {
+      method: 'POST', body: JSON.stringify({ examType: 'wassce', subjectId: 'subject_1' }),
+    });
+    expect(response.status).toBe(200);
+    const payload = await response.json() as { data: { sessionId: string; version: number; done: { readiness: number } } };
+    expect(payload.data).toMatchObject({ sessionId: 'gs_done', version: 10, done: { readiness: 100 } });
+    expect(db.calls.some((call) => /INSERT INTO guidance_sessions/.test(call.sql))).toBe(false);
+  });
+
   it('requires the client session version and rejects stale answer state before question access', async () => {
     const missingVersionDb = createMockD1([authHandler]);
     const missing = await guidanceRequest(missingVersionDb, '/assessment/gs_1/answer', {
@@ -352,6 +393,47 @@ describe('Counselor Brie route contracts', () => {
     expect(await stale.json()).toMatchObject({ code: 'STALE_SESSION' });
     expect(staleDb.calls.some((call) => call.sql.includes('WHERE q.id ='))).toBe(false);
   });
+  it('makes a stale or abandoned session fail the answer insert so its D1 batch rolls back', () => {
+    const db = new Database(':memory:');
+    try {
+      db.exec(`
+        CREATE TABLE guidance_sessions (
+          id TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          version INTEGER NOT NULL,
+          status TEXT NOT NULL
+        );
+        CREATE TABLE guidance_session_answers (
+          id TEXT PRIMARY KEY,
+          session_id TEXT NOT NULL,
+          ordinal INTEGER NOT NULL,
+          question_id TEXT NOT NULL,
+          user_answer TEXT NOT NULL,
+          is_correct INTEGER NOT NULL,
+          time_taken INTEGER NOT NULL,
+          difficulty TEXT NOT NULL,
+          topic_id TEXT,
+          idempotency_key TEXT NOT NULL,
+          question_attempt_id TEXT NOT NULL,
+          created_at TEXT NOT NULL
+        );
+        INSERT INTO guidance_sessions (id, user_id, version, status)
+        VALUES ('gs_1', 'user_1', 3, 'in_progress');
+      `);
+      const insert = db.prepare(GUIDANCE_ANSWER_INSERT_SQL);
+      const values = ['answer_1', 'gs_1', 'user_1', 2, 0, 'q_1', 'B', 1, 4, 'medium', null, 'idem_1', 'attempt_1'];
+      expect(() => insert.run(...values)).toThrow(/NOT NULL/);
+      expect(db.prepare('SELECT COUNT(*) AS count FROM guidance_session_answers').get()).toEqual({ count: 0 });
+
+      db.prepare("UPDATE guidance_sessions SET status = 'abandoned' WHERE id = 'gs_1'").run();
+      values[3] = 3;
+      expect(() => insert.run(...values)).toThrow(/NOT NULL/);
+      expect(db.prepare('SELECT COUNT(*) AS count FROM guidance_session_answers').get()).toEqual({ count: 0 });
+    } finally {
+      db.close();
+    }
+  });
+
   it('replays an accepted idempotency key without creating another attempt', async () => {
     const db = createMockD1([
       authHandler,

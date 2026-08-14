@@ -35,6 +35,17 @@ export const ASSESSMENT_TARGET = 9;
 export const SKIP_THRESHOLD = 20;
 export const RECENT_EVIDENCE_DAYS = 180;
 export const RETAKE_COOLDOWN_SECONDS = 24 * 60 * 60;
+export const GUIDANCE_ANSWER_INSERT_SQL = `
+  INSERT INTO guidance_session_answers (
+    id, session_id, ordinal, question_id, user_answer, is_correct, time_taken,
+    difficulty, topic_id, idempotency_key, question_attempt_id, created_at
+  ) VALUES (
+    ?,
+    (SELECT id FROM guidance_sessions
+      WHERE id = ? AND user_id = ? AND version = ? AND status = 'in_progress'),
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now')
+  )
+`;
 export const DIFFICULTY_ORDER = ['easy', 'medium', 'hard', 'expert'] as const;
 export const DIFFICULTY_WEIGHTS: Record<string, number> = {
   easy: 1,
@@ -722,6 +733,30 @@ guidanceApp.post('/assessment/start', async (c) => {
     } });
   }
 
+  if (!forceRetake) {
+    const completedSession = await c.env.DB.prepare(`
+      SELECT * FROM guidance_sessions
+      WHERE user_id = ? AND exam_type = ? AND subject_id = ? AND status = 'completed'
+      ORDER BY completed_at DESC LIMIT 1
+    `).bind(userId, examType, subjectId).first<SessionRow>();
+    if (completedSession) {
+      const completedEnvelope = parseEnvelope(completedSession.questions);
+      const snapshot = await getEvidenceSnapshot(c.env.DB, userId, subjectId);
+      const readiness = Number(completedSession.readiness_score ?? computeWeightedReadiness(completedEnvelope.asked));
+      return c.json({ success: true, data: {
+        sessionId: completedSession.id,
+        version: completedSession.version,
+        askedSoFar: completedEnvelope.asked.length,
+        target: ASSESSMENT_TARGET,
+        done: {
+          readiness,
+          ...assessmentMetadata(snapshot, Boolean(completedSession.completed_early)),
+        },
+        ...assessmentMetadata(snapshot, Boolean(completedSession.completed_early)),
+      } });
+    }
+  }
+
   if (forceRetake) {
     const latest = await c.env.DB.prepare(`
       SELECT created_at FROM guidance_sessions
@@ -867,13 +902,9 @@ guidanceApp.post('/assessment/:sessionId/answer', async (c) => {
   });
   const guidanceAnswerId = newId('guidance_answer');
   const answerOrdinal = envelope.asked.length - 1;
-  const answerInsert = c.env.DB.prepare(`
-    INSERT INTO guidance_session_answers (
-      id, session_id, ordinal, question_id, user_answer, is_correct, time_taken,
-      difficulty, topic_id, idempotency_key, question_attempt_id, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
-  `).bind(
-    guidanceAnswerId, sessionId, answerOrdinal, questionId, answer, correct ? 1 : 0,
+  const answerInsert = c.env.DB.prepare(GUIDANCE_ANSWER_INSERT_SQL).bind(
+    guidanceAnswerId, sessionId, userId, session.version,
+    answerOrdinal, questionId, answer, correct ? 1 : 0,
     timeTaken, question.difficulty, question.topic_id, idempotencyKey, prepared.attemptId,
   );
   const sessionUpdate = c.env.DB.prepare(`

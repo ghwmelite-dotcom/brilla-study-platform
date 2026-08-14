@@ -56,6 +56,7 @@ export function CounselorBrieWizard() {
   const dialogRef = useRef<HTMLDivElement>(null);
   const openedFromRef = useRef<HTMLElement | null>(null);
   const questionStartedAtRef = useRef(Date.now());
+  const dismissRef = useRef<() => void>(() => undefined);
 
   const subjects = useMemo(() => getGuidanceSubjects(selectedExam), [selectedExam]);
   const grades = getGuidanceGradeScale(selectedExam);
@@ -79,6 +80,7 @@ export function CounselorBrieWizard() {
     if (user && selectedSubject) markBrieDismissed(user.id, examType, selectedSubject);
     closeWizard();
   };
+  dismissRef.current = dismiss;
 
   useEffect(() => {
     if (!wizardOpen) return;
@@ -90,7 +92,7 @@ export function CounselorBrieWizard() {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
-        dismiss();
+        dismissRef.current();
         return;
       }
       if (event.key !== 'Tab' || !dialogRef.current) return;
@@ -117,7 +119,7 @@ export function CounselorBrieWizard() {
       document.body.style.overflow = previousOverflow;
       openedFromRef.current?.focus();
     };
-  });
+  }, [wizardOpen]);
 
   if (!wizardOpen) return null;
 

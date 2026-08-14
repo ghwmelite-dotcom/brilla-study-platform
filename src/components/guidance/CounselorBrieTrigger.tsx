@@ -62,7 +62,7 @@ export function CounselorBrieTrigger() {
       // The start endpoint resumes the one active user/exam/subject session. This
       // probe intentionally runs even though the goal was already saved.
       const result = await startAssessment(examType, subjectId);
-      if (!cancelled && (result === 'quiz' || result === 'skip' || result === 'complete')) openWizard();
+      if (!cancelled && result === 'quiz') openWizard();
     }, 500);
 
     return () => {
