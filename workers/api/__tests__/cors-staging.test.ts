@@ -7,6 +7,10 @@ const deployments = JSON.parse(
 ) as { staging: { pagesOrigin: string } };
 const configuredOrigin = deployments.staging.pagesOrigin;
 
+const wranglerToml = readFileSync(new URL('../../../wrangler.toml', import.meta.url), 'utf8');
+const stagingVars = wranglerToml
+  .split('[env.staging.vars]')[1]
+  ?.split(/\r?\n\[/, 1)[0] ?? '';
 const env = {
   APP_URL: configuredOrigin,
   ENVIRONMENT: 'staging',
@@ -22,6 +26,13 @@ describe('staging CORS boundary', () => {
     );
 
     expect(response.headers.get('Access-Control-Allow-Origin')).toBe(configuredOrigin);
+  });
+
+  it('pins Google OAuth to the staging callback instead of production', () => {
+    expect(stagingVars).toContain(
+      `GOOGLE_REDIRECT_URI = "${configuredOrigin}/oauth/callback"`,
+    );
+    expect(stagingVars).not.toContain('GOOGLE_REDIRECT_URI = "https://brillaprep.org/oauth/callback"');
   });
 
   it('does not reflect an unconfigured origin', async () => {

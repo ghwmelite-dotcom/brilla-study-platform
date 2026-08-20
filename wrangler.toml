@@ -121,6 +121,7 @@ AI_MODEL_TTS = "@cf/deepgram/aura-2-en"
 AI_MODEL_VISION = "@cf/meta/llama-4-scout-17b-16e-instruct"
 AI_CACHE_THRESHOLD = "0.92"
 APP_URL = "https://whiteboard-staging.brilla-study-platform.pages.dev"
+GOOGLE_REDIRECT_URI = "https://whiteboard-staging.brilla-study-platform.pages.dev/oauth/callback"
 REGISTRATION_MODE = "open"
 
 [env.staging.ai]
