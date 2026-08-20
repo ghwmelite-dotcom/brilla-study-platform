@@ -7,27 +7,20 @@ import {
   Shield,
   Users,
   Zap,
-  BookOpen,
   Trophy,
-  MessageCircle,
   Globe,
   Copy,
   Check,
   ChevronRight,
-  Star,
   Heart,
   Rocket,
-  Target,
   BarChart3,
   Lock,
   Clock,
   GraduationCap,
   Brain,
-  Wallet,
-  Repeat,
   Gift,
   Flame,
-  ExternalLink,
   Twitter,
   MessageSquare,
   Send,
@@ -226,13 +219,6 @@ function AnimatedCounter({ end, suffix = '', duration = 2000 }: { end: number; s
 export default function BriieTokenPage() {
   const [copied, setCopied] = useState(false);
   const particles = useParticles(30);
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const handleCopyCA = () => {
     navigator.clipboard.writeText(TOKEN_CA);
@@ -596,7 +582,7 @@ export default function BriieTokenPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {roadmap.map((phase, i) => (
+            {roadmap.map((phase) => (
               <div
                 key={phase.phase}
                 className={`relative rounded-2xl p-6 border transition-all duration-300 ${
