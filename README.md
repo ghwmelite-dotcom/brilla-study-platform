@@ -89,7 +89,7 @@ Also on board: an **e-library** with multimedia content (R2-backed), an **intera
   <img src="docs/assets/architecture.svg" alt="Brilla system architecture" width="100%">
 </p>
 
-The frontend is a React 18 SPA (73 route pages, 49 Zustand stores) built with Vite and deployed to Cloudflare Pages. The backend is a single Cloudflare Worker running a Hono router with 28 route modules (`workers/api/index.ts`), backed by Cloudflare D1 (SQLite — canonical schema plus a 3-migration post-squash chain; the original 001-087 chain is archived), two R2 buckets (e-library media, whiteboard recordings), and Workers AI (Llama 3.3 70B) for all AI features. A cron trigger runs every six hours to clean up expired demo data. Email goes through Resend, sign-in supports Google OAuth, and payments run through Paystack.
+The frontend is a React 18 SPA (73 route pages, 49 Zustand stores) built with Vite and deployed to Cloudflare Pages. The backend is a single Cloudflare Worker running a Hono router with 28 route modules (`workers/api/index.ts`), backed by Cloudflare D1 (SQLite — canonical schema plus a maintained post-squash migration chain; the original 001-087 chain is archived), two R2 buckets (e-library media, whiteboard recordings), and Workers AI (Llama 3.3 70B) for all AI features. A cron trigger runs every six hours to clean up expired demo data. Email goes through Resend, sign-in supports Google OAuth, and payments run through Paystack.
 
 ## Tech Stack
 
@@ -101,7 +101,7 @@ The frontend is a React 18 SPA (73 route pages, 49 Zustand stores) built with Vi
 | **Data** | Cloudflare D1 (SQLite at the edge), Cloudflare R2 (object storage) |
 | **AI** | Cloudflare Workers AI — `@cf/meta/llama-3.3-70b-instruct-fp8-fast` |
 | **Services** | Resend (email), Google OAuth, Paystack (payments &amp; MoMo) |
-| **Tooling** | Wrangler 3, ESLint 9, PostCSS, PWA (service worker + manifest) |
+| **Tooling** | Wrangler 4, ESLint 9, PostCSS, PWA (service worker + manifest) |
 
 ## Getting Started
 
@@ -134,8 +134,8 @@ npm run dev:all    # Both, via concurrently
 The migration chain 001-087 was squashed on 2026-08-11 into a canonical
 `database/schema.sql` + `database/seed.sql`. The old files are preserved
 untouched in `database/migrations/archive/` (outside `migrations_dir`, so
-wrangler ignores them); `database/migrations/` now holds only the post-squash
-chain (`088`, `088a`, `089`).
+wrangler ignores them); `database/migrations/` now holds the maintained
+post-squash chain from `088` through `098`.
 
 Fresh environment — single bootstrap path:
 
@@ -144,7 +144,7 @@ wrangler d1 create brilla-db
 npm run db:migrate    # schema.sql — FRESH databases only, not idempotent
 npm run db:seed       # seed.sql — idempotent, safe to re-run
 wrangler d1 execute brilla-db --local --file=database/seeds/seed_chat_rooms.sql
-npm run db:baseline   # wrangler d1 migrations apply → records 088, 088a, 089
+npm run db:baseline   # wrangler d1 migrations apply → records the current post-squash chain
 npm run db:verify     # gate — must be green
 ```
 
@@ -178,10 +178,14 @@ wrangler secret put GOOGLE_CLIENT_SECRET
 ### Build &amp; deploy
 
 ```bash
-npm run build      # tsc -b && vite build
+VITE_DEPLOYMENT_TARGET=production npm run build  # tsc -b, Vite, and fail-closed Pages CSP generation
 npm run lint       # ESLint
 wrangler deploy    # API to Cloudflare Workers
 ```
+
+Staging builds must set both `VITE_DEPLOYMENT_TARGET=staging` and the approved
+staging `VITE_API_URL`; the build fails if the target and API origin do not
+match. In PowerShell, set these with `$env:VITE_DEPLOYMENT_TARGET=...`.
 
 ## Project Structure
 
@@ -201,7 +205,7 @@ brilla-study-platform/
 │   ├── revision-classroom.ts
 │   └── ...                # tutor, teambattles, payments, whiteboards, ...
 ├── database/            # canonical schema.sql + seed.sql; migrations/ holds
-│   │                    #   the post-squash chain (088, 088a, 089);
+│   │                    #   the maintained post-squash chain through 098;
 │   │                    #   migrations/archive/ preserves 001-087 untouched
 ├── public/                # PWA manifest, service worker, icons, offline page
 ├── scripts/               # PWA icon/asset generators

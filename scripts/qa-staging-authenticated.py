@@ -4,6 +4,7 @@ from pathlib import Path
 import secrets
 import subprocess
 import time
+import tomllib
 from typing import Any
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -12,10 +13,46 @@ from playwright.sync_api import sync_playwright
 
 
 ROOT = Path(__file__).resolve().parents[1]
-API_URL = "https://brilla-api-staging.ghwmelite.workers.dev/api"
-PAGES_URL = "https://whiteboard-staging.brilla-study-platform.pages.dev"
-DATABASE = "brilla-db-staging"
+DEPLOYMENTS = json.loads((ROOT / "config" / "deployments.json").read_text(encoding="utf-8"))
+STAGING = DEPLOYMENTS["staging"]
+API_URL = f"{STAGING['apiOrigin']}/api"
+PAGES_URL = STAGING["pagesOrigin"]
+DATABASE = STAGING["database"]
 SCREENSHOT = ROOT / "artifacts" / "staging-my-plan-authenticated.png"
+
+EXPECTED_STAGING = {
+    "apiOrigin": "https://brilla-api-staging.ghwmelite.workers.dev",
+    "pagesOrigin": "https://whiteboard-staging.brilla-study-platform.pages.dev",
+    "database": "brilla-db-staging",
+    "databaseId": "1faeca41-2233-4a0b-a273-0d3aadba9c96",
+}
+
+
+def validate_staging_target() -> None:
+    """Fail closed before any remote request or write can reach production."""
+    if STAGING != EXPECTED_STAGING:
+        raise RuntimeError("Staging deployment manifest does not match the approved isolated target")
+
+    wrangler = tomllib.loads((ROOT / "wrangler.toml").read_text(encoding="utf-8"))
+    production_db = wrangler["d1_databases"][0]
+    staging_db = wrangler["env"]["staging"]["d1_databases"][0]
+    production_manifest = DEPLOYMENTS["production"]
+
+    if (
+        production_db["database_name"] != production_manifest["database"]
+        or production_db["database_id"] != production_manifest["databaseId"]
+        or staging_db["database_name"] != EXPECTED_STAGING["database"]
+        or staging_db["database_id"] != EXPECTED_STAGING["databaseId"]
+    ):
+        raise RuntimeError("Wrangler database bindings do not match the deployment manifest")
+
+    if (
+        staging_db["database_name"] == production_db["database_name"]
+        or staging_db["database_id"] == production_db["database_id"]
+        or STAGING["apiOrigin"] == production_manifest["apiOrigin"]
+        or STAGING["pagesOrigin"] == production_manifest["pagesOrigin"]
+    ):
+        raise RuntimeError("Staging target is not isolated from production")
 
 
 def create_synthetic_whiteboard_png() -> str:
@@ -94,6 +131,8 @@ def run_staging_sql(sql: str) -> None:
             "d1",
             "execute",
             DATABASE,
+            "--env",
+            "staging",
             "--remote",
             "--command",
             sql,
@@ -101,11 +140,46 @@ def run_staging_sql(sql: str) -> None:
         cwd=ROOT,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         check=False,
         env={**os.environ, "NO_COLOR": "1"},
     )
     if result.returncode != 0:
         raise RuntimeError("Staging D1 operation failed")
+
+def verify_staging_migration_ledger() -> None:
+    result = subprocess.run(
+        [
+            "npx.cmd",
+            "wrangler",
+            "d1",
+            "execute",
+            DATABASE,
+            "--env",
+            "staging",
+            "--remote",
+            "--command",
+            "SELECT name FROM d1_migrations ORDER BY id;",
+            "--json",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+        env={**os.environ, "NO_COLOR": "1"},
+    )
+    if result.returncode != 0:
+        raise RuntimeError("Unable to read the staging migration ledger")
+
+    payload = json.loads(result.stdout)
+    rows = payload[0].get("results", []) if payload else []
+    remote_names = [row.get("name") for row in rows]
+    local_names = sorted(path.name for path in (ROOT / "database" / "migrations").glob("*.sql"))
+    if remote_names != local_names or "098_ai_answer_cache.sql" not in remote_names:
+        raise RuntimeError("Staging migration ledger is not current through migration 098")
 
 
 def sql_literal(value: str) -> str:
@@ -113,9 +187,12 @@ def sql_literal(value: str) -> str:
 
 
 def main() -> None:
+    validate_staging_target()
+    verify_staging_migration_ledger()
     checks: list[dict[str, Any]] = []
     synthetic_whiteboard_png = create_synthetic_whiteboard_png()
     run_id = f"{int(time.time())}-{secrets.token_hex(4)}"
+    qa_topic_id = f"topic_qa_{run_id.replace('-', '_')}"
     student_email = f"qa-student-{run_id}@example.invalid"
     teacher_email = f"qa-teacher-{run_id}@example.invalid"
     student_password = secrets.token_urlsafe(24) + "A1!"
@@ -269,13 +346,20 @@ def main() -> None:
         )
         require(checks, "free_plan_regenerate_gated", status == 403, {"status": status})
 
+        run_staging_sql(
+            "INSERT INTO topics (id, subject_id, name, slug, description) VALUES ("
+            f"{sql_literal(qa_topic_id)}, 'subj_nsmq_math', "
+            f"{sql_literal('Synthetic QA ' + run_id)}, {sql_literal('synthetic-qa-' + run_id)}, "
+            "'Run-scoped live AI verification topic');"
+        )
+
         status, payload = request_json(
             "POST",
             "/revision-classroom/sessions",
             {
                 "examType": "nsmq",
                 "subjectId": "subj_nsmq_math",
-                "topicId": "topic_algebra",
+                "topicId": qa_topic_id,
                 "sessionType": "topic_revision",
             },
             student_token,
@@ -321,8 +405,32 @@ def main() -> None:
             "premium_whiteboard_teach",
             status == 200
             and payload.get("success") is True
-            and payload.get("data", {}).get("fallback") is False,
-            {"status": status, "fallback": payload.get("data", {}).get("fallback")},
+            and payload.get("data", {}).get("fallback") is False
+            and payload.get("data", {}).get("cached") is False,
+            {"status": status, "fallback": payload.get("data", {}).get("fallback"), "cached": payload.get("data", {}).get("cached")},
+        )
+
+        outline = payload.get("data", {}).get("outline", [])
+        status, payload = request_json(
+            "POST",
+            f"/revision-classroom/lessons/{lesson_id}/whiteboard-teach",
+            {"lessonType": "step-by-step", "stepIndex": 1, "outline": outline},
+            student_token,
+            timeout=180,
+        )
+        require(
+            checks,
+            "premium_whiteboard_dedicated_step",
+            status == 200
+            and payload.get("success") is True
+            and payload.get("data", {}).get("stepIndex") == 1
+            and payload.get("data", {}).get("fallback") is False
+            and payload.get("data", {}).get("cached") is False,
+            {
+                "status": status,
+                "fallback": payload.get("data", {}).get("fallback"),
+                "cached": payload.get("data", {}).get("cached"),
+            },
         )
 
         status, payload = request_json(
@@ -400,7 +508,7 @@ def main() -> None:
             page = context.new_page()
             console_errors: list[str] = []
             failed_requests: list[str] = []
-            guidance_statuses: list[int] = []
+            guidance_responses: list[dict[str, Any]] = []
             page.on(
                 "console",
                 lambda message: console_errors.append(message.text)
@@ -414,7 +522,9 @@ def main() -> None:
             )
             page.on(
                 "response",
-                lambda response: guidance_statuses.append(response.status)
+                lambda response: guidance_responses.append(
+                    {"url": response.url, "status": response.status}
+                )
                 if "/api/guidance/" in response.url
                 else None,
             )
@@ -428,8 +538,16 @@ def main() -> None:
                 response is not None
                 and response.status == 200
                 and page.url.endswith("/my-plan")
-                and all(status < 400 for status in guidance_statuses),
-                {"document_status": response.status if response else None, "guidance_statuses": guidance_statuses},
+                and bool(guidance_responses)
+                and any(
+                    "/api/guidance/plan" in item["url"] and item["status"] == 200
+                    for item in guidance_responses
+                )
+                and all(item["status"] < 400 for item in guidance_responses),
+                {
+                    "document_status": response.status if response else None,
+                    "guidance_responses": guidance_responses,
+                },
             )
             require(
                 checks,
@@ -451,7 +569,11 @@ def main() -> None:
             try:
                 run_staging_sql(
                     "UPDATE users SET status='suspended', is_active=0, session_version=session_version+1 "
-                    f"WHERE email IN ({sql_literal(student_email)}, {sql_literal(teacher_email)});"
+                    f"WHERE email IN ({sql_literal(student_email)}, {sql_literal(teacher_email)}); "
+                    "DELETE FROM revision_sessions WHERE user_id IN ("
+                    "SELECT id FROM users "
+                    f"WHERE email IN ({sql_literal(student_email)}, {sql_literal(teacher_email)})); "
+                    f"DELETE FROM topics WHERE id={sql_literal(qa_topic_id)};"
                 )
             except Exception:
                 checks.append({"name": "qa_accounts_suspended", "passed": False, "detail": "cleanup failed"})

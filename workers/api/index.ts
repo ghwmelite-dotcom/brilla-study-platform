@@ -791,10 +791,18 @@ const app = new Hono<AppEnv>();
 // Middleware
 app.use('*', cors({
   origin: (origin, c) => {
-    const allowed = new Set(['https://brillaprep.org', 'https://www.brillaprep.org']);
+    const allowed = new Set<string>();
     if (c.env.APP_URL) {
       try {
-        allowed.add(new URL(c.env.APP_URL).origin);
+        const configuredOrigin = new URL(c.env.APP_URL).origin;
+        allowed.add(configuredOrigin);
+        if (
+          configuredOrigin === 'https://brillaprep.org'
+          || configuredOrigin === 'https://www.brillaprep.org'
+        ) {
+          allowed.add('https://brillaprep.org');
+          allowed.add('https://www.brillaprep.org');
+        }
       } catch {
         // Ignore malformed deployment configuration and fail closed.
       }

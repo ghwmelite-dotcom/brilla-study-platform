@@ -116,7 +116,7 @@ const generatedStep = (n: number) => ({
 const mockAi = {
   run: async (_model: string, opts: { max_tokens?: number }) =>
     opts.max_tokens === 1600
-      ? { response: JSON.stringify({ outline: OUTLINE, firstStep: generatedStep(1) }), usage: { total_tokens: 140 } }
+      ? { response: JSON.stringify({ outline: OUTLINE, firstStep: generatedStep(0) }), usage: { total_tokens: 140 } }
       : { response: JSON.stringify(generatedStep(1)), usage: { total_tokens: 120 } },
 };
 
@@ -134,6 +134,41 @@ async function teach(db: unknown, body: object, ai?: unknown) {
 
 const writeCalls = (db: { calls: { sql: string; binds: unknown[] }[] }) =>
   db.calls.filter((c) => /INSERT INTO revision_ai_interactions|UPDATE revision_ai_interactions/.test(c.sql));
+
+const expectStepResponseOptions = (options: Record<string, unknown>, expectedStepNumber: number) => {
+  expect(options.temperature).toBe(0.2);
+  expect(options.response_format).toMatchObject({
+    type: 'json_schema',
+    json_schema: {
+      required: ['stepNumber', 'explanation', 'voiceOver', 'duration', 'commands', 'highlights', 'clearPrevious'],
+      properties: {
+        stepNumber: { type: 'integer', enum: [expectedStepNumber] },
+        explanation: { minLength: 1, maxLength: 4000 },
+        duration: { minimum: 1, maximum: 120 },
+        commands: {
+          minItems: 1,
+          maxItems: 12,
+          items: {
+            properties: {
+              type: { enum: ['rect', 'circle', 'line', 'arrow', 'text', 'path', 'polygon', 'primitive', 'math'] },
+              props: {
+                additionalProperties: false,
+                properties: {
+                  x1: { type: 'number' },
+                  points: {
+                    minItems: 3,
+                    maxItems: 100,
+                  },
+                  name: { minLength: 1, maxLength: 100 },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+};
 
 describe('whiteboard-teach progressive protocol', () => {
   it('returns the fallback outline + fallback step 0 when AI is unavailable', async () => {
@@ -301,8 +336,8 @@ describe('whiteboard-teach progressive protocol', () => {
     expect(body.data.cached).toBe(false);
     expect(body.data.outline).toEqual(OUTLINE);
     // Generated ids are prefixed server-side before returning.
-    expect(body.data.step.commands[0].id).toBe('s0-gen-1');
-    expect(body.data.step.highlights).toEqual(['s0-gen-1']);
+    expect(body.data.step.commands[0].id).toBe('s0-gen-0');
+    expect(body.data.step.highlights).toEqual(['s0-gen-0']);
 
     const inserts = writeCalls(db).filter((c) => /INSERT/.test(c.sql));
     expect(inserts).toHaveLength(1);
@@ -315,17 +350,19 @@ describe('whiteboard-teach progressive protocol', () => {
     };
     expect(stored.outline).toEqual(OUTLINE);
     expect(stored.steps).toHaveLength(1);
-    expect(stored.steps[0].commands[0].id).toBe('s0-gen-1');
+    expect(stored.steps[0].commands[0].id).toBe('s0-gen-0');
   });
 
   it('fused partial failure (valid outline, broken firstStep) retries step 0 with a second call and caches on success', async () => {
     let aiCalls = 0;
+    const capturedOptions: Record<string, unknown>[] = [];
     const partialAi = {
-      run: async (_model: string, opts: { max_tokens?: number }) => {
+      run: async (_model: string, opts: Record<string, unknown>) => {
+        capturedOptions.push(opts);
         aiCalls++;
         return opts.max_tokens === 1600
           ? { response: JSON.stringify({ outline: OUTLINE, firstStep: { broken: true } }), usage: { total_tokens: 140 } }
-          : { response: JSON.stringify(generatedStep(1)), usage: { total_tokens: 120 } };
+          : { response: JSON.stringify(generatedStep(0)), usage: { total_tokens: 120 } };
       },
     };
     const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheMissHandler, writeHandler]);
@@ -338,9 +375,10 @@ describe('whiteboard-teach progressive protocol', () => {
     // Two calls: the fused one plus the dedicated step-0 retry.
     expect(aiCalls).toBe(2);
     expect(body.data.fallback).toBe(false);
+    expectStepResponseOptions(capturedOptions[1], 1);
     expect(body.data.cached).toBe(false);
     expect(body.data.outline).toEqual(OUTLINE);
-    expect(body.data.step.commands[0].id).toBe('s0-gen-1');
+    expect(body.data.step.commands[0].id).toBe('s0-gen-0');
 
     // Fully generated (outline from call 1, step from call 2) -> cached.
     const inserts = writeCalls(db).filter((c) => /INSERT/.test(c.sql));
@@ -369,6 +407,106 @@ describe('whiteboard-teach progressive protocol', () => {
     expect(writeCalls(db)).toHaveLength(0);
   });
 
+  it('rejects bounded-schema violations at runtime and never caches them', async () => {
+    const invalidSteps = [
+      { ...generatedStep(0), duration: -1 },
+      { ...generatedStep(0), commands: Array.from({ length: 13 }, (_, index) => ({
+        type: 'text', id: `too-many-${index}`, props: { text: 'x' },
+      })) },
+      { ...generatedStep(0), commands: [{
+        type: 'text', id: 'huge-coordinate', props: { left: 10001, top: 10, text: 'x' },
+      }] },
+      { ...generatedStep(0), commands: [{
+        type: 'polygon', id: 'broken-polygon', props: { points: [{ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 10001, y: 2 }] },
+      }] },
+      { ...generatedStep(0), commands: [{
+        type: 'primitive', id: 'deep-primitive', props: { name: 'axes', params: { a: { b: { c: { d: { e: 1 } } } } } },
+      }] },
+      { ...generatedStep(0), commands: [{
+        type: 'text', id: 'array-props', props: [] as unknown as Record<string, unknown>,
+      }] },
+      { ...generatedStep(0), commands: [{
+        type: 'arrow', id: 'unsupported-arrow-shape', props: { from: [0, 0], to: [10, 10], width: 2 },
+      }] },
+    ];
+
+    for (const invalidStep of invalidSteps) {
+      const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheMissHandler, writeHandler]);
+      const invalidAi = {
+        run: async (_model: string, opts: { max_tokens?: number }) =>
+          opts.max_tokens === 1600
+            ? { response: { outline: OUTLINE, firstStep: invalidStep } }
+            : { response: invalidStep },
+      };
+      const res = await teach(db, { lessonType: 'step-by-step' }, invalidAi);
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { data: { fallback: boolean; cached: boolean } };
+      expect(body.data.fallback).toBe(true);
+      expect(body.data.cached).toBe(false);
+      expect(writeCalls(db)).toHaveLength(0);
+    }
+  });
+
+
+  it('rejects oversized fused outline titles and never caches them', async () => {
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheMissHandler, writeHandler]);
+    const oversizedOutlineAi = {
+      run: async () => ({
+        response: {
+          outline: ['x'.repeat(201), ...OUTLINE.slice(1)],
+          firstStep: generatedStep(0),
+        },
+      }),
+    };
+
+    const res = await teach(db, { lessonType: 'step-by-step' }, oversizedOutlineAi);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { data: { outline: string[]; fallback: boolean; cached: boolean } };
+    expect(body.data.outline).toEqual(OUTLINE);
+    expect(body.data.fallback).toBe(true);
+    expect(body.data.cached).toBe(false);
+    expect(writeCalls(db)).toHaveLength(0);
+  });
+  it('accepts valid nested primitive params, polygon points, and a 200-character outline title', async () => {
+    const boundaryOutline = ['x'.repeat(200), ...OUTLINE.slice(1)];
+    const validBoundaryStep = {
+      ...generatedStep(0),
+      commands: [
+        {
+          type: 'polygon',
+          id: 'triangle',
+          props: { points: [{ x: 0, y: 0 }, { x: 80, y: 0 }, { x: 40, y: 60 }], fill: '#ffffff' },
+        },
+        {
+          type: 'primitive',
+          id: 'table',
+          props: {
+            name: 'tableGrid',
+            params: {
+              left: 100,
+              top: 100,
+              width: 400,
+              height: 200,
+              rows: [['Term', 'Value'], ['x', '2']],
+            },
+          },
+        },
+      ],
+      highlights: ['triangle', 'table'],
+    };
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheMissHandler, writeHandler]);
+    const boundaryAi = {
+      run: async () => ({ response: { outline: boundaryOutline, firstStep: validBoundaryStep } }),
+    };
+
+    const res = await teach(db, { lessonType: 'step-by-step' }, boundaryAi);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { data: { outline: string[]; fallback: boolean; cached: boolean } };
+    expect(body.data.outline).toEqual(boundaryOutline);
+    expect(body.data.fallback).toBe(false);
+    expect(body.data.cached).toBe(false);
+    expect(writeCalls(db)).toHaveLength(1);
+  });
   it('accepts an already-parsed JSON response from the AI binding (live llama fp8-fast behavior)', async () => {
     // Live finding (Phase B verification): when the model output is bare valid
     // JSON, the Workers AI binding returns `response` as parsed JSON, not a
@@ -376,7 +514,7 @@ describe('whiteboard-teach progressive protocol', () => {
     const parsedJsonAi = {
       run: async (_model: string, opts: { max_tokens?: number }) =>
         opts.max_tokens === 1600
-          ? { response: { outline: [...OUTLINE], firstStep: generatedStep(1) }, usage: { total_tokens: 140 } }
+          ? { response: { outline: [...OUTLINE], firstStep: generatedStep(0) }, usage: { total_tokens: 140 } }
           : { response: generatedStep(1), usage: { total_tokens: 120 } },
     };
     const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheMissHandler, writeHandler]);
@@ -389,10 +527,75 @@ describe('whiteboard-teach progressive protocol', () => {
     expect(body.data.fallback).toBe(false);
     expect(body.data.cached).toBe(false);
     expect(body.data.outline).toEqual(OUTLINE);
-    expect(body.data.step.commands[0].id).toBe('s0-gen-1');
+    expect(body.data.step.commands[0].id).toBe('s0-gen-0');
     expect(writeCalls(db).filter((c) => /INSERT/.test(c.sql))).toHaveLength(1);
   });
 
+  it('uses the server-requested step number when generated metadata is stale', async () => {
+    const row = {
+      id: 'wb_row_step_number',
+      ai_message: JSON.stringify({ outline: OUTLINE, steps: [storedStep(0)] }),
+    };
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheRowHandler(row), writeHandler]);
+    let aiCalls = 0;
+    let capturedOptions: Record<string, unknown> | null = null;
+    const staleMetadataAi = {
+      run: async (_model: string, opts: Record<string, unknown>) => {
+        aiCalls++;
+        capturedOptions = opts;
+        return { response: generatedStep(0), usage: { total_tokens: 50 } };
+      },
+    };
+
+    const res = await teach(
+      db,
+      { lessonType: 'step-by-step', stepIndex: 1, outline: OUTLINE },
+      staleMetadataAi,
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      data: { fallback: boolean; cached: boolean; step: { stepNumber: number } };
+    };
+    expect(body.data.fallback).toBe(false);
+    expect(body.data.cached).toBe(false);
+    expect(body.data.step.stepNumber).toBe(2);
+    expect(aiCalls).toBe(1);
+    expectStepResponseOptions(capturedOptions!, 2);
+    expect(writeCalls(db).filter((call) => /UPDATE/.test(call.sql))).toHaveLength(1);
+  });
+  it('retries a malformed dedicated step once, then caches the valid retry', async () => {
+    const row = {
+      id: 'wb_row_retry',
+      ai_message: JSON.stringify({ outline: OUTLINE, steps: [storedStep(0)] }),
+    };
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheRowHandler(row), writeHandler]);
+    let aiCalls = 0;
+    const capturedOptions: Record<string, unknown>[] = [];
+    const retryAi = {
+      run: async (_model: string, opts: Record<string, unknown>) => {
+        capturedOptions.push(opts);
+        aiCalls++;
+        return {
+          response: aiCalls === 1 ? { ...generatedStep(1), duration: 0 } : generatedStep(1),
+          usage: { total_tokens: 50 },
+        };
+      },
+    };
+
+    const res = await teach(
+      db,
+      { lessonType: 'step-by-step', stepIndex: 1, outline: OUTLINE },
+      retryAi,
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { data: { fallback: boolean; cached: boolean } };
+    expect(body.data.fallback).toBe(false);
+    expect(body.data.cached).toBe(false);
+    expect(aiCalls).toBe(2);
+    expectStepResponseOptions(capturedOptions[0], 2);
+    expectStepResponseOptions(capturedOptions[1], 2);
+    expect(writeCalls(db).filter((call) => /UPDATE/.test(call.sql))).toHaveLength(1);
+  });
   it('merges a newly generated step into the existing cache row via UPDATE', async () => {
     const row = {
       id: 'wb_row_1',
@@ -400,10 +603,20 @@ describe('whiteboard-teach progressive protocol', () => {
     };
     const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheRowHandler(row), writeHandler]);
 
-    const res = await teach(db, { lessonType: 'step-by-step', stepIndex: 1, outline: OUTLINE }, mockAi);
+
+    let capturedOptions: Record<string, unknown> | null = null;
+    const countingAi = {
+      run: async (model: string, opts: Record<string, unknown>) => {
+        capturedOptions = opts;
+        return mockAi.run(model, opts as { max_tokens?: number });
+      },
+    };
+    const res = await teach(db, { lessonType: 'step-by-step', stepIndex: 1, outline: OUTLINE }, countingAi);
     expect(res.status).toBe(200);
     const body = (await res.json()) as { data: { fallback: boolean; cached: boolean; step: { commands: { id: string }[] } } };
     expect(body.data.fallback).toBe(false);
+    expect(capturedOptions).not.toBeNull();
+    expectStepResponseOptions(capturedOptions!, 2);
     expect(body.data.cached).toBe(false);
     expect(body.data.step.commands[0].id).toBe('s1-gen-1');
 

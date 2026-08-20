@@ -181,7 +181,21 @@ describe('ask-about endpoint', () => {
     expect(captured).not.toBeNull();
     const { model, opts } = captured!;
     expect(model).toBe('@cf/meta/llama-4-scout-17b-16e-instruct');
-    expect(opts.guided_json).toBeTruthy();
+    expect(opts.guided_json).toMatchObject({
+      additionalProperties: false,
+      properties: {
+        answer: { minLength: 1, maxLength: 4000 },
+        annotation: {
+          additionalProperties: false,
+          properties: {
+            props: {
+              additionalProperties: false,
+              required: ['left', 'top', 'radius'],
+            },
+          },
+        },
+      },
+    });
     const messages = opts.messages as { role: string; content: { type: string; text?: string; image_url?: { url: string } }[] }[];
     expect(messages).toHaveLength(1);
     expect(messages[0].role).toBe('user');
@@ -220,6 +234,40 @@ describe('ask-about endpoint', () => {
     expect(capturedPrompt).toContain('what is this label?');
   });
 
+  it('retries one malformed annotation and returns a valid second answer', async () => {
+    let aiCalls = 0;
+    const retryAi = {
+      run: async () => {
+        aiCalls++;
+        return {
+          response: JSON.stringify(
+            aiCalls === 1
+              ? {
+                  answer: 'Malformed first response',
+                  annotation: {
+                    type: 'circle',
+                    id: 'bad',
+                    props: { left: [10], top: 20, radius: 30 },
+                  },
+                }
+              : { answer: 'That point marks the value on the number line.' },
+          ),
+        };
+      },
+    };
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler]);
+
+    const res = await askAbout(
+      db,
+      { imageBase64: 'aW1hZ2U=', x: 100, y: 200 },
+      retryAi,
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { data: { answer: string; fallback: boolean } };
+    expect(body.data.fallback).toBe(false);
+    expect(body.data.answer).toContain('number line');
+    expect(aiCalls).toBe(2);
+  });
   it('returns the honest fallback when the model output fails validation', async () => {
     const mockAi = {
       run: async () => ({ response: 'I cannot help with that.' }),

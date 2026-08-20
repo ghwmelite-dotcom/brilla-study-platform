@@ -1,42 +1,65 @@
+import { readFileSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
-export const PRODUCTION_API_ORIGIN = 'https://brilla-api.ghwmelite.workers.dev';
-export const STAGING_API_ORIGIN = 'https://brilla-api-staging.ghwmelite.workers.dev';
+const deploymentConfig = JSON.parse(
+  readFileSync(new URL('../config/deployments.json', import.meta.url), 'utf8'),
+);
 
-const ALLOWED_API_ORIGINS = new Set([PRODUCTION_API_ORIGIN, STAGING_API_ORIGIN]);
+export const PRODUCTION_API_ORIGIN = deploymentConfig.production.apiOrigin;
+export const STAGING_API_ORIGIN = deploymentConfig.staging.apiOrigin;
+export const EXPECTED_API_ORIGIN_REFERENCES = 2;
 
-export function resolvePagesApiOrigin(configuredUrl) {
+
+export function resolvePagesApiOrigin(configuredUrl, deploymentTarget) {
+  if (deploymentTarget !== 'production' && deploymentTarget !== 'staging') {
+    throw new Error('VITE_DEPLOYMENT_TARGET must be explicitly set to production or staging');
+  }
+
+  const expectedOrigin = deploymentTarget === 'staging'
+    ? STAGING_API_ORIGIN
+    : PRODUCTION_API_ORIGIN;
   const value = configuredUrl?.trim();
-  if (!value || value.startsWith('/')) return PRODUCTION_API_ORIGIN;
+  if (!value || value.startsWith('/')) {
+    if (deploymentTarget === 'staging') {
+      throw new Error('Staging builds require the explicit staging VITE_API_URL');
+    }
+    return expectedOrigin;
+  }
 
   let url;
   try {
     url = new URL(value);
   } catch {
-    throw new Error('VITE_API_URL must be an absolute HTTPS URL or a relative path');
+    throw new Error('VITE_API_URL must be an absolute HTTPS URL');
   }
 
   if (url.protocol !== 'https:' || url.username || url.password) {
     throw new Error('VITE_API_URL must use HTTPS and must not contain credentials');
   }
-  if (!ALLOWED_API_ORIGINS.has(url.origin)) {
-    throw new Error(`Refusing to add unapproved API origin to Pages CSP: ${url.origin}`);
+  if (url.origin !== expectedOrigin) {
+    throw new Error(
+      `VITE_API_URL origin ${url.origin} does not match deployment target ${deploymentTarget}`,
+    );
   }
   return url.origin;
 }
 
-export function configurePagesHeaders(source, configuredUrl) {
-  const apiOrigin = resolvePagesApiOrigin(configuredUrl);
+export function configurePagesHeaders(source, configuredUrl, deploymentTarget) {
+  const apiOrigin = resolvePagesApiOrigin(configuredUrl, deploymentTarget);
   const canonicalCount = source.split(PRODUCTION_API_ORIGIN).length - 1;
-  if (canonicalCount !== 2) {
-    throw new Error(`Expected exactly 2 canonical API origins in dist/_headers, found ${canonicalCount}`);
+  if (canonicalCount !== EXPECTED_API_ORIGIN_REFERENCES) {
+    throw new Error(
+      `Expected exactly ${EXPECTED_API_ORIGIN_REFERENCES} canonical API origins in dist/_headers, found ${canonicalCount}`,
+    );
   }
 
   const output = source.replaceAll(PRODUCTION_API_ORIGIN, apiOrigin);
   const targetCount = output.split(apiOrigin).length - 1;
-  if (targetCount !== 2) {
-    throw new Error(`Expected exactly 2 target API origins in dist/_headers, found ${targetCount}`);
+  if (targetCount !== EXPECTED_API_ORIGIN_REFERENCES) {
+    throw new Error(
+      `Expected exactly ${EXPECTED_API_ORIGIN_REFERENCES} target API origins in dist/_headers, found ${targetCount}`,
+    );
   }
   if (apiOrigin !== PRODUCTION_API_ORIGIN && output.includes(PRODUCTION_API_ORIGIN)) {
     throw new Error('Staging Pages CSP still contains the production API origin');
@@ -47,7 +70,11 @@ export function configurePagesHeaders(source, configuredUrl) {
 async function main() {
   const headersUrl = new URL('../dist/_headers', import.meta.url);
   const source = await readFile(headersUrl, 'utf8');
-  const { output, apiOrigin } = configurePagesHeaders(source, process.env.VITE_API_URL);
+  const { output, apiOrigin } = configurePagesHeaders(
+    source,
+    process.env.VITE_API_URL,
+    process.env.VITE_DEPLOYMENT_TARGET,
+  );
   if (output !== source) await writeFile(headersUrl, output, 'utf8');
   console.log(`Pages CSP API origin: ${apiOrigin}`);
 }

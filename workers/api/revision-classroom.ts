@@ -1925,6 +1925,13 @@ All primitives take a bounding box and compute every coordinate internally — n
 - triangleFigure — params: { left, top, width, height, labels?: { angles?: [string,string,string], sides?: [string,string,string] } } → labeled triangle.
 - tableGrid — params: { left, top, width, height, rows: string[][] } → grid with cell texts.
 Math expressions go in "math" commands with LaTeX: { "type": "math", "id": "...", "props": { "left": 100, "top": 100, "latex": "\\frac{3}{4}" } } (latex max 200 chars).
+RAW COMMAND PROPS (use only these exact keys):
+- rect: left, top, width, height, fill, stroke, strokeWidth, opacity, angle, scaleX, scaleY
+- circle: left, top, radius, fill, stroke, strokeWidth, opacity
+- line/arrow: x1, y1, x2, y2, stroke, strokeWidth, opacity (never use from/to)
+- text: left, top, text, fontSize, fontFamily, fontWeight, fill, textAlign, opacity
+- path: left, top, path, fill, stroke, strokeWidth, opacity
+- polygon: left, top, points (array of { x, y }), fill, stroke, strokeWidth, opacity
 
 RESPOND WITH VALID JSON ONLY in this exact format:
 {
@@ -1960,6 +1967,51 @@ RESPOND WITH VALID JSON ONLY in this exact format:
   "summary": "Key takeaways from this visual lesson"
 }`;
 
+// Structured-output schema restricts the model to renderer-supported property
+// names. Runtime validation below remains the final untrusted-output boundary.
+const WHITEBOARD_COMMAND_PROPS_RESPONSE_SCHEMA = {
+  type: 'object',
+  properties: {
+    left: { type: 'number' },
+    top: { type: 'number' },
+    width: { type: 'number' },
+    height: { type: 'number' },
+    radius: { type: 'number' },
+    x1: { type: 'number' },
+    y1: { type: 'number' },
+    x2: { type: 'number' },
+    y2: { type: 'number' },
+    strokeWidth: { type: 'number' },
+    opacity: { type: 'number' },
+    fontSize: { type: 'number' },
+    angle: { type: 'number' },
+    scaleX: { type: 'number' },
+    scaleY: { type: 'number' },
+    path: { type: 'string', maxLength: 10000 },
+    fill: { type: 'string', maxLength: 10000 },
+    stroke: { type: 'string', maxLength: 10000 },
+    text: { type: 'string', maxLength: 10000 },
+    fontFamily: { type: 'string', maxLength: 10000 },
+    fontWeight: { type: 'string', maxLength: 10000 },
+    textAlign: { type: 'string', maxLength: 10000 },
+    color: { type: 'string', maxLength: 10000 },
+    latex: { type: 'string', minLength: 1, maxLength: 200 },
+    points: {
+      type: 'array',
+      minItems: 3,
+      maxItems: 100,
+      items: {
+        type: 'object',
+        properties: { x: { type: 'number' }, y: { type: 'number' } },
+        required: ['x', 'y'],
+        additionalProperties: false,
+      },
+    },
+    name: { type: 'string', minLength: 1, maxLength: 100 },
+    params: { type: 'object' },
+  },
+  additionalProperties: false,
+};
 // Structural validation of AI-generated whiteboard content. The model's JSON
 // is untrusted: it must have the fields the renderer dereferences, every
 // command must be a known type, and every numeric prop must be finite.
@@ -1973,8 +2025,8 @@ const WHITEBOARD_COMMAND_RESPONSE_SCHEMA = {
   type: 'object',
   properties: {
     type: { type: 'string', enum: [...WHITEBOARD_COMMAND_TYPE_VALUES] },
-    id: { type: 'string' },
-    props: { type: 'object' },
+    id: { type: 'string', minLength: 1, maxLength: 100 },
+    props: WHITEBOARD_COMMAND_PROPS_RESPONSE_SCHEMA,
   },
   required: ['type', 'id', 'props'],
 };
@@ -1982,17 +2034,21 @@ const WHITEBOARD_COMMAND_RESPONSE_SCHEMA = {
 const WHITEBOARD_STEP_RESPONSE_SCHEMA = {
   type: 'object',
   properties: {
-    stepNumber: { type: 'integer' },
-    explanation: { type: 'string' },
-    voiceOver: { type: 'string' },
-    duration: { type: 'number' },
+    stepNumber: { type: 'integer', minimum: 1, maximum: 6 },
+    explanation: { type: 'string', minLength: 1, maxLength: 4000 },
+    voiceOver: { type: 'string', minLength: 1, maxLength: 4000 },
+    duration: { type: 'number', minimum: 1, maximum: 120 },
     commands: {
       type: 'array',
       minItems: 1,
       maxItems: 12,
       items: WHITEBOARD_COMMAND_RESPONSE_SCHEMA,
     },
-    highlights: { type: 'array', items: { type: 'string' } },
+    highlights: {
+      type: 'array',
+      maxItems: 12,
+      items: { type: 'string', minLength: 1, maxLength: 100 },
+    },
     clearPrevious: { type: 'boolean' },
   },
   required: ['stepNumber', 'explanation', 'voiceOver', 'duration', 'commands', 'highlights', 'clearPrevious'],
@@ -2005,32 +2061,145 @@ const WHITEBOARD_FUSED_RESPONSE_SCHEMA = {
       type: 'array',
       minItems: 4,
       maxItems: 6,
-      items: { type: 'string' },
+      items: { type: 'string', minLength: 1, maxLength: 200 },
     },
     firstStep: WHITEBOARD_STEP_RESPONSE_SCHEMA,
   },
   required: ['outline', 'firstStep'],
 };
 
-function isValidWhiteboardStep(step: unknown): step is WhiteboardStep {
+const WHITEBOARD_NUMERIC_PROPS = new Set([
+  'left', 'top', 'width', 'height', 'radius', 'x1', 'y1', 'x2', 'y2',
+  'strokeWidth', 'opacity', 'fontSize', 'angle', 'scaleX', 'scaleY',
+]);
+const WHITEBOARD_STRING_PROPS = new Set([
+  'path', 'fill', 'stroke', 'text', 'fontFamily', 'fontWeight', 'textAlign', 'color', 'latex',
+]);
+const WHITEBOARD_ALLOWED_PROPS: Record<string, ReadonlySet<string>> = {
+  rect: new Set(['left', 'top', 'width', 'height', 'fill', 'stroke', 'strokeWidth', 'opacity', 'angle', 'scaleX', 'scaleY']),
+  circle: new Set(['left', 'top', 'radius', 'fill', 'stroke', 'strokeWidth', 'opacity']),
+  line: new Set(['x1', 'y1', 'x2', 'y2', 'stroke', 'strokeWidth', 'opacity']),
+  arrow: new Set(['x1', 'y1', 'x2', 'y2', 'stroke', 'strokeWidth', 'opacity']),
+  text: new Set(['left', 'top', 'text', 'fontSize', 'fontFamily', 'fontWeight', 'fill', 'textAlign', 'opacity']),
+  path: new Set(['left', 'top', 'path', 'fill', 'stroke', 'strokeWidth', 'opacity']),
+  polygon: new Set(['left', 'top', 'points', 'fill', 'stroke', 'strokeWidth', 'opacity']),
+  primitive: new Set(['name', 'params']),
+  math: new Set(['left', 'top', 'latex', 'fontSize', 'fontFamily', 'color', 'fill', 'opacity']),
+};
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === 'object' && !Array.isArray(value);
+}
+
+function isBoundedPrimitiveParam(value: unknown, depth = 0): boolean {
+  if (depth > 4) return false;
+  if (value === null || typeof value === 'boolean') return true;
+  if (typeof value === 'number') return Number.isFinite(value) && Math.abs(value) <= 10000;
+  if (typeof value === 'string') return value.length <= 1000;
+  if (Array.isArray(value)) {
+    return value.length <= 100 && value.every((item) => isBoundedPrimitiveParam(item, depth + 1));
+  }
+  if (!isPlainRecord(value)) return false;
+  const entries = Object.entries(value);
+  return entries.length <= 50 && entries.every(([key, item]) => (
+    key.length > 0
+    && key.length <= 100
+    && isBoundedPrimitiveParam(item, depth + 1)
+  ));
+}
+
+function hasValidWhiteboardProps(type: string, props: unknown): props is Record<string, unknown> {
+  if (!isPlainRecord(props)) return false;
+  const allowed = WHITEBOARD_ALLOWED_PROPS[type];
+  if (!allowed) return false;
+  for (const [key, value] of Object.entries(props)) {
+    if (!allowed.has(key)) return false;
+    if (WHITEBOARD_NUMERIC_PROPS.has(key)) {
+      if (typeof value !== 'number' || !Number.isFinite(value) || Math.abs(value) > 10000) return false;
+      continue;
+    }
+    if (WHITEBOARD_STRING_PROPS.has(key)) {
+      if (typeof value !== 'string' || value.length > 10000) return false;
+      continue;
+    }
+    if (key === 'points') {
+      if (
+        !Array.isArray(value)
+        || value.length < 3
+        || value.length > 100
+        || !value.every((point) => (
+          isPlainRecord(point)
+          && Object.keys(point).length === 2
+          && typeof point.x === 'number'
+          && Number.isFinite(point.x)
+          && Math.abs(point.x) <= 10000
+          && typeof point.y === 'number'
+          && Number.isFinite(point.y)
+          && Math.abs(point.y) <= 10000
+        ))
+      ) return false;
+      continue;
+    }
+    if (key === 'name') {
+      if (typeof value !== 'string' || value.length === 0 || value.length > 100) return false;
+      continue;
+    }
+    if (key === 'params' && !isBoundedPrimitiveParam(value)) return false;
+  }
+  if (type === 'primitive' && (!('name' in props) || !('params' in props))) return false;
+  if (type === 'math' && (typeof props.latex !== 'string' || props.latex.length === 0 || props.latex.length > 200)) return false;
+  return true;
+}
+function isValidWhiteboardStep(
+  step: unknown,
+  expectedStepNumber?: number,
+  requireComplete = false,
+): step is WhiteboardStep {
   if (!step || typeof step !== 'object') return false;
   const s = step as Partial<WhiteboardStep>;
-  if (typeof s.explanation !== 'string' || typeof s.duration !== 'number') return false;
-  if (!Array.isArray(s.commands) || s.commands.length === 0) return false;
+  if (!Number.isInteger(s.stepNumber) || (s.stepNumber as number) < 1 || (s.stepNumber as number) > 20) {
+    return false;
+  }
+  if (expectedStepNumber !== undefined && s.stepNumber !== expectedStepNumber) return false;
+  if (
+    typeof s.explanation !== 'string'
+    || s.explanation.length === 0
+    || s.explanation.length > 4000
+  ) return false;
+  if (!Number.isFinite(s.duration) || (s.duration as number) < 1 || (s.duration as number) > 120) {
+    return false;
+  }
+  if (
+    s.voiceOver !== undefined
+    && (typeof s.voiceOver !== 'string' || s.voiceOver.length === 0 || s.voiceOver.length > 4000)
+  ) return false;
+  if (requireComplete && typeof s.voiceOver !== 'string') return false;
+  if (
+    s.highlights !== undefined
+    && (
+      !Array.isArray(s.highlights)
+      || s.highlights.length > 12
+      || !s.highlights.every((id) => typeof id === 'string' && id.length > 0 && id.length <= 100)
+    )
+  ) return false;
+  if (requireComplete && !Array.isArray(s.highlights)) return false;
+  if (s.clearPrevious !== undefined && typeof s.clearPrevious !== 'boolean') return false;
+  if (requireComplete && typeof s.clearPrevious !== 'boolean') return false;
+  if (!Array.isArray(s.commands) || s.commands.length === 0 || s.commands.length > 12) return false;
   for (const cmd of s.commands) {
-    if (!cmd || typeof cmd.id !== 'string' || !WHITEBOARD_COMMAND_TYPES.has(cmd.type)) return false;
-    if (!cmd.props || typeof cmd.props !== 'object') return false;
-    for (const v of Object.values(cmd.props)) {
-      if (typeof v === 'number' && !Number.isFinite(v)) return false;
-    }
-    // Primitive commands must name the primitive and carry a params object.
-    if (cmd.type === 'primitive') {
-      if (typeof cmd.props.name !== 'string' || cmd.props.name.length === 0) return false;
-      if (!cmd.props.params || typeof cmd.props.params !== 'object' || Array.isArray(cmd.props.params)) return false;
-    }
-    // Math commands carry bounded LaTeX source.
-    if (cmd.type === 'math') {
-      if (typeof cmd.props.latex !== 'string' || cmd.props.latex.length === 0 || cmd.props.latex.length > 200) return false;
+    if (
+      !cmd
+      || typeof cmd.id !== 'string'
+      || cmd.id.length === 0
+      || cmd.id.length > 100
+      || !WHITEBOARD_COMMAND_TYPES.has(cmd.type)
+    ) return false;
+    if (!hasValidWhiteboardProps(cmd.type, cmd.props)) {
+      console.error('Whiteboard command props rejected', {
+        type: cmd.type,
+        propKeys: isPlainRecord(cmd.props) ? Object.keys(cmd.props).slice(0, 30) : [],
+      });
+      return false;
     }
   }
   return true;
@@ -2219,7 +2388,7 @@ const WHITEBOARD_FALLBACK_OUTLINE = ['Introduction', 'Core concepts', 'Worked ex
 // Outline shape rule: 4-6 non-empty titles, trimmed.
 function parseWhiteboardOutline(v: unknown): string[] | null {
   if (!Array.isArray(v) || v.length < 4 || v.length > 6) return null;
-  if (!v.every((t) => typeof t === 'string' && t.trim().length > 0)) return null;
+  if (!v.every((t) => typeof t === 'string' && t.trim().length > 0 && t.trim().length <= 200)) return null;
   return v.map((t) => (t as string).trim());
 }
 
@@ -2289,7 +2458,7 @@ ${UNTRUSTED_AI_DATA_INSTRUCTION}`;
 
     const outline = parseWhiteboardOutline(parsed?.outline);
     if (outline) {
-      if (isValidWhiteboardStep(parsed?.firstStep)) {
+      if (isValidWhiteboardStep(parsed?.firstStep, 1, true)) {
         return { outline, step: prefixStepCommandIds(parsed.firstStep, 0), usedFallback: false, tokensUsed };
       }
       // Partial failure: the outline is good — retry only step 0 with the
@@ -2384,56 +2553,113 @@ Output ONE JSON step object only — not a whole lesson — in this exact format
 }
 Canvas is 1200x800. Keep commands under 12.`;
 
-  try {
-    const model = getGenerationModel(env);
+  const model = getGenerationModel(env);
+  let totalTokens = 0;
+  let hasTokenUsage = false;
+  let lastError: unknown = new Error('Whiteboard generation did not run');
 
-    const result = await env.AI.run(model, {
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: formatUntrustedAiData('Whiteboard step context', {
-          topic, subject, examType, lessonType, outline, stepIndex,
-        }) },
-      ],
-      max_tokens: 1200,
-      temperature: 0.2,
-      response_format: {
-        type: 'json_schema',
-        json_schema: WHITEBOARD_STEP_RESPONSE_SCHEMA,
-      },
-    });
+  // Structured generation is probabilistic even with JSON schema enabled.
+  // Retry once on a transport, parse, or validation failure; invalid content is
+  // never cached, and two failed attempts still degrade honestly to fallback.
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const result = await env.AI.run(model, {
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: formatUntrustedAiData('Whiteboard step context', {
+            topic, subject, examType, lessonType, outline, stepIndex,
+          }) },
+        ],
+        max_tokens: 1800,
+        temperature: 0.2,
+        response_format: {
+          type: 'json_schema',
+          json_schema: {
+            ...WHITEBOARD_STEP_RESPONSE_SCHEMA,
+            properties: {
+              ...WHITEBOARD_STEP_RESPONSE_SCHEMA.properties,
+              stepNumber: { type: 'integer', enum: [stepIndex + 1] },
+            },
+          },
+        },
+      });
 
-    const raw: unknown = typeof result === 'object' && result !== null && 'response' in result
-      ? (result as { response: unknown }).response
-      : result;
-
-    const tokensUsed =
-      typeof result === 'object' && result !== null && 'usage' in result
-        ? ((result as { usage?: { total_tokens?: number } }).usage?.total_tokens ?? null)
-        : null;
-
-    // Workers AI returns `response` as a string normally, but as ALREADY-PARSED
-    // JSON when the model output is bare valid JSON (llama fp8-fast does this).
-    const candidate = typeof raw === 'string' ? raw.match(/\{[\s\S]*\}/)?.[0] : raw;
-    if (candidate) {
-      const parsed = (typeof candidate === 'string' ? JSON.parse(candidate) : candidate) as unknown;
-      if (isValidWhiteboardStep(parsed)) {
-        return { step: prefixStepCommandIds(parsed, stepIndex), usedFallback: false, tokensUsed };
+      const raw: unknown = typeof result === 'object' && result !== null && 'response' in result
+        ? (result as { response: unknown }).response
+        : result;
+      const attemptTokens =
+        typeof result === 'object' && result !== null && 'usage' in result
+          ? ((result as { usage?: { total_tokens?: number } }).usage?.total_tokens ?? null)
+          : null;
+      if (attemptTokens !== null) {
+        totalTokens += attemptTokens;
+        hasTokenUsage = true;
       }
-      console.error(`Whiteboard step ${stepIndex} failed validation — using fallback step`);
+
+      // Workers AI returns `response` as a string normally, but as already
+      // parsed JSON when the model output is bare valid JSON.
+      const candidate = typeof raw === 'string' ? raw.match(/\{[\s\S]*\}/)?.[0] : raw;
+      if (candidate) {
+        const parsedCandidate = (typeof candidate === 'string' ? JSON.parse(candidate) : candidate) as unknown;
+        // Step position is selected and authorized by the server route, not by
+        // generated content. Normalize that metadata while validating every
+        // generated presentation field unchanged.
+        const parsed = isPlainRecord(parsedCandidate) ? { ...parsedCandidate, stepNumber: stepIndex + 1 } : parsedCandidate;
+        if (isValidWhiteboardStep(parsed, stepIndex + 1, true)) {
+          return {
+            step: prefixStepCommandIds(parsed, stepIndex),
+            usedFallback: false,
+            tokensUsed: hasTokenUsage ? totalTokens : null,
+          };
+        }
+
+        const parsedRecord = isPlainRecord(parsed) ? parsed : {};
+        const commands = Array.isArray(parsedRecord.commands) ? parsedRecord.commands : [];
+        console.error('Whiteboard step shape rejected', {
+          expectedStepNumber: stepIndex + 1,
+          stepNumber: typeof parsedRecord.stepNumber === 'number' ? parsedRecord.stepNumber : typeof parsedRecord.stepNumber,
+          explanation: typeof parsedRecord.explanation === 'string' ? parsedRecord.explanation.length : typeof parsedRecord.explanation,
+          voiceOver: typeof parsedRecord.voiceOver === 'string' ? parsedRecord.voiceOver.length : typeof parsedRecord.voiceOver,
+          duration: typeof parsedRecord.duration === 'number' ? parsedRecord.duration : typeof parsedRecord.duration,
+          commandCount: commands.length,
+          commandShapes: commands.slice(0, 12).map((command) => (
+            isPlainRecord(command)
+              ? {
+                  type: typeof command.type === 'string' ? command.type : typeof command.type,
+                  propKeys: isPlainRecord(command.props) ? Object.keys(command.props).slice(0, 30) : [],
+                }
+              : { type: typeof command, propKeys: [] }
+          )),
+          highlightCount: Array.isArray(parsedRecord.highlights) ? parsedRecord.highlights.length : typeof parsedRecord.highlights,
+          clearPrevious: typeof parsedRecord.clearPrevious,
+        });
+      } else {
+        console.error('Whiteboard step response contained no JSON object', {
+          rawType: typeof raw,
+          rawLength: typeof raw === 'string' ? raw.length : null,
+        });
+      }
+      lastError = new Error('Failed to validate whiteboard step');
+    } catch (error) {
+      console.error('Whiteboard step attempt could not be parsed', {
+        attempt,
+        errorType: error instanceof Error ? error.name : typeof error,
+      });
+      lastError = error;
     }
 
-    throw new Error('Failed to parse whiteboard step');
-  } catch (error) {
-    console.error(`Error generating whiteboard step ${stepIndex}:`, error);
-    // Flagged so the UI can be honest about this step being generic.
-    return {
-      step: prefixStepCommandIds(getFallbackWhiteboardStep(topic, outline, stepIndex), stepIndex),
-      usedFallback: true,
-      tokensUsed: null,
-    };
+    if (attempt === 1) {
+      console.error(`Whiteboard step ${stepIndex} generation failed validation — retrying once`);
+    }
   }
-}
 
+  console.error(`Error generating whiteboard step ${stepIndex} after retry:`, lastError);
+  return {
+    step: prefixStepCommandIds(getFallbackWhiteboardStep(topic, outline, stepIndex), stepIndex),
+    usedFallback: true,
+    tokensUsed: null,
+  };
+}
 // API Endpoint: Generate AI whiteboard teaching content (progressive per-step protocol)
 revisionClassroomApp.post('/lessons/:lessonId/whiteboard-teach', async (c) => {
   try {
@@ -2912,41 +3138,73 @@ const ASK_ABOUT_FALLBACK: AskAboutAnswer = {
 };
 
 // guided_json is verified honored by the vision model (vision spike results).
+const ASK_ABOUT_ANNOTATION_PROP_KEYS = new Set([
+  'left', 'top', 'radius', 'stroke', 'strokeWidth', 'fill', 'opacity',
+]);
+
 const ASK_ABOUT_GUIDED_SCHEMA = {
   type: 'object',
   properties: {
-    answer: { type: 'string' },
+    answer: { type: 'string', minLength: 1, maxLength: 4000 },
     annotation: {
       type: 'object',
       properties: {
         type: { type: 'string', enum: ['circle'] },
-        id: { type: 'string' },
-        props: { type: 'object' },
+        id: { type: 'string', minLength: 1, maxLength: 100 },
+        props: {
+          type: 'object',
+          properties: {
+            left: { type: 'number' },
+            top: { type: 'number' },
+            radius: { type: 'number' },
+            stroke: { type: 'string', maxLength: 100 },
+            strokeWidth: { type: 'number' },
+            fill: { type: 'string', maxLength: 100 },
+            opacity: { type: 'number' },
+          },
+          required: ['left', 'top', 'radius'],
+          additionalProperties: false,
+        },
       },
       required: ['type', 'id', 'props'],
+      additionalProperties: false,
     },
   },
   required: ['answer'],
+  additionalProperties: false,
 };
 
 // Structural validation of the model's answer JSON. The annotation is
-// optional but, when present, must be a circle with a non-empty id and finite
-// numeric props. Coordinate props are then CLAMPED in place to the 1200x800
-// canvas (same clamping-not-rejection rule as check-work).
+// optional but, when present, must be a bounded circle. Coordinate props are
+// clamped in place to the 1200x800 canvas.
 function isValidAskAboutResponse(v: unknown): v is { answer: string; annotation?: AskAboutAnnotation } {
-  if (!v || typeof v !== 'object') return false;
-  const r = v as { answer?: unknown; annotation?: unknown };
-  if (typeof r.answer !== 'string' || r.answer.trim().length === 0) return false;
-  if (r.annotation === undefined || r.annotation === null) return true;
+  if (!isPlainRecord(v)) return false;
+  if (typeof v.answer !== 'string' || v.answer.trim().length === 0 || v.answer.length > 4000) return false;
+  if (v.annotation === undefined || v.annotation === null) return true;
+  if (!isPlainRecord(v.annotation)) return false;
 
-  const ann = r.annotation as Partial<AskAboutAnnotation>;
-  if (!ann || typeof ann !== 'object') return false;
+  const ann = v.annotation;
+  if (Object.keys(ann).some((key) => !['type', 'id', 'props'].includes(key))) return false;
   if (ann.type !== 'circle') return false;
-  if (typeof ann.id !== 'string' || ann.id.trim().length === 0) return false;
-  if (!ann.props || typeof ann.props !== 'object' || Array.isArray(ann.props)) return false;
-  for (const val of Object.values(ann.props)) {
-    if (typeof val === 'number' && !Number.isFinite(val)) return false;
+  if (typeof ann.id !== 'string' || ann.id.trim().length === 0 || ann.id.length > 100) return false;
+  if (!isPlainRecord(ann.props)) return false;
+  if (
+    typeof ann.props.left !== 'number'
+    || typeof ann.props.top !== 'number'
+    || typeof ann.props.radius !== 'number'
+  ) return false;
+
+  for (const [key, val] of Object.entries(ann.props)) {
+    if (!ASK_ABOUT_ANNOTATION_PROP_KEYS.has(key)) return false;
+    if (typeof val === 'number') {
+      if (!Number.isFinite(val) || Math.abs(val) > 10000) return false;
+    } else if (typeof val === 'string') {
+      if (val.length > 100) return false;
+    } else {
+      return false;
+    }
   }
+
   for (const [key, val] of Object.entries(ann.props)) {
     if (typeof val !== 'number') continue;
     if (CHECK_WORK_X_PROPS.has(key) || CHECK_WORK_W_PROPS.has(key)) {
@@ -2957,7 +3215,6 @@ function isValidAskAboutResponse(v: unknown): v is { answer: string; annotation?
   }
   return true;
 }
-
 // API Endpoint: Answer a question about the exact spot the student tapped on
 // the whiteboard (premium-only). Never cached — every tap/question is unique.
 revisionClassroomApp.post('/lessons/:lessonId/ask-about', async (c) => {
@@ -3022,46 +3279,67 @@ Respond with ONLY JSON in this exact shape:
 { "answer": "...", "annotation": { "type": "circle", "id": "tap-highlight", "props": { "left": ${x}, "top": ${y}, "radius": 60, "stroke": "#7c3aed" } } }
 The annotation is optional — include it only when circling the tapped spot helps. It must be a circle centered near (${x}, ${y}); the canvas is 1200x800.`;
 
-  try {
-    const model = getVisionModel(c.env);
-    const result: unknown = await c.env.AI.run(model as never, {
-      messages: [
-        {
-          role: 'user',
-          content: [
-            { type: 'text', text: prompt },
-            { type: 'image_url', image_url: { url: `data:image/png;base64,${imageBase64}` } },
-          ],
-        },
-      ],
-      max_tokens: 400,
-      guided_json: ASK_ABOUT_GUIDED_SCHEMA,
-    } as never);
+  const model = getVisionModel(c.env);
+  let lastError: unknown = new Error('Ask-about generation did not run');
 
-    // The runtime shape is { response: string } — always unwrap, never cast.
-    const text = unwrapAiText(result);
-    const candidate = text.match(/\{[\s\S]*\}/)?.[0];
-    const parsed = candidate ? (JSON.parse(candidate) as unknown) : null;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const result: unknown = await c.env.AI.run(model as never, {
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: prompt },
+              { type: 'image_url', image_url: { url: `data:image/png;base64,${imageBase64}` } },
+            ],
+          },
+        ],
+        max_tokens: 400,
+        guided_json: ASK_ABOUT_GUIDED_SCHEMA,
+      } as never);
 
-    if (!parsed || !isValidAskAboutResponse(parsed)) {
-      console.error('Ask-about output failed validation — serving honest fallback');
-      throw new Error('Invalid ask-about response');
+      const text = unwrapAiText(result);
+      const candidate = text.match(/\{[\s\S]*\}/)?.[0];
+      const parsed = candidate ? (JSON.parse(candidate) as unknown) : null;
+
+      if (parsed && isValidAskAboutResponse(parsed)) {
+        const annotation = parsed.annotation ?? null;
+        if (annotation) prefixAnnotationIds([annotation]);
+
+        return c.json({
+          success: true,
+          data: { answer: parsed.answer, annotation, fallback: false },
+        });
+      }
+
+      const parsedRecord = isPlainRecord(parsed) ? parsed : {};
+      const annotation = isPlainRecord(parsedRecord.annotation) ? parsedRecord.annotation : {};
+      console.error('Ask-about output failed validation', {
+        attempt,
+        answer: typeof parsedRecord.answer === 'string' ? parsedRecord.answer.length : typeof parsedRecord.answer,
+        annotationType: parsedRecord.annotation === null ? 'null' : typeof parsedRecord.annotation,
+        annotationKeys: Object.keys(annotation).slice(0, 10),
+        propKeys: isPlainRecord(annotation.props) ? Object.keys(annotation.props).slice(0, 20) : [],
+      });
+      lastError = new Error('Invalid ask-about response');
+    } catch (error) {
+      console.error('Ask-about attempt could not be parsed', {
+        attempt,
+        errorType: error instanceof Error ? error.name : typeof error,
+      });
+      lastError = error;
     }
 
-    const annotation = parsed.annotation ?? null;
-    if (annotation) prefixAnnotationIds([annotation]);
-
-    return c.json({
-      success: true,
-      data: { answer: parsed.answer, annotation, fallback: false },
-    });
-  } catch (error) {
-    console.error('Ask-about vision call failed:', error);
-    return c.json({
-      success: true,
-      data: { ...ASK_ABOUT_FALLBACK, fallback: true },
-    });
+    if (attempt === 1) {
+      console.error('Ask-about generation failed — retrying once');
+    }
   }
+
+  console.error('Ask-about vision call failed after retry:', lastError);
+  return c.json({
+    success: true,
+    data: { ...ASK_ABOUT_FALLBACK, fallback: true },
+  });
 });
 
 // API Endpoint: Get available whiteboard lesson types
