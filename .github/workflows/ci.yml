@@ -47,3 +47,4 @@ jobs:
         run: npm run build
         env:
           VITE_DEPLOYMENT_TARGET: production
+          VITE_API_URL: https://brilla-api.ghwmelite.workers.dev/api

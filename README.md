@@ -178,14 +178,17 @@ wrangler secret put GOOGLE_CLIENT_SECRET
 ### Build &amp; deploy
 
 ```bash
-VITE_DEPLOYMENT_TARGET=production npm run build  # tsc -b, Vite, and fail-closed Pages CSP generation
+VITE_DEPLOYMENT_TARGET=production VITE_API_URL=https://brilla-api.ghwmelite.workers.dev/api npm run build
+# Pre-build target/API validation, tsc -b, Vite, then fail-closed Pages CSP generation
 npm run lint       # ESLint
 wrangler deploy    # API to Cloudflare Workers
 ```
 
-Staging builds must set both `VITE_DEPLOYMENT_TARGET=staging` and the approved
-staging `VITE_API_URL`; the build fails if the target and API origin do not
-match. In PowerShell, set these with `$env:VITE_DEPLOYMENT_TARGET=...`.
+Every Pages build must set both `VITE_DEPLOYMENT_TARGET` and the exact approved
+`VITE_API_URL` ending in `/api`; validation runs before Vite compiles the
+bundle. In PowerShell, set both environment variables explicitly. Automatic
+Counselor Brie onboarding defaults off and must be opted in only after the
+authenticated production QA gate passes.
 
 ## Project Structure
 

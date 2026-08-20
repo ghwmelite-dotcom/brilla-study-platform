@@ -21,10 +21,7 @@ export function resolvePagesApiOrigin(configuredUrl, deploymentTarget) {
     : PRODUCTION_API_ORIGIN;
   const value = configuredUrl?.trim();
   if (!value || value.startsWith('/')) {
-    if (deploymentTarget === 'staging') {
-      throw new Error('Staging builds require the explicit staging VITE_API_URL');
-    }
-    return expectedOrigin;
+    throw new Error(`${deploymentTarget} builds require an explicit absolute VITE_API_URL`);
   }
 
   let url;
@@ -37,9 +34,10 @@ export function resolvePagesApiOrigin(configuredUrl, deploymentTarget) {
   if (url.protocol !== 'https:' || url.username || url.password) {
     throw new Error('VITE_API_URL must use HTTPS and must not contain credentials');
   }
-  if (url.origin !== expectedOrigin) {
+  const expectedBase = `${expectedOrigin}/api`;
+  if (url.href !== expectedBase) {
     throw new Error(
-      `VITE_API_URL origin ${url.origin} does not match deployment target ${deploymentTarget}`,
+      `VITE_API_URL must exactly match ${expectedBase} for deployment target ${deploymentTarget}`,
     );
   }
   return url.origin;
@@ -68,12 +66,20 @@ export function configurePagesHeaders(source, configuredUrl, deploymentTarget) {
 }
 
 async function main() {
+  const deploymentTarget = process.env.VITE_DEPLOYMENT_TARGET;
+  const configuredUrl = process.env.VITE_API_URL;
+  const apiOrigin = resolvePagesApiOrigin(configuredUrl, deploymentTarget);
+  if (process.argv.includes('--check')) {
+    console.log(`Pages build target verified: ${deploymentTarget} -> ${configuredUrl}`);
+    return;
+  }
+
   const headersUrl = new URL('../dist/_headers', import.meta.url);
   const source = await readFile(headersUrl, 'utf8');
-  const { output, apiOrigin } = configurePagesHeaders(
+  const { output } = configurePagesHeaders(
     source,
-    process.env.VITE_API_URL,
-    process.env.VITE_DEPLOYMENT_TARGET,
+    configuredUrl,
+    deploymentTarget,
   );
   if (output !== source) await writeFile(headersUrl, output, 'utf8');
   console.log(`Pages CSP API origin: ${apiOrigin}`);

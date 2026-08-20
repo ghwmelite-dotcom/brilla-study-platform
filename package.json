@@ -7,7 +7,7 @@
     "dev": "vite",
     "dev:api": "wrangler dev --env dev",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:api\"",
-    "build": "tsc -b && vite build && node scripts/configure-pages-headers.mjs",
+    "build": "node scripts/configure-pages-headers.mjs --check && tsc -b && vite build && node scripts/configure-pages-headers.mjs",
     "lint": "eslint src workers scripts",
     "typecheck:api": "tsc -p workers/tsconfig.json",
     "lint:api": "eslint workers",

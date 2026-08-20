@@ -18,10 +18,10 @@ const wranglerConfig = readFileSync(new URL('../../../wrangler.toml', import.met
 const template = `Content-Security-Policy: img-src 'self' ${PRODUCTION_API_ORIGIN}; connect-src 'self' ${PRODUCTION_API_ORIGIN};`;
 
 describe('Pages CSP API-origin generation', () => {
-  it('keeps the canonical production origin for unset and relative API URLs', () => {
-    expect(resolvePagesApiOrigin(undefined, 'production')).toBe(PRODUCTION_API_ORIGIN);
-    expect(resolvePagesApiOrigin('/api', 'production')).toBe(PRODUCTION_API_ORIGIN);
-    expect(configurePagesHeaders(template, undefined, 'production').output).toBe(template);
+  it('keeps the canonical production origin only for the exact production API base', () => {
+    expect(resolvePagesApiOrigin(`${PRODUCTION_API_ORIGIN}/api`, 'production')).toBe(PRODUCTION_API_ORIGIN);
+    expect(configurePagesHeaders(template, `${PRODUCTION_API_ORIGIN}/api`, 'production').output)
+      .toBe(template);
   });
 
   it('generates a staging-only CSP from the configured staging API URL', () => {
@@ -35,18 +35,22 @@ describe('Pages CSP API-origin generation', () => {
     expect(() => resolvePagesApiOrigin('http://brilla-api-staging.ghwmelite.workers.dev/api', 'staging'))
       .toThrow(/HTTPS/);
     expect(() => resolvePagesApiOrigin('https://example.com/api', 'production'))
-      .toThrow(/does not match deployment target/);
+      .toThrow(/must exactly match/);
+    expect(() => resolvePagesApiOrigin(`${PRODUCTION_API_ORIGIN}/wrong`, 'production'))
+      .toThrow(/must exactly match/);
   });
 
   it('fails closed when the target is absent or does not match the API origin', () => {
     expect(() => resolvePagesApiOrigin(undefined, undefined)).toThrow(/explicitly set/);
-    expect(() => resolvePagesApiOrigin(undefined, 'staging')).toThrow(/explicit staging VITE_API_URL/);
+    expect(() => resolvePagesApiOrigin(undefined, 'production')).toThrow(/explicit absolute VITE_API_URL/);
+    expect(() => resolvePagesApiOrigin('/api', 'production')).toThrow(/explicit absolute VITE_API_URL/);
+    expect(() => resolvePagesApiOrigin(undefined, 'staging')).toThrow(/explicit absolute VITE_API_URL/);
     expect(() => resolvePagesApiOrigin(PRODUCTION_API_ORIGIN, 'staging'))
-      .toThrow(/does not match deployment target/);
+      .toThrow(/must exactly match/);
   });
 
   it('fails when the copied header template drifts from the expected shape', () => {
-    expect(() => configurePagesHeaders('Content-Security-Policy: default-src self', undefined, 'production'))
+    expect(() => configurePagesHeaders('Content-Security-Policy: default-src self', `${PRODUCTION_API_ORIGIN}/api`, 'production'))
       .toThrow(/exactly 2 canonical API origins/);
   });
 
