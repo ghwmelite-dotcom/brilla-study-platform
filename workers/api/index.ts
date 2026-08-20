@@ -845,6 +845,32 @@ publicApp.get('/health', (c) => {
   return c.json({ success: true, data: { status: 'ok' } });
 });
 
+const STAGING_QA_SENTINEL_PATTERN = /^qa-sentinel-[a-f0-9]{16,64}$/;
+
+// Proves that the deployed staging Worker is bound to the same isolated D1
+// database that the QA harness writes to before the harness mutates any user
+// data. The route is deliberately absent outside staging and never exposes a
+// database name, id, or row contents.
+publicApp.get('/health/staging-target/:nonce', async (c) => {
+  if (c.env.ENVIRONMENT !== 'staging') {
+    return c.json({ success: false, error: 'Not found' }, 404);
+  }
+
+  const nonce = c.req.param('nonce');
+  if (!STAGING_QA_SENTINEL_PATTERN.test(nonce)) {
+    return c.json({ success: false, error: 'Not found' }, 404);
+  }
+
+  const row = await c.env.DB.prepare(
+    "SELECT 1 AS verified FROM rate_limits WHERE identifier = ? AND endpoint = 'qa-deployment-sentinel' LIMIT 1",
+  ).bind(nonce).first<{ verified: number }>();
+  if (row?.verified !== 1) {
+    return c.json({ success: false, error: 'Not found' }, 404);
+  }
+
+  return c.json({ success: true, data: { verified: true } });
+});
+
 // =============================================
 // EXAM TYPES ENDPOINTS
 // =============================================

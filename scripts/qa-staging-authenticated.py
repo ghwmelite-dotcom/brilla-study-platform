@@ -18,7 +18,7 @@ STAGING = DEPLOYMENTS["staging"]
 API_URL = f"{STAGING['apiOrigin']}/api"
 PAGES_URL = STAGING["pagesOrigin"]
 DATABASE = STAGING["database"]
-SCREENSHOT = ROOT / "artifacts" / "staging-my-plan-authenticated.png"
+SCREENSHOT_DIR = ROOT / "artifacts"
 
 EXPECTED_STAGING = {
     "apiOrigin": "https://brilla-api-staging.ghwmelite.workers.dev",
@@ -148,7 +148,7 @@ def run_staging_sql(sql: str) -> None:
     if result.returncode != 0:
         raise RuntimeError("Staging D1 operation failed")
 
-def verify_staging_migration_ledger() -> None:
+def query_staging_sql(sql: str) -> list[dict[str, Any]]:
     result = subprocess.run(
         [
             "npx.cmd",
@@ -160,7 +160,7 @@ def verify_staging_migration_ledger() -> None:
             "staging",
             "--remote",
             "--command",
-            "SELECT name FROM d1_migrations ORDER BY id;",
+            sql,
             "--json",
         ],
         cwd=ROOT,
@@ -172,10 +172,12 @@ def verify_staging_migration_ledger() -> None:
         env={**os.environ, "NO_COLOR": "1"},
     )
     if result.returncode != 0:
-        raise RuntimeError("Unable to read the staging migration ledger")
-
+        raise RuntimeError("Staging D1 query failed")
     payload = json.loads(result.stdout)
-    rows = payload[0].get("results", []) if payload else []
+    return payload[0].get("results", []) if payload else []
+
+def verify_staging_migration_ledger() -> None:
+    rows = query_staging_sql("SELECT name FROM d1_migrations ORDER BY id;")
     remote_names = [row.get("name") for row in rows]
     local_names = sorted(path.name for path in (ROOT / "database" / "migrations").glob("*.sql"))
     if remote_names != local_names or "098_ai_answer_cache.sql" not in remote_names:
@@ -190,8 +192,9 @@ def main() -> None:
     validate_staging_target()
     verify_staging_migration_ledger()
     checks: list[dict[str, Any]] = []
-    synthetic_whiteboard_png = create_synthetic_whiteboard_png()
     run_id = f"{int(time.time())}-{secrets.token_hex(4)}"
+    sentinel = f"qa-sentinel-{secrets.token_hex(16)}"
+    screenshot = SCREENSHOT_DIR / f"staging-my-plan-authenticated-{run_id}.png"
     qa_topic_id = f"topic_qa_{run_id.replace('-', '_')}"
     student_email = f"qa-student-{run_id}@example.invalid"
     teacher_email = f"qa-teacher-{run_id}@example.invalid"
@@ -200,6 +203,37 @@ def main() -> None:
     student_token = ""
     teacher_token = ""
     student_user: dict[str, Any] = {}
+
+    run_staging_sql(
+        "INSERT INTO rate_limits (identifier, endpoint, request_count, window_start) VALUES ("
+        f"{sql_literal(sentinel)}, 'qa-deployment-sentinel', 1, datetime('now'));"
+    )
+    try:
+        status, payload = request_json("GET", f"/health/staging-target/{sentinel}")
+    finally:
+        run_staging_sql(
+            "DELETE FROM rate_limits "
+            f"WHERE identifier={sql_literal(sentinel)} AND endpoint='qa-deployment-sentinel';"
+        )
+    require(
+        checks,
+        "deployed_worker_staging_d1_verified",
+        status == 200
+        and payload.get("success") is True
+        and payload.get("data", {}).get("verified") is True,
+        {"status": status, "verified": payload.get("data", {}).get("verified")},
+    )
+    sentinel_rows = query_staging_sql(
+        "SELECT COUNT(*) AS count FROM rate_limits "
+        f"WHERE identifier={sql_literal(sentinel)} AND endpoint='qa-deployment-sentinel';"
+    )
+    require(
+        checks,
+        "deployment_sentinel_removed",
+        sentinel_rows == [{"count": 0}],
+        {"remaining": sentinel_rows[0].get("count") if sentinel_rows else None},
+    )
+    synthetic_whiteboard_png = create_synthetic_whiteboard_png()
 
     try:
         for role, email, password in (
@@ -264,6 +298,61 @@ def main() -> None:
         require(checks, "teacher_login", status == 200 and payload.get("success") is True, {"status": status})
         teacher_token = payload["data"]["token"]
 
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch(headless=True)
+            context = browser.new_context(viewport={"width": 1440, "height": 1100})
+            onboarding_auth_state = {
+                "state": {
+                    "user": student_user,
+                    "token": student_token,
+                    "isAuthenticated": True,
+                },
+                "version": 3,
+            }
+            context.add_init_script(
+                "localStorage.setItem('brilla_token', " + json.dumps(student_token) + ");"
+                "localStorage.setItem('brilla-auth', " + json.dumps(json.dumps(onboarding_auth_state)) + ");"
+                "sessionStorage.setItem('brilla_splash_shown', 'true');"
+            )
+            page = context.new_page()
+            onboarding_console_errors: list[str] = []
+            onboarding_failed_requests: list[str] = []
+            page.on(
+                "console",
+                lambda message: onboarding_console_errors.append(message.text)
+                if message.type == "error"
+                else None,
+            )
+            page.on("pageerror", lambda error: onboarding_console_errors.append(str(error)))
+            page.on(
+                "requestfailed",
+                lambda request: onboarding_failed_requests.append(request.url),
+            )
+            response = page.goto(f"{PAGES_URL}/dashboard", wait_until="networkidle")
+            dialog = page.get_by_role("dialog", name="Counselor Brie")
+            dialog.wait_for(timeout=30000)
+            notice_visible = dialog.get_by_text("Brie is an AI academic guide", exact=False).is_visible()
+            require(
+                checks,
+                "automatic_onboarding_wizard_visible",
+                response is not None
+                and response.status == 200
+                and dialog.is_visible()
+                and notice_visible,
+                {"document_status": response.status if response else None, "notice": notice_visible},
+            )
+            page.get_by_role("button", name="Close Counselor Brie").click()
+            require(
+                checks,
+                "automatic_onboarding_browser_clean",
+                not onboarding_failed_requests and not onboarding_console_errors,
+                {
+                    "failed_requests": onboarding_failed_requests,
+                    "console_errors": onboarding_console_errors[:3],
+                },
+            )
+            browser.close()
+
         status, _ = request_json("GET", "/guidance/goals", token=student_token)
         require(checks, "student_guidance_allowed", status == 200, {"status": status})
         status, _ = request_json("GET", "/guidance/goals", token=teacher_token)
@@ -277,6 +366,16 @@ def main() -> None:
             status == 200 and payload.get("success") is True,
             {"status": status},
         )
+        status, _ = request_json("GET", "/counselor/conversations", token=teacher_token)
+        require(checks, "teacher_counselor_read_denied", status == 403, {"status": status})
+        status, _ = request_json(
+            "POST",
+            "/counselor/conversations",
+            {"counselorType": "academic", "title": "Denied synthetic staging QA"},
+            teacher_token,
+        )
+        require(checks, "teacher_counselor_write_denied", status == 403, {"status": status})
+
 
         status, payload = request_json(
             "POST",
@@ -488,7 +587,7 @@ def main() -> None:
             {"status": status},
         )
 
-        SCREENSHOT.parent.mkdir(parents=True, exist_ok=True)
+        screenshot.parent.mkdir(parents=True, exist_ok=True)
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
             context = browser.new_context(viewport={"width": 1440, "height": 1100})
@@ -529,9 +628,12 @@ def main() -> None:
                 else None,
             )
             response = page.goto(f"{PAGES_URL}/my-plan", wait_until="networkidle")
+            page.wait_for_timeout(1000)
+            close_brie = page.get_by_role("button", name="Close Counselor Brie")
+            if close_brie.is_visible():
+                close_brie.click()
             page.get_by_role("heading", name="My Plan", exact=True).wait_for(timeout=30000)
             page.get_by_role("heading", name="This Week", exact=True).wait_for(timeout=30000)
-            page.screenshot(path=str(SCREENSHOT), full_page=True)
             require(
                 checks,
                 "authenticated_my_plan_ui",
@@ -555,6 +657,13 @@ def main() -> None:
                 not failed_requests and not console_errors,
                 {"failed_requests": len(failed_requests), "console_errors": console_errors[:3]},
             )
+            page.screenshot(path=str(screenshot), full_page=True)
+            require(
+                checks,
+                "run_scoped_screenshot_created",
+                screenshot.exists() and screenshot.stat().st_size > 0,
+                {"path": str(screenshot), "bytes": screenshot.stat().st_size if screenshot.exists() else 0},
+            )
             page.goto(f"{PAGES_URL}/briie", wait_until="networkidle")
             require(
                 checks,
@@ -565,21 +674,68 @@ def main() -> None:
             browser.close()
 
     finally:
-        if student_email and teacher_email:
-            try:
-                run_staging_sql(
-                    "UPDATE users SET status='suspended', is_active=0, session_version=session_version+1 "
-                    f"WHERE email IN ({sql_literal(student_email)}, {sql_literal(teacher_email)}); "
-                    "DELETE FROM revision_sessions WHERE user_id IN ("
-                    "SELECT id FROM users "
-                    f"WHERE email IN ({sql_literal(student_email)}, {sql_literal(teacher_email)})); "
-                    f"DELETE FROM topics WHERE id={sql_literal(qa_topic_id)};"
-                )
-            except Exception:
-                checks.append({"name": "qa_accounts_suspended", "passed": False, "detail": "cleanup failed"})
+        try:
+            qa_user_rows = query_staging_sql(
+                "SELECT id FROM users "
+                f"WHERE email IN ({sql_literal(student_email)}, {sql_literal(teacher_email)});"
+            )
+            qa_user_ids = [str(row["id"]) for row in qa_user_rows]
+            qa_user_ids_sql = ", ".join(sql_literal(user_id) for user_id in qa_user_ids) or "''"
+            student_pattern = sql_literal(f"%{student_email}%")
+            teacher_pattern = sql_literal(f"%{teacher_email}%")
+            run_staging_sql(
+                "DELETE FROM notifications "
+                f"WHERE metadata LIKE {student_pattern} OR metadata LIKE {teacher_pattern}; "
+                "DELETE FROM revision_sessions "
+                f"WHERE user_id IN ({qa_user_ids_sql}); "
+                "DELETE FROM users "
+                f"WHERE email IN ({sql_literal(student_email)}, {sql_literal(teacher_email)}); "
+                f"DELETE FROM topics WHERE id={sql_literal(qa_topic_id)};"
+            )
+            residual_rows = query_staging_sql(
+                "SELECT 'users' AS scope, COUNT(*) AS count FROM users "
+                f"WHERE email IN ({sql_literal(student_email)}, {sql_literal(teacher_email)}) "
+                "UNION ALL SELECT 'user_goals', COUNT(*) FROM user_goals "
+                f"WHERE user_id IN ({qa_user_ids_sql}) "
+                "UNION ALL SELECT 'guidance_sessions', COUNT(*) FROM guidance_sessions "
+                f"WHERE user_id IN ({qa_user_ids_sql}) "
+                "UNION ALL SELECT 'counselor_conversations', COUNT(*) FROM counselor_conversations "
+                f"WHERE user_id IN ({qa_user_ids_sql}) "
+                "UNION ALL SELECT 'revision_sessions', COUNT(*) FROM revision_sessions "
+                f"WHERE user_id IN ({qa_user_ids_sql}) "
+                "UNION ALL SELECT 'revision_ai_interactions', COUNT(*) FROM revision_ai_interactions "
+                f"WHERE user_id IN ({qa_user_ids_sql}) "
+                "UNION ALL SELECT 'question_attempts', COUNT(*) FROM question_attempts "
+                f"WHERE user_id IN ({qa_user_ids_sql}) "
+                "UNION ALL SELECT 'topics', COUNT(*) FROM topics "
+                f"WHERE id={sql_literal(qa_topic_id)} "
+                "UNION ALL SELECT 'notifications', COUNT(*) FROM notifications "
+                f"WHERE metadata LIKE {student_pattern} OR metadata LIKE {teacher_pattern};"
+            )
+            residuals = {row["scope"]: row["count"] for row in residual_rows}
+            checks.append(
+                {
+                    "name": "run_owned_cleanup_zero_residual",
+                    "passed": len(residuals) == 9 and all(count == 0 for count in residuals.values()),
+                    "detail": residuals,
+                }
+            )
+        except Exception as error:
+            checks.append(
+                {
+                    "name": "run_owned_cleanup_zero_residual",
+                    "passed": False,
+                    "detail": type(error).__name__,
+                }
+            )
 
     failed = [check["name"] for check in checks if not check["passed"]]
-    print(json.dumps({"passed": len(checks) - len(failed), "failed": failed, "checks": checks}, indent=2))
+    print(json.dumps({
+        "passed": len(checks) - len(failed),
+        "failed": failed,
+        "checks": checks,
+        "screenshot": str(screenshot) if screenshot.exists() else None,
+    }, indent=2))
     if failed:
         raise SystemExit(1)
 

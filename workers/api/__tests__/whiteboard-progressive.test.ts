@@ -428,8 +428,32 @@ describe('whiteboard-teach progressive protocol', () => {
       { ...generatedStep(0), commands: [{
         type: 'arrow', id: 'unsupported-arrow-shape', props: { from: [0, 0], to: [10, 10], width: 2 },
       }] },
-    ];
+      { ...generatedStep(0), commands: [{
+        type: 'circle', id: 'missing-radius', props: {},
+      }] },
+      { ...generatedStep(0), commands: [{
+        type: 'rect', id: 'zero-width', props: { width: 0, height: 20 },
+      }] },
+      { ...generatedStep(0), commands: [{
+        type: 'line', id: 'missing-endpoints', props: { strokeWidth: 2 },
+      }] },
+      { ...generatedStep(0), commands: [{
+        type: 'arrow', id: 'degenerate-arrow', props: { x1: 1, y1: 1, x2: 1, y2: 1 },
+      }] },
+      { ...generatedStep(0), commands: [{
+        type: 'text', id: 'blank-text', props: { text: '   ' },
+      }] },
+      { ...generatedStep(0), commands: [{
+        type: 'path', id: 'blank-path', props: { path: '' },
+      }] },
+      { ...generatedStep(0), commands: [{
+        type: 'text', id: 'bad-opacity', props: { text: 'x', opacity: 1.01 },
+      }] },
+      { ...generatedStep(0), commands: [{
+        type: 'text', id: 'negative-font', props: { text: 'x', fontSize: -1 },
+      }] },
 
+    ];
     for (const invalidStep of invalidSteps) {
       const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheMissHandler, writeHandler]);
       const invalidAi = {

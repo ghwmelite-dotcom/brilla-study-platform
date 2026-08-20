@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import worker, { type Env } from '../index';
 
 const deployments = JSON.parse(
@@ -65,4 +65,53 @@ describe('staging CORS boundary', () => {
       }
     });
   }
+});
+
+describe('staging deployment target proof', () => {
+  const nonce = 'qa-sentinel-0123456789abcdef';
+
+  function sentinelDb(found: boolean) {
+    return {
+      prepare: vi.fn(() => ({
+        bind: vi.fn(() => ({
+          first: vi.fn().mockResolvedValue(found ? { verified: 1 } : null),
+        })),
+      })),
+    } as unknown as D1Database;
+  }
+
+  it('is absent outside staging before touching D1', async () => {
+    const db = sentinelDb(true);
+    const response = await worker.fetch(
+      new Request(`http://worker.test/api/health/staging-target/${nonce}`),
+      { DB: db, ENVIRONMENT: 'production' } as unknown as Env,
+    );
+
+    expect(response.status).toBe(404);
+    expect(db.prepare).not.toHaveBeenCalled();
+  });
+
+  it('verifies only a nonce present through the deployed staging binding', async () => {
+    for (const [found, expectedStatus] of [[true, 200], [false, 404]] as const) {
+      const response = await worker.fetch(
+        new Request(`http://worker.test/api/health/staging-target/${nonce}`),
+        { DB: sentinelDb(found), ENVIRONMENT: 'staging' } as unknown as Env,
+      );
+      expect(response.status).toBe(expectedStatus);
+      const body = await response.json() as { success: boolean; data?: { verified: boolean } };
+      expect(body.success).toBe(found);
+      if (found) expect(body.data?.verified).toBe(true);
+    }
+  });
+
+  it('rejects malformed nonces before touching D1', async () => {
+    const db = sentinelDb(true);
+    const response = await worker.fetch(
+      new Request('http://worker.test/api/health/staging-target/not-a-sentinel'),
+      { DB: db, ENVIRONMENT: 'staging' } as unknown as Env,
+    );
+
+    expect(response.status).toBe(404);
+    expect(db.prepare).not.toHaveBeenCalled();
+  });
 });

@@ -2146,8 +2146,36 @@ function hasValidWhiteboardProps(type: string, props: unknown): props is Record<
     }
     if (key === 'params' && !isBoundedPrimitiveParam(value)) return false;
   }
-  if (type === 'primitive' && (!('name' in props) || !('params' in props))) return false;
-  if (type === 'math' && (typeof props.latex !== 'string' || props.latex.length === 0 || props.latex.length > 200)) return false;
+  if (
+    'opacity' in props
+    && (typeof props.opacity !== 'number' || props.opacity < 0 || props.opacity > 1)
+  ) return false;
+  for (const positiveProp of ['width', 'height', 'radius', 'strokeWidth', 'fontSize', 'scaleX', 'scaleY']) {
+    if (positiveProp in props && (typeof props[positiveProp] !== 'number' || props[positiveProp] <= 0)) {
+      return false;
+    }
+  }
+
+  if (type === 'rect') {
+    return typeof props.width === 'number' && props.width > 0
+      && typeof props.height === 'number' && props.height > 0;
+  }
+  if (type === 'circle') return typeof props.radius === 'number' && props.radius > 0;
+  if (type === 'line' || type === 'arrow') {
+    const coordinates = [props.x1, props.y1, props.x2, props.y2];
+    return coordinates.every((value) => typeof value === 'number' && Number.isFinite(value))
+      && (props.x1 !== props.x2 || props.y1 !== props.y2);
+  }
+  if (type === 'text') {
+    return typeof props.text === 'string' && props.text.trim().length > 0;
+  }
+  if (type === 'path') {
+    return typeof props.path === 'string' && props.path.trim().length > 0;
+  }
+  if (type === 'primitive') return 'name' in props && 'params' in props;
+  if (type === 'math') {
+    return typeof props.latex === 'string' && props.latex.length > 0 && props.latex.length <= 200;
+  }
   return true;
 }
 function isValidWhiteboardStep(
