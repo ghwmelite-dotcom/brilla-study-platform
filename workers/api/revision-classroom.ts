@@ -2190,7 +2190,7 @@ async function generateWhiteboardOutlineAndFirstStep(
 ): Promise<{ outline: string[]; step: WhiteboardStep; usedFallback: boolean; tokensUsed: number | null }> {
   const systemPrompt = `${WHITEBOARD_TEACHING_PROMPT}
 
-${getWhiteboardLessonTypeInstructions(lessonType, topic)}
+${getWhiteboardLessonTypeInstructions(lessonType)}
 
 Output ONE JSON object only — the lesson outline AND its first step together — in this exact format:
 {

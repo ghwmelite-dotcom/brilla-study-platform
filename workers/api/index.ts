@@ -5,7 +5,6 @@ import { sign } from 'hono/jwt';
 import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware';
 import { parseLimit, parseJsonBody } from './http';
 import type { JWTPayload } from 'hono/utils/jwt/types';
-import type { BaseAiTextGenerationModels } from '@cloudflare/workers-types';
 import { getChatModel, getGenerationModel, getTtsModel, getVisionModel, unwrapAiText } from './ai-models';
 import { formatUntrustedAiData, normalizeAiGradingFeedback, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
 import { libraryApp } from './library';
