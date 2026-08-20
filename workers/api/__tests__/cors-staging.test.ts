@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import worker, { type Env } from '../index';
+import worker, { resolveRegistrationRateLimitIdentifier, type Env } from '../index';
 
 const deployments = JSON.parse(
   readFileSync(new URL('../../../config/deployments.json', import.meta.url), 'utf8'),
@@ -113,5 +113,36 @@ describe('staging deployment target proof', () => {
 
     expect(response.status).toBe(404);
     expect(db.prepare).not.toHaveBeenCalled();
+  });
+});
+
+describe('staging QA registration rate-limit isolation', () => {
+  const nonce = 'qa-sentinel-0123456789abcdef';
+
+  function resolverEnv(environment: string, found: boolean) {
+    return { DB: {
+      prepare: vi.fn(() => ({
+        bind: vi.fn(() => ({
+          first: vi.fn().mockResolvedValue(found ? { verified: 1 } : null),
+        })),
+      })),
+    }, ENVIRONMENT: environment } as unknown as Env;
+  }
+
+  it('uses a run-scoped bucket only for a verified staging sentinel', async () => {
+    await expect(resolveRegistrationRateLimitIdentifier(
+      resolverEnv('staging', true), '203.0.113.1', nonce,
+    )).resolves.toBe(`qa:${nonce}`);
+  });
+
+  it('falls back to the real client IP for missing sentinels and production', async () => {
+    await expect(resolveRegistrationRateLimitIdentifier(
+      resolverEnv('staging', false), '203.0.113.2', nonce,
+    )).resolves.toBe('203.0.113.2');
+    const productionEnv = resolverEnv('production', true);
+    await expect(resolveRegistrationRateLimitIdentifier(
+      productionEnv, '203.0.113.3', nonce,
+    )).resolves.toBe('203.0.113.3');
+    expect(productionEnv.DB.prepare).not.toHaveBeenCalled();
   });
 });

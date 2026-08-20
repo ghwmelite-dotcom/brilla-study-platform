@@ -92,6 +92,7 @@ def request_json(
     body: dict[str, Any] | None = None,
     token: str | None = None,
     timeout: int = 90,
+    qa_sentinel: str | None = None,
 ) -> tuple[int, dict[str, Any]]:
     headers = {
         "Content-Type": "application/json",
@@ -100,6 +101,8 @@ def request_json(
     }
     if token:
         headers["Authorization"] = f"Bearer {token}"
+    if qa_sentinel:
+        headers["X-Brilla-QA-Sentinel"] = qa_sentinel
     request = Request(
         f"{API_URL}{path}",
         data=json.dumps(body).encode("utf-8") if body is not None else None,
@@ -210,7 +213,18 @@ def main() -> None:
     )
     try:
         status, payload = request_json("GET", f"/health/staging-target/{sentinel}")
-    finally:
+    except Exception:
+        run_staging_sql(
+            "DELETE FROM rate_limits "
+            f"WHERE identifier={sql_literal(sentinel)} AND endpoint='qa-deployment-sentinel';"
+        )
+        raise
+    sentinel_verified = (
+        status == 200
+        and payload.get("success") is True
+        and payload.get("data", {}).get("verified") is True
+    )
+    if not sentinel_verified:
         run_staging_sql(
             "DELETE FROM rate_limits "
             f"WHERE identifier={sql_literal(sentinel)} AND endpoint='qa-deployment-sentinel';"
@@ -218,20 +232,8 @@ def main() -> None:
     require(
         checks,
         "deployed_worker_staging_d1_verified",
-        status == 200
-        and payload.get("success") is True
-        and payload.get("data", {}).get("verified") is True,
+        sentinel_verified,
         {"status": status, "verified": payload.get("data", {}).get("verified")},
-    )
-    sentinel_rows = query_staging_sql(
-        "SELECT COUNT(*) AS count FROM rate_limits "
-        f"WHERE identifier={sql_literal(sentinel)} AND endpoint='qa-deployment-sentinel';"
-    )
-    require(
-        checks,
-        "deployment_sentinel_removed",
-        sentinel_rows == [{"count": 0}],
-        {"remaining": sentinel_rows[0].get("count") if sentinel_rows else None},
     )
     synthetic_whiteboard_png = create_synthetic_whiteboard_png()
 
@@ -256,7 +258,7 @@ def main() -> None:
                         "primaryExamTypeId": "exam_nsmq",
                     }
                 )
-            status, payload = request_json("POST", "/auth/register", body)
+            status, payload = request_json("POST", "/auth/register", body, qa_sentinel=sentinel)
             require(
                 checks,
                 f"{role}_registration_pending",
@@ -317,6 +319,7 @@ def main() -> None:
             page = context.new_page()
             onboarding_console_errors: list[str] = []
             onboarding_failed_requests: list[str] = []
+            onboarding_http_errors: list[dict[str, Any]] = []
             page.on(
                 "console",
                 lambda message: onboarding_console_errors.append(message.text)
@@ -327,6 +330,13 @@ def main() -> None:
             page.on(
                 "requestfailed",
                 lambda request: onboarding_failed_requests.append(request.url),
+            )
+            page.on(
+                "response",
+                lambda response: onboarding_http_errors.append(
+                    {"url": response.url, "status": response.status}
+                )
+                if response.status >= 400 else None,
             )
             response = page.goto(f"{PAGES_URL}/dashboard", wait_until="networkidle")
             dialog = page.get_by_role("dialog", name="Counselor Brie")
@@ -345,10 +355,11 @@ def main() -> None:
             require(
                 checks,
                 "automatic_onboarding_browser_clean",
-                not onboarding_failed_requests and not onboarding_console_errors,
+                not onboarding_failed_requests and not onboarding_console_errors and not onboarding_http_errors,
                 {
                     "failed_requests": onboarding_failed_requests,
                     "console_errors": onboarding_console_errors[:3],
+                    "http_errors": onboarding_http_errors,
                 },
             )
             browser.close()
@@ -684,6 +695,9 @@ def main() -> None:
             student_pattern = sql_literal(f"%{student_email}%")
             teacher_pattern = sql_literal(f"%{teacher_email}%")
             run_staging_sql(
+                "DELETE FROM rate_limits WHERE "
+                f"(identifier={sql_literal(sentinel)} AND endpoint='qa-deployment-sentinel') OR "
+                f"(identifier={sql_literal('qa:' + sentinel)} AND endpoint='register'); "
                 "DELETE FROM notifications "
                 f"WHERE metadata LIKE {student_pattern} OR metadata LIKE {teacher_pattern}; "
                 "DELETE FROM revision_sessions "
@@ -710,13 +724,16 @@ def main() -> None:
                 "UNION ALL SELECT 'topics', COUNT(*) FROM topics "
                 f"WHERE id={sql_literal(qa_topic_id)} "
                 "UNION ALL SELECT 'notifications', COUNT(*) FROM notifications "
-                f"WHERE metadata LIKE {student_pattern} OR metadata LIKE {teacher_pattern};"
+                f"WHERE metadata LIKE {student_pattern} OR metadata LIKE {teacher_pattern} "
+                "UNION ALL SELECT 'rate_limits', COUNT(*) FROM rate_limits WHERE "
+                f"(identifier={sql_literal(sentinel)} AND endpoint='qa-deployment-sentinel') OR "
+                f"(identifier={sql_literal('qa:' + sentinel)} AND endpoint='register');"
             )
             residuals = {row["scope"]: row["count"] for row in residual_rows}
             checks.append(
                 {
                     "name": "run_owned_cleanup_zero_residual",
-                    "passed": len(residuals) == 9 and all(count == 0 for count in residuals.values()),
+                    "passed": len(residuals) == 10 and all(count == 0 for count in residuals.values()),
                     "detail": residuals,
                 }
             )

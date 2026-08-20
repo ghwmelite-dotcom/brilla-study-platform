@@ -871,6 +871,24 @@ publicApp.get('/health/staging-target/:nonce', async (c) => {
   return c.json({ success: true, data: { verified: true } });
 });
 
+
+export async function resolveRegistrationRateLimitIdentifier(
+  env: Env,
+  clientIp: string,
+  qaSentinel: string | undefined,
+): Promise<string> {
+  if (env.ENVIRONMENT !== 'staging' || !qaSentinel || !STAGING_QA_SENTINEL_PATTERN.test(qaSentinel)) {
+    return clientIp;
+  }
+  try {
+    const row = await env.DB.prepare(
+      "SELECT 1 AS verified FROM rate_limits WHERE identifier = ? AND endpoint = 'qa-deployment-sentinel' LIMIT 1",
+    ).bind(qaSentinel).first<{ verified: number }>();
+    return row?.verified === 1 ? `qa:${qaSentinel}` : clientIp;
+  } catch {
+    return clientIp;
+  }
+}
 // =============================================
 // EXAM TYPES ENDPOINTS
 // =============================================
@@ -962,8 +980,12 @@ publicApp.post('/auth/register', async (c) => {
           selectedTierId, turnstileToken, examTypeIds, primaryExamTypeId, referralCode } = body;
   const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
 
-  // Rate limiting - check IP-based limit for registrations
-  const ipRateLimit = await checkRateLimit(c.env.DB, clientIp, 'register');
+  // Ordinary traffic remains IP-limited. A live staging QA run may use only a
+  // nonce that the harness has already written through the approved D1 target.
+  const rateLimitIdentifier = await resolveRegistrationRateLimitIdentifier(
+    c.env, clientIp, c.req.header('X-Brilla-QA-Sentinel'),
+  );
+  const ipRateLimit = await checkRateLimit(c.env.DB, rateLimitIdentifier, 'register');
   if (!ipRateLimit.allowed) {
     // Send security alert to admins for blocked registration attempts
     if (c.env.RESEND_API_KEY && c.env.FROM_EMAIL) {
