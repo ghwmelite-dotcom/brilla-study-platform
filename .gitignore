@@ -57,3 +57,4 @@ parse-*.cjs
 
 # Visual QA evidence artifacts
 qa-shots/
+.gstack/
