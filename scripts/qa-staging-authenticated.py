@@ -364,6 +364,20 @@ def main() -> None:
             )
             browser.close()
 
+        status, payload = request_json("GET", "/rewards/wheel/status", token=student_token)
+        require(
+            checks,
+            "student_reward_wheel_status",
+            status == 200 and payload.get("success") is True,
+            {"status": status},
+        )
+        status, payload = request_json("GET", "/activity/friends", token=student_token)
+        require(
+            checks,
+            "fresh_student_activity_feed",
+            status == 200 and payload.get("success") is True,
+            {"status": status},
+        )
         status, _ = request_json("GET", "/guidance/goals", token=student_token)
         require(checks, "student_guidance_allowed", status == 200, {"status": status})
         status, _ = request_json("GET", "/guidance/goals", token=teacher_token)

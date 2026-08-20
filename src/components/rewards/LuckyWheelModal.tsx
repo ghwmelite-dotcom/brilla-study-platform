@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Clock } from 'lucide-react';
 import { Button } from '@/components/common';
 import { useRewardStore, type ChestReward } from '@/stores/rewardStore';
+import { getWheelTargetRotation } from './wheelRotation';
 
 interface LuckyWheelModalProps {
   isOpen: boolean;
@@ -32,26 +33,32 @@ export function LuckyWheelModal({
   }, [isOpen, fetchLuckyWheel]);
 
   const handleSpin = async () => {
-    if (!luckyWheel || luckyWheel.spinsRemaining <= 0 || isSpinning) return;
+    if (!luckyWheel || luckyWheel.spinsRemaining <= 0 || isSpinning || luckyWheel.segments.length === 0) return;
 
     setIsSpinning(true);
 
-    // Calculate random rotation (5-10 full rotations + random segment)
-    const extraRotations = (5 + Math.random() * 5) * 360;
-    const randomAngle = Math.random() * 360;
-    const totalRotation = rotation + extraRotations + randomAngle;
+    const result = await spinLuckyWheel();
+    if (!result?.wheelSegmentId) {
+      setIsSpinning(false);
+      return;
+    }
+
+    const selectedIndex = luckyWheel.segments.findIndex(
+      (segment) => segment.id === `w${result.wheelSegmentId}`,
+    );
+    if (selectedIndex < 0) {
+      setIsSpinning(false);
+      return;
+    }
+
+    const totalRotation = getWheelTargetRotation(rotation, selectedIndex, luckyWheel.segments.length);
 
     setRotation(totalRotation);
-
-    // Wait for animation to complete
     await new Promise((resolve) => setTimeout(resolve, 5000));
 
-    const result = await spinLuckyWheel();
-    if (result) {
-      setReward(result);
-      setShowReward(true);
-      onRewardClaimed?.(result);
-    }
+    setReward(result);
+    setShowReward(true);
+    onRewardClaimed?.(result);
 
     setIsSpinning(false);
   };
