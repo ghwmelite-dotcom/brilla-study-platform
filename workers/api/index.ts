@@ -791,11 +791,19 @@ const app = new Hono<AppEnv>();
 // Middleware
 app.use('*', cors({
   origin: (origin, c) => {
-    const allowed = ['https://brillaprep.org', 'https://www.brillaprep.org'];
-    if (c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev') {
-      allowed.push('http://localhost:5173', 'http://127.0.0.1:5173');
+    const allowed = new Set(['https://brillaprep.org', 'https://www.brillaprep.org']);
+    if (c.env.APP_URL) {
+      try {
+        allowed.add(new URL(c.env.APP_URL).origin);
+      } catch {
+        // Ignore malformed deployment configuration and fail closed.
+      }
     }
-    return allowed.includes(origin) ? origin : '';
+    if (c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev') {
+      allowed.add('http://localhost:5173');
+      allowed.add('http://127.0.0.1:5173');
+    }
+    return allowed.has(origin) ? origin : '';
   },
   allowHeaders: ['Content-Type', 'Authorization'],
   allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
