@@ -8,7 +8,7 @@
     "dev:api": "wrangler dev --env dev",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:api\"",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "lint": "eslint src workers scripts",
     "typecheck:api": "tsc -p workers/tsconfig.json",
     "lint:api": "eslint workers",
     "preview": "vite preview",

@@ -121,9 +121,6 @@ const StudyRooms = lazyWithRetry(() => import('@/pages/StudyRooms'));
 // Immersive Learning Mode
 const ImmersiveLearning = lazyWithRetry(() => import('@/pages/ImmersiveLearning'));
 
-// $BRIIE Token Page
-const BriieTokenPage = lazyWithRetry(() => import('@/pages/BriieToken'));
-
 // Protected Route wrapper
 function ProtectedRoute({
   children,
@@ -306,9 +303,6 @@ function App() {
         {/* Legal pages (no layout) */}
         <Route path="/privacy" element={<LazyPage><PrivacyPolicyPage /></LazyPage>} />
         <Route path="/terms" element={<LazyPage><TermsOfServicePage /></LazyPage>} />
-
-        {/* $BRIIE Token page (no layout) */}
-        <Route path="/briie" element={<LazyPage><BriieTokenPage /></LazyPage>} />
 
         {/* Exam mode routes (full-screen, distraction-free, no layout) */}
         <Route
