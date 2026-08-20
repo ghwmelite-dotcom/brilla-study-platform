@@ -1963,7 +1963,54 @@ RESPOND WITH VALID JSON ONLY in this exact format:
 // Structural validation of AI-generated whiteboard content. The model's JSON
 // is untrusted: it must have the fields the renderer dereferences, every
 // command must be a known type, and every numeric prop must be finite.
-const WHITEBOARD_COMMAND_TYPES = new Set(['rect', 'circle', 'line', 'arrow', 'text', 'path', 'polygon', 'primitive', 'math']);
+const WHITEBOARD_COMMAND_TYPE_VALUES = ['rect', 'circle', 'line', 'arrow', 'text', 'path', 'polygon', 'primitive', 'math'] as const;
+const WHITEBOARD_COMMAND_TYPES = new Set<string>(WHITEBOARD_COMMAND_TYPE_VALUES);
+
+// Cloudflare JSON Mode schema for the generation model. Keeping this shape
+// beside the runtime validator makes structured-output drift visible in tests
+// while the validator remains the final untrusted-output boundary.
+const WHITEBOARD_COMMAND_RESPONSE_SCHEMA = {
+  type: 'object',
+  properties: {
+    type: { type: 'string', enum: [...WHITEBOARD_COMMAND_TYPE_VALUES] },
+    id: { type: 'string' },
+    props: { type: 'object' },
+  },
+  required: ['type', 'id', 'props'],
+};
+
+const WHITEBOARD_STEP_RESPONSE_SCHEMA = {
+  type: 'object',
+  properties: {
+    stepNumber: { type: 'integer' },
+    explanation: { type: 'string' },
+    voiceOver: { type: 'string' },
+    duration: { type: 'number' },
+    commands: {
+      type: 'array',
+      minItems: 1,
+      maxItems: 12,
+      items: WHITEBOARD_COMMAND_RESPONSE_SCHEMA,
+    },
+    highlights: { type: 'array', items: { type: 'string' } },
+    clearPrevious: { type: 'boolean' },
+  },
+  required: ['stepNumber', 'explanation', 'voiceOver', 'duration', 'commands', 'highlights', 'clearPrevious'],
+};
+
+const WHITEBOARD_FUSED_RESPONSE_SCHEMA = {
+  type: 'object',
+  properties: {
+    outline: {
+      type: 'array',
+      minItems: 4,
+      maxItems: 6,
+      items: { type: 'string' },
+    },
+    firstStep: WHITEBOARD_STEP_RESPONSE_SCHEMA,
+  },
+  required: ['outline', 'firstStep'],
+};
 
 function isValidWhiteboardStep(step: unknown): step is WhiteboardStep {
   if (!step || typeof step !== 'object') return false;
@@ -2217,7 +2264,11 @@ ${UNTRUSTED_AI_DATA_INSTRUCTION}`;
         { role: 'user', content: formatUntrustedAiData('Whiteboard lesson context', { topic, subject, examType, lessonType }) },
       ],
       max_tokens: 1600,
-      temperature: 0.7,
+      temperature: 0.2,
+      response_format: {
+        type: 'json_schema',
+        json_schema: WHITEBOARD_FUSED_RESPONSE_SCHEMA,
+      },
     });
 
     const raw: unknown = typeof result === 'object' && result !== null && 'response' in result
@@ -2344,7 +2395,11 @@ Canvas is 1200x800. Keep commands under 12.`;
         }) },
       ],
       max_tokens: 1200,
-      temperature: 0.7,
+      temperature: 0.2,
+      response_format: {
+        type: 'json_schema',
+        json_schema: WHITEBOARD_STEP_RESPONSE_SCHEMA,
+      },
     });
 
     const raw: unknown = typeof result === 'object' && result !== null && 'response' in result

@@ -1,4 +1,3 @@
-import base64
 import json
 import os
 from pathlib import Path
@@ -17,11 +16,37 @@ API_URL = "https://brilla-api-staging.ghwmelite.workers.dev/api"
 PAGES_URL = "https://whiteboard-staging.brilla-study-platform.pages.dev"
 DATABASE = "brilla-db-staging"
 SCREENSHOT = ROOT / "artifacts" / "staging-my-plan-authenticated.png"
-BLANK_PNG = base64.b64encode(
-    base64.b64decode(
-        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
-    )
-).decode("ascii")
+
+
+def create_synthetic_whiteboard_png() -> str:
+    """Render a real 1200x800 PNG so vision QA exercises meaningful input."""
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        try:
+            page = browser.new_page(viewport={"width": 1200, "height": 800})
+            page.set_content('<canvas id="board" width="1200" height="800"></canvas>')
+            data_url = page.evaluate("""
+                () => {
+                  const canvas = document.getElementById('board');
+                  const ctx = canvas.getContext('2d');
+                  ctx.fillStyle = '#ffffff';
+                  ctx.fillRect(0, 0, 1200, 800);
+                  ctx.fillStyle = '#1e40af';
+                  ctx.font = 'bold 42px sans-serif';
+                  ctx.fillText('Synthetic QA: Solve 2x + 4 = 10', 100, 120);
+                  ctx.fillStyle = '#111827';
+                  ctx.font = '32px sans-serif';
+                  ctx.fillText('2x = 6', 180, 280);
+                  ctx.fillText('x = 3', 180, 360);
+                  ctx.strokeStyle = '#7c3aed';
+                  ctx.lineWidth = 5;
+                  ctx.strokeRect(150, 315, 180, 70);
+                  return canvas.toDataURL('image/png');
+                }
+            """)
+            return data_url.split(',', 1)[1]
+        finally:
+            browser.close()
 
 
 def request_json(
@@ -89,6 +114,7 @@ def sql_literal(value: str) -> str:
 
 def main() -> None:
     checks: list[dict[str, Any]] = []
+    synthetic_whiteboard_png = create_synthetic_whiteboard_png()
     run_id = f"{int(time.time())}-{secrets.token_hex(4)}"
     student_email = f"qa-student-{run_id}@example.invalid"
     teacher_email = f"qa-teacher-{run_id}@example.invalid"
@@ -293,35 +319,51 @@ def main() -> None:
         require(
             checks,
             "premium_whiteboard_teach",
-            status == 200 and payload.get("success") is True,
+            status == 200
+            and payload.get("success") is True
+            and payload.get("data", {}).get("fallback") is False,
             {"status": status, "fallback": payload.get("data", {}).get("fallback")},
         )
 
         status, payload = request_json(
             "POST",
             f"/revision-classroom/lessons/{lesson_id}/check-work",
-            {"imageBase64": BLANK_PNG, "imageWidth": 100, "imageHeight": 100, "stepIndex": 0},
+            {
+                "imageBase64": synthetic_whiteboard_png,
+                "imageWidth": 1200,
+                "imageHeight": 800,
+                "stepIndex": 0,
+            },
             student_token,
             timeout=180,
         )
         require(
             checks,
             "premium_check_work",
-            status == 200 and payload.get("success") is True,
+            status == 200
+            and payload.get("success") is True
+            and payload.get("data", {}).get("fallback") is False,
             {"status": status, "fallback": payload.get("data", {}).get("fallback")},
         )
 
         status, payload = request_json(
             "POST",
             f"/revision-classroom/lessons/{lesson_id}/ask-about",
-            {"imageBase64": BLANK_PNG, "x": 100, "y": 100, "question": "Explain this synthetic test point."},
+            {
+                "imageBase64": synthetic_whiteboard_png,
+                "x": 240,
+                "y": 350,
+                "question": "Explain the boxed synthetic answer.",
+            },
             student_token,
             timeout=180,
         )
         require(
             checks,
             "premium_ask_about",
-            status == 200 and payload.get("success") is True,
+            status == 200
+            and payload.get("success") is True
+            and payload.get("data", {}).get("fallback") is False,
             {"status": status, "fallback": payload.get("data", {}).get("fallback")},
         )
 

@@ -259,10 +259,12 @@ describe('whiteboard-teach progressive protocol', () => {
 
   it('upserts one progressive cache row after a successful outline request (ONE fused AI call)', async () => {
     let aiCalls = 0;
+    let capturedOptions: Record<string, unknown> | null = null;
     const countingAi = {
-      run: async (model: string, opts: { max_tokens?: number }) => {
+      run: async (model: string, opts: Record<string, unknown>) => {
         aiCalls++;
-        return mockAi.run(model, opts);
+        capturedOptions = opts;
+        return mockAi.run(model, opts as { max_tokens?: number });
       },
     };
     const db = createMockD1([authHandler, premiumHandler, lessonHandler, cacheMissHandler, writeHandler]);
@@ -279,6 +281,18 @@ describe('whiteboard-teach progressive protocol', () => {
     };
     // The fused cold path makes exactly one AI call (halved TTFS).
     expect(aiCalls).toBe(1);
+    expect(capturedOptions).not.toBeNull();
+    expect(capturedOptions!.temperature).toBe(0.2);
+    expect(capturedOptions!.response_format).toMatchObject({
+      type: 'json_schema',
+      json_schema: {
+        required: ['outline', 'firstStep'],
+        properties: {
+          outline: { minItems: 4, maxItems: 6 },
+          firstStep: { required: expect.arrayContaining(['commands', 'explanation', 'voiceOver']) },
+        },
+      },
+    });
     // Response contract unchanged: exactly these fields.
     expect(Object.keys(body.data).sort()).toEqual(
       ['cached', 'fallback', 'outline', 'step', 'stepIndex', 'totalSteps'].sort()
