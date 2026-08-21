@@ -1,4 +1,4 @@
-import { useChatStore } from '@/stores';
+import { useChatStore } from '@/stores/chatStore';
 import { cn } from '@/utils';
 import { Hash, Lock, User, Users } from 'lucide-react';
 import type { ChatRoom, ChatRoomType } from '@/types';

@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Clock,
@@ -21,7 +22,8 @@ import {
   Moon,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import { useThemeStore, useUIStore } from '@/stores';
+import { useThemeStore } from '@/stores/themeStore';
+import { useUIStore } from '@/stores/uiStore';
 import { api } from '@/lib/api';
 import { cn } from '@/utils';
 
@@ -96,6 +98,7 @@ export default function TakePaper() {
   const [showQuestionPanel, setShowQuestionPanel] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const handleSubmitRef = useRef<() => void>(() => {});
 
   // Load paper details
   useEffect(() => {
@@ -244,7 +247,7 @@ export default function TakePaper() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isTimerRunning]);
+  }, [isTimerRunning, timeRemaining]);
 
   // Time warning at 5 minutes
   useEffect(() => {
@@ -261,7 +264,7 @@ export default function TakePaper() {
   // Auto-submit when time runs out
   useEffect(() => {
     if (timeRemaining === 0 && isTimerRunning) {
-      handleSubmit();
+      handleSubmitRef.current();
     }
   }, [timeRemaining, isTimerRunning]);
 
@@ -356,6 +359,8 @@ export default function TakePaper() {
     }
     setIsSubmitting(false);
   };
+
+  handleSubmitRef.current = handleSubmit;
 
   const handleExit = () => {
     setShowExitConfirm(false);

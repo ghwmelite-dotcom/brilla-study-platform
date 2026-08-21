@@ -19,7 +19,9 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { Card, CardHeader, Button, Badge, ProgressBar, CircularProgress } from '@/components/common';
-import { useParentStore, useAuthStore, useCounselorReportsStore } from '@/stores';
+import { useParentStore } from '@/stores/parentStore';
+import { useAuthStore } from '@/stores/authStore';
+import { useCounselorReportsStore } from '@/stores/counselorReportsStore';
 import { AlertCard } from '@/components/counselorReports';
 import { cn } from '@/utils';
 import type { ParentStudentLink, StudentProgressSummary, CounselorReport, WellbeingAlert } from '@/types';

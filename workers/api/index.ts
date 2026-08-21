@@ -907,7 +907,7 @@ publicApp.get('/exam-types/:slug', async (c) => {
     }
 
     return c.json({ success: true, data: examType });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch exam type' }, 500);
   }
 });
@@ -925,7 +925,7 @@ publicApp.get('/exam-types/:slug/categories', async (c) => {
     `).bind(slug).all();
 
     return c.json({ success: true, data: results });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch categories' }, 500);
   }
 });
@@ -943,7 +943,7 @@ publicApp.get('/exam-types/:slug/paper-types', async (c) => {
     `).bind(slug).all();
 
     return c.json({ success: true, data: results });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch paper types' }, 500);
   }
 });
@@ -1535,7 +1535,7 @@ publicApp.get('/auth/verify-token', async (c) => {
       valid: true,
       data: { name: user.name, email: user.email }
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Token verification failed' }, 500);
   }
 });
@@ -1965,7 +1965,7 @@ publicApp.get('/subjects', async (c) => {
     const { results } = await stmt.all();
 
     return c.json({ success: true, data: results });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch subjects' }, 500);
   }
 });
@@ -1983,7 +1983,7 @@ publicApp.get('/subjects/:slug', async (c) => {
     }
 
     return c.json({ success: true, data: subject });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch subject' }, 500);
   }
 });
@@ -2023,7 +2023,7 @@ publicApp.get('/topics', async (c) => {
     }));
 
     return c.json({ success: true, data: topics });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch topics' }, 500);
   }
 });
@@ -2047,7 +2047,7 @@ publicApp.get('/topics/:id', async (c) => {
         keyFormulas: topic.key_formulas ? JSON.parse(topic.key_formulas as string) : [],
       },
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch topic' }, 500);
   }
 });
@@ -2095,7 +2095,7 @@ publicApp.get('/questions', async (c) => {
     }));
 
     return c.json({ success: true, data: questions });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch questions' }, 500);
   }
 });
@@ -2119,7 +2119,7 @@ publicApp.get('/questions/:id', async (c) => {
         options: transformQuestionOptions(question.options, question.correct_answer as string),
       },
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch question' }, 500);
   }
 });
@@ -2153,7 +2153,7 @@ publicApp.get('/riddles', async (c) => {
     }));
 
     return c.json({ success: true, data: riddles });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch riddles' }, 500);
   }
 });
@@ -2166,7 +2166,7 @@ publicApp.get('/achievements', async (c) => {
     `).all();
 
     return c.json({ success: true, data: results });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch achievements' }, 500);
   }
 });
@@ -2859,7 +2859,7 @@ publicApp.get('/papers', async (c) => {
     const { results } = await stmt.all();
 
     return c.json({ success: true, data: results });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch past papers' }, 500);
   }
 });
@@ -2898,7 +2898,7 @@ publicApp.get('/papers/years', async (c) => {
     const years = results.map((r: Record<string, unknown>) => r.year);
 
     return c.json({ success: true, data: years });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch years' }, 500);
   }
 });
@@ -2947,7 +2947,7 @@ publicApp.get('/papers/:id', async (c) => {
         questions: parsedQuestions,
       },
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch paper' }, 500);
   }
 });
@@ -2981,7 +2981,7 @@ publicApp.get('/essays/:questionId', async (c) => {
     };
 
     return c.json({ success: true, data });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch essay question' }, 500);
   }
 });
@@ -3002,7 +3002,7 @@ publicApp.get('/houses', async (c) => {
     `).all();
 
     return c.json({ success: true, data: results });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch houses' }, 500);
   }
 });
@@ -3037,7 +3037,7 @@ publicApp.get('/houses/standings', async (c) => {
     }));
 
     return c.json({ success: true, data: standings });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch standings' }, 500);
   }
 });
@@ -3057,7 +3057,7 @@ publicApp.get('/houses/activity', async (c) => {
     `).bind(limit).all();
 
     return c.json({ success: true, data: results });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch activity' }, 500);
   }
 });
@@ -3079,7 +3079,7 @@ publicApp.get('/houses/:id', async (c) => {
     }
 
     return c.json({ success: true, data: house });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch house' }, 500);
   }
 });
@@ -3100,7 +3100,7 @@ publicApp.get('/houses/:id/members', async (c) => {
     `).bind(id, id, limit).all();
 
     return c.json({ success: true, data: results });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch members' }, 500);
   }
 });
@@ -3125,7 +3125,7 @@ publicApp.get('/battles/available', async (c) => {
     `).all();
 
     return c.json({ success: true, data: results });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch battles' }, 500);
   }
 });
@@ -3165,7 +3165,7 @@ publicApp.get('/battles/:id', async (c) => {
     };
 
     return c.json({ success: true, data });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch battle' }, 500);
   }
 });
@@ -3282,7 +3282,7 @@ app.get('/api/battles/history', requireAuth, async (c) => {
     }));
 
     return c.json({ success: true, data: formattedResults });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch battle history' }, 500);
   }
 });
@@ -3379,7 +3379,7 @@ app.get('/api/essays/history', requireAuth, async (c) => {
     }));
 
     return c.json({ success: true, data: attempts });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch essay history' }, 500);
   }
 });
@@ -3607,7 +3607,7 @@ protectedApp.get('/progress', async (c) => {
         streak: user?.streak_days || 0,
       },
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch progress' }, 500);
   }
 });
@@ -3952,7 +3952,7 @@ protectedApp.post('/houses', async (c) => {
     `).bind(id, name, color, icon || 'shield', description || null, schoolId || null).run();
 
     return c.json({ success: true, data: { id, name, color, icon: icon || 'shield', description, isDefault: false, schoolId } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to create house' }, 500);
   }
 });
@@ -3981,7 +3981,7 @@ protectedApp.post('/houses/points', async (c) => {
     `).bind(id, houseId, userId, points, source, sourceId || null, period, demoFlags.is_demo_data, demoFlags.expires_at).run();
 
     return c.json({ success: true, data: { id, houseId, userId, points, source, period } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to award points' }, 500);
   }
 });
@@ -4002,7 +4002,7 @@ protectedApp.put('/users/:id/house', async (c) => {
     `).bind(houseId, id).run();
 
     return c.json({ success: true, data: { userId: id, houseId } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to update house' }, 500);
   }
 });
@@ -4082,7 +4082,7 @@ protectedApp.post('/battles', async (c) => {
         createdAt: new Date().toISOString(),
       },
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to create battle' }, 500);
   }
 });
@@ -4132,7 +4132,7 @@ protectedApp.post('/battles/:id/join', async (c) => {
         startedAt: new Date().toISOString(),
       },
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to join battle' }, 500);
   }
 });
@@ -4233,7 +4233,7 @@ protectedApp.post('/battles/:id/answer', async (c) => {
         battleComplete: bothComplete,
       },
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to submit answer' }, 500);
   }
 });
@@ -4268,7 +4268,7 @@ protectedApp.post('/battles/:id/cancel', async (c) => {
     `).bind(winnerId, battleId).run();
 
     return c.json({ success: true, data: { battleId, status: 'cancelled', winnerId } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to cancel battle' }, 500);
   }
 });
@@ -4403,7 +4403,7 @@ protectedApp.put('/papers/attempts/:attemptId/answer', async (c) => {
     }
 
     return c.json({ success: true, data: { saved: true } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to save answer' }, 500);
   }
 });
@@ -4481,7 +4481,7 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
         status: 'completed',
       },
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to submit paper' }, 500);
   }
 });
@@ -4523,7 +4523,7 @@ protectedApp.get('/papers/attempts/:attemptId/results', async (c) => {
         answers,
       },
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch results' }, 500);
   }
 });
@@ -4604,7 +4604,7 @@ protectedApp.post('/essays/submit', async (c) => {
         gradingStatus: wantsAIGrading ? 'pending' : 'graded',
       },
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to submit essay' }, 500);
   }
 });
@@ -4715,7 +4715,7 @@ Grade the essay using only the supplied data.`;
         feedback: aiFeedback,
       },
     });
-  } catch (error) {
+  } catch {
     // Update status to failed
     await c.env.DB.prepare(`
       UPDATE essay_attempts SET grading_status = 'failed' WHERE id = ?
@@ -4904,7 +4904,7 @@ protectedApp.post('/ai/hint', async (c) => {
         provider: 'mock',
       },
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to generate hint' }, 500);
   }
 });
@@ -4936,7 +4936,7 @@ protectedApp.post('/ai/study-plan', async (c) => {
       success: true,
       data: mockPlan,
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to generate study plan' }, 500);
   }
 });
@@ -5523,7 +5523,7 @@ protectedApp.get('/students/parent-links', userAuth, async (c) => {
     `).bind(user.userId).all();
 
     return c.json({ success: true, data: results });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch parent links' }, 500);
   }
 });
@@ -5562,7 +5562,7 @@ protectedApp.delete('/students/parent-link/:parentId', userAuth, async (c) => {
     `).bind(notifId, parentId, user.userId).run();
 
     return c.json({ success: true, data: { message: 'Parent access revoked' } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to revoke parent access' }, 500);
   }
 });
@@ -5696,7 +5696,7 @@ protectedApp.get('/parents/students', userAuth, async (c) => {
     }));
 
     return c.json({ success: true, data: students });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch linked students' }, 500);
   }
 });
@@ -5915,7 +5915,7 @@ protectedApp.get('/parents/students/:studentId/activity', userAuth, async (c) =>
     `).bind(logId, user.userId, studentId).run();
 
     return c.json({ success: true, data: activities.slice(0, limit) });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch student activity' }, 500);
   }
 });
@@ -5975,7 +5975,7 @@ protectedApp.get('/parents/notifications', userAuth, async (c) => {
         unreadCount: unreadResult?.count || 0,
       },
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch notifications' }, 500);
   }
 });
@@ -5995,7 +5995,7 @@ protectedApp.put('/parents/notifications/:id/read', userAuth, async (c) => {
     `).bind(notificationId, user.userId).run();
 
     return c.json({ success: true, data: { message: 'Notification marked as read' } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to mark notification' }, 500);
   }
 });
@@ -6014,7 +6014,7 @@ protectedApp.put('/parents/notifications/read-all', userAuth, async (c) => {
     `).bind(user.userId).run();
 
     return c.json({ success: true, data: { message: 'All notifications marked as read' } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to mark notifications' }, 500);
   }
 });
@@ -6055,7 +6055,7 @@ protectedApp.get('/parents/preferences', userAuth, async (c) => {
         lowPerformanceThreshold: prefs.low_performance_threshold || 40,
       },
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch preferences' }, 500);
   }
 });
@@ -6096,7 +6096,7 @@ protectedApp.put('/parents/preferences', userAuth, async (c) => {
     ).run();
 
     return c.json({ success: true, data: { message: 'Preferences updated' } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to update preferences' }, 500);
   }
 });
@@ -6817,7 +6817,7 @@ adminApp.get('/users/stats', async (c) => {
         activeToday: (activeToday as any)?.count || 0,
       }
     });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch stats' }, 500);
   }
 });
@@ -6840,7 +6840,7 @@ adminApp.get('/users/pending', async (c) => {
     }));
 
     return c.json({ success: true, data: users });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to fetch pending users' }, 500);
   }
 });
@@ -6988,7 +6988,7 @@ adminApp.post('/users/:id/approve', async (c) => {
     }
 
     return c.json({ success: true, data: { message: 'User approved successfully', trialStarted } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to approve user' }, 500);
   }
 });
@@ -7161,7 +7161,7 @@ adminApp.post('/users/:id/reject', async (c) => {
     }
 
     return c.json({ success: true, data: { message: 'User rejected' } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to reject user' }, 500);
   }
 });
@@ -7386,7 +7386,7 @@ adminApp.put('/users/:id', async (c) => {
     ).run();
 
     return c.json({ success: true, data: { message: 'User updated successfully' } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to update user' }, 500);
   }
 });
@@ -7407,7 +7407,7 @@ adminApp.post('/users/:id/deactivate', async (c) => {
     `).bind(userId).run();
 
     return c.json({ success: true, data: { message: 'User deactivated' } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to deactivate user' }, 500);
   }
 });
@@ -7422,7 +7422,7 @@ adminApp.post('/users/:id/reactivate', async (c) => {
     `).bind(userId).run();
 
     return c.json({ success: true, data: { message: 'User reactivated' } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to reactivate user' }, 500);
   }
 });
@@ -7460,7 +7460,7 @@ adminApp.delete('/users/:id', async (c) => {
     });
 
     return c.json({ success: true, data: { message: 'User deleted' } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to delete user' }, 500);
   }
 });
@@ -7508,7 +7508,7 @@ adminApp.post('/users/:id/resend-verification', async (c) => {
     }
 
     return c.json({ success: true, data: { message: 'Verification email sent' } });
-  } catch (error) {
+  } catch {
     return c.json({ success: false, error: 'Failed to resend verification' }, 500);
   }
 });

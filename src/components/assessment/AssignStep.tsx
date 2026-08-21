@@ -73,28 +73,34 @@ export function AssignStep({ draft, onUpdate }: AssignStepProps) {
         setMode('individual');
       }
     }
-  }, []);
+  }, [draft.assignments]);
 
   // Load students when in individual mode
   useEffect(() => {
-    if (mode === 'individual') {
-      loadStudents();
-    }
-  }, [mode]);
+    if (mode !== 'individual') return;
 
-  const loadStudents = async () => {
-    setIsLoadingStudents(true);
-    try {
-      const response = await api.get<{ students: Student[] }>('/students/search');
-      if (response.success && response.data) {
-        setStudents(response.data.students);
+    let cancelled = false;
+    const loadStudents = async () => {
+      setIsLoadingStudents(true);
+      try {
+        const response = await api.get<{ students: Student[] }>('/students/search');
+        if (!cancelled && response.success && response.data) {
+          setStudents(response.data.students);
+        }
+      } catch (error) {
+        console.error('Failed to load students:', error);
+      } finally {
+        if (!cancelled) {
+          setIsLoadingStudents(false);
+        }
       }
-    } catch (error) {
-      console.error('Failed to load students:', error);
-    } finally {
-      setIsLoadingStudents(false);
-    }
-  };
+    };
+
+    void loadStudents();
+    return () => {
+      cancelled = true;
+    };
+  }, [mode]);
 
   // Update draft assignments when selection changes
   useEffect(() => {
@@ -123,7 +129,7 @@ export function AssignStep({ draft, onUpdate }: AssignStepProps) {
     }
 
     onUpdate({ assignments });
-  }, [mode, selectedClasses, selectedStudents, selectedLevel]);
+  }, [mode, onUpdate, selectedClasses, selectedStudents, selectedLevel]);
 
   const toggleClass = (classId: string) => {
     const newSelected = new Set(selectedClasses);

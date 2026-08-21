@@ -51,6 +51,9 @@ export default function WhiteboardEditor() {
   const [webcamSettings, setWebcamSettings] = useState<WebcamSettings>(DEFAULT_WEBCAM_SETTINGS);
   const [fabricCanvas, setFabricCanvas] = useState<fabric.Canvas | null>(null);
   const [, setLastRecording] = useState<RecordingSession | null>(null);
+  const handleSaveRef = useRef<() => void>(() => {});
+  const handleUndoRef = useRef<() => void>(() => {});
+  const handleRedoRef = useRef<() => void>(() => {});
 
   // Recording hook
   const {
@@ -91,7 +94,7 @@ export default function WhiteboardEditor() {
       }
     };
     loadData();
-  }, [id]);
+  }, [id, loadWhiteboard, startNewWhiteboard]);
 
   // Calculate canvas size based on viewport
   useEffect(() => {
@@ -112,13 +115,13 @@ export default function WhiteboardEditor() {
       if (e.ctrlKey || e.metaKey) {
         if (e.key === 'z' && !e.shiftKey) {
           e.preventDefault();
-          handleUndo();
+          handleUndoRef.current();
         } else if ((e.key === 'y') || (e.key === 'z' && e.shiftKey)) {
           e.preventDefault();
-          handleRedo();
+          handleRedoRef.current();
         } else if (e.key === 's') {
           e.preventDefault();
-          handleSave();
+          handleSaveRef.current();
         }
       }
     };
@@ -167,6 +170,10 @@ export default function WhiteboardEditor() {
       canvasRef.current.loadFromJSON(state.json);
     }
   }, [redo]);
+
+  handleSaveRef.current = handleSave;
+  handleUndoRef.current = handleUndo;
+  handleRedoRef.current = handleRedo;
 
   const handleClear = useCallback(() => {
     if (window.confirm('Are you sure you want to clear the canvas? This cannot be undone.')) {

@@ -14,7 +14,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { cn } from '@/utils';
-import { useLibraryStore } from '@/stores';
+import { useLibraryStore } from '@/stores/libraryStore';
 import type { ResourceType } from '@/types';
 
 interface ResourceFiltersProps {

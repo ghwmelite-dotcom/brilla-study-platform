@@ -276,7 +276,7 @@ export default function SyllabusBrowser() {
   const syllabusTree = useMemo(() => {
     if (!specificationId) return [];
     return getSyllabusTree(specificationId);
-  }, [specificationId, getSyllabusTree, syllabusTopics]);
+  }, [specificationId, getSyllabusTree]);
 
   // Get progress for a topic
   const getTopicProgress = (topicId: string) => {

@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Clock,
@@ -51,6 +52,7 @@ export default function TakeAssessment() {
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [showTimeWarning, setShowTimeWarning] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const handleSubmitRef = useRef<() => void>(() => {});
 
   // Load assessment and start attempt
   useEffect(() => {
@@ -83,7 +85,7 @@ export default function TakeAssessment() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isTimerRunning, decrementTimer]);
+  }, [decrementTimer, isTimerRunning, timeRemaining]);
 
   // Time warning at 5 minutes
   useEffect(() => {
@@ -96,7 +98,7 @@ export default function TakeAssessment() {
   // Auto-submit when time runs out
   useEffect(() => {
     if (timeRemaining === 0 && isTimerRunning) {
-      handleSubmit();
+      handleSubmitRef.current();
     }
   }, [timeRemaining, isTimerRunning]);
 
@@ -136,6 +138,8 @@ export default function TakeAssessment() {
       navigate(`/assessments/${id}/results`);
     }
   };
+
+  handleSubmitRef.current = handleSubmit;
 
   const handleExit = () => {
     setShowExitConfirm(false);

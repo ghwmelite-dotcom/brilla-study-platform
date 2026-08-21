@@ -7,7 +7,7 @@
     "dev": "vite",
     "dev:api": "wrangler dev --env dev",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:api\"",
-    "build": "node scripts/configure-pages-headers.mjs --check && tsc -b && vite build && node scripts/configure-pages-headers.mjs",
+    "build": "node scripts/configure-pages-headers.mjs --check && tsc -b && vite build && node scripts/verify-bundle-budget.mjs && node scripts/configure-pages-headers.mjs",
     "lint": "eslint src workers scripts",
     "typecheck:api": "tsc -p workers/tsconfig.json",
     "lint:api": "eslint workers",
@@ -31,7 +31,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-pdf": "^10.2.0",
-    "react-router-dom": "^6.30.4",
+    "react-router-dom": "^7.18.2",
     "recharts": "^2.12.0",
     "warning": "^4.0.3",
     "zustand": "^5.0.1"
@@ -58,8 +58,11 @@
     "tailwindcss": "^3.4.14",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.11.0",
-    "vite": "^5.4.10",
-    "vitest": "^2.1.9",
+    "vite": "^6.4.3",
+    "vitest": "^3.2.6",
     "wrangler": "^4.121.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }

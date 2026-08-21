@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Reply, Smile, Trash2, Flag } from 'lucide-react';
-import { useChatStore } from '@/stores';
+import { useChatStore } from '@/stores/chatStore';
 import { cn } from '@/utils';
 import type { ChatMessage as ChatMessageType } from '@/types';
 

@@ -1,5 +1,7 @@
 import { MessageCircle } from 'lucide-react';
-import { useChatStore, useAuthStore, useUIStore } from '@/stores';
+import { useChatStore } from '@/stores/chatStore';
+import { useAuthStore } from '@/stores/authStore';
+import { useUIStore } from '@/stores/uiStore';
 import { cn } from '@/utils';
 
 export function ChatButton() {

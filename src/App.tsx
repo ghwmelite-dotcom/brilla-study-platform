@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, useState } from 'react';
 import { Layout } from '@/components/layout';
-import { useAuthStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
 import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/guide';
 import { CounselorBrieTrigger, CounselorBrieWizard } from '@/components/guidance';
 import { ToastContainer } from '@/components/toast';
@@ -17,12 +17,10 @@ function LazyPage({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<PageLoader />}>{children}</Suspense>;
 }
 
-// Core pages (loaded immediately for fast initial load)
-import { HomePage } from '@/pages/Home';
-import { DashboardPage } from '@/pages/Dashboard';
-import { LandingPage } from '@/pages/Landing';
-
 // Lazy loaded pages (direct imports for true code splitting)
+const HomePage = lazyWithRetry(() => import('@/pages/Home').then(m => ({ default: m.HomePage })));
+const DashboardPage = lazyWithRetry(() => import('@/pages/Dashboard').then(m => ({ default: m.DashboardPage })));
+const LandingPage = lazyWithRetry(() => import('@/pages/Landing').then(m => ({ default: m.LandingPage })));
 const TopicsPage = lazyWithRetry(() => import('@/pages/Topics').then(m => ({ default: m.TopicsPage })));
 const PracticePage = lazyWithRetry(() => import('@/pages/Practice').then(m => ({ default: m.PracticePage })));
 const CompetitionPage = lazyWithRetry(() => import('@/pages/Competition').then(m => ({ default: m.CompetitionPage })));
@@ -220,7 +218,7 @@ function HomeRoute() {
   const { isAuthenticated, user } = useAuthStore();
 
   if (!isAuthenticated) {
-    return <LandingPage />;
+    return <LazyPage><LandingPage /></LazyPage>;
   }
 
   // Redirect admins to admin dashboard
@@ -236,7 +234,7 @@ function HomeRoute() {
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 py-6 lg:px-6">
-        <HomePage />
+        <LazyPage><HomePage /></LazyPage>
       </div>
     </Layout>
   );
@@ -384,7 +382,7 @@ function App() {
             path="dashboard"
             element={
               <ProtectedRoute>
-                <DashboardPage />
+                <LazyPage><DashboardPage /></LazyPage>
               </ProtectedRoute>
             }
           />

@@ -4,7 +4,7 @@ import type { Question } from '@/types';
 import { QuestionCard } from '@/components/questions';
 import { Button, Card, ProgressBar, Badge } from '@/components/common';
 import { cn, formatTime, calculateAccuracy } from '@/utils';
-import { useQuizStore } from '@/stores';
+import { useQuizStore } from '@/stores/quizStore';
 
 interface TopicDrillProps {
   questions: Question[];

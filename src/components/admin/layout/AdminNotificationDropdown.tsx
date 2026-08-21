@@ -13,7 +13,7 @@ import {
   Trash2,
   AlertCircle,
 } from 'lucide-react';
-import { useNotificationStore } from '@/stores';
+import { useNotificationStore } from '@/stores/notificationStore';
 import type { NotificationType } from '@/stores/notificationStore';
 import { cn } from '@/utils';
 import { toSafeInternalPath } from '@/utils/navigation';

@@ -338,7 +338,7 @@ export const useQuickPlayStore = create<QuickPlayState>()(
           // Fallback to mock data
           const challenge = generateDailyBrainTeaser();
           set({ dailyChallenge: challenge, isLoading: false });
-        } catch (error) {
+        } catch {
           // Fallback to mock data on error
           const challenge = generateDailyBrainTeaser();
           set({ dailyChallenge: challenge, isLoading: false });
@@ -414,7 +414,7 @@ export const useQuickPlayStore = create<QuickPlayState>()(
             showQuickPlayModal: false,
             isQuickPlayModalOpen: false,
           });
-        } catch (error) {
+        } catch {
           set({ error: 'Failed to start game', isLoading: false });
         }
       },

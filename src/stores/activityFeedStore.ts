@@ -217,7 +217,7 @@ export const useActivityFeedStore = create<ActivityFeedState>((set, get) => ({
           hasMore: true,
         });
       }
-    } catch (error) {
+    } catch {
       // Use mock data on error
       const mockData = generateMockActivities(limit);
       set({
@@ -248,7 +248,7 @@ export const useActivityFeedStore = create<ActivityFeedState>((set, get) => ({
           isLoading: false,
         });
       }
-    } catch (error) {
+    } catch {
       // Use mock data on error
       const mockData = generateMockActivities(10, true);
       set({
@@ -277,7 +277,7 @@ export const useActivityFeedStore = create<ActivityFeedState>((set, get) => ({
           isLoading: false,
         });
       }
-    } catch (error) {
+    } catch {
       // Use mock data on error
       const mockData = generateMockActivities(15);
       set({
@@ -315,7 +315,7 @@ export const useActivityFeedStore = create<ActivityFeedState>((set, get) => ({
           isLoading: false,
         });
       }
-    } catch (error) {
+    } catch {
       // Generate more mock data on error
       const mockData = generateMockActivities(10);
       set({

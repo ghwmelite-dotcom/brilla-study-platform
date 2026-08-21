@@ -39,7 +39,7 @@ export const RecordingPlayer = forwardRef<RecordingPlayerRef, RecordingPlayerPro
 
     // Initialize Fabric canvas
     useEffect(() => {
-      if (!canvasRef.current || fabricCanvas) return;
+      if (!canvasRef.current) return;
 
       const canvas = new fabric.Canvas(canvasRef.current, {
         width: recording.canvasWidth || 1200,

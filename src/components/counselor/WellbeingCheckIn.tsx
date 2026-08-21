@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X, Heart, Battery, BookOpen, Frown, Smile } from 'lucide-react';
 import { cn } from '@/utils';
-import { useCounselorStore } from '@/stores';
+import { useCounselorStore } from '@/stores/counselorStore';
 import { MOOD_OPTIONS } from '@/types/counselor';
 import type { MoodType } from '@/types';
 

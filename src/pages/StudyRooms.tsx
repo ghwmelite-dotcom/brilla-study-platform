@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { useStudyRoomStore, CreateSessionData } from '@/stores/studyRoomStore';
-import { useAuthStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
 import { StudyRoom } from '@/components/study-room/StudyRoom';
 
 export function StudyRoomsPage() {

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Users, UserMinus, Plus, AlertTriangle, Check, Loader2 } from 'lucide-react';
 import { Card, CardHeader, Button, Badge } from '@/components/common';
-import { useParentStore, useAuthStore } from '@/stores';
+import { useParentStore } from '@/stores/parentStore';
+import { useAuthStore } from '@/stores/authStore';
 import { ParentInviteModal } from './ParentInviteModal';
 import type { ParentStudentLink } from '@/types';
 
@@ -22,7 +23,7 @@ export function ParentAccessControl() {
 
   useEffect(() => {
     fetchParentLinks();
-  }, []);
+  }, [fetchParentLinks]);
 
   const canRevokeAccess = user?.schoolLevel === 'shs';
 

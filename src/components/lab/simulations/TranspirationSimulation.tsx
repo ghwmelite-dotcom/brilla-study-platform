@@ -14,6 +14,14 @@ interface TrialData {
 }
 
 type Condition = 'normal' | 'wind' | 'humid' | 'dark' | 'vaseline';
+const CONDITION_RATES: Record<Condition, { rate: number; label: string; description: string }> = {
+  normal: { rate: 1.0, label: 'Normal', description: 'Room temperature, still air' },
+  wind: { rate: 2.0, label: 'Wind (Fan)', description: 'Increased air movement' },
+  humid: { rate: 0.3, label: 'High Humidity', description: 'Plastic bag over leaves' },
+  dark: { rate: 0.5, label: 'Darkness', description: 'Stomata partially closed' },
+  vaseline: { rate: 0.1, label: 'Vaseline', description: 'Stomata blocked' },
+};
+
 
 export function TranspirationSimulation({ onMeasurement, onObservation }: TranspirationSimulationProps) {
   const [condition, setCondition] = useState<Condition>('normal');
@@ -23,19 +31,12 @@ export function TranspirationSimulation({ onMeasurement, onObservation }: Transp
   const [trials, setTrials] = useState<TrialData[]>([]);
 
   // Transpiration rates for different conditions (mm/min relative to normal)
-  const conditionRates: Record<Condition, { rate: number; label: string; description: string }> = {
-    normal: { rate: 1.0, label: 'Normal', description: 'Room temperature, still air' },
-    wind: { rate: 2.0, label: 'Wind (Fan)', description: 'Increased air movement' },
-    humid: { rate: 0.3, label: 'High Humidity', description: 'Plastic bag over leaves' },
-    dark: { rate: 0.5, label: 'Darkness', description: 'Stomata partially closed' },
-    vaseline: { rate: 0.1, label: 'Vaseline', description: 'Stomata blocked' },
-  };
 
   // Run simulation
   useEffect(() => {
     if (!isRunning) return;
 
-    const rate = conditionRates[condition].rate;
+    const rate = CONDITION_RATES[condition].rate;
 
     const interval = setInterval(() => {
       setTime(prev => prev + 1);
@@ -43,7 +44,7 @@ export function TranspirationSimulation({ onMeasurement, onObservation }: Transp
         const newPos = prev + (rate * 0.5); // 0.5mm per second at normal rate
         if (newPos >= 100) {
           setIsRunning(false);
-          onObservation?.(`Bubble moved 100mm in ${time + 1}s under ${conditionRates[condition].label} conditions`);
+          onObservation?.(`Bubble moved 100mm in ${time + 1}s under ${CONDITION_RATES[condition].label} conditions`);
           return 100;
         }
         return newPos;
@@ -57,7 +58,7 @@ export function TranspirationSimulation({ onMeasurement, onObservation }: Transp
     setIsRunning(true);
     setTime(0);
     setBubblePosition(0);
-    onObservation?.(`Starting measurement under ${conditionRates[condition].label} conditions`);
+    onObservation?.(`Starting measurement under ${CONDITION_RATES[condition].label} conditions`);
   };
 
   const stopAndRecord = () => {
@@ -65,13 +66,13 @@ export function TranspirationSimulation({ onMeasurement, onObservation }: Transp
     const rate = bubblePosition / (time / 60); // mm/min
 
     const trial: TrialData = {
-      condition: conditionRates[condition].label,
+      condition: CONDITION_RATES[condition].label,
       rate,
       distance: bubblePosition,
       time,
     };
     setTrials(prev => [...prev, trial]);
-    onMeasurement?.(rate, 'mm/min', `Rate (${conditionRates[condition].label})`);
+    onMeasurement?.(rate, 'mm/min', `Rate (${CONDITION_RATES[condition].label})`);
     onObservation?.(`Recorded: ${bubblePosition.toFixed(1)}mm in ${time}s = ${rate.toFixed(2)} mm/min`);
   };
 
@@ -98,7 +99,7 @@ export function TranspirationSimulation({ onMeasurement, onObservation }: Transp
           <div className="bg-white/5 rounded-xl p-4 border border-white/10">
             <h3 className="text-sm font-semibold mb-3 text-white/80">Environmental Condition</h3>
             <div className="space-y-2">
-              {(Object.entries(conditionRates) as [Condition, typeof conditionRates[Condition]][]).map(([key, val]) => (
+              {(Object.entries(CONDITION_RATES) as [Condition, typeof CONDITION_RATES[Condition]][]).map(([key, val]) => (
                 <button
                   key={key}
                   onClick={() => !isRunning && setCondition(key)}
@@ -282,7 +283,7 @@ export function TranspirationSimulation({ onMeasurement, onObservation }: Transp
             <g transform="translate(380, 320)">
               <text x="0" y="0" fill="#fff" fontSize="10">Expected rate:</text>
               <text x="0" y="18" fill="#22c55e" fontSize="14" fontWeight="bold">
-                {(conditionRates[condition].rate * 30).toFixed(0)} mm/min
+                {(CONDITION_RATES[condition].rate * 30).toFixed(0)} mm/min
               </text>
               <text x="0" y="35" fill="#fff" fontSize="9" opacity="0.5">
                 (relative)

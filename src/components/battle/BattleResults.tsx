@@ -1,5 +1,5 @@
 import { Trophy, Medal, RotateCcw, Home } from 'lucide-react';
-import { useAuthStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
 import type { Battle } from '@/types';
 
 interface BattleResultsProps {

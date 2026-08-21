@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useRef } from 'react';
 import {
   Users,
   CheckCircle,
@@ -234,9 +235,10 @@ export default function AdminTutoringDirectory() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const loadDataRef = useRef<() => void>(() => {});
 
   useEffect(() => {
-    loadData();
+    loadDataRef.current();
   }, [page]);
 
   const loadData = async () => {
@@ -259,6 +261,8 @@ export default function AdminTutoringDirectory() {
       setIsLoading(false);
     }
   };
+
+  loadDataRef.current = loadData;
 
   const handleApprove = async (profileId: string) => {
     setProcessingId(profileId);

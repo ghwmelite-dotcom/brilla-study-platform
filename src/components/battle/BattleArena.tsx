@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Clock, Check, X, Loader2 } from 'lucide-react';
-import { useBattleStore, useAuthStore } from '@/stores';
+import { useBattleStore } from '@/stores/battleStore';
+import { useAuthStore } from '@/stores/authStore';
 import { useTimer } from '@/hooks';
 import type { Battle } from '@/types';
 import { VoiceInput } from '@/components/common';
@@ -111,7 +112,7 @@ export function BattleArena({ battle, onComplete }: BattleArenaProps) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [user, currentQuestion, isSubmitting, battle.id, currentQuestionIndex, submitAnswer, answerStartTime, fetchBattle, onComplete, nextQuestion]);
+  }, [user, currentQuestion, isSubmitting, battle, currentQuestionIndex, submitAnswer, answerStartTime, fetchBattle, onComplete, nextQuestion]);
 
   const handleOptionSelect = (optionText: string) => {
     if (showResult || isSubmitting) return;

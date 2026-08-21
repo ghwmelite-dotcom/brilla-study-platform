@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { AdminCard, AdminCardHeader, AdminButton, AdminBadge, AdminInput, AdminTextarea } from '@/components/admin';
 import { api } from '@/lib/api';
-import { useAuthStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/utils';
 
 interface SchoolRow {

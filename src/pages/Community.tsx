@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useRef } from 'react';
 import {
   MessageSquare,
   Users,
@@ -14,7 +15,8 @@ import {
   UserPlus,
   Loader2,
 } from 'lucide-react';
-import { useChatStore, useExamStore } from '@/stores';
+import { useChatStore } from '@/stores/chatStore';
+import { useExamStore } from '@/stores/examStore';
 import { cn } from '@/utils';
 import { ChatCreateRoom } from '@/components/chat';
 import type { GhanaExamTypeSlug, ExamTypeSlug } from '@/types';
@@ -62,14 +64,17 @@ export function CommunityPage() {
   const [recentDiscussions, setRecentDiscussions] = useState<RecentDiscussion[]>([]);
   const [isLoadingOnline, setIsLoadingOnline] = useState(false);
   const [isLoadingFeatured, setIsLoadingFeatured] = useState(false);
+  const fetchOnlineUsersRef = useRef<() => void>(() => {});
+  const fetchFeaturedRoomsRef = useRef<() => void>(() => {});
+  const fetchRecentDiscussionsRef = useRef<() => void>(() => {});
 
   // Fetch data on mount
   useEffect(() => {
     fetchRooms();
-    fetchOnlineUsers();
-    fetchFeaturedRooms();
-    fetchRecentDiscussions();
-  }, [currentExamType]);
+    fetchOnlineUsersRef.current();
+    fetchFeaturedRoomsRef.current();
+    fetchRecentDiscussionsRef.current();
+  }, [currentExamType, fetchRooms]);
 
   const fetchOnlineUsers = async () => {
     setIsLoadingOnline(true);
@@ -132,6 +137,10 @@ export function CommunityPage() {
       console.error('Failed to fetch recent discussions:', error);
     }
   };
+
+  fetchOnlineUsersRef.current = fetchOnlineUsers;
+  fetchFeaturedRoomsRef.current = fetchFeaturedRooms;
+  fetchRecentDiscussionsRef.current = fetchRecentDiscussions;
 
   // Filter rooms based on current exam type
   const myRooms = rooms.filter(

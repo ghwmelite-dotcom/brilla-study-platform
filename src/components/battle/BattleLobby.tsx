@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Swords, Users, RefreshCw, Zap } from 'lucide-react';
-import { useBattleStore, useAuthStore } from '@/stores';
+import { useBattleStore } from '@/stores/battleStore';
+import { useAuthStore } from '@/stores/authStore';
 import { usePolling } from '@/hooks/usePolling';
 import type { Battle, Difficulty } from '@/types';
 

@@ -1,68 +1,13 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { ChevronDown, ChevronRight, Loader2 } from 'lucide-react';
-import * as Icons from 'lucide-react';
 import { useExamStore } from '@/stores/examStore';
+import { getSubjectIcon } from '@/lib/subjectIcons';
 import { cn } from '@/utils';
 import type { Subject, SubjectCategory } from '@/types';
 
 interface SubjectNavigationProps {
   onItemClick?: () => void;
-}
-
-// Map icon names to components
-function getIconComponent(iconName: string): React.ComponentType<{ className?: string; style?: React.CSSProperties }> {
-  const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
-    Calculator: Icons.Calculator,
-    Atom: Icons.Atom,
-    FlaskConical: Icons.FlaskConical,
-    Dna: Icons.Dna,
-    BookOpen: Icons.BookOpen,
-    Microscope: Icons.Microscope,
-    Globe: Icons.Globe,
-    Globe2: Icons.Globe2,
-    Languages: Icons.Languages,
-    TrendingUp: Icons.TrendingUp,
-    Briefcase: Icons.Briefcase,
-    Receipt: Icons.Receipt,
-    Store: Icons.Store,
-    GraduationCap: Icons.GraduationCap,
-    Landmark: Icons.Landmark,
-    Clock: Icons.Clock,
-    Church: Icons.Church,
-    Moon: Icons.Moon,
-    Map: Icons.Map,
-    Music: Icons.Music,
-    Palette: Icons.Palette,
-    MessageCircle: Icons.MessageCircle,
-    Ruler: Icons.Ruler,
-    Hammer: Icons.Hammer,
-    TreeDeciduous: Icons.TreeDeciduous,
-    Cpu: Icons.Cpu,
-    Car: Icons.Car,
-    Building: Icons.Building,
-    Zap: Icons.Zap,
-    Home: Icons.Home,
-    UtensilsCrossed: Icons.UtensilsCrossed,
-    Shirt: Icons.Shirt,
-    Monitor: Icons.Monitor,
-    Camera: Icons.Camera,
-    Package: Icons.Package,
-    Wallet: Icons.Wallet,
-    Box: Icons.Box,
-    Heart: Icons.Heart,
-    FileText: Icons.FileText,
-    Keyboard: Icons.Keyboard,
-    Wheat: Icons.Wheat,
-    FunctionSquare: Icons.FunctionSquare,
-    Leaf: Icons.Leaf,
-    Beaker: Icons.Beaker,
-    Users: Icons.Users,
-    Sigma: Icons.Sigma,
-    PiggyBank: Icons.PiggyBank,
-  };
-
-  return iconMap[iconName] || Icons.BookOpen;
 }
 
 interface CategoryGroupProps {
@@ -98,7 +43,7 @@ function CategoryGroup({ category, subjects, onItemClick }: CategoryGroupProps) 
       {isExpanded && (
         <ul className="space-y-0.5 mt-1 animate-in slide-in-from-top-2 duration-200">
           {subjects.map((subject) => {
-            const IconComponent = getIconComponent(subject.icon);
+            const IconComponent = getSubjectIcon(subject.icon);
 
             return (
               <li key={subject.id}>
@@ -161,7 +106,7 @@ export function SubjectNavigation({ onItemClick }: SubjectNavigationProps) {
         </h3>
         <ul className="space-y-1">
           {subjects.map((subject) => {
-            const IconComponent = getIconComponent(subject.icon);
+            const IconComponent = getSubjectIcon(subject.icon);
 
             return (
               <li key={subject.id}>

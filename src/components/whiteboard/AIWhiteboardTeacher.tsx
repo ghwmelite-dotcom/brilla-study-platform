@@ -1056,8 +1056,9 @@ export function AIWhiteboardTeacher({
 
   // Cancel speech and timers on unmount (e.g. toggling back to Chat mid-sentence)
   useEffect(() => {
+    const voiceGenerationRef = voiceGenRef;
     return () => {
-      voiceGenRef.current++;
+      voiceGenerationRef.current++;
       if (playTimeoutRef.current) clearTimeout(playTimeoutRef.current);
       cancelAnimations();
       audioRef.current?.pause();

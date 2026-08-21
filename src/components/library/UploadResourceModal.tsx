@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { Button } from '@/components/common';
-import { useLibraryStore } from '@/stores';
+import { useLibraryStore } from '@/stores/libraryStore';
 import type { ResourceType } from '@/types';
 
 interface UploadResourceModalProps {

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import katex from 'katex';
 import { hasLatex, extractLatex } from '@/utils';
-import { escapeHtml } from '@/utils/html';
+import { formulaFallbackHtml } from '@/utils/formulaFallback';
 
 interface MathTextProps {
   text: string;
@@ -68,12 +68,6 @@ export function MathText({ text, className = '', displayMode = false }: MathText
 interface FormulaProps {
   formula: string;
   className?: string;
-}
-
-// KaTeX error fallback: the formula is escaped before interpolation so a
-// malformed/handler-bearing formula can never inject markup.
-export function formulaFallbackHtml(formula: string): string {
-  return `<span class="text-red-500">${escapeHtml(formula)}</span>`;
 }
 
 export function Formula({ formula, className = '' }: FormulaProps) {

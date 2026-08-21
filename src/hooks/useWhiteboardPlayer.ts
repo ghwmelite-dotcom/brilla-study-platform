@@ -69,6 +69,7 @@ export function useWhiteboardPlayer({
 
   // Initial canvas state
   const initialCanvasJSONRef = useRef<string>('');
+  const seekRef = useRef<(time: number) => Promise<void>>(async () => {});
 
   // Load recording data
   const loadRecording = useCallback(async (rec: WhiteboardRecording) => {
@@ -233,7 +234,7 @@ export function useWhiteboardPlayer({
   const play = useCallback(() => {
     if (playbackState === 'ended') {
       // Restart from beginning
-      seek(0);
+      void seekRef.current(0);
     }
 
     playbackStartTimeRef.current = Date.now();
@@ -331,6 +332,8 @@ export function useWhiteboardPlayer({
     }
   }, [canvas, playbackState, pause, play, replayEvent]);
 
+  seekRef.current = seek;
+
   // Set playback speed
   const setSpeed = useCallback((newSpeed: PlaybackSpeed) => {
     const wasPlaying = playbackState === 'playing';
@@ -361,7 +364,7 @@ export function useWhiteboardPlayer({
     if (recording) {
       loadRecording(recording);
     }
-  }, [recording?.id]);
+  }, [loadRecording, recording]);
 
   // Cleanup on unmount
   useEffect(() => {

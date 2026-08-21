@@ -37,11 +37,9 @@ import {
 } from 'lucide-react';
 import { AIWhiteboardTeacher } from '@/components/whiteboard/AIWhiteboardTeacher';
 import { VoiceConversation } from '@/components/voice/VoiceConversation';
-import {
-  useAuthStore,
-  useExamStore,
-  useRevisionClassroomStore,
-} from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
+import { useExamStore } from '@/stores/examStore';
+import { useRevisionClassroomStore } from '@/stores/revisionClassroomStore';
 import type { ExamTypeSlug } from '@/types';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { subjects as examSubjects, examTypes } from '@/data/examData';

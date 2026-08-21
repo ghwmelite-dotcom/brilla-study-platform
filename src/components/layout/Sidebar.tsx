@@ -34,7 +34,12 @@ import {
   Compass,
 } from 'lucide-react';
 import { cn } from '@/utils';
-import { useAuthStore, useExamStore, useChatStore, useProgressStore, useParentStore, useGradingStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
+import { useExamStore } from '@/stores/examStore';
+import { useChatStore } from '@/stores/chatStore';
+import { useProgressStore } from '@/stores/progressStore';
+import { useParentStore } from '@/stores/parentStore';
+import { useGradingStore } from '@/stores/gradingStore';
 import { useExamBoardStore } from '@/stores/examBoardStore';
 import { SubjectNavigation } from '@/components/subjects';
 import { ExamModeSwitcher } from '@/components/exam';

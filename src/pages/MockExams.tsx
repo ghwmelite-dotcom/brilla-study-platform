@@ -17,7 +17,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { Button, Card, Badge } from '@/components/common';
-import { useExamStore } from '@/stores';
+import { useExamStore } from '@/stores/examStore';
 import { cn } from '@/utils';
 import { api } from '@/lib/api';
 import type { GhanaExamTypeSlug, ExamTypeSlug } from '@/types';

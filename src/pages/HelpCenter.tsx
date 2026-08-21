@@ -41,7 +41,7 @@ import {
   Calendar,
   Bell,
 } from 'lucide-react';
-import { useExamStore } from '@/stores';
+import { useExamStore } from '@/stores/examStore';
 import { useGuideStore } from '@/stores/guideStore';
 import { featureGuides, guideCategories, searchGuides, getGuidesForExam } from '@/data/guides';
 import type { FeatureGuide, GuideCategory } from '@/types/guide';

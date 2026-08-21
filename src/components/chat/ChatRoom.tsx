@@ -1,5 +1,6 @@
 import { ArrowLeft, MoreVertical, Hash, Lock, User } from 'lucide-react';
-import { useChatStore, useAuthStore } from '@/stores';
+import { useChatStore } from '@/stores/chatStore';
+import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/utils';
 import { ChatMessageList } from './ChatMessageList';
 import { ChatInput } from './ChatInput';

@@ -23,15 +23,13 @@ import { DailyMultiplierBanner, MysteryChestModal, LuckyWheelModal, SurpriseChal
 import { StreakWarningBanner, ComebackModal, NudgeContainer } from '@/components/engagement';
 import { DashboardHero, ExamFlyers, DailyTip, FeaturedStats } from '@/components/dashboard';
 import { OALevelBanner, OALevelProgressWidget } from '@/components/exam-setup';
-import {
-  useAuthStore,
-  useProgressStore,
-  useQuickPlayStore,
-  useEventStore,
-  useRewardStore,
-  useEngagementStore,
-  useRaceStore,
-} from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
+import { useProgressStore } from '@/stores/progressStore';
+import { useQuickPlayStore } from '@/stores/quickPlayStore';
+import { useEventStore } from '@/stores/eventStore';
+import { useRewardStore } from '@/stores/rewardStore';
+import { useEngagementStore } from '@/stores/engagementStore';
+import { useRaceStore } from '@/stores/raceStore';
 import { useExamStore } from '@/stores/examStore';
 import { useExamBoardStore } from '@/stores/examBoardStore';
 import { getExamConfig } from '@/config';

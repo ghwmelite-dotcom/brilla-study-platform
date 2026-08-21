@@ -20,6 +20,7 @@ export function AmbientSounds({ sound, volume }: AmbientSoundsProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
+  const volumeRef = useRef(volume);
 
   useEffect(() => {
     if (sound === 'none') {
@@ -65,9 +66,9 @@ export function AmbientSounds({ sound, volume }: AmbientSoundsProps) {
 
     // Set volume
     if (gainNodeRef.current) {
-      gainNodeRef.current.gain.setValueAtTime(volume, audioContextRef.current!.currentTime);
+      gainNodeRef.current.gain.setValueAtTime(volumeRef.current, audioContextRef.current!.currentTime);
     } else {
-      audio.volume = volume;
+      audio.volume = volumeRef.current;
     }
 
     // Play with fade in
@@ -79,7 +80,7 @@ export function AmbientSounds({ sound, volume }: AmbientSoundsProps) {
 
         if (gainNodeRef.current) {
           gainNodeRef.current.gain.setValueAtTime(0, audioContextRef.current!.currentTime);
-          gainNodeRef.current.gain.linearRampToValueAtTime(volume, audioContextRef.current!.currentTime + 1);
+          gainNodeRef.current.gain.linearRampToValueAtTime(volumeRef.current, audioContextRef.current!.currentTime + 1);
         }
 
         await audio.play();
@@ -107,6 +108,7 @@ export function AmbientSounds({ sound, volume }: AmbientSoundsProps) {
 
   // Update volume when it changes
   useEffect(() => {
+    volumeRef.current = volume;
     if (gainNodeRef.current && audioContextRef.current) {
       gainNodeRef.current.gain.setValueAtTime(volume, audioContextRef.current.currentTime);
     } else if (audioRef.current) {

@@ -17,7 +17,7 @@ import { StarRating } from '@/components/tutoring/StarRating';
 import { ReviewCard } from '@/components/tutoring/ReviewCard';
 import { SessionRequestForm } from '@/components/tutoring/SessionRequestForm';
 import { useTutoringStore } from '@/stores/tutoringStore';
-import { useAuthStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
 import type { SessionType, TeacherDirectoryProfile } from '@/types/tutoring';
 
 const sessionTypeConfig: Record<SessionType, { icon: React.ReactNode; label: string; description: string }> = {

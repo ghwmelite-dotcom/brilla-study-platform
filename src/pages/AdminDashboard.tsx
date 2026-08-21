@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRef } from 'react';
 import {
   Users,
   UserCheck,
@@ -15,7 +16,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AdminCard, AdminCardHeader, AdminButton, AdminBadge } from '@/components/admin';
-import { useAuthStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/lib/api';
 import { cn } from '@/utils';
 
@@ -59,9 +60,10 @@ export default function AdminDashboard() {
     storage: 'healthy',
   });
   const [isLoading, setIsLoading] = useState(true);
+  const loadDashboardDataRef = useRef<() => void>(() => {});
 
   useEffect(() => {
-    loadDashboardData();
+    loadDashboardDataRef.current();
   }, []);
 
   const loadDashboardData = async () => {
@@ -107,6 +109,8 @@ export default function AdminDashboard() {
       setIsLoading(false);
     }
   };
+
+  loadDashboardDataRef.current = loadDashboardData;
 
   const statCards = [
     {

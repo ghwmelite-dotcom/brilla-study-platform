@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useRef } from 'react';
 import {
   Shield,
   Search,
@@ -17,7 +18,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { Card, CardHeader, Button, Badge } from '@/components/common';
-import { useAuthStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
 import { fetchWithAuth } from '@/lib/api';
 import type {
   AuditLogEntry,
@@ -57,6 +58,10 @@ export function AuditLog() {
   const [loginAttempts, setLoginAttempts] = useState<LoginAttempt[]>([]);
   const [loginsPagination, setLoginsPagination] = useState({ page: 1, pages: 1, total: 0 });
   const [showFailedOnly, setShowFailedOnly] = useState(false);
+  const fetchStatsRef = useRef<() => Promise<void>>(async () => {});
+  const fetchLogsRef = useRef<(page?: number) => Promise<void>>(async () => {});
+  const fetchSecurityEventsRef = useRef<(page?: number) => Promise<void>>(async () => {});
+  const fetchLoginAttemptsRef = useRef<(page?: number) => Promise<void>>(async () => {});
 
   const fetchStats = async () => {
     try {
@@ -134,6 +139,11 @@ export function AuditLog() {
     }
   };
 
+  fetchStatsRef.current = fetchStats;
+  fetchLogsRef.current = fetchLogs;
+  fetchSecurityEventsRef.current = fetchSecurityEvents;
+  fetchLoginAttemptsRef.current = fetchLoginAttempts;
+
   const resolveSecurityEvent = async (eventId: string, notes: string) => {
     try {
       const response = await fetchWithAuth(`${API_URL}/api/admin/audit/security-events/${eventId}/resolve`, {
@@ -157,16 +167,16 @@ export function AuditLog() {
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
-      await fetchStats();
+      await fetchStatsRef.current();
       setIsLoading(false);
     };
     loadData();
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'logs') fetchLogs(1);
-    if (activeTab === 'security') fetchSecurityEvents(1);
-    if (activeTab === 'logins') fetchLoginAttempts(1);
+    if (activeTab === 'logs') void fetchLogsRef.current(1);
+    if (activeTab === 'security') void fetchSecurityEventsRef.current(1);
+    if (activeTab === 'logins') void fetchLoginAttemptsRef.current(1);
   }, [activeTab, logsFilters, showUnresolvedOnly, showFailedOnly]);
 
   const getCategoryColor = (category: AuditActionCategory) => {

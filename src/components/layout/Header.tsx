@@ -12,7 +12,8 @@ import {
   Star,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { useAuthStore, useNotificationStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
+import { useNotificationStore } from '@/stores/notificationStore';
 import { Button, ThemeToggle } from '@/components/common';
 import { ExamModeSwitcher } from '@/components/exam';
 import { StreakPopup, XPPopup, NotificationDropdown } from '@/components/header';

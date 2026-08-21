@@ -43,7 +43,9 @@ import {
   TranspirationSimulation,
   DissectionSimulation,
 } from './simulations';
-import { useLabStore, useThemeStore, useUIStore } from '@/stores';
+import { useLabStore } from '@/stores/labStore';
+import { useThemeStore } from '@/stores/themeStore';
+import { useUIStore } from '@/stores/uiStore';
 import { cn } from '@/utils';
 import type { GradingResult } from '@/types';
 

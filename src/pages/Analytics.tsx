@@ -8,7 +8,8 @@ import {
   BookOpen,
   BarChart3,
 } from 'lucide-react';
-import { useAuthStore, useExamStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
+import { useExamStore } from '@/stores/examStore';
 import { api } from '@/lib/api';
 import {
   PerformanceChart,
@@ -189,7 +190,7 @@ export function AnalyticsPage() {
     };
 
     loadAnalytics();
-  }, []);
+  }, [subjectMeta]);
 
   const handleTopicClick = (topicId: string) => {
     navigate(`/topics?focus=${topicId}`);

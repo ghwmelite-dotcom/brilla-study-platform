@@ -36,6 +36,14 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
     const isDrawingShape = useRef(false);
     const shapeStartPoint = useRef<{ x: number; y: number } | null>(null);
     const currentShape = useRef<fabric.FabricObject | null>(null);
+    const widthRef = useRef(width);
+    const heightRef = useRef(height);
+    const addToHistoryRef = useRef<(state: string) => void>(() => {});
+    const onCanvasReadyRef = useRef(onCanvasReady);
+    const onObjectModifiedRef = useRef(onObjectModified);
+    const setupEraserModeRef = useRef<(canvas: fabric.Canvas) => void>(() => {});
+    const setupShapeDrawingRef = useRef<(canvas: fabric.Canvas, tool: WhiteboardToolType) => void>(() => {});
+    const setupTextModeRef = useRef<(canvas: fabric.Canvas) => void>(() => {});
 
     const {
       activeTool,
@@ -44,13 +52,19 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
       addToHistory,
     } = useWhiteboardStore();
 
+    widthRef.current = width;
+    heightRef.current = height;
+    addToHistoryRef.current = addToHistory;
+    onCanvasReadyRef.current = onCanvasReady;
+    onObjectModifiedRef.current = onObjectModified;
+
     // Initialize Fabric.js canvas
     useEffect(() => {
       if (!canvasRef.current || fabricCanvasRef.current) return;
 
       const canvas = new fabric.Canvas(canvasRef.current, {
-        width,
-        height,
+        width: widthRef.current,
+        height: heightRef.current,
         backgroundColor: '#ffffff',
         selection: true,
         preserveObjectStacking: true,
@@ -67,33 +81,41 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
       fabric.FabricObject.prototype.borderScaleFactor = 2;
 
       // Save initial state to history
-      addToHistory(JSON.stringify(canvas.toJSON()));
+      addToHistoryRef.current(JSON.stringify(canvas.toJSON()));
 
       // Canvas event listeners
       canvas.on('object:modified', () => {
-        addToHistory(JSON.stringify(canvas.toJSON()));
-        onObjectModified?.();
+        addToHistoryRef.current(JSON.stringify(canvas.toJSON()));
+        onObjectModifiedRef.current?.();
       });
 
       canvas.on('object:added', () => {
         if (!isDrawingShape.current) {
-          addToHistory(JSON.stringify(canvas.toJSON()));
-          onObjectModified?.();
+          addToHistoryRef.current(JSON.stringify(canvas.toJSON()));
+          onObjectModifiedRef.current?.();
         }
       });
 
       canvas.on('path:created', () => {
-        addToHistory(JSON.stringify(canvas.toJSON()));
-        onObjectModified?.();
+        addToHistoryRef.current(JSON.stringify(canvas.toJSON()));
+        onObjectModifiedRef.current?.();
       });
 
-      onCanvasReady?.(canvas);
+      onCanvasReadyRef.current?.(canvas);
 
       return () => {
         canvas.dispose();
         fabricCanvasRef.current = null;
       };
     }, []);
+
+    useEffect(() => {
+      const canvas = fabricCanvasRef.current;
+      if (!canvas) return;
+
+      canvas.setDimensions({ width, height });
+      canvas.renderAll();
+    }, [height, width]);
 
     // Handle tool changes
     useEffect(() => {
@@ -131,7 +153,7 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
           canvas.selection = false;
           canvas.defaultCursor = 'crosshair';
           canvas.hoverCursor = 'crosshair';
-          setupEraserMode(canvas);
+          setupEraserModeRef.current(canvas);
           break;
 
         case 'select':
@@ -145,13 +167,13 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
         case 'arrow':
           canvas.selection = false;
           canvas.defaultCursor = 'crosshair';
-          setupShapeDrawing(canvas, activeTool);
+          setupShapeDrawingRef.current(canvas, activeTool);
           break;
 
         case 'text':
           canvas.selection = false;
           canvas.defaultCursor = 'text';
-          setupTextMode(canvas);
+          setupTextModeRef.current(canvas);
           break;
       }
     }, [activeTool, settings.strokeColor, settings.strokeWidth]);
@@ -415,6 +437,10 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
       });
     };
 
+    setupEraserModeRef.current = setupEraserMode;
+    setupShapeDrawingRef.current = setupShapeDrawing;
+    setupTextModeRef.current = setupTextMode;
+
     // Expose methods via ref
     useImperativeHandle(ref, () => ({
       getCanvas: () => fabricCanvasRef.current,
@@ -518,8 +544,8 @@ export const WhiteboardCanvas = forwardRef<WhiteboardCanvasRef, WhiteboardCanvas
               }
             });
             canvas.discardActiveObject();
-            addToHistory(JSON.stringify(canvas.toJSON()));
-            onObjectModified?.();
+            addToHistoryRef.current(JSON.stringify(canvas.toJSON()));
+            onObjectModifiedRef.current?.();
           }
         }
 

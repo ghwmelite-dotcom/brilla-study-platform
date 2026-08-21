@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X, Search, Plus, Users, MessageSquare, Hash } from 'lucide-react';
-import { useChatStore } from '@/stores';
+import { useChatStore } from '@/stores/chatStore';
 import { cn } from '@/utils';
 import { ChatRoomList } from './ChatRoomList';
 import { ChatRoom } from './ChatRoom';

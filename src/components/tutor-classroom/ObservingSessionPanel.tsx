@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Eye,
@@ -81,7 +81,7 @@ export function ObservingSessionPanel({
   } = useTutorClassroomStore();
 
   const session = observedSessionDetails.get(sessionId);
-  const events = observedSessionEvents.get(sessionId) || [];
+  const events = useMemo(() => observedSessionEvents.get(sessionId) || [], [observedSessionEvents, sessionId]);
 
   const [currentMode, setCurrentMode] = useState<TutorModeType>('observe');
   const [messageText, setMessageText] = useState('');

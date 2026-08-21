@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import * as Icons from 'lucide-react';
 import {
   ChevronRight,
   BookOpen,
@@ -17,40 +16,10 @@ import { DailyUsageIndicator } from '@/components/subscription';
 import { cn } from '@/utils';
 import { api } from '@/lib/api';
 import { progressService } from '@/lib/services';
-import { useExamStore, useUsageStore } from '@/stores';
+import { useExamStore } from '@/stores/examStore';
+import { useUsageStore } from '@/stores/usageStore';
 import { isCoreSubject } from '@/config';
-
-// Icon mapping helper
-function getIconComponent(iconName: string): React.ComponentType<{ className?: string }> {
-  const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-    Calculator: Icons.Calculator,
-    Atom: Icons.Atom,
-    FlaskConical: Icons.FlaskConical,
-    Leaf: Icons.Leaf,
-    BookOpen: Icons.BookOpen,
-    Languages: Icons.Languages,
-    Beaker: Icons.Beaker,
-    Users: Icons.Users,
-    TrendingUp: Icons.TrendingUp,
-    Briefcase: Icons.Briefcase,
-    Receipt: Icons.Receipt,
-    PiggyBank: Icons.PiggyBank,
-    Landmark: Icons.Landmark,
-    Globe: Icons.Globe,
-    Globe2: Icons.Globe2,
-    Clock: Icons.Clock,
-    Church: Icons.Church,
-    Monitor: Icons.Monitor,
-    Ruler: Icons.Ruler,
-    UtensilsCrossed: Icons.UtensilsCrossed,
-    Hammer: Icons.Hammer,
-    MessageCircle: Icons.MessageCircle,
-    Heart: Icons.Heart,
-    Sigma: Icons.Sigma,
-    Dna: Icons.Dna,
-  };
-  return iconMap[iconName] || Icons.BookOpen;
-}
+import { getSubjectIcon } from '@/lib/subjectIcons';
 
 // Color mapping helper - convert hex to Tailwind bg class
 function getColorClass(hexColor: string): string {
@@ -197,7 +166,7 @@ export function TopicsPage() {
       );
     }
 
-    const SubjectIcon = getIconComponent(currentSubject.icon);
+    const SubjectIcon = getSubjectIcon(currentSubject.icon);
     const colorClass = getColorClass(currentSubject.color);
 
     // Build topics from API data
@@ -493,7 +462,7 @@ export function TopicsPage() {
       ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {subjects.map((subject) => {
-          const SubjectIcon = getIconComponent(subject.icon);
+          const SubjectIcon = getSubjectIcon(subject.icon);
           const colorClass = getColorClass(subject.color);
           const locked = isSubjectLocked(subject.slug);
 

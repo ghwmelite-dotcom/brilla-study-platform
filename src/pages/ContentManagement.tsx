@@ -17,7 +17,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { Card, Button, Badge } from '@/components/common';
-import { useAuthStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/utils';
 import { api } from '@/lib/api';
 

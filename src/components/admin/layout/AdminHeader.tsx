@@ -12,7 +12,8 @@ import {
   Activity,
   Command,
 } from 'lucide-react';
-import { useAuthStore, useNotificationStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
+import { useNotificationStore } from '@/stores/notificationStore';
 import { usePolling } from '@/hooks/usePolling';
 import { cn } from '@/utils';
 import { AdminNotificationDropdown } from './AdminNotificationDropdown';

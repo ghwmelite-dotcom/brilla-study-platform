@@ -8,7 +8,8 @@ import {
   Plus,
   ChevronRight,
 } from 'lucide-react';
-import { useLibraryStore, useAuthStore } from '@/stores';
+import { useLibraryStore } from '@/stores/libraryStore';
+import { useAuthStore } from '@/stores/authStore';
 import { ResourceCard, ResourceFilters, ResourceViewerModal, UploadResourceModal, EditResourceModal } from '@/components/library';
 import type { LibraryResource } from '@/types';
 

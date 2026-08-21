@@ -4,7 +4,7 @@ import type { Topic } from '@/types';
 import { Card, Button, Badge } from '@/components/common';
 import { MathText } from '@/components/questions';
 import { cn, shuffleArray } from '@/utils';
-import { useThemeStore } from '@/stores';
+import { useThemeStore } from '@/stores/themeStore';
 
 interface FlashcardItem {
   id: string;

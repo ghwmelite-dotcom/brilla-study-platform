@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Star, TrendingUp, Award, BookOpen, Swords, Flame, Gift, PenTool, Sparkles } from 'lucide-react';
-import { useNotificationStore } from '@/stores';
+import { useNotificationStore } from '@/stores/notificationStore';
 import { cn, formatNumber } from '@/utils';
 
 interface XPPopupProps {

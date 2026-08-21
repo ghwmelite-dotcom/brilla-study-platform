@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, Send, Sparkles, BookOpen, Lightbulb, GraduationCap, FileText, PenTool, Calculator, Heart, Paperclip, XCircle, type LucideIcon } from 'lucide-react';
-import { useAiTutorStore, useAuthStore, useExamStore } from '@/stores';
+import { useAiTutorStore } from '@/stores/aiTutorStore';
+import { useAuthStore } from '@/stores/authStore';
+import { useExamStore } from '@/stores/examStore';
 import { AiMessage } from './AiMessage';
 import { ThinkingIndicator } from './ThinkingIndicator';
 import type { GhanaExamTypeSlug } from '@/types';

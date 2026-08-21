@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRef } from 'react';
 import {
   Users,
   TrendingUp,
@@ -57,9 +58,10 @@ export default function AdminAnalytics() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
+  const loadAnalyticsRef = useRef<() => void>(() => {});
 
   useEffect(() => {
-    loadAnalytics();
+    loadAnalyticsRef.current();
   }, [timeRange]);
 
   const loadAnalytics = async () => {
@@ -75,6 +77,8 @@ export default function AdminAnalytics() {
       setIsLoading(false);
     }
   };
+
+  loadAnalyticsRef.current = loadAnalytics;
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;

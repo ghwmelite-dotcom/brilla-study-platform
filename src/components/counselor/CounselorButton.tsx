@@ -8,7 +8,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { cn } from '@/utils';
-import { useCounselorStore } from '@/stores';
+import { useCounselorStore } from '@/stores/counselorStore';
 import type { CounselorType } from '@/types';
 
 interface CounselorButtonProps {

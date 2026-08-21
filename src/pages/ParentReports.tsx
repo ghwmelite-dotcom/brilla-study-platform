@@ -10,7 +10,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { Card, Button, Badge } from '@/components/common';
-import { useAuthStore, useCounselorReportsStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
+import { useCounselorReportsStore } from '@/stores/counselorReportsStore';
 import { ReportCard, ReportDetail, AlertCard } from '@/components/counselorReports';
 import { cn } from '@/utils';
 import type { ReportType } from '@/types';
@@ -44,14 +45,14 @@ export function ParentReportsPage() {
     loadLinkedStudents();
     loadReports();
     loadAlerts();
-  }, []);
+  }, [loadAlerts, loadLinkedStudents, loadReports]);
 
   // Load specific report if ID is in URL
   useEffect(() => {
     if (reportId) {
       loadReport(reportId);
     }
-  }, [reportId]);
+  }, [loadReport, reportId]);
 
   // Filter reports
   const filteredReports = reports.filter((report) => {

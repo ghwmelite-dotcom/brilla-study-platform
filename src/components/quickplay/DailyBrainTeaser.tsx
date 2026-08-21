@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain,
@@ -32,6 +32,8 @@ export function DailyBrainTeaser({ isOpen, onClose }: DailyBrainTeaserProps) {
   const [currentHint, setCurrentHint] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState<{ correct: boolean; xpEarned: number } | null>(null);
+  const handleSubmitRef = useRef<() => void>(() => undefined);
+  const challengeCompleted = dailyChallenge?.completed ?? false;
   const [timeRemaining, setTimeRemaining] = useState(120);
 
   useEffect(() => {
@@ -47,13 +49,13 @@ export function DailyBrainTeaser({ isOpen, onClose }: DailyBrainTeaserProps) {
 
   // Timer
   useEffect(() => {
-    if (!isOpen || !dailyChallenge || dailyChallenge.completed || showResult) return;
+    if (!isOpen || !dailyChallenge || challengeCompleted || showResult) return;
 
     const interval = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
           // Time's up - auto submit wrong answer
-          handleSubmit();
+          handleSubmitRef.current();
           return 0;
         }
         return prev - 1;
@@ -61,7 +63,7 @@ export function DailyBrainTeaser({ isOpen, onClose }: DailyBrainTeaserProps) {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isOpen, dailyChallenge?.completed, showResult]);
+  }, [challengeCompleted, dailyChallenge, isOpen, showResult]);
 
   const handleUseHint = () => {
     const hint = consumeDailyHint();
@@ -94,6 +96,7 @@ export function DailyBrainTeaser({ isOpen, onClose }: DailyBrainTeaserProps) {
   };
 
   if (!isOpen) return null;
+  handleSubmitRef.current = handleSubmit;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);

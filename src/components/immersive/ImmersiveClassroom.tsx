@@ -31,6 +31,7 @@ export function ImmersiveClassroom({
   const containerRef = useRef<HTMLDivElement>(null);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const handleExitRef = useRef<() => void>(() => undefined);
 
   // Store
   const {
@@ -159,7 +160,7 @@ export function ImmersiveClassroom({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        handleExit();
+        handleExitRef.current();
       } else if (e.key === ' ' && e.target === document.body) {
         e.preventDefault();
         // Toggle voice listening
@@ -193,7 +194,7 @@ export function ImmersiveClassroom({
     const lowerText = text.toLowerCase();
 
     if (lowerText.includes('exit') || lowerText.includes('leave') || lowerText.includes('quit')) {
-      handleExit();
+      handleExitRef.current();
       return "Goodbye! Great studying today.";
     }
 
@@ -252,6 +253,10 @@ export function ImmersiveClassroom({
       setShowSummary(true);
     }, 500);
   }, [sessionStats.startTime, aiMessages.length, pauseSession]);
+
+  useEffect(() => {
+    handleExitRef.current = handleExit;
+  }, [handleExit]);
 
   // Handle summary close
   const handleSummaryClose = useCallback(() => {
