@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import type { Context } from 'hono';
+import type { Context, Next } from 'hono';
 import { requireAuth } from './auth-middleware';
 import { checkRateLimit } from './rate-limit';
 import { parseCounselorReportContent } from './counselor-report-schema';
@@ -144,6 +144,17 @@ function getUserRole(c: Context): string | undefined {
   return c.get('userRole');
 }
 
+async function requireStudentCounselorAccess(
+  c: Context,
+  next: Next,
+): Promise<Response | void> {
+  if (c.req.method === 'OPTIONS') return next();
+  if (getUserRole(c) !== 'student') {
+    return c.json({ success: false, error: 'Student access required' }, 403);
+  }
+  await next();
+}
+
 // Call Claude API for counselor response
 async function getCounselorResponse(
   env: Env,
@@ -272,7 +283,7 @@ function extractResources(content: string, _counselorType: CounselorType): Sugge
 // =============================================
 
 // Get user's conversations
-counselorApp.get('/conversations', async (c) => {
+counselorApp.get('/conversations', requireStudentCounselorAccess, async (c) => {
   try {
     const userId = getUserId(c);
 
@@ -308,7 +319,7 @@ counselorApp.get('/conversations', async (c) => {
 });
 
 // Start a new conversation
-counselorApp.post('/conversations', async (c) => {
+counselorApp.post('/conversations', requireStudentCounselorAccess, async (c) => {
   try {
     const userId = getUserId(c);
 
@@ -370,7 +381,7 @@ counselorApp.post('/conversations', async (c) => {
 });
 
 // Get conversation with messages
-counselorApp.get('/conversations/:id', async (c) => {
+counselorApp.get('/conversations/:id', requireStudentCounselorAccess, async (c) => {
   try {
     const conversationId = c.req.param('id');
     const userId = getUserId(c);
@@ -423,7 +434,7 @@ counselorApp.get('/conversations/:id', async (c) => {
 });
 
 // Archive a conversation
-counselorApp.delete('/conversations/:id', async (c) => {
+counselorApp.delete('/conversations/:id', requireStudentCounselorAccess, async (c) => {
   try {
     const conversationId = c.req.param('id');
     const userId = getUserId(c);
@@ -450,7 +461,7 @@ counselorApp.delete('/conversations/:id', async (c) => {
 // =============================================
 
 // Send a message and get AI response
-counselorApp.post('/chat', async (c) => {
+counselorApp.post('/chat', requireStudentCounselorAccess, async (c) => {
   try {
     const userId = getUserId(c);
 
@@ -642,7 +653,7 @@ counselorApp.post('/chat', async (c) => {
 });
 
 // Rate message helpfulness
-counselorApp.post('/messages/:id/feedback', async (c) => {
+counselorApp.post('/messages/:id/feedback', requireStudentCounselorAccess, async (c) => {
   try {
     const messageId = c.req.param('id');
     const userId = getUserId(c);
@@ -678,7 +689,7 @@ counselorApp.post('/messages/:id/feedback', async (c) => {
 // =============================================
 
 // Log daily wellbeing check-in
-counselorApp.post('/wellbeing/log', async (c) => {
+counselorApp.post('/wellbeing/log', requireStudentCounselorAccess, async (c) => {
   try {
     const userId = getUserId(c);
 
@@ -742,7 +753,7 @@ counselorApp.post('/wellbeing/log', async (c) => {
 });
 
 // Get wellbeing history
-counselorApp.get('/wellbeing/history', async (c) => {
+counselorApp.get('/wellbeing/history', requireStudentCounselorAccess, async (c) => {
   try {
     const userId = getUserId(c);
 

@@ -11,7 +11,7 @@ AI_MODEL_CHAT = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 AI_MODEL_GENERATION = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 AI_MODEL_EMBEDDING = "@cf/qwen/qwen3-embedding-0.6b"
 AI_MODEL_TTS = "@cf/deepgram/aura-2-en"
-AI_MODEL_VISION = "@cf/meta/llama-4-scout-17b-16e-instruct"
+AI_MODEL_VISION = "@cf/meta/llama-3.2-11b-vision-instruct"
 AI_CACHE_THRESHOLD = "0.92"
 APP_URL = "https://brillaprep.org"
 FROM_EMAIL = "Brilla Study Platform <noreply@brillaprep.org>"
@@ -79,7 +79,7 @@ AI_MODEL_CHAT = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 AI_MODEL_GENERATION = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 AI_MODEL_EMBEDDING = "@cf/qwen/qwen3-embedding-0.6b"
 AI_MODEL_TTS = "@cf/deepgram/aura-2-en"
-AI_MODEL_VISION = "@cf/meta/llama-4-scout-17b-16e-instruct"
+AI_MODEL_VISION = "@cf/meta/llama-3.2-11b-vision-instruct"
 AI_CACHE_THRESHOLD = "0.92"
 APP_URL = "http://localhost:3000"
 FROM_EMAIL = "Brilla Study Platform <noreply@brillaprep.org>"
@@ -106,3 +106,44 @@ bucket_name = "brilla-recordings"
 [[env.dev.vectorize]]
 binding = "ANSWERS_INDEX"
 index_name = "brilla-answers"
+
+# Isolated remote staging environment. Never point these bindings at
+# production resources.
+[env.staging.vars]
+ENVIRONMENT = "staging"
+COUNSELOR_BRIE_ENABLED = "true"
+AI_PROVIDER = "workers-ai"
+AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+AI_MODEL_CHAT = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+AI_MODEL_GENERATION = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+AI_MODEL_EMBEDDING = "@cf/qwen/qwen3-embedding-0.6b"
+AI_MODEL_TTS = "@cf/deepgram/aura-2-en"
+AI_MODEL_VISION = "@cf/meta/llama-3.2-11b-vision-instruct"
+AI_CACHE_THRESHOLD = "0.92"
+APP_URL = "https://whiteboard-staging.brilla-study-platform.pages.dev"
+GOOGLE_REDIRECT_URI = "https://whiteboard-staging.brilla-study-platform.pages.dev/oauth/callback"
+REGISTRATION_MODE = "open"
+
+[env.staging.ai]
+binding = "AI"
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "brilla-db-staging"
+database_id = "1faeca41-2233-4a0b-a273-0d3aadba9c96"
+migrations_dir = "database/migrations"
+
+[[env.staging.r2_buckets]]
+binding = "LIBRARY_BUCKET"
+bucket_name = "brilla-library-staging"
+
+[[env.staging.r2_buckets]]
+binding = "RECORDINGS_BUCKET"
+bucket_name = "brilla-recordings-staging"
+
+[[env.staging.vectorize]]
+binding = "ANSWERS_INDEX"
+index_name = "brilla-answers-staging"
+
+[env.staging.triggers]
+crons = []

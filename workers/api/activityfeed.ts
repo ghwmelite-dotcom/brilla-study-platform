@@ -35,7 +35,7 @@ activityFeedApp.get('/', async (c) => {
     let query = `
       SELECT
         af.*,
-        u.display_name as user_name,
+        u.name as user_name,
         u.avatar_url as user_avatar
       FROM activity_feed af
       JOIN users u ON af.user_id = u.id
@@ -94,7 +94,7 @@ activityFeedApp.get('/friends', async (c) => {
     const activities = await c.env.DB.prepare(`
       SELECT
         af.*,
-        u.display_name as user_name,
+        u.name as user_name,
         u.avatar_url as user_avatar
       FROM activity_feed af
       JOIN users u ON af.user_id = u.id
@@ -154,7 +154,7 @@ activityFeedApp.get('/user/:userId', async (c) => {
     let query = `
       SELECT
         af.*,
-        u.display_name as user_name,
+        u.name as user_name,
         u.avatar_url as user_avatar
       FROM activity_feed af
       JOIN users u ON af.user_id = u.id

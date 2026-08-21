@@ -791,11 +791,27 @@ const app = new Hono<AppEnv>();
 // Middleware
 app.use('*', cors({
   origin: (origin, c) => {
-    const allowed = ['https://brillaprep.org', 'https://www.brillaprep.org'];
-    if (c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev') {
-      allowed.push('http://localhost:5173', 'http://127.0.0.1:5173');
+    const allowed = new Set<string>();
+    if (c.env.APP_URL) {
+      try {
+        const configuredOrigin = new URL(c.env.APP_URL).origin;
+        allowed.add(configuredOrigin);
+        if (
+          configuredOrigin === 'https://brillaprep.org'
+          || configuredOrigin === 'https://www.brillaprep.org'
+        ) {
+          allowed.add('https://brillaprep.org');
+          allowed.add('https://www.brillaprep.org');
+        }
+      } catch {
+        // Ignore malformed deployment configuration and fail closed.
+      }
     }
-    return allowed.includes(origin) ? origin : '';
+    if (c.env.ENVIRONMENT === 'development' || c.env.ENVIRONMENT === 'dev') {
+      allowed.add('http://localhost:5173');
+      allowed.add('http://127.0.0.1:5173');
+    }
+    return allowed.has(origin) ? origin : '';
   },
   allowHeaders: ['Content-Type', 'Authorization'],
   allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -829,6 +845,50 @@ publicApp.get('/health', (c) => {
   return c.json({ success: true, data: { status: 'ok' } });
 });
 
+const STAGING_QA_SENTINEL_PATTERN = /^qa-sentinel-[a-f0-9]{16,64}$/;
+
+// Proves that the deployed staging Worker is bound to the same isolated D1
+// database that the QA harness writes to before the harness mutates any user
+// data. The route is deliberately absent outside staging and never exposes a
+// database name, id, or row contents.
+publicApp.get('/health/staging-target/:nonce', async (c) => {
+  if (c.env.ENVIRONMENT !== 'staging') {
+    return c.json({ success: false, error: 'Not found' }, 404);
+  }
+
+  const nonce = c.req.param('nonce');
+  if (!STAGING_QA_SENTINEL_PATTERN.test(nonce)) {
+    return c.json({ success: false, error: 'Not found' }, 404);
+  }
+
+  const row = await c.env.DB.prepare(
+    "SELECT 1 AS verified FROM rate_limits WHERE identifier = ? AND endpoint = 'qa-deployment-sentinel' LIMIT 1",
+  ).bind(nonce).first<{ verified: number }>();
+  if (row?.verified !== 1) {
+    return c.json({ success: false, error: 'Not found' }, 404);
+  }
+
+  return c.json({ success: true, data: { verified: true } });
+});
+
+
+export async function resolveRegistrationRateLimitIdentifier(
+  env: Env,
+  clientIp: string,
+  qaSentinel: string | undefined,
+): Promise<string> {
+  if (env.ENVIRONMENT !== 'staging' || !qaSentinel || !STAGING_QA_SENTINEL_PATTERN.test(qaSentinel)) {
+    return clientIp;
+  }
+  try {
+    const row = await env.DB.prepare(
+      "SELECT 1 AS verified FROM rate_limits WHERE identifier = ? AND endpoint = 'qa-deployment-sentinel' LIMIT 1",
+    ).bind(qaSentinel).first<{ verified: number }>();
+    return row?.verified === 1 ? `qa:${qaSentinel}` : clientIp;
+  } catch {
+    return clientIp;
+  }
+}
 // =============================================
 // EXAM TYPES ENDPOINTS
 // =============================================
@@ -920,8 +980,12 @@ publicApp.post('/auth/register', async (c) => {
           selectedTierId, turnstileToken, examTypeIds, primaryExamTypeId, referralCode } = body;
   const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
 
-  // Rate limiting - check IP-based limit for registrations
-  const ipRateLimit = await checkRateLimit(c.env.DB, clientIp, 'register');
+  // Ordinary traffic remains IP-limited. A live staging QA run may use only a
+  // nonce that the harness has already written through the approved D1 target.
+  const rateLimitIdentifier = await resolveRegistrationRateLimitIdentifier(
+    c.env, clientIp, c.req.header('X-Brilla-QA-Sentinel'),
+  );
+  const ipRateLimit = await checkRateLimit(c.env.DB, rateLimitIdentifier, 'register');
   if (!ipRateLimit.allowed) {
     // Send security alert to admins for blocked registration attempts
     if (c.env.RESEND_API_KEY && c.env.FROM_EMAIL) {

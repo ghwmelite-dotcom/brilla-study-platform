@@ -1,0 +1,14 @@
+{
+  "production": {
+    "apiOrigin": "https://brilla-api.ghwmelite.workers.dev",
+    "pagesOrigin": "https://brillaprep.org",
+    "database": "brilla-db",
+    "databaseId": "aa806d65-d3dd-4cf9-9cac-e3ddd252f937"
+  },
+  "staging": {
+    "apiOrigin": "https://brilla-api-staging.ghwmelite.workers.dev",
+    "pagesOrigin": "https://whiteboard-staging.brilla-study-platform.pages.dev",
+    "database": "brilla-db-staging",
+    "databaseId": "1faeca41-2233-4a0b-a273-0d3aadba9c96"
+  }
+}

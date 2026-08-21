@@ -180,8 +180,27 @@ describe('ask-about endpoint', () => {
     // Spike contract: openai-image-url content parts + guided_json.
     expect(captured).not.toBeNull();
     const { model, opts } = captured!;
-    expect(model).toBe('@cf/meta/llama-4-scout-17b-16e-instruct');
-    expect(opts.guided_json).toBeTruthy();
+    expect(model).toBe('@cf/meta/llama-3.2-11b-vision-instruct');
+    expect(opts.guided_json).toMatchObject({
+      additionalProperties: false,
+      properties: {
+        answer: { minLength: 1, maxLength: 4000 },
+        annotation: {
+          additionalProperties: false,
+          properties: {
+            props: {
+              additionalProperties: false,
+              properties: {
+                radius: { exclusiveMinimum: 0, maximum: 600 },
+                strokeWidth: { exclusiveMinimum: 0, maximum: 100 },
+                opacity: { minimum: 0, maximum: 1 },
+              },
+              required: ['left', 'top', 'radius'],
+            },
+          },
+        },
+      },
+    });
     const messages = opts.messages as { role: string; content: { type: string; text?: string; image_url?: { url: string } }[] }[];
     expect(messages).toHaveLength(1);
     expect(messages[0].role).toBe('user');
@@ -219,6 +238,107 @@ describe('ask-about endpoint', () => {
     expect(capturedPrompt).toContain('(0, 800)');
     expect(capturedPrompt).toContain('what is this label?');
   });
+
+  it('retries one malformed annotation and returns a valid second answer', async () => {
+    let aiCalls = 0;
+    const retryAi = {
+      run: async () => {
+        aiCalls++;
+        return {
+          response: JSON.stringify(
+            aiCalls === 1
+              ? {
+                  answer: 'Malformed first response',
+                  annotation: {
+                    type: 'circle',
+                    id: 'bad',
+                    props: { left: [10], top: 20, radius: 30 },
+                  },
+                }
+              : { answer: 'That point marks the value on the number line.' },
+          ),
+        };
+      },
+    };
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler]);
+
+    const res = await askAbout(
+      db,
+      { imageBase64: 'aW1hZ2U=', x: 100, y: 200 },
+      retryAi,
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { data: { answer: string; fallback: boolean } };
+    expect(body.data.fallback).toBe(false);
+    expect(body.data.answer).toContain('number line');
+    expect(aiCalls).toBe(2);
+  });
+  it('keeps a validated answer after both optional annotations are malformed', async () => {
+    let aiCalls = 0;
+    const mockAi = {
+      run: async () => {
+        aiCalls++;
+        return {
+          response: JSON.stringify({
+            answer: 'This step divides both sides by two.',
+            annotation: {
+              type: 'circle',
+              id: 'bad-annotation',
+              props: { left: 'not-a-number', top: 20, radius: 30 },
+            },
+          }),
+        };
+      },
+    };
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler]);
+
+    const res = await askAbout(
+      db,
+      { imageBase64: 'aW1hZ2U=', x: 100, y: 200 },
+      mockAi,
+    );
+    const body = (await res.json()) as {
+      data: { answer: string; annotation: unknown; fallback: boolean };
+    };
+
+    expect(aiCalls).toBe(2);
+    expect(body.data.fallback).toBe(false);
+    expect(body.data.answer).toContain('divides both sides');
+    expect(body.data.annotation).toBeNull();
+  });
+  it.each([
+    ['radius', { left: 10, top: 20, radius: 0 }],
+    ['strokeWidth', { left: 10, top: 20, radius: 30, strokeWidth: 0 }],
+    ['opacity', { left: 10, top: 20, radius: 30, opacity: 2 }],
+  ])('drops an annotation whose %s is out of bounds', async (_bound, props) => {
+    let aiCalls = 0;
+    const mockAi = {
+      run: async () => {
+        aiCalls++;
+        return {
+          response: JSON.stringify({
+            answer: 'The marked area shows the operation for this step.',
+            annotation: { type: 'circle', id: 'bad-bound', props },
+          }),
+        };
+      },
+    };
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler]);
+
+    const res = await askAbout(
+      db,
+      { imageBase64: 'aW1hZ2U=', x: 100, y: 200 },
+      mockAi,
+    );
+    const body = (await res.json()) as {
+      data: { annotation: unknown; fallback: boolean };
+    };
+
+    expect(aiCalls).toBe(2);
+    expect(body.data.fallback).toBe(false);
+    expect(body.data.annotation).toBeNull();
+  });
+
 
   it('returns the honest fallback when the model output fails validation', async () => {
     const mockAi = {

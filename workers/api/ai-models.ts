@@ -6,7 +6,7 @@
 const DEFAULT_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const DEFAULT_EMBEDDING_MODEL = '@cf/qwen/qwen3-embedding-0.6b';
 const DEFAULT_TTS_MODEL = '@cf/deepgram/aura-2-en';
-const DEFAULT_VISION_MODEL = '@cf/meta/llama-4-scout-17b-16e-instruct';
+const DEFAULT_VISION_MODEL = '@cf/meta/llama-3.2-11b-vision-instruct';
 const DEFAULT_CACHE_THRESHOLD = 0.92;
 
 interface ModelEnv {

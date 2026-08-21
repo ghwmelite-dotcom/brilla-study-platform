@@ -22,6 +22,7 @@ export interface ChestReward {
   cosmeticName?: string;
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
   message: string;
+  wheelSegmentId?: number;
 }
 
 export interface MysteryChest {
@@ -48,6 +49,45 @@ export interface LuckyWheelState {
   nextSpinAt?: string;
   spinsRemaining: number;
   segments: WheelSegment[];
+}
+
+interface WheelStatusSegment {
+  id: number;
+  type: 'xp' | 'multiplier' | 'protection' | 'chest';
+  label: string;
+}
+
+interface WheelStatusResponse {
+  canSpin: boolean;
+  weeklySpins: number;
+  maxWeeklySpins: number;
+  segments: WheelStatusSegment[];
+}
+
+interface WheelSpinResponse {
+  segment: number;
+  type: 'xp' | 'multiplier' | 'protection' | 'chest';
+  value: number | string;
+  label: string;
+  spinsRemaining: number;
+}
+
+function mapWheelReward(spin: WheelSpinResponse): ChestReward {
+  const type: RewardType = spin.type === 'protection'
+    ? 'streak_protection'
+    : spin.type === 'multiplier'
+      ? 'bonus_time'
+      : spin.type === 'chest'
+        ? 'mystery'
+        : 'xp';
+  return {
+    id: `wheel_${spin.segment}_${Date.now()}`,
+    type,
+    amount: typeof spin.value === 'number' ? spin.value : undefined,
+    rarity: spin.type === 'chest' ? 'epic' : 'common',
+    message: `You won ${spin.label}!`,
+    wheelSegmentId: spin.segment,
+  };
 }
 
 export interface SurpriseChallenge {
@@ -131,18 +171,26 @@ function generateDailyMultiplier(): DailyMultiplier {
   };
 }
 
-// Generate wheel segments
-function generateWheelSegments(): WheelSegment[] {
-  return [
-    { id: 'w1', label: '50 XP', type: 'xp', amount: 50, probability: 0.25, color: '#22c55e' },
-    { id: 'w2', label: '100 XP', type: 'xp', amount: 100, probability: 0.2, color: '#3b82f6' },
-    { id: 'w3', label: '200 XP', type: 'xp', amount: 200, probability: 0.15, color: '#8b5cf6' },
-    { id: 'w4', label: '50 Coins', type: 'coins', amount: 50, probability: 0.15, color: '#f59e0b' },
-    { id: 'w5', label: '100 Coins', type: 'coins', amount: 100, probability: 0.1, color: '#ef4444' },
-    { id: 'w6', label: 'Streak Shield', type: 'streak_protection', amount: 1, probability: 0.08, color: '#ec4899' },
-    { id: 'w7', label: '500 XP', type: 'xp', amount: 500, probability: 0.05, color: '#14b8a6' },
-    { id: 'w8', label: 'Mystery!', type: 'mystery', probability: 0.02, color: '#6366f1' },
-  ];
+const WHEEL_SEGMENT_COLORS = [
+  '#22c55e', '#3b82f6', '#8b5cf6', '#f59e0b',
+  '#ef4444', '#ec4899', '#14b8a6', '#6366f1',
+];
+
+function mapWheelSegments(segments: WheelStatusSegment[]): WheelSegment[] {
+  const probability = 1 / Math.max(1, segments.length);
+  return segments.map((segment, index) => ({
+    id: `w${segment.id}`,
+    label: segment.label,
+    type: segment.type === 'protection'
+      ? 'streak_protection'
+      : segment.type === 'multiplier'
+        ? 'bonus_time'
+        : segment.type === 'chest'
+          ? 'mystery'
+          : 'xp',
+    probability,
+    color: WHEEL_SEGMENT_COLORS[index % WHEEL_SEGMENT_COLORS.length],
+  }));
 }
 
 // Generate mystery chests
@@ -187,44 +235,6 @@ function generateChestRewards(type: MysteryChest['type']): ChestReward[] {
   };
 
   return baseRewards[type];
-}
-
-// Generate surprise challenge
-function generateSurpriseChallenge(): SurpriseChallenge | null {
-  // 10% chance of getting a surprise challenge
-  if (Math.random() > 0.1) return null;
-
-  const challenges = [
-    {
-      title: 'Speed Demon',
-      description: 'Complete 3 quizzes in the next 10 minutes',
-      xpMultiplier: 2,
-      timeLimit: 600,
-      requirement: { type: 'quiz' as const, target: 3 },
-    },
-    {
-      title: 'Perfect Scholar',
-      description: 'Get a perfect score on your next quiz',
-      xpMultiplier: 3,
-      timeLimit: 1800,
-      requirement: { type: 'perfect_score' as const, target: 1 },
-    },
-    {
-      title: 'Battle Champion',
-      description: 'Win 2 battles in the next 15 minutes',
-      xpMultiplier: 2.5,
-      timeLimit: 900,
-      requirement: { type: 'battle' as const, target: 2 },
-    },
-  ];
-
-  const challenge = challenges[Math.floor(Math.random() * challenges.length)];
-
-  return {
-    id: `challenge_${Date.now()}`,
-    ...challenge,
-    expiresAt: new Date(Date.now() + challenge.timeLimit * 1000).toISOString(),
-  };
 }
 
 export const useRewardStore = create<RewardState>()(
@@ -377,34 +387,35 @@ export const useRewardStore = create<RewardState>()(
       },
 
       fetchLuckyWheel: async () => {
-        set({ isLoading: true });
+        set({ isLoading: true, error: null });
 
         try {
-          const response = await api.get<{ wheel: LuckyWheelState }>('/rewards/wheel');
-
+          const response = await api.get<WheelStatusResponse>('/rewards/wheel/status');
           if (response.success && response.data) {
-            set({
-              luckyWheel: response.data.wheel,
-              isLoading: false,
-            });
-          } else {
+            const spinsRemaining = Math.max(
+              0,
+              response.data.maxWeeklySpins - response.data.weeklySpins,
+            );
             set({
               luckyWheel: {
-                available: true,
-                spinsRemaining: 1,
-                segments: generateWheelSegments(),
+                available: response.data.canSpin && spinsRemaining > 0,
+                spinsRemaining,
+                segments: mapWheelSegments(response.data.segments),
               },
               isLoading: false,
             });
+            return;
           }
+          set({
+            luckyWheel: null,
+            isLoading: false,
+            error: response.error || 'Unable to load wheel status',
+          });
         } catch {
           set({
-            luckyWheel: {
-              available: true,
-              spinsRemaining: 1,
-              segments: generateWheelSegments(),
-            },
+            luckyWheel: null,
             isLoading: false,
+            error: 'Unable to load wheel status',
           });
         }
       },
@@ -416,20 +427,18 @@ export const useRewardStore = create<RewardState>()(
         set({ isLoading: true });
 
         try {
-          const response = await api.post<{ reward: ChestReward }>('/rewards/wheel/spin');
+          const response = await api.post<WheelSpinResponse>('/rewards/wheel/spin');
 
           if (response.success && response.data) {
-            const wheelReward = response.data.reward;
+            const spinResult = response.data;
+            const wheelReward = mapWheelReward(spinResult);
             set((state) => ({
               luckyWheel: state.luckyWheel
                 ? {
                     ...state.luckyWheel,
-                    spinsRemaining: state.luckyWheel.spinsRemaining - 1,
-                    available: state.luckyWheel.spinsRemaining > 1,
-                    nextSpinAt:
-                      state.luckyWheel.spinsRemaining <= 1
-                        ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-                        : undefined,
+                    spinsRemaining: Math.max(0, spinResult.spinsRemaining),
+                    available: spinResult.spinsRemaining > 0,
+                    nextSpinAt: undefined,
                   }
                 : null,
               recentRewards: [wheelReward, ...state.recentRewards.slice(0, 9)],
@@ -438,105 +447,23 @@ export const useRewardStore = create<RewardState>()(
             return wheelReward;
           }
 
-          // Mock spin based on probabilities
-          const segments = luckyWheel.segments;
-          const random = Math.random();
-          let cumulative = 0;
-          let selectedSegment = segments[0];
-
-          for (const segment of segments) {
-            cumulative += segment.probability;
-            if (random <= cumulative) {
-              selectedSegment = segment;
-              break;
-            }
-          }
-
-          const reward: ChestReward = {
-            id: `wheel_${Date.now()}`,
-            type: selectedSegment.type,
-            amount: selectedSegment.amount,
-            cosmeticId: selectedSegment.cosmeticId,
-            rarity: selectedSegment.type === 'mystery' ? 'legendary' : 'common',
-            message: `You won ${selectedSegment.label}!`,
-          };
-
-          set((state) => ({
-            luckyWheel: state.luckyWheel
-              ? {
-                  ...state.luckyWheel,
-                  spinsRemaining: state.luckyWheel.spinsRemaining - 1,
-                  available: state.luckyWheel.spinsRemaining > 1,
-                  nextSpinAt:
-                    state.luckyWheel.spinsRemaining <= 1
-                      ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-                      : undefined,
-                }
-              : null,
-            recentRewards: [reward, ...state.recentRewards.slice(0, 9)],
-            isLoading: false,
-          }));
-
-          return reward;
+          set({ isLoading: false, error: response.error || 'Unable to spin wheel' });
+          return null;
         } catch {
-          set({ isLoading: false });
+          set({ isLoading: false, error: 'Unable to spin wheel' });
           return null;
         }
       },
 
       checkForSurpriseChallenge: async () => {
-        const { activeChallenge } = get();
-
-        // Don't generate if there's already an active challenge
-        if (activeChallenge && new Date(activeChallenge.expiresAt) > new Date()) return;
-
-        try {
-          const response = await api.get<{ challenge: SurpriseChallenge | null }>('/rewards/surprise');
-
-          if (response.success && response.data?.challenge) {
-            set({ activeChallenge: response.data.challenge });
-          } else {
-            set({ activeChallenge: generateSurpriseChallenge() });
-          }
-        } catch {
-          set({ activeChallenge: generateSurpriseChallenge() });
-        }
+        // Surprise challenges have no server-side issuance/replay contract yet.
+        // Keep the surface disabled instead of fabricating rewards in the client.
+        set({ activeChallenge: null });
       },
 
       completeSurpriseChallenge: async () => {
-        const { activeChallenge } = get();
-        if (!activeChallenge) return null;
-
-        try {
-          const response = await api.post<{ reward: ChestReward }>('/rewards/surprise/complete');
-
-          if (response.success && response.data) {
-            const challengeReward = response.data.reward;
-            set((state) => ({
-              activeChallenge: null,
-              recentRewards: [challengeReward, ...state.recentRewards.slice(0, 9)],
-            }));
-            return challengeReward;
-          }
-
-          const reward: ChestReward = {
-            id: `surprise_${Date.now()}`,
-            type: 'xp',
-            amount: 200 * activeChallenge.xpMultiplier,
-            rarity: 'epic',
-            message: `Challenge Complete! ${200 * activeChallenge.xpMultiplier} XP!`,
-          };
-
-          set((state) => ({
-            activeChallenge: null,
-            recentRewards: [reward, ...state.recentRewards.slice(0, 9)],
-          }));
-
-          return reward;
-        } catch {
-          set({ activeChallenge: null });
-          return null;
-        }
+        set({ activeChallenge: null });
+        return null;
       },
 
       dismissSurpriseChallenge: () => {

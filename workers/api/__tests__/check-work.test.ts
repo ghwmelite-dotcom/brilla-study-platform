@@ -255,7 +255,7 @@ describe('check-work endpoint', () => {
     // Spike contract: openai-image-url content parts + guided_json + max_tokens 1200.
     expect(captured).not.toBeNull();
     const { model, opts } = captured!;
-    expect(model).toBe('@cf/meta/llama-4-scout-17b-16e-instruct');
+    expect(model).toBe('@cf/meta/llama-3.2-11b-vision-instruct');
     expect(opts.max_tokens).toBe(1200);
     expect(opts.guided_json).toBeTruthy();
     const messages = opts.messages as { role: string; content: { type: string; text?: string; image_url?: { url: string } }[] }[];
