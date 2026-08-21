@@ -3309,6 +3309,7 @@ The annotation is optional — include it only when circling the tapped spot hel
 
   const model = getVisionModel(c.env);
   let lastError: unknown = new Error('Ask-about generation did not run');
+  let lastValidAnswer: string | null = null;
 
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
@@ -3341,6 +3342,13 @@ The annotation is optional — include it only when circling the tapped spot hel
       }
 
       const parsedRecord = isPlainRecord(parsed) ? parsed : {};
+      if (
+        typeof parsedRecord.answer === 'string'
+        && parsedRecord.answer.trim().length > 0
+        && parsedRecord.answer.length <= 4000
+      ) {
+        lastValidAnswer = parsedRecord.answer.trim();
+      }
       const annotation = isPlainRecord(parsedRecord.annotation) ? parsedRecord.annotation : {};
       console.error('Ask-about output failed validation', {
         attempt,
@@ -3361,6 +3369,14 @@ The annotation is optional — include it only when circling the tapped spot hel
     if (attempt === 1) {
       console.error('Ask-about generation failed — retrying once');
     }
+  }
+
+  if (lastValidAnswer) {
+    console.warn('Ask-about served a valid answer without an invalid optional annotation');
+    return c.json({
+      success: true,
+      data: { answer: lastValidAnswer, annotation: null, fallback: false },
+    });
   }
 
   console.error('Ask-about vision call failed after retry:', lastError);

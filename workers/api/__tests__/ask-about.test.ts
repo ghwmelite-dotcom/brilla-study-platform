@@ -268,6 +268,40 @@ describe('ask-about endpoint', () => {
     expect(body.data.answer).toContain('number line');
     expect(aiCalls).toBe(2);
   });
+  it('keeps a validated answer after both optional annotations are malformed', async () => {
+    let aiCalls = 0;
+    const mockAi = {
+      run: async () => {
+        aiCalls++;
+        return {
+          response: JSON.stringify({
+            answer: 'This step divides both sides by two.',
+            annotation: {
+              type: 'circle',
+              id: 'bad-annotation',
+              props: { left: 'not-a-number', top: 20, radius: 30 },
+            },
+          }),
+        };
+      },
+    };
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler]);
+
+    const res = await askAbout(
+      db,
+      { imageBase64: 'aW1hZ2U=', x: 100, y: 200 },
+      mockAi,
+    );
+    const body = (await res.json()) as {
+      data: { answer: string; annotation: unknown; fallback: boolean };
+    };
+
+    expect(aiCalls).toBe(2);
+    expect(body.data.fallback).toBe(false);
+    expect(body.data.answer).toContain('divides both sides');
+    expect(body.data.annotation).toBeNull();
+  });
+
   it('returns the honest fallback when the model output fails validation', async () => {
     const mockAi = {
       run: async () => ({ response: 'I cannot help with that.' }),

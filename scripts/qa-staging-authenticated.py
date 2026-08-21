@@ -699,6 +699,7 @@ def main() -> None:
             browser.close()
 
     finally:
+        cleanup_stage = "resolve_user_ids"
         try:
             qa_user_rows = query_staging_sql(
                 "SELECT id FROM users "
@@ -708,18 +709,22 @@ def main() -> None:
             qa_user_ids_sql = ", ".join(sql_literal(user_id) for user_id in qa_user_ids) or "''"
             student_pattern = sql_literal(f"%{student_email}%")
             teacher_pattern = sql_literal(f"%{teacher_email}%")
+            cleanup_stage = "delete_run_owned_rows"
             run_staging_sql(
                 "DELETE FROM rate_limits WHERE "
                 f"(identifier={sql_literal(sentinel)} AND endpoint='qa-deployment-sentinel') OR "
                 f"(identifier={sql_literal('qa:' + sentinel)} AND endpoint='register'); "
                 "DELETE FROM notifications "
                 f"WHERE metadata LIKE {student_pattern} OR metadata LIKE {teacher_pattern}; "
+                "DELETE FROM guidance_session_answers "
+                f"WHERE session_id IN (SELECT id FROM guidance_sessions WHERE user_id IN ({qa_user_ids_sql})); "
                 "DELETE FROM revision_sessions "
-                f"WHERE user_id IN ({qa_user_ids_sql}); "
+                f"WHERE user_id IN ({qa_user_ids_sql}) OR topic_id={sql_literal(qa_topic_id)}; "
                 "DELETE FROM users "
                 f"WHERE email IN ({sql_literal(student_email)}, {sql_literal(teacher_email)}); "
                 f"DELETE FROM topics WHERE id={sql_literal(qa_topic_id)};"
             )
+            cleanup_stage = "verify_zero_residual"
             residual_rows = query_staging_sql(
                 "SELECT 'users' AS scope, COUNT(*) AS count FROM users "
                 f"WHERE email IN ({sql_literal(student_email)}, {sql_literal(teacher_email)}) "
@@ -729,8 +734,11 @@ def main() -> None:
                 f"WHERE user_id IN ({qa_user_ids_sql}) "
                 "UNION ALL SELECT 'counselor_conversations', COUNT(*) FROM counselor_conversations "
                 f"WHERE user_id IN ({qa_user_ids_sql}) "
-                "UNION ALL SELECT 'revision_sessions', COUNT(*) FROM revision_sessions "
-                f"WHERE user_id IN ({qa_user_ids_sql}) "
+            ) + query_staging_sql(
+                "SELECT 'revision_sessions' AS scope, COUNT(*) AS count FROM revision_sessions "
+                f"WHERE user_id IN ({qa_user_ids_sql}) OR topic_id={sql_literal(qa_topic_id)} "
+                "UNION ALL SELECT 'revision_lessons', COUNT(*) FROM revision_lessons "
+                f"WHERE topic_id={sql_literal(qa_topic_id)} "
                 "UNION ALL SELECT 'revision_ai_interactions', COUNT(*) FROM revision_ai_interactions "
                 f"WHERE user_id IN ({qa_user_ids_sql}) "
                 "UNION ALL SELECT 'question_attempts', COUNT(*) FROM question_attempts "
@@ -747,7 +755,7 @@ def main() -> None:
             checks.append(
                 {
                     "name": "run_owned_cleanup_zero_residual",
-                    "passed": len(residuals) == 10 and all(count == 0 for count in residuals.values()),
+                    "passed": len(residuals) == 11 and all(count == 0 for count in residuals.values()),
                     "detail": residuals,
                 }
             )
@@ -756,7 +764,7 @@ def main() -> None:
                 {
                     "name": "run_owned_cleanup_zero_residual",
                     "passed": False,
-                    "detail": type(error).__name__,
+                    "detail": {"stage": cleanup_stage, "errorType": type(error).__name__},
                 }
             )
 
