@@ -28,4 +28,37 @@ describe('migration 098 semantic answer cache', () => {
       db.close();
     }
   });
+  it('fails closed and preserves the source table when a patched schema is missing a column', () => {
+    const db = new Database(':memory:');
+    try {
+      const migration = readFileSync(
+        new URL('../../../database/migrations/098_ai_answer_cache.sql', import.meta.url),
+        'utf8',
+      );
+      db.exec(`
+        CREATE TABLE ai_answer_cache (
+          id TEXT PRIMARY KEY,
+          topic_id TEXT NOT NULL,
+          subject_id TEXT,
+          exam_type TEXT,
+          question_text TEXT NOT NULL,
+          answer_text TEXT NOT NULL,
+          model TEXT,
+          embedding_id TEXT,
+          hit_count INTEGER DEFAULT 0,
+          created_at TEXT DEFAULT (datetime('now'))
+        );
+        INSERT INTO ai_answer_cache (
+          id, topic_id, question_text, answer_text
+        ) VALUES ('legacy_1', 'topic_1', 'Question?', 'Answer.');
+      `);
+
+      expect(() => db.exec(migration)).toThrow(/last_hit_at/);
+      expect(db.prepare('SELECT id, answer_text FROM ai_answer_cache').get())
+        .toEqual({ id: 'legacy_1', answer_text: 'Answer.' });
+    } finally {
+      db.close();
+    }
+  });
+
 });

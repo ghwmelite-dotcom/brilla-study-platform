@@ -190,6 +190,11 @@ describe('ask-about endpoint', () => {
           properties: {
             props: {
               additionalProperties: false,
+              properties: {
+                radius: { exclusiveMinimum: 0, maximum: 600 },
+                strokeWidth: { exclusiveMinimum: 0, maximum: 100 },
+                opacity: { minimum: 0, maximum: 1 },
+              },
               required: ['left', 'top', 'radius'],
             },
           },
@@ -301,6 +306,39 @@ describe('ask-about endpoint', () => {
     expect(body.data.answer).toContain('divides both sides');
     expect(body.data.annotation).toBeNull();
   });
+  it.each([
+    ['radius', { left: 10, top: 20, radius: 0 }],
+    ['strokeWidth', { left: 10, top: 20, radius: 30, strokeWidth: 0 }],
+    ['opacity', { left: 10, top: 20, radius: 30, opacity: 2 }],
+  ])('drops an annotation whose %s is out of bounds', async (_bound, props) => {
+    let aiCalls = 0;
+    const mockAi = {
+      run: async () => {
+        aiCalls++;
+        return {
+          response: JSON.stringify({
+            answer: 'The marked area shows the operation for this step.',
+            annotation: { type: 'circle', id: 'bad-bound', props },
+          }),
+        };
+      },
+    };
+    const db = createMockD1([authHandler, premiumHandler, lessonHandler]);
+
+    const res = await askAbout(
+      db,
+      { imageBase64: 'aW1hZ2U=', x: 100, y: 200 },
+      mockAi,
+    );
+    const body = (await res.json()) as {
+      data: { annotation: unknown; fallback: boolean };
+    };
+
+    expect(aiCalls).toBe(2);
+    expect(body.data.fallback).toBe(false);
+    expect(body.data.annotation).toBeNull();
+  });
+
 
   it('returns the honest fallback when the model output fails validation', async () => {
     const mockAi = {

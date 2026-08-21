@@ -3184,11 +3184,11 @@ const ASK_ABOUT_GUIDED_SCHEMA = {
           properties: {
             left: { type: 'number' },
             top: { type: 'number' },
-            radius: { type: 'number' },
+            radius: { type: 'number', exclusiveMinimum: 0, maximum: 600 },
             stroke: { type: 'string', maxLength: 100 },
-            strokeWidth: { type: 'number' },
+            strokeWidth: { type: 'number', exclusiveMinimum: 0, maximum: 100 },
             fill: { type: 'string', maxLength: 100 },
-            opacity: { type: 'number' },
+            opacity: { type: 'number', minimum: 0, maximum: 1 },
           },
           required: ['left', 'top', 'radius'],
           additionalProperties: false,
@@ -3222,6 +3222,19 @@ function isValidAskAboutResponse(v: unknown): v is { answer: string; annotation?
     || typeof ann.props.radius !== 'number'
   ) return false;
 
+  if (ann.props.radius <= 0 || ann.props.radius > 600) return false;
+  if (
+    ann.props.strokeWidth !== undefined
+    && (
+      typeof ann.props.strokeWidth !== 'number'
+      || ann.props.strokeWidth <= 0
+      || ann.props.strokeWidth > 100
+    )
+  ) return false;
+  if (
+    ann.props.opacity !== undefined
+    && (typeof ann.props.opacity !== 'number' || ann.props.opacity < 0 || ann.props.opacity > 1)
+  ) return false;
   for (const [key, val] of Object.entries(ann.props)) {
     if (!ASK_ABOUT_ANNOTATION_PROP_KEYS.has(key)) return false;
     if (typeof val === 'number') {
