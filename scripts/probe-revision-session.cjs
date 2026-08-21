@@ -1,3 +1,6 @@
+const { getQaCredentials } = require('./qa-credentials.cjs');
+const [qaEmail, qaPassword] = getQaCredentials('admin');
+
 /* Login as admin test account, then call POST /revision-classroom/sessions
    directly and print the full response body. */
 const puppeteer = require('puppeteer-core');
@@ -17,8 +20,8 @@ const puppeteer = require('puppeteer-core');
   });
   await page.goto('https://brillaprep.org/?login=true', { waitUntil: 'networkidle2', timeout: 60000 });
   await page.waitForSelector('input[type="email"]', { timeout: 15000 });
-  await page.type('input[type="email"]', 'admintest@brillaprep.org', { delay: 5 });
-  await page.type('input[placeholder="Enter your password"]', 'Admin123!', { delay: 5 });
+  await page.type('input[type="email"]', qaEmail, { delay: 5 });
+  await page.type('input[placeholder="Enter your password"]', qaPassword, { delay: 5 });
   await page.waitForFunction(
     () => (document.querySelector('input[name="cf-turnstile-response"]')?.value || '').length > 10,
     { timeout: 45000 }

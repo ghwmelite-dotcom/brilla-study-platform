@@ -1,3 +1,5 @@
+const { getQaCredentials } = require('./qa-credentials.cjs');
+
 /* Vision spike probe (whiteboard Phase C, task 1) — IDEMPOTENT, read-only.
    Logs in as admintest via the real UI (Turnstile), renders two synthetic
    "student worked solution" fixtures client-side on a canvas 2D context
@@ -186,7 +188,7 @@ function scoreTranscription(output) {
     defaultViewport: { width: 1366, height: 900 },
   });
 
-  const { ctx, page, token } = await uiLogin(browser, 'admintest@brillaprep.org', 'Admin123!');
+  const { ctx, page, token } = await uiLogin(browser, ...getQaCredentials('admin'));
   console.log('logged in as admintest');
   const fixtures = await buildFixtures(page);
   console.log(`fixtures built: clean=${fixtures.clean.length}b64 degraded=${fixtures.degraded.length}b64\n`);

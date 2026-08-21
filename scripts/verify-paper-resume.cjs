@@ -1,3 +1,6 @@
+const { getQaCredentials } = require('./qa-credentials.cjs');
+const [qaEmail, qaPassword] = getQaCredentials('student');
+
 /* Verify the resume-attempt flow in a real browser as johndoe:
    1. Via API: create an in-progress attempt on pp_bece_math_2024_1 with 2 saved answers.
    2. In the browser: open the paper, click Start Paper → expect the
@@ -26,8 +29,8 @@ const PAPER = 'pp_bece_math_2024_1';
   });
   await page.goto('https://brillaprep.org/?login=true', { waitUntil: 'networkidle2', timeout: 60000 });
   await page.waitForSelector('input[type="email"]', { timeout: 15000 });
-  await page.type('input[type="email"]', 'johndoe@gmail.com', { delay: 5 });
-  await page.type('input[placeholder="Enter your password"]', 'Student123!', { delay: 5 });
+  await page.type('input[type="email"]', qaEmail, { delay: 5 });
+  await page.type('input[placeholder="Enter your password"]', qaPassword, { delay: 5 });
   await page.waitForFunction(
     () => (document.querySelector('input[name="cf-turnstile-response"]')?.value || '').length > 10,
     { timeout: 45000 }

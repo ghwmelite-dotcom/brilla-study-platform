@@ -1,3 +1,6 @@
+const { getQaCredentials } = require('./qa-credentials.cjs');
+const [qaEmail, qaPassword] = getQaCredentials('student');
+
 /* Spot-check: login as johndoe, open /revision-classroom, switch to WASSCE tab,
    click Elective Mathematics (id was misaligned before the fix), verify the
    classroom renders without the error boundary. */
@@ -26,8 +29,8 @@ const puppeteer = require('puppeteer-core');
 
   await page.goto('https://brillaprep.org/?login=true', { waitUntil: 'networkidle2', timeout: 60000 });
   await page.waitForSelector('input[type="email"]', { timeout: 15000 });
-  await page.type('input[type="email"]', 'johndoe@gmail.com', { delay: 5 });
-  await page.type('input[placeholder="Enter your password"]', 'Student123!', { delay: 5 });
+  await page.type('input[type="email"]', qaEmail, { delay: 5 });
+  await page.type('input[placeholder="Enter your password"]', qaPassword, { delay: 5 });
   await page.waitForFunction(
     () => (document.querySelector('input[name="cf-turnstile-response"]')?.value || '').length > 10,
     { timeout: 45000 }

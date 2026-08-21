@@ -1,3 +1,6 @@
+const { getQaCredentials } = require('./qa-credentials.cjs');
+const [qaEmail, qaPassword] = getQaCredentials('student');
+
 /* Probe: login as johndoe, then exercise the revision session flow directly:
    1. POST /sessions with a bogus subjectId (deployment check: 400 = new worker, 500 = old)
    2. POST /sessions with subj_nsmq_math (valid) — status + timing
@@ -23,8 +26,8 @@ const API = 'https://brilla-api.ghwmelite.workers.dev/api';
   });
   await page.goto('https://brillaprep.org/?login=true', { waitUntil: 'networkidle2', timeout: 60000 });
   await page.waitForSelector('input[type="email"]', { timeout: 15000 });
-  await page.type('input[type="email"]', 'johndoe@gmail.com', { delay: 5 });
-  await page.type('input[placeholder="Enter your password"]', 'Student123!', { delay: 5 });
+  await page.type('input[type="email"]', qaEmail, { delay: 5 });
+  await page.type('input[placeholder="Enter your password"]', qaPassword, { delay: 5 });
   await page.waitForFunction(
     () => (document.querySelector('input[name="cf-turnstile-response"]')?.value || '').length > 10,
     { timeout: 45000 }

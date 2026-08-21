@@ -1,3 +1,5 @@
+const { getQaCredentials } = require('./qa-credentials.cjs');
+
 /* Probe: Phase C live verification — two-way whiteboard: check-work (ink +
    photo), point-and-ask, fused cold TTFS. IDEMPOTENT, safe to re-run.
 
@@ -192,10 +194,10 @@ function annotationsError(annotations, maxW, maxH) {
     defaultViewport: { width: 1366, height: 900 },
   });
 
-  const studentToken = await uiLogin(browser, 'johndoe@gmail.com', 'Student123!');
+  const studentToken = await uiLogin(browser, ...getQaCredentials('student'));
   const studentId = decodeUserId(studentToken);
   console.log(`logged in as johndoe (${studentId}), nonce=${NONCE}`);
-  const adminToken = await uiLogin(browser, 'admintest@brillaprep.org', 'Admin123!');
+  const adminToken = await uiLogin(browser, ...getQaCredentials('admin'));
   console.log('logged in as admintest');
 
   const fixtures = await renderFixtures(browser);

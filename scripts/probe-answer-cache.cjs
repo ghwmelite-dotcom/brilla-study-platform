@@ -1,3 +1,5 @@
+const { getQaCredentials } = require('./qa-credentials.cjs');
+
 /* Probe: semantic answer cache (task 9) — IDEMPOTENT, safe to re-run.
    Every probe question embeds a per-run tag `[probe <nonce>]` and the probe
    DELETES all tagged cache rows on exit (via `wrangler d1 execute`, so it must
@@ -109,10 +111,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     defaultViewport: { width: 1366, height: 900 },
   });
 
-  const studentToken = await uiLogin(browser, 'johndoe@gmail.com', 'Student123!');
+  const studentToken = await uiLogin(browser, ...getQaCredentials('student'));
   const studentId = decodeUserId(studentToken);
   console.log(`logged in as johndoe (${studentId}), nonce=${NONCE}`);
-  const adminToken = await uiLogin(browser, 'admintest@brillaprep.org', 'Admin123!');
+  const adminToken = await uiLogin(browser, ...getQaCredentials('admin'));
   console.log('logged in as admintest\n');
   await browser.close();
 

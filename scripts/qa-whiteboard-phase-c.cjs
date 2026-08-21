@@ -1,3 +1,5 @@
+const { getQaCredentials } = require('./qa-credentials.cjs');
+
 /* QA: Phase C visual verification — two-way whiteboard in a REAL browser
    (headful Chrome) as premium johndoe. EVIDENCE GATHERING, not pass/fail:
    exits 0 unless the driver itself breaks; every major step is screenshotted
@@ -120,10 +122,10 @@ class DeadEnd extends Error {}
 
   try {
     // ---- Tokens + premium upgrade BEFORE the QA app loads ------------------
-    const student = await uiLogin(browser, 'johndoe@gmail.com', 'Student123!');
+    const student = await uiLogin(browser, ...getQaCredentials('student'));
     studentToken = student.token;
     studentId = decodeUserId(studentToken);
-    adminToken = (await uiLogin(browser, 'admintest@brillaprep.org', 'Admin123!')).token;
+    adminToken = (await uiLogin(browser, ...getQaCredentials('admin'))).token;
     note(`logged in as johndoe (${studentId}) + admintest, nonce=${NONCE}`);
     const up = await api(adminToken, 'POST', `/admin/users/${studentId}/set-tier`, { tierId: 'tier_student_monthly', durationDays: 30 });
     note(`set-tier premium: ${up.status} ${up.json.success ? 'ok' : JSON.stringify(up.json).slice(0, 120)}`);

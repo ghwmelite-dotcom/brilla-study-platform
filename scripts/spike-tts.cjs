@@ -1,3 +1,6 @@
+const { getQaCredentials } = require('./qa-credentials.cjs');
+const [qaEmail, qaPassword] = getQaCredentials('admin');
+
 /* Spike: login as admin, then POST /api/admin/tts-spike to learn the true
    response shape of the Deepgram Aura 2 TTS model via Workers AI.
    Prints { shape, contentType, byteLength, isBase64, firstBytes }.
@@ -23,8 +26,8 @@ const TEXT = process.argv[2] || 'Photosynthesis is how plants turn sunlight into
   });
   await page.goto('https://brillaprep.org/?login=true', { waitUntil: 'networkidle2', timeout: 60000 });
   await page.waitForSelector('input[type="email"]', { timeout: 15000 });
-  await page.type('input[type="email"]', 'admintest@brillaprep.org', { delay: 5 });
-  await page.type('input[placeholder="Enter your password"]', 'Admin123!', { delay: 5 });
+  await page.type('input[type="email"]', qaEmail, { delay: 5 });
+  await page.type('input[placeholder="Enter your password"]', qaPassword, { delay: 5 });
   await page.waitForFunction(
     () => (document.querySelector('input[name="cf-turnstile-response"]')?.value || '').length > 10,
     { timeout: 45000 }
