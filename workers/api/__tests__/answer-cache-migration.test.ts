@@ -53,12 +53,39 @@ describe('migration 098 semantic answer cache', () => {
         ) VALUES ('legacy_1', 'topic_1', 'Question?', 'Answer.');
       `);
 
-      expect(() => db.exec(migration)).toThrow(/last_hit_at/);
+      expect(() => db.exec(migration)).toThrow(/CHECK constraint failed/);
       expect(db.prepare('SELECT id, answer_text FROM ai_answer_cache').get())
         .toEqual({ id: 'legacy_1', answer_text: 'Answer.' });
     } finally {
       db.close();
     }
   });
+  it('fails closed and preserves data when a patched schema has an unexpected column', () => {
+    const db = new Database(':memory:');
+    try {
+      const migration = readFileSync(
+        new URL('../../../database/migrations/098_ai_answer_cache.sql', import.meta.url),
+        'utf8',
+      );
+      const productionPatch = readFileSync(
+        new URL('../../../database/prod-patches/097_ai_answer_cache.sql', import.meta.url),
+        'utf8',
+      );
+      db.exec(productionPatch);
+      db.exec(`
+        ALTER TABLE ai_answer_cache ADD COLUMN legacy_note TEXT;
+        INSERT INTO ai_answer_cache (
+          id, topic_id, question_text, answer_text, legacy_note
+        ) VALUES ('legacy_2', 'topic_2', 'Question?', 'Answer.', 'preserve me');
+      `);
+
+      expect(() => db.exec(migration)).toThrow(/CHECK constraint failed/);
+      expect(db.prepare('SELECT id, legacy_note FROM ai_answer_cache').get())
+        .toEqual({ id: 'legacy_2', legacy_note: 'preserve me' });
+    } finally {
+      db.close();
+    }
+  });
+
 
 });
