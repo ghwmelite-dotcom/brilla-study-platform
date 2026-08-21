@@ -13,7 +13,7 @@ import { notificationsApp, createNotification } from './notifications';
 import { tutorApp } from './tutor';
 import { chatApp } from './chat';
 import { moderationApp } from './moderation';
-import { paymentsApp } from './payments';
+import { paymentsApp, runPaymentReconciliation } from './payments';
 import { subscriptionsApp } from './subscriptions';
 import { affiliatesApp, isValidReferralCode, attributeReferral } from './affiliates';
 import { recordingsApp } from './recordings';
@@ -11298,6 +11298,20 @@ export default {
       console.log(`Race maintenance: ${race.crowned} crowned, ${race.opened} opened`);
     } catch (error) {
       console.error('Race cycle maintenance failed:', error);
+    }
+
+    // Reconcile stale subscription checkouts against Paystack. This never fails
+    // rows based on age alone and processes a bounded provider-verified batch.
+    if (env.PAYSTACK_SECRET_KEY) {
+      ctx.waitUntil(
+        runPaymentReconciliation(env.DB, env.PAYSTACK_SECRET_KEY)
+          .then((result) => console.log(
+            `Payment reconciliation: ${result.checked} checked, ${result.settled} settled, ${result.failed} failed, ${result.stillPending} pending, ${result.providerErrors} provider errors, ${result.affiliateRepairs} affiliate repairs`,
+          ))
+          .catch((error) => console.error('Payment reconciliation failed:', error)),
+      );
+    } else {
+      console.error('Payment reconciliation skipped: PAYSTACK_SECRET_KEY is unavailable');
     }
 
     // Telegram community alerts: fire-and-forget. Cron "success" no longer

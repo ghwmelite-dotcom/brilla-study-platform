@@ -1,8 +1,20 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
-import { awardPoints } from './points';
-import { applyFailedTransferRefund } from './payment-webhooks';
+import {
+  applyFailedTransferRefund,
+  applyReversedTransferRefund,
+  recordSuccessfulTransfer,
+} from './payment-webhooks';
+import { getActiveCycleForUser, recordRaceCrossingIfReached } from './points';
+import {
+  isTerminalProviderFailure,
+  reconcilePendingSubscriptionPayments,
+  sanitizeProviderTransaction,
+  settleVerifiedSubscriptionPayment,
+  verifyPaystackTransaction,
+  type SettledPaymentContext,
+} from './payment-settlement';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -55,25 +67,6 @@ async function initializeTransaction(
   }
 }
 
-// Verify a Paystack transaction
-async function verifyTransaction(
-  secretKey: string,
-  reference: string
-): Promise<{ status: boolean; data?: { status: string; amount: number; currency: string; customer: { email: string }; metadata?: Record<string, unknown> }; message?: string }> {
-  try {
-    const response = await fetch(`${PAYSTACK_API}/transaction/verify/${reference}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${secretKey}`,
-      },
-    });
-
-    return await response.json();
-  } catch (error) {
-    console.error('Paystack verify error:', error);
-    return { status: false, message: 'Failed to verify transaction' };
-  }
-}
 
 // Create a transfer recipient (for affiliate payouts)
 async function createTransferRecipient(
@@ -350,7 +343,27 @@ paymentsApp.post('/initialize', requireAuth, async (c) => {
     );
 
     if (!result.status || !result.data) {
+      await c.env.DB.prepare(`
+        UPDATE payment_transactions
+        SET status = 'failed', paystack_response = ?
+        WHERE reference = ? AND status = 'pending'
+      `).bind(
+        JSON.stringify({ status: 'initialization_failed' }),
+        reference,
+      ).run();
       return c.json({ success: false, error: result.message || 'Failed to initialize payment' }, 500);
+    }
+
+    if (result.data.reference !== reference) {
+      await c.env.DB.prepare(`
+        UPDATE payment_transactions
+        SET status = 'failed', paystack_response = ?
+        WHERE reference = ? AND status = 'pending'
+      `).bind(
+        JSON.stringify({ status: 'initialization_reference_mismatch' }),
+        reference,
+      ).run();
+      return c.json({ success: false, error: 'Payment provider reference mismatch' }, 502);
     }
 
     return c.json({
@@ -380,318 +393,326 @@ paymentsApp.get('/verify/:reference', requireAuth, async (c) => {
       return c.json({ success: false, error: 'Reference required' }, 400);
     }
 
-    // Get transaction record
     const transaction = await c.env.DB.prepare(`
-      SELECT * FROM payment_transactions WHERE reference = ?
-    `).bind(reference).first();
+      SELECT user_id, status, settlement_applied_at
+      FROM payment_transactions
+      WHERE reference = ?
+    `).bind(reference).first<{
+      user_id: string;
+      status: string;
+      settlement_applied_at: string | null;
+    }>();
 
-    if (!transaction) {
+    // SECURITY: 404 avoids leaking valid transaction references across users.
+    if (!transaction || transaction.user_id !== userId) {
       return c.json({ success: false, error: 'Transaction not found' }, 404);
     }
 
-    // SECURITY: ownership check — 404 (not 403) to avoid leaking which references exist
-    if (transaction.user_id !== userId) {
-      return c.json({ success: false, error: 'Transaction not found' }, 404);
-    }
-
-    // IDEMPOTENCY: already verified — never credit twice. Returns before ANY
-    // crediting side-effect (grading credits, subscription, trial conversion,
-    // affiliate commission).
-    if (transaction.status === 'success') {
+    if (transaction.status === 'success' || transaction.settlement_applied_at) {
       return c.json({
         success: true,
         data: { reference, status: 'success', alreadyVerified: true },
       });
     }
 
-    // Verify with Paystack
-    const result = await verifyTransaction(c.env.PAYSTACK_SECRET_KEY, reference);
-
-    if (!result.status || !result.data) {
-      return c.json({ success: false, error: result.message || 'Failed to verify payment' }, 500);
+    const verification = await verifyPaystackTransaction(
+      c.env.PAYSTACK_SECRET_KEY,
+      reference,
+    );
+    if (!verification.ok || !verification.data) {
+      return c.json({ success: false, error: 'Failed to verify payment' }, 502);
     }
 
-    const paymentStatus = result.data.status;
-
-    if (paymentStatus === 'success') {
-      // SECURITY: validate Paystack's amount/currency against what we recorded at initialize.
-      // Paystack amount is in pesewas; payment_transactions.amount is in GHS.
-      const paidAmountGhs = (result.data.amount as number) / 100;
-      const expectedAmountGhs = transaction.amount as number;
-      const currencyMatches = result.data.currency === (transaction.currency as string || 'GHS');
-      const amountMatches = Math.abs(paidAmountGhs - expectedAmountGhs) < 0.01;
-
-      if (!currencyMatches || !amountMatches) {
-        console.error('Payment amount/currency mismatch', {
-          reference, expectedAmountGhs, paidAmountGhs,
-          expectedCurrency: transaction.currency, paidCurrency: result.data.currency,
-        });
-        // Status-guarded: a concurrent verify that already succeeded (or vice
-        // versa) must not be flipped back to failed.
-        await c.env.DB.prepare(`
-          UPDATE payment_transactions
-          SET status = 'failed', paystack_response = ?
-          WHERE reference = ? AND status != 'success'
-        `).bind(JSON.stringify(result.data), reference).run();
-        return c.json({ success: false, error: 'Payment amount mismatch' }, 400);
-      }
-
-      // CLAIM FIRST, before any crediting side-effect: the status-guarded UPDATE
-      // atomically claims the transaction. If changes = 0, a concurrent request
-      // already verified it — exit as alreadyVerified and credit nothing.
-      const claim = await c.env.DB.prepare(`
-        UPDATE payment_transactions
-        SET status = 'success', verified_at = datetime('now'), paystack_response = ?
-        WHERE reference = ? AND status != 'success'
-      `).bind(JSON.stringify(result.data), reference).run();
-
-      if (!claim.meta?.changes) {
-        return c.json({
-          success: true,
-          data: { reference, status: 'success', alreadyVerified: true },
-        });
-      }
-
-      // Get plan details for subscription duration
-      const plan = await c.env.DB.prepare(`
-        SELECT * FROM subscription_tiers WHERE id = ?
-      `).bind(transaction.plan_id).first();
-
-      // Calculate subscription expiry
-      const billingCycle = transaction.billing_cycle as string;
-      const expiryDate = new Date();
-      if (billingCycle === 'yearly') {
-        expiryDate.setFullYear(expiryDate.getFullYear() + 1);
-      } else {
-        expiryDate.setMonth(expiryDate.getMonth() + 1);
-      }
-
-      // Update user subscription
-      await c.env.DB.prepare(`
-        UPDATE users
-        SET subscription_tier_id = ?,
-            subscription_expires_at = ?,
-            ai_grading_credits = CASE
-              WHEN ? = -1 THEN -1
-              ELSE COALESCE(ai_grading_credits, 0) + ?
-            END
-        WHERE id = ?
-      `).bind(
-        transaction.plan_id,
-        expiryDate.toISOString(),
-        plan?.ai_grading_quota || 0,
-        plan?.ai_grading_quota || 0,
-        transaction.user_id
-      ).run();
-
-      // Update trial status if exists
-      await c.env.DB.prepare(`
-        UPDATE user_trials
-        SET status = 'converted', converted_at = datetime('now')
-        WHERE user_id = ? AND status = 'active'
-      `).bind(transaction.user_id).run();
-
-      // Check if user was referred - process affiliate commission
-      const user = await c.env.DB.prepare(`
-        SELECT referred_by FROM users WHERE id = ?
-      `).bind(transaction.user_id).first();
-
-      if (user?.referred_by) {
-        await processAffiliateCommission(
-          c.env.DB,
-          user.referred_by as string,
-          transaction.user_id as string,
-          transaction.id as string,
-          (transaction.amount as number)
-        );
-      }
-
-      return c.json({
-        success: true,
-        data: {
-          status: 'success',
-          planId: transaction.plan_id,
-          expiresAt: expiryDate.toISOString(),
-        },
-      });
-    } else {
-      // Update transaction as failed
+    const provider = sanitizeProviderTransaction(verification.data);
+    if (provider.status !== 'success') {
+      const terminal = isTerminalProviderFailure(provider.status);
       await c.env.DB.prepare(`
         UPDATE payment_transactions
-        SET status = 'failed', paystack_response = ?
+        SET status = CASE WHEN ? THEN 'failed' ELSE status END,
+            paystack_response = ?,
+            reconciliation_checked_at = datetime('now')
         WHERE reference = ?
-      `).bind(JSON.stringify(result.data), reference).run();
+          AND status = 'pending'
+          AND settlement_applied_at IS NULL
+      `).bind(
+        terminal ? 1 : 0,
+        JSON.stringify(provider),
+        reference,
+      ).run();
 
       return c.json({
         success: false,
-        error: 'Payment was not successful',
-        data: { status: paymentStatus },
-      });
+        error: terminal ? 'Payment was not successful' : 'Payment is still pending',
+        data: { status: provider.status },
+      }, 400);
     }
+
+    const settlement = await settleVerifiedSubscriptionPayment(
+      c.env.DB,
+      verification.data,
+      'callback',
+    );
+
+    if (settlement.outcome === 'mismatch') {
+      console.error('ALERT: provider-confirmed payment did not match the stored transaction');
+      return c.json({ success: false, error: 'Payment amount mismatch' }, 400);
+    }
+    if (settlement.outcome === 'refunded') {
+      return c.json({ success: false, error: 'Payment has been refunded' }, 409);
+    }
+    if (settlement.outcome === 'not_found' || settlement.outcome === 'not_success') {
+      return c.json({ success: false, error: 'Payment could not be settled' }, 409);
+    }
+
+    if (settlement.outcome === 'applied' && settlement.context) {
+      const affiliateComplete = await completeAffiliateSettlement(c.env.DB, settlement.context);
+      if (!affiliateComplete) {
+        console.error('Affiliate payment effects require scheduled retry');
+      }
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        reference,
+        status: 'success',
+        alreadyVerified: settlement.outcome === 'already_applied',
+        planId: settlement.planId,
+        expiresAt: settlement.expiresAt,
+      },
+    });
   } catch (error) {
     console.error('Verify payment error:', error);
     return c.json({ success: false, error: 'Failed to verify payment' }, 500);
   }
 });
 
-// Process affiliate commission helper with fraud detection
+// Process the first-payment referral effects as a replay-safe D1 transaction.
 async function processAffiliateCommission(
   db: D1Database,
   referralCode: string,
   referredUserId: string,
   transactionId: string,
-  amount: number
-): Promise<void> {
+  amount: number,
+): Promise<boolean> {
   try {
-    // SECURITY: Validate inputs
     if (!referralCode || !referredUserId || !transactionId || amount <= 0) {
-      console.error('Invalid commission processing inputs');
-      return;
+      return false;
     }
 
-    // Get affiliate profile
     const affiliate = await db.prepare(`
-      SELECT ap.*, u.role as user_role, u.email as affiliate_email, at.commission_rate
+      SELECT ap.id, ap.user_id, ap.successful_conversions, u.role AS user_role,
+             at.commission_rate
       FROM affiliate_profiles ap
       JOIN users u ON ap.user_id = u.id
       JOIN affiliate_tiers at ON ap.tier_id = at.id
       WHERE ap.referral_code = ? AND ap.is_active = 1
-    `).bind(referralCode.toUpperCase()).first();
+    `).bind(referralCode.toUpperCase()).first<{
+      id: string;
+      user_id: string;
+      successful_conversions: number;
+      user_role: string;
+      commission_rate: number;
+    }>();
+    if (!affiliate) return true;
 
-    if (!affiliate) return;
-
-    // Get referral record
     const referral = await db.prepare(`
-      SELECT * FROM affiliate_referrals
+      SELECT id, status, signup_at
+      FROM affiliate_referrals
       WHERE affiliate_id = ? AND referred_user_id = ?
-    `).bind(affiliate.id, referredUserId).first();
+    `).bind(affiliate.id, referredUserId).first<{
+      id: string;
+      status: string;
+      signup_at: string;
+    }>();
+    if (!referral || referral.status === 'converted') return true;
 
-    if (!referral) return;
-
-    // SECURITY: Check for duplicate commission (prevent double processing)
     const existingCommission = await db.prepare(`
-      SELECT id FROM affiliate_commissions
-      WHERE referral_id = ? AND transaction_id = ?
-    `).bind(referral.id, transactionId).first();
+      SELECT id, effects_applied_at
+      FROM affiliate_commissions
+      WHERE transaction_id = ?
+    `).bind(transactionId).first<{ id: string; effects_applied_at: string | null }>();
+    if (existingCommission?.effects_applied_at) return true;
 
-    if (existingCommission) {
-      console.log('Commission already exists for this referral/transaction');
-      return;
-    }
-
-    // SECURITY: Check if referral is already converted
-    if (referral.status === 'converted') {
-      console.log('Referral already converted');
-      return;
-    }
-
-    // SECURITY: Check minimum time between signup and conversion
-    const signupTime = new Date(referral.signup_at as string).getTime();
-    const currentTime = Date.now();
-    const hoursSinceSignup = (currentTime - signupTime) / (1000 * 60 * 60);
-
-    let isSuspicious = false;
-    let suspiciousReason = '';
-
-    if (hoursSinceSignup < FRAUD_THRESHOLDS.MIN_SIGNUP_TO_CONVERSION_HOURS) {
-      isSuspicious = true;
-      suspiciousReason = `Conversion too fast: ${hoursSinceSignup.toFixed(2)} hours since signup`;
-    }
-
-    // SECURITY: Check daily conversion limit
     const dailyConversions = await db.prepare(`
-      SELECT COUNT(*) as count FROM affiliate_commissions
+      SELECT COUNT(*) AS count
+      FROM affiliate_commissions
       WHERE affiliate_id = ? AND created_at > datetime('now', '-1 day')
-    `).bind(affiliate.id).first();
+    `).bind(affiliate.id).first<{ count: number }>();
 
-    if ((dailyConversions?.count as number) >= FRAUD_THRESHOLDS.MAX_CONVERSIONS_PER_DAY) {
-      isSuspicious = true;
-      suspiciousReason = `Daily conversion limit exceeded: ${dailyConversions?.count}`;
-    }
+    const signupTime = new Date(referral.signup_at).getTime();
+    const hoursSinceSignup = (Date.now() - signupTime) / (1000 * 60 * 60);
+    const commissionAmount = amount * affiliate.commission_rate;
+    const isSuspicious = !Number.isFinite(hoursSinceSignup)
+      || hoursSinceSignup < FRAUD_THRESHOLDS.MIN_SIGNUP_TO_CONVERSION_HOURS
+      || (dailyConversions?.count ?? 0) >= FRAUD_THRESHOLDS.MAX_CONVERSIONS_PER_DAY
+      || commissionAmount > FRAUD_THRESHOLDS.MAX_COMMISSION_AMOUNT;
 
-    // Calculate commission
-    const commissionRate = affiliate.commission_rate as number;
-    const commissionAmount = amount * commissionRate;
+    const commissionId = existingCommission?.id ?? `commission_${crypto.randomUUID()}`;
+    const commissionGuard = `
+      EXISTS (
+        SELECT 1 FROM affiliate_commissions guard_commission
+        WHERE guard_commission.transaction_id = ?
+          AND guard_commission.effects_applied_at IS NULL
+      )
+    `;
+    const now = new Date();
+    const weekNumber = Math.ceil((now.getDate() - now.getDay() + 1) / 7);
+    const period = `${now.getFullYear()}-W${String(weekNumber).padStart(2, '0')}`;
 
-    // SECURITY: Flag high-value commissions for manual review
-    if (commissionAmount > FRAUD_THRESHOLDS.MAX_COMMISSION_AMOUNT) {
-      isSuspicious = true;
-      suspiciousReason = `High commission amount: ${commissionAmount} GHS`;
-    }
-
-    // Create commission record
-    const commissionId = crypto.randomUUID();
-    const initialStatus = isSuspicious ? 'pending' : 'pending';
-
-    await db.prepare(`
-      INSERT INTO affiliate_commissions (
-        id, affiliate_id, referral_id, transaction_id, amount, commission_rate, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).bind(
-      commissionId,
-      affiliate.id,
-      referral.id,
-      transactionId,
-      commissionAmount,
-      commissionRate,
-      initialStatus
-    ).run();
-
-    // Update referral status
-    await db.prepare(`
-      UPDATE affiliate_referrals
-      SET status = 'converted', converted_at = datetime('now'), first_payment_id = ?
-      WHERE id = ?
-    `).bind(transactionId, referral.id).run();
-
-    // Growth loop: race points ride the existing exactly-once path — this line is
-    // unreachable for duplicate verifies (claim-first at payments.ts:437) and for
-    // already-converted referrals (guard above), so the 500 pts can never double-fire.
-    await awardPoints(db, {
-      userId: affiliate.user_id as string,
-      points: REFERRAL_PAID_CONVERSION_POINTS,
-      source: 'referral_paid_conversion',
-      sourceRef: referral.id as string,
-    });
-
-    // Update affiliate stats
-    await db.prepare(`
-      UPDATE affiliate_profiles
-      SET
-        successful_conversions = successful_conversions + 1,
-        pending_earnings = pending_earnings + ?,
-        last_referral_at = datetime('now')
-      WHERE id = ?
-    `).bind(commissionAmount, affiliate.id).run();
-
-    // Only auto-approve if not suspicious
-    if (!isSuspicious) {
-      await db.prepare(`
-        UPDATE affiliate_commissions
-        SET status = 'approved', approved_at = datetime('now')
-        WHERE id = ?
-      `).bind(commissionId).run();
-
-      // Move to available earnings
-      await db.prepare(`
+    const statements: D1PreparedStatement[] = [
+      db.prepare(`
+        INSERT OR IGNORE INTO affiliate_commissions (
+          id, affiliate_id, referral_id, transaction_id, amount,
+          commission_rate, status, effects_applied_at
+        ) VALUES (?, ?, ?, ?, ?, ?, 'pending', NULL)
+      `).bind(
+        commissionId,
+        affiliate.id,
+        referral.id,
+        transactionId,
+        commissionAmount,
+        affiliate.commission_rate,
+      ),
+      db.prepare(`
+        UPDATE affiliate_referrals
+        SET status = 'converted', converted_at = datetime('now'), first_payment_id = ?
+        WHERE id = ? AND ${commissionGuard}
+      `).bind(transactionId, referral.id, transactionId),
+      db.prepare(`
         UPDATE affiliate_profiles
-        SET
-          pending_earnings = pending_earnings - ?,
-          available_earnings = available_earnings + ?,
-          total_earnings = total_earnings + ?
-        WHERE id = ?
-      `).bind(commissionAmount, commissionAmount, commissionAmount, affiliate.id).run();
-    } else {
-      // Log suspicious activity for admin review
-      console.warn(`SUSPICIOUS COMMISSION FLAGGED: ${commissionId} - ${suspiciousReason}`);
+        SET successful_conversions = successful_conversions + 1,
+            pending_earnings = pending_earnings + ?,
+            last_referral_at = datetime('now')
+        WHERE id = ? AND ${commissionGuard}
+      `).bind(commissionAmount, affiliate.id, transactionId),
+    ];
+
+    if (!isSuspicious) {
+      statements.push(
+        db.prepare(`
+          UPDATE affiliate_commissions
+          SET status = 'approved', approved_at = datetime('now')
+          WHERE transaction_id = ? AND effects_applied_at IS NULL
+        `).bind(transactionId),
+        db.prepare(`
+          UPDATE affiliate_profiles
+          SET pending_earnings = pending_earnings - ?,
+              available_earnings = available_earnings + ?,
+              total_earnings = total_earnings + ?
+          WHERE id = ? AND ${commissionGuard}
+        `).bind(
+          commissionAmount,
+          commissionAmount,
+          commissionAmount,
+          affiliate.id,
+          transactionId,
+        ),
+      );
     }
 
-    // Check for tier upgrade
-    await checkAffiliateTierUpgrade(db, affiliate.id as string, affiliate.user_role as string);
+    statements.push(
+      db.prepare(`
+        UPDATE users
+        SET xp_points = xp_points + ?
+        WHERE id = ? AND ${commissionGuard}
+      `).bind(REFERRAL_PAID_CONVERSION_POINTS, affiliate.user_id, transactionId),
+      db.prepare(`
+        INSERT OR IGNORE INTO points_ledger (
+          id, user_id, points, source, source_ref, cycle_id, is_demo_data, expires_at
+        )
+        SELECT ?, ?, ?, 'referral_paid_conversion', ?, (
+          SELECT rc.id
+          FROM race_cycles rc
+          LEFT JOIN users cycle_user ON cycle_user.id = ?
+          WHERE rc.status = 'active'
+            AND (
+              rc.scope = 'platform'
+              OR (rc.scope = 'school' AND rc.school_id = cycle_user.school_id)
+            )
+          ORDER BY CASE WHEN rc.scope = 'school' THEN 0 ELSE 1 END
+          LIMIT 1
+        ), 0, NULL
+        WHERE ${commissionGuard}
+      `).bind(
+        `pl_referral_${transactionId}`,
+        affiliate.user_id,
+        REFERRAL_PAID_CONVERSION_POINTS,
+        referral.id,
+        affiliate.user_id,
+        transactionId,
+      ),
+      db.prepare(`
+        INSERT OR IGNORE INTO house_points (
+          id, house_id, user_id, points, source, source_id, period,
+          is_demo_data, expires_at
+        )
+        SELECT ?, u.house, u.id, ?, 'bonus', ?, ?, 0, NULL
+        FROM users u
+        WHERE u.id = ? AND u.house IS NOT NULL AND ${commissionGuard}
+      `).bind(
+        `hp_referral_${transactionId}`,
+        REFERRAL_PAID_CONVERSION_POINTS,
+        referral.id,
+        period,
+        affiliate.user_id,
+        transactionId,
+      ),
+      db.prepare(`
+        UPDATE affiliate_commissions
+        SET effects_applied_at = datetime('now')
+        WHERE transaction_id = ? AND effects_applied_at IS NULL
+      `).bind(transactionId),
+    );
 
+    await db.batch(statements);
+    if (isSuspicious) console.warn('Suspicious affiliate commission queued for review');
+    const activeCycle = await getActiveCycleForUser(db, affiliate.user_id);
+    if (activeCycle) {
+      await recordRaceCrossingIfReached(db, activeCycle, affiliate.user_id);
+    }
+
+    await checkAffiliateTierUpgrade(db, affiliate.id, affiliate.user_role);
+    return true;
   } catch (error) {
     console.error('Process affiliate commission error:', error);
+    return false;
   }
+}
+
+async function completeAffiliateSettlement(
+  db: D1Database,
+  context: SettledPaymentContext,
+): Promise<boolean> {
+  if (context.referralCode) {
+    const commissionComplete = await processAffiliateCommission(
+      db,
+      context.referralCode,
+      context.userId,
+      context.transactionId,
+      context.amountGhs,
+    );
+    if (!commissionComplete) return false;
+  }
+
+  await db.prepare(`
+    UPDATE payment_transactions
+    SET affiliate_processed_at = COALESCE(affiliate_processed_at, datetime('now'))
+    WHERE id = ? AND status = 'success' AND settlement_applied_at IS NOT NULL
+  `).bind(context.transactionId).run();
+  return true;
+}
+
+export async function runPaymentReconciliation(
+  db: D1Database,
+  secretKey: string,
+) {
+  return reconcilePendingSubscriptionPayments(
+    db,
+    secretKey,
+    25,
+    (context) => completeAffiliateSettlement(db, context),
+  );
 }
 
 // Check and upgrade affiliate tier
@@ -777,19 +798,48 @@ paymentsApp.post('/webhook', async (c) => {
     }
 
     switch (event.event) {
-      case 'charge.success':
-        // Payment successful - already handled in verify endpoint
-        console.log('Webhook: charge.success', event.data.reference);
+      case 'charge.success': {
+        const reference = event.data.reference;
+        if (
+          typeof reference !== 'string'
+          || !reference.startsWith('SUB_')
+          || reference.length > 200
+        ) {
+          break;
+        }
+
+        const verification = await verifyPaystackTransaction(
+          c.env.PAYSTACK_SECRET_KEY,
+          reference,
+        );
+        if (!verification.ok || !verification.data) {
+          console.error('Paystack charge webhook verification unavailable');
+          return c.json({ success: false, error: 'Verification unavailable' }, 503);
+        }
+
+        const settlement = await settleVerifiedSubscriptionPayment(
+          c.env.DB,
+          verification.data,
+          'webhook',
+        );
+        if (settlement.outcome === 'mismatch') {
+          console.error('ALERT: signed charge webhook did not match stored payment');
+        } else if (settlement.outcome === 'applied' && settlement.context) {
+          const affiliateComplete = await completeAffiliateSettlement(
+            c.env.DB,
+            settlement.context,
+          );
+          if (!affiliateComplete) {
+            console.error('Affiliate webhook effects require scheduled retry');
+          }
+        }
         break;
+      }
 
       case 'transfer.success': {
         const transferCode = event.data.transfer_code;
-        if (transferCode && typeof transferCode === 'string') {
-          await c.env.DB.prepare(`
-            UPDATE affiliate_payouts
-            SET status = 'completed', processed_at = datetime('now')
-            WHERE paystack_transfer_code = ? AND status = 'processing'
-          `).bind(transferCode).run();
+        if (typeof transferCode === 'string' && transferCode.length > 0 && transferCode.length <= 200) {
+          await recordSuccessfulTransfer(c.env.DB, transferCode);
         }
         break;
       }
@@ -801,6 +851,17 @@ paymentsApp.post('/webhook', async (c) => {
             ? event.data.reason.trim().slice(0, 1000) || 'Transfer failed'
             : 'Transfer failed';
           await applyFailedTransferRefund(c.env.DB, transferCode, reason);
+        }
+        break;
+      }
+
+      case 'transfer.reversed': {
+        const transferCode = event.data.transfer_code;
+        if (typeof transferCode === 'string' && transferCode.length > 0 && transferCode.length <= 200) {
+          const reason = typeof event.data.reason === 'string'
+            ? event.data.reason.trim().slice(0, 1000) || 'Transfer reversed'
+            : 'Transfer reversed';
+          await applyReversedTransferRefund(c.env.DB, transferCode, reason);
         }
         break;
       }

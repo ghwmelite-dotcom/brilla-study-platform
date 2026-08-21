@@ -71,7 +71,7 @@ export async function getActiveCycleForUser(db: D1Database, userId: string): Pro
   `).bind(userId).first<ActiveCycle>();
 }
 
-async function maybeRecordCrossing(db: D1Database, cycle: ActiveCycle, userId: string): Promise<void> {
+export async function recordRaceCrossingIfReached(db: D1Database, cycle: ActiveCycle, userId: string): Promise<void> {
   const row = await db.prepare(`
     SELECT COALESCE(SUM(points), 0) AS score FROM points_ledger
     WHERE user_id = ? AND created_at >= ? AND created_at < ? AND is_demo_data = 0
@@ -115,7 +115,7 @@ export async function awardPoints(db: D1Database, input: AwardInput): Promise<{ 
     `).bind(`pl_${crypto.randomUUID()}`, input.userId, weighted, input.source,
             input.sourceRef ?? null, cycle?.id ?? null,
             input.isDemoData ?? 0, input.expiresAt ?? null).run();
-    if (cycle) await maybeRecordCrossing(db, cycle, input.userId);
+    if (cycle) await recordRaceCrossingIfReached(db, cycle, input.userId);
 
     // 3. House consistency: race score and house contribution can never visibly disagree.
     const houseSource = HOUSE_SOURCE_MAP[input.source];

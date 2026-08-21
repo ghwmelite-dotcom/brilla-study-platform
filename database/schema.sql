@@ -1502,7 +1502,11 @@ CREATE TABLE IF NOT EXISTS payment_transactions (
   metadata TEXT,
   created_at TEXT DEFAULT (datetime('now')),
   verified_at TEXT,
-  refunded_at TEXT
+  refunded_at TEXT,
+  settlement_applied_at TEXT,
+  settlement_source TEXT,
+  reconciliation_checked_at TEXT,
+  affiliate_processed_at TEXT
 );
 
 -- Source: migrations/021_subscription_affiliate_system.sql
@@ -2626,6 +2630,8 @@ CREATE TABLE IF NOT EXISTS affiliate_payouts (
 
 -- Source: migrations/096_atomic_failed_transfer_refunds.sql
 CREATE TABLE IF NOT EXISTS payment_webhook_receipts (
+  transaction_reference TEXT,
+  outcome TEXT,
   id TEXT PRIMARY KEY,
   event_type TEXT NOT NULL,
   event_key TEXT NOT NULL UNIQUE,
@@ -3231,7 +3237,8 @@ CREATE TABLE IF NOT EXISTS affiliate_commissions (
   created_at TEXT DEFAULT (datetime('now')),
   approved_at TEXT,
   paid_at TEXT,
-  payout_id TEXT REFERENCES affiliate_payouts(id)
+  payout_id TEXT REFERENCES affiliate_payouts(id),
+  effects_applied_at TEXT
 );
 
 -- Source: migrations/027_teacher_bonus_tutoring.sql
@@ -4544,6 +4551,14 @@ CREATE INDEX IF NOT EXISTS idx_reminder_history_user ON reminder_history(user_id
 CREATE INDEX IF NOT EXISTS idx_reminder_history_type ON reminder_history(reminder_type);
 CREATE INDEX IF NOT EXISTS idx_reminder_history_sent ON reminder_history(sent_at);
 CREATE INDEX IF NOT EXISTS idx_user_trials_user ON user_trials(user_id);
+CREATE INDEX IF NOT EXISTS idx_payment_transactions_reconcile
+ON payment_transactions(status, reconciliation_checked_at, created_at);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_affiliate_commissions_transaction_unique
+ON affiliate_commissions(transaction_id)
+WHERE transaction_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_payment_webhook_receipts_transaction
+ON payment_webhook_receipts(transaction_reference, event_type);
+
 CREATE INDEX IF NOT EXISTS idx_user_trials_status ON user_trials(status);
 CREATE INDEX IF NOT EXISTS idx_user_trials_expires ON user_trials(expires_at);
 CREATE INDEX IF NOT EXISTS idx_payment_transactions_user ON payment_transactions(user_id);

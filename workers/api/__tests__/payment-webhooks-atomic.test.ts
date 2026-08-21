@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyFailedTransferRefund } from '../payment-webhooks';
+import { applyFailedTransferRefund, applyReversedTransferRefund } from '../payment-webhooks';
 
 interface BoundStatement {
   sql: string;
@@ -7,8 +7,8 @@ interface BoundStatement {
   run(): Promise<D1Result>;
 }
 
-function createSerializedRefundDb() {
-  let payoutStatus = 'processing';
+function createSerializedRefundDb(initialStatus = 'processing') {
+  let payoutStatus = initialStatus;
   let refundApplied = false;
   let balance = 0;
   let receipts = 0;
@@ -26,7 +26,9 @@ function createSerializedRefundDb() {
     },
     batch(statements: BoundStatement[]) {
       const execute = async () => {
-        const eligible = payoutStatus === 'processing' && !refundApplied;
+        const acceptsCompleted = statements.some((statement) =>
+          statement.sql.includes("status IN ('processing', 'completed')"));
+        const eligible = !refundApplied && (payoutStatus === 'processing' || (acceptsCompleted && payoutStatus === 'completed'));
         const results: D1Result[] = [];
         for (const statement of statements) {
           if (statement.sql.includes('UPDATE affiliate_profiles')) {
@@ -81,5 +83,23 @@ describe('atomic failed-transfer refund', () => {
     expect(credit.sql).toMatch(/ap\.status = 'processing'/);
     expect(credit.sql).toMatch(/ap\.refund_applied_at IS NULL/);
     expect(credit.binds).toEqual(['TRF_real', 'TRF_real']);
+  });
+
+  it('refunds a reversed completed transfer exactly once', async () => {
+    const state = createSerializedRefundDb('completed');
+    const results = await Promise.all(Array.from({ length: 20 }, () =>
+      applyReversedTransferRefund(state.db, 'TRF_reversed', 'Transfer reversed')));
+
+    expect(results.filter((result) => result.refunded)).toHaveLength(1);
+    expect(state.snapshot()).toEqual({
+      payoutStatus: 'failed',
+      refundApplied: true,
+      balance: 100,
+      receipts: 1,
+    });
+
+    const credit = state.prepared.find((statement) => statement.sql.includes('UPDATE affiliate_profiles'))!;
+    expect(credit.sql).toMatch(/status IN \('processing', 'completed'\)/);
+    expect(credit.binds).toEqual(['TRF_reversed', 'TRF_reversed']);
   });
 });
