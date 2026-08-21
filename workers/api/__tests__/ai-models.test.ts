@@ -33,9 +33,9 @@ describe('model routing', () => {
   it('vision: var → built-in default, NEVER AI_MODEL (text model)', () => {
     expect(getVisionModel({ AI_MODEL_VISION: '@cf/meta/llama-3.2-11b-vision-instruct' } as any))
       .toBe('@cf/meta/llama-3.2-11b-vision-instruct');
-    expect(getVisionModel({} as any)).toBe('@cf/meta/llama-4-scout-17b-16e-instruct');
+    expect(getVisionModel({} as any)).toBe('@cf/meta/llama-3.2-11b-vision-instruct');
     // AI_MODEL alone must NOT be picked up — it is a text model, not vision-capable
     expect(getVisionModel({ AI_MODEL: '@cf/meta/llama-3.3-70b-instruct-fp8-fast' } as any))
-      .toBe('@cf/meta/llama-4-scout-17b-16e-instruct');
+      .toBe('@cf/meta/llama-3.2-11b-vision-instruct');
   });
 });

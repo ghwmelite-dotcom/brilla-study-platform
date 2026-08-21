@@ -180,7 +180,7 @@ describe('ask-about endpoint', () => {
     // Spike contract: openai-image-url content parts + guided_json.
     expect(captured).not.toBeNull();
     const { model, opts } = captured!;
-    expect(model).toBe('@cf/meta/llama-4-scout-17b-16e-instruct');
+    expect(model).toBe('@cf/meta/llama-3.2-11b-vision-instruct');
     expect(opts.guided_json).toMatchObject({
       additionalProperties: false,
       properties: {

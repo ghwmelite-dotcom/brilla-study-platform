@@ -743,7 +743,8 @@ def main() -> None:
                 f"WHERE user_id IN ({qa_user_ids_sql}) "
                 "UNION ALL SELECT 'question_attempts', COUNT(*) FROM question_attempts "
                 f"WHERE user_id IN ({qa_user_ids_sql}) "
-                "UNION ALL SELECT 'topics', COUNT(*) FROM topics "
+            ) + query_staging_sql(
+                "SELECT 'topics' AS scope, COUNT(*) AS count FROM topics "
                 f"WHERE id={sql_literal(qa_topic_id)} "
                 "UNION ALL SELECT 'notifications', COUNT(*) FROM notifications "
                 f"WHERE metadata LIKE {student_pattern} OR metadata LIKE {teacher_pattern} "

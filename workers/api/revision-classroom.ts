@@ -3165,7 +3165,7 @@ const ASK_ABOUT_FALLBACK: AskAboutAnswer = {
   annotation: null,
 };
 
-// guided_json is verified honored by the vision model (vision spike results).
+// guided_json requires a JSON-mode-supported vision model.
 const ASK_ABOUT_ANNOTATION_PROP_KEYS = new Set([
   'left', 'top', 'radius', 'stroke', 'strokeWidth', 'fill', 'opacity',
 ]);
