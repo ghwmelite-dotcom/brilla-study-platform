@@ -1,3 +1,6 @@
+const { getQaCredentials } = require('./qa-credentials.cjs');
+const [qaEmail, qaPassword] = getQaCredentials('student');
+
 /* Verify paper submit flow E2E as johndoe across several papers:
    for each paper: abandon stale attempt → start attempt → fetch paper →
    answer first 2 questions → submit → fetch results. Also GET /papers/attempts.
@@ -29,8 +32,8 @@ const PAPERS = [
   });
   await page.goto('https://brillaprep.org/?login=true', { waitUntil: 'networkidle2', timeout: 60000 });
   await page.waitForSelector('input[type="email"]', { timeout: 15000 });
-  await page.type('input[type="email"]', 'johndoe@gmail.com', { delay: 5 });
-  await page.type('input[placeholder="Enter your password"]', 'Student123!', { delay: 5 });
+  await page.type('input[type="email"]', qaEmail, { delay: 5 });
+  await page.type('input[placeholder="Enter your password"]', qaPassword, { delay: 5 });
   await page.waitForFunction(
     () => (document.querySelector('input[name="cf-turnstile-response"]')?.value || '').length > 10,
     { timeout: 45000 }

@@ -1,3 +1,5 @@
+const { getQaCredentials } = require('./qa-credentials.cjs');
+
 /* Probe: Phase B live verification — progressive whiteboard, content cache,
    TTS R2 cache, semantic answer cache. IDEMPOTENT, safe to re-run.
 
@@ -96,10 +98,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     defaultViewport: { width: 1366, height: 900 },
   });
 
-  const studentToken = await uiLogin(browser, 'johndoe@gmail.com', 'Student123!');
+  const studentToken = await uiLogin(browser, ...getQaCredentials('student'));
   const studentId = decodeUserId(studentToken);
   console.log(`logged in as johndoe (${studentId}), nonce=${NONCE}`);
-  const adminToken = await uiLogin(browser, 'admintest@brillaprep.org', 'Admin123!');
+  const adminToken = await uiLogin(browser, ...getQaCredentials('admin'));
   console.log('logged in as admintest\n');
   await browser.close();
 

@@ -1,3 +1,6 @@
+const { getQaCredentials } = require('./qa-credentials.cjs');
+const [qaEmail, qaPassword] = getQaCredentials('admin');
+
 /* Qwen3-30B vs Llama-3.3-70B quality pilot.
    Logs in as admin, then runs 6 representative prompts through /api/admin/ai-compare
    with both models, recording ok/latencyMs/tokensUsed/output per model.
@@ -54,8 +57,8 @@ function validateWhiteboardJson(output) {
   });
   await page.goto('https://brillaprep.org/?login=true', { waitUntil: 'networkidle2', timeout: 60000 });
   await page.waitForSelector('input[type="email"]', { timeout: 15000 });
-  await page.type('input[type="email"]', 'admintest@brillaprep.org', { delay: 5 });
-  await page.type('input[placeholder="Enter your password"]', 'Admin123!', { delay: 5 });
+  await page.type('input[type="email"]', qaEmail, { delay: 5 });
+  await page.type('input[placeholder="Enter your password"]', qaPassword, { delay: 5 });
   await page.waitForFunction(
     () => (document.querySelector('input[name="cf-turnstile-response"]')?.value || '').length > 10,
     { timeout: 45000 }
