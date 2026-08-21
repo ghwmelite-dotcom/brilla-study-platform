@@ -18,7 +18,8 @@ import {
 import { Card, Button, Badge, Select } from '@/components/common';
 import { TopicDrill, SpeedRace, Flashcard } from '@/components/practice';
 import { DailyUsageIndicator, LimitReachedModal } from '@/components/subscription';
-import { useExamStore, useUsageStore } from '@/stores';
+import { useExamStore } from '@/stores/examStore';
+import { useUsageStore } from '@/stores/usageStore';
 import { getExamConfig, isCoreSubject } from '@/config';
 import { cn } from '@/utils';
 import { api } from '@/lib/api';

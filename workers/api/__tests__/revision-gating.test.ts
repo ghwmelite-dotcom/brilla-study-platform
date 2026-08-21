@@ -25,14 +25,6 @@ const lessonHandler: MockHandler = {
   }),
 };
 
-const premiumHandler: MockHandler = {
-  match: /SELECT role, subscription_tier_id, subscription_expires_at, trial_expires_at\s+FROM users/,
-  first: () => ({
-    role: 'student', subscription_tier_id: 'tier_student_monthly',
-    subscription_expires_at: new Date(Date.now() + 86400000).toISOString(), trial_expires_at: null,
-  }),
-};
-
 const freeHandler: MockHandler = {
   match: /SELECT role, subscription_tier_id, subscription_expires_at, trial_expires_at\s+FROM users/,
   first: () => ({

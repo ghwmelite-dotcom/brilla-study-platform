@@ -218,7 +218,7 @@ export const useTeamBattleStore = create<TeamBattleState>((set, get) => ({
         isLoading: false,
       });
       return mockBattle;
-    } catch (error) {
+    } catch {
       const mockBattle = generateMockTeamBattle();
       mockBattle.status = 'forming';
       set({
@@ -310,7 +310,7 @@ export const useTeamBattleStore = create<TeamBattleState>((set, get) => ({
         myTeam: null,
         myTeamId: null,
       });
-    } catch (error) {
+    } catch {
       set({
         currentTeamBattle: null,
         myTeam: null,
@@ -379,7 +379,7 @@ export const useTeamBattleStore = create<TeamBattleState>((set, get) => ({
         correctAnswer: currentQuestion.correctAnswer || '',
         pointsEarned: isCorrect ? 10 : 0,
       };
-    } catch (error) {
+    } catch {
       const isCorrect = answer === currentQuestion?.correctAnswer;
       return {
         isCorrect,
@@ -407,7 +407,7 @@ export const useTeamBattleStore = create<TeamBattleState>((set, get) => ({
           isLoading: false,
         });
       }
-    } catch (error) {
+    } catch {
       set({
         availableTeamBattles: generateMockTeamBattles(3),
         isLoading: false,

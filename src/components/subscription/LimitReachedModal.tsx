@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Crown, Clock, Zap, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/common';
-import { useUsageStore } from '@/stores';
+import { useUsageStore } from '@/stores/usageStore';
 import { formatTimeUntilReset, DAILY_QUESTION_LIMIT } from '@/config';
 
 interface LimitReachedModalProps {

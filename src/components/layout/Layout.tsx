@@ -25,7 +25,7 @@ export function Layout({ children }: LayoutProps) {
   useEffect(() => {
     // Re-apply the theme to ensure it's synced
     setTheme(theme);
-  }, []);
+  }, [setTheme, theme]);
 
   // Load exam types and user preferences on mount when authenticated
   useEffect(() => {
@@ -38,7 +38,7 @@ export function Layout({ children }: LayoutProps) {
         loadPreferences();
       }
     }
-  }, [isAuthenticated, user?.id, loadExamTypes, loadPreferences]);
+  }, [isAuthenticated, loadExamTypes, loadPreferences, user]);
 
   return (
     <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-slate-900 transition-colors duration-300">

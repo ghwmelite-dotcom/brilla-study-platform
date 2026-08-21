@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useProgressStore } from '@/stores';
+import { useProgressStore } from '@/stores/progressStore';
 import { calculateXP, calculateMastery } from '@/utils';
 import type { Difficulty } from '@/types';
 

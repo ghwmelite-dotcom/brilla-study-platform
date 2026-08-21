@@ -122,6 +122,17 @@ export function InteractiveWhiteboard({
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showStrokePicker, setShowStrokePicker] = useState(false);
+  const activeToolRef = useRef(activeTool);
+  const activeColorRef = useRef(activeColor);
+  const strokeWidthRef = useRef(strokeWidth);
+  const historyIndexRef = useRef(historyIndex);
+  const onCursorMoveRef = useRef(onCursorMove);
+
+  activeToolRef.current = activeTool;
+  activeColorRef.current = activeColor;
+  strokeWidthRef.current = strokeWidth;
+  historyIndexRef.current = historyIndex;
+  onCursorMoveRef.current = onCursorMove;
 
   // Initialize canvases
   useEffect(() => {
@@ -136,27 +147,31 @@ export function InteractiveWhiteboard({
       width,
       height,
       backgroundColor: 'transparent',
-      selection: activeTool === 'select',
-      isDrawingMode: activeTool === 'pencil' || activeTool === 'highlighter',
+      selection: activeToolRef.current === 'select',
+      isDrawingMode: activeToolRef.current === 'pencil' || activeToolRef.current === 'highlighter',
     });
 
     fabricRef.current = canvas;
 
     // Set up drawing brush
     if (canvas.freeDrawingBrush) {
-      canvas.freeDrawingBrush.color = activeColor;
-      canvas.freeDrawingBrush.width = strokeWidth;
+      canvas.freeDrawingBrush.color = activeColorRef.current;
+      canvas.freeDrawingBrush.width = strokeWidthRef.current;
     }
 
     // Save state to history on object added/modified
     const saveHistory = () => {
       const json = JSON.stringify(canvas.toJSON());
       setHistory(prev => {
-        const newHistory = prev.slice(0, historyIndex + 1);
+        const newHistory = prev.slice(0, historyIndexRef.current + 1);
         newHistory.push(json);
         return newHistory;
       });
-      setHistoryIndex(prev => prev + 1);
+      setHistoryIndex(prev => {
+        const nextIndex = prev + 1;
+        historyIndexRef.current = nextIndex;
+        return nextIndex;
+      });
     };
 
     canvas.on('object:added', saveHistory);
@@ -164,8 +179,8 @@ export function InteractiveWhiteboard({
 
     // Track cursor for collaboration
     canvas.on('mouse:move', (opt) => {
-      if (opt.e && onCursorMove && opt.scenePoint) {
-        onCursorMove(opt.scenePoint.x, opt.scenePoint.y);
+      if (opt.e && onCursorMoveRef.current && opt.scenePoint) {
+        onCursorMoveRef.current(opt.scenePoint.x, opt.scenePoint.y);
       }
     });
 

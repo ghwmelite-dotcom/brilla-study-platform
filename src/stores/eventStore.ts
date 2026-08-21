@@ -497,7 +497,7 @@ export const useEventStore = create<EventState>()(
               isLoading: false,
             });
           }
-        } catch (error) {
+        } catch {
           // Use mock data on error with current exam type
           const mockEvents = getMockEventsForExamType(currentExamType);
           set({
@@ -532,7 +532,7 @@ export const useEventStore = create<EventState>()(
               isLoading: false,
             });
           }
-        } catch (error) {
+        } catch {
           // Use mock data on error
           const mockTournaments = generateMockTournaments();
           const active = mockTournaments.find(t => t.status === 'active' && t.userRegistered);
@@ -568,7 +568,7 @@ export const useEventStore = create<EventState>()(
             ),
           }));
           return true;
-        } catch (error) {
+        } catch {
           // Mock success for demo
           set((state) => ({
             availableTournaments: state.availableTournaments.map(t =>

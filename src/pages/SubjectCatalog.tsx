@@ -14,45 +14,14 @@ import {
   CheckCircle2,
   Lock,
 } from 'lucide-react';
-import * as Icons from 'lucide-react';
 import { Card, Badge, Button } from '@/components/common';
 import { DailyUsageIndicator, PremiumSubjectBadge } from '@/components/subscription';
-import { useExamStore, useUsageStore } from '@/stores';
+import { useExamStore } from '@/stores/examStore';
+import { useUsageStore } from '@/stores/usageStore';
 import { isCoreSubject } from '@/config';
 import { cn } from '@/utils';
 import type { Subject } from '@/types';
-
-// Icon mapping
-function getIconComponent(iconName: string): React.ComponentType<{ className?: string; style?: React.CSSProperties }> {
-  const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
-    Calculator: Icons.Calculator,
-    Atom: Icons.Atom,
-    FlaskConical: Icons.FlaskConical,
-    Leaf: Icons.Leaf,
-    Dna: Icons.Dna,
-    BookOpen: Icons.BookOpen,
-    Languages: Icons.Languages,
-    Beaker: Icons.Beaker,
-    Users: Icons.Users,
-    TrendingUp: Icons.TrendingUp,
-    Briefcase: Icons.Briefcase,
-    Receipt: Icons.Receipt,
-    PiggyBank: Icons.PiggyBank,
-    Landmark: Icons.Landmark,
-    Globe: Icons.Globe,
-    Globe2: Icons.Globe2,
-    Clock: Icons.Clock,
-    Church: Icons.Church,
-    Monitor: Icons.Monitor,
-    Ruler: Icons.Ruler,
-    UtensilsCrossed: Icons.UtensilsCrossed,
-    Hammer: Icons.Hammer,
-    MessageCircle: Icons.MessageCircle,
-    Heart: Icons.Heart,
-    Sigma: Icons.Sigma,
-  };
-  return iconMap[iconName] || Icons.BookOpen;
-}
+import { getSubjectIcon } from '@/lib/subjectIcons';
 
 // Exam type display labels
 const examTypeLabelMap: Record<string, string> = {
@@ -101,7 +70,7 @@ export function SubjectCatalogPage() {
     }
     fetchSubjects(currentExamType);
     fetchCategories(currentExamType);
-  }, [currentExamType, initializeExamData, fetchSubjects, fetchCategories]);
+  }, [categories.length, currentExamType, fetchCategories, fetchSubjects, initializeExamData, subjects.length]);
 
   // Set default expanded categories after categories load
   useEffect(() => {
@@ -109,7 +78,7 @@ export function SubjectCatalogPage() {
       const coreCategories = categories.filter(c => c.isCore).map(c => c.id);
       setExpandedCategories(new Set(coreCategories));
     }
-  }, [categories]);
+  }, [categories, expandedCategories.size]);
 
   // Filter subjects
   const filteredSubjects = useMemo(() => {
@@ -411,7 +380,7 @@ interface SubjectCardProps {
 }
 
 function SubjectCard({ subject, progress, viewMode, isLocked = false, onLockedClick }: SubjectCardProps) {
-  const IconComponent = getIconComponent(subject.icon);
+  const IconComponent = getSubjectIcon(subject.icon);
 
   const handleClick = (e: React.MouseEvent) => {
     if (isLocked && onLockedClick) {

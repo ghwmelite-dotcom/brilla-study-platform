@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { Home, BookOpen, Brain, Trophy, Library } from 'lucide-react';
 import { cn } from '@/utils';
-import { useAuthStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
 
 interface NavItem {
   path: string;

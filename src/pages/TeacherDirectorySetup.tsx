@@ -13,7 +13,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { useTutoringStore } from '@/stores/tutoringStore';
-import { useAuthStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
 import type { SessionType } from '@/types/tutoring';
 
 const sessionTypeConfig: Record<SessionType, { icon: React.ReactNode; label: string; description: string }> = {

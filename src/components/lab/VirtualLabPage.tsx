@@ -13,7 +13,7 @@ import { Card, Button, Badge, Input, Select } from '@/components/common';
 import { ExperimentList } from './ExperimentList';
 import { LabWorkspace } from './LabWorkspace';
 import { allExperiments, getExperimentBySlug } from '@/data/experiments';
-import { useLabStore } from '@/stores';
+import { useLabStore } from '@/stores/labStore';
 import { cn } from '@/utils';
 import type { Experiment } from '@/types';
 

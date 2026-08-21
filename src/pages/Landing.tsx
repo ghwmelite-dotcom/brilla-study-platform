@@ -866,6 +866,9 @@ const testimonials = [
 // MAIN COMPONENT
 // ============================================
 
+type PreviewMode = 'chat' | 'whiteboard' | 'voice' | 'focus';
+const PREVIEW_MODES: PreviewMode[] = ['chat', 'whiteboard', 'voice', 'focus'];
+
 export function LandingPage() {
   const mousePosition = useMouseParallax(0.02);
   const scrollState = useScrollState();
@@ -881,19 +884,18 @@ export function LandingPage() {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
   // AI Classroom preview mode toggle with auto-cycle
-  const [aiPreviewMode, setAiPreviewMode] = useState<'chat' | 'whiteboard' | 'voice' | 'focus'>('chat');
+  const [aiPreviewMode, setAiPreviewMode] = useState<PreviewMode>('chat');
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const autoPlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Auto-cycle between all preview modes
-  const previewModes: Array<'chat' | 'whiteboard' | 'voice' | 'focus'> = ['chat', 'whiteboard', 'voice', 'focus'];
   useEffect(() => {
     if (!isAutoPlaying) return;
 
     const interval = setInterval(() => {
       setAiPreviewMode(prev => {
-        const currentIndex = previewModes.indexOf(prev);
-        return previewModes[(currentIndex + 1) % previewModes.length];
+        const currentIndex = PREVIEW_MODES.indexOf(prev);
+        return PREVIEW_MODES[(currentIndex + 1) % PREVIEW_MODES.length];
       });
     }, 4000); // Switch every 4 seconds
 
@@ -901,7 +903,7 @@ export function LandingPage() {
   }, [isAutoPlaying]);
 
   // Handle manual toggle - pause auto-play briefly then resume
-  const handlePreviewModeChange = (mode: 'chat' | 'whiteboard' | 'voice' | 'focus') => {
+  const handlePreviewModeChange = (mode: PreviewMode) => {
     setAiPreviewMode(mode);
     setIsAutoPlaying(false);
 

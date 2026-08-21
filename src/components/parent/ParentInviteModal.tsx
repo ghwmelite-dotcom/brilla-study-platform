@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Copy, Check, RefreshCw, Clock, Users, Shield } from 'lucide-react';
 import { Button, Badge } from '@/components/common';
-import { useParentStore } from '@/stores';
+import { useParentStore } from '@/stores/parentStore';
 import { cn } from '@/utils';
 
 interface ParentInviteModalProps {

@@ -22,7 +22,7 @@ import {
 import { cn } from '@/utils';
 import { Button } from '@/components/common';
 import { PDFViewer } from './PDFViewer';
-import { useAuthStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
 import type { LibraryResource, ResourceType } from '@/types';
 
 interface ResourceViewerModalProps {

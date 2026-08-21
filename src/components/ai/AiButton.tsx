@@ -1,5 +1,7 @@
 import { Sparkles } from 'lucide-react';
-import { useAiTutorStore, useAuthStore, useUIStore } from '@/stores';
+import { useAiTutorStore } from '@/stores/aiTutorStore';
+import { useAuthStore } from '@/stores/authStore';
+import { useUIStore } from '@/stores/uiStore';
 
 interface AiButtonProps {
   context?: string;

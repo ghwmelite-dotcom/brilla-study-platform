@@ -22,13 +22,19 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { Card, Button, Badge } from '@/components/common';
-import { useAuthStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
 import { useExamStore } from '@/stores/examStore';
 import { getExamConfig, getExamGradient } from '@/config';
+import { getSubjectIcon } from '@/lib/subjectIcons';
 import { cn } from '@/utils';
 
-// Icon mapping for subjects
-import * as Icons from 'lucide-react';
+const REVISION_PHASES = ['Hook', 'Explain', 'Check', 'Practice', 'Confirm', 'Connect'];
+const REVISION_DEMO_MESSAGES = [
+  { type: 'ai', text: "Let me ask you something interesting... Have you ever wondered why ice floats on water? 🤔" },
+  { type: 'ai', text: 'Most substances become denser when they solidify, but water is special! This is because of hydrogen bonding...' },
+  { type: 'user', text: "That's fascinating! So the hydrogen bonds create a crystal structure?" },
+  { type: 'ai', text: "Exactly right! ✨ You're connecting the dots perfectly. Now, let me check your understanding with a quick question..." },
+];
 
 // AI Revision Classroom Showcase Component
 function AIRevisionShowcase() {
@@ -36,22 +42,14 @@ function AIRevisionShowcase() {
   const [messageIndex, setMessageIndex] = useState(0);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
 
-  const phases = ['Hook', 'Explain', 'Check', 'Practice', 'Confirm', 'Connect'];
-
-  const demoMessages = [
-    { type: 'ai', text: "Let me ask you something interesting... Have you ever wondered why ice floats on water? 🤔" },
-    { type: 'ai', text: "Most substances become denser when they solidify, but water is special! This is because of hydrogen bonding..." },
-    { type: 'user', text: "That's fascinating! So the hydrogen bonds create a crystal structure?" },
-    { type: 'ai', text: "Exactly right! ✨ You're connecting the dots perfectly. Now, let me check your understanding with a quick question..." },
-  ];
 
   useEffect(() => {
     const phaseInterval = setInterval(() => {
-      setCurrentPhase((prev) => (prev + 1) % phases.length);
+      setCurrentPhase((prev) => (prev + 1) % REVISION_PHASES.length);
     }, 2000);
 
     const messageInterval = setInterval(() => {
-      setMessageIndex((prev) => (prev + 1) % demoMessages.length);
+      setMessageIndex((prev) => (prev + 1) % REVISION_DEMO_MESSAGES.length);
     }, 3000);
 
     return () => {
@@ -172,12 +170,12 @@ function AIRevisionShowcase() {
                     </div>
                     <div>
                       <p className="font-semibold text-white">Brilla AI Teacher</p>
-                      <p className="text-xs text-white/70">Teaching Phase: {phases[currentPhase]}</p>
+                      <p className="text-xs text-white/70">Teaching Phase: {REVISION_PHASES[currentPhase]}</p>
                     </div>
                   </div>
                   {/* Phase indicators */}
                   <div className="flex gap-1">
-                    {phases.map((_, i) => (
+                    {REVISION_PHASES.map((_, i) => (
                       <div
                         key={i}
                         className={cn(
@@ -198,7 +196,7 @@ function AIRevisionShowcase() {
                     <Sparkles className="w-3.5 h-3.5 text-violet-400" />
                   </div>
                   <div className="bg-neutral-800 rounded-xl rounded-tl-sm p-3 max-w-[85%] border border-neutral-700">
-                    <p className="text-sm text-neutral-200">{demoMessages[messageIndex].text}</p>
+                    <p className="text-sm text-neutral-200">{REVISION_DEMO_MESSAGES[messageIndex].text}</p>
                   </div>
                 </div>
 
@@ -206,7 +204,7 @@ function AIRevisionShowcase() {
                 {messageIndex === 2 && (
                   <div className="flex gap-2 justify-end animate-fade-in">
                     <div className="bg-violet-600 text-white rounded-xl rounded-tr-sm p-3 max-w-[80%]">
-                      <p className="text-sm">{demoMessages[2].text}</p>
+                      <p className="text-sm">{REVISION_DEMO_MESSAGES[2].text}</p>
                     </div>
                   </div>
                 )}
@@ -434,12 +432,6 @@ function AIRevisionShowcase() {
       )}
     </section>
   );
-}
-
-function getSubjectIcon(iconName?: string) {
-  if (!iconName) return Icons.BookOpen;
-  const Icon = (Icons as Record<string, unknown>)[iconName];
-  return (Icon as typeof Icons.BookOpen) || Icons.BookOpen;
 }
 
 export function HomePage() {

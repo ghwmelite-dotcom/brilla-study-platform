@@ -15,7 +15,8 @@ import {
   Trash2,
 } from 'lucide-react';
 import { cn } from '@/utils';
-import { useCounselorStore, useAuthStore } from '@/stores';
+import { useCounselorStore } from '@/stores/counselorStore';
+import { useAuthStore } from '@/stores/authStore';
 import type { CounselorType, CounselorMessage, SuggestedResource } from '@/types';
 import { COUNSELOR_CONFIGS } from '@/types/counselor';
 

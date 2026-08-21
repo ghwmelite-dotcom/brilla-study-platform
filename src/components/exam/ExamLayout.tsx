@@ -21,7 +21,8 @@ import {
   Moon,
 } from 'lucide-react';
 import { cn } from '@/utils';
-import { useThemeStore, useUIStore } from '@/stores';
+import { useThemeStore } from '@/stores/themeStore';
+import { useUIStore } from '@/stores/uiStore';
 
 export interface ExamLayoutProps {
   children: ReactNode;

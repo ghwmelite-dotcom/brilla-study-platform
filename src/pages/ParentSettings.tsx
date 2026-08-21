@@ -11,7 +11,8 @@ import {
   Loader2,
 } from 'lucide-react';
 import { Card, CardHeader, Button, Badge } from '@/components/common';
-import { useParentStore, useAuthStore } from '@/stores';
+import { useParentStore } from '@/stores/parentStore';
+import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/utils';
 import type { ParentNotificationPreferences } from '@/types';
 
@@ -197,7 +198,7 @@ export function ParentSettingsPage() {
   useEffect(() => {
     fetchLinkedStudents();
     fetchPreferences();
-  }, []);
+  }, [fetchLinkedStudents, fetchPreferences]);
 
   const handlePreferenceChange = async (
     key: keyof ParentNotificationPreferences,

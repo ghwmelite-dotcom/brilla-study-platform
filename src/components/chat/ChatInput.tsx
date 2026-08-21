@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, X, Smile, Paperclip, Image, FileText, Loader2 } from 'lucide-react';
-import { useChatStore } from '@/stores';
+import { useChatStore } from '@/stores/chatStore';
 import { cn } from '@/utils';
 
 const EMOJI_LIST = ['😀', '😂', '❤️', '👍', '🙏', '🎉', '🔥', '💯', '✨', '🤔', '😊', '👏'];

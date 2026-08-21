@@ -14,7 +14,8 @@ import {
   Filter,
 } from 'lucide-react';
 import { Card, Button, Badge } from '@/components/common';
-import { useParentStore, useAuthStore } from '@/stores';
+import { useParentStore } from '@/stores/parentStore';
+import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/utils';
 import type { ParentNotificationType } from '@/types';
 
@@ -60,7 +61,7 @@ export function ParentNotificationsPage() {
 
   useEffect(() => {
     fetchNotifications(filter === 'unread');
-  }, [filter]);
+  }, [fetchNotifications, filter]);
 
   const handleMarkAllRead = async () => {
     await markAllNotificationsRead();

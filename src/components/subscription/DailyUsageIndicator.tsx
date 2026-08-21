@@ -6,7 +6,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Zap, Crown, Clock } from 'lucide-react';
-import { useUsageStore } from '@/stores';
+import { useUsageStore } from '@/stores/usageStore';
 import { formatTimeUntilReset } from '@/config';
 import { cn } from '@/utils';
 

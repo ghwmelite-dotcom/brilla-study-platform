@@ -29,7 +29,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/lib/api';
 import { cn } from '@/utils';
 import { PlanSelectionStep } from './PlanSelectionStep';
-import { Turnstile, useTurnstile } from '@/components/common/Turnstile';
+import { Turnstile } from '@/components/common/Turnstile';
+import { useTurnstile } from '@/hooks/useTurnstile';
 import { ExamTypeSelector } from './ExamTypeSelector';
 import { GoogleSignInButton } from './GoogleSignInButton';
 

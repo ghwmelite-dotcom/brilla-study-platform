@@ -13,7 +13,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/common';
-import { useLibraryStore } from '@/stores';
+import { useLibraryStore } from '@/stores/libraryStore';
 import type { LibraryResource, ResourceType } from '@/types';
 
 interface EditResourceModalProps {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/utils';
 
 interface SpecificHeatSimulationProps {
@@ -30,6 +30,9 @@ export function SpecificHeatSimulation({ onMeasurement, onObservation }: Specifi
   const [, setMixingTime] = useState(0);
   const [isMixing, setIsMixing] = useState(false);
 
+  const calculateFinalTempRef = useRef<() => number>(() => 25);
+  const onObservationRef = useRef(onObservation);
+  onObservationRef.current = onObservation;
   // Metal properties (specific heat in J/g°C)
   const metals = {
     aluminum: { name: 'Aluminum', color: '#C0C0C0', actualSHC: 0.897, maxTemp: 100 },
@@ -48,20 +51,20 @@ export function SpecificHeatSimulation({ onMeasurement, onObservation }: Specifi
         const newTemp = Math.min(prev + 2, currentMetal.maxTemp);
         if (newTemp >= currentMetal.maxTemp) {
           setIsHeating(false);
-          onObservation?.(`Metal heated to ${newTemp}°C - ready for transfer`);
+          onObservationRef.current?.(`Metal heated to ${newTemp}°C - ready for transfer`);
         }
         return newTemp;
       });
     }, 100);
     return () => clearInterval(interval);
-  }, [isHeating, currentMetal.maxTemp, onObservation]);
+  }, [isHeating, currentMetal.maxTemp]);
 
   // Mixing/equilibration effect
   useEffect(() => {
     if (!isMixing) return;
 
     // Calculate final temperature using heat exchange
-    const targetTemp = calculateFinalTemp();
+    const targetTemp = calculateFinalTempRef.current();
 
     const interval = setInterval(() => {
       setMixingTime(prev => prev + 1);
@@ -69,7 +72,7 @@ export function SpecificHeatSimulation({ onMeasurement, onObservation }: Specifi
         const diff = targetTemp - prev;
         if (Math.abs(diff) < 0.1) {
           setIsMixing(false);
-          onObservation?.(`Thermal equilibrium reached at ${targetTemp.toFixed(1)}°C`);
+          onObservationRef.current?.(`Thermal equilibrium reached at ${targetTemp.toFixed(1)}°C`);
           return targetTemp;
         }
         return prev + diff * 0.1;
@@ -90,6 +93,7 @@ export function SpecificHeatSimulation({ onMeasurement, onObservation }: Specifi
     return numerator / denominator;
   }, [massMetal, massWater, tempMetal, tempWater, currentMetal.actualSHC]);
 
+  calculateFinalTempRef.current = calculateFinalTemp;
   const calculateSHC = useCallback(() => {
     // c_metal = (m_water * c_water * (T_final - T_water)) / (m_metal * (T_metal - T_final))
     const cWater = 4.186;
@@ -104,18 +108,18 @@ export function SpecificHeatSimulation({ onMeasurement, onObservation }: Specifi
   const startHeating = () => {
     setIsHeating(true);
     setStage('heating');
-    onObservation?.('Heating metal in boiling water bath...');
+    onObservationRef.current?.('Heating metal in boiling water bath...');
   };
 
   const transferMetal = () => {
     if (tempMetal < 80) {
-      onObservation?.('Metal not hot enough. Heat until at least 80°C');
+      onObservationRef.current?.('Metal not hot enough. Heat until at least 80°C');
       return;
     }
     setStage('mixing');
     setFinalTemp(tempWater);
     setIsMixing(true);
-    onObservation?.(`Transferring ${currentMetal.name} (${tempMetal}°C) to calorimeter water (${tempWater}°C)`);
+    onObservationRef.current?.(`Transferring ${currentMetal.name} (${tempMetal}°C) to calorimeter water (${tempWater}°C)`);
   };
 
   const recordResult = () => {
@@ -130,7 +134,7 @@ export function SpecificHeatSimulation({ onMeasurement, onObservation }: Specifi
     };
     setDataPoints(prev => [...prev, newPoint]);
     onMeasurement?.(calculatedSHC, 'J/g°C', `Specific heat of ${currentMetal.name}`);
-    onObservation?.(`Calculated specific heat: ${calculatedSHC.toFixed(3)} J/g°C (Actual: ${currentMetal.actualSHC} J/g°C)`);
+    onObservationRef.current?.(`Calculated specific heat: ${calculatedSHC.toFixed(3)} J/g°C (Actual: ${currentMetal.actualSHC} J/g°C)`);
     setStage('results');
   };
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Trophy, GraduationCap, BookOpen, Check, Star, Globe, Award } from 'lucide-react';
 
 // Exam type configuration with icons and colors
@@ -94,38 +94,32 @@ export function ExamTypeSelector({
   allowAll = false,
   error,
 }: ExamTypeSelectorProps) {
-  const [availableExamTypes, setAvailableExamTypes] = useState<string[]>([]);
-
-  // Determine which exam types to show based on school level
-  useEffect(() => {
+  const availableExamTypes = useMemo(() => {
     if (allowAll || isTeacher) {
-      // Teachers and admins can see all exam types
-      setAvailableExamTypes(['exam_bece', 'exam_wassce', 'exam_nsmq', 'igcse', 'cambridge_a2']);
-    } else if (schoolLevel === 'jhs') {
-      // JHS students only see BECE
-      setAvailableExamTypes(['exam_bece']);
-      // Auto-select BECE for JHS
-      if (selectedExamTypes.length === 0) {
-        onChange(['exam_bece'], 'exam_bece');
-      }
-    } else if (schoolLevel === 'shs') {
-      // SHS students see WASSCE and NSMQ
-      setAvailableExamTypes(['exam_wassce', 'exam_nsmq']);
-      // Auto-select WASSCE for SHS if nothing selected
-      if (selectedExamTypes.length === 0) {
-        onChange(['exam_wassce'], 'exam_wassce');
-      }
-    } else if (schoolLevel === 'international') {
-      // International students see IGCSE and A-Level
-      setAvailableExamTypes(['igcse', 'cambridge_a2']);
-      // Auto-select IGCSE for international if nothing selected
-      if (selectedExamTypes.length === 0) {
-        onChange(['igcse'], 'igcse');
-      }
-    } else {
-      setAvailableExamTypes([]);
+      return ['exam_bece', 'exam_wassce', 'exam_nsmq', 'igcse', 'cambridge_a2'];
     }
-  }, [schoolLevel, isTeacher, allowAll]);
+    if (schoolLevel === 'jhs') return ['exam_bece'];
+    if (schoolLevel === 'shs') return ['exam_wassce', 'exam_nsmq'];
+    if (schoolLevel === 'international') return ['igcse', 'cambridge_a2'];
+    return [];
+  }, [allowAll, isTeacher, schoolLevel]);
+
+  useEffect(() => {
+    if (allowAll || isTeacher || selectedExamTypes.length > 0) return;
+
+    const defaultExamType =
+      schoolLevel === 'jhs'
+        ? 'exam_bece'
+        : schoolLevel === 'shs'
+          ? 'exam_wassce'
+          : schoolLevel === 'international'
+            ? 'igcse'
+            : null;
+
+    if (defaultExamType) {
+      onChange([defaultExamType], defaultExamType);
+    }
+  }, [allowAll, isTeacher, onChange, schoolLevel, selectedExamTypes.length]);
 
   const handleToggleExamType = (examTypeId: string) => {
     const isSelected = selectedExamTypes.includes(examTypeId);

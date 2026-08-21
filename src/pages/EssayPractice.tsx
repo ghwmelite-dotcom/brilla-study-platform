@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { Card, Button, Badge } from '@/components/common';
 import { EssayEditor, EssayQuestion, EssayFeedback, ModelAnswer } from '@/components/essay';
-import { useEssayStore } from '@/stores';
+import { useEssayStore } from '@/stores/essayStore';
 import { essayQuestions as dataEssayQuestions } from '@/data';
 import { api } from '@/lib/api';
 import type { EssayQuestion as EssayQuestionType } from '@/types';

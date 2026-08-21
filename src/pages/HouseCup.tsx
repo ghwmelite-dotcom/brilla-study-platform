@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useHouseStore, useAuthStore } from '@/stores';
+import { useHouseStore } from '@/stores/houseStore';
+import { useAuthStore } from '@/stores/authStore';
 import { HouseCard, HouseLeaderboard, HousePointsLog } from '@/components/house';
 
 export function HouseCupPage() {

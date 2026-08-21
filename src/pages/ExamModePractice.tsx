@@ -5,7 +5,9 @@ import { Loader2 } from 'lucide-react';
 import { ExamLayout, ExamQuestionCard } from '@/components/exam';
 import { DailyUsageIndicator, LimitReachedModal } from '@/components/subscription';
 import { api } from '@/lib/api';
-import { useExamStore, useThemeStore, useUsageStore } from '@/stores';
+import { useExamStore } from '@/stores/examStore';
+import { useThemeStore } from '@/stores/themeStore';
+import { useUsageStore } from '@/stores/usageStore';
 import { cn } from '@/utils';
 import type { Question } from '@/types';
 

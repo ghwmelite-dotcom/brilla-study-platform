@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
-import { useBattleStore } from '@/stores';
+import { useBattleStore } from '@/stores/battleStore';
 import { BattleLobby, BattleArena, BattleResults } from '@/components/battle';
 import type { Battle } from '@/types';
 

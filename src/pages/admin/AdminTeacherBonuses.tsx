@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useRef } from 'react';
 import {
   Gift,
   CheckCircle,
@@ -191,9 +192,10 @@ export default function AdminTeacherBonuses() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear);
+  const loadDataRef = useRef<() => void>(() => {});
 
   useEffect(() => {
-    loadData();
+    loadDataRef.current();
   }, [page, statusFilter, selectedYear]);
 
   const loadData = async () => {
@@ -216,6 +218,8 @@ export default function AdminTeacherBonuses() {
       setIsLoading(false);
     }
   };
+
+  loadDataRef.current = loadData;
 
   const handleCalculate = async () => {
     setIsCalculating(true);

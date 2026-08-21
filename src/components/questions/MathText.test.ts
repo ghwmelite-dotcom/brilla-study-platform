@@ -8,7 +8,7 @@ vi.mock('@/utils', () => ({
   extractLatex: () => [],
 }));
 
-import { formulaFallbackHtml } from './MathText';
+import { formulaFallbackHtml } from '@/utils/formulaFallback';
 
 describe('formulaFallbackHtml', () => {
   it('escapes the formula so it cannot inject markup', () => {

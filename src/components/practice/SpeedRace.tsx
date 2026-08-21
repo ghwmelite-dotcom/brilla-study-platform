@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Zap, Clock } from 'lucide-react';
 import type { Question } from '@/types';
 import { Card, Button, Badge, ProgressBar } from '@/components/common';
@@ -36,6 +36,7 @@ export function SpeedRace({
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
   const [isComplete, setIsComplete] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const handleTimeUpRef = useRef<() => void>(() => undefined);
 
   const currentQuestion = questions[currentIndex];
 
@@ -46,7 +47,7 @@ export function SpeedRace({
     const interval = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
-          handleTimeUp();
+          handleTimeUpRef.current();
           return 0;
         }
         return prev - 1;
@@ -68,6 +69,7 @@ export function SpeedRace({
 
   const handleSubmit = () => {
     if (!userAnswer.trim() || isAnswered) return;
+  handleTimeUpRef.current = handleTimeUp;
 
     const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
     const correct =

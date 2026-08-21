@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Hash, Lock, BookOpen } from 'lucide-react';
-import { useChatStore, useExamStore } from '@/stores';
+import { useChatStore } from '@/stores/chatStore';
+import { useExamStore } from '@/stores/examStore';
 import { cn } from '@/utils';
 import type { ChatRoomType } from '@/types';
 

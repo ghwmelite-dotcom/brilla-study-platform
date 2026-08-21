@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Search,
   X,
@@ -25,11 +25,7 @@ export function QuestionPicker({ onSelect, onClose, existingIds }: QuestionPicke
   const [subjectFilter, setSubjectFilter] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    loadQuestions();
-  }, []);
-
-  const loadQuestions = async () => {
+  const loadQuestions = useCallback(async () => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
@@ -52,12 +48,12 @@ export function QuestionPicker({ onSelect, onClose, existingIds }: QuestionPicke
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [existingIds, searchQuery, subjectFilter, typeFilter]);
 
   useEffect(() => {
     const timer = setTimeout(loadQuestions, 300);
     return () => clearTimeout(timer);
-  }, [searchQuery, typeFilter, subjectFilter]);
+  }, [loadQuestions]);
 
   const toggleQuestion = (questionId: string) => {
     const newSelected = new Set(selectedIds);

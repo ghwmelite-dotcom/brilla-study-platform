@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, MessageSquare, Users } from 'lucide-react';
-import { useChatStore } from '@/stores';
+import { useChatStore } from '@/stores/chatStore';
 import { cn } from '@/utils';
 
 interface SearchUser {

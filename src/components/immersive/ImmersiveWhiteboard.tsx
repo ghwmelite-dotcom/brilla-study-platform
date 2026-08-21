@@ -59,9 +59,17 @@ export function ImmersiveWhiteboard({
   const aiFabricRef = useRef<fabric.Canvas | null>(null);
 
   const [isDrawing, setIsDrawing] = useState(false);
+  const onDrawingAddRef = useRef(onDrawingAdd);
+  const onQuestionMarkRef = useRef(onQuestionMark);
+  const addQuestionMarkRef = useRef<(x: number, y: number) => void>(() => undefined);
   const [currentTool, setCurrentTool] = useState<'draw' | 'highlight' | 'question' | 'check' | 'x'>('draw');
   const [showToolHint, setShowToolHint] = useState(false);
   const [lastTapTime, setLastTapTime] = useState(0);
+
+  useEffect(() => {
+    onDrawingAddRef.current = onDrawingAdd;
+    onQuestionMarkRef.current = onQuestionMark;
+  }, [onDrawingAdd, onQuestionMark]);
 
   // Colors
   const studentColor = '#10b981'; // Emerald for student
@@ -112,20 +120,16 @@ export function ImmersiveWhiteboard({
       if (gesture === 'circle') {
         // User drew a circle - might be highlighting something
         // Trigger question mark for AI explanation
-        if (onQuestionMark) {
-          onQuestionMark();
-        }
+        onQuestionMarkRef.current?.();
       }
 
       // Notify parent of new drawing
-      if (onDrawingAdd) {
-        onDrawingAdd({
+      onDrawingAddRef.current?.({
           id: crypto.randomUUID(),
           type: 'path',
           objectData: JSON.stringify(path.toJSON()),
           timestamp: Date.now(),
-        });
-      }
+      });
     });
 
     // Handle mouse events for tool hints
@@ -209,7 +213,7 @@ export function ImmersiveWhiteboard({
         y = e.clientY - rect.top;
       }
 
-      addQuestionMark(x, y);
+      addQuestionMarkRef.current(x, y);
     }
     setLastTapTime(now);
   }, [lastTapTime]);
@@ -250,6 +254,10 @@ export function ImmersiveWhiteboard({
       });
     }
   }, [onQuestionMark, onDrawingAdd]);
+
+  useEffect(() => {
+    addQuestionMarkRef.current = addQuestionMark;
+  }, [addQuestionMark]);
 
   // Swipe gesture detection for tool switching
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle, HelpCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/utils';
-import { useThemeStore } from '@/stores';
+import { useThemeStore } from '@/stores/themeStore';
 
 export interface QuestionOption {
   id: string;

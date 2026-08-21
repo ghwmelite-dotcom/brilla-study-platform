@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Clock,
@@ -173,6 +174,7 @@ export default function TutoringSessions() {
   const [showReviewModal, setShowReviewModal] = useState<TutoringSession | null>(null);
   const [paymentLoading, setPaymentLoading] = useState<string | null>(null);
   const [paymentMessage, setPaymentMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const verifyPaymentRef = useRef<(reference: string) => void>(() => {});
 
   // Handle payment verification from Paystack redirect
   useEffect(() => {
@@ -180,7 +182,7 @@ export default function TutoringSessions() {
     const reference = searchParams.get('ref') || searchParams.get('reference');
 
     if (payment === 'verify' && reference) {
-      verifyPayment(reference);
+      verifyPaymentRef.current(reference);
       // Clear query params
       setSearchParams({});
     }
@@ -203,6 +205,8 @@ export default function TutoringSessions() {
     // Clear message after 5 seconds
     setTimeout(() => setPaymentMessage(null), 5000);
   };
+
+  verifyPaymentRef.current = verifyPayment;
 
   useEffect(() => {
     loadMySessions();

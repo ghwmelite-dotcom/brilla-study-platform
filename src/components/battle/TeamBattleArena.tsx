@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Clock,
@@ -62,25 +62,24 @@ export function TeamBattleArena({
     return () => clearInterval(timer);
   }, [timeRemaining, isAnswerLocked, updateTimeRemaining]);
 
-  // Auto-submit on timer end
-  useEffect(() => {
-    if (timeRemaining === 0 && !isAnswerLocked && selectedAnswer) {
-      handleSubmit();
-    }
-  }, [timeRemaining, isAnswerLocked, selectedAnswer]);
-
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (!selectedAnswer) return;
 
     const result = await submitTeamAnswer(selectedAnswer);
     setLastResult(result);
     setShowResult(true);
 
-    // Hide result after 2 seconds
     setTimeout(() => {
       setShowResult(false);
     }, 2000);
-  };
+  }, [selectedAnswer, submitTeamAnswer]);
+
+  // Auto-submit on timer end
+  useEffect(() => {
+    if (timeRemaining === 0 && !isAnswerLocked && selectedAnswer) {
+      void handleSubmit();
+    }
+  }, [handleSubmit, isAnswerLocked, selectedAnswer, timeRemaining]);
 
   // Team info for potential future use (e.g., showing team-specific UI)
   // const myTeam = myTeamId === battle.team1.id ? battle.team1 : battle.team2;

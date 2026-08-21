@@ -13,7 +13,8 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { cn } from '@/utils';
-import { Turnstile, useTurnstile } from '@/components/common/Turnstile';
+import { Turnstile } from '@/components/common/Turnstile';
+import { useTurnstile } from '@/hooks/useTurnstile';
 
 export function SetPasswordPage() {
   const [searchParams] = useSearchParams();

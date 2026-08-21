@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useGuideStore } from '@/stores/guideStore';
-import { useAuthStore } from '@/stores';
+import { useAuthStore } from '@/stores/authStore';
 
 /**
  * This component automatically triggers the onboarding modal

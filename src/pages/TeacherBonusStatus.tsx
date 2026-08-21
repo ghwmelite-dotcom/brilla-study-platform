@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Gift,
@@ -213,9 +214,10 @@ export default function TeacherBonusStatus() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const currentYear = new Date().getFullYear();
+  const loadDataRef = useRef<() => void>(() => {});
 
   useEffect(() => {
-    loadData();
+    loadDataRef.current();
   }, []);
 
   const loadData = async () => {
@@ -238,6 +240,8 @@ export default function TeacherBonusStatus() {
       setIsLoading(false);
     }
   };
+
+  loadDataRef.current = loadData;
 
   if (isLoading) {
     return (

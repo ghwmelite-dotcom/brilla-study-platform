@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Flame, Trophy, Calendar, Zap, CheckCircle, Circle } from 'lucide-react';
-import { useNotificationStore } from '@/stores';
+import { useNotificationStore } from '@/stores/notificationStore';
 import { cn } from '@/utils';
 
 interface StreakPopupProps {

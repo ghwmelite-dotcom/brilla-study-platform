@@ -10,7 +10,8 @@ import {
   History,
   Sparkles,
 } from 'lucide-react';
-import { useCounselorStore, useAuthStore } from '@/stores';
+import { useCounselorStore } from '@/stores/counselorStore';
+import { useAuthStore } from '@/stores/authStore';
 import { CounselorChat, WellbeingCheckIn } from '@/components/counselor';
 import type { CounselorType } from '@/types';
 import { COUNSELOR_CONFIGS, MOOD_OPTIONS } from '@/types/counselor';

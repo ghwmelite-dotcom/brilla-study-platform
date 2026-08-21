@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -26,7 +27,8 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { api, fetchWithAuth } from '@/lib/api';
 import { cn } from '@/utils';
-import { Turnstile, useTurnstile } from '@/components/common/Turnstile';
+import { Turnstile } from '@/components/common/Turnstile';
+import { useTurnstile } from '@/hooks/useTurnstile';
 
 type SettingsTab = 'profile' | 'password' | 'notifications' | 'appearance';
 
@@ -74,6 +76,7 @@ export default function Settings() {
   const [accountsError, setAccountsError] = useState<string | null>(null);
   const [accountsSuccess, setAccountsSuccess] = useState<string | null>(null);
   const { getLinkedProviders, unlinkGoogle, initiateGoogleAuth } = useAuthStore();
+  const loadConnectedAccountsRef = useRef<() => void>(() => {});
 
   // Notification preferences
   const [notifications, setNotifications] = useState({
@@ -113,7 +116,7 @@ export default function Settings() {
   // Load connected accounts when password tab is active
   useEffect(() => {
     if (activeTab === 'password') {
-      loadConnectedAccounts();
+      loadConnectedAccountsRef.current();
     }
   }, [activeTab]);
 
@@ -169,6 +172,8 @@ export default function Settings() {
       setAccountsLoading(false);
     }
   };
+
+  loadConnectedAccountsRef.current = loadConnectedAccounts;
 
   const handleLinkGoogle = async () => {
     setLinkingGoogle(true);
