@@ -56,3 +56,83 @@ export async function applyFailedTransferRefund(
   const refundResult = results[0] as D1Result;
   return { refunded: (refundResult.meta?.changes || 0) === 1 };
 }
+
+/**
+ * A transfer.reversed event can arrive after transfer.success. Restore the
+ * affiliate balance exactly once from either processing or completed state.
+ */
+export async function applyReversedTransferRefund(
+  db: D1Database,
+  transferCode: string,
+  reason: string,
+): Promise<FailedTransferRefundResult> {
+  const refundBalance = db.prepare(`
+    UPDATE affiliate_profiles
+    SET available_earnings = available_earnings + (
+      SELECT ap.amount
+      FROM affiliate_payouts ap
+      WHERE ap.paystack_transfer_code = ?
+        AND ap.status IN ('processing', 'completed')
+        AND ap.refund_applied_at IS NULL
+    )
+    WHERE id = (
+      SELECT ap.affiliate_id
+      FROM affiliate_payouts ap
+      WHERE ap.paystack_transfer_code = ?
+        AND ap.status IN ('processing', 'completed')
+        AND ap.refund_applied_at IS NULL
+    )
+  `).bind(transferCode, transferCode);
+
+  const finalizePayout = db.prepare(`
+    UPDATE affiliate_payouts
+    SET status = 'failed',
+        failure_reason = ?,
+        refund_applied_at = datetime('now'),
+        processed_at = datetime('now')
+    WHERE paystack_transfer_code = ?
+      AND status IN ('processing', 'completed')
+      AND refund_applied_at IS NULL
+  `).bind(reason, transferCode);
+
+  const recordReceipt = db.prepare(`
+    INSERT OR IGNORE INTO payment_webhook_receipts
+      (id, event_type, event_key, transfer_code, processed_at)
+    VALUES (?, 'transfer.reversed', ?, ?, datetime('now'))
+  `).bind(
+    `wh_${crypto.randomUUID()}`,
+    `transfer.reversed:${transferCode}`,
+    transferCode,
+  );
+
+  const results = await db.batch([refundBalance, finalizePayout, recordReceipt]);
+  const refundResult = results[0] as D1Result;
+  return { refunded: (refundResult.meta?.changes || 0) === 1 };
+}
+
+export async function recordSuccessfulTransfer(
+  db: D1Database,
+  transferCode: string,
+): Promise<{ completed: boolean }> {
+  const finalizePayout = db.prepare(`
+    UPDATE affiliate_payouts
+    SET status = 'completed', processed_at = datetime('now')
+    WHERE paystack_transfer_code = ?
+      AND status = 'processing'
+      AND refund_applied_at IS NULL
+  `).bind(transferCode);
+
+  const recordReceipt = db.prepare(`
+    INSERT OR IGNORE INTO payment_webhook_receipts
+      (id, event_type, event_key, transfer_code, processed_at)
+    VALUES (?, 'transfer.success', ?, ?, datetime('now'))
+  `).bind(
+    `wh_${crypto.randomUUID()}`,
+    `transfer.success:${transferCode}`,
+    transferCode,
+  );
+
+  const results = await db.batch([finalizePayout, recordReceipt]);
+  const completion = results[0] as D1Result;
+  return { completed: (completion.meta?.changes || 0) === 1 };
+}

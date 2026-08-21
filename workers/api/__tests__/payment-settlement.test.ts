@@ -7,7 +7,7 @@ import {
 } from '../payment-settlement';
 
 interface RunnableStatement {
-  run(): Promise<D1Result>;
+  run(): D1Result;
 }
 
 function sqliteD1(sqlite: Database.Database): D1Database {
@@ -19,26 +19,24 @@ function sqliteD1(sqlite: Database.Database): D1Database {
           params = values;
           return statement;
         },
-        async first<T>() {
+        first<T>() {
           return (sqlite.prepare(sql).get(...params) as T | undefined) ?? null;
         },
-        async all<T>() {
+        all<T>() {
           return { results: sqlite.prepare(sql).all(...params) as T[] };
         },
-        async run() {
+        run() {
           const result = sqlite.prepare(sql).run(...params);
           return { success: true, meta: { changes: result.changes } } as D1Result;
         },
       };
       return statement;
     },
-    async batch(statements: RunnableStatement[]) {
+    batch(statements: RunnableStatement[]) {
       const execute = sqlite.transaction(() => {
         const results: D1Result[] = [];
         for (const statement of statements) {
-          const result = sqlite.prepare('SELECT 1').get();
-          void result;
-          results.push(statement.run() as unknown as D1Result);
+          results.push(statement.run());
         }
         return results;
       });
@@ -93,6 +91,7 @@ function createPaymentDb() {
       event_key TEXT NOT NULL UNIQUE,
       transfer_code TEXT,
       transaction_reference TEXT,
+      outcome TEXT,
       processed_at TEXT DEFAULT (datetime('now'))
     );
     INSERT INTO users (id, ai_grading_credits) VALUES ('user_1', 2);
@@ -213,5 +212,34 @@ describe('subscription payment settlement', () => {
       state.sqlite.close();
     }
   });
-});
+  it('marks only provider-confirmed terminal states failed', async () => {
+    const state = createPaymentDb();
+    try {
+      vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+        status: true,
+        data: { ...verifiedSuccess, status: 'failed' },
+      }))));
+      const result = await reconcilePendingSubscriptionPayments(state.db, 'sk_test_reconcile');
+      expect(result).toMatchObject({ checked: 1, settled: 0, failed: 1, providerErrors: 0 });
+      expect(state.sqlite.prepare("SELECT status FROM payment_transactions WHERE id = 'tx_1'").get())
+        .toEqual({ status: 'failed' });
+    } finally {
+      state.sqlite.close();
+    }
+  });
 
+  it('keeps a payment pending when provider verification is unavailable', async () => {
+    const state = createPaymentDb();
+    try {
+      vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 503 })));
+      const result = await reconcilePendingSubscriptionPayments(state.db, 'sk_test_reconcile');
+      expect(result).toMatchObject({ checked: 1, failed: 0, providerErrors: 1 });
+      expect(state.sqlite.prepare("SELECT status FROM payment_transactions WHERE id = 'tx_1'").get())
+        .toEqual({ status: 'pending' });
+    } finally {
+      state.sqlite.close();
+    }
+  });
+
+
+});
