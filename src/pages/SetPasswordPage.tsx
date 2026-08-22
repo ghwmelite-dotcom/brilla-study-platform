@@ -140,7 +140,7 @@ export function SetPasswordPage() {
           </h1>
           <p className="text-neutral-600 mb-6">
             {isEmailVerification
-              ? 'This email verification link is invalid or has expired. Please sign in and request a new verification email, or contact support.'
+              ? 'This email verification link is invalid or has expired. Please contact support to request a new verification email.'
               : 'This password setup link is invalid or has expired. Please contact your administrator to request a new link.'}
           </p>
           <Link
