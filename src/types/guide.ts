@@ -1,5 +1,7 @@
 // Guide System Types
 
+import type { UserRole } from '@/types';
+
 export type ExamType = 'wassce' | 'bece' | 'nsmq' | 'all';
 
 export interface FeatureGuide {
@@ -43,6 +45,7 @@ export interface OnboardingStep {
   image?: string;
   icon?: string;
   features?: string[];
+  audience?: UserRole[];
   action?: {
     label: string;
     onClick?: () => void;

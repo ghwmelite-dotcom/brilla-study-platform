@@ -1,5 +1,5 @@
 import type { FeatureGuide, OnboardingStep, TourConfig, GuideCategory } from '@/types/guide';
-import type { GhanaExamTypeSlug } from '@/types';
+import type { GhanaExamTypeSlug, UserRole } from '@/types';
 
 // Category metadata
 export const guideCategories: Record<GuideCategory, { label: string; description: string; icon: string }> = {
@@ -109,6 +109,13 @@ export const onboardingSteps: OnboardingStep[] = [
     ],
   },
   {
+    id: 'share-brilla',
+    title: 'Lift Your Circle as You Learn',
+    description: 'Every student starts as a Brilla Scout. Your personal link lets classmates join instantly and keeps your referrals and rewards together in one place.',
+    icon: 'Share2',
+    audience: ['student'],
+  },
+  {
     id: 'ready',
     title: 'You\'re All Set!',
     description: 'You\'re ready to start your learning journey. Remember, consistency is key - even 15 minutes daily can make a huge difference!',
@@ -118,6 +125,10 @@ export const onboardingSteps: OnboardingStep[] = [
     },
   },
 ];
+
+export function getOnboardingStepsForRole(role?: UserRole): OnboardingStep[] {
+  return onboardingSteps.filter((step) => !step.audience || (role ? step.audience.includes(role) : false));
+}
 
 // Feature guides for Help Center
 export const featureGuides: FeatureGuide[] = [

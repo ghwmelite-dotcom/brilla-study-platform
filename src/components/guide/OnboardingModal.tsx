@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   X,
   ChevronLeft,
@@ -9,10 +10,14 @@ import {
   Bot,
   TrendingUp,
   Rocket,
+  Share2,
   Check,
 } from 'lucide-react';
 import { useGuideStore } from '@/stores/guideStore';
-import { onboardingSteps } from '@/data/guides';
+import { useAuthStore } from '@/stores/authStore';
+import { useAffiliateStore } from '@/stores/affiliateStore';
+import { getOnboardingStepsForRole, onboardingSteps } from '@/data/guides';
+import { AffiliateOnboardingSpotlight } from './AffiliateOnboardingSpotlight';
 
 const iconMap: Record<string, React.ElementType> = {
   Sparkles,
@@ -21,9 +26,18 @@ const iconMap: Record<string, React.ElementType> = {
   Bot,
   TrendingUp,
   Rocket,
+  Share2,
 };
 
 export function OnboardingModal() {
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const {
+    profile: affiliateProfile,
+    isLoading: isAffiliateLoading,
+    fetchProfile: fetchAffiliateProfile,
+  } = useAffiliateStore();
+
   const {
     showOnboarding,
     onboardingStep,
@@ -36,10 +50,21 @@ export function OnboardingModal() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [direction, setDirection] = useState<'next' | 'prev'>('next');
 
-  const currentStep = onboardingSteps[onboardingStep];
-  const isLastStep = onboardingStep === onboardingSteps.length - 1;
+  const steps = useMemo(
+    () => user?.role ? getOnboardingStepsForRole(user.role) : onboardingSteps.filter((step) => !step.audience),
+    [user?.role],
+  );
+  const currentStep = steps[Math.min(onboardingStep, steps.length - 1)] || steps[0];
+  const isLastStep = onboardingStep === steps.length - 1;
   const isFirstStep = onboardingStep === 0;
   const Icon = iconMap[currentStep?.icon || 'Sparkles'] || Sparkles;
+  const currentAffiliateProfile = affiliateProfile?.userId === user?.id ? affiliateProfile : null;
+
+  useEffect(() => {
+    if (showOnboarding && user?.role === 'student') {
+      void fetchAffiliateProfile();
+    }
+  }, [fetchAffiliateProfile, showOnboarding, user?.role]);
 
   const handleNext = () => {
     if (isLastStep) {
@@ -63,6 +88,11 @@ export function OnboardingModal() {
     }, 200);
   };
 
+  const handleExploreAffiliate = () => {
+    completeOnboarding();
+    navigate('/affiliate');
+  };
+
   if (!showOnboarding) return null;
 
   return (
@@ -74,7 +104,12 @@ export function OnboardingModal() {
       />
 
       {/* Modal - Scrollable container for small screens */}
-      <div className="relative w-full max-w-lg max-h-[95vh] sm:max-h-[90vh] bg-white rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="onboarding-title"
+        className="relative w-full max-w-lg max-h-[95vh] sm:max-h-[90vh] bg-white rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+      >
         {/* Skip button */}
         <button
           onClick={skipOnboarding}
@@ -105,7 +140,7 @@ export function OnboardingModal() {
 
           {/* Step indicator */}
           <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2">
-            {onboardingSteps.map((_, index) => (
+            {steps.map((_, index) => (
               <button
                 key={index}
                 onClick={() => {
@@ -147,12 +182,19 @@ export function OnboardingModal() {
               }
             `}
           >
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-neutral-900 mb-1 sm:mb-2">
+            <h2 id="onboarding-title" className="text-lg sm:text-xl md:text-2xl font-bold text-neutral-900 mb-1 sm:mb-2">
               {currentStep.title}
             </h2>
             <p className="text-sm sm:text-base text-neutral-600 mb-4 sm:mb-6">
               {currentStep.description}
             </p>
+            {currentStep.id === 'share-brilla' && (
+              <AffiliateOnboardingSpotlight
+                profile={currentAffiliateProfile}
+                isLoading={isAffiliateLoading}
+                onExplore={handleExploreAffiliate}
+              />
+            )}
 
             {/* Features list - Responsive spacing */}
             {currentStep.features && (
@@ -195,7 +237,7 @@ export function OnboardingModal() {
 
           {/* Step counter for mobile */}
           <span className="text-xs text-neutral-400 sm:hidden">
-            {onboardingStep + 1} / {onboardingSteps.length}
+            {onboardingStep + 1} / {steps.length}
           </span>
 
           <button
