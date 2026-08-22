@@ -6,7 +6,6 @@ import {
   User,
   GraduationCap,
   BookOpen,
-  Shield,
   Eye,
   EyeOff,
   Loader2,
@@ -36,7 +35,7 @@ import { ExamTypeSelector } from './ExamTypeSelector';
 import { GoogleSignInButton } from './GoogleSignInButton';
 
 type AuthMode = 'login' | 'register';
-type UserRole = 'student' | 'teacher' | 'admin' | 'parent';
+type UserRole = 'student' | 'teacher' | 'parent';
 type SchoolLevel = 'jss' | 'shs' | 'international';
 type RegistrationStatus = 'idle' | 'pending' | 'approved' | 'error';
 type RegistrationStep = 'role' | 'schoolLevel' | 'plan' | 'form';
@@ -81,7 +80,6 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
         setSubjectsTaught([]);
         setYearsExperience('');
         setQualifications('');
-        setAdminCode('');
         setPhoneNumber('');
         setParentInviteCode('');
         setSelectedExamTypes([]);
@@ -144,8 +142,6 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
   const [yearsExperience, setYearsExperience] = useState('');
   const [qualifications, setQualifications] = useState('');
 
-  // Admin-specific fields
-  const [adminCode, setAdminCode] = useState('');
 
   // Parent-specific fields
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -174,7 +170,6 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
     setSubjectsTaught([]);
     setYearsExperience('');
     setQualifications('');
-    setAdminCode('');
     setPhoneNumber('');
     setParentInviteCode('');
     setSelectedExamTypes([]);
@@ -192,7 +187,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
     clearError();
   };
 
-  // Handle role selection - students go to school level, teachers to plan, admin/parent to form
+  // Handle role selection - students go to school level, teachers to plan, parents to form
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role);
     if (role === 'student') {
@@ -200,7 +195,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
     } else if (role === 'teacher') {
       setRegistrationStep('plan');
     } else {
-      // Admin and parent skip plan selection
+      // Parents skip plan selection
       setRegistrationStep('form');
     }
   };
@@ -338,11 +333,6 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
         }
       }
 
-      if (selectedRole === 'admin') {
-        if (!adminCode.trim()) {
-          errors.adminCode = 'Admin invitation code is required';
-        }
-      }
 
       if (selectedRole === 'parent') {
         if (!phoneNumber.trim()) {
@@ -391,7 +381,6 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           subjectsTaught: selectedRole === 'teacher' ? subjectsTaught : undefined,
           yearsExperience: selectedRole === 'teacher' ? yearsExperience : undefined,
           qualifications: selectedRole === 'teacher' ? qualifications : undefined,
-          adminCode: selectedRole === 'admin' ? adminCode : undefined,
           phoneNumber: selectedRole === 'parent' ? phoneNumber : undefined,
           inviteCode: selectedRole === 'parent' && parentInviteCode ? parentInviteCode : undefined,
           selectedTierId: selectedTierId || undefined,
@@ -621,18 +610,6 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                 </div>
               </button>
 
-              <button
-                onClick={() => handleRoleSelect('admin')}
-                className="w-full flex items-center gap-4 p-4 border-2 border-neutral-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all group"
-              >
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-                  <Shield className="w-6 h-6 text-purple-600" />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-semibold text-neutral-900">Administrator</h3>
-                  <p className="text-sm text-neutral-500">School admin with invitation code</p>
-                </div>
-              </button>
 
               <button
                 onClick={() => handleRoleSelect('parent')}
@@ -1172,30 +1149,6 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                     </>
                   )}
 
-                  {/* Admin-specific fields */}
-                  {selectedRole === 'admin' && (
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-1">
-                        Admin Invitation Code
-                      </label>
-                      <div className="relative">
-                        <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
-                        <input
-                          type="text"
-                          value={adminCode}
-                          onChange={(e) => setAdminCode(e.target.value)}
-                          placeholder="Enter your invitation code"
-                          className={cn(
-                            'w-full pl-10 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20',
-                            formErrors.adminCode ? 'border-red-300' : 'border-neutral-300'
-                          )}
-                        />
-                      </div>
-                      {formErrors.adminCode && <p className="text-red-500 text-xs mt-1">{formErrors.adminCode}</p>}
-                      <p className="text-xs text-neutral-500 mt-1">Contact your school or Brilla support for an admin code</p>
-                    </div>
-                  )}
-
                   {/* Parent-specific fields */}
                   {selectedRole === 'parent' && (
                     <>
@@ -1282,7 +1235,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                   exam types, referral code, teacher credentials — is captured
                   into the OAuth registration data. Turnstile is not needed here;
                   the worker relies on Google's verified identity flow. */}
-              {mode === 'register' && selectedRole && selectedRole !== 'admin' && (
+              {mode === 'register' && selectedRole && (
                 <>
                   <div className="relative my-4">
                     <div className="absolute inset-0 flex items-center">
