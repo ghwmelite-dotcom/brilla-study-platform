@@ -60,7 +60,9 @@ function makeDb(stateRow: unknown, captured: Captured, { affiliateRow = null }: 
         first: vi.fn().mockImplementation(() => {
           if (sql.includes('FROM oauth_states')) return Promise.resolve(stateRow);
           if (sql.includes('FROM affiliate_profiles') && sql.includes('referral_code = ?')) {
-            return Promise.resolve(affiliateRow);
+            return Promise.resolve(
+              args[0] === AFFILIATE.referral_code ? affiliateRow : null,
+            );
           }
           return Promise.resolve(null);
         }),
@@ -147,7 +149,7 @@ describe('OAuth register role hardening', () => {
     expect(captured.usersInsertArgs?.[4]).toBe('pending');
   });
 
-  it("inserts role: 'student' with status 'pending' and returns no token", async () => {
+  it("approves a verified Google student and returns a session plus share code", async () => {
     stubGoogleTokenExchange();
     const captured: Captured = { usersInsertArgs: null, runs: [] };
     const res = await oauthApp.fetch(
@@ -156,11 +158,13 @@ describe('OAuth register role hardening', () => {
     );
     expect(res.status).toBe(200);
     expect(captured.usersInsertArgs?.[3]).toBe('student');
-    expect(captured.usersInsertArgs?.[4]).toBe('pending');
+    expect(captured.usersInsertArgs?.[4]).toBe('approved');
     const body = await res.json();
-    expect(body.data.requiresApproval).toBe(true);
-    expect(body.data.token).toBeUndefined();
-    expect(captured.runs.some((r) => r.sql.includes('last_login_at'))).toBe(false);
+    expect(body.data.requiresApproval).toBe(false);
+    expect(typeof body.data.token).toBe('string');
+    expect(typeof body.data.referralCode).toBe('string');
+    expect(captured.runs.some((r) => r.sql.includes('INSERT INTO affiliate_profiles'))).toBe(true);
+    expect(captured.runs.some((r) => r.sql.includes('last_login_at'))).toBe(true);
   });
 });
 
@@ -200,21 +204,35 @@ describe('OAuth register — invite-mode referral code validation', () => {
     expect(captured.usersInsertArgs).toBeNull();
   });
 
-  it('rejects a codeless attempt in invite mode with the codeRequired envelope', async () => {
+  it('allows a codeless student in invite mode', async () => {
     stubGoogleTokenExchange();
     const captured: Captured = { usersInsertArgs: null, runs: [] };
     const res = await oauthApp.fetch(
       callbackRequest(),
       makeEnv(makeStateRow('student'), captured, { registrationMode: 'invite' }),
     );
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body.success).toBe(false);
-    expect(body.data?.codeRequired).toBe(true);
+    expect(body.data.requiresApproval).toBe(false);
+    expect(typeof body.data.token).toBe('string');
+  });
+
+  it('still rejects a codeless teacher in invite mode', async () => {
+    stubGoogleTokenExchange();
+    const captured: Captured = { usersInsertArgs: null, runs: [] };
+    const res = await oauthApp.fetch(
+      callbackRequest(),
+      makeEnv(makeStateRow('teacher'), captured, { registrationMode: 'invite' }),
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({
+      success: false,
+      data: { codeRequired: true },
+    });
     expect(captured.usersInsertArgs).toBeNull();
   });
 
-  it('valid code → pending user + attribution, without token or signup points', async () => {
+  it('valid code → approved student, attribution and signup points', async () => {
     stubGoogleTokenExchange();
     const captured: Captured = { usersInsertArgs: null, runs: [] };
     const res = await oauthApp.fetch(
@@ -226,12 +244,13 @@ describe('OAuth register — invite-mode referral code validation', () => {
     );
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body.data.requiresApproval).toBe(true);
-    expect(body.data.token).toBeUndefined();
+    expect(body.data.requiresApproval).toBe(false);
+    expect(typeof body.data.token).toBe('string');
+    expect(typeof body.data.referralCode).toBe('string');
 
-    // referred_by is the last bind on INSERT INTO users (uppercased code).
+    // referred_by remains attribution; is_affiliate marks the generated profile.
     expect(captured.usersInsertArgs).not.toBeNull();
-    expect(captured.usersInsertArgs![captured.usersInsertArgs!.length - 1]).toBe('ABC123XY');
+    expect(captured.usersInsertArgs![16]).toBe('ABC123XY');
 
     // attributeReferral batch ran for the new user under the affiliate.
     const referralInsert = captured.runs.find((r) => r.sql.includes('INSERT INTO affiliate_referrals'));
@@ -239,7 +258,6 @@ describe('OAuth register — invite-mode referral code validation', () => {
     expect(referralInsert!.args[1]).toBe('aff_1');
     expect(referralInsert!.args[2]).toBe(captured.usersInsertArgs![0]); // new user id
 
-    // Referral rewards wait for explicit administrator approval.
-    expect(captured.runs.some((r) => r.sql.includes('INSERT INTO points_ledger'))).toBe(false);
+    expect(captured.runs.some((r) => r.sql.includes('INSERT INTO points_ledger'))).toBe(true);
   });
 });

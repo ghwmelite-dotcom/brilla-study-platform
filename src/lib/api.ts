@@ -223,6 +223,10 @@ class ApiClient {
     return this.post<{ message: string }>('/auth/set-password', { token, password, turnstileToken });
   }
 
+  async verifyEmail(token: string, turnstileToken?: string) {
+    return this.post<{ message: string }>('/auth/verify-email', { token, turnstileToken });
+  }
+
   async forgotPassword(email: string, turnstileToken?: string) {
     return this.post<{ message: string }>('/auth/forgot-password', { email, turnstileToken });
   }

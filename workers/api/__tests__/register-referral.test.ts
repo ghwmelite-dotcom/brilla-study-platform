@@ -36,9 +36,16 @@ interface DbOptions {
   // Row returned for the affiliate_profiles referral-code lookup (null =
   // unknown code).
   affiliateRow?: unknown;
+  verificationUser?: {
+    id: string;
+    verification_token_expires_at: string | null;
+  } | null;
 }
 
-function makeDb({ affiliateRow = null }: DbOptions = {}) {
+function makeDb({
+  affiliateRow = null,
+  verificationUser = null,
+}: DbOptions = {}) {
   const batchCalls: CapturedStatement[][] = [];
   const runsOutsideBatch: CapturedStatement[] = [];
   const allCalls: CapturedStatement[] = [];
@@ -57,8 +64,13 @@ function makeDb({ affiliateRow = null }: DbOptions = {}) {
             if (sql.includes('FROM rate_limits') && sql.includes('SUM(request_count)')) {
               return Promise.resolve({ total_requests: 0, last_request: null });
             }
+            if (sql.includes('WHERE verification_token = ?')) {
+              return Promise.resolve(verificationUser);
+            }
             if (sql.includes('FROM affiliate_profiles') && sql.includes('referral_code = ?')) {
-              return Promise.resolve(affiliateRow);
+              return Promise.resolve(
+                args[0] === AFFILIATE.referral_code ? affiliateRow : null,
+              );
             }
             // rate_limits window lookup, `SELECT id FROM users WHERE email`,
             // awardPoints' race_cycles / house lookups → empty.
@@ -100,14 +112,31 @@ const INVITE_ENV = { JWT_SECRET, REGISTRATION_MODE: 'invite' };
 const OPEN_ENV = { JWT_SECRET };
 
 describe('/auth/register — referral code gate (Task 5)', () => {
-  it('(a) invite mode + no code → 400 with data.codeRequired === true', async () => {
-    const { db, allCalls } = makeDb();
+  it('(a) invite mode + student without a code is approved and receives a share code', async () => {
+    const { db, batchCalls } = makeDb();
     const res = await worker.fetch(registerRequest(VALID_BODY), { ...INVITE_ENV, DB: db });
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body.success).toBe(false);
-    expect(body.data?.codeRequired).toBe(true);
-    // No user insert attempted.
+    expect(body).toMatchObject({
+      success: true,
+      data: { status: 'approved', requiresApproval: false },
+    });
+    expect(typeof body.data.token).toBe('string');
+    expect(typeof body.data.referralCode).toBe('string');
+    expect(batchCalls[0][1].sql).toContain('INSERT INTO affiliate_profiles');
+  });
+
+  it('invite mode still requires a code for teacher registration', async () => {
+    const { db, allCalls } = makeDb();
+    const res = await worker.fetch(
+      registerRequest({ ...VALID_BODY, role: 'teacher' }),
+      { ...INVITE_ENV, DB: db },
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({
+      success: false,
+      data: { codeRequired: true },
+    });
     expect(allCalls.some((c) => c.sql.includes('INSERT INTO users'))).toBe(false);
   });
 
@@ -133,29 +162,33 @@ describe('/auth/register — referral code gate (Task 5)', () => {
     expect(allCalls.some((c) => c.sql.includes('INSERT INTO users'))).toBe(false);
   });
 
-  it('(d) invite mode + valid code → pending INSERT + attribution, without signup points', async () => {
+  it('(d) invite mode + valid code → approved student, attribution and signup points', async () => {
     const { db, batchCalls, runsOutsideBatch } = makeDb({ affiliateRow: AFFILIATE });
     const res = await worker.fetch(
       registerRequest({ ...VALID_BODY, referralCode: 'abc123xy' }), // case-insensitive
       { ...INVITE_ENV, DB: db },
     );
     expect(res.status).toBe(200);
-    expect(await res.json()).toMatchObject({
+    const body = await res.json();
+    expect(body).toMatchObject({
       success: true,
       data: {
-        status: 'pending',
-        message: 'Your registration is pending approval. You will be notified once an administrator reviews your application.',
+        status: 'approved',
+        requiresApproval: false,
       },
     });
+    expect(typeof body.data.token).toBe('string');
+    expect(typeof body.data.referralCode).toBe('string');
 
-    // Registration batch: INSERT INTO users carries status + referred_by.
-    expect(batchCalls.length).toBeGreaterThanOrEqual(2);
+    // Registration batch carries the account and its own affiliate profile.
+    expect(batchCalls).toHaveLength(2);
     const insert = batchCalls[0][0];
     expect(insert.sql).toContain('INSERT INTO users');
     expect(insert.sql).toContain('referred_by');
-    // Bind order: id, email, hash, name, role, status, ...9 optionals..., referred_by
-    expect(insert.args[5]).toBe('pending');
-    expect(insert.args[insert.args.length - 1]).toBe('ABC123XY');
+    expect(insert.args[5]).toBe('approved');
+    expect(insert.args[17]).toBe('ABC123XY');
+    expect(insert.args[18]).toBe(1);
+    expect(batchCalls[0][1].sql).toContain('INSERT INTO affiliate_profiles');
 
     // Attribution batch (attributeReferral): referral row + stats + referred_by + xp.
     const attribution = batchCalls[1];
@@ -167,45 +200,80 @@ describe('/auth/register — referral code gate (Task 5)', () => {
     expect(attribution[2].args[0]).toBe('ABC123XY');
     expect(attribution[3].sql).toContain('affiliate_xp');
 
-    // Attribution is recorded, but rewards wait for explicit admin approval.
-    expect(runsOutsideBatch.some((c) => c.sql.includes('INSERT INTO points_ledger'))).toBe(false);
+    expect(runsOutsideBatch.some((c) => c.sql.includes('INSERT INTO points_ledger'))).toBe(true);
   });
 
-  it('(e) open mode + no code → unchanged pending flow', async () => {
+  it('(e) open mode + no code → approved with an automatically generated share code', async () => {
     const { db, batchCalls, runsOutsideBatch, allCalls } = makeDb();
     const res = await worker.fetch(registerRequest(VALID_BODY), { ...OPEN_ENV, DB: db });
     expect(res.status).toBe(200);
-    expect(await res.json()).toMatchObject({ success: true, data: { status: 'pending' } });
+    const body = await res.json();
+    expect(body).toMatchObject({ success: true, data: { status: 'approved' } });
+    expect(typeof body.data.referralCode).toBe('string');
 
     const insert = batchCalls[0][0];
-    expect(insert.args[5]).toBe('pending');
-    expect(insert.args[insert.args.length - 1]).toBeNull(); // referred_by NULL
+    expect(insert.args[5]).toBe('approved');
+    expect(insert.args[17]).toBeNull();
+    expect(batchCalls[0][1].sql).toContain('INSERT INTO affiliate_profiles');
 
-    // No affiliate lookup, no attribution batch, no points.
-    expect(allCalls.some((c) => c.sql.includes('FROM affiliate_profiles'))).toBe(false);
+    expect(allCalls.some((c) => c.sql.includes('is_active = 1'))).toBe(false);
     expect(batchCalls).toHaveLength(1);
     expect(runsOutsideBatch.some((c) => c.sql.includes('INSERT INTO points_ledger'))).toBe(false);
   });
 
-  it('(f) open mode + valid code → pending + attribution, without signup points', async () => {
+  it('(f) open mode + valid code → approved with attribution and signup points', async () => {
     const { db, batchCalls, runsOutsideBatch } = makeDb({ affiliateRow: AFFILIATE });
     const res = await worker.fetch(
       registerRequest({ ...VALID_BODY, referralCode: 'ABC123XY' }),
       { ...OPEN_ENV, DB: db },
     );
     expect(res.status).toBe(200);
-    expect(await res.json()).toMatchObject({ success: true, data: { status: 'pending' } });
+    expect(await res.json()).toMatchObject({ success: true, data: { status: 'approved' } });
 
     const insert = batchCalls[0][0];
-    expect(insert.args[5]).toBe('pending');
-    expect(insert.args[insert.args.length - 1]).toBe('ABC123XY');
+    expect(insert.args[5]).toBe('approved');
+    expect(insert.args[17]).toBe('ABC123XY');
 
-    // Attribution runs in both modes…
     expect(batchCalls).toHaveLength(2);
     expect(batchCalls[1][0].sql).toContain('INSERT INTO affiliate_referrals');
+    expect(runsOutsideBatch.some((c) => c.sql.includes('INSERT INTO points_ledger'))).toBe(true);
+  });
 
-    // Rewards are deferred until the referred account is approved.
-    expect(runsOutsideBatch.some((c) => c.sql.includes('INSERT INTO points_ledger'))).toBe(false);
+  it('verifies a student email without replacing the chosen password', async () => {
+    const { db, runsOutsideBatch } = makeDb({
+      verificationUser: {
+        id: 'user_new',
+        verification_token_expires_at: new Date(Date.now() + 60_000).toISOString(),
+      },
+    });
+    const res = await worker.fetch(
+      new Request('http://x/api/auth/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: 'verification-token' }),
+      }),
+      { ...OPEN_ENV, DB: db },
+    );
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ success: true });
+    const update = runsOutsideBatch.find((c) => c.sql.includes('email_verified = 1'));
+    expect(update?.args).toEqual(['user_new']);
+    expect(runsOutsideBatch.some((c) => c.sql.includes('password_hash'))).toBe(false);
+  });
+
+  it('retires the legacy invite request endpoint without writing contact data', async () => {
+    const { db, allCalls } = makeDb();
+    const res = await worker.fetch(
+      new Request('http://x/api/referral-code-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'Student', contact: 'student@example.com' }),
+      }),
+      { ...OPEN_ENV, DB: db },
+    );
+    expect(res.status).toBe(410);
+    expect(await res.json()).toMatchObject({ success: false });
+    expect(allCalls.some((c) => c.sql.includes('INSERT INTO referral_code_requests'))).toBe(false);
   });
 
   it('(g) Turnstile runs before code validation; code validation before email-exists', async () => {

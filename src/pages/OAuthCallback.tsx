@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Loader2, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, AlertTriangle, Copy } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 
 type CallbackStatus = 'processing' | 'success' | 'error' | 'needs_registration' | 'pending_approval';
@@ -19,6 +19,7 @@ export function OAuthCallback() {
   const [error, setError] = useState<CallbackError | null>(null);
   const [isNewUser, setIsNewUser] = useState(false);
   const [pendingMessage, setPendingMessage] = useState('Your registration is awaiting administrator approval.');
+  const [referralCode, setReferralCode] = useState<string | null>(null);
   const hasExchanged = useRef(false);
 
   useEffect(() => {
@@ -58,6 +59,7 @@ export function OAuthCallback() {
 
         if (result.success) {
           setIsNewUser(result.isNewUser || false);
+          setReferralCode(result.referralCode || null);
 
           // Clear stored state once the one-time callback is consumed.
           sessionStorage.removeItem('oauth_state');
@@ -69,9 +71,11 @@ export function OAuthCallback() {
           }
 
           setStatus('success');
-          setTimeout(() => {
-            navigate('/dashboard', { replace: true });
-          }, 1500);
+          if (!result.referralCode) {
+            setTimeout(() => {
+              navigate('/dashboard', { replace: true });
+            }, 1500);
+          }
         } else {
           // Handle specific error cases
           if (result.code === 'NO_ACCOUNT') {
@@ -134,9 +138,38 @@ export function OAuthCallback() {
                 ? 'Your account has been created successfully.'
                 : 'You have been signed in successfully.'}
             </p>
-            <p className="text-sm text-gray-500 mt-4">
-              Redirecting to dashboard...
-            </p>
+            {referralCode ? (
+              <>
+                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl text-left">
+                  <p className="text-sm font-medium text-gray-900">Your share code</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <code className="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-center font-bold tracking-wider text-blue-700">
+                      {referralCode}
+                    </code>
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard.writeText(referralCode)}
+                      aria-label="Copy your share code"
+                      className="p-2.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-white"
+                    >
+                      <Copy className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-2">
+                    Share it with friends. They can enter it during registration.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate('/dashboard', { replace: true })}
+                  className="mt-6 w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700"
+                >
+                  Start learning
+                </button>
+              </>
+            ) : (
+              <p className="text-sm text-gray-500 mt-4">Redirecting to dashboard...</p>
+            )}
           </>
         )}
 

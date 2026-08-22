@@ -107,15 +107,18 @@ const VALID_BODY = {
 };
 
 describe('/auth/register batched writes', () => {
-  it('sends the user insert + primary update + 2 preference inserts in one batch of 4', async () => {
+  it('batches the student, share code, primary update and two exam preferences', async () => {
     const { db, batchCalls, runsOutsideBatch } = makeDb();
     const res = await worker.fetch(registerRequest(VALID_BODY), { DB: db, JWT_SECRET });
     expect(res.status).toBe(200);
-    expect(await res.json()).toMatchObject({ success: true, data: { status: 'pending' } });
+    const body = await res.json();
+    expect(body).toMatchObject({ success: true, data: { status: 'approved' } });
+    expect(typeof body.data.token).toBe('string');
+    expect(typeof body.data.referralCode).toBe('string');
 
     expect(batchCalls).toHaveLength(1);
     const statements = batchCalls[0];
-    expect(statements).toHaveLength(4);
+    expect(statements).toHaveLength(5);
 
     // 1. INSERT INTO users — id, email, passwordHash, name, role, ...
     expect(statements[0].sql).toContain('INSERT INTO users');
@@ -123,19 +126,22 @@ describe('/auth/register batched writes', () => {
     expect(statements[0].args[3]).toBe('New Student');
     expect(statements[0].args[4]).toBe('student');
 
-    // 2. UPDATE users SET primary_exam_type_id
-    expect(statements[1].sql).toContain('UPDATE users SET primary_exam_type_id');
-    expect(statements[1].args[0]).toBe('wassce');
+    // 2. The generated share code is atomic with the user.
+    expect(statements[1].sql).toContain('INSERT INTO affiliate_profiles');
 
-    // 3-4. user_exam_preferences inserts — primary flagged 1, other 0
-    expect(statements[2].sql).toContain('INSERT INTO user_exam_preferences');
-    expect(statements[2].args[2]).toBe('wassce');
-    expect(statements[2].args[3]).toBe(1);
+    // 3. UPDATE users SET primary_exam_type_id
+    expect(statements[2].sql).toContain('UPDATE users SET primary_exam_type_id');
+    expect(statements[2].args[0]).toBe('wassce');
+
+    // 4-5. user_exam_preferences inserts — primary flagged 1, other 0
     expect(statements[3].sql).toContain('INSERT INTO user_exam_preferences');
-    expect(statements[3].args[2]).toBe('bece');
-    expect(statements[3].args[3]).toBe(0);
+    expect(statements[3].args[2]).toBe('wassce');
+    expect(statements[3].args[3]).toBe(1);
+    expect(statements[4].sql).toContain('INSERT INTO user_exam_preferences');
+    expect(statements[4].args[2]).toBe('bece');
+    expect(statements[4].args[3]).toBe(0);
 
-    // None of the four registration writes may run outside the batch.
+    // None of the registration writes may run outside the batch.
     expect(
       runsOutsideBatch.some(
         (r) =>
@@ -147,8 +153,8 @@ describe('/auth/register batched writes', () => {
   });
 
   it('returns 500 when a preference insert fails inside the batch', async () => {
-    // Fail at index 2 — the first user_exam_preferences insert.
-    const mock = makeDb({ failBatchAt: 2 });
+    // Fail at index 3 — the first user_exam_preferences insert.
+    const mock = makeDb({ failBatchAt: 3 });
     const res = await worker.fetch(registerRequest(VALID_BODY), {
       DB: mock.db,
       JWT_SECRET,
@@ -156,8 +162,8 @@ describe('/auth/register batched writes', () => {
     expect(res.status).toBe(500);
     expect(await res.json()).toMatchObject({ success: false });
     // The mock runs the batch sequentially and recorded the failure point;
-    // D1's real batch() is atomic, so in production none of the 4 apply.
-    expect(mock.batchFailureIndex).toBe(2);
-    expect(mock.batchAppliedBeforeFailure).toBe(2);
+    // D1's real batch() is atomic, so in production none of the five apply.
+    expect(mock.batchFailureIndex).toBe(3);
+    expect(mock.batchAppliedBeforeFailure).toBe(3);
   });
 });

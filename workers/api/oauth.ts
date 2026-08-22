@@ -2,8 +2,17 @@ import { Hono } from 'hono';
 import { sign } from 'hono/jwt';
 import { parseJsonBody } from './http';
 import { requireAuth, type AuthPayload } from './auth-middleware';
-import { isValidReferralCode, attributeReferral } from './affiliates';
-import { PENDING_APPROVAL_MESSAGE, SELF_REGISTRATION_STATUS } from './registration-policy';
+import {
+  isValidReferralCode,
+  attributeReferral,
+  awardReferralSignupPoints,
+  generateUniqueReferralCode,
+} from './affiliates';
+import {
+  getSelfRegistrationStatus,
+  PENDING_APPROVAL_MESSAGE,
+  type SelfServeRegistrationRole,
+} from './registration-policy';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -327,6 +336,7 @@ oauthApp.post('/google/callback', async (c) => {
   let user: Record<string, unknown> | null = null;
   let isNewUser = false;
   let accountLinked = false;
+  let generatedReferralCode: string | null = null;
 
   // Handle based on intent
   if (intent === 'login') {
@@ -430,10 +440,13 @@ oauthApp.post('/google/callback', async (c) => {
       }, 409);
     }
 
-    // Growth loop (Task 5): invite mode requires a referral code. The code
-    // arrives via registrationData — client-supplied through OAuth state, so
-    // untrusted: validate it exactly like /auth/register (format + active
-    // affiliate lookup). No code in invite mode → same codeRequired envelope.
+    if (role && !ALLOWED_SELF_SERVE_ROLES.includes(role)) {
+      return c.json({ success: false, error: 'Invalid role' }, 400);
+    }
+    const userRole = (role || 'student') as SelfServeRegistrationRole;
+
+    // Referral codes are optional attribution for students. Other roles retain
+    // the invite-mode gate when that environment setting is enabled.
     let referralAffiliate: { id: string; user_id: string; referral_code: string } | null = null;
     const oauthReferralCode = registrationData?.referralCode;
     if (oauthReferralCode) {
@@ -447,20 +460,16 @@ oauthApp.post('/google/callback', async (c) => {
       if (!referralAffiliate) {
         return c.json({ success: false, error: 'Invalid referral code' }, 400);
       }
-    } else if (c.env.REGISTRATION_MODE === 'invite') {
+    } else if (c.env.REGISTRATION_MODE === 'invite' && userRole !== 'student') {
       return c.json({
         success: false,
-        error: 'An invite code is required to register. Request one below.',
+        error: 'An invite code is required for this role. Contact a BrillaPrep administrator.',
         data: { codeRequired: true },
       }, 400);
     }
 
     // Create new user
     const userId = `user_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
-    if (role && !ALLOWED_SELF_SERVE_ROLES.includes(role)) {
-      return c.json({ success: false, error: 'Invalid role' }, 400);
-    }
-    const userRole = role || 'student';
 
     // Parse registration data
     const schoolLevel = normalizeSchoolLevel(registrationData?.schoolLevel);
@@ -474,8 +483,10 @@ oauthApp.post('/google/callback', async (c) => {
     const selectedTierId = registrationData?.selectedTierId || 'tier_free';
     const primaryExamTypeId = registrationData?.primaryExamTypeId || null;
 
-    // Verified identity is not authorization: every self-registration waits.
-    const status = SELF_REGISTRATION_STATUS;
+    const status = getSelfRegistrationStatus(userRole);
+    generatedReferralCode = status === 'approved'
+      ? await generateUniqueReferralCode(c.env.DB, googleUser.name)
+      : null;
 
     // Generate a random password hash (user cannot know this password)
     // This satisfies the NOT NULL constraint while keeping the account OAuth-only
@@ -489,9 +500,9 @@ oauthApp.post('/google/callback', async (c) => {
           id, email, name, role, status, password_hash,
           school_level, year_group, school_name, house,
           teacher_license_number, subjects_taught, years_experience, qualifications,
-          subscription_tier_id, primary_exam_type_id, referred_by,
+          selected_tier_id, primary_exam_type_id, referred_by, is_affiliate,
           email_verified, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
       `).bind(
         userId,
         googleUser.email,
@@ -509,9 +520,19 @@ oauthApp.post('/google/callback', async (c) => {
         qualifications,
         selectedTierId,
         primaryExamTypeId,
-        referralAffiliate ? referralAffiliate.referral_code : null
+        referralAffiliate ? referralAffiliate.referral_code : null,
+        generatedReferralCode ? 1 : 0,
       ),
     ];
+
+    if (generatedReferralCode) {
+      statements.push(
+        c.env.DB.prepare(`
+          INSERT INTO affiliate_profiles (id, user_id, referral_code, tier_id)
+          VALUES (?, ?, ?, 'tier_scout')
+        `).bind(`affiliate_${crypto.randomUUID()}`, userId, generatedReferralCode)
+      );
+    }
 
     // Link Google provider
     const oauthId = `oauth_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
@@ -544,9 +565,15 @@ oauthApp.post('/google/callback', async (c) => {
 
     await c.env.DB.batch(statements);
 
-    // Referral codes only attribute; rewards are issued on admin approval.
     if (referralAffiliate) {
-      await attributeReferral(c.env.DB, referralAffiliate, userId, referralAffiliate.referral_code);
+      try {
+        await attributeReferral(c.env.DB, referralAffiliate, userId, referralAffiliate.referral_code);
+        if (status === 'approved') {
+          await awardReferralSignupPoints(c.env.DB, referralAffiliate.user_id, userId);
+        }
+      } catch (referralError) {
+        console.error('Failed to attribute OAuth referral:', referralError);
+      }
     }
 
     user = {
@@ -681,6 +708,7 @@ oauthApp.post('/google/callback', async (c) => {
       isNewUser,
       accountLinked,
       requiresApproval: false,
+      referralCode: generatedReferralCode,
     }
   });
 });
