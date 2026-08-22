@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
+import { awardPoints } from './points';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -33,8 +34,39 @@ function checkRateLimit(key: string, maxRequests: number, windowMs: number): boo
 // Generate unique referral code
 function generateReferralCode(name: string): string {
   const cleanName = name.replace(/[^a-zA-Z]/g, '').toUpperCase().substring(0, 4);
-  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+  const random = crypto.randomUUID().replaceAll('-', '').substring(0, 6).toUpperCase();
   return `${cleanName}${random}`;
+}
+
+export async function generateUniqueReferralCode(db: D1Database, name: string): Promise<string> {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const referralCode = generateReferralCode(name);
+    const existing = await db.prepare(
+      'SELECT id FROM affiliate_profiles WHERE referral_code = ?',
+    ).bind(referralCode).first();
+    if (!existing) return referralCode;
+  }
+  throw new Error('Unable to generate a unique referral code');
+}
+
+export async function awardReferralSignupPoints(
+  db: D1Database,
+  affiliateUserId: string,
+  newUserId: string,
+): Promise<void> {
+  const existingAward = await db.prepare(`
+    SELECT id FROM points_ledger
+    WHERE user_id = ? AND source = 'referral_signup' AND source_ref = ?
+    LIMIT 1
+  `).bind(affiliateUserId, newUserId).first();
+  if (existingAward) return;
+
+  await awardPoints(db, {
+    userId: affiliateUserId,
+    points: 100,
+    source: 'referral_signup',
+    sourceRef: newUserId,
+  });
 }
 
 // Secure hash IP address for privacy using SHA-256
@@ -112,20 +144,7 @@ affiliatesApp.post('/join', requireAuth, async (c) => {
       return c.json({ success: false, error: 'User not found' }, 404);
     }
 
-    // Generate unique referral code
-    let referralCode = generateReferralCode(user.name as string);
-
-    // Ensure uniqueness
-    let attempts = 0;
-    while (attempts < 10) {
-      const codeExists = await c.env.DB.prepare(`
-        SELECT id FROM affiliate_profiles WHERE referral_code = ?
-      `).bind(referralCode).first();
-
-      if (!codeExists) break;
-      referralCode = generateReferralCode(user.name as string);
-      attempts++;
-    }
+    const referralCode = await generateUniqueReferralCode(c.env.DB, user.name as string);
 
     // Create affiliate profile
     const affiliateId = crypto.randomUUID();

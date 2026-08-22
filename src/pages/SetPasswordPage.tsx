@@ -22,6 +22,7 @@ export function SetPasswordPage() {
   const turnstile = useTurnstile();
 
   const token = searchParams.get('token');
+  const isEmailVerification = searchParams.get('mode') === 'verify-email';
 
   const [isVerifying, setIsVerifying] = useState(true);
   const [isValid, setIsValid] = useState(false);
@@ -71,14 +72,16 @@ export function SetPasswordPage() {
     e.preventDefault();
     setError(null);
 
-    if (!isPasswordValid) {
-      setError('Please meet all password requirements.');
-      return;
-    }
+    if (!isEmailVerification) {
+      if (!isPasswordValid) {
+        setError('Please meet all password requirements.');
+        return;
+      }
 
-    if (!passwordsMatch) {
-      setError('Passwords do not match.');
-      return;
+      if (!passwordsMatch) {
+        setError('Passwords do not match.');
+        return;
+      }
     }
 
     if (!turnstile.isVerified || !turnstile.token) {
@@ -89,15 +92,23 @@ export function SetPasswordPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await api.setPassword(token!, password, turnstile.token);
+      const response = isEmailVerification
+        ? await api.verifyEmail(token!, turnstile.token)
+        : await api.setPassword(token!, password, turnstile.token);
       if (response.success) {
         setIsSuccess(true);
       } else {
-        setError(response.error || 'Failed to set password.');
+        setError(response.error || (isEmailVerification ? 'Failed to verify email.' : 'Failed to set password.'));
         turnstile.reset();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to set password.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : isEmailVerification
+            ? 'Failed to verify email.'
+            : 'Failed to set password.',
+      );
       turnstile.reset();
     } finally {
       setIsSubmitting(false);
@@ -128,7 +139,9 @@ export function SetPasswordPage() {
             Invalid or Expired Link
           </h1>
           <p className="text-neutral-600 mb-6">
-            This password setup link is invalid or has expired. Please contact your administrator to request a new link.
+            {isEmailVerification
+              ? 'This email verification link is invalid or has expired. Please sign in and request a new verification email, or contact support.'
+              : 'This password setup link is invalid or has expired. Please contact your administrator to request a new link.'}
           </p>
           <Link
             to="/"
@@ -151,16 +164,18 @@ export function SetPasswordPage() {
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
           <h1 className="text-2xl font-bold text-neutral-900 mb-2">
-            Password Set Successfully!
+            {isEmailVerification ? 'Email Verified!' : 'Password Set Successfully!'}
           </h1>
           <p className="text-neutral-600 mb-6">
-            Your password has been set. You can now log in to your account using your email and new password.
+            {isEmailVerification
+              ? 'Your email address is confirmed. You can continue using BrillaPrep.'
+              : 'Your password has been set. You can now log in to your account using your email and new password.'}
           </p>
           <button
             onClick={() => navigate('/', { state: { openLogin: true } })}
             className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors"
           >
-            Go to Login
+            {isEmailVerification ? 'Continue to BrillaPrep' : 'Go to Login'}
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -181,7 +196,7 @@ export function SetPasswordPage() {
             <span className="text-2xl font-bold text-neutral-900">Brilla</span>
           </div>
           <h1 className="text-2xl font-bold text-neutral-900 mb-2">
-            Set Up Your Password
+            {isEmailVerification ? 'Verify Your Email' : 'Set Up Your Password'}
           </h1>
           <p className="text-neutral-600">
             Welcome, <span className="font-medium text-neutral-900">{userName}</span>!
@@ -200,6 +215,8 @@ export function SetPasswordPage() {
               </div>
             )}
 
+            {!isEmailVerification && (
+              <>
             {/* Password field */}
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1.5">
@@ -297,6 +314,9 @@ export function SetPasswordPage() {
               )}
             </div>
 
+              </>
+            )}
+
             {/* Turnstile Security Check */}
             <div className="flex justify-center">
               <Turnstile
@@ -311,10 +331,10 @@ export function SetPasswordPage() {
             {/* Submit button */}
             <button
               type="submit"
-              disabled={isSubmitting || !isPasswordValid || !passwordsMatch || !turnstile.isVerified}
+              disabled={isSubmitting || !turnstile.isVerified || (!isEmailVerification && (!isPasswordValid || !passwordsMatch))}
               className={cn(
                 'w-full py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2',
-                isSubmitting || !isPasswordValid || !passwordsMatch || !turnstile.isVerified
+                isSubmitting || !turnstile.isVerified || (!isEmailVerification && (!isPasswordValid || !passwordsMatch))
                   ? 'bg-neutral-200 text-neutral-500 cursor-not-allowed'
                   : 'bg-primary text-white hover:bg-primary-dark'
               )}
@@ -322,11 +342,11 @@ export function SetPasswordPage() {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Setting Password...
+                  {isEmailVerification ? 'Verifying Email...' : 'Setting Password...'}
                 </>
               ) : (
                 <>
-                  Set Password & Continue
+                  {isEmailVerification ? 'Verify Email & Continue' : 'Set Password & Continue'}
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}

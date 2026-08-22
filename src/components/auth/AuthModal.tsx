@@ -24,6 +24,7 @@ import {
   Crown,
   Globe,
   Ticket,
+  Copy,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/lib/api';
@@ -95,14 +96,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
         setReferralCode('');
         setReferralValidation('idle');
         setReferralSchoolName(null);
-        setInviteModeDetected(false);
-        setShowCodeRequest(false);
-        setCodeReqName('');
-        setCodeReqContact('');
-        setCodeReqSchool('');
-        setCodeReqSubmitting(false);
-        setCodeReqSuccess(false);
-        setCodeReqError('');
+        setGeneratedReferralCode(null);
         turnstile.reset();
         clearError();
       }, 300);
@@ -161,20 +155,11 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
   const [selectedExamTypes, setSelectedExamTypes] = useState<string[]>([]);
   const [primaryExamType, setPrimaryExamType] = useState('');
 
-  // Referral / invite code (growth loop)
+  // Optional attribution code and the new student's generated share code
   const [referralCode, setReferralCode] = useState('');
   const [referralValidation, setReferralValidation] = useState<'idle' | 'checking' | 'valid' | 'invalid'>('idle');
   const [referralSchoolName, setReferralSchoolName] = useState<string | null>(null);
-  // Set when the backend rejects a registration with data.codeRequired (invite mode)
-  const [inviteModeDetected, setInviteModeDetected] = useState(false);
-  // Inline "request a code" form
-  const [showCodeRequest, setShowCodeRequest] = useState(false);
-  const [codeReqName, setCodeReqName] = useState('');
-  const [codeReqContact, setCodeReqContact] = useState('');
-  const [codeReqSchool, setCodeReqSchool] = useState('');
-  const [codeReqSubmitting, setCodeReqSubmitting] = useState(false);
-  const [codeReqSuccess, setCodeReqSuccess] = useState(false);
-  const [codeReqError, setCodeReqError] = useState('');
+  const [generatedReferralCode, setGeneratedReferralCode] = useState<string | null>(null);
 
   const resetForm = () => {
     setEmail('');
@@ -203,14 +188,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
     setReferralCode('');
     setReferralValidation('idle');
     setReferralSchoolName(null);
-    setInviteModeDetected(false);
-    setShowCodeRequest(false);
-    setCodeReqName('');
-    setCodeReqContact('');
-    setCodeReqSchool('');
-    setCodeReqSubmitting(false);
-    setCodeReqSuccess(false);
-    setCodeReqError('');
+    setGeneratedReferralCode(null);
     clearError();
   };
 
@@ -300,26 +278,6 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
     }
   };
 
-  const handleCodeRequestSubmit = async () => {
-    if (!codeReqName.trim() || !codeReqContact.trim()) {
-      setCodeReqError('Name and contact are required');
-      return;
-    }
-    setCodeReqSubmitting(true);
-    setCodeReqError('');
-    const response = await api.post('/referral-code-requests', {
-      name: codeReqName.trim(),
-      contact: codeReqContact.trim(),
-      schoolName: codeReqSchool.trim() || undefined,
-    });
-    setCodeReqSubmitting(false);
-    if (response.success) {
-      setCodeReqSuccess(true);
-    } else {
-      // Rate-limit (429) and validation errors surface here
-      setCodeReqError(response.error || 'Failed to submit request. Please try again.');
-    }
-  };
 
   const validateForm = (): boolean => {
     const errors: FormErrors = {};
@@ -419,7 +377,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
         await login(email, password, turnstile.token);
         onClose();
       } else {
-        // Register user - account will be pending until admin approves
+        // Students are signed in immediately; teacher and parent roles remain pending.
         const result = await register({
           email,
           password,
@@ -445,14 +403,13 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           primaryExamTypeId: (selectedRole === 'student' || selectedRole === 'teacher') && primaryExamType
             ? primaryExamType
             : undefined,
-          // Affiliate referral/invite code (trimmed, uppercased)
+          // Optional attribution code (trimmed, uppercased)
           referralCode: referralCode.trim() ? referralCode.trim().toUpperCase() : undefined,
         });
 
-        // Invite-mode registrations are auto-approved: prompt login instead
-        // of the pending-approval copy.
         if (result.status === 'approved') {
           setRegistrationStatus('approved');
+          setGeneratedReferralCode(result.referralCode || null);
         } else {
           setRegistrationStatus('pending');
         }
@@ -461,15 +418,6 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
     } catch (err) {
       if (mode === 'register') {
         setRegistrationStatus('error');
-        // Invite mode: backend rejected with data.codeRequired — surface the
-        // request-a-code form automatically (error text renders via formErrors.submit).
-        const codeRequired =
-          (err as { codeRequired?: boolean })?.codeRequired === true ||
-          (err instanceof Error && /invite code is required/i.test(err.message));
-        if (codeRequired) {
-          setInviteModeDetected(true);
-          setShowCodeRequest(true);
-        }
       }
       setFormErrors({ submit: err instanceof Error ? err.message : 'An error occurred. Please try again.' });
       // Reset turnstile on error so user can try again
@@ -554,16 +502,42 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle2 className="w-10 h-10 text-green-600" />
               </div>
-              <h3 className="text-xl font-semibold text-neutral-900">Your account is ready — log in</h3>
+              <h3 className="text-xl font-semibold text-neutral-900">Welcome to BrillaPrep!</h3>
               <p className="text-neutral-600 mt-3 max-w-sm mx-auto">
                 {registrationMessage}
               </p>
 
+              {generatedReferralCode && (
+                <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-xl text-left">
+                  <p className="text-sm font-medium text-neutral-900">Your share code</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <code className="flex-1 px-3 py-2 bg-white border border-neutral-200 rounded-lg text-center font-bold tracking-wider text-primary">
+                      {generatedReferralCode}
+                    </code>
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard.writeText(generatedReferralCode)}
+                      aria-label="Copy your share code"
+                      className="p-2.5 border border-neutral-200 rounded-lg text-neutral-600 hover:bg-white transition-colors"
+                    >
+                      <Copy className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-neutral-600 mt-2">
+                    Share this code with friends. They can enter it during registration.
+                  </p>
+                </div>
+              )}
+
+              <p className="text-xs text-neutral-500 mt-4">
+                You are signed in. Please use the verification email we sent so future sign-ins stay secure.
+              </p>
+
               <button
-                onClick={() => handleModeSwitch('login')}
+                onClick={onClose}
                 className="mt-6 px-6 py-2.5 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors"
               >
-                Sign In
+                Start learning
               </button>
             </div>
           ) : registrationStatus === 'pending' ? (
@@ -884,10 +858,10 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                     {formErrors.confirmPassword && <p className="text-red-500 text-xs mt-1">{formErrors.confirmPassword}</p>}
                   </div>
 
-                  {/* Referral / Invite Code (growth loop) */}
+                  {/* Optional referral attribution */}
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-1">
-                      Referral / Invite Code
+                      Referral code (optional)
                     </label>
                     <div className="relative">
                       <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
@@ -900,7 +874,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                           setReferralSchoolName(null);
                         }}
                         onBlur={() => validateReferralCode(referralCode)}
-                        placeholder="Enter your invite code"
+                        placeholder="Enter a friend's share code"
                         className={cn(
                           'w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 uppercase',
                           formErrors.referralCode
@@ -923,69 +897,9 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                         Code verified{referralSchoolName ? ` — ${referralSchoolName}` : ''}
                       </p>
                     )}
-                    {!showCodeRequest && (
-                      <button
-                        type="button"
-                        onClick={() => setShowCodeRequest(true)}
-                        className="text-primary text-xs font-medium mt-1 hover:underline"
-                      >
-                        Don't have a code? Request one
-                      </button>
-                    )}
-                    {showCodeRequest && (
-                      <div className="mt-2 p-3 bg-neutral-50 border border-neutral-200 rounded-lg space-y-2">
-                        {codeReqSuccess ? (
-                          <p className="text-sm text-green-700 flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                            We'll review your request and send a code.
-                          </p>
-                        ) : (
-                          <>
-                            <p className="text-xs font-medium text-neutral-700">Request an invite code</p>
-                            <input
-                              type="text"
-                              value={codeReqName}
-                              onChange={(e) => setCodeReqName(e.target.value)}
-                              placeholder="Your name"
-                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                            />
-                            <input
-                              type="text"
-                              value={codeReqContact}
-                              onChange={(e) => setCodeReqContact(e.target.value)}
-                              placeholder="Email or phone number"
-                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                            />
-                            <input
-                              type="text"
-                              value={codeReqSchool}
-                              onChange={(e) => setCodeReqSchool(e.target.value)}
-                              placeholder="School name (optional)"
-                              className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                            />
-                            {codeReqError && <p className="text-red-500 text-xs">{codeReqError}</p>}
-                            <div className="flex items-center gap-3">
-                              <button
-                                type="button"
-                                onClick={handleCodeRequestSubmit}
-                                disabled={codeReqSubmitting}
-                                className="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary/90 disabled:opacity-50 flex items-center gap-1.5"
-                              >
-                                {codeReqSubmitting && <Loader2 className="w-3 h-3 animate-spin" />}
-                                Submit Request
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setShowCodeRequest(false)}
-                                className="text-neutral-600 text-xs hover:underline"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    )}
+                    <p className="text-neutral-500 text-xs mt-1">
+                      Have one? Enter it here. You will receive your own share code after registration.
+                    </p>
                   </div>
 
                   {/* Student-specific fields */}
@@ -1366,11 +1280,9 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
               {/* Google Sign-Up (register mode only). Placed AFTER the form
                   fields so everything the user has chosen — plan, year group,
                   exam types, referral code, teacher credentials — is captured
-                  into the OAuth registration data. Hidden in invite mode once
-                  detected: Google registration hits the same codeRequired
-                  rejection. Turnstile is not needed here; the worker skips it
-                  for OAuth because Google verifies humanity. */}
-              {mode === 'register' && selectedRole && selectedRole !== 'admin' && !inviteModeDetected && (
+                  into the OAuth registration data. Turnstile is not needed here;
+                  the worker relies on Google's verified identity flow. */}
+              {mode === 'register' && selectedRole && selectedRole !== 'admin' && (
                 <>
                   <div className="relative my-4">
                     <div className="absolute inset-0 flex items-center">
@@ -1397,13 +1309,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                       ...(primaryExamType ? { primaryExamTypeId: primaryExamType } : {}),
                       ...(referralCode.trim() ? { referralCode: referralCode.trim().toUpperCase() } : {}),
                     }}
-                    onError={(error) => {
-                      setFormErrors({ submit: error });
-                      if (/invite code is required/i.test(error)) {
-                        setInviteModeDetected(true);
-                        setShowCodeRequest(true);
-                      }
-                    }}
+                    onError={(error) => setFormErrors({ submit: error })}
                     disabled={isLoading}
                   />
                 </>

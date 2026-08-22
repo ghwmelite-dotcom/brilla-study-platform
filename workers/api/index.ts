@@ -15,7 +15,13 @@ import { chatApp } from './chat';
 import { moderationApp } from './moderation';
 import { paymentsApp, runPaymentReconciliation } from './payments';
 import { subscriptionsApp } from './subscriptions';
-import { affiliatesApp, isValidReferralCode, attributeReferral } from './affiliates';
+import {
+  affiliatesApp,
+  isValidReferralCode,
+  attributeReferral,
+  awardReferralSignupPoints,
+  generateUniqueReferralCode,
+} from './affiliates';
 import { recordingsApp } from './recordings';
 import { whiteboardsApp } from './whiteboards';
 import { teacherBonusesRouter } from './teacher-bonuses';
@@ -39,7 +45,11 @@ import { studyRoomsApp } from './study-rooms';
 import tutorClassroomApp from './tutor-classroom';
 import { cleanupExpiredDemoData } from './demoUtils';
 import { awardPoints } from './points';
-import { PENDING_APPROVAL_MESSAGE, SELF_REGISTRATION_STATUS } from './registration-policy';
+import {
+  getSelfRegistrationStatus,
+  IMMEDIATE_STUDENT_REGISTRATION_MESSAGE,
+  PENDING_APPROVAL_MESSAGE,
+} from './registration-policy';
 import { raceApp, runRaceCycleMaintenance } from './race';
 import { telegramWebhookApp } from './telegram';
 import { runTelegramRaceAlerts } from './race-alerts';
@@ -429,6 +439,32 @@ export function getVerificationEmailHTML(name: string, verificationUrl: string):
         <p style="font-size: 14px; color: #6b7280;">This link expires in 24 hours. If you didn't expect this email, please ignore it.</p>
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
         <p style="font-size: 12px; color: #9ca3af; text-align: center;">Brilla Study Platform - Excellence in Learning</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+export function getEmailVerificationHTML(name: string, verificationUrl: string): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Verify Your Email - BrillaPrep</title>
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to BrillaPrep!</h1>
+      </div>
+      <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+        <p style="font-size: 16px;">Hello <strong>${escapeHtml(name)}</strong>,</p>
+        <p style="font-size: 16px;">Your student account is ready. Confirm this email address so future sign-ins stay secure.</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${escapeHtml(verificationUrl)}" style="background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">Verify Email</a>
+        </div>
+        <p style="font-size: 14px; color: #6b7280;">This link expires in 24 hours. If you did not create this account, ignore this email.</p>
       </div>
     </body>
     </html>
@@ -952,26 +988,8 @@ publicApp.get('/exam-types/:slug/paper-types', async (c) => {
 // AUTHENTICATION ROUTES
 // =============================================
 
-// Referral signup rewards are issued only after an administrator approves the
-// referred account. The ledger check makes approval retries idempotent.
-async function awardReferralSignupPoints(db: D1Database, affiliateUserId: string, newUserId: string): Promise<void> {
-  const existingAward = await db.prepare(`
-    SELECT id FROM points_ledger
-    WHERE user_id = ? AND source = 'referral_signup' AND source_ref = ?
-    LIMIT 1
-  `).bind(affiliateUserId, newUserId).first();
-  if (existingAward) return;
-
-  await awardPoints(db, {
-    userId: affiliateUserId,
-    points: 100,
-    source: 'referral_signup',
-    sourceRef: newUserId,
-  });
-}
-
-// Register new user. Every self-registration remains pending until an
-// administrator approves it; referral codes never grant access.
+// Register a new user. Students begin immediately; roles with elevated access
+// remain pending. Referral codes are optional attribution, never an access gate.
 publicApp.post('/auth/register', async (c) => {
   const body = await parseJsonBody(c);
   if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
@@ -1028,8 +1046,14 @@ publicApp.post('/auth/register', async (c) => {
   }
 
   try {
-    // Growth loop: referral code gate. Validated BEFORE any other field/user check —
-    // an invalid code is a 400 before the email-exists lookup or user creation.
+    // Defense-in-depth: only self-serve roles may be caller-selected.
+    if (role && !ALLOWED_SELF_SERVE_ROLES.includes(role)) {
+      return c.json({ success: false, error: 'Invalid role' }, 400);
+    }
+    const userRole = (role || 'student') as 'student' | 'teacher' | 'parent';
+
+    // Students never need an invite. Other self-serve roles retain the legacy
+    // invite-mode gate when that environment setting is intentionally enabled.
     const inviteMode = c.env.REGISTRATION_MODE === 'invite';
     let referralAffiliate: { id: string; user_id: string; referral_code: string } | null = null;
     if (referralCode) {
@@ -1043,10 +1067,10 @@ publicApp.post('/auth/register', async (c) => {
       if (!referralAffiliate) {
         return c.json({ success: false, error: 'Invalid referral code' }, 400);
       }
-    } else if (inviteMode) {
+    } else if (inviteMode && userRole !== 'student') {
       return c.json({
         success: false,
-        error: 'An invite code is required to register. Request one below.',
+        error: 'An invite code is required for this role. Contact a BrillaPrep administrator.',
         data: { codeRequired: true },
       }, 400);
     }
@@ -1067,34 +1091,48 @@ publicApp.post('/auth/register', async (c) => {
 
     // Hash password
     const passwordHash = await hashPassword(password);
-    const id = `user_${Date.now()}`;
-    // Defense-in-depth: only self-serve roles may be caller-selected
-    if (role && !ALLOWED_SELF_SERVE_ROLES.includes(role)) {
-      return c.json({ success: false, error: 'Invalid role' }, 400);
-    }
-    const userRole = role || 'student';
+    const id = `user_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
+    const initialStatus = getSelfRegistrationStatus(userRole);
+    const ownReferralCode = initialStatus === 'approved'
+      ? await generateUniqueReferralCode(c.env.DB, name)
+      : null;
+    const verificationToken = initialStatus === 'approved' ? generateToken() : null;
+    const verificationExpiresAt = verificationToken
+      ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      : null;
 
     // The user insert, primary exam-type update and preference inserts run in
     // one D1 batch so a failure mid-write cannot leave a partial account.
     // referred_by is attribution metadata only and never affects access.
-    const initialStatus = SELF_REGISTRATION_STATUS;
     const statements = [
       c.env.DB.prepare(`
         INSERT INTO users (id, email, password_hash, name, role, status, email_verified,
+                           verification_token, verification_token_expires_at,
                            school_level, year_group, school_name, house,
                            teacher_license_number, subjects_taught, years_experience, qualifications,
-                           selected_tier_id, referred_by)
-        VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                           selected_tier_id, referred_by, is_affiliate)
+        VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
         id, email, passwordHash, name, userRole, initialStatus,
+        verificationToken, verificationExpiresAt,
         normalizeSchoolLevel(schoolLevel), yearGroup || null, schoolName || null, house || null,
         teacherLicenseNumber || null,
         subjectsTaught ? JSON.stringify(subjectsTaught) : null,
         yearsExperience || null, qualifications || null,
         selectedTierId || null,
-        referralAffiliate ? referralAffiliate.referral_code : null
+        referralAffiliate ? referralAffiliate.referral_code : null,
+        ownReferralCode ? 1 : 0,
       ),
     ];
+
+    if (ownReferralCode) {
+      statements.push(
+        c.env.DB.prepare(`
+          INSERT INTO affiliate_profiles (id, user_id, referral_code, tier_id)
+          VALUES (?, ?, ?, 'tier_scout')
+        `).bind(`affiliate_${crypto.randomUUID()}`, id, ownReferralCode)
+      );
+    }
 
     // Create exam type preferences if provided
     if (examTypeIds && Array.isArray(examTypeIds) && examTypeIds.length > 0) {
@@ -1123,13 +1161,22 @@ publicApp.post('/auth/register', async (c) => {
 
     await c.env.DB.batch(statements);
 
-    // Attribute the referral now, but defer its reward until admin approval.
+    // Attribution and rewards are best-effort side effects. They must never
+    // turn a successfully committed student account into a reported failure.
     if (referralAffiliate) {
-      await attributeReferral(c.env.DB, referralAffiliate, id, referralAffiliate.referral_code);
+      try {
+        await attributeReferral(c.env.DB, referralAffiliate, id, referralAffiliate.referral_code);
+        if (initialStatus === 'approved') {
+          await awardReferralSignupPoints(c.env.DB, referralAffiliate.user_id, id);
+        }
+      } catch (referralError) {
+        console.error('Failed to attribute referral during registration:', referralError);
+      }
     }
 
-    // Notify all admin users about the new registration
-    try {
+    if (initialStatus === 'pending') {
+      // Notify all admin users about the new registration
+      try {
       const { results: admins } = await c.env.DB.prepare(
         "SELECT id, email, name FROM users WHERE role = 'admin' AND status = 'approved'"
       ).all();
@@ -1180,9 +1227,66 @@ publicApp.post('/auth/register', async (c) => {
           }
         }
       }
-    } catch (notifyError) {
-      // Log but don't fail the registration if notification fails
-      console.error('Failed to notify admins:', notifyError);
+      } catch (notifyError) {
+        // Log but don't fail the registration if notification fails
+        console.error('Failed to notify admins:', notifyError);
+      }
+    }
+
+    if (initialStatus === 'approved') {
+      if (verificationToken && c.env.RESEND_API_KEY) {
+        try {
+          const appUrl = c.env.APP_URL || 'https://brillaprep.org';
+          const verificationUrl = `${appUrl}/set-password?mode=verify-email&token=${verificationToken}`;
+          await sendEmail(
+            c.env.RESEND_API_KEY,
+            c.env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>',
+            email,
+            'Verify your BrillaPrep email',
+            getEmailVerificationHTML(name, verificationUrl),
+          );
+        } catch (verificationEmailError) {
+          console.error('Failed to send student verification email:', verificationEmailError);
+        }
+      }
+
+      const token = await generateJWT({
+        userId: id,
+        email,
+        role: userRole,
+        sessionVersion: 0,
+      }, c.env.JWT_SECRET);
+
+      await c.env.DB.prepare(
+        "UPDATE users SET last_login_at = datetime('now') WHERE id = ?"
+      ).bind(id).run();
+
+      return c.json({
+        success: true,
+        data: {
+          status: initialStatus,
+          message: IMMEDIATE_STUDENT_REGISTRATION_MESSAGE,
+          requiresApproval: false,
+          referralCode: ownReferralCode,
+          token,
+          user: {
+            id,
+            email,
+            name,
+            role: userRole,
+            status: initialStatus,
+            emailVerified: false,
+            house: house || null,
+            yearGroup: yearGroup || null,
+            schoolLevel: normalizeSchoolLevel(schoolLevel),
+            schoolName: schoolName || null,
+            xpPoints: 0,
+            level: 1,
+            streakDays: 0,
+            aiGradingCredits: 0,
+          },
+        }
+      });
     }
 
     return c.json({
@@ -1190,6 +1294,7 @@ publicApp.post('/auth/register', async (c) => {
       data: {
         status: initialStatus,
         message: PENDING_APPROVAL_MESSAGE,
+        requiresApproval: true,
       }
     });
   } catch (error) {
@@ -1198,70 +1303,13 @@ publicApp.post('/auth/register', async (c) => {
   }
 });
 
-// Request an invite/referral code (public, rate-limited — growth loop Task 5).
-// Pilot students without a code ask here; admins fulfill from /admin/affiliates.
+// Legacy client compatibility: student invite requests are intentionally
+// retired. Historical records remain available to administrators.
 publicApp.post('/referral-code-requests', async (c) => {
-  const body = await parseJsonBody(c);
-  if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
-  const { name, contact, schoolName, message } = body;
-
-  if (!name || !contact) {
-    return c.json({ success: false, error: 'Name and contact are required' }, 400);
-  }
-
-  // Input length caps (untrusted public input)
-  if (
-    String(name).length > 100 ||
-    String(contact).length > 254 ||
-    (schoolName && String(schoolName).length > 120) ||
-    (message && String(message).length > 500)
-  ) {
-    return c.json({ success: false, error: 'Input too long' }, 400);
-  }
-
-  const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
-  const rateLimit = await checkRateLimit(c.env.DB, clientIp, 'code-request');
-  if (!rateLimit.allowed) {
-    return rateLimitResponse(c, rateLimit);
-  }
-
-  try {
-    const id = `rcr_${crypto.randomUUID()}`;
-    await c.env.DB.prepare(`
-      INSERT INTO referral_code_requests (id, name, contact, school_name, message)
-      VALUES (?, ?, ?, ?, ?)
-    `).bind(id, String(name).trim(), String(contact).trim(), schoolName || null, message || null).run();
-
-    // Notify admins in-app (same pattern as new registrations)
-    try {
-      const { results: admins } = await c.env.DB.prepare(
-        "SELECT id FROM users WHERE role = 'admin' AND status = 'approved'"
-      ).all();
-
-      for (const admin of admins as { id: string }[]) {
-        await createNotification(
-          c.env.DB,
-          admin.id,
-          'system',
-          'New Invite Code Request',
-          `${name} (${contact}) requested an invite code${schoolName ? ` — ${schoolName}` : ''}.`,
-          {
-            icon: 'ticket',
-            link: '/admin/affiliates',
-            metadata: { requestId: id }
-          }
-        );
-      }
-    } catch (notifyError) {
-      // Log but don't fail the request if notification fails
-      console.error('Failed to notify admins of code request:', notifyError);
-    }
-
-    return c.json({ success: true, data: { id } });
-  } catch (error) {
-    console.error('Referral code request error:', error);
-    return c.json({ success: false, error: 'Failed to submit request' }, 500);
-  }
+  return c.json({
+    success: false,
+    error: 'Invite requests are no longer required for student registration. Create your student account directly.',
+  }, 410);
 });
 
 // Login
@@ -1502,6 +1550,69 @@ publicApp.post('/auth/set-password', async (c) => {
   } catch (error) {
     console.error('Set password error:', error);
     return c.json({ success: false, error: 'Failed to set password' }, 500);
+  }
+});
+
+// Verify a self-registered email without changing the password.
+publicApp.post('/auth/verify-email', async (c) => {
+  const body = await parseJsonBody(c);
+  if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+  const { token, turnstileToken } = body;
+  if (!token) return c.json({ success: false, error: 'Token is required' }, 400);
+
+  const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
+  const ipRateLimit = await checkRateLimit(c.env.DB, clientIp, 'set-password');
+  if (!ipRateLimit.allowed) {
+    return rateLimitResponse(c, ipRateLimit);
+  }
+
+  if (c.env.TURNSTILE_SECRET && turnstileToken) {
+    const isValidTurnstile = await verifyTurnstile(
+      turnstileToken,
+      c.env.TURNSTILE_SECRET,
+      clientIp,
+    );
+    if (!isValidTurnstile) {
+      return c.json({ success: false, error: 'Security verification failed. Please try again.' }, 400);
+    }
+  } else if (c.env.TURNSTILE_SECRET && !turnstileToken) {
+    return c.json({ success: false, error: 'Security verification required.' }, 400);
+  }
+
+  try {
+    const user = await c.env.DB.prepare(`
+      SELECT id, verification_token_expires_at
+      FROM users
+      WHERE verification_token = ?
+    `).bind(String(token)).first<{ id: string; verification_token_expires_at: string | null }>();
+
+    if (!user) {
+      return c.json({ success: false, error: 'Invalid or expired verification link.' }, 400);
+    }
+
+    if (
+      user.verification_token_expires_at &&
+      new Date(user.verification_token_expires_at) < new Date()
+    ) {
+      return c.json({ success: false, error: 'This verification link has expired.' }, 400);
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        email_verified = 1,
+        verification_token = NULL,
+        verification_token_expires_at = NULL,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(user.id).run();
+
+    return c.json({
+      success: true,
+      data: { message: 'Email verified successfully.' },
+    });
+  } catch (error) {
+    console.error('Verify email error:', error);
+    return c.json({ success: false, error: 'Failed to verify email' }, 500);
   }
 });
 

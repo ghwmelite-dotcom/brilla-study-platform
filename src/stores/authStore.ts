@@ -81,7 +81,12 @@ interface AuthState {
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   login: (email: string, password: string, turnstileToken?: string) => Promise<void>;
-  register: (data: RegisterData) => Promise<{ success: boolean; status: UserStatus; message: string }>;
+  register: (data: RegisterData) => Promise<{
+    success: boolean;
+    status: UserStatus;
+    message: string;
+    referralCode?: string;
+  }>;
   logout: () => void;
   updateProfile: (updates: Partial<User>) => void;
   clearError: () => void;
@@ -116,6 +121,7 @@ interface AuthState {
     isNewUser?: boolean;
     requiresApproval?: boolean;
     message?: string;
+    referralCode?: string;
   }>;
   getLinkedProviders: () => Promise<{ hasPassword: boolean; providers: Array<{ provider: string; email: string }> }>;
   unlinkGoogle: () => Promise<void>;
@@ -181,7 +187,7 @@ interface RegisterData {
   // Exam type preferences (for students and teachers)
   examTypeIds?: string[];
   primaryExamTypeId?: string;
-  // Affiliate referral/invite code (required when backend runs in invite mode)
+  // Optional attribution code from another student or affiliate
   referralCode?: string;
 }
 
@@ -268,7 +274,30 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
         try {
           // Call the API to register user
-          const response = await api.post<{ status?: string; message?: string; codeRequired?: boolean }>('/auth/register', {
+          const response = await api.post<{
+            status?: string;
+            message?: string;
+            codeRequired?: boolean;
+            requiresApproval?: boolean;
+            referralCode?: string;
+            token?: string;
+            user?: {
+              id: string;
+              email: string;
+              name: string;
+              role: string;
+              status: string;
+              emailVerified?: boolean;
+              house?: string;
+              yearGroup?: number;
+              schoolLevel?: string;
+              schoolName?: string;
+              xpPoints?: number;
+              level?: number;
+              streakDays?: number;
+              aiGradingCredits?: number;
+            };
+          }>('/auth/register', {
             email: data.email,
             password: data.password,
             name: data.name,
@@ -287,7 +316,7 @@ export const useAuthStore = create<AuthState>()(
             // Include exam type preferences
             examTypeIds: data.examTypeIds,
             primaryExamTypeId: data.primaryExamTypeId,
-            // Affiliate referral/invite code (growth loop; required in invite mode)
+            // Optional attribution code from another student or affiliate
             referralCode: data.referralCode,
           });
 
@@ -303,11 +332,47 @@ export const useAuthStore = create<AuthState>()(
             throw err;
           }
 
-          // Return status info from API response
+          const status = (response.data?.status || 'pending') as UserStatus;
+          const apiUser = response.data?.user;
+          const token = response.data?.token;
+
+          if (status === 'approved' && apiUser && token) {
+            const user: ManagedUser = {
+              id: apiUser.id,
+              email: apiUser.email,
+              name: apiUser.name,
+              role: apiUser.role as UserRole,
+              status,
+              house: apiUser.house || undefined,
+              yearGroup: apiUser.yearGroup || undefined,
+              schoolLevel: apiUser.schoolLevel as SchoolLevel | undefined,
+              schoolName: apiUser.schoolName || undefined,
+              xpPoints: apiUser.xpPoints || 0,
+              level: apiUser.level || 1,
+              streakDays: apiUser.streakDays || 0,
+              aiGradingCredits: apiUser.aiGradingCredits || 0,
+              emailVerified: apiUser.emailVerified ?? false,
+              isActive: true,
+              passwordSet: true,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+
+            api.setToken(token);
+            set({
+              user,
+              token,
+              isAuthenticated: true,
+              isLoading: false,
+              error: null,
+            });
+          }
+
           return {
             success: true,
-            status: (response.data?.status || 'pending') as UserStatus,
+            status,
             message: response.data?.message || 'Your registration is pending approval. You will be notified once an administrator reviews your application.',
+            referralCode: response.data?.referralCode,
           };
         } catch (error) {
           set({
@@ -726,11 +791,12 @@ export const useAuthStore = create<AuthState>()(
             isNewUser: boolean;
             requiresApproval: boolean;
             message?: string;
+            referralCode?: string;
           }
           const response = await api.post<OAuthCallbackResponse>('/auth/oauth/google/callback', { code, state });
 
           if (response.success && response.data) {
-            const { user: apiUser, token, isNewUser, requiresApproval, message } = response.data;
+            const { user: apiUser, token, isNewUser, requiresApproval, message, referralCode } = response.data;
 
             if (requiresApproval) {
               set({
@@ -782,7 +848,7 @@ export const useAuthStore = create<AuthState>()(
             // Set token in API client
             api.setToken(token);
 
-            return { success: true, isNewUser };
+            return { success: true, isNewUser, referralCode };
           } else {
             // Error response may include a code from API
             const errorResponse = response as { error?: string; code?: string };
