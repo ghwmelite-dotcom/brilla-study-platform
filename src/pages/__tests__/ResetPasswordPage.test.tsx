@@ -6,10 +6,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   resetPassword: vi.fn(),
+  logout: vi.fn(),
 }));
 
 vi.mock('@/lib/api', () => ({
   api: { resetPassword: mocks.resetPassword },
+}));
+
+vi.mock('@/stores/authStore', () => ({
+  useAuthStore: (selector: (state: { logout: () => void }) => unknown) => selector({ logout: mocks.logout }),
 }));
 
 vi.mock('@/hooks/useTurnstile', () => ({
@@ -50,6 +55,7 @@ describe('ResetPasswordPage', () => {
     container = document.createElement('div');
     document.body.appendChild(container);
     root = createRoot(container);
+    mocks.logout.mockReset();
     mocks.resetPassword.mockReset().mockResolvedValue({
       success: true,
       data: { message: 'Password reset successfully.' },
@@ -97,6 +103,7 @@ describe('ResetPasswordPage', () => {
       'N3wSecurePassword1',
       'turnstile-token',
     );
+    expect(mocks.logout).toHaveBeenCalledOnce();
     expect(container.textContent).toContain('Password Reset Successfully');
   });
 });
