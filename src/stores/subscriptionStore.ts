@@ -11,6 +11,39 @@ import type {
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
+interface SubscriptionPlanApiResponse {
+  id: string;
+  name: string;
+  description?: string;
+  userType?: 'student' | 'teacher';
+  price_monthly?: number | null;
+  price_yearly?: number | null;
+  priceMonthly?: number | null;
+  priceYearly?: number | null;
+  features?: string[];
+  ai_grading_quota?: number;
+  aiGradingQuota?: number;
+  is_active?: number | boolean;
+  isActive?: boolean;
+}
+
+export function normalizeSubscriptionPlan(plan: SubscriptionPlanApiResponse): SubscriptionPlan {
+  const priceMonthly = plan.priceMonthly ?? plan.price_monthly ?? null;
+  const priceYearly = plan.priceYearly ?? plan.price_yearly ?? null;
+
+  return {
+    id: plan.id,
+    name: plan.name,
+    description: plan.description,
+    userType: plan.userType ?? (plan.id.includes('teacher') ? 'teacher' : 'student'),
+    priceMonthly,
+    priceYearly,
+    features: Array.isArray(plan.features) ? plan.features : [],
+    aiGradingQuota: plan.aiGradingQuota ?? plan.ai_grading_quota ?? 0,
+    isActive: plan.isActive ?? (plan.is_active === 1 || plan.is_active === true),
+  };
+}
+
 interface SubscriptionState {
   // State
   plans: SubscriptionPlan[];
@@ -72,10 +105,13 @@ export const useSubscriptionStore = create<SubscriptionState>()(
           const response = await fetchWithAuth(`${API_BASE}/subscriptions/plans`, { headers });
           const data = await response.json();
 
-          if (data.success) {
-            set({ plans: data.data, isLoading: false });
+          if (data.success && Array.isArray(data.data)) {
+            set({
+              plans: data.data.map((plan: SubscriptionPlanApiResponse) => normalizeSubscriptionPlan(plan)),
+              isLoading: false,
+            });
           } else {
-            set({ error: data.error, isLoading: false });
+            set({ error: data.error || 'Invalid subscription plan response', isLoading: false });
           }
         } catch {
           set({ error: 'Failed to fetch plans', isLoading: false });
