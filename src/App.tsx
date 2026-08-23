@@ -52,6 +52,7 @@ const AdminSchools = lazyWithRetry(() => import('@/pages/admin/AdminSchools'));
 // Admin layout (lazy loaded)
 const AdminLayout = lazyWithRetry(() => import('@/components/admin/layout/AdminLayout').then(m => ({ default: m.AdminLayout })));
 const SetPasswordPage = lazyWithRetry(() => import('@/pages/SetPasswordPage').then(m => ({ default: m.SetPasswordPage })));
+const ResetPasswordPage = lazyWithRetry(() => import('@/pages/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })));
 const ParentDashboardPage = lazyWithRetry(() => import('@/pages/ParentDashboard').then(m => ({ default: m.ParentDashboardPage })));
 const ParentSettingsPage = lazyWithRetry(() => import('@/pages/ParentSettings').then(m => ({ default: m.ParentSettingsPage })));
 const ParentReportsPage = lazyWithRetry(() => import('@/pages/ParentReports').then(m => ({ default: m.ParentReportsPage })));
@@ -296,6 +297,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/set-password" element={<LazyPage><SetPasswordPage /></LazyPage>} />
+        <Route path="/reset-password" element={<LazyPage><ResetPasswordPage /></LazyPage>} />
         <Route path="/oauth/callback" element={<LazyPage><OAuthCallback /></LazyPage>} />
 
         {/* Legal pages (no layout) */}

@@ -12,4 +12,9 @@ describe('public release boundaries', () => {
     expect(appSource).not.toContain("import('@/pages/BriieToken')");
     expect(appSource).not.toMatch(/<Route\s+path=["']\/briie["']/);
   });
+
+  it('keeps emailed password-reset links on a dedicated public route', () => {
+    expect(appSource).toContain("import('@/pages/ResetPasswordPage')");
+    expect(appSource).toMatch(/<Route path="\/reset-password"/);
+  });
 });
