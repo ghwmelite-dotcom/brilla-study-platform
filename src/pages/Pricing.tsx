@@ -3,8 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { Check, Zap, Crown, Star, ArrowRight, Clock, Gift, Sparkles } from 'lucide-react';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { useAuthStore } from '@/stores/authStore';
+import type { SubscriptionPlan } from '@/types';
 
 type BillingCycle = 'monthly' | 'yearly';
+
+function getPlanBillingCycle(plan: SubscriptionPlan): BillingCycle {
+  if (plan.priceYearly != null && plan.priceMonthly == null) {
+    return 'yearly';
+  }
+  return 'monthly';
+}
+
+function getPlanPrice(plan: SubscriptionPlan): number | null {
+  const billingCycle = getPlanBillingCycle(plan);
+  const price = billingCycle === 'yearly' ? plan.priceYearly : plan.priceMonthly;
+  return typeof price === 'number' && price > 0 ? price : null;
+}
 
 export default function Pricing() {
   const navigate = useNavigate();
@@ -19,7 +33,6 @@ export default function Pricing() {
     initializePayment,
   } = useSubscriptionStore();
 
-  const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -42,16 +55,17 @@ export default function Pricing() {
     }
   };
 
-  const handleSelectPlan = async (planId: string) => {
+  const handleSelectPlan = async (plan: SubscriptionPlan) => {
     if (!isAuthenticated) {
-      navigate('/register?plan=' + planId);
+      navigate('/register?plan=' + plan.id);
       return;
     }
 
-    setSelectedPlan(planId);
+    const billingCycle = getPlanBillingCycle(plan);
+    setSelectedPlan(plan.id);
     setIsProcessing(true);
 
-    const result = await initializePayment(planId, billingCycle);
+    const result = await initializePayment(plan.id, billingCycle);
 
     if (result?.authorizationUrl) {
       // Redirect to Paystack checkout
@@ -69,30 +83,9 @@ export default function Pricing() {
     return plan.userType === userRole;
   });
 
-  // Get price based on billing cycle
-  const getPrice = (plan: typeof plans[0]) => {
-    if (billingCycle === 'yearly' && plan.priceYearly) {
-      return plan.priceYearly;
-    }
-    return plan.priceMonthly || 0;
-  };
-
-  // Get monthly equivalent for yearly plans
-  const getMonthlyEquivalent = (plan: typeof plans[0]) => {
-    if (billingCycle === 'yearly' && plan.priceYearly) {
-      return Math.round(plan.priceYearly / 12);
-    }
-    return plan.priceMonthly || 0;
-  };
-
-  // Calculate savings
-  const getSavings = (plan: typeof plans[0]) => {
-    if (billingCycle === 'yearly' && plan.priceMonthly && plan.priceYearly) {
-      const yearlyIfMonthly = plan.priceMonthly * 12;
-      return yearlyIfMonthly - plan.priceYearly;
-    }
-    return 0;
-  };
+  const monthlyPlanPrice = filteredPlans.find(
+    plan => getPlanBillingCycle(plan) === 'monthly' && getPlanPrice(plan) != null,
+  )?.priceMonthly ?? null;
 
   const hasTrialAvailable = !trialStatus && subscriptionStatus?.status === 'free';
   const isOnTrial = subscriptionStatus?.status === 'trial';
@@ -143,35 +136,6 @@ export default function Pricing() {
           )}
         </div>
 
-        {/* Billing Toggle */}
-        <div className="flex justify-center mb-10">
-          <div className="bg-neutral-100 p-1 rounded-xl inline-flex">
-            <button
-              onClick={() => setBillingCycle('monthly')}
-              className={`px-6 py-2.5 rounded-lg font-medium transition-all ${
-                billingCycle === 'monthly'
-                  ? 'bg-white text-neutral-900 shadow-sm'
-                  : 'text-neutral-600 hover:text-neutral-900'
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setBillingCycle('yearly')}
-              className={`px-6 py-2.5 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                billingCycle === 'yearly'
-                  ? 'bg-white text-neutral-900 shadow-sm'
-                  : 'text-neutral-600 hover:text-neutral-900'
-              }`}
-            >
-              Yearly
-              <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
-                Save 20%
-              </span>
-            </button>
-          </div>
-        </div>
-
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {/* Free Tier */}
@@ -213,11 +177,16 @@ export default function Pricing() {
           {filteredPlans
             .filter(plan => plan.id !== 'tier_free')
             .map((plan, index) => {
-              const price = getPrice(plan);
-              const monthlyEquivalent = getMonthlyEquivalent(plan);
-              const savings = getSavings(plan);
-              const isPopular = index === 0;
-              const discountedPrice = discountPercent > 0
+              const billingCycle = getPlanBillingCycle(plan);
+              const price = getPlanPrice(plan);
+              const monthlyEquivalent = billingCycle === 'yearly' && price != null
+                ? Math.round(price / 12)
+                : null;
+              const savings = billingCycle === 'yearly' && price != null && monthlyPlanPrice != null
+                ? Math.max(0, monthlyPlanPrice * 12 - price)
+                : 0;
+              const isPopular = billingCycle === 'yearly' || index === 0;
+              const discountedPrice = discountPercent > 0 && price != null
                 ? Math.round(price * (1 - discountPercent / 100))
                 : price;
 
@@ -248,7 +217,7 @@ export default function Pricing() {
                   </div>
 
                   <div className="mb-6">
-                    {discountPercent > 0 && (
+                    {discountPercent > 0 && price != null && (
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-lg text-neutral-400 line-through">{price} GHS</span>
                         <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
@@ -256,16 +225,20 @@ export default function Pricing() {
                         </span>
                       </div>
                     )}
-                    <div className="flex items-baseline">
-                      <span className="text-4xl font-bold text-neutral-900">
-                        {discountPercent > 0 ? discountedPrice : price}
-                      </span>
-                      <span className="text-lg text-neutral-500 ml-1">GHS</span>
-                      <span className="text-sm text-neutral-400 ml-2">
-                        /{billingCycle === 'yearly' ? 'year' : 'month'}
-                      </span>
-                    </div>
-                    {billingCycle === 'yearly' && (
+                    {price != null ? (
+                      <div className="flex items-baseline">
+                        <span className="text-4xl font-bold text-neutral-900">
+                          {discountPercent > 0 ? discountedPrice : price}
+                        </span>
+                        <span className="text-lg text-neutral-500 ml-1">GHS</span>
+                        <span className="text-sm text-neutral-400 ml-2">
+                          /{billingCycle === 'yearly' ? 'year' : 'month'}
+                        </span>
+                      </div>
+                    ) : (
+                      <p className="text-lg font-semibold text-neutral-700">Price unavailable</p>
+                    )}
+                    {billingCycle === 'yearly' && monthlyEquivalent != null && (
                       <p className="text-sm text-neutral-500 mt-1">
                         {monthlyEquivalent} GHS/month
                         {savings > 0 && (
@@ -296,8 +269,8 @@ export default function Pricing() {
                   </ul>
 
                   <button
-                    onClick={() => handleSelectPlan(plan.id)}
-                    disabled={isProcessing || isSubscribed}
+                    onClick={() => handleSelectPlan(plan)}
+                    disabled={isProcessing || isSubscribed || price == null}
                     className={`w-full py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${
                       isPopular
                         ? 'bg-primary text-white hover:bg-primary-dark'
