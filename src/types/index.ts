@@ -2148,12 +2148,18 @@ export interface AffiliateDashboard {
     availableEarnings: number;
     conversionRate: number;
   };
+  networkStatus: {
+    pending: number;
+    trial: number;
+    converted: number;
+    churned: number;
+  };
   ranking: {
     rank: number;
     totalParticipants: number;
     percentile: number;
   };
-  tier: AffiliateTier | null;
+  tier: Pick<AffiliateTier, 'id' | 'name' | 'title' | 'commissionRate' | 'badgeIcon' | 'badgeColor'> | null;
   recentReferrals: {
     id: string;
     name: string;
