@@ -37,11 +37,11 @@ interface FormErrors {
 }
 
 export function EditUserModal({ isOpen, user, onClose, onSuccess }: EditUserModalProps) {
-  const { updateUser, resendVerificationEmail } = useAuthStore();
+  const { updateUser, sendPasswordResetEmail } = useAuthStore();
 
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isResendingEmail, setIsResendingEmail] = useState(false);
+  const [isSendingPasswordReset, setIsSendingPasswordReset] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
   // Form fields
@@ -190,18 +190,18 @@ export function EditUserModal({ isOpen, user, onClose, onSuccess }: EditUserModa
     }
   };
 
-  const handleResendVerification = async () => {
+  const handleSendPasswordReset = async () => {
     if (!user) return;
 
-    setIsResendingEmail(true);
+    setIsSendingPasswordReset(true);
     try {
-      await resendVerificationEmail(user.id);
-      setSuccessMessage('Verification email sent successfully!');
+      await sendPasswordResetEmail(user.id);
+      setSuccessMessage('Password reset email sent successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      setFormErrors({ resend: err instanceof Error ? err.message : 'Failed to send email' });
+      setFormErrors({ passwordReset: err instanceof Error ? err.message : 'Failed to send email' });
     } finally {
-      setIsResendingEmail(false);
+      setIsSendingPasswordReset(false);
     }
   };
 
@@ -296,34 +296,40 @@ export function EditUserModal({ isOpen, user, onClose, onSuccess }: EditUserModa
             </div>
           </div>
 
-          {/* Resend Verification (if not verified) */}
-          {!user.passwordSet && (
-            <div className="mb-6 p-4 bg-amber-50 border border-amber-100 rounded-lg">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm font-medium text-amber-800">Password Not Set</p>
-                  <p className="text-xs text-amber-600 mt-1">
-                    This user hasn't set their password yet. You can resend the verification email.
-                  </p>
-                </div>
-                <button
-                  onClick={handleResendVerification}
-                  disabled={isResendingEmail}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 disabled:opacity-50 transition-colors"
-                >
-                  {isResendingEmail ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <RefreshCw className="w-4 h-4" />
-                  )}
-                  Resend
-                </button>
+          {/* Password setup and recovery are independent from email verification. */}
+          <div className={cn(
+            'mb-6 rounded-lg border p-4',
+            user.passwordSet ? 'border-blue-100 bg-blue-50' : 'border-amber-100 bg-amber-50',
+          )}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className={cn('text-sm font-medium', user.passwordSet ? 'text-blue-800' : 'text-amber-800')}>
+                  {user.passwordSet ? 'Password Reset' : 'Password Not Set'}
+                </p>
+                <p className={cn('mt-1 text-xs', user.passwordSet ? 'text-blue-600' : 'text-amber-600')}>
+                  {user.passwordSet
+                    ? 'Send a secure one-hour link so this user can choose a new password.'
+                    : 'Send a secure one-hour link so this user can set their first password.'}
+                </p>
               </div>
-              {formErrors.resend && (
-                <p className="text-red-500 text-xs mt-2">{formErrors.resend}</p>
-              )}
+              <button
+                type="button"
+                onClick={handleSendPasswordReset}
+                disabled={isSendingPasswordReset}
+                className="flex min-h-11 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 disabled:opacity-50"
+              >
+                {isSendingPasswordReset ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-4 h-4" />
+                )}
+                {user.passwordSet ? 'Send reset link' : 'Send setup link'}
+              </button>
             </div>
-          )}
+            {formErrors.passwordReset && (
+              <p className="mt-2 text-xs text-red-500">{formErrors.passwordReset}</p>
+            )}
+          </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
