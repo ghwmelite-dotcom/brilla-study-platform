@@ -38,6 +38,7 @@ interface DbOptions {
   affiliateRow?: unknown;
   verificationUser?: {
     id: string;
+    email_verified: number;
     verification_token_expires_at: string | null;
   } | null;
 }
@@ -86,7 +87,9 @@ function makeDb({
     })),
     batch: vi.fn((statements: CapturedStatement[]) => {
       batchCalls.push(statements.map((s) => ({ sql: s.sql, args: s.args })));
-      return Promise.resolve([]);
+      return Promise.resolve(
+        statements.map(() => ({ success: true, meta: { changes: 1 } })),
+      );
     }),
   } as unknown as D1Database;
 
@@ -240,9 +243,10 @@ describe('/auth/register — referral code gate (Task 5)', () => {
   });
 
   it('verifies a student email without replacing the chosen password', async () => {
-    const { db, runsOutsideBatch } = makeDb({
+    const { db, batchCalls, runsOutsideBatch } = makeDb({
       verificationUser: {
         id: 'user_new',
+        email_verified: 0,
         verification_token_expires_at: new Date(Date.now() + 60_000).toISOString(),
       },
     });
@@ -255,10 +259,64 @@ describe('/auth/register — referral code gate (Task 5)', () => {
       { ...OPEN_ENV, DB: db },
     );
     expect(res.status).toBe(200);
-    expect(await res.json()).toMatchObject({ success: true });
-    const update = runsOutsideBatch.find((c) => c.sql.includes('email_verified = 1'));
-    expect(update?.args).toEqual(['user_new']);
+    expect(await res.json()).toMatchObject({
+      success: true,
+      data: { xpAwarded: 100 },
+    });
+    const verificationBatch = batchCalls.at(-1);
+    expect(verificationBatch).toHaveLength(2);
+    expect(verificationBatch?.[0].sql).toContain('email_verified = 1');
+    expect(verificationBatch?.[0].sql).toContain('xp_points = xp_points +');
+    expect(verificationBatch?.[0].sql).not.toContain('password_hash');
+    expect(verificationBatch?.[1].sql).toContain('INSERT OR IGNORE INTO xp_transactions');
+    expect(verificationBatch?.[1].args).toEqual([
+      'xp_email_verified_user_new',
+      'user_new',
+      100,
+      'email_verification',
+      'user_new',
+    ]);
     expect(runsOutsideBatch.some((c) => c.sql.includes('password_hash'))).toBe(false);
+  });
+
+  it('rewards an admin-created user when initial password setup verifies their email', async () => {
+    const { db, batchCalls } = makeDb({
+      verificationUser: {
+        id: 'user_setup',
+        email_verified: 0,
+        verification_token_expires_at: new Date(Date.now() + 60_000).toISOString(),
+      },
+    });
+    const res = await worker.fetch(
+      new Request('http://x/api/auth/set-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: 'verification-token',
+          password: 'N3w!Password123',
+        }),
+      }),
+      { ...OPEN_ENV, DB: db },
+    );
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      success: true,
+      data: { xpAwarded: 100 },
+    });
+    const verificationBatch = batchCalls.at(-1);
+    expect(verificationBatch).toHaveLength(2);
+    expect(verificationBatch?.[0].sql).toContain('password_hash = ?');
+    expect(verificationBatch?.[0].sql).toContain('session_version = session_version + 1');
+    expect(verificationBatch?.[0].sql).toContain('xp_points = xp_points +');
+    expect(verificationBatch?.[1].sql).toContain('INSERT OR IGNORE INTO xp_transactions');
+    expect(verificationBatch?.[1].args).toEqual([
+      'xp_email_verified_user_setup',
+      'user_setup',
+      100,
+      'email_verification',
+      'user_setup',
+    ]);
   });
 
   it('retires the legacy invite request endpoint without writing contact data', async () => {

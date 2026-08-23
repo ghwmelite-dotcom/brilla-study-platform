@@ -163,6 +163,17 @@ describe('OAuth register role hardening', () => {
     expect(body.data.requiresApproval).toBe(false);
     expect(typeof body.data.token).toBe('string');
     expect(typeof body.data.referralCode).toBe('string');
+    expect(body.data.user.xpPoints).toBe(100);
+    expect(captured.usersInsertArgs?.[18]).toBe(100);
+    const verificationReward = captured.runs.find((r) =>
+      r.sql.includes('INSERT OR IGNORE INTO xp_transactions'),
+    );
+    expect(verificationReward?.args.slice(1)).toEqual([
+      captured.usersInsertArgs?.[0],
+      100,
+      'email_verification',
+      captured.usersInsertArgs?.[0],
+    ]);
     expect(captured.runs.some((r) => r.sql.includes('INSERT INTO affiliate_profiles'))).toBe(true);
     expect(captured.runs.some((r) => r.sql.includes('last_login_at'))).toBe(true);
   });
