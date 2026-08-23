@@ -14,6 +14,7 @@ import {
 import { Turnstile } from '@/components/common/Turnstile';
 import { useTurnstile } from '@/hooks/useTurnstile';
 import { api } from '@/lib/api';
+import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/utils';
 
 const PASSWORD_MAX_LENGTH = 128;
@@ -21,6 +22,7 @@ const PASSWORD_MAX_LENGTH = 128;
 export function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
   const turnstile = useTurnstile();
   const token = searchParams.get('token');
 
@@ -66,6 +68,10 @@ export function ResetPasswordPage() {
     try {
       const response = await api.resetPassword(token, password, turnstile.token);
       if (response.success) {
+        // The backend deliberately invalidates every pre-reset JWT. Clear the
+        // matching browser state immediately so the UI cannot appear signed in
+        // until the next protected request or hard refresh discovers it.
+        logout();
         setIsSuccess(true);
       } else {
         setError(response.error || 'Failed to reset password. Please request a new link and try again.');
