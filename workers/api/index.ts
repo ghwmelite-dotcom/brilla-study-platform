@@ -6874,7 +6874,8 @@ adminApp.get('/users', async (c) => {
         SELECT id, email, name, role, status, email_verified, is_active,
                school_level, year_group, school_name, house,
                teacher_license_number, subjects_taught, years_experience, qualifications,
-               xp_points, level, streak_days, last_login_at, created_at, updated_at
+               xp_points, level, streak_days, last_login_at, created_at, updated_at,
+               CASE WHEN password_hash IS NOT NULL AND password_hash != '' THEN 1 ELSE 0 END AS password_set
         FROM users
         ORDER BY created_at DESC
         LIMIT ? OFFSET ?
@@ -7573,6 +7574,85 @@ adminApp.delete('/users/:id', async (c) => {
     return c.json({ success: true, data: { message: 'User deleted' } });
   } catch {
     return c.json({ success: false, error: 'Failed to delete user' }, 500);
+  }
+});
+
+// Send a password setup/reset link. This is intentionally separate from email
+// verification: verified accounts may still need a password reset, and Google
+// accounts may not have a password yet.
+adminApp.post('/users/:id/send-password-reset', async (c) => {
+  const userId = c.req.param('id');
+  const adminUser = c.get('user') as UserPayload;
+  const appUrl = c.env.APP_URL || 'https://brillaprep.org';
+
+  if (!c.env.RESEND_API_KEY) {
+    return c.json({ success: false, error: 'Email service not configured' }, 503);
+  }
+
+  const resetRateLimit = await checkRateLimit(c.env.DB, `admin-password-reset:${userId}`, 'forgot-password');
+  if (!resetRateLimit.allowed) {
+    return rateLimitResponse(c, resetRateLimit);
+  }
+
+  try {
+    const user = await c.env.DB.prepare(
+      'SELECT id, name, email FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    const resetToken = generateToken();
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
+    await c.env.DB.prepare(`
+      UPDATE users SET
+        password_reset_token = ?,
+        password_reset_expires_at = ?,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(resetToken, expiresAt, userId).run();
+
+    const resetUrl = `${appUrl}/reset-password?token=${resetToken}`;
+    const delivered = await sendEmail(
+      c.env.RESEND_API_KEY,
+      c.env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>',
+      user.email as string,
+      'Set or Reset Your Password - Brilla',
+      getPasswordResetEmailHTML(user.name as string, resetUrl)
+    );
+
+    if (!delivered) {
+      // Do not leave an unreachable token active when delivery fails.
+      await c.env.DB.prepare(`
+        UPDATE users SET
+          password_reset_token = NULL,
+          password_reset_expires_at = NULL,
+          updated_at = datetime('now')
+        WHERE id = ? AND password_reset_token = ?
+      `).bind(userId, resetToken).run();
+      return c.json({ success: false, error: 'Failed to send password reset email' }, 502);
+    }
+
+    await logAudit({
+      db: c.env.DB,
+      userId: adminUser.userId,
+      userEmail: adminUser.email,
+      userRole: 'admin',
+      action: 'password_reset_email_sent',
+      actionCategory: 'user_management',
+      targetType: 'user',
+      targetId: userId,
+      targetDetails: 'Sent a one-hour password setup/reset link',
+      ipAddress: c.req.header('cf-connecting-ip') || 'unknown',
+      userAgent: c.req.header('user-agent') || 'unknown',
+    });
+
+    return c.json({ success: true, data: { message: 'Password reset email sent' } });
+  } catch (error) {
+    console.error('Admin password reset email error:', error);
+    return c.json({ success: false, error: 'Failed to send password reset email' }, 500);
   }
 });
 

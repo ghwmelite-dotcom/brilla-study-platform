@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
 import { sign } from 'hono/jwt';
 import worker from '../index';
 
@@ -13,6 +13,8 @@ const USER_ROW = {
   email: 'student@test.dev',
   name: 'Test Student',
   role: 'student',
+  email_verified: 1,
+  password_set: 1,
   subjects_taught: '["Integrated Science"]',
 };
 
@@ -55,6 +57,11 @@ async function adminHeader() {
   return { Authorization: `Bearer ${token}` };
 }
 
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
+
 describe('GET /api/admin/users pagination', () => {
   it('clamps an oversized ?limit to the parseLimit cap (100) and returns the envelope', async () => {
     const { db, queries } = createMockDb();
@@ -75,6 +82,9 @@ describe('GET /api/admin/users pagination', () => {
     expect(Array.isArray(body.data.users)).toBe(true);
     // Per-row JSON.parse behavior preserved
     expect(body.data.users[0].subjectsTaught).toEqual(['Integrated Science']);
+    // The API exposes only a boolean, never the password hash itself.
+    expect(body.data.users[0].password_set).toBe(1);
+    expect(body.data.users[0]).not.toHaveProperty('password_hash');
 
     const select = queries.find(
       (q) => q.sql.includes('ORDER BY created_at DESC') && q.sql.includes('LIMIT ? OFFSET ?'),
@@ -88,6 +98,81 @@ describe('GET /api/admin/users pagination', () => {
     const { db } = createMockDb();
     const res = await worker.fetch(
       new Request('http://x/api/admin/users'),
+      { DB: db, JWT_SECRET },
+    );
+    expect(res.status).toBe(401);
+  });
+});
+
+describe('POST /api/admin/users/:id/send-password-reset', () => {
+  it('sends a reset link for an already-verified user and stores a one-hour token', async () => {
+    const queries: Query[] = [];
+    const target = {
+      id: 'user_1',
+      name: 'Test Student',
+      email: 'student@test.dev',
+      email_verified: 1,
+    };
+    const db = {
+      prepare(sql: string) {
+        const statement = {
+          first: async () => {
+            if (isAuthLookup(sql)) return ADMIN_ROW;
+            if (sql.includes('SELECT id, name, email FROM users WHERE id = ?')) return target;
+            return null;
+          },
+          all: async () => ({ results: [] }),
+          run: async () => ({ success: true, meta: { changes: 1 } }),
+        };
+        return {
+          ...statement,
+          bind(...params: unknown[]) {
+            queries.push({ sql, params });
+            return statement;
+          },
+        };
+      },
+    } as unknown as D1Database;
+    const emailFetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ id: 'email_1' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    vi.stubGlobal('fetch', emailFetch);
+
+    const res = await worker.fetch(
+      new Request('http://x/api/admin/users/user_1/send-password-reset', {
+        method: 'POST',
+        headers: await adminHeader(),
+      }),
+      {
+        DB: db,
+        JWT_SECRET,
+        RESEND_API_KEY: 'resend-test-key',
+        APP_URL: 'https://brillaprep.org',
+      },
+    );
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      success: true,
+      data: { message: 'Password reset email sent' },
+    });
+    const tokenWrite = queries.find((query) => query.sql.includes('password_reset_token = ?'));
+    expect(tokenWrite).toBeDefined();
+    expect(tokenWrite?.params[2]).toBe('user_1');
+    expect(emailFetch).toHaveBeenCalledOnce();
+    const emailRequest = emailFetch.mock.calls[0][1] as RequestInit;
+    const emailBody = JSON.parse(String(emailRequest.body)) as { to: string[]; html: string };
+    expect(emailBody.to).toEqual(['student@test.dev']);
+    expect(emailBody.html).toContain('https://brillaprep.org/reset-password?token=');
+  });
+
+  it('rejects unauthenticated reset-link requests', async () => {
+    const { db } = createMockDb();
+    const res = await worker.fetch(
+      new Request('http://x/api/admin/users/user_1/send-password-reset', { method: 'POST' }),
       { DB: db, JWT_SECRET },
     );
     expect(res.status).toBe(401);

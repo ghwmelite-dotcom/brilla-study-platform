@@ -105,7 +105,7 @@ interface AuthState {
   reactivateUser: (userId: string) => Promise<void>;
   deleteUser: (userId: string) => Promise<void>;
   getUserStats: () => UserStats;
-  resendVerificationEmail: (userId: string) => Promise<void>;
+  sendPasswordResetEmail: (userId: string) => Promise<void>;
 
   // OAuth actions
   initiateGoogleAuth: (
@@ -530,7 +530,7 @@ export const useAuthStore = create<AuthState>()(
             aiGradingCredits: (u.ai_grading_credits as number) || 0,
             isActive: (u.is_active as number) === 1,
             emailVerified: (u.email_verified as number) === 1,
-            passwordSet: !!(u.password_hash),
+            passwordSet: (u.password_set as number) === 1,
             lastLoginAt: u.last_login_at as string | undefined,
             createdAt: u.created_at as string,
             updatedAt: u.updated_at as string,
@@ -725,23 +725,23 @@ export const useAuthStore = create<AuthState>()(
         };
       },
 
-      resendVerificationEmail: async (userId: string) => {
+      sendPasswordResetEmail: async (userId: string) => {
         const { user } = get();
         if (!user || user.role !== 'admin') {
-          throw new Error('Only admins can resend verification emails');
+          throw new Error('Only admins can send password reset emails');
         }
 
         try {
-          const response = await api.post(`/admin/users/${userId}/resend-verification`, {});
+          const response = await api.post(`/admin/users/${userId}/send-password-reset`, {});
 
           if (!response.success) {
-            throw new Error(response.error || 'Failed to resend verification email');
+            throw new Error(response.error || 'Failed to send password reset email');
           }
 
           // Refresh user list
           await get().loadAllUsers();
         } catch (error) {
-          throw error instanceof Error ? error : new Error('Failed to resend verification email');
+          throw error instanceof Error ? error : new Error('Failed to send password reset email');
         }
       },
 
