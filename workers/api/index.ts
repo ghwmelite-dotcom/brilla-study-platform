@@ -38,7 +38,7 @@ import { engagementApp } from './engagement';
 import { friendsApp } from './friends';
 import { oauthApp, ALLOWED_SELF_SERVE_ROLES } from './oauth';
 import { checkRateLimit, cleanupRateLimits, RATE_LIMITS, type RateLimitResult } from './rate-limit';
-import { validateRegistration } from './validation';
+import { validatePassword, validateRegistration } from './validation';
 import { examBoardsApp } from './exam-boards';
 import { revisionClassroomApp } from './revision-classroom';
 import { studyRoomsApp } from './study-rooms';
@@ -1744,7 +1744,17 @@ publicApp.post('/auth/forgot-password', async (c) => {
 
 // Reset password with token
 publicApp.post('/auth/reset-password', async (c) => {
-  const { token, password, turnstileToken } = await c.req.json();
+  const body = await parseJsonBody(c);
+  if (!body) return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+
+  const { token, password, turnstileToken } = body;
+  if (typeof token !== 'string' || token.length === 0) {
+    return c.json({ success: false, error: 'Token is required' }, 400);
+  }
+  if (!validatePassword(password)) {
+    return c.json({ success: false, error: 'Password must be between 8 and 128 characters.' }, 400);
+  }
+
   const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
 
   // Rate limiting
@@ -1783,15 +1793,19 @@ publicApp.post('/auth/reset-password', async (c) => {
     // Hash new password and update user
     const passwordHash = await hashPassword(password);
 
-    await c.env.DB.prepare(`
+    const passwordUpdate = await c.env.DB.prepare(`
       UPDATE users SET
         password_hash = ?,
         session_version = session_version + 1,
         password_reset_token = NULL,
         password_reset_expires_at = NULL,
         updated_at = datetime('now')
-      WHERE id = ?
-    `).bind(passwordHash, user.id).run();
+      WHERE id = ? AND password_reset_token = ?
+    `).bind(passwordHash, user.id, token).run();
+
+    if ((passwordUpdate.meta?.changes ?? 0) === 0) {
+      return c.json({ success: false, error: 'This reset link has already been used.' }, 400);
+    }
 
     return c.json({ success: true, data: { message: 'Password reset successfully.' } });
   } catch (error) {
