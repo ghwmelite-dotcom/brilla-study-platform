@@ -28,7 +28,16 @@ import {
 } from 'lucide-react';
 import { useAuthStore, type ManagedUser, type UserSubscriptionDetails } from '@/stores/authStore';
 import { api } from '@/lib/api';
-import { AddUserModal, EditUserModal, AdminCard, AdminButton, AdminModal, AdminInput, AdminSelect } from '@/components/admin';
+import {
+  AddUserModal,
+  EditUserModal,
+  AdminCard,
+  AdminButton,
+  AdminDropdownMenu,
+  AdminModal,
+  AdminInput,
+  AdminSelect,
+} from '@/components/admin';
 import { cn } from '@/utils';
 
 type RoleFilter = 'all' | 'student' | 'teacher' | 'admin';
@@ -85,7 +94,7 @@ export default function UserManagement() {
       const matchesSearch =
         u.name.toLowerCase().includes(query) ||
         u.email.toLowerCase().includes(query) ||
-        (u.schoolName?.toLowerCase().includes(query));
+        u.schoolName?.toLowerCase().includes(query);
       if (!matchesSearch) return false;
     }
 
@@ -100,6 +109,8 @@ export default function UserManagement() {
   });
 
   const handleDeactivate = async (userId: string) => {
+    if (actionLoading) return;
+    setOpenDropdown(null);
     setActionLoading(userId);
     try {
       await deactivateUser(userId);
@@ -107,11 +118,12 @@ export default function UserManagement() {
       console.error('Failed to deactivate user:', error);
     } finally {
       setActionLoading(null);
-      setOpenDropdown(null);
     }
   };
 
   const handleReactivate = async (userId: string) => {
+    if (actionLoading) return;
+    setOpenDropdown(null);
     setActionLoading(userId);
     try {
       await reactivateUser(userId);
@@ -119,7 +131,6 @@ export default function UserManagement() {
       console.error('Failed to reactivate user:', error);
     } finally {
       setActionLoading(null);
-      setOpenDropdown(null);
     }
   };
 
@@ -147,11 +158,12 @@ export default function UserManagement() {
     setOpenDropdown(null);
 
     // Load tier options for the Set Tier section (data is a plain array)
-    api.get<{ id: string; name: string }[]>('/subscriptions/plans')
-      .then((r) => {
+    api
+      .get<{ id: string; name: string }[]>('/subscriptions/plans')
+      .then(r => {
         const list = Array.isArray(r.data) ? r.data : [];
-        setAvailableTiers(list.map((t) => ({ id: t.id, name: t.name })));
-        if (list.length > 0 && !list.some((t) => t.id === selectedTierId)) {
+        setAvailableTiers(list.map(t => ({ id: t.id, name: t.name })));
+        if (list.length > 0 && !list.some(t => t.id === selectedTierId)) {
           setSelectedTierId(list[0].id);
         }
       })
@@ -276,11 +288,26 @@ export default function UserManagement() {
 
   const statCards = [
     { label: 'Total Users', value: stats.total, icon: Users, color: 'cyan' },
-    { label: 'Students', value: stats.students, icon: GraduationCap, color: 'blue' },
-    { label: 'Teachers', value: stats.teachers, icon: BookOpen, color: 'emerald' },
+    {
+      label: 'Students',
+      value: stats.students,
+      icon: GraduationCap,
+      color: 'blue',
+    },
+    {
+      label: 'Teachers',
+      value: stats.teachers,
+      icon: BookOpen,
+      color: 'emerald',
+    },
     { label: 'Admins', value: stats.admins, icon: Shield, color: 'purple' },
     { label: 'Pending', value: stats.pending, icon: Clock, color: 'amber' },
-    { label: 'Active Today', value: stats.activeToday, icon: UserCheck, color: 'cyan' },
+    {
+      label: 'Active Today',
+      value: stats.activeToday,
+      icon: UserCheck,
+      color: 'cyan',
+    },
   ];
 
   return (
@@ -308,27 +335,31 @@ export default function UserManagement() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {statCards.map((stat) => {
+        {statCards.map(stat => {
           const Icon = stat.icon;
           return (
             <AdminCard key={stat.label} className="!p-4">
               <div className="flex items-center gap-3">
-                <div className={cn(
-                  'w-10 h-10 rounded-lg flex items-center justify-center',
-                  stat.color === 'cyan' && 'bg-cyan-500/20',
-                  stat.color === 'blue' && 'bg-blue-500/20',
-                  stat.color === 'emerald' && 'bg-emerald-500/20',
-                  stat.color === 'purple' && 'bg-purple-500/20',
-                  stat.color === 'amber' && 'bg-amber-500/20',
-                )}>
-                  <Icon className={cn(
-                    'w-5 h-5',
-                    stat.color === 'cyan' && 'text-admin-accent-cyan',
-                    stat.color === 'blue' && 'text-admin-accent-blue',
-                    stat.color === 'emerald' && 'text-admin-accent-emerald',
-                    stat.color === 'purple' && 'text-admin-accent-purple',
-                    stat.color === 'amber' && 'text-admin-accent-amber',
-                  )} />
+                <div
+                  className={cn(
+                    'w-10 h-10 rounded-lg flex items-center justify-center',
+                    stat.color === 'cyan' && 'bg-cyan-500/20',
+                    stat.color === 'blue' && 'bg-blue-500/20',
+                    stat.color === 'emerald' && 'bg-emerald-500/20',
+                    stat.color === 'purple' && 'bg-purple-500/20',
+                    stat.color === 'amber' && 'bg-amber-500/20',
+                  )}
+                >
+                  <Icon
+                    className={cn(
+                      'w-5 h-5',
+                      stat.color === 'cyan' && 'text-admin-accent-cyan',
+                      stat.color === 'blue' && 'text-admin-accent-blue',
+                      stat.color === 'emerald' && 'text-admin-accent-emerald',
+                      stat.color === 'purple' && 'text-admin-accent-purple',
+                      stat.color === 'amber' && 'text-admin-accent-amber',
+                    )}
+                  />
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-admin-text">{stat.value}</p>
@@ -342,64 +373,70 @@ export default function UserManagement() {
 
       {/* Filters & Search */}
       <AdminCard className="!p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           {/* Search */}
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-admin-text-muted" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-admin-text-muted" />
             <input
               type="text"
+              aria-label="Search users"
               placeholder="Search by name, email, or school..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="admin-input pl-10"
+              onChange={e => setSearchQuery(e.target.value)}
+              className="admin-input !pl-10 !pr-11"
             />
             {searchQuery && (
               <button
+                type="button"
+                aria-label="Clear user search"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-admin-text-muted hover:text-admin-text"
+                className="absolute right-0 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-md text-admin-text-muted transition-colors hover:bg-admin-border hover:text-admin-text focus:outline-none focus:ring-2 focus:ring-admin-accent-cyan/50"
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" />
               </button>
             )}
           </div>
 
           {/* Role Filter */}
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-admin-text-muted" />
+          <div className="relative sm:w-40">
+            <Filter className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-admin-text-muted" />
             <select
+              aria-label="Filter users by role"
               value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value as RoleFilter)}
-              className="admin-input pl-9 pr-8 min-w-[140px] appearance-none cursor-pointer"
+              onChange={e => setRoleFilter(e.target.value as RoleFilter)}
+              className="admin-input min-w-[140px] cursor-pointer appearance-none !pl-9 !pr-9"
             >
-              <option value="all">All Roles</option>
+              <option value="all">All roles</option>
               <option value="student">Students</option>
               <option value="teacher">Teachers</option>
               <option value="admin">Admins</option>
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-admin-text-muted pointer-events-none" />
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-admin-text-muted" />
           </div>
 
           {/* Status Filter */}
-          <div className="relative">
+          <div className="relative sm:w-36">
             <select
+              aria-label="Filter users by status"
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-              className="admin-input pr-8 min-w-[130px] appearance-none cursor-pointer"
+              onChange={e => setStatusFilter(e.target.value as StatusFilter)}
+              className="admin-input min-w-[130px] cursor-pointer appearance-none !pr-9"
             >
-              <option value="all">All Status</option>
+              <option value="all">All statuses</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-admin-text-muted pointer-events-none" />
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-admin-text-muted" />
           </div>
 
           {/* Refresh */}
           <button
+            type="button"
+            aria-label="Refresh users"
             onClick={() => loadAllUsers()}
-            className="p-2.5 text-admin-text-muted hover:text-admin-text hover:bg-admin-bg-tertiary rounded-lg transition-colors"
-            title="Refresh"
+            className="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-admin-text-muted transition-colors hover:bg-admin-bg-tertiary hover:text-admin-text focus:outline-none focus:ring-2 focus:ring-admin-accent-cyan/50"
           >
-            <RefreshCw className="w-5 h-5" />
+            <RefreshCw className="h-5 w-5" />
           </button>
         </div>
       </AdminCard>
@@ -428,15 +465,17 @@ export default function UserManagement() {
                   </td>
                 </tr>
               ) : (
-                filteredUsers.map((u) => (
+                filteredUsers.map(u => (
                   <tr key={u.id}>
                     {/* User */}
                     <td>
                       <div className="flex items-center gap-3">
-                        <div className={cn(
-                          'w-10 h-10 rounded-full flex items-center justify-center text-white font-medium',
-                          getRoleAvatarClass(u.role)
-                        )}>
+                        <div
+                          className={cn(
+                            'w-10 h-10 rounded-full flex items-center justify-center text-white font-medium',
+                            getRoleAvatarClass(u.role),
+                          )}
+                        >
                           {u.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -451,10 +490,12 @@ export default function UserManagement() {
 
                     {/* Role */}
                     <td>
-                      <span className={cn(
-                        'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium capitalize',
-                        getRoleBadgeClass(u.role)
-                      )}>
+                      <span
+                        className={cn(
+                          'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium capitalize',
+                          getRoleBadgeClass(u.role),
+                        )}
+                      >
                         {getRoleIcon(u.role)}
                         {u.role}
                       </span>
@@ -474,106 +515,111 @@ export default function UserManagement() {
 
                     {/* Joined */}
                     <td className="hidden lg:table-cell">
-                      <span className="text-sm text-admin-text-secondary">
-                        {formatDate(u.createdAt)}
-                      </span>
+                      <span className="text-sm text-admin-text-secondary">{formatDate(u.createdAt)}</span>
                     </td>
 
                     {/* Status */}
                     <td>
-                      <span className={cn(
-                        'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium',
-                        u.isActive
-                          ? 'bg-emerald-500/20 text-admin-accent-emerald border border-emerald-500/30'
-                          : 'bg-admin-bg-tertiary text-admin-text-muted'
-                      )}>
-                        <span className={cn(
-                          'w-1.5 h-1.5 rounded-full',
-                          u.isActive ? 'bg-emerald-400' : 'bg-admin-text-muted'
-                        )} />
+                      <span
+                        className={cn(
+                          'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium',
+                          u.isActive
+                            ? 'bg-emerald-500/20 text-admin-accent-emerald border border-emerald-500/30'
+                            : 'bg-admin-bg-tertiary text-admin-text-muted',
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            'w-1.5 h-1.5 rounded-full',
+                            u.isActive ? 'bg-emerald-400' : 'bg-admin-text-muted',
+                          )}
+                        />
                         {u.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
 
                     {/* Actions */}
                     <td className="text-right">
-                      <div className="relative inline-block">
-                        <button
-                          onClick={() => setOpenDropdown(openDropdown === u.id ? null : u.id)}
+                      <div className="inline-block">
+                        <AdminDropdownMenu
+                          isOpen={openDropdown === u.id}
+                          onOpenChange={isOpen => setOpenDropdown(isOpen ? u.id : null)}
                           disabled={actionLoading === u.id}
-                          className="p-2 text-admin-text-muted hover:text-admin-text hover:bg-admin-bg-tertiary rounded-lg transition-colors disabled:opacity-50"
+                          ariaLabel={`Actions for ${u.name}`}
+                          triggerClassName="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-admin-text-muted transition-colors hover:bg-admin-bg-tertiary hover:text-admin-text focus:outline-none focus:ring-2 focus:ring-admin-accent-cyan/50 disabled:opacity-50"
+                          trigger={
+                            actionLoading === u.id ? (
+                              <Loader2 className="h-5 w-5 animate-spin" />
+                            ) : (
+                              <MoreVertical className="h-5 w-5" />
+                            )
+                          }
                         >
-                          {actionLoading === u.id ? (
-                            <Loader2 className="w-5 h-5 animate-spin" />
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => {
+                              setSelectedUser(u);
+                              setShowEditModal(true);
+                              setOpenDropdown(null);
+                            }}
+                            className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-admin-text-secondary transition-colors hover:bg-admin-bg-tertiary hover:text-admin-text focus:bg-admin-bg-tertiary focus:text-admin-text focus:outline-none"
+                          >
+                            <Edit className="h-4 w-4" />
+                            Edit user
+                          </button>
+
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => openSubscriptionModal(u)}
+                            className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-admin-accent-cyan transition-colors hover:bg-cyan-500/10 focus:bg-cyan-500/10 focus:outline-none"
+                          >
+                            <CreditCard className="h-4 w-4" />
+                            Manage subscription
+                          </button>
+
+                          <hr className="my-1 border-admin-border" />
+
+                          {u.isActive ? (
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={() => handleDeactivate(u.id)}
+                              disabled={u.id === user?.id}
+                              className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-admin-accent-amber transition-colors hover:bg-amber-500/10 focus:bg-amber-500/10 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                              <UserX className="h-4 w-4" />
+                              Deactivate
+                            </button>
                           ) : (
-                            <MoreVertical className="w-5 h-5" />
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={() => handleReactivate(u.id)}
+                              className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-admin-accent-emerald transition-colors hover:bg-emerald-500/10 focus:bg-emerald-500/10 focus:outline-none"
+                            >
+                              <UserCheck className="h-4 w-4" />
+                              Reactivate
+                            </button>
                           )}
-                        </button>
 
-                        {openDropdown === u.id && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-10"
-                              onClick={() => setOpenDropdown(null)}
-                            />
-                            <div className="absolute right-0 mt-1 w-48 bg-admin-bg-secondary rounded-lg shadow-lg border border-admin-border py-1 z-20">
-                              <button
-                                onClick={() => {
-                                  setSelectedUser(u);
-                                  setShowEditModal(true);
-                                  setOpenDropdown(null);
-                                }}
-                                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-admin-text-secondary hover:text-admin-text hover:bg-admin-bg-tertiary"
-                              >
-                                <Edit className="w-4 h-4" />
-                                Edit User
-                              </button>
+                          <hr className="my-1 border-admin-border" />
 
-                              <button
-                                onClick={() => openSubscriptionModal(u)}
-                                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-admin-accent-cyan hover:bg-cyan-500/10"
-                              >
-                                <CreditCard className="w-4 h-4" />
-                                Manage Subscription
-                              </button>
-
-                              <hr className="my-1 border-admin-border" />
-
-                              {u.isActive ? (
-                                <button
-                                  onClick={() => handleDeactivate(u.id)}
-                                  disabled={u.id === user?.id}
-                                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-admin-accent-amber hover:bg-amber-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  <UserX className="w-4 h-4" />
-                                  Deactivate
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => handleReactivate(u.id)}
-                                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-admin-accent-emerald hover:bg-emerald-500/10"
-                                >
-                                  <UserCheck className="w-4 h-4" />
-                                  Reactivate
-                                </button>
-                              )}
-
-                              <hr className="my-1 border-admin-border" />
-
-                              <button
-                                onClick={() => {
-                                  setShowDeleteConfirm(u.id);
-                                  setOpenDropdown(null);
-                                }}
-                                disabled={u.id === user?.id}
-                                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-admin-accent-rose hover:bg-rose-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                                Delete User
-                              </button>
-                            </div>
-                          </>
-                        )}
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => {
+                              setShowDeleteConfirm(u.id);
+                              setOpenDropdown(null);
+                            }}
+                            disabled={u.id === user?.id}
+                            className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-admin-accent-rose transition-colors hover:bg-rose-500/10 focus:bg-rose-500/10 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete user
+                          </button>
+                        </AdminDropdownMenu>
                       </div>
                     </td>
                   </tr>
@@ -592,11 +638,7 @@ export default function UserManagement() {
       </AdminCard>
 
       {/* Add User Modal */}
-      <AddUserModal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSuccess={() => loadAllUsers()}
-      />
+      <AddUserModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} onSuccess={() => loadAllUsers()} />
 
       {/* Edit User Modal */}
       <EditUserModal
@@ -625,11 +667,7 @@ export default function UserManagement() {
           </div>
 
           <div className="flex items-center gap-3 pt-2">
-            <AdminButton
-              variant="secondary"
-              onClick={() => setShowDeleteConfirm(null)}
-              className="flex-1"
-            >
+            <AdminButton variant="secondary" onClick={() => setShowDeleteConfirm(null)} className="flex-1">
               Cancel
             </AdminButton>
             <AdminButton
@@ -683,10 +721,14 @@ export default function UserManagement() {
                   </div>
                   {subscriptionDetails?.trial ? (
                     <div>
-                      <p className={cn(
-                        'text-lg font-bold',
-                        subscriptionDetails.trial.status === 'active' ? 'text-admin-accent-emerald' : 'text-admin-text-muted'
-                      )}>
+                      <p
+                        className={cn(
+                          'text-lg font-bold',
+                          subscriptionDetails.trial.status === 'active'
+                            ? 'text-admin-accent-emerald'
+                            : 'text-admin-text-muted',
+                        )}
+                      >
                         {subscriptionDetails.trial.status === 'active' ? 'Active' : 'Expired'}
                       </p>
                       <p className="text-xs text-admin-text-muted">
@@ -714,9 +756,7 @@ export default function UserManagement() {
                       <p className="text-lg font-bold text-admin-accent-purple">
                         {subscriptionDetails.subscription.planName}
                       </p>
-                      <p className="text-xs text-admin-text-muted">
-                        {subscriptionDetails.subscription.billingCycle}
-                      </p>
+                      <p className="text-xs text-admin-text-muted">{subscriptionDetails.subscription.billingCycle}</p>
                       <p className="text-xs text-admin-text-muted mt-1">
                         {subscriptionDetails.subscription.daysRemaining} days remaining
                       </p>
@@ -752,7 +792,7 @@ export default function UserManagement() {
                       <AdminInput
                         type="number"
                         value={extendDays}
-                        onChange={(e) => setExtendDays(e.target.value)}
+                        onChange={e => setExtendDays(e.target.value)}
                         min={1}
                         max={90}
                         placeholder="Days"
@@ -768,9 +808,7 @@ export default function UserManagement() {
                       Add Days
                     </AdminButton>
                   </div>
-                  <p className="text-xs text-admin-text-muted mt-2">
-                    Enter 1-90 days to extend or start a trial
-                  </p>
+                  <p className="text-xs text-admin-text-muted mt-2">Enter 1-90 days to extend or start a trial</p>
                 </div>
 
                 {/* Add Credits */}
@@ -784,7 +822,7 @@ export default function UserManagement() {
                       <AdminInput
                         type="number"
                         value={addCreditsAmount}
-                        onChange={(e) => setAddCreditsAmount(e.target.value)}
+                        onChange={e => setAddCreditsAmount(e.target.value)}
                         min={1}
                         max={1000}
                         placeholder="Credits"
@@ -800,9 +838,7 @@ export default function UserManagement() {
                       Add Credits
                     </AdminButton>
                   </div>
-                  <p className="text-xs text-admin-text-muted mt-2">
-                    Enter 1-1000 credits to add
-                  </p>
+                  <p className="text-xs text-admin-text-muted mt-2">Enter 1-1000 credits to add</p>
                 </div>
 
                 {/* Set Subscription Tier */}
@@ -815,14 +851,17 @@ export default function UserManagement() {
                     <div className="flex-1">
                       <AdminSelect
                         value={selectedTierId}
-                        onChange={(e) => setSelectedTierId(e.target.value)}
-                        options={availableTiers.map((t) => ({ value: t.id, label: t.name }))}
+                        onChange={e => setSelectedTierId(e.target.value)}
+                        options={availableTiers.map(t => ({
+                          value: t.id,
+                          label: t.name,
+                        }))}
                       />
                     </div>
                     <div className="sm:w-48">
                       <AdminSelect
                         value={tierDuration}
-                        onChange={(e) => setTierDuration(e.target.value)}
+                        onChange={e => setTierDuration(e.target.value)}
                         options={[
                           { value: '30', label: '30 days' },
                           { value: '90', label: '90 days' },
