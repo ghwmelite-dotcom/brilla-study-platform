@@ -22,6 +22,7 @@ import { EventBanner } from '@/components/events';
 import { DailyMultiplierBanner, MysteryChestModal, LuckyWheelModal, SurpriseChallengePopup } from '@/components/rewards';
 import { StreakWarningBanner, ComebackModal, NudgeContainer } from '@/components/engagement';
 import { DashboardHero, ExamFlyers, DailyTip, FeaturedStats } from '@/components/dashboard';
+import { ScoutNetworkCard } from '@/components/affiliate';
 import { OALevelBanner, OALevelProgressWidget } from '@/components/exam-setup';
 import { useAuthStore } from '@/stores/authStore';
 import { useProgressStore } from '@/stores/progressStore';
@@ -232,6 +233,9 @@ export function DashboardPage() {
           </div>
         </Card>
       </div>
+
+      {/* Student Scout network - own aggregate referral performance only */}
+      {user.role === 'student' && <ScoutNetworkCard />}
 
       {/* Exam-Specific Promotional Flyers */}
       <ExamFlyers />

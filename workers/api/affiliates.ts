@@ -287,6 +287,7 @@ affiliatesApp.get('/profile', requireAuth, async (c) => {
 affiliatesApp.get('/dashboard', requireAuth, async (c) => {
   try {
     const userId = c.get('userId') as string;
+    const summaryOnly = c.req.query('summary') === '1';
 
     const profile = await c.env.DB.prepare(`
       SELECT ap.*, u.role, u.school_name
@@ -306,11 +307,15 @@ affiliatesApp.get('/dashboard', requireAuth, async (c) => {
 
     const monthStats = await c.env.DB.prepare(`
       SELECT
-        COUNT(*) as referrals_this_month,
-        SUM(CASE WHEN status = 'converted' THEN 1 ELSE 0 END) as conversions_this_month
+        SUM(CASE WHEN signup_at >= ? THEN 1 ELSE 0 END) as referrals_this_month,
+        SUM(CASE WHEN signup_at >= ? AND status = 'converted' THEN 1 ELSE 0 END) as conversions_this_month,
+        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+        SUM(CASE WHEN status = 'trial' THEN 1 ELSE 0 END) as trial,
+        SUM(CASE WHEN status = 'converted' THEN 1 ELSE 0 END) as converted,
+        SUM(CASE WHEN status = 'churned' THEN 1 ELSE 0 END) as churned
       FROM affiliate_referrals
-      WHERE affiliate_id = ? AND signup_at >= ?
-    `).bind(profile.id, monthStart.toISOString()).first();
+      WHERE affiliate_id = ?
+    `).bind(monthStart.toISOString(), monthStart.toISOString(), profile.id).first();
 
     // Get this week's clicks
     const weekStart = new Date();
@@ -342,17 +347,22 @@ affiliatesApp.get('/dashboard', requireAuth, async (c) => {
       SELECT COUNT(*) as total FROM affiliate_profiles WHERE is_active = 1
     `).first();
 
-    // Get recent activity
-    const recentReferrals = await c.env.DB.prepare(`
-      SELECT
-        ar.*,
-        u.name, u.role, u.avatar_url
-      FROM affiliate_referrals ar
-      JOIN users u ON ar.referred_user_id = u.id
-      WHERE ar.affiliate_id = ?
-      ORDER BY ar.signup_at DESC
-      LIMIT 5
-    `).bind(profile.id).all();
+    const emptyRows = { results: [] as Record<string, unknown>[] };
+
+    // The main student dashboard requests aggregate-only data. The detailed
+    // Scout hub retains recent activity for the owning Scout.
+    const recentReferrals = summaryOnly
+      ? emptyRows
+      : await c.env.DB.prepare(`
+        SELECT
+          ar.*,
+          u.name, u.role, u.avatar_url
+        FROM affiliate_referrals ar
+        JOIN users u ON ar.referred_user_id = u.id
+        WHERE ar.affiliate_id = ?
+        ORDER BY ar.signup_at DESC
+        LIMIT 5
+      `).bind(profile.id).all();
 
     // Get tier info
     const tier = await c.env.DB.prepare(`
@@ -360,10 +370,12 @@ affiliatesApp.get('/dashboard', requireAuth, async (c) => {
     `).bind(profile.tier_id).first();
 
     // Get active campaigns
-    const campaigns = await c.env.DB.prepare(`
-      SELECT * FROM affiliate_campaigns
-      WHERE is_active = 1 AND start_date <= datetime('now') AND end_date >= datetime('now')
-    `).all();
+    const campaigns = summaryOnly
+      ? emptyRows
+      : await c.env.DB.prepare(`
+        SELECT * FROM affiliate_campaigns
+        WHERE is_active = 1 AND start_date <= datetime('now') AND end_date >= datetime('now')
+      `).all();
 
     return c.json({
       success: true,
@@ -389,6 +401,12 @@ affiliatesApp.get('/dashboard', requireAuth, async (c) => {
           percentile: totalAffiliates?.total
             ? Math.round((1 - ((rank?.rank as number) - 1) / (totalAffiliates.total as number)) * 100)
             : 100,
+        },
+        networkStatus: {
+          pending: Number(monthStats?.pending || 0),
+          trial: Number(monthStats?.trial || 0),
+          converted: Number(monthStats?.converted || 0),
+          churned: Number(monthStats?.churned || 0),
         },
         tier: tier ? {
           id: tier.id,
