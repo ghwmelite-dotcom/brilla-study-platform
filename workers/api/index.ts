@@ -50,6 +50,10 @@ import {
   IMMEDIATE_STUDENT_REGISTRATION_MESSAGE,
   PENDING_APPROVAL_MESSAGE,
 } from './registration-policy';
+import {
+  EMAIL_VERIFICATION_REWARD_XP,
+  finalizeEmailVerification,
+} from './email-verification-reward';
 import { raceApp, runRaceCycleMaintenance } from './race';
 import { telegramWebhookApp } from './telegram';
 import { runTelegramRaceAlerts } from './race-alerts';
@@ -461,6 +465,7 @@ export function getEmailVerificationHTML(name: string, verificationUrl: string):
       <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
         <p style="font-size: 16px;">Hello <strong>${escapeHtml(name)}</strong>,</p>
         <p style="font-size: 16px;">Your student account is ready. Confirm this email address so future sign-ins stay secure.</p>
+        <p style="font-size: 16px; color: #1e40af;"><strong>Verify now and earn ${EMAIL_VERIFICATION_REWARD_XP} XP</strong> to start your BrillaPrep journey.</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${escapeHtml(verificationUrl)}" style="background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px;">Verify Email</a>
         </div>
@@ -1535,18 +1540,23 @@ publicApp.post('/auth/set-password', async (c) => {
     // Hash new password and update user
     const passwordHash = await hashPassword(password);
 
-    await c.env.DB.prepare(`
-      UPDATE users SET
-        password_hash = ?,
-        session_version = session_version + 1,
-        email_verified = 1,
-        verification_token = NULL,
-        verification_token_expires_at = NULL,
-        updated_at = datetime('now')
-      WHERE id = ?
-    `).bind(passwordHash, user.id).run();
+    const verification = await finalizeEmailVerification(c.env.DB, {
+      userId: String(user.id),
+      token: String(token),
+      passwordHash,
+    });
 
-    return c.json({ success: true, data: { message: 'Password set successfully. You can now log in.' } });
+    if (!verification.verified) {
+      return c.json({ success: false, error: 'This verification link has already been used.' }, 400);
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        message: 'Password set successfully. You can now log in.',
+        xpAwarded: verification.xpAwarded,
+      },
+    });
   } catch (error) {
     console.error('Set password error:', error);
     return c.json({ success: false, error: 'Failed to set password' }, 500);
@@ -1581,10 +1591,14 @@ publicApp.post('/auth/verify-email', async (c) => {
 
   try {
     const user = await c.env.DB.prepare(`
-      SELECT id, verification_token_expires_at
+      SELECT id, email_verified, verification_token_expires_at
       FROM users
       WHERE verification_token = ?
-    `).bind(String(token)).first<{ id: string; verification_token_expires_at: string | null }>();
+    `).bind(String(token)).first<{
+      id: string;
+      email_verified: number;
+      verification_token_expires_at: string | null;
+    }>();
 
     if (!user) {
       return c.json({ success: false, error: 'Invalid or expired verification link.' }, 400);
@@ -1597,18 +1611,25 @@ publicApp.post('/auth/verify-email', async (c) => {
       return c.json({ success: false, error: 'This verification link has expired.' }, 400);
     }
 
-    await c.env.DB.prepare(`
-      UPDATE users SET
-        email_verified = 1,
-        verification_token = NULL,
-        verification_token_expires_at = NULL,
-        updated_at = datetime('now')
-      WHERE id = ?
-    `).bind(user.id).run();
+    if (Number(user.email_verified) === 1) {
+      return c.json({ success: false, error: 'This verification link has already been used.' }, 400);
+    }
+
+    const verification = await finalizeEmailVerification(c.env.DB, {
+      userId: user.id,
+      token: String(token),
+    });
+
+    if (!verification.verified) {
+      return c.json({ success: false, error: 'This verification link has already been used.' }, 400);
+    }
 
     return c.json({
       success: true,
-      data: { message: 'Email verified successfully.' },
+      data: {
+        message: 'Email verified successfully.',
+        xpAwarded: verification.xpAwarded,
+      },
     });
   } catch (error) {
     console.error('Verify email error:', error);

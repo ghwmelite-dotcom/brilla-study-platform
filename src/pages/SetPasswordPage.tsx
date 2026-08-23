@@ -10,8 +10,10 @@ import {
   Loader2,
   GraduationCap,
   ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { EMAIL_VERIFICATION_REWARD_XP } from '@/lib/rewardConstants';
 import { cn } from '@/utils';
 import { Turnstile } from '@/components/common/Turnstile';
 import { useTurnstile } from '@/hooks/useTurnstile';
@@ -37,6 +39,7 @@ export function SetPasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [xpAwarded, setXpAwarded] = useState(0);
 
   // Password validation
   const passwordChecks = {
@@ -96,6 +99,7 @@ export function SetPasswordPage() {
         ? await api.verifyEmail(token!, turnstile.token)
         : await api.setPassword(token!, password, turnstile.token);
       if (response.success) {
+        setXpAwarded(response.data?.xpAwarded ?? 0);
         setIsSuccess(true);
       } else {
         setError(response.error || (isEmailVerification ? 'Failed to verify email.' : 'Failed to set password.'));
@@ -171,6 +175,18 @@ export function SetPasswordPage() {
               ? 'Your email address is confirmed. You can continue using BrillaPrep.'
               : 'Your password has been set. You can now log in to your account using your email and new password.'}
           </p>
+          {xpAwarded > 0 && (
+            <div
+              role="status"
+              className="mb-6 flex items-center justify-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900"
+            >
+              <Sparkles className="h-5 w-5 shrink-0 text-amber-600" aria-hidden="true" />
+              <div className="text-left">
+                <p className="font-bold">+{xpAwarded} XP earned</p>
+                <p className="text-sm text-amber-700">Your first reward is already in your XP history.</p>
+              </div>
+            </div>
+          )}
           <button
             onClick={() => navigate('/', { state: { openLogin: true } })}
             className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors"
@@ -317,6 +333,16 @@ export function SetPasswordPage() {
               </>
             )}
 
+            <div className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-neutral-700">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                <Sparkles className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <div>
+                <p className="font-semibold text-neutral-900">Earn {EMAIL_VERIFICATION_REWARD_XP} XP</p>
+                <p className="mt-1">Confirm your email to secure your account and unlock your first reward.</p>
+              </div>
+            </div>
+
             {/* Turnstile Security Check */}
             <div className="flex justify-center">
               <Turnstile
@@ -346,7 +372,9 @@ export function SetPasswordPage() {
                 </>
               ) : (
                 <>
-                  {isEmailVerification ? 'Verify Email & Continue' : 'Set Password & Continue'}
+                  {isEmailVerification
+                    ? `Verify Email & Earn ${EMAIL_VERIFICATION_REWARD_XP} XP`
+                    : `Set Password & Earn ${EMAIL_VERIFICATION_REWARD_XP} XP`}
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}

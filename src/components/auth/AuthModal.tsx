@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/lib/api';
+import { EMAIL_VERIFICATION_REWARD_XP } from '@/lib/rewardConstants';
 import { cn } from '@/utils';
 import { PlanSelectionStep } from './PlanSelectionStep';
 import { Turnstile } from '@/components/common/Turnstile';
@@ -518,9 +519,19 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                 </div>
               )}
 
-              <p className="text-xs text-neutral-500 mt-4">
-                You are signed in. Please use the verification email we sent so future sign-ins stay secure.
-              </p>
+              <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-left">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                  <BadgeCheck className="h-5 w-5 text-amber-700" aria-hidden="true" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-amber-950">
+                    Confirm your email and earn {EMAIL_VERIFICATION_REWARD_XP} XP
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-amber-800">
+                    Open the verification email we sent. Your reward is added immediately after confirmation.
+                  </p>
+                </div>
+              </div>
 
               <button
                 onClick={onClose}

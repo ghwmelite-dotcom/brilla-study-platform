@@ -13,6 +13,10 @@ import {
   PENDING_APPROVAL_MESSAGE,
   type SelfServeRegistrationRole,
 } from './registration-policy';
+import {
+  EMAIL_VERIFICATION_REWARD_XP,
+  createEmailVerificationRewardStatement,
+} from './email-verification-reward';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -501,8 +505,8 @@ oauthApp.post('/google/callback', async (c) => {
           school_level, year_group, school_name, house,
           teacher_license_number, subjects_taught, years_experience, qualifications,
           selected_tier_id, primary_exam_type_id, referred_by, is_affiliate,
-          email_verified, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))
+          email_verified, xp_points, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, datetime('now'), datetime('now'))
       `).bind(
         userId,
         googleUser.email,
@@ -522,8 +526,11 @@ oauthApp.post('/google/callback', async (c) => {
         primaryExamTypeId,
         referralAffiliate ? referralAffiliate.referral_code : null,
         generatedReferralCode ? 1 : 0,
+        EMAIL_VERIFICATION_REWARD_XP,
       ),
     ];
+
+    statements.push(createEmailVerificationRewardStatement(c.env.DB, userId));
 
     if (generatedReferralCode) {
       statements.push(
@@ -586,7 +593,7 @@ oauthApp.post('/google/callback', async (c) => {
       yearGroup,
       schoolLevel,
       schoolName,
-      xpPoints: 0,
+      xpPoints: EMAIL_VERIFICATION_REWARD_XP,
       level: 1,
       streakDays: 0,
       aiGradingCredits: 0,
