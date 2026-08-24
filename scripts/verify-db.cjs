@@ -27,6 +27,8 @@ const SEED_FILE = path.join(DB_DIR, 'seed.sql');
 const POST_SEED_MIGRATIONS = [
   path.join(DB_DIR, 'migrations', '100_question_bank_integrity.sql'),
   path.join(DB_DIR, 'migrations', '101_atomic_question_allowance.sql'),
+  path.join(DB_DIR, 'migrations', '102_nsmq_question_alignment.sql'),
+  path.join(DB_DIR, 'migrations', '103_exact_question_deduplication.sql'),
 ];
 
 const results = [];

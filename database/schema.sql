@@ -613,6 +613,17 @@ CREATE TABLE IF NOT EXISTS question_bank_remediation_log (
 CREATE INDEX IF NOT EXISTS idx_question_bank_remediation_log_release
     ON question_bank_remediation_log(migration_id, entity_type, entity_id);
 
+-- Source: migrations/103_exact_question_deduplication.sql
+CREATE TABLE IF NOT EXISTS question_bank_question_archive (
+    migration_id TEXT NOT NULL,
+    question_id TEXT NOT NULL,
+    canonical_question_id TEXT NOT NULL,
+    row_json TEXT NOT NULL CHECK (json_valid(row_json)),
+    archived_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (migration_id, question_id)
+);
+CREATE INDEX IF NOT EXISTS idx_question_bank_question_archive_canonical
+    ON question_bank_question_archive(migration_id, canonical_question_id);
 -- Source: schema.sql
 CREATE TABLE IF NOT EXISTS user_exam_preferences (
     id TEXT PRIMARY KEY,
