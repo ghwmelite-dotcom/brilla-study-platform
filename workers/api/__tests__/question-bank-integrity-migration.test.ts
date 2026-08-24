@@ -273,6 +273,53 @@ describe('migration 100 question-bank integrity', () => {
     db.close();
   });
 
+  it('accepts canonical populated WASSCE subjects already assigned to the correct exam', () => {
+    const db = createFixture();
+    db.prepare(`
+      UPDATE subjects
+      SET exam_type_id = 'exam_wassce'
+      WHERE id IN ('subj_wassce_cost_accounting', 'subj_wassce_tech_drawing')
+    `).run();
+
+    expect(() => db.exec(migrationSql)).not.toThrow();
+    expect(db.prepare(`
+      SELECT id, exam_type_id AS examTypeId, category_id AS categoryId, waec_code AS waecCode
+      FROM subjects
+      WHERE id IN ('subj_wassce_cost_accounting', 'subj_wassce_tech_drawing')
+      ORDER BY id
+    `).all()).toEqual([
+      {
+        id: 'subj_wassce_cost_accounting',
+        examTypeId: 'exam_wassce',
+        categoryId: 'cat_wassce_business',
+        waecCode: 'CAC',
+      },
+      {
+        id: 'subj_wassce_tech_drawing',
+        examTypeId: 'exam_wassce',
+        categoryId: 'cat_wassce_technical',
+        waecCode: 'TED',
+      },
+    ]);
+    expect(db.prepare(`
+      SELECT COUNT(*) AS count
+      FROM question_bank_remediation_log
+      WHERE entity_id IN ('subj_wassce_cost_accounting', 'subj_wassce_tech_drawing')
+        AND field_name = 'exam_type_id'
+    `).get()).toEqual({ count: 0 });
+    db.close();
+  });
+
+  it('fails before mutation when a canonical populated WASSCE subject has the wrong exam', () => {
+    const db = createFixture();
+    db.prepare('UPDATE subjects SET exam_type_id = ? WHERE id = ?')
+      .run('igcse', 'subj_wassce_cost_accounting');
+    const before = snapshot(db);
+
+    expect(() => db.exec(migrationSql)).toThrow();
+    expect(snapshot(db)).toEqual(before);
+    db.close();
+  });
   it('fails before mutation when a mapped category belongs to the wrong exam', () => {
     const db = createFixture();
     db.prepare('UPDATE subject_categories SET exam_type_id = ? WHERE id = ?')

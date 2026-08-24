@@ -61,11 +61,16 @@ SELECT CASE WHEN
   )) = 4
   AND (
     (
+      -- Earlier releases may already have assigned the canonical populated
+      -- WASSCE subjects to the correct exam. Their category and WAEC code
+      -- must still match the reviewed pre-migration state below.
       (SELECT COUNT(*) FROM subjects WHERE
         (id = 'subj_wassce_cost_accounting' AND slug = 'cost-accounting'
-          AND exam_type_id IS NULL AND category_id IS NULL AND waec_code IS NULL AND is_active = 1)
+          AND (exam_type_id IS NULL OR exam_type_id = 'exam_wassce')
+          AND category_id IS NULL AND waec_code IS NULL AND is_active = 1)
         OR (id = 'subj_wassce_tech_drawing' AND slug = 'technical-drawing'
-          AND exam_type_id IS NULL AND category_id IS NULL AND waec_code IS NULL AND is_active = 1)
+          AND (exam_type_id IS NULL OR exam_type_id = 'exam_wassce')
+          AND category_id IS NULL AND waec_code IS NULL AND is_active = 1)
       ) = 2
       AND (SELECT COUNT(*) FROM subjects WHERE
         (id = 'subj_wassce_cost_acct' AND slug = 'wassce-cost-accounting'
