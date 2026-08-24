@@ -154,17 +154,19 @@ The deeper audit separated relationship defects from editorial work:
 - Null topic links have no deterministic one-topic shortcut. Topic assignment remains a curriculum-review task; no keyword, fuzzy, or AI guess is published automatically.
 - Explanations below 20 characters are classified as concise explanations for review. Many are valid equations or formulae, so length alone is not treated as a defect and no padding is generated.
 
-Automated evidence passes 19 focused migration/preflight/rollback tests and the complete 25-check clean schema/seed replay through migrations 100-103. Explicit Cloudflare account selection resolved API error 7403, and pinned aggregate-only audits completed against both staging and production.
+Automated evidence passes 21 focused migration/preflight/rollback tests and the complete 25-check clean schema/seed replay through migrations 100-103. Explicit Cloudflare account selection resolved API error 7403, and pinned aggregate-only audits completed against both staging and production. Migration SHA-256 values used for the exact-byte staging replay are `CC13E6D94567EE8B60C835CFF70DF2DBF40EF2F2712CCA18F90AB00EE786632E` for 102 and `2E880424C1A1F74919D080A373F23894CBBFF9037822B76CDD0E43D0C8CB64D3` for 103.
 
 Staging migrations 102 and 103 were applied on 2026-08-24. The post-migration audit reports 71 active subjects, 44 populated subjects, 27 unavailable subjects, 4,543 questions, 674 canonical NSMQ round questions, zero source-side NSMQ rows, zero exact-clone groups, zero referenced redundant rows, zero exam mismatches, and zero cross-subject topic mismatches. The two exact staging clones removed by migration 103 were both NSMQ-format rows. Remaining editorial review queues are 3,869 null topic links, 117 concise explanations, 235 normalized-text collision groups, and 234 conflict groups; none is safe for automatic rewriting or deletion.
 
-Wrangler's staging migration ledger now records both files after a successful idempotent replay. The post-migration authenticated suite passed 54/54 checks across NSMQ practice and answer-key redaction, Counselor Brie authorization, study-plan generation, automatic onboarding, browser runtime, premium/free boundaries, and cleanup; all eleven run-owned synthetic-data scopes returned zero residual rows.
+Wrangler's staging migration ledger records both files. A fresh staging export was captured, migration 103 was rolled back before migration 102, and the current repository bytes were then replayed in forward order. The post-migration authenticated suite passed 54/54 checks across NSMQ practice and answer-key redaction, Counselor Brie authorization, study-plan generation, automatic onboarding, browser runtime, premium/free boundaries, and cleanup; all eleven run-owned synthetic-data scopes returned zero residual rows.
 
 Production remains unchanged. Its verified baseline is 75 active subjects, 40 populated subjects, 35 unavailable subjects, 4,545 questions, 676 source-side NSMQ rows, 41 unreferenced exact redundant rows, one redundant NSMQ-format row, 3,532 null topic links, 121 concise explanations, 270 normalized-text collision groups, and 230 conflict groups. Preflight reports zero unexpected NSMQ owners, zero exam mismatches, zero cross-subject topic mismatches, and zero referenced redundant rows. Applying migrations 102 and 103 is therefore expected to produce 71 active subjects, 44 populated subjects, 27 unavailable subjects, 4,504 questions, 675 canonical NSMQ round questions, and zero exact clones; these remain release expectations until production is explicitly authorized and audited afterward.
 
 ### Content-remediation release gate
 
 Completed on staging: Wrangler ledger alignment, aggregate audit, idempotent replay, authenticated NSMQ/Counselor/study-plan/browser QA, and zero-residual cleanup.
+
+Data rollback must run in reverse dependency order: `database/rollbacks/103_exact_question_deduplication.sql` before `database/rollbacks/102_nsmq_question_alignment.sql`. After either forward migration or rollback sequence, rerun the aggregate preflight, foreign-key checks, and authenticated smoke tests before changing the release freeze.
 
 Remaining production gate:
 

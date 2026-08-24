@@ -383,6 +383,20 @@ describe('question-bank content remediation migrations', () => {
     db.close();
   });
 
+  it('restores the full pre-remediation state when rollbacks run in reverse order', () => {
+    const db = createFixture();
+    const beforeRemediation = snapshot(db);
+
+    db.exec(migration102);
+    db.exec(migration103);
+    db.exec(rollback103);
+    db.exec(rollback102);
+
+    expect(snapshot(db)).toEqual(beforeRemediation);
+    expect(db.pragma('foreign_key_check')).toEqual([]);
+    db.close();
+  });
+
   it('fails migration 103 before mutation when a redundant clone is referenced', () => {
     const db = createFixture();
     db.exec(migration102);
