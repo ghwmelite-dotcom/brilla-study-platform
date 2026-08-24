@@ -4,16 +4,12 @@
  */
 
 import type { D1Database } from '@cloudflare/workers-types';
+import { CORE_SUBJECTS, isFreeSubject } from '../../shared/freemium-policy';
+
+export { CORE_SUBJECTS, INTERNATIONAL_FREE_EXAMS } from '../../shared/freemium-policy';
 
 // Constants
 export const DAILY_QUESTION_LIMIT = 10;
-
-// Core subjects per exam type - free users can only access these
-export const CORE_SUBJECTS: Record<string, string[]> = {
-  bece: ['mathematics', 'english', 'integrated-science', 'social-studies'],
-  wassce: ['core-mathematics', 'english-language', 'integrated-science', 'social-studies'],
-  nsmq: ['mathematics', 'physics', 'chemistry', 'biology'], // All are core for NSMQ
-};
 
 export interface DailyUsageInfo {
   used: number;
@@ -268,20 +264,75 @@ export async function incrementUsage(
   return { used, remaining };
 }
 
+/** Prepare one free-tier allowance increment for an atomic D1 batch. */
+export function prepareQuestionAllowance(
+  userId: string,
+  db: D1Database,
+): D1PreparedStatement {
+  const today = getTodayUTC();
+  const id = `usage_${userId}_${today}`;
+
+  return db.prepare(`
+    INSERT INTO daily_usage (id, user_id, usage_date, question_count, updated_at)
+    VALUES (?, ?, ?, 1, datetime('now'))
+    ON CONFLICT(user_id, usage_date) DO UPDATE SET
+      question_count = daily_usage.question_count + 1,
+      updated_at = datetime('now')
+    RETURNING question_count
+  `).bind(id, userId, today);
+}
+
+/** Atomically consume one free-tier question allowance. */
+export async function consumeQuestionAllowance(
+  userId: string,
+  db: D1Database,
+): Promise<UsageCheckResult & { used: number }> {
+  if (await isPremiumUser(userId, db)) {
+    return { allowed: true, used: 0, remaining: -1, limit: -1 };
+  }
+
+  const today = getTodayUTC();
+  const id = `usage_${userId}_${today}`;
+  const row = await db.prepare(`
+    INSERT INTO daily_usage (id, user_id, usage_date, question_count, updated_at)
+    VALUES (?, ?, ?, 1, datetime('now'))
+    ON CONFLICT(user_id, usage_date) DO UPDATE SET
+      question_count = daily_usage.question_count + 1,
+      updated_at = datetime('now')
+    WHERE daily_usage.question_count < ?
+    RETURNING question_count
+  `).bind(id, userId, today, DAILY_QUESTION_LIMIT).first<{ question_count: number }>();
+
+  if (!row) {
+    return {
+      allowed: false,
+      used: DAILY_QUESTION_LIMIT,
+      remaining: 0,
+      limit: DAILY_QUESTION_LIMIT,
+      reason: 'daily_limit_reached',
+    };
+  }
+
+  const used = Number(row.question_count);
+  return {
+    allowed: true,
+    used,
+    remaining: Math.max(0, DAILY_QUESTION_LIMIT - used),
+    limit: DAILY_QUESTION_LIMIT,
+  };
+}
 /**
  * Check if a subject is a core subject for an exam type
  */
 export function isCoreSubject(examType: string, subjectSlug: string): boolean {
-  const coreSubjects = CORE_SUBJECTS[examType.toLowerCase()];
-  if (!coreSubjects) return true; // If exam type unknown, allow all
-  return coreSubjects.includes(subjectSlug.toLowerCase());
+  return isFreeSubject(examType, subjectSlug);
 }
 
 /**
  * Get list of core subject slugs for an exam type
  */
 export function getCoreSubjects(examType: string): string[] {
-  return CORE_SUBJECTS[examType.toLowerCase()] || [];
+  return [...(CORE_SUBJECTS[examType.toLowerCase()] || [])];
 }
 
 /**

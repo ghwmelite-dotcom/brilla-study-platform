@@ -350,6 +350,9 @@ export interface Subject {
   // Computed
   topicCount?: number;
   questionCount?: number;
+  availabilityStatus?: 'available' | 'limited' | 'unavailable' | 'unknown';
+  availabilityReason?: string;
+  contentReviewStatus?: 'legacy_unreviewed';
   category?: SubjectCategory;
 }
 
@@ -460,10 +463,11 @@ export interface PaperAttempt {
   id: string;
   userId: string;
   paperId: string;
-  status: 'in_progress' | 'completed' | 'abandoned';
+  status: 'in_progress' | 'submitted' | 'graded' | 'abandoned';
   timeAllowed?: number;
   timeUsed?: number;
   totalScore?: number;
+  maxScore?: number;
   percentageScore?: number;
   startedAt: string;
   submittedAt?: string;

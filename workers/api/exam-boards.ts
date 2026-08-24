@@ -573,6 +573,38 @@ examBoardsApp.post('/seed-questions', requireAdmin, async (c) => {
   }
 
   try {
+    const validationStatements = questions.map((q) => {
+      const topicId = q.topic_id || null;
+      return db.prepare(`
+        SELECT CASE WHEN EXISTS (
+          SELECT 1
+          FROM subjects s
+          WHERE s.id = ?
+            AND s.is_active = 1
+            AND s.exam_type_id IS ?
+            AND (
+              ? IS NULL
+              OR EXISTS (
+                SELECT 1 FROM topics t
+                WHERE t.id = ? AND t.subject_id = s.id
+              )
+            )
+        ) THEN 1 ELSE 0 END AS is_valid
+      `).bind(q.subject_id, q.exam_type_id || null, topicId, topicId);
+    });
+    const validationResults = await db.batch(validationStatements);
+    const invalidIndex = validationResults.findIndex((result) => (
+      Number((result.results?.[0] as { is_valid?: number } | undefined)?.is_valid ?? 0) !== 1
+    ));
+    if (invalidIndex >= 0) {
+      return c.json({
+        success: false,
+        error: 'Question subject, topic, and exam relationships are inconsistent',
+        code: 'QUESTION_RELATIONSHIP_MISMATCH',
+        index: invalidIndex,
+      }, 400);
+    }
+
     const stmts = questions.map((q) =>
       db.prepare(`
         INSERT OR IGNORE INTO questions (

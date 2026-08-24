@@ -13,6 +13,7 @@
     "lint:api": "eslint workers",
     "preview": "vite preview",
     "db:verify:prod-cache": "node scripts/verify-ai-answer-cache-production.mjs",
+    "db:audit:questions": "node scripts/audit-question-bank.mjs",
     "test": "vitest run",
     "db:verify": "node scripts/verify-db.cjs",
     "db:migrate": "wrangler d1 execute brilla-db --local --file=database/schema.sql",

@@ -1,7 +1,8 @@
 /**
  * DB Verify Gate for Brilla Prep
- * Applies database/schema.sql + database/seed.sql to an in-memory SQLite DB
- * (node:sqlite, zero deps) and runs integrity checks over the result.
+ * Applies database/schema.sql + database/seed.sql + data-dependent migrations
+ * 100 and 101 to an in-memory SQLite DB (node:sqlite, zero deps), then runs
+ * integrity checks over the final result.
  *
  * Exit 0 = all checks pass. Exit 1 = any failure (this IS the expected state
  * until the database reckoning tasks land — the failing baseline is the proof
@@ -12,7 +13,8 @@
  *   2. seed.sql applies cleanly (with PRAGMA foreign_keys = ON)
  *   3. Answer-format checks over questions
  *   4. Referential integrity checks (FK resolution)
- *   5. Duplicate-subject detection
+ *   5. Post-migration relationship and trigger invariants
+ *   6. Duplicate-subject detection
  */
 
 const { DatabaseSync } = require('node:sqlite');
@@ -22,6 +24,10 @@ const path = require('path');
 const DB_DIR = path.join(__dirname, '..', 'database');
 const SCHEMA_FILE = path.join(DB_DIR, 'schema.sql');
 const SEED_FILE = path.join(DB_DIR, 'seed.sql');
+const POST_SEED_MIGRATIONS = [
+  path.join(DB_DIR, 'migrations', '100_question_bank_integrity.sql'),
+  path.join(DB_DIR, 'migrations', '101_atomic_question_allowance.sql'),
+];
 
 const results = [];
 
@@ -92,7 +98,7 @@ function main() {
   const db = new DatabaseSync(':memory:');
   db.exec('PRAGMA foreign_keys = ON');
 
-  // --- 1 & 2. Apply schema.sql then seed.sql -------------------------------
+  // --- 1 & 2. Apply schema.sql, seed.sql, then data migrations -------------
   console.log('\n📐 Applying schema.sql...');
   const schemaError = applySqlFile(db, SCHEMA_FILE, 'schema.sql');
   if (schemaError) {
@@ -120,6 +126,20 @@ function main() {
   } else {
     record('seed.sql applies cleanly', 0);
     console.log('  ✓ seed.sql applied');
+  }
+
+  if (!seedError) {
+    console.log('\n🧭 Applying post-seed data migrations...');
+    for (const migrationFile of POST_SEED_MIGRATIONS) {
+      const label = path.basename(migrationFile);
+      const migrationError = applySqlFile(db, migrationFile, label);
+      record(`${label} applies cleanly`, migrationError ? 1 : 0, migrationError || '');
+      console.log(`  ${migrationError ? '✗' : '✓'} ${migrationError || `${label} applied`}`);
+    }
+  } else {
+    for (const migrationFile of POST_SEED_MIGRATIONS) {
+      record(`${path.basename(migrationFile)} applies cleanly`, 1, 'not attempted (seed failed)');
+    }
   }
 
   if (!tableExists(db, 'questions')) {
@@ -266,7 +286,40 @@ function main() {
     }
   }
 
-  // --- 5. Duplicate-subject detection ---------------------------------------
+  // --- 5. Post-migration integrity -------------------------------------------
+  const examMismatches = db.prepare(
+    `SELECT COUNT(*) AS n FROM questions q JOIN subjects s ON s.id = q.subject_id ` +
+      `WHERE q.exam_type_id IS NOT NULL AND q.exam_type_id IS NOT s.exam_type_id`
+  ).get().n;
+  const topicMismatches = db.prepare(
+    `SELECT COUNT(*) AS n FROM questions q JOIN topics t ON t.id = q.topic_id ` +
+      `WHERE q.topic_id IS NOT NULL AND t.subject_id <> q.subject_id`
+  ).get().n;
+  const expectedTriggers = [
+    'trg_daily_usage_question_limit_insert',
+    'trg_daily_usage_question_limit_update',
+    'trg_questions_subject_exam_insert',
+    'trg_questions_subject_exam_update',
+    'trg_questions_subject_topic_insert',
+    'trg_questions_subject_topic_update',
+    'trg_subject_exam_update_with_questions',
+    'trg_topic_subject_update_with_questions',
+  ];
+  const triggerPlaceholders = expectedTriggers.map(() => '?').join(', ');
+  const installedTriggerCount = db.prepare(
+    `SELECT COUNT(*) AS n FROM sqlite_master WHERE type = 'trigger' AND name IN (${triggerPlaceholders})`
+  ).get(...expectedTriggers).n;
+
+  record('question/subject exam mismatches after migration', examMismatches);
+  record('question/topic subject mismatches after migration', topicMismatches);
+  record(
+    'question-bank and allowance integrity triggers installed',
+    installedTriggerCount === expectedTriggers.length ? 0 : 1,
+    `${installedTriggerCount}/${expectedTriggers.length} expected triggers installed`
+  );
+  console.log(`\n🛡️  Post-migration integrity: exam=${examMismatches}, topic=${topicMismatches}, triggers=${installedTriggerCount}/${expectedTriggers.length}`);
+
+  // --- 6. Duplicate-subject detection ---------------------------------------
   console.log('\n👯 Running duplicate-subject detection...');
 
   if (!tableExists(db, 'subjects')) {

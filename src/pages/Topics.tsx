@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import {
   ChevronRight,
@@ -9,6 +9,7 @@ import {
   Filter,
   Loader2,
   Lock,
+  AlertTriangle,
 } from 'lucide-react';
 import { Card, Button, Badge, Input, ProgressBar } from '@/components/common';
 import { PremiumSubjectBadge } from '@/components/subscription';
@@ -16,10 +17,11 @@ import { DailyUsageIndicator } from '@/components/subscription';
 import { cn } from '@/utils';
 import { api } from '@/lib/api';
 import { progressService } from '@/lib/services';
-import { useExamStore } from '@/stores/examStore';
+import { mapApiSubject, useExamStore, type ApiSubject } from '@/stores/examStore';
 import { useUsageStore } from '@/stores/usageStore';
 import { isCoreSubject } from '@/config';
 import { getSubjectIcon } from '@/lib/subjectIcons';
+import type { Subject } from '@/types';
 
 // Color mapping helper - convert hex to Tailwind bg class
 function getColorClass(hexColor: string): string {
@@ -69,7 +71,14 @@ interface TopicProgressRow {
 export function TopicsPage() {
   const { subjectSlug } = useParams();
   const navigate = useNavigate();
-  const { subjects, initializeExamData, currentExamType } = useExamStore();
+  const {
+    subjects,
+    initializeExamData,
+    fetchSubjects,
+    currentExamType,
+    isLoadingSubjects,
+    error: subjectError,
+  } = useExamStore();
   const { dailyUsage, fetchDailyUsage } = useUsageStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
@@ -78,6 +87,15 @@ export function TopicsPage() {
   const [loading, setLoading] = useState(false);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [masteryFilter, setMasteryFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
+  const [directSubjectRetry, setDirectSubjectRetry] = useState(0);
+  const [directSubjectState, setDirectSubjectState] = useState<{
+    slug: string | null;
+    subject: Subject | null;
+    error: string | null;
+    loading: boolean;
+    resolved: boolean;
+  }>({ slug: null, subject: null, error: null, loading: false, resolved: false });
+  const topicRequestVersion = useRef(0);
 
   // Check if user has premium access
   const isPremiumUser = dailyUsage?.isUnlimited || dailyUsage?.isPremium || false;
@@ -93,23 +111,85 @@ export function TopicsPage() {
     return !isCoreSubject(currentExamType, subjectSlug);
   };
 
-  // Ensure subjects are loaded
+  // Keep the selected exam catalogue fresh for the top-level library.
   useEffect(() => {
-    if (subjects.length === 0) {
-      initializeExamData();
+    initializeExamData();
+    void fetchSubjects(currentExamType);
+  }, [currentExamType, fetchSubjects, initializeExamData]);
+
+  // A direct /topics/:slug link must resolve independently of the persisted
+  // exam selector; otherwise cross-exam cold loads falsely report not found.
+  useEffect(() => {
+    if (!subjectSlug) {
+      setDirectSubjectState({ slug: null, subject: null, error: null, loading: false, resolved: false });
+      return;
     }
-  }, [subjects.length, initializeExamData]);
 
-  // Find current subject from store
+    let cancelled = false;
+    setDirectSubjectState({ slug: subjectSlug, subject: null, error: null, loading: true, resolved: false });
+    void api.get<ApiSubject>(`/subjects/${encodeURIComponent(subjectSlug)}`)
+      .then((response) => {
+        if (cancelled) return;
+        if (response.success && response.data) {
+          setDirectSubjectState({
+            slug: subjectSlug,
+            subject: mapApiSubject(response.data),
+            error: null,
+            loading: false,
+            resolved: true,
+          });
+          return;
+        }
+        const notFound = response.error === 'Subject not found';
+        setDirectSubjectState({
+          slug: subjectSlug,
+          subject: null,
+          error: notFound ? null : (response.error || 'Live subject availability is temporarily unavailable.'),
+          loading: false,
+          resolved: true,
+        });
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setDirectSubjectState({
+          slug: subjectSlug,
+          subject: null,
+          error: error instanceof Error ? error.message : 'Live subject availability is temporarily unavailable.',
+          loading: false,
+          resolved: true,
+        });
+      });
+
+    return () => { cancelled = true; };
+  }, [directSubjectRetry, subjectSlug]);
+
+  const storeSubject = subjectSlug ? subjects.find((subject) => subject.slug === subjectSlug) : null;
+  const directStateIsCurrent = directSubjectState.slug === subjectSlug;
   const currentSubject = subjectSlug
-    ? subjects.find(s => s.slug === subjectSlug)
+    ? (directStateIsCurrent && directSubjectState.resolved ? directSubjectState.subject : storeSubject)
     : null;
+  const isResolvingDirectSubject = Boolean(subjectSlug)
+    && !currentSubject
+    && (!directStateIsCurrent || directSubjectState.loading);
+  const directSubjectError = directStateIsCurrent ? directSubjectState.error : null;
 
-  // Fetch topics from API
+  // Fetch topics from API. A request epoch prevents slower, older subject
+  // responses from overwriting the current route after rapid navigation.
   useEffect(() => {
+    const requestVersion = ++topicRequestVersion.current;
     const fetchTopics = async () => {
-      if (!currentSubject && subjectSlug) {
-        // Subject not found yet, wait for store to load
+      if (
+        subjectSlug
+        && (
+          !currentSubject
+          || currentSubject.availabilityStatus === 'unknown'
+          || currentSubject.availabilityStatus === 'unavailable'
+        )
+      ) {
+        if (requestVersion === topicRequestVersion.current) {
+          setApiTopics([]);
+          setLoading(false);
+        }
         return;
       }
 
@@ -121,6 +201,7 @@ export function TopicsPage() {
           api.get<ApiTopic[]>(url),
           progressService.getProgress().catch(() => null),
         ]);
+        if (requestVersion !== topicRequestVersion.current) return;
         const data = res.success ? res.data : null;
         if (Array.isArray(data)) {
           setApiTopics(data);
@@ -132,21 +213,51 @@ export function TopicsPage() {
           );
         }
       } catch (err) {
-        console.error('Failed to fetch topics:', err);
+        if (requestVersion === topicRequestVersion.current) {
+          console.error('Failed to fetch topics:', err);
+        }
       } finally {
-        setLoading(false);
+        if (requestVersion === topicRequestVersion.current) setLoading(false);
       }
     };
-    fetchTopics();
+    void fetchTopics();
+    return () => {
+      if (topicRequestVersion.current === requestVersion) topicRequestVersion.current += 1;
+    };
   }, [subjectSlug, currentSubject]);
 
   // If viewing a specific subject
   if (subjectSlug) {
-    // Show loading while subjects are being fetched
-    if (subjects.length === 0) {
+    // A terminal error must win over placeholder state so retry remains reachable.
+    if (isResolvingDirectSubject || (isLoadingSubjects && !currentSubject)) {
       return (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <div className="flex items-center justify-center py-12" role="status" aria-live="polite">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" aria-hidden="true" />
+          <span className="sr-only">Loading live subject availability</span>
+        </div>
+      );
+    }
+
+    if (!currentSubject && (directSubjectError || subjectError)) {
+      const message = directSubjectError || subjectError;
+      return (
+        <Card className="p-8 text-center" role="alert">
+          <AlertTriangle className="w-10 h-10 text-red-500 mx-auto mb-3" aria-hidden="true" />
+          <p className="font-semibold text-neutral-900">Live subject availability could not be loaded</p>
+          <p className="mt-2 text-sm text-neutral-600">{message}</p>
+          <Button className="mt-4" onClick={() => {
+            setDirectSubjectRetry((value) => value + 1);
+            void fetchSubjects(currentExamType);
+          }}>Try again</Button>
+        </Card>
+      );
+    }
+
+    if (currentSubject?.availabilityStatus === 'unknown') {
+      return (
+        <div className="flex items-center justify-center py-12" role="status" aria-live="polite">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" aria-hidden="true" />
+          <span className="sr-only">Loading live subject availability</span>
         </div>
       );
     }
@@ -159,10 +270,29 @@ export function TopicsPage() {
           <p className="text-sm text-neutral-400 mt-2">
             The subject "{subjectSlug}" could not be found.
           </p>
-          <Link to="/subjects" className="mt-4 inline-block">
+          <Link to="/catalog" className="mt-4 inline-block">
             <Button variant="outline">Browse All Subjects</Button>
           </Link>
         </div>
+      );
+    }
+
+    if (currentSubject.availabilityStatus === 'unavailable') {
+      const SubjectIcon = getSubjectIcon(currentSubject.icon);
+      return (
+        <Card className="p-8 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-neutral-100">
+            <SubjectIcon className="w-7 h-7 text-neutral-500" aria-hidden="true" />
+          </div>
+          <h1 className="text-xl font-semibold text-neutral-900">{currentSubject.name}</h1>
+          <p className="mt-2 text-neutral-600">
+            This subject is listed in the catalogue, but its practice bank is not yet available.
+          </p>
+          <p className="mt-2 text-sm text-neutral-500">No payment or upgrade will unlock missing questions.</p>
+          <Link to="/catalog" className="mt-5 inline-block">
+            <Button variant="outline">Back to Subject Catalogue</Button>
+          </Link>
+        </Card>
       );
     }
 
@@ -216,6 +346,34 @@ export function TopicsPage() {
             </Button>
           </Link>
         </div>
+
+        {currentSubject.contentReviewStatus === 'legacy_unreviewed' && (
+          <Card className="border-indigo-200 bg-indigo-50 p-4" role="note">
+            <div className="flex items-start gap-3">
+              <BookOpen className="mt-0.5 w-5 h-5 text-indigo-700" aria-hidden="true" />
+              <div>
+                <p className="font-medium text-indigo-900">Academic review pending</p>
+                <p className="text-sm text-indigo-800">
+                  This legacy question bank has not yet completed independent academic review.
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {currentSubject.availabilityStatus === 'limited' && (
+          <Card className="border-amber-200 bg-amber-50 p-4" role="status">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 w-5 h-5 text-amber-700" aria-hidden="true" />
+              <div>
+                <p className="font-medium text-amber-900">Limited question bank</p>
+                <p className="text-sm text-amber-800">
+                  {currentSubject.questionCount ?? 0} questions are currently available, so practice sessions may repeat.
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Search */}
         <Input
@@ -365,6 +523,17 @@ export function TopicsPage() {
     }
   };
 
+  if (subjectError) {
+    return (
+      <Card className="p-8 text-center" role="alert">
+        <AlertTriangle className="w-10 h-10 text-red-500 mx-auto mb-3" aria-hidden="true" />
+        <p className="font-semibold text-neutral-900">Live subject availability could not be loaded</p>
+        <p className="mt-2 text-sm text-neutral-600">{subjectError}</p>
+        <Button className="mt-4" onClick={() => void fetchSubjects(currentExamType)}>Try again</Button>
+      </Card>
+    );
+  }
+
   // Main subjects view
   return (
     <div className="space-y-6">
@@ -464,7 +633,11 @@ export function TopicsPage() {
         {subjects.map((subject) => {
           const SubjectIcon = getSubjectIcon(subject.icon);
           const colorClass = getColorClass(subject.color);
-          const locked = isSubjectLocked(subject.slug);
+          const unavailable = subject.availabilityStatus === 'unavailable';
+          const checking = subject.availabilityStatus === 'unknown';
+          const limited = subject.availabilityStatus === 'limited';
+          const reviewPending = subject.contentReviewStatus === 'legacy_unreviewed';
+          const locked = !unavailable && !checking && isSubjectLocked(subject.slug);
 
           // Get topics for this subject from API
           const subjectApiTopics = apiTopics.filter(t => t.subject_id === subject.id);
@@ -476,12 +649,18 @@ export function TopicsPage() {
             : 0;
 
           return (
-            <div
+            <button
               key={subject.id}
+              type="button"
+              disabled={unavailable || checking}
               onClick={() => handleSubjectClick(subject, locked)}
-              className="cursor-pointer"
+              aria-label={`${subject.name}: ${unavailable ? 'Not yet available' : checking ? 'Checking availability' : 'Open subject'}`}
+              className={cn(
+                'w-full text-left rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                unavailable || checking ? 'cursor-not-allowed' : 'cursor-pointer',
+              )}
             >
-              <Card hoverable className={cn('h-full relative overflow-hidden', locked && 'opacity-90')}>
+              <Card hoverable={!unavailable && !checking} className={cn('h-full relative overflow-hidden', locked && 'opacity-90', (unavailable || checking) && 'opacity-75')}>
                 <div className={cn('h-2 rounded-t-xl', colorClass)} />
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
@@ -489,6 +668,8 @@ export function TopicsPage() {
                       <SubjectIcon className="w-6 h-6" />
                     </div>
                     <div className="flex items-center gap-2">
+                      {limited && <Badge variant="warning">Limited bank</Badge>}
+                      {reviewPending && <Badge variant="neutral">Academic review pending</Badge>}
                       {locked && <PremiumSubjectBadge size="sm" />}
                       <Badge variant="neutral">{topicCount} topics</Badge>
                     </div>
@@ -516,17 +697,26 @@ export function TopicsPage() {
                   />
                 </div>
 
-                {/* Premium overlay for locked subjects */}
+                {(unavailable || checking) && (
+                  <div className="absolute inset-0 bg-white/75 flex flex-col items-center justify-end pb-6 rounded-xl">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-neutral-700 text-white rounded-full shadow-lg">
+                      <AlertTriangle className="w-4 h-4" aria-hidden="true" />
+                      <span className="text-sm font-medium">
+                        {unavailable ? 'Not yet available' : 'Checking availability'}
+                      </span>
+                    </div>
+                  </div>
+                )}
                 {locked && (
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex flex-col items-center justify-end pb-6 rounded-xl">
                     <div className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-full shadow-lg">
-                      <Lock className="w-4 h-4" />
+                      <Lock className="w-4 h-4" aria-hidden="true" />
                       <span className="text-sm font-medium">Upgrade to Access</span>
                     </div>
                   </div>
                 )}
               </Card>
-            </div>
+            </button>
           );
         })}
       </div>

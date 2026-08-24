@@ -12,8 +12,8 @@ describe('usage-limits', () => {
     expect(isCoreSubject('wassce', 'core-mathematics')).toBe(true)
   })
 
-  it('allows all subjects for unknown exam types', () => {
-    expect(isCoreSubject('unknown-exam', 'anything')).toBe(true)
+  it('fails closed for unknown exam types', () => {
+    expect(isCoreSubject('unknown-exam', 'anything')).toBe(false)
     expect(getCoreSubjects('unknown-exam')).toEqual([])
   })
 

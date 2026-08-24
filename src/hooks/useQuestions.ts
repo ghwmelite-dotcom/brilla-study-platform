@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { Question, Subject, Topic, Difficulty, RoundType } from '@/types';
 import { api } from '@/lib/api';
+import { getQuestionBankError } from '@/lib/subjectAvailability';
 
 interface UseQuestionsOptions {
   subjectId?: string;
@@ -40,7 +41,7 @@ export function useQuestions(initialOptions?: UseQuestionsOptions): UseQuestions
       if (res.success && res.data) {
         setQuestions(res.data);
       } else {
-        setError(res.error || 'Failed to fetch questions');
+        setError(getQuestionBankError(res, 'Failed to fetch questions'));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch questions');

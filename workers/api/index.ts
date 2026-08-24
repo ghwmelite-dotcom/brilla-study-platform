@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import type { MiddlewareHandler } from 'hono';
+import type { Context, MiddlewareHandler } from 'hono';
 import { cors } from 'hono/cors';
 import { sign } from 'hono/jwt';
 import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware';
@@ -57,16 +57,21 @@ import {
 import { raceApp, runRaceCycleMaintenance } from './race';
 import { telegramWebhookApp } from './telegram';
 import { runTelegramRaceAlerts } from './race-alerts';
-import { recordAttemptProgress } from './attempt-progress';
+import { prepareAttemptProgress } from './attempt-progress';
 import { getParentGuidance } from './parent-guidance';
 import { parseEssaySubmission } from './essay-content';
 import {
   getDailyUsage,
   checkCanAnswer,
-  incrementUsage,
+  prepareQuestionAllowance,
   getCoreSubjects,
+  isCoreSubject,
+  isPremiumUser,
+  CORE_SUBJECTS,
+  INTERNATIONAL_FREE_EXAMS,
   DAILY_QUESTION_LIMIT,
 } from './usage-limits';
+import { mapSubjectCatalogRow } from './subject-catalog';
 
 // Types for Cloudflare bindings
 export interface Env {
@@ -122,6 +127,8 @@ interface AppVariables {
 }
 
 type AppEnv = { Bindings: Env; Variables: AppVariables };
+
+const MAX_QUESTION_ANSWER_LENGTH = 10_000;
 
 // =============================================
 // UTILITY FUNCTIONS
@@ -189,6 +196,15 @@ function transformQuestionOptions(
   });
 }
 
+function sanitizeQuestionForStudent(question: Record<string, unknown>): Record<string, unknown> {
+  const sanitized = { ...question };
+  delete sanitized.correct_answer;
+  delete sanitized.explanation;
+  const options = transformQuestionOptions(question.options, null);
+  sanitized.options = options?.map(({ id, text }) => ({ id, text })) ?? null;
+  return sanitized;
+}
+
 // Normalize answer for comparison
 // Handles cases where:
 // - User submits "A. 1/4" but correct_answer is "A"
@@ -225,6 +241,36 @@ function normalizeAnswerForComparison(
 
   // Default: compare as-is
   return { userNormalized: userTrimmed, correctNormalized: correctTrimmed };
+}
+
+function isSubmittedAnswerCorrect(
+  questionType: unknown,
+  questionOptions: unknown,
+  userAnswer: string,
+  correctAnswer: string,
+): boolean {
+  const fallback = normalizeAnswerForComparison(userAnswer, correctAnswer);
+  if (questionType !== 'multiple_choice') {
+    return fallback.userNormalized === fallback.correctNormalized;
+  }
+
+  const options = transformQuestionOptions(questionOptions, null);
+  const selected = options?.find(
+    (option) => option.id.toLowerCase() === userAnswer.trim().toLowerCase(),
+  );
+  if (!selected) return fallback.userNormalized === fallback.correctNormalized;
+
+  const correct = correctAnswer.trim();
+  if (selected.id.toLowerCase() === correct.toLowerCase()) return true;
+
+  const labelledCorrect = correct.match(/^([A-F])(?:$|\s*[.):-]\s*)/i);
+  if (labelledCorrect?.[1].toLowerCase() === selected.id.toLowerCase()) return true;
+
+  const stripLabel = (value: string) => value
+    .replace(/^([A-F])\s*[.):-]\s*/i, '')
+    .trim()
+    .toLowerCase();
+  return stripLabel(selected.text) === stripLabel(correct);
 }
 
 // Canonical school_level values are 'jhs' | 'shs' (DB CHECK constraint).
@@ -1116,7 +1162,7 @@ publicApp.post('/auth/register', async (c) => {
                            school_level, year_group, school_name, house,
                            teacher_license_number, subjects_taught, years_experience, qualifications,
                            selected_tier_id, referred_by, is_affiliate)
-        VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
         id, email, passwordHash, name, userRole, initialStatus,
         verificationToken, verificationExpiresAt,
@@ -2076,42 +2122,57 @@ publicApp.get('/exam-types', async (c) => {
   }
 });
 
-// Subjects - Now with exam_type and category filtering
+const subjectCatalogSelect = `
+  SELECT s.*, sc.name AS category_name, sc.slug AS category_slug, sc.is_core,
+         et.name AS exam_type_name, et.slug AS exam_type_slug,
+         COALESCE(qc.question_count, 0) AS question_count,
+         COALESCE(tc.topic_count, 0) AS topic_count
+  FROM subjects s
+  LEFT JOIN subject_categories sc ON s.category_id = sc.id
+  LEFT JOIN exam_types et ON s.exam_type_id = et.id
+  LEFT JOIN (
+    SELECT subject_id, COUNT(*) AS question_count
+    FROM questions
+    GROUP BY subject_id
+  ) qc ON qc.subject_id = s.id
+  LEFT JOIN (
+    SELECT subject_id, COUNT(*) AS topic_count
+    FROM topics
+    GROUP BY subject_id
+  ) tc ON tc.subject_id = s.id
+`;
+
+// Public catalogue: all active subjects, with truthful live inventory metadata.
 publicApp.get('/subjects', async (c) => {
-  const examType = c.req.query('exam_type'); // e.g., 'wassce', 'bece', 'nsmq'
-  const category = c.req.query('category');   // e.g., 'core', 'science', 'business'
+  const examType = c.req.query('exam_type');
+  const category = c.req.query('category');
 
   try {
-    let query = `
-      SELECT s.*, sc.name as category_name, sc.slug as category_slug, sc.is_core,
-             et.name as exam_type_name, et.slug as exam_type_slug
-      FROM subjects s
-      LEFT JOIN subject_categories sc ON s.category_id = sc.id
-      LEFT JOIN exam_types et ON s.exam_type_id = et.id
-      WHERE s.is_active = 1
-    `;
+    let query = `${subjectCatalogSelect} WHERE s.is_active = 1`;
     const params: string[] = [];
 
     if (examType) {
       query += ' AND et.slug = ?';
       params.push(examType);
     }
-
     if (category) {
       query += ' AND sc.slug = ?';
       params.push(category);
     }
 
-    query += ' ORDER BY sc.display_order, s.display_order';
+    query += ' ORDER BY COALESCE(sc.display_order, 9999), s.display_order, s.name';
 
     const stmt = params.length > 0
       ? c.env.DB.prepare(query).bind(...params)
       : c.env.DB.prepare(query);
-
     const { results } = await stmt.all();
 
-    return c.json({ success: true, data: results });
-  } catch {
+    return c.json({
+      success: true,
+      data: results.map((row) => mapSubjectCatalogRow(row as Record<string, unknown>)),
+    });
+  } catch (error) {
+    console.error('Error fetching subject catalogue:', error);
     return c.json({ success: false, error: 'Failed to fetch subjects' }, 500);
   }
 });
@@ -2120,16 +2181,20 @@ publicApp.get('/subjects/:slug', async (c) => {
   const slug = c.req.param('slug');
 
   try {
-    const subject = await c.env.DB.prepare(`
-      SELECT * FROM subjects WHERE slug = ?
-    `).bind(slug).first();
+    const subject = await c.env.DB.prepare(
+      `${subjectCatalogSelect} WHERE s.is_active = 1 AND s.slug = ?`,
+    ).bind(slug).first();
 
     if (!subject) {
       return c.json({ success: false, error: 'Subject not found' }, 404);
     }
 
-    return c.json({ success: true, data: subject });
-  } catch {
+    return c.json({
+      success: true,
+      data: mapSubjectCatalogRow(subject as Record<string, unknown>),
+    });
+  } catch (error) {
+    console.error('Error fetching subject:', error);
     return c.json({ success: false, error: 'Failed to fetch subject' }, 500);
   }
 });
@@ -2139,11 +2204,10 @@ publicApp.get('/topics', async (c) => {
   const subjectId = c.req.query('subject');
 
   try {
-    // Query with question count
     let query = `
-      SELECT t.*,
-             COUNT(q.id) as question_count
+      SELECT t.*, COUNT(q.id) AS question_count
       FROM topics t
+      JOIN subjects subject ON subject.id = t.subject_id AND subject.is_active = 1
       LEFT JOIN questions q ON q.topic_id = t.id
     `;
     const params: string[] = [];
@@ -2158,18 +2222,17 @@ publicApp.get('/topics', async (c) => {
     const stmt = params.length > 0
       ? c.env.DB.prepare(query).bind(...params)
       : c.env.DB.prepare(query);
-
     const { results } = await stmt.all();
 
-    // Parse key_formulas JSON and include question count
-    const topics = results.map((t: Record<string, unknown>) => ({
-      ...t,
-      keyFormulas: t.key_formulas ? JSON.parse(t.key_formulas as string) : [],
-      questionCount: t.question_count || 0,
+    const topics = results.map((topic: Record<string, unknown>) => ({
+      ...topic,
+      keyFormulas: topic.key_formulas ? JSON.parse(topic.key_formulas as string) : [],
+      questionCount: Number(topic.question_count ?? 0),
     }));
 
     return c.json({ success: true, data: topics });
-  } catch {
+  } catch (error) {
+    console.error('Error fetching topics:', error);
     return c.json({ success: false, error: 'Failed to fetch topics' }, 500);
   }
 });
@@ -2179,7 +2242,10 @@ publicApp.get('/topics/:id', async (c) => {
 
   try {
     const topic = await c.env.DB.prepare(`
-      SELECT * FROM topics WHERE id = ?
+      SELECT t.*
+      FROM topics t
+      JOIN subjects s ON s.id = t.subject_id AND s.is_active = 1
+      WHERE t.id = ?
     `).bind(id).first();
 
     if (!topic) {
@@ -2193,55 +2259,169 @@ publicApp.get('/topics/:id', async (c) => {
         keyFormulas: topic.key_formulas ? JSON.parse(topic.key_formulas as string) : [],
       },
     });
-  } catch {
+  } catch (error) {
+    console.error('Error fetching topic:', error);
     return c.json({ success: false, error: 'Failed to fetch topic' }, 500);
   }
 });
 
-// Questions
+// Question reads require authentication, entitlement, usage, and request-rate
+// policy; answer material is withheld until an authorized attempt is submitted.
+publicApp.use('/questions', requireAuth);
+publicApp.use('/questions/*', requireAuth);
+
+type SubjectBankAccessRow = {
+  id: string;
+  slug: string;
+  exam_type_slug: string;
+  question_count: number;
+};
+
+function hasFreeSubjectAccess(subject: SubjectBankAccessRow): boolean {
+  return isCoreSubject(subject.exam_type_slug, subject.slug);
+}
+
+async function getQuestionReadContext(
+  c: Context<AppEnv>,
+  subjectIdentifier: string | undefined,
+  topicIdentifier: string | undefined,
+): Promise<
+  | { response: Response }
+  | { userId: string; premium: boolean; subject: SubjectBankAccessRow | null; limit: number }
+> {
+  const userId = getUserId(c)!;
+  const rateLimit = await checkRateLimit(c.env.DB, userId, 'question-read', {
+    maxRequests: 120,
+    windowMs: 60 * 60 * 1000,
+  });
+  if (!rateLimit.allowed) return { response: rateLimitResponse(c, rateLimit) };
+
+  const premium = await isPremiumUser(userId, c.env.DB);
+  let subject: SubjectBankAccessRow | null = null;
+
+  if (subjectIdentifier) {
+    subject = await c.env.DB.prepare(`
+      SELECT s.id, s.slug, et.slug AS exam_type_slug,
+             COUNT(q.id) AS question_count
+      FROM subjects s
+      JOIN exam_types et ON et.id = s.exam_type_id
+      LEFT JOIN questions q ON q.subject_id = s.id
+      WHERE (s.id = ? OR s.slug = ?) AND s.is_active = 1
+      GROUP BY s.id, s.slug, et.slug
+    `).bind(subjectIdentifier, subjectIdentifier).first<SubjectBankAccessRow>();
+  } else if (topicIdentifier) {
+    subject = await c.env.DB.prepare(`
+      SELECT s.id, s.slug, et.slug AS exam_type_slug,
+             COUNT(q.id) AS question_count
+      FROM topics t
+      JOIN subjects s ON s.id = t.subject_id AND s.is_active = 1
+      JOIN exam_types et ON et.id = s.exam_type_id
+      LEFT JOIN questions q ON q.subject_id = s.id
+      WHERE t.id = ?
+      GROUP BY s.id, s.slug, et.slug
+    `).bind(topicIdentifier).first<SubjectBankAccessRow>();
+  }
+
+  if ((subjectIdentifier || topicIdentifier) && !subject) {
+    return {
+      response: c.json({ success: false, error: 'Subject not found', code: 'SUBJECT_NOT_FOUND' }, 404),
+    };
+  }
+  if (subject && Number(subject.question_count) === 0) {
+    return {
+      response: c.json({
+        success: false,
+        error: 'This subject does not have practice questions yet.',
+        code: 'SUBJECT_UNAVAILABLE',
+      }, 409),
+    };
+  }
+  if (subject && !premium && !hasFreeSubjectAccess(subject)) {
+    return {
+      response: c.json({
+        success: false,
+        error: 'This subject requires an active premium plan.',
+        code: 'SUBJECT_PREMIUM_REQUIRED',
+      }, 403),
+    };
+  }
+
+  let allowedLimit = Number.POSITIVE_INFINITY;
+  if (!premium) {
+    const usage = await checkCanAnswer(userId, c.env.DB);
+    if (!usage.allowed) {
+      return {
+        response: c.json({
+          success: false,
+          error: 'Daily question limit reached',
+          code: 'LIMIT_REACHED',
+        }, 403),
+      };
+    }
+    allowedLimit = usage.remaining;
+  }
+
+  return { userId, premium, subject, limit: allowedLimit };
+}
+
 publicApp.get('/questions', async (c) => {
-  const subject = c.req.query('subject');
-  const topic = c.req.query('topic');
+  const subjectIdentifier = c.req.query('subject');
+  const topicIdentifier = c.req.query('topic');
   const difficulty = c.req.query('difficulty');
   const round = c.req.query('round');
-  const limit = parseLimit(c, 20);
+  const requestedLimit = parseLimit(c, 20);
   const offset = parseInt(c.req.query('offset') || '0');
 
   try {
-    let query = 'SELECT * FROM questions WHERE 1=1';
+    const access = await getQuestionReadContext(c, subjectIdentifier, topicIdentifier);
+    if ('response' in access) return access.response;
+
+    let query = `
+      SELECT q.*
+      FROM questions q
+      JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
+      JOIN exam_types et ON et.id = s.exam_type_id
+      WHERE 1=1
+    `;
     const params: (string | number)[] = [];
 
-    if (subject) {
-      query += ' AND subject_id = ?';
-      params.push(subject);
+    if (access.subject) {
+      query += ' AND q.subject_id = ?';
+      params.push(access.subject.id);
     }
-    if (topic) {
-      query += ' AND topic_id = ?';
-      params.push(topic);
+    if (topicIdentifier) {
+      query += ' AND q.topic_id = ?';
+      params.push(topicIdentifier);
     }
     if (difficulty) {
-      query += ' AND difficulty = ?';
+      query += ' AND q.difficulty = ?';
       params.push(difficulty);
     }
     if (round) {
-      query += ' AND round_type = ?';
+      query += ' AND q.round_type = ?';
       params.push(round);
+    }
+    if (!access.premium) {
+      const corePairs = Object.entries(CORE_SUBJECTS)
+        .flatMap(([examSlug, subjectSlugs]) => subjectSlugs.flatMap((subjectSlug) => [
+          [examSlug, subjectSlug] as const,
+          [examSlug, `${examSlug}-${subjectSlug}`] as const,
+        ]));
+      const internationalPlaceholders = INTERNATIONAL_FREE_EXAMS.map(() => '?').join(', ');
+      query += ` AND (${corePairs.map(() => '(et.slug = ? AND s.slug = ?)').join(' OR ')} OR et.slug IN (${internationalPlaceholders}))`;
+      corePairs.forEach(([examSlug, subjectSlug]) => params.push(examSlug, subjectSlug));
+      params.push(...INTERNATIONAL_FREE_EXAMS);
     }
 
     query += ' ORDER BY RANDOM() LIMIT ? OFFSET ?';
-    params.push(limit, offset);
+    params.push(Math.min(requestedLimit, access.limit), offset);
 
-    const stmt = c.env.DB.prepare(query).bind(...params);
-    const { results } = await stmt.all();
-
-    // Parse and transform options to proper format
-    const questions = results.map((q: Record<string, unknown>) => ({
-      ...q,
-      options: transformQuestionOptions(q.options, q.correct_answer as string),
-    }));
+    const { results } = await c.env.DB.prepare(query).bind(...params).all();
+    const questions = results.map((question: Record<string, unknown>) => sanitizeQuestionForStudent(question));
 
     return c.json({ success: true, data: questions });
-  } catch {
+  } catch (error) {
+    console.error('Error fetching questions:', error);
     return c.json({ success: false, error: 'Failed to fetch questions' }, 500);
   }
 });
@@ -2250,26 +2430,43 @@ publicApp.get('/questions/:id', async (c) => {
   const id = c.req.param('id');
 
   try {
+    const access = await getQuestionReadContext(c, undefined, undefined);
+    if ('response' in access) return access.response;
+
     const question = await c.env.DB.prepare(`
-      SELECT * FROM questions WHERE id = ?
-    `).bind(id).first();
+      SELECT q.*, s.slug AS subject_slug, et.slug AS exam_type_slug
+      FROM questions q
+      JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
+      JOIN exam_types et ON et.id = s.exam_type_id
+      WHERE q.id = ?
+    `).bind(id).first<Record<string, unknown>>();
 
     if (!question) {
       return c.json({ success: false, error: 'Question not found' }, 404);
     }
+    const bank = {
+      id: String(question.subject_id),
+      slug: String(question.subject_slug),
+      exam_type_slug: String(question.exam_type_slug),
+      question_count: 1,
+    };
+    if (!access.premium && !hasFreeSubjectAccess(bank)) {
+      return c.json({
+        success: false,
+        error: 'This subject requires an active premium plan.',
+        code: 'SUBJECT_PREMIUM_REQUIRED',
+      }, 403);
+    }
 
-    return c.json({
-      success: true,
-      data: {
-        ...question,
-        options: transformQuestionOptions(question.options, question.correct_answer as string),
-      },
-    });
-  } catch {
+    const questionData = sanitizeQuestionForStudent(question);
+    delete questionData.subject_slug;
+    delete questionData.exam_type_slug;
+    return c.json({ success: true, data: questionData });
+  } catch (error) {
+    console.error('Error fetching question:', error);
     return c.json({ success: false, error: 'Failed to fetch question' }, 500);
   }
 });
-
 // Riddles
 publicApp.get('/riddles', async (c) => {
   const subject = c.req.query('subject');
@@ -2974,7 +3171,7 @@ publicApp.get('/papers', async (c) => {
         pt.name as paper_type_name, pt.slug as paper_type_slug, pt.question_format,
         et.name as exam_type_name, et.slug as exam_type_slug
       FROM past_papers pp
-      JOIN subjects s ON pp.subject_id = s.id
+      JOIN subjects s ON pp.subject_id = s.id AND s.is_active = 1
       JOIN paper_types pt ON pp.paper_type_id = pt.id
       JOIN exam_types et ON pp.exam_type_id = et.id
       WHERE 1=1
@@ -3020,7 +3217,7 @@ publicApp.get('/papers/years', async (c) => {
       SELECT DISTINCT pp.year
       FROM past_papers pp
       JOIN exam_types et ON pp.exam_type_id = et.id
-      JOIN subjects s ON pp.subject_id = s.id
+      JOIN subjects s ON pp.subject_id = s.id AND s.is_active = 1
       WHERE 1=1
     `;
     const params: string[] = [];
@@ -3050,6 +3247,7 @@ publicApp.get('/papers/years', async (c) => {
 });
 
 // Get single past paper with questions
+publicApp.use('/papers/:id', requireAuth);
 publicApp.get('/papers/:id', async (c) => {
   const id = c.req.param('id');
 
@@ -3071,6 +3269,16 @@ publicApp.get('/papers/:id', async (c) => {
       return c.json({ success: false, error: 'Paper not found' }, 404);
     }
 
+    const access = await getQuestionReadContext(c, String(paper.subject_id), undefined);
+    if ('response' in access) return access.response;
+    if (Number(paper.is_premium) === 1 && !access.premium) {
+      return c.json({
+        success: false,
+        error: 'This past paper requires an active premium plan.',
+        code: 'PAPER_PREMIUM_REQUIRED',
+      }, 403);
+    }
+
     // Get questions for this paper
     const { results: questions } = await c.env.DB.prepare(`
       SELECT q.*, t.name as topic_name
@@ -3081,10 +3289,7 @@ publicApp.get('/papers/:id', async (c) => {
     `).bind(id).all();
 
     // Parse and transform options to proper format
-    const parsedQuestions = questions.map((q: Record<string, unknown>) => ({
-      ...q,
-      options: transformQuestionOptions(q.options, q.correct_answer as string),
-    }));
+    const parsedQuestions = questions.map((q: Record<string, unknown>) => sanitizeQuestionForStudent(q));
 
     return c.json({
       success: true,
@@ -3535,6 +3740,11 @@ app.get('/api/essays/history', requireAuth, async (c) => {
 // registered earlier than protectedApp's routes and would otherwise shadow
 // `/questions/bank` (Hono: first-registered matching route wins).
 app.get('/api/questions/bank', requireAuth, async (c) => {
+  const role = getUserRole(c);
+  if (role !== 'admin' && role !== 'teacher') {
+    return c.json({ success: false, error: 'Teacher or administrator access required' }, 403);
+  }
+
   try {
     const search = c.req.query('search');
     const subjectId = c.req.query('subject');
@@ -3645,46 +3855,62 @@ protectedApp.get('/usage/core-subjects/:examType', async (c) => {
 // Submit answer
 protectedApp.post('/questions/:id/attempt', async (c) => {
   const questionId = c.req.param('id');
-  const { answer } = await c.req.json();
+  const body = await parseJsonBody(c);
+  const answer = typeof body?.answer === 'string' ? body.answer : '';
+  if (!answer.trim() || answer.length > MAX_QUESTION_ANSWER_LENGTH) {
+    return c.json({ success: false, error: 'A valid answer is required' }, 400);
+  }
 
-  // Get userId from JWT context (set by auth middleware)
-  const userId = c.get('userId') as string || 'user_demo';
+  const userId = getUserId(c)!;
 
   try {
-    // Check daily usage limit before processing
-    const usageCheck = await checkCanAnswer(userId, c.env.DB);
-    if (!usageCheck.allowed) {
-      const usage = await getDailyUsage(userId, c.env.DB);
-      return c.json({
-        success: false,
-        error: 'Daily question limit reached',
-        code: 'LIMIT_REACHED',
-        data: {
-          usage,
-          message: `You've used all ${DAILY_QUESTION_LIMIT} questions for today. Upgrade for unlimited practice!`,
-        },
-      }, 403);
-    }
-
-    // Get the question
+    // Resolve through the active subject before exposing answer material.
     const question = await c.env.DB.prepare(`
-      SELECT * FROM questions WHERE id = ?
+      SELECT q.*, s.slug AS subject_slug, et.slug AS exam_type_slug
+      FROM questions q
+      JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
+      JOIN exam_types et ON et.id = s.exam_type_id
+      WHERE q.id = ?
     `).bind(questionId).first();
 
     if (!question) {
       return c.json({ success: false, error: 'Question not found' }, 404);
     }
 
-    const { userNormalized, correctNormalized } = normalizeAnswerForComparison(
-      answer,
-      question.correct_answer as string
-    );
-    const isCorrect = userNormalized === correctNormalized;
-    const pointsEarned = isCorrect ? (question.points as number) : 0;
+    const premium = await isPremiumUser(userId, c.env.DB);
+    if (!premium && !isCoreSubject(String(question.exam_type_slug), String(question.subject_slug))) {
+      return c.json({
+        success: false,
+        error: 'This subject requires an active premium plan.',
+        code: 'SUBJECT_PREMIUM_REQUIRED',
+      }, 403);
+    }
 
-    // Increment usage count for non-premium users
-    await incrementUsage(userId, c.env.DB);
-    await recordAttemptProgress(c.env.DB, {
+    let freeAllowance: Awaited<ReturnType<typeof checkCanAnswer>> | null = null;
+    if (!premium) {
+      freeAllowance = await checkCanAnswer(userId, c.env.DB);
+      if (!freeAllowance.allowed) {
+        const currentUsage = await getDailyUsage(userId, c.env.DB);
+        return c.json({
+          success: false,
+          error: 'Daily question limit reached',
+          code: 'LIMIT_REACHED',
+          data: {
+            usage: currentUsage,
+            message: `You've used all ${DAILY_QUESTION_LIMIT} questions for today. Upgrade for unlimited practice!`,
+          },
+        }, 403);
+      }
+    }
+
+    const isCorrect = isSubmittedAnswerCorrect(
+      question.question_type,
+      question.options,
+      answer,
+      String(question.correct_answer),
+    );
+    const pointsEarned = isCorrect ? (question.points as number) : 0;
+    const progress = await prepareAttemptProgress(c.env.DB, {
       userId,
       questionId,
       topicId: (question.topic_id as string | null) ?? null,
@@ -3695,9 +3921,45 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
       points: (question.points as number | null) ?? 3,
     });
 
-    // Get updated usage info
-    const usage = await getDailyUsage(userId, c.env.DB);
-    const showUpgradePrompt = !usage.isUnlimited && usage.remaining <= 3;
+    let used = 0;
+    let remaining = -1;
+    let limit = -1;
+
+    if (premium) {
+      await c.env.DB.batch(progress.statements);
+    } else {
+      const allowance = prepareQuestionAllowance(userId, c.env.DB);
+      try {
+        const batchResults = await c.env.DB.batch([allowance, ...progress.statements]);
+        const allowanceResult = batchResults[0] as {
+          results?: Array<{ question_count?: unknown }>;
+        };
+        const returnedCount = Number(allowanceResult.results?.[0]?.question_count);
+        used = Number.isFinite(returnedCount)
+          ? returnedCount
+          : DAILY_QUESTION_LIMIT - (freeAllowance?.remaining ?? DAILY_QUESTION_LIMIT) + 1;
+        limit = DAILY_QUESTION_LIMIT;
+        remaining = Math.max(0, limit - used);
+      } catch (writeError) {
+        const message = writeError instanceof Error ? writeError.message : String(writeError);
+        if (message.includes('DAILY_QUESTION_LIMIT_EXCEEDED')) {
+          const currentUsage = await getDailyUsage(userId, c.env.DB);
+          return c.json({
+            success: false,
+            error: 'Daily question limit reached',
+            code: 'LIMIT_REACHED',
+            data: {
+              usage: currentUsage,
+              message: `You've used all ${DAILY_QUESTION_LIMIT} questions for today. Upgrade for unlimited practice!`,
+            },
+          }, 403);
+        }
+        throw writeError;
+      }
+    }
+
+    const isUnlimited = limit === -1;
+    const showUpgradePrompt = !isUnlimited && remaining <= 3;
 
     return c.json({
       success: true,
@@ -3707,10 +3969,10 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
         explanation: question.explanation,
         pointsEarned,
         usage: {
-          used: usage.used,
-          limit: usage.limit,
-          remaining: usage.remaining,
-          isUnlimited: usage.isUnlimited,
+          used,
+          limit,
+          remaining,
+          isUnlimited,
           showUpgradePrompt,
         },
       },
@@ -3720,7 +3982,6 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
     return c.json({ success: false, error: 'Failed to submit answer' }, 500);
   }
 });
-
 // Get user progress
 protectedApp.get('/progress', async (c) => {
   const userId = getUserId(c)!;
@@ -4443,11 +4704,22 @@ protectedApp.post('/papers/:id/attempt', async (c) => {
       SELECT pp.*, pt.typical_duration
       FROM past_papers pp
       JOIN paper_types pt ON pp.paper_type_id = pt.id
+      JOIN subjects s ON s.id = pp.subject_id AND s.is_active = 1
       WHERE pp.id = ?
     `).bind(paperId).first();
 
     if (!paper) {
       return c.json({ success: false, error: 'Paper not found' }, 404);
+    }
+
+    const access = await getQuestionReadContext(c, String(paper.subject_id), undefined);
+    if ('response' in access) return access.response;
+    if (Number(paper.is_premium) === 1 && !access.premium) {
+      return c.json({
+        success: false,
+        error: 'This past paper requires an active premium plan.',
+        code: 'PAPER_PREMIUM_REQUIRED',
+      }, 403);
     }
 
     // Auto-abandon stale attempts older than 24 hours for this user
@@ -4514,42 +4786,61 @@ protectedApp.post('/papers/:id/abandon', async (c) => {
 // Save answer for paper attempt
 protectedApp.put('/papers/attempts/:attemptId/answer', async (c) => {
   const attemptId = c.req.param('attemptId');
-  const { questionId, answer, timeTaken } = await c.req.json();
+  const body = await parseJsonBody(c);
+  const questionId = typeof body?.questionId === 'string' ? body.questionId.trim() : '';
+  const answer = typeof body?.answer === 'string' ? body.answer : null;
+  const rawTimeTaken = body?.timeTaken ?? 0;
+  const timeTaken = typeof rawTimeTaken === 'number' ? rawTimeTaken : Number.NaN;
   const userId = getUserId(c)!;
 
+  if (
+    !questionId
+    || answer === null
+    || answer.length > MAX_QUESTION_ANSWER_LENGTH
+    || !Number.isFinite(timeTaken)
+    || timeTaken < 0
+  ) {
+    return c.json({ success: false, error: 'Invalid paper answer' }, 400);
+  }
+
   try {
-    // Verify attempt belongs to user and is in progress
-    const attempt = await c.env.DB.prepare(`
-      SELECT * FROM paper_attempts WHERE id = ? AND user_id = ? AND status = 'in_progress'
-    `).bind(attemptId, userId).first();
+    // Authorize both the attempt owner and the question's membership in the
+    // attempt's paper. A valid question from another paper must fail closed.
+    const membership = await c.env.DB.prepare(`
+      SELECT pa.id, pa.paper_id, q.id AS question_id
+      FROM paper_attempts pa
+      JOIN questions q ON q.past_paper_id = pa.paper_id AND q.id = ?
+      WHERE pa.id = ? AND pa.user_id = ? AND pa.status = 'in_progress'
+    `).bind(questionId, attemptId, userId).first();
 
-    if (!attempt) {
-      return c.json({ success: false, error: 'Attempt not found or already submitted' }, 404);
+    if (!membership) {
+      return c.json({ success: false, error: 'Attempt or question not found' }, 404);
     }
 
-    // Check if answer already exists
-    const existing = await c.env.DB.prepare(`
-      SELECT id FROM paper_attempt_answers WHERE attempt_id = ? AND question_id = ?
-    `).bind(attemptId, questionId).first();
-
-    if (existing) {
-      // Update existing answer
-      await c.env.DB.prepare(`
-        UPDATE paper_attempt_answers
-        SET answer_text = ?, time_taken = ?, answered_at = datetime('now')
-        WHERE id = ?
-      `).bind(answer, timeTaken || 0, existing.id).run();
-    } else {
-      // Insert new answer
-      const answerId = `paa_${Date.now()}`;
-      await c.env.DB.prepare(`
-        INSERT INTO paper_attempt_answers (id, attempt_id, question_id, answer_text, time_taken)
-        VALUES (?, ?, ?, ?, ?)
-      `).bind(answerId, attemptId, questionId, answer, timeTaken || 0).run();
-    }
+    const answerId = `paa_${crypto.randomUUID()}`;
+    const demoFlags = getDemoDataFlags(userId);
+    await c.env.DB.prepare(`
+      INSERT INTO paper_attempt_answers (
+        id, paper_attempt_id, question_id, user_answer, time_taken,
+        is_demo_data, expires_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(paper_attempt_id, question_id) DO UPDATE SET
+        user_answer = excluded.user_answer,
+        time_taken = excluded.time_taken,
+        answered_at = datetime('now')
+    `).bind(
+      answerId,
+      attemptId,
+      questionId,
+      answer,
+      Math.round(timeTaken),
+      demoFlags.is_demo_data,
+      demoFlags.expires_at,
+    ).run();
 
     return c.json({ success: true, data: { saved: true } });
-  } catch {
+  } catch (error) {
+    console.error('Save paper answer error:', error);
     return c.json({ success: false, error: 'Failed to save answer' }, 500);
   }
 });
@@ -4557,65 +4848,72 @@ protectedApp.put('/papers/attempts/:attemptId/answer', async (c) => {
 // Submit paper attempt
 protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
   const attemptId = c.req.param('attemptId');
-  const { timeUsed } = await c.req.json();
+  const body = await parseJsonBody(c);
+  const rawTimeUsed = body?.timeUsed ?? 0;
+  const timeUsed = typeof rawTimeUsed === 'number' ? rawTimeUsed : Number.NaN;
   const userId = getUserId(c)!;
 
+  if (!Number.isFinite(timeUsed) || timeUsed < 0 || timeUsed > 24 * 60 * 60) {
+    return c.json({ success: false, error: 'Invalid time used' }, 400);
+  }
+
   try {
-    // Verify attempt
     const attempt = await c.env.DB.prepare(`
       SELECT pa.*, pp.total_marks
       FROM paper_attempts pa
       JOIN past_papers pp ON pa.paper_id = pp.id
       WHERE pa.id = ? AND pa.user_id = ? AND pa.status = 'in_progress'
-    `).bind(attemptId, userId).first();
+    `).bind(attemptId, userId).first<Record<string, unknown>>();
 
     if (!attempt) {
       return c.json({ success: false, error: 'Attempt not found or already submitted' }, 404);
     }
 
-    // Get all answers and grade objective questions
     const { results: answers } = await c.env.DB.prepare(`
-      SELECT paa.*, q.correct_answer, q.marks, q.question_type
+      SELECT paa.*, q.correct_answer, q.marks, q.question_type, q.options
       FROM paper_attempt_answers paa
-      JOIN questions q ON paa.question_id = q.id
-      WHERE paa.attempt_id = ?
-    `).bind(attemptId).all();
+      JOIN paper_attempts pa ON pa.id = paa.paper_attempt_id
+      JOIN questions q ON q.id = paa.question_id AND q.past_paper_id = pa.paper_id
+      WHERE paa.paper_attempt_id = ?
+    `).bind(attemptId).all<Record<string, unknown>>();
 
     let totalScore = 0;
+    const gradeStatements: D1PreparedStatement[] = [];
 
-    // Grade each answer (only objective questions auto-graded)
-    for (const ans of answers) {
-      const answer = ans as Record<string, unknown>;
-      const isObjective = ['multiple_choice', 'true_false'].includes(answer.question_type as string);
+    for (const answerRow of answers) {
+      const isObjective = ['multiple_choice', 'true_false'].includes(String(answerRow.question_type));
+      if (!isObjective) continue;
 
-      if (isObjective) {
-        const { userNormalized, correctNormalized } = normalizeAnswerForComparison(
-          answer.answer_text as string,
-          answer.correct_answer as string
-        );
-        const isCorrect = userNormalized === correctNormalized;
-        const marksEarned = isCorrect ? (answer.marks as number) : 0;
+      const isCorrect = isSubmittedAnswerCorrect(
+        answerRow.question_type,
+        answerRow.options,
+        String(answerRow.user_answer ?? ''),
+        String(answerRow.correct_answer ?? ''),
+      );
+      const marks = Number(answerRow.marks) || 0;
+      const marksEarned = isCorrect ? marks : 0;
+      totalScore += marksEarned;
 
-        await c.env.DB.prepare(`
-          UPDATE paper_attempt_answers
-          SET is_correct = ?, marks_earned = ?
-          WHERE id = ?
-        `).bind(isCorrect ? 1 : 0, marksEarned, answer.id).run();
-
-        totalScore += marksEarned;
-      }
+      gradeStatements.push(c.env.DB.prepare(`
+        UPDATE paper_attempt_answers
+        SET is_correct = ?, marks_earned = ?
+        WHERE id = ? AND paper_attempt_id = ?
+      `).bind(isCorrect ? 1 : 0, marksEarned, answerRow.id, attemptId));
     }
 
-    // Calculate percentage
-    const totalMarks = attempt.total_marks as number || 100;
-    const percentageScore = Math.round((totalScore / totalMarks) * 100);
+    const totalMarks = Number(attempt.total_marks) || 0;
+    const percentageScore = totalMarks > 0
+      ? Math.round((totalScore / totalMarks) * 100)
+      : 0;
 
-    // Update attempt
-    await c.env.DB.prepare(`
+    gradeStatements.push(c.env.DB.prepare(`
       UPDATE paper_attempts
-      SET status = 'completed', time_used = ?, total_score = ?, percentage = ?, submitted_at = datetime('now')
-      WHERE id = ?
-    `).bind(timeUsed || 0, totalScore, percentageScore, attemptId).run();
+      SET status = 'graded', time_used = ?, total_score = ?, max_score = ?,
+          percentage = ?, submitted_at = datetime('now')
+      WHERE id = ? AND user_id = ? AND status = 'in_progress'
+    `).bind(Math.round(timeUsed), totalScore, totalMarks, percentageScore, attemptId, userId));
+
+    await c.env.DB.batch(gradeStatements);
 
     return c.json({
       success: true,
@@ -4624,10 +4922,11 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
         totalScore,
         totalMarks,
         percentageScore,
-        status: 'completed',
+        status: 'graded',
       },
     });
-  } catch {
+  } catch (error) {
+    console.error('Submit paper attempt error:', error);
     return c.json({ success: false, error: 'Failed to submit paper' }, 500);
   }
 });
@@ -4635,45 +4934,60 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
 // Get paper attempt results
 protectedApp.get('/papers/attempts/:attemptId/results', async (c) => {
   const attemptId = c.req.param('attemptId');
-  // Self-scope only (Task 10 decision): identity comes from the JWT; no admin
-  // ?userId= override — no admin UI needs support lookups here yet.
+  // Self-scope only: identity comes from the JWT; no admin query override.
   const userId = getUserId(c)!;
 
   try {
     const attempt = await c.env.DB.prepare(`
-      SELECT pa.*, pa.percentage AS percentage_score, pp.title as paper_title, pp.year, s.name as subject_name, pt.name as paper_type_name
+      SELECT pa.*, pa.percentage AS percentage_score, pp.title as paper_title,
+             pp.year, s.name as subject_name, pt.name as paper_type_name
       FROM paper_attempts pa
       JOIN past_papers pp ON pa.paper_id = pp.id
       JOIN subjects s ON pp.subject_id = s.id
       JOIN paper_types pt ON pp.paper_type_id = pt.id
       WHERE pa.id = ? AND pa.user_id = ?
-    `).bind(attemptId, userId).first();
+    `).bind(attemptId, userId).first<Record<string, unknown>>();
 
     if (!attempt) {
       return c.json({ success: false, error: 'Attempt not found' }, 404);
     }
 
-    // Get answers with questions
-    const { results: answers } = await c.env.DB.prepare(`
-      SELECT paa.*, q.question_text, q.correct_answer, q.explanation, q.marks, q.question_type
-      FROM paper_attempt_answers paa
-      JOIN questions q ON paa.question_id = q.id
-      WHERE paa.attempt_id = ?
-      ORDER BY q.section, q.question_number
-    `).bind(attemptId).all();
+    if (attempt.status === 'in_progress') {
+      const { results: answers } = await c.env.DB.prepare(`
+        SELECT paa.id, paa.paper_attempt_id, paa.question_id,
+               paa.user_answer AS answer_text, paa.time_taken, paa.answered_at
+        FROM paper_attempt_answers paa
+        JOIN questions q ON q.id = paa.question_id AND q.past_paper_id = ?
+        WHERE paa.paper_attempt_id = ?
+        ORDER BY q.section, q.question_number
+      `).bind(attempt.paper_id, attemptId).all();
 
-    return c.json({
-      success: true,
-      data: {
-        attempt,
-        answers,
-      },
-    });
-  } catch {
+      return c.json({ success: true, data: { attempt, answers } });
+    }
+
+    if (!['submitted', 'graded'].includes(String(attempt.status))) {
+      return c.json({
+        success: false,
+        error: 'Results are not available for this attempt',
+        code: 'RESULTS_UNAVAILABLE',
+      }, 409);
+    }
+
+    const { results: answers } = await c.env.DB.prepare(`
+      SELECT paa.*, paa.user_answer AS answer_text, q.question_text,
+             q.correct_answer, q.explanation, q.marks, q.question_type
+      FROM paper_attempt_answers paa
+      JOIN questions q ON q.id = paa.question_id AND q.past_paper_id = ?
+      WHERE paa.paper_attempt_id = ?
+      ORDER BY q.section, q.question_number
+    `).bind(attempt.paper_id, attemptId).all();
+
+    return c.json({ success: true, data: { attempt, answers } });
+  } catch (error) {
+    console.error('Fetch paper results error:', error);
     return c.json({ success: false, error: 'Failed to fetch results' }, 500);
   }
 });
-
 // =============================================
 // ESSAY SUBMISSION & GRADING ENDPOINTS
 // =============================================

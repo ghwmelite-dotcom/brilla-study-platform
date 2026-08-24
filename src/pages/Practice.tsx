@@ -23,6 +23,7 @@ import { useUsageStore } from '@/stores/usageStore';
 import { getExamConfig, isCoreSubject } from '@/config';
 import { cn } from '@/utils';
 import { api } from '@/lib/api';
+import { getPracticeSubjectOption, getQuestionBankError } from '@/lib/subjectAvailability';
 import type { Question, GhanaExamTypeSlug } from '@/types';
 import { isGhanaExam } from '@/types';
 import type { LucideIcon } from 'lucide-react';
@@ -36,8 +37,8 @@ interface ApiQuestion {
   question_type: string;
   round_type: string;
   options: unknown[] | null;
-  correct_answer: string;
-  explanation: string | null;
+  correct_answer?: string;
+  explanation?: string | null;
   difficulty: string;
   points: number;
   marks: number;
@@ -53,7 +54,7 @@ const transformQuestion = (q: ApiQuestion): Question => ({
   questionType: q.question_type as Question['questionType'],
   roundType: q.round_type as Question['roundType'],
   options: q.options as Question['options'],
-  correctAnswer: q.correct_answer,
+  correctAnswer: q.correct_answer || '',
   explanation: q.explanation || undefined,
   difficulty: q.difficulty as Question['difficulty'],
   points: q.points,
@@ -310,11 +311,10 @@ export function PracticePage() {
   // Build subject options from exam store (with lock indicators for premium subjects)
   const subjectOptions = [
     { value: 'all', label: 'All Subjects' },
-    ...examSubjects.map((s) => ({
-      value: s.slug,
-      label: isSubjectLocked(s.slug) ? `🔒 ${s.name}` : s.name,
-      disabled: isSubjectLocked(s.slug),
-    })),
+    ...examSubjects.map((subject) => getPracticeSubjectOption(
+      subject,
+      isSubjectLocked(subject.slug),
+    )),
   ];
 
   // Fetch speed race questions from API
@@ -336,7 +336,7 @@ export function PracticePage() {
         const transformedQuestions = data.map(transformQuestion);
         setSpeedQuestions(transformedQuestions);
       } else {
-        setSpeedError('No speed race questions available. Try different filters.');
+        setSpeedError(getQuestionBankError(res, 'No speed race questions available. Try different filters.'));
       }
     } catch (err) {
       console.error('Failed to fetch speed race questions:', err);
@@ -367,7 +367,7 @@ export function PracticePage() {
         const transformedQuestions = data.map(transformQuestion);
         setDrillQuestions(transformedQuestions);
       } else {
-        setDrillError('No questions available for these filters. Try different settings.');
+        setDrillError(getQuestionBankError(res, 'No questions available for these filters. Try different settings.'));
       }
     } catch (err) {
       console.error('Failed to fetch drill questions:', err);

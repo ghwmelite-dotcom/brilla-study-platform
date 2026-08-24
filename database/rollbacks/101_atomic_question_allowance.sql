@@ -1,0 +1,2 @@
+DROP TRIGGER IF EXISTS trg_daily_usage_question_limit_update;
+DROP TRIGGER IF EXISTS trg_daily_usage_question_limit_insert;
