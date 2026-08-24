@@ -1,0 +1,210 @@
+{
+  "batchId": "edexcel-igcse-pilot-001",
+  "status": "draft_academic_review",
+  "examTypeId": "edexcel_igcse",
+  "provenance": [
+    {
+      "publisher": "Pearson Edexcel",
+      "title": "International GCSE Mathematics A (4MA1) specification",
+      "url": "https://qualifications.pearson.com/content/dam/pdf/International%20GCSE/Mathematics%20A/2016/Specification%20and%20sample%20assessments/international-gcse-in-mathematics-spec-a.pdf",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "Pearson Edexcel",
+      "title": "International GCSE Biology (4BI1) specification",
+      "url": "https://qualifications.pearson.com/content/dam/pdf/International%20GCSE/Biology/2017/specification-and-sample-assessments/international-gcse-biology-2017-specification1.pdf",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "Pearson Edexcel",
+      "title": "International GCSE Chemistry (4CH1) specification",
+      "url": "https://qualifications.pearson.com/content/dam/pdf/International%20GCSE/Chemistry/2017/specification-and-sample-assessments/international-gcse-chemistry-2017-specification.pdf",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "Pearson Edexcel",
+      "title": "International GCSE Physics (4PH1) specification",
+      "url": "https://qualifications.pearson.com/content/dam/pdf/International%20GCSE/Physics/2017/specification-and-sample-assessments/international-gcse-physics-2017-specification.pdf",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "academicReviewer": null,
+    "reviewedAt": null,
+    "notes": "Original pilot items staged for independent academic review. This batch is intentionally ineligible for import or production."
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_edexcel_igcse_math",
+      "specificationCode": "4MA1",
+      "topics": [
+        { "code": "4MA1-NUM", "title": "Numbers and the number system", "objective": "Apply percentages, ratio and numerical methods accurately in multi-step contexts." },
+        { "code": "4MA1-ALG", "title": "Equations, formulae and identities", "objective": "Form, manipulate and solve algebraic equations using valid methods." },
+        { "code": "4MA1-GEO", "title": "Geometry and mensuration", "objective": "Use geometric properties and mensuration formulae to solve problems." },
+        { "code": "4MA1-STA", "title": "Statistics and probability", "objective": "Summarise data and interpret statistical measures in context." }
+      ],
+      "questions": [
+        {
+          "id": "q_edx_4ma1_p001_001", "original": true, "topicCode": "4MA1-NUM", "type": "calculation",
+          "prompt": "A bicycle costs GHS 1,250. Its price increases by 8%. Calculate the new price.",
+          "correctAnswer": "GHS 1,350", "workedSolution": "An 8% increase means multiply the original price by 1.08. Therefore 1,250 × 1.08 = 1,350, so the bicycle's new price is GHS 1,350.",
+          "difficulty": "easy", "marks": 2, "commandWord": "Calculate", "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_edx_4ma1_p001_002", "original": true, "topicCode": "4MA1-ALG", "type": "short_answer",
+          "prompt": "Solve the equation x² − 5x + 6 = 0, showing a valid algebraic method.",
+          "correctAnswer": "x = 2 or x = 3", "workedSolution": "Find two numbers whose product is 6 and whose sum is −5. They are −2 and −3, so x² − 5x + 6 = (x − 2)(x − 3). Setting each factor to zero gives x = 2 or x = 3.",
+          "difficulty": "medium", "marks": 3, "commandWord": "Solve", "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_edx_4ma1_p001_003", "original": true, "topicCode": "4MA1-GEO", "type": "calculation",
+          "prompt": "A closed cylinder has radius 3 cm and height 10 cm. Calculate its total surface area in terms of π.",
+          "correctAnswer": "78π cm²", "workedSolution": "The two circular ends have area 2πr² and the curved surface has area 2πrh. Substituting r = 3 and h = 10 gives 2π(9) + 2π(3)(10) = 18π + 60π = 78π cm².",
+          "difficulty": "hard", "marks": 4, "commandWord": "Calculate", "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_edx_4ma1_p001_004", "original": true, "topicCode": "4MA1-STA", "type": "multiple_choice",
+          "prompt": "The ordered data are 3, 5, 7, 8, 12, 14. What is the median?",
+          "options": [
+            { "label": "A", "text": "7", "rationale": "This selects only the lower of the two central values." },
+            { "label": "B", "text": "7.5", "rationale": "This correctly averages the two central values, 7 and 8." },
+            { "label": "C", "text": "8", "rationale": "This selects only the upper of the two central values." },
+            { "label": "D", "text": "8.2", "rationale": "This is close to the mean, not the median of the data." }
+          ],
+          "correctAnswer": "B", "workedSolution": "There are six values, so the median is the mean of the third and fourth values. Those values are 7 and 8; (7 + 8) ÷ 2 = 7.5, making option B correct.",
+          "difficulty": "easy", "marks": 1, "commandWord": "Determine", "assessmentObjective": "AO1"
+        }
+      ]
+    },
+    {
+      "subjectId": "subj_edexcel_igcse_biology",
+      "specificationCode": "4BI1",
+      "topics": [
+        { "code": "4BI1-CEL", "title": "Cells and movement of substances", "objective": "Explain cell processes using particle movement and membrane properties." },
+        { "code": "4BI1-NUT", "title": "Nutrition and enzymes", "objective": "Analyse digestion and enzyme investigations using controlled variables." },
+        { "code": "4BI1-ECO", "title": "Ecology and the environment", "objective": "Apply sampling methods and quantitative reasoning to populations." },
+        { "code": "4BI1-INH", "title": "Inheritance", "objective": "Predict inheritance outcomes from genotypes and explain probability." }
+      ],
+      "questions": [
+        {
+          "id": "q_edx_4bi1_p001_001", "original": true, "topicCode": "4BI1-CEL", "type": "short_answer",
+          "prompt": "A potato cylinder gains mass after being placed in dilute sugar solution. Explain this observation using water potential.",
+          "correctAnswer": "Water entered the potato cells by osmosis from the higher water potential solution.",
+          "workedSolution": "The dilute solution has a higher water potential than the potato cell contents. Water therefore moves through partially permeable cell membranes into the cells by osmosis, increasing the cylinder's mass.",
+          "difficulty": "medium", "marks": 3, "commandWord": "Explain", "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_edx_4bi1_p001_002", "original": true, "topicCode": "4BI1-NUT", "type": "short_answer",
+          "prompt": "A student tests how temperature affects amylase. State two variables that should be controlled and explain why.",
+          "correctAnswer": "Any two of enzyme concentration, starch concentration, pH or reaction volume, kept constant for a fair comparison.",
+          "workedSolution": "For example, keep the amylase concentration and pH constant. Otherwise a change in reaction time could be caused by a different enzyme concentration or pH rather than temperature, so the comparison would not be valid.",
+          "difficulty": "hard", "marks": 4, "commandWord": "Explain", "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_edx_4bi1_p001_003", "original": true, "topicCode": "4BI1-ECO", "type": "calculation",
+          "prompt": "Five 1 m² quadrats contain 6, 4, 7, 3 and 5 daisies. Estimate the number of daisies in a 200 m² field.",
+          "correctAnswer": "1,000 daisies", "workedSolution": "The mean number per square metre is (6 + 4 + 7 + 3 + 5) ÷ 5 = 5. Multiplying this density by the field area gives 5 × 200 = 1,000 daisies.",
+          "difficulty": "medium", "marks": 3, "commandWord": "Estimate", "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_edx_4bi1_p001_004", "original": true, "topicCode": "4BI1-INH", "type": "multiple_choice",
+          "prompt": "Two parents are both heterozygous for a recessive condition. What is the probability that their child is affected?",
+          "options": [
+            { "label": "A", "text": "0%", "rationale": "This ignores the chance that both parents pass on the recessive allele." },
+            { "label": "B", "text": "25%", "rationale": "One of four equally likely genotypes is homozygous recessive." },
+            { "label": "C", "text": "50%", "rationale": "This is the probability of receiving one recessive allele, not two." },
+            { "label": "D", "text": "75%", "rationale": "This combines unaffected genotypes rather than the affected genotype." }
+          ],
+          "correctAnswer": "B", "workedSolution": "Let the normal allele be A and the recessive condition allele be a. Crossing Aa with Aa gives AA, Aa, Aa and aa. Only aa is affected, so the probability is 1 out of 4, or 25%.",
+          "difficulty": "medium", "marks": 2, "commandWord": "Determine", "assessmentObjective": "AO2"
+        }
+      ]
+    },
+    {
+      "subjectId": "subj_edexcel_igcse_chemistry",
+      "specificationCode": "4CH1",
+      "topics": [
+        { "code": "4CH1-BON", "title": "Atomic structure and bonding", "objective": "Relate particle structure and bonding to observable material properties." },
+        { "code": "4CH1-STO", "title": "Formulae, equations and amounts", "objective": "Use quantitative composition data to determine chemical formulae." },
+        { "code": "4CH1-RAT", "title": "Rates of reaction", "objective": "Interpret reaction evidence and explain collision-theory effects." },
+        { "code": "4CH1-ORG", "title": "Organic chemistry", "objective": "Identify organic functional groups from reactions and observations." }
+      ],
+      "questions": [
+        {
+          "id": "q_edx_4ch1_p001_001", "original": true, "topicCode": "4CH1-BON", "type": "multiple_choice",
+          "prompt": "Why does solid sodium chloride not conduct electricity, while molten sodium chloride does?",
+          "options": [
+            { "label": "A", "text": "Electrons are created when it melts", "rationale": "Melting does not create electrons in sodium chloride." },
+            { "label": "B", "text": "Ions become free to move when it melts", "rationale": "Mobile charged ions carry current through the molten compound." },
+            { "label": "C", "text": "The ions lose their charges when solid", "rationale": "The ions remain charged in the solid ionic lattice." },
+            { "label": "D", "text": "The molten substance contains metal atoms", "rationale": "Molten sodium chloride still contains sodium and chloride ions." }
+          ],
+          "correctAnswer": "B", "workedSolution": "In the solid, sodium and chloride ions are held in fixed lattice positions and cannot carry charge through the material. When molten, the ions are mobile and can move to electrodes, so current flows.",
+          "difficulty": "medium", "marks": 2, "commandWord": "Explain", "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_edx_4ch1_p001_002", "original": true, "topicCode": "4CH1-STO", "type": "calculation",
+          "prompt": "A compound contains 2.4 g of magnesium and 1.6 g of oxygen. Determine its empirical formula. Use Ar: Mg = 24, O = 16.",
+          "correctAnswer": "MgO", "workedSolution": "Moles of magnesium = 2.4 ÷ 24 = 0.10 mol. Moles of oxygen = 1.6 ÷ 16 = 0.10 mol. Dividing both by 0.10 gives a 1:1 ratio, so the empirical formula is MgO.",
+          "difficulty": "medium", "marks": 3, "commandWord": "Determine", "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_edx_4ch1_p001_003", "original": true, "topicCode": "4CH1-RAT", "type": "short_answer",
+          "prompt": "Explain, using collision theory, why powdered calcium carbonate reacts faster with acid than equal-mass marble chips.",
+          "correctAnswer": "Powder has greater surface area, causing more frequent successful collisions per second.",
+          "workedSolution": "Powdering exposes a greater total surface area to the acid. More acid particles can collide with calcium carbonate particles each second, so successful collisions occur more frequently and the reaction rate increases.",
+          "difficulty": "medium", "marks": 3, "commandWord": "Explain", "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_edx_4ch1_p001_004", "original": true, "topicCode": "4CH1-ORG", "type": "multiple_choice",
+          "prompt": "A hydrocarbon rapidly decolourises bromine water at room temperature. Which conclusion is best supported?",
+          "options": [
+            { "label": "A", "text": "It is an alkane", "rationale": "Alkanes do not rapidly decolourise bromine water without ultraviolet light." },
+            { "label": "B", "text": "It contains a carbon-carbon double bond", "rationale": "Bromine adds across an alkene double bond and loses its colour." },
+            { "label": "C", "text": "It contains only single bonds", "rationale": "A saturated hydrocarbon does not give this rapid room-temperature result." },
+            { "label": "D", "text": "It must contain oxygen", "rationale": "The bromine-water test does not establish the presence of oxygen." }
+          ],
+          "correctAnswer": "B", "workedSolution": "Rapid decolourisation of bromine water is the standard observation for addition across a carbon-carbon double bond. The evidence therefore supports an unsaturated hydrocarbon such as an alkene.",
+          "difficulty": "easy", "marks": 1, "commandWord": "Deduce", "assessmentObjective": "AO2"
+        }
+      ]
+    },
+    {
+      "subjectId": "subj_edexcel_igcse_physics",
+      "specificationCode": "4PH1",
+      "topics": [
+        { "code": "4PH1-FOR", "title": "Forces and motion", "objective": "Use motion relationships to calculate and interpret changes in velocity." },
+        { "code": "4PH1-ENE", "title": "Energy resources and transfers", "objective": "Calculate energy efficiency and account for energy transfers." },
+        { "code": "4PH1-WAV", "title": "Waves", "objective": "Apply the wave equation to measurable wave properties." },
+        { "code": "4PH1-ELE", "title": "Electricity", "objective": "Analyse series and parallel circuits using current, voltage and resistance." }
+      ],
+      "questions": [
+        {
+          "id": "q_edx_4ph1_p001_001", "original": true, "topicCode": "4PH1-FOR", "type": "calculation",
+          "prompt": "A train's velocity increases uniformly from 6 m/s to 18 m/s in 4.0 s. Calculate its acceleration.",
+          "correctAnswer": "3.0 m/s²", "workedSolution": "Acceleration is change in velocity divided by time. The change is 18 − 6 = 12 m/s. Therefore acceleration = 12 ÷ 4.0 = 3.0 m/s².",
+          "difficulty": "easy", "marks": 2, "commandWord": "Calculate", "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_edx_4ph1_p001_002", "original": true, "topicCode": "4PH1-ENE", "type": "calculation",
+          "prompt": "A motor receives 9.0 kJ of electrical energy and transfers 6.3 kJ usefully. Calculate its efficiency as a percentage.",
+          "correctAnswer": "70%", "workedSolution": "Efficiency = useful energy output ÷ total energy input × 100%. Substitution gives 6.3 ÷ 9.0 × 100% = 70%. The remaining 30% is transferred to non-useful stores or pathways.",
+          "difficulty": "medium", "marks": 3, "commandWord": "Calculate", "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_edx_4ph1_p001_003", "original": true, "topicCode": "4PH1-WAV", "type": "calculation",
+          "prompt": "Water waves have frequency 25 Hz and wavelength 0.80 m. Calculate their speed.",
+          "correctAnswer": "20 m/s", "workedSolution": "Use the wave equation v = fλ. Substituting f = 25 Hz and λ = 0.80 m gives v = 25 × 0.80 = 20 m/s. The units combine to metres per second.",
+          "difficulty": "easy", "marks": 2, "commandWord": "Calculate", "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_edx_4ph1_p001_004", "original": true, "topicCode": "4PH1-ELE", "type": "calculation",
+          "prompt": "A 4 Ω resistor and a 6 Ω resistor are connected in parallel across a 12 V supply. Calculate the total current.",
+          "correctAnswer": "5 A", "workedSolution": "Each branch has 12 V across it. The branch currents are I₁ = 12 ÷ 4 = 3 A and I₂ = 12 ÷ 6 = 2 A. Parallel branch currents add, so total current = 3 + 2 = 5 A.",
+          "difficulty": "hard", "marks": 4, "commandWord": "Calculate", "assessmentObjective": "AO2"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brillaprep.org/schemas/question-batch.schema.json",
+  "title": "BrillaPrep curriculum question batch",
+  "type": "object",
+  "required": ["batchId", "status", "examTypeId", "subjects", "provenance", "review"],
+  "properties": {
+    "batchId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]+$" },
+    "status": { "enum": ["draft_academic_review", "approved_for_staging", "approved_for_production"] },
+    "examTypeId": { "type": "string", "minLength": 1 },
+    "provenance": { "type": "array", "minItems": 1 },
+    "subjects": { "type": "array", "minItems": 1 },
+    "review": { "type": "object" }
+  }
+}

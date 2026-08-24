@@ -1,0 +1,147 @@
+{
+  "matrixVersion": "2026-08-24",
+  "status": "authoritative_source_review_complete",
+  "policy": {
+    "publicationThreshold": "Human academic approval is required before production publication.",
+    "copyright": "Only original questions may be authored. Official documents are used as curriculum blueprints, never copied as question text.",
+    "availability": "A subject remains unavailable until its approved bank meets the operational coverage floor."
+  },
+  "officialSources": [
+    {
+      "id": "waec-wassce-school",
+      "publisher": "WAEC Ghana",
+      "title": "WASSCE for School Candidates",
+      "url": "https://waecgh.org/home/wassce-school/",
+      "purpose": "Current programme and subject catalogue"
+    },
+    {
+      "id": "waec-wassce-2026-timetable",
+      "publisher": "WAEC Ghana",
+      "title": "WASSCE for School Candidates 2026 Final Timetable",
+      "url": "https://waecgh.org/wp-content/uploads/2026/03/FINAL-TIMETABLE-FOR-WASSCE-SC-2026-GHANA-ONLY-NEW-TAD.pdf",
+      "purpose": "Current and transitional examined-subject verification"
+    },
+    {
+      "id": "waec-bece-2024-guidelines",
+      "publisher": "WAEC Ghana",
+      "title": "2024 BECE Guidelines, Scheme and Structure",
+      "url": "https://waecgh.org/wp-content/uploads/2024/05/2024-BECE-GUIDELINES-SCHEME-AND-STRUCTURE.pdf",
+      "purpose": "Language-specific BECE subject verification"
+    },
+    {
+      "id": "nacca-secondary",
+      "publisher": "NaCCA Ghana",
+      "title": "Secondary Education Curriculum",
+      "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+      "purpose": "Ghana secondary curriculum transition map"
+    },
+    {
+      "id": "nacca-common-core",
+      "publisher": "NaCCA Ghana",
+      "title": "Common Core Programme",
+      "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+      "purpose": "BECE curriculum alignment"
+    },
+    {
+      "id": "pearson-4ma1",
+      "publisher": "Pearson Edexcel",
+      "title": "International GCSE Mathematics A (4MA1) specification",
+      "url": "https://qualifications.pearson.com/content/dam/pdf/International%20GCSE/Mathematics%20A/2016/Specification%20and%20sample%20assessments/international-gcse-in-mathematics-spec-a.pdf",
+      "purpose": "Mathematics topic and assessment blueprint"
+    },
+    {
+      "id": "pearson-4bi1",
+      "publisher": "Pearson Edexcel",
+      "title": "International GCSE Biology (4BI1) specification",
+      "url": "https://qualifications.pearson.com/content/dam/pdf/International%20GCSE/Biology/2017/specification-and-sample-assessments/international-gcse-biology-2017-specification1.pdf",
+      "purpose": "Biology topic and assessment blueprint"
+    },
+    {
+      "id": "pearson-4ch1",
+      "publisher": "Pearson Edexcel",
+      "title": "International GCSE Chemistry (4CH1) specification",
+      "url": "https://qualifications.pearson.com/content/dam/pdf/International%20GCSE/Chemistry/2017/specification-and-sample-assessments/international-gcse-chemistry-2017-specification.pdf",
+      "purpose": "Chemistry topic and assessment blueprint"
+    },
+    {
+      "id": "pearson-4ph1",
+      "publisher": "Pearson Edexcel",
+      "title": "International GCSE Physics (4PH1) specification",
+      "url": "https://qualifications.pearson.com/content/dam/pdf/International%20GCSE/Physics/2017/specification-and-sample-assessments/international-gcse-physics-2017-specification.pdf",
+      "purpose": "Physics topic and assessment blueprint"
+    }
+  ],
+  "summary": {
+    "productionEmptyRecordsAfterMigration103": 27,
+    "populateExisting": 24,
+    "splitExisting": 1,
+    "retireExisting": 2,
+    "languageBanksAfterSplit": 11,
+    "validTargetBanksAfterCatalogueCorrection": 35
+  },
+  "subjects": [
+    { "id": "subj_edexcel_igcse_math", "exam": "edexcel_igcse", "name": "Mathematics A", "code": "4MA1", "decision": "populate", "sources": ["pearson-4ma1"] },
+    { "id": "subj_edexcel_igcse_biology", "exam": "edexcel_igcse", "name": "Biology", "code": "4BI1", "decision": "populate", "sources": ["pearson-4bi1"] },
+    { "id": "subj_edexcel_igcse_chemistry", "exam": "edexcel_igcse", "name": "Chemistry", "code": "4CH1", "decision": "populate", "sources": ["pearson-4ch1"] },
+    { "id": "subj_edexcel_igcse_physics", "exam": "edexcel_igcse", "name": "Physics", "code": "4PH1", "decision": "populate", "sources": ["pearson-4ph1"] },
+
+    {
+      "id": "subj_bece_gh_lang",
+      "exam": "bece",
+      "name": "Ghanaian Language",
+      "decision": "split",
+      "reason": "WAEC assesses distinct languages. A mixed generic bank would present questions to learners in the wrong language.",
+      "sources": ["waec-bece-2024-guidelines", "nacca-common-core"],
+      "replacementSubjects": [
+        { "id": "subj_bece_dagaare", "name": "Dagaare" },
+        { "id": "subj_bece_dagbani", "name": "Dagbani" },
+        { "id": "subj_bece_dangme", "name": "Dangme" },
+        { "id": "subj_bece_ewe", "name": "Ewe" },
+        { "id": "subj_bece_fante", "name": "Fante" },
+        { "id": "subj_bece_ga", "name": "Ga" },
+        { "id": "subj_bece_gonja", "name": "Gonja" },
+        { "id": "subj_bece_kasem", "name": "Kasem" },
+        { "id": "subj_bece_nzema", "name": "Nzema" },
+        { "id": "subj_bece_twi_akuapem", "name": "Twi (Akuapem)" },
+        { "id": "subj_bece_twi_asante", "name": "Twi (Asante)" }
+      ]
+    },
+
+    { "id": "subj_wassce_agric", "exam": "wassce", "name": "Agricultural Science", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable", "nacca-secondary"] },
+    { "id": "subj_wassce_elect_app", "exam": "wassce", "name": "Applied Electricity", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_auto_mech", "exam": "wassce", "name": "Auto Mechanics", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_basketry", "exam": "wassce", "name": "Basketry", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_building", "exam": "wassce", "name": "Building Construction", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_clerical", "exam": "wassce", "name": "Clerical Office Duties", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_textiles", "exam": "wassce", "name": "Clothing and Textiles", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_electronics", "exam": "wassce", "name": "Electronics", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_ewe", "exam": "wassce", "name": "Ewe", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_fante", "exam": "wassce", "name": "Fante", "decision": "populate", "sources": ["waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_ga", "exam": "wassce", "name": "Ga", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_irs", "exam": "wassce", "name": "Islamic Religious Studies", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_leatherwork", "exam": "wassce", "name": "Leatherwork", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_home_mgmt", "exam": "wassce", "name": "Management-in-Living", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_metalwork", "exam": "wassce", "name": "Metalwork", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_music", "exam": "wassce", "name": "Music", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_picture_making", "exam": "wassce", "name": "Picture Making", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_sculpture", "exam": "wassce", "name": "Sculpture", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_typewriting", "exam": "wassce", "name": "Typewriting", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    { "id": "subj_wassce_woodwork", "exam": "wassce", "name": "Woodwork", "decision": "populate", "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"] },
+    {
+      "id": "subj_wassce_commerce",
+      "exam": "wassce",
+      "name": "Commerce",
+      "decision": "retire",
+      "reason": "Not present in the current WAEC Ghana WASSCE school subject catalogue or 2026 timetable. It must not be populated from a different board or qualification.",
+      "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"]
+    },
+    {
+      "id": "subj_wassce_visual_arts",
+      "exam": "wassce",
+      "name": "Visual Arts",
+      "decision": "retire",
+      "reason": "Visual Arts is a programme/category, not a single examined subject. Learners must use the named art subjects such as Picture Making, Basketry, Leatherwork or Sculpture.",
+      "sources": ["waec-wassce-school", "waec-wassce-2026-timetable"]
+    }
+  ]
+}
