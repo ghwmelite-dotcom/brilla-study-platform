@@ -22,6 +22,9 @@ CREATE TABLE IF NOT EXISTS _migration_100_guard (
   valid INTEGER NOT NULL CHECK (valid = 1)
 );
 DELETE FROM _migration_100_guard;
+-- Canonical populated WASSCE subjects may already have the correct exam
+-- assignment from an earlier release; the guarded category and WAEC code
+-- remain required to match the reviewed pre-migration state.
 WITH mapping(subject_id, exam_type_id, category_id) AS (
   VALUES
     ('subj_igcse_physics', 'igcse', 'cat_igcse_sciences'),
@@ -61,9 +64,6 @@ SELECT CASE WHEN
   )) = 4
   AND (
     (
-      -- Earlier releases may already have assigned the canonical populated
-      -- WASSCE subjects to the correct exam. Their category and WAEC code
-      -- must still match the reviewed pre-migration state below.
       (SELECT COUNT(*) FROM subjects WHERE
         (id = 'subj_wassce_cost_accounting' AND slug = 'cost-accounting'
           AND (exam_type_id IS NULL OR exam_type_id = 'exam_wassce')

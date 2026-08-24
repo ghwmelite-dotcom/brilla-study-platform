@@ -122,6 +122,17 @@ function snapshot(db: Database.Database) {
 }
 
 describe('migration 100 question-bank integrity', () => {
+  it('keeps line comments outside the guarded CTE for Wrangler migration parsing', () => {
+    const guardStart = migrationSql.indexOf('WITH mapping(');
+    const guardTerminator = 'THEN 1 ELSE 0 END;';
+    const guardEnd = migrationSql.indexOf(guardTerminator, guardStart) + guardTerminator.length;
+    const guardedStatement = migrationSql.slice(guardStart, guardEnd);
+
+    expect(guardStart).toBeGreaterThan(-1);
+    expect(guardEnd).toBeGreaterThan(guardStart);
+    expect(guardedStatement).not.toMatch(/^\s*--/m);
+  });
+
   it('is deterministic, idempotent, and exactly reversible', () => {
     const db = createFixture();
     const before = snapshot(db);
