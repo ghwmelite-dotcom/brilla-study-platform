@@ -35,7 +35,7 @@ const usageHandlers: MockHandler[] = [
       trial_expires_at: null,
     }),
   },
-  { match: /INSERT INTO daily_usage/ },
+  { match: /INSERT INTO daily_usage/, first: () => ({ question_count: 1 }) },
   {
     match: /SELECT question_count FROM daily_usage/,
     first: () => ({ question_count: 1 }),
@@ -44,8 +44,8 @@ const usageHandlers: MockHandler[] = [
 
 function questionHandler(question: Record<string, unknown>): MockHandler {
   return {
-    match: /SELECT \* FROM questions WHERE id = \?/,
-    first: () => question,
+    match: /SELECT q\.\*, s\.slug AS subject_slug, et\.slug AS exam_type_slug/,
+    first: () => ({ ...question, subject_slug: 'wassce-core-mathematics', exam_type_slug: 'wassce' }),
   };
 }
 

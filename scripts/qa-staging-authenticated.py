@@ -126,6 +126,31 @@ def require(checks: list[dict[str, Any]], name: str, condition: bool, detail: An
         raise AssertionError(f"{name} failed: {detail}")
 
 
+def contains_answer_material(question: dict[str, Any]) -> bool:
+    if "correct_answer" in question or "correctAnswer" in question or "explanation" in question:
+        return True
+    options = question.get("options")
+    return isinstance(options, list) and any(
+        isinstance(option, dict) and ("isCorrect" in option or "is_correct" in option)
+        for option in options
+    )
+
+
+def first_party_browser_failures(urls: list[str]) -> list[str]:
+    return [
+        url for url in urls
+        if url.startswith(PAGES_URL) or url.startswith(STAGING["apiOrigin"])
+    ]
+
+
+def blocking_browser_console_errors(errors: list[str], failed_requests: list[str]) -> list[str]:
+    first_party_failures = first_party_browser_failures(failed_requests)
+    return [
+        error for error in errors
+        if first_party_failures or error != "Failed to load resource: net::ERR_FAILED"
+    ]
+
+
 def run_staging_sql(sql: str) -> None:
     result = subprocess.run(
         [
@@ -183,8 +208,8 @@ def verify_staging_migration_ledger() -> None:
     rows = query_staging_sql("SELECT name FROM d1_migrations ORDER BY id;")
     remote_names = [row.get("name") for row in rows]
     local_names = sorted(path.name for path in (ROOT / "database" / "migrations").glob("*.sql"))
-    if remote_names != local_names or "098_ai_answer_cache.sql" not in remote_names:
-        raise RuntimeError("Staging migration ledger is not current through migration 098")
+    if remote_names != local_names or "101_atomic_question_allowance.sql" not in remote_names:
+        raise RuntimeError("Staging migration ledger is not current through migration 101")
 
 
 def sql_literal(value: str) -> str:
@@ -206,6 +231,40 @@ def main() -> None:
     student_token = ""
     teacher_token = ""
     student_user: dict[str, Any] = {}
+
+    question_fixtures = query_staging_sql(
+        "SELECT q.id, q.correct_answer FROM questions q "
+        "JOIN subjects s ON s.id=q.subject_id AND s.is_active=1 "
+        "JOIN exam_types et ON et.id=s.exam_type_id "
+        "WHERE et.slug='nsmq' AND s.slug='nsmq-mathematics' "
+        "ORDER BY q.id LIMIT 1;"
+    )
+    paper_fixtures = query_staging_sql(
+        "SELECT pp.id FROM past_papers pp "
+        "JOIN subjects s ON s.id=pp.subject_id AND s.is_active=1 "
+        "JOIN exam_types et ON et.id=pp.exam_type_id "
+        "WHERE et.slug='bece' AND s.slug='bece-english-language' AND pp.is_premium=0 "
+        "AND EXISTS (SELECT 1 FROM questions q WHERE q.past_paper_id=pp.id) "
+        "ORDER BY pp.id LIMIT 1;"
+    )
+    premium_subject_fixtures = query_staging_sql(
+        "SELECT s.id FROM subjects s JOIN exam_types et ON et.id=s.exam_type_id "
+        "WHERE s.is_active=1 AND et.slug='bece' AND s.slug='bece-basic-design-technology' "
+        "AND EXISTS (SELECT 1 FROM questions q WHERE q.subject_id=s.id) LIMIT 1;"
+    )
+    if not question_fixtures or not paper_fixtures or not premium_subject_fixtures:
+        raise RuntimeError("Staging question-bank QA fixtures are unavailable")
+    question_fixture = question_fixtures[0]
+    paper_id = str(paper_fixtures[0]["id"])
+    premium_subject_id = str(premium_subject_fixtures[0]["id"])
+    foreign_paper_questions = query_staging_sql(
+        "SELECT q.id FROM questions q "
+        f"WHERE q.past_paper_id IS NOT NULL AND q.past_paper_id <> {sql_literal(paper_id)} "
+        "ORDER BY q.id LIMIT 1;"
+    )
+    if not foreign_paper_questions:
+        raise RuntimeError("Staging cross-paper authorization fixture is unavailable")
+    foreign_paper_question_id = str(foreign_paper_questions[0]["id"])
 
     run_staging_sql(
         "INSERT INTO rate_limits (identifier, endpoint, request_count, window_start) VALUES ("
@@ -259,12 +318,13 @@ def main() -> None:
                     }
                 )
             status, payload = request_json("POST", "/auth/register", body, qa_sentinel=sentinel)
+            expected_status = "approved" if role == "student" else "pending"
             require(
                 checks,
-                f"{role}_registration_pending",
+                f"{role}_registration_{expected_status}",
                 status == 200
                 and payload.get("success") is True
-                and payload.get("data", {}).get("status") == "pending",
+                and payload.get("data", {}).get("status") == expected_status,
                 {
                     "status": status,
                     "pending": payload.get("data", {}).get("status"),
@@ -273,7 +333,7 @@ def main() -> None:
             )
 
         status, payload = request_json(
-            "POST", "/auth/login", {"email": student_email, "password": student_password}
+            "POST", "/auth/login", {"email": teacher_email, "password": teacher_password}
         )
         require(
             checks,
@@ -299,6 +359,158 @@ def main() -> None:
         )
         require(checks, "teacher_login", status == 200 and payload.get("success") is True, {"status": status})
         teacher_token = payload["data"]["token"]
+
+        status, _ = request_json("GET", f"/papers/{paper_id}")
+        require(checks, "anonymous_paper_denied", status == 401, {"status": status})
+
+        status, payload = request_json("GET", f"/papers/{paper_id}", token=student_token)
+        paper_questions = payload.get("data", {}).get("questions", [])
+        require(
+            checks,
+            "authenticated_paper_answer_keys_redacted",
+            status == 200
+            and payload.get("success") is True
+            and bool(paper_questions)
+            and all(
+                isinstance(question, dict) and not contains_answer_material(question)
+                for question in paper_questions
+            ),
+            {"status": status, "question_count": len(paper_questions)},
+        )
+
+        status, payload = request_json(
+            "POST", f"/papers/{paper_id}/attempt", {}, student_token
+        )
+        paper_attempt = payload.get("data", {})
+        paper_attempt_id = str(paper_attempt.get("attemptId", ""))
+        require(
+            checks,
+            "paper_attempt_started",
+            status == 200 and payload.get("success") is True and bool(paper_attempt_id),
+            {"status": status, "has_attempt": bool(paper_attempt_id)},
+        )
+
+        paper_question_id = str(paper_questions[0].get("id", ""))
+        status, payload = request_json(
+            "PUT",
+            f"/papers/attempts/{paper_attempt_id}/answer",
+            {"questionId": paper_question_id, "answer": "B", "timeTaken": 1},
+            student_token,
+        )
+        require(
+            checks,
+            "paper_answer_saved_with_canonical_schema",
+            status == 200 and payload.get("success") is True,
+            {"status": status},
+        )
+
+        status, payload = request_json(
+            "PUT",
+            f"/papers/attempts/{paper_attempt_id}/answer",
+            {"questionId": foreign_paper_question_id, "answer": "B", "timeTaken": 1},
+            student_token,
+        )
+        require(
+            checks,
+            "cross_paper_answer_rejected",
+            status == 404 and payload.get("success") is False,
+            {"status": status},
+        )
+
+        status, payload = request_json(
+            "GET", f"/papers/attempts/{paper_attempt_id}/results", token=student_token
+        )
+        resume_answers = payload.get("data", {}).get("answers", [])
+        require(
+            checks,
+            "in_progress_paper_results_are_resume_safe",
+            status == 200
+            and payload.get("success") is True
+            and len(resume_answers) == 1
+            and resume_answers[0].get("answer_text") == "B"
+            and not contains_answer_material(resume_answers[0]),
+            {"status": status, "answer_count": len(resume_answers)},
+        )
+
+        status, payload = request_json(
+            "POST",
+            f"/papers/attempts/{paper_attempt_id}/submit",
+            {"timeUsed": 1},
+            student_token,
+        )
+        require(
+            checks,
+            "paper_attempt_graded",
+            status == 200
+            and payload.get("success") is True
+            and payload.get("data", {}).get("status") == "graded",
+            {"status": status, "attempt_status": payload.get("data", {}).get("status")},
+        )
+
+        status, payload = request_json(
+            "GET", f"/papers/attempts/{paper_attempt_id}/results", token=student_token
+        )
+        graded_answers = payload.get("data", {}).get("answers", [])
+        require(
+            checks,
+            "graded_paper_results_release_feedback",
+            status == 200
+            and payload.get("success") is True
+            and len(graded_answers) == 1
+            and contains_answer_material(graded_answers[0]),
+            {"status": status, "answer_count": len(graded_answers)},
+        )
+
+        status, payload = request_json(
+            "GET", "/questions?subject=subj_nsmq_math&limit=1", token=student_token
+        )
+        questions = payload.get("data", [])
+        question = questions[0] if questions else {}
+        require(
+            checks,
+            "prefixed_core_subject_allowed_and_answer_key_redacted",
+            status == 200
+            and payload.get("success") is True
+            and bool(question)
+            and not contains_answer_material(question),
+            {"status": status, "question_count": len(questions)},
+        )
+
+        status, payload = request_json(
+            "GET", f"/questions?subject={premium_subject_id}&limit=1", token=student_token
+        )
+        require(
+            checks,
+            "free_student_premium_subject_denied",
+            status == 403 and payload.get("code") == "SUBJECT_PREMIUM_REQUIRED",
+            {"status": status, "code": payload.get("code")},
+        )
+
+        status, payload = request_json(
+            "POST",
+            f"/questions/{question_fixture['id']}/attempt",
+            {"answer": question_fixture["correct_answer"]},
+            student_token,
+        )
+        attempt = payload.get("data", {})
+        attempt_usage = attempt.get("usage", {})
+        require(
+            checks,
+            "answer_feedback_released_only_after_atomic_attempt",
+            status == 200
+            and payload.get("success") is True
+            and attempt.get("isCorrect") is True
+            and "correctAnswer" in attempt
+            and "explanation" in attempt
+            and attempt_usage.get("used") == 1
+            and attempt_usage.get("remaining") == 9,
+            {
+                "status": status,
+                "correct": attempt.get("isCorrect"),
+                "used": attempt_usage.get("used"),
+                "remaining": attempt_usage.get("remaining"),
+            },
+        )
 
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
@@ -352,13 +564,21 @@ def main() -> None:
                 {"document_status": response.status if response else None, "notice": notice_visible},
             )
             page.get_by_role("button", name="Close Counselor Brie").click()
+            onboarding_first_party_failures = first_party_browser_failures(onboarding_failed_requests)
+            onboarding_blocking_console = blocking_browser_console_errors(
+                onboarding_console_errors, onboarding_failed_requests
+            )
             require(
                 checks,
                 "automatic_onboarding_browser_clean",
-                not onboarding_failed_requests and not onboarding_console_errors and not onboarding_http_errors,
+                not onboarding_first_party_failures
+                and not onboarding_blocking_console
+                and not onboarding_http_errors,
                 {
-                    "failed_requests": onboarding_failed_requests,
-                    "console_errors": onboarding_console_errors[:3],
+                    "first_party_failed_requests": onboarding_first_party_failures,
+                    "external_failed_request_count": len(onboarding_failed_requests)
+                    - len(onboarding_first_party_failures),
+                    "console_errors": onboarding_blocking_console[:3],
                     "http_errors": onboarding_http_errors,
                 },
             )
@@ -676,11 +896,17 @@ def main() -> None:
                     "guidance_responses": guidance_responses,
                 },
             )
+            first_party_failed_requests = first_party_browser_failures(failed_requests)
+            blocking_console_errors = blocking_browser_console_errors(console_errors, failed_requests)
             require(
                 checks,
                 "browser_runtime_clean",
-                not failed_requests and not console_errors,
-                {"failed_requests": len(failed_requests), "console_errors": console_errors[:3]},
+                not first_party_failed_requests and not blocking_console_errors,
+                {
+                    "first_party_failed_requests": first_party_failed_requests,
+                    "external_failed_request_count": len(failed_requests) - len(first_party_failed_requests),
+                    "console_errors": blocking_console_errors[:3],
+                },
             )
             page.screenshot(path=str(screenshot), full_page=True)
             require(

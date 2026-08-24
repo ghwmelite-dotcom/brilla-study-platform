@@ -376,6 +376,22 @@ CREATE TABLE IF NOT EXISTS daily_usage (
     UNIQUE(user_id, usage_date)
 );
 
+-- Source: migrations/101_atomic_question_allowance.sql
+CREATE TRIGGER IF NOT EXISTS trg_daily_usage_question_limit_insert
+BEFORE INSERT ON daily_usage
+WHEN NEW.question_count < 0 OR NEW.question_count > 10
+BEGIN
+  SELECT RAISE(ABORT, 'DAILY_QUESTION_LIMIT_EXCEEDED');
+END;
+
+-- Source: migrations/101_atomic_question_allowance.sql
+CREATE TRIGGER IF NOT EXISTS trg_daily_usage_question_limit_update
+BEFORE UPDATE OF question_count ON daily_usage
+WHEN NEW.question_count < 0 OR NEW.question_count > 10
+BEGIN
+  SELECT RAISE(ABORT, 'DAILY_QUESTION_LIMIT_EXCEEDED');
+END;
+
 -- Source: migrations/071_add_oauth_providers.sql
 CREATE TABLE IF NOT EXISTS oauth_states (
     id TEXT PRIMARY KEY,
@@ -581,6 +597,21 @@ CREATE TABLE IF NOT EXISTS subjects (
     is_active INTEGER DEFAULT 1,
     created_at TEXT DEFAULT (datetime('now'))
 );
+
+-- Source: migrations/100_question_bank_integrity.sql
+CREATE TABLE IF NOT EXISTS question_bank_remediation_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    migration_id TEXT NOT NULL,
+    entity_type TEXT NOT NULL CHECK (entity_type IN ('subject', 'question')),
+    entity_id TEXT NOT NULL,
+    field_name TEXT NOT NULL,
+    old_value TEXT,
+    new_value TEXT,
+    changed_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (migration_id, entity_type, entity_id, field_name)
+);
+CREATE INDEX IF NOT EXISTS idx_question_bank_remediation_log_release
+    ON question_bank_remediation_log(migration_id, entity_type, entity_id);
 
 -- Source: schema.sql
 CREATE TABLE IF NOT EXISTS user_exam_preferences (
@@ -4859,6 +4890,73 @@ CREATE INDEX IF NOT EXISTS idx_questions_round ON questions(round_type);
 CREATE INDEX IF NOT EXISTS idx_questions_difficulty ON questions(difficulty);
 CREATE INDEX IF NOT EXISTS idx_questions_paper_type ON questions(paper_type_id);
 CREATE INDEX IF NOT EXISTS idx_questions_type ON questions(question_type);
+-- Durable question-bank relationship invariants. These prevent future imports
+-- from recreating the repaired cross-subject topic or exam mismatches.
+CREATE TRIGGER IF NOT EXISTS trg_questions_subject_exam_insert
+BEFORE INSERT ON questions
+WHEN NEW.exam_type_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM subjects s
+    WHERE s.id = NEW.subject_id AND s.exam_type_id IS NEW.exam_type_id
+  )
+BEGIN
+  SELECT RAISE(ABORT, 'QUESTION_SUBJECT_EXAM_MISMATCH');
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_questions_subject_exam_update
+BEFORE UPDATE OF subject_id, exam_type_id ON questions
+WHEN NEW.exam_type_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM subjects s
+    WHERE s.id = NEW.subject_id AND s.exam_type_id IS NEW.exam_type_id
+  )
+BEGIN
+  SELECT RAISE(ABORT, 'QUESTION_SUBJECT_EXAM_MISMATCH');
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_questions_subject_topic_insert
+BEFORE INSERT ON questions
+WHEN NEW.topic_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM topics t
+    WHERE t.id = NEW.topic_id AND t.subject_id = NEW.subject_id
+  )
+BEGIN
+  SELECT RAISE(ABORT, 'QUESTION_SUBJECT_TOPIC_MISMATCH');
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_questions_subject_topic_update
+BEFORE UPDATE OF subject_id, topic_id ON questions
+WHEN NEW.topic_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM topics t
+    WHERE t.id = NEW.topic_id AND t.subject_id = NEW.subject_id
+  )
+BEGIN
+  SELECT RAISE(ABORT, 'QUESTION_SUBJECT_TOPIC_MISMATCH');
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_subject_exam_update_with_questions
+BEFORE UPDATE OF exam_type_id ON subjects
+WHEN EXISTS (
+  SELECT 1 FROM questions q
+  WHERE q.subject_id = OLD.id
+    AND q.exam_type_id IS NOT NULL
+    AND q.exam_type_id IS NOT NEW.exam_type_id
+)
+BEGIN
+  SELECT RAISE(ABORT, 'SUBJECT_EXAM_HAS_MISMATCHED_QUESTIONS');
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_topic_subject_update_with_questions
+BEFORE UPDATE OF subject_id ON topics
+WHEN EXISTS (
+  SELECT 1 FROM questions q
+  WHERE q.topic_id = OLD.id AND q.subject_id IS NOT NEW.subject_id
+)
+BEGIN
+  SELECT RAISE(ABORT, 'TOPIC_SUBJECT_HAS_MISMATCHED_QUESTIONS');
+END;
 CREATE INDEX IF NOT EXISTS idx_flashcard_reviews_user ON flashcard_reviews(user_id);
 CREATE INDEX IF NOT EXISTS idx_flashcard_reviews_next ON flashcard_reviews(user_id, next_review_at);
 CREATE INDEX IF NOT EXISTS idx_paper_files_paper ON past_paper_files(past_paper_id);

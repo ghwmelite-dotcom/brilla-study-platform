@@ -2195,7 +2195,7 @@ export function LandingPage() {
 
                   {/* Description */}
                   <p className="text-white/70 text-sm sm:text-base mb-6 leading-relaxed">
-                    Master the Cambridge IGCSE curriculum with expertly crafted questions covering all key topics. Perfect for students aged 14-16 preparing for international qualifications.
+                    Explore our growing Cambridge IGCSE practice banks with live availability shown for each subject. Designed for students aged 14-16 preparing for international qualifications.
                   </p>
 
                   {/* Subjects Grid */}

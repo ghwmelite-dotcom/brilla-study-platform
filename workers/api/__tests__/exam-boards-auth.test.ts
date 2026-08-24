@@ -8,7 +8,7 @@ import { examBoardsApp } from '../exam-boards';
 
 const JWT_SECRET = 'test-secret-that-is-long-enough';
 
-function makeDb(userRow: unknown) {
+function makeDb(userRow: unknown, batchResults: unknown[] = [{ meta: { changes: 1 } }]) {
   const stmt = {
     bind: vi.fn(),
     first: vi.fn().mockResolvedValue(userRow),
@@ -18,7 +18,7 @@ function makeDb(userRow: unknown) {
   stmt.bind.mockReturnValue(stmt);
   return {
     prepare: vi.fn(() => stmt),
-    batch: vi.fn().mockResolvedValue([{ meta: { changes: 1 } }]),
+    batch: vi.fn().mockResolvedValue(batchResults),
   } as unknown as D1Database;
 }
 
@@ -50,5 +50,30 @@ describe('exam-boards POST /seed-questions auth gate', () => {
     const t = await token({ userId: 'student_1', role: 'student' });
     const res = await postSeed({ Authorization: `Bearer ${t}` });
     expect(res.status).toBe(403);
+  });
+
+  it('rejects an inconsistent question tuple before any insert batch', async () => {
+    const db = makeDb(
+      { role: 'admin', status: 'approved', is_active: 1 },
+      [{ results: [{ is_valid: 0 }], meta: { changes: 0 } }],
+    );
+    const t = await token({ userId: 'admin_1', role: 'admin' });
+    const res = await examBoardsApp.fetch(
+      new Request('http://x/seed-questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` },
+        body: JSON.stringify({
+          questions: [{
+            id: 'q_bad', subject_id: 'subject-a', topic_id: 'topic-b', exam_type_id: 'exam-a',
+            question_text: 'Invalid tuple', question_type: 'short_answer',
+            correct_answer: 'No', explanation: 'Mismatch', difficulty: 'easy',
+          }],
+        }),
+      }),
+      { DB: db, JWT_SECRET },
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({ code: 'QUESTION_RELATIONSHIP_MISMATCH', index: 0 });
+    expect(db.batch).toHaveBeenCalledTimes(1);
   });
 });

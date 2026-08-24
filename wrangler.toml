@@ -121,8 +121,13 @@ AI_MODEL_TTS = "@cf/deepgram/aura-2-en"
 AI_MODEL_VISION = "@cf/meta/llama-3.2-11b-vision-instruct"
 AI_CACHE_THRESHOLD = "0.92"
 APP_URL = "https://whiteboard-staging.brilla-study-platform.pages.dev"
+FROM_EMAIL = "Brilla Study Platform <noreply@brillaprep.org>"
 GOOGLE_REDIRECT_URI = "https://whiteboard-staging.brilla-study-platform.pages.dev/oauth/callback"
+NOTIFICATION_EMAILS = "brillaprepgh@gmail.com"
 REGISTRATION_MODE = "open"
+TELEGRAM_BOT_USERNAME = "BrillaPrepCommunityBot"
+TELEGRAM_COMMUNITY_URL = "https://t.me/brillaprepchannel"
+TELEGRAM_PLATFORM_CHANNEL_ID = "@brillaprepchannel"
 
 [env.staging.ai]
 binding = "AI"

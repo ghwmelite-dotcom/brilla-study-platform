@@ -142,7 +142,7 @@ export function ExamQuestionCard({
       {questionType === 'multiple_choice' && options.length > 0 && (
         <div className="space-y-3">
           {options.map((option, index) => {
-            const isSelected = selectedAnswer === option.text;
+            const isSelected = selectedAnswer === option.id;
             const letterIndex = String.fromCharCode(65 + index);
             const showCorrect = showFeedback && option.isCorrect;
             const showWrong = showFeedback && isSelected && !option.isCorrect;
@@ -150,7 +150,7 @@ export function ExamQuestionCard({
             return (
               <button
                 key={option.id || index}
-                onClick={() => !showFeedback && onAnswerSelect(option.text)}
+                onClick={() => !showFeedback && onAnswerSelect(option.id)}
                 disabled={showFeedback}
                 className={cn(
                   'w-full flex items-center gap-4 p-4 lg:p-5 rounded-2xl border-2 text-left transition-all group',

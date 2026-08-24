@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 4,
+  "release": "question-bank-integrity-100-101",
+  "environment": "staging",
+  "verifiedAt": "2026-08-24T08:21:42.7528020Z",
+  "sourceBinding": {
+    "baseCommit": "813dd8ed35498255520cf2d28fee475573970a1c",
+    "manifestAlgorithm": "SHA-256 of sorted LF-joined '<gitBlobSha1> <path>' entries for every staged non-doc release path, with a final LF; docs are excluded to avoid self-reference",
+    "releaseContentManifestSha256": "e85cdd6f28440e583615a6099c584052559f1fe8f00f77d739d26ddfecfdb6c2",
+    "migration": {
+      "path": "database/migrations/100_question_bank_integrity.sql",
+      "gitBlobSha1": "e668cb3c70d43001b46cab59d3867f540c6c8693",
+      "sha256": "c629d8cadb5ad8300cef77b0d84951e45c9e55fc53361f0367bad712d8d0e282"
+    },
+    "rollback": {
+      "path": "database/rollbacks/100_question_bank_integrity.sql",
+      "gitBlobSha1": "c37194cabd94cf334d02b3eef0101377c5bf4f55",
+      "sha256": "f54dbfc2d824b28d335d4bd6e3626be2c68231cbfd1fce7bf51791e951be13d9"
+    },
+    "manifestEntries": [
+      "0478833f82d735091632cdb6ecca3168bcdce73d workers/api/usage-limits.test.ts",
+      "0641e6174b65625b09f0b7bf1a0fc0937bda188a workers/api/usage-limits.ts",
+      "078561f29d7ac39941b25a50941045ce1b3e3f68 workers/api/subject-catalog.ts",
+      "0c76bf1ea95819040234e783d93407deae952188 src/config/freemiumConfig.ts",
+      "0cdce84c1dd7625cfb3fd61705f9430df4d25440 workers/api/__tests__/user-progress.test.ts",
+      "0d61e4c5fa4d8c1a2ffa5ce7df8229c223eaab2c src/types/index.ts",
+      "1dac82d773b8ae612ea7da8079bbb980ea32b939 src/components/exam/ExamQuestionCard.test.tsx",
+      "1fab0e68c30f5cdfb8b5a07343bde5cc79a6debf src/stores/examStore.test.ts",
+      "20fdb6c9d5a6166e286cc746e18dcf181accb294 src/pages/SubjectCatalog.tsx",
+      "29bfafe14f522e411dc025ccb690e7ab1f77be47 wrangler.toml",
+      "3b8f33cfcb68384c608f86027c589c5b4aaa18fc workers/api/__tests__/register.test.ts",
+      "3c26b9c73e27018fde1c53d28de4d55b86c47158 workers/api/__tests__/usage-limits.test.ts",
+      "3ffa3c0d0089d1feb098b4265bbc174cb1d54ac9 workers/api/__tests__/subject-catalog.test.ts",
+      "47a5c224acb50521d73f4edb7b5500bc87a0f317 src/components/exam/ExamQuestionCard.tsx",
+      "49e21cbb135c28a2c2ec20a0193516ef7878064e src/pages/Topics.tsx",
+      "4fdc86809df313bf528c1980f2c98be9f34ce58d workers/api/__tests__/question-paper-lifecycle.test.ts",
+      "5e269cb3c685e38a7d45e4aa7e41d13bde245ff1 package.json",
+      "62fdbc366c9f8a413b0da45c1c1b3ba03a1b20e9 database/migrations/101_atomic_question_allowance.sql",
+      "633b75f9c509b9ae5195e60439c215f5c2988d80 src/pages/SubjectCatalog.test.tsx",
+      "67051a326428a62bd21474a862104ef0028fb261 workers/api/__tests__/exam-boards-auth.test.ts",
+      "790826b343802242e9bbac87f9a32cde71033ad8 src/config/freemiumConfig.test.ts",
+      "83ad7bc83bf429727d8ec31a3dd319551b98c53e src/pages/Practice.tsx",
+      "86b3271a6fc15691af7e6110960d8f2c3c15996f src/lib/subjectAvailability.ts",
+      "8ef46d32a53fc655069c4ad52f98f77785f00fec scripts/audit-question-bank.mjs",
+      "8fe0134fe1e6341a06b98448cbde888dc5675335 workers/api/__tests__/atomic-question-allowance-migration.test.ts",
+      "9a7176d31dd9d9bdfd344236f9a707ca054618ad scripts/qa-staging-authenticated.py",
+      "9abb03e53b408d113bae66ecd390b6b349dfa69c src/stores/examStore.ts",
+      "b63b36e82a991183be6f3a79f319df21e996401e src/pages/ExamModePractice.tsx",
+      "c37194cabd94cf334d02b3eef0101377c5bf4f55 database/rollbacks/100_question_bank_integrity.sql",
+      "c8d06d42bf92acd702cd322467058201fb6145fc database/rollbacks/101_atomic_question_allowance.sql",
+      "ccb53660c894cac6c5c66255238e3f19e415f30b workers/api/exam-boards.ts",
+      "cd28b10cc6242fca039a7e41d9d238071cd0f9ea shared/freemium-policy.ts",
+      "d39a7c6bd1f8f5418402eab1b02a2af479a8f1a1 database/schema.sql",
+      "d7108fc14124702f1e17f0b8bed5adbff7503fd7 src/lib/subjectAvailability.test.ts",
+      "e2e19216d02d52a1831bb5a8d621eecc616f69c8 src/hooks/useQuestions.ts",
+      "e668cb3c70d43001b46cab59d3867f540c6c8693 database/migrations/100_question_bank_integrity.sql",
+      "e67a8b7f912c87ee2187c633d7ec6741a8688514 src/pages/Landing.tsx",
+      "e826b97b368cba8566239f0e15a0f9af330db80e workers/api/__tests__/papers-progress-idor.test.ts",
+      "ebe490b5788f13fbad27404e1d6d25ef908ed62f workers/api/__tests__/question-bank-integrity-migration.test.ts",
+      "f785191bd1724818b8ac9f628bff6f892ab6a67f workers/api/index.ts",
+      "f84d837911d5ffe90b66d161e33edf126f085a57 vitest.config.ts",
+      "fe2482408581269727e08d997abf4faf4f949607 src/pages/Topics.test.tsx"
+    ],
+    "atomicAllowanceMigration": {
+      "path": "database/migrations/101_atomic_question_allowance.sql",
+      "gitBlobSha1": "62fdbc366c9f8a413b0da45c1c1b3ba03a1b20e9",
+      "sha256": "d49640c0a74d7c02c0e4ca9dcbaf75f9f373cd6ad97ee0a6dd32103e8dde35f2",
+      "rollbackPath": "database/rollbacks/101_atomic_question_allowance.sql",
+      "rollbackGitBlobSha1": "c8d06d42bf92acd702cd322467058201fb6145fc",
+      "rollbackSha256": "3590ff018def4e8f6203f83dfc5f35a4a7e95c3112a038a07043ce11f01f0fc2"
+    }
+  },
+  "database": {
+    "name": "brilla-db-staging",
+    "id": "1faeca41-2233-4a0b-a273-0d3aadba9c96",
+    "migration": 101
+  },
+  "deployments": {
+    "workerVersion": "1f753322-00d4-4b1d-8a1b-42b6682231ce",
+    "workerUrl": "https://brilla-api-staging.ghwmelite.workers.dev",
+    "pagesDeployment": "https://47ea4f02.brilla-study-platform.pages.dev",
+    "pagesAlias": "https://whiteboard-staging.brilla-study-platform.pages.dev"
+  },
+  "authenticatedQa": {
+    "command": "python scripts/qa-staging-authenticated.py",
+    "exitCode": 0,
+    "passed": 47,
+    "total": 47,
+    "syntheticRecordsCleaned": true,
+    "cleanupResidualCounts": {
+      "users": 0,
+      "userGoals": 0,
+      "guidanceSessions": 0,
+      "counselorConversations": 0,
+      "revisionSessions": 0,
+      "revisionLessons": 0,
+      "revisionAiInteractions": 0,
+      "questionAttempts": 0,
+      "topics": 0,
+      "notifications": 0,
+      "rateLimits": 0
+    },
+    "conversationContentRead": false,
+    "firstPartyBrowserFailures": 0,
+    "thirdPartyFontRequestFailures": 1,
+    "securityAssertions": [
+      "anonymous paper denied",
+      "paper answer keys redacted",
+      "cross-paper answer rejected",
+      "in-progress paper results resume-safe",
+      "graded paper feedback released only after submission",
+      "prefixed core subject allowed with answer keys redacted",
+      "free student denied premium subject",
+      "feedback released after atomic quota-consuming attempt"
+    ]
+  },
+  "inventory": {
+    "activeSubjects": 71,
+    "available": 40,
+    "limited": 4,
+    "unavailable": 27,
+    "questions": 4545,
+    "missingAnswers": 0,
+    "missingExplanations": 0,
+    "missingExamTypes": 0,
+    "crossSubjectTopicLinks": 0,
+    "nullTopicLinks": 3871,
+    "shortExplanations": 118,
+    "duplicateTextGroups": 235
+  },
+  "migrationReplay": {
+    "command": "npx wrangler d1 execute DB --env staging --remote --file=database/migrations/100_question_bank_integrity.sql",
+    "exitCode": 0,
+    "forwardMatchedStaging": true,
+    "rerunIdempotent": true,
+    "rollbackExact": true,
+    "localIntegrityCheck": "ok",
+    "stagingForeignKeyViolations": 0,
+    "ledgerEntries": 2647,
+    "stagingInvariantTriggers": 8,
+    "stagingExamMismatches": 0,
+    "stagingTopicMismatches": 0,
+    "stagingQuickCheck": {
+      "status": "unavailable",
+      "providerError": "SQLITE_NOMEM",
+      "treatedAsPass": false
+    }
+  },
+  "queryPlan": {
+    "command": "npx wrangler d1 execute DB --env staging --remote --command <exact SQL below>",
+    "sql": "EXPLAIN QUERY PLAN SELECT s.*, sc.name AS category_name, sc.slug AS category_slug, sc.is_core, et.name AS exam_type_name, et.slug AS exam_type_slug, COALESCE(qc.question_count, 0) AS question_count, COALESCE(tc.topic_count, 0) AS topic_count FROM subjects s LEFT JOIN subject_categories sc ON s.category_id = sc.id LEFT JOIN exam_types et ON s.exam_type_id = et.id LEFT JOIN (SELECT subject_id, COUNT(*) AS question_count FROM questions GROUP BY subject_id) qc ON qc.subject_id = s.id LEFT JOIN (SELECT subject_id, COUNT(*) AS topic_count FROM topics GROUP BY subject_id) tc ON tc.subject_id = s.id WHERE s.is_active = 1 ORDER BY COALESCE(sc.display_order, 9999), s.display_order, s.name",
+    "exitCode": 0,
+    "changedDatabase": false,
+    "rowsRead": 0,
+    "rowsWritten": 0,
+    "sqlDurationMs": 0.4564,
+    "rawRows": [
+      {
+        "id": 3,
+        "parent": 0,
+        "notused": 0,
+        "detail": "MATERIALIZE qc"
+      },
+      {
+        "id": 10,
+        "parent": 3,
+        "notused": 208,
+        "detail": "SCAN questions USING COVERING INDEX idx_questions_subject"
+      },
+      {
+        "id": 43,
+        "parent": 0,
+        "notused": 0,
+        "detail": "MATERIALIZE tc"
+      },
+      {
+        "id": 50,
+        "parent": 43,
+        "notused": 210,
+        "detail": "SCAN topics USING COVERING INDEX idx_topics_subject"
+      },
+      {
+        "id": 88,
+        "parent": 0,
+        "notused": 45,
+        "detail": "SEARCH s USING INDEX idx_subjects_active (is_active=?)"
+      },
+      {
+        "id": 93,
+        "parent": 0,
+        "notused": 46,
+        "detail": "SEARCH sc USING INDEX sqlite_autoindex_subject_categories_1 (id=?) LEFT-JOIN"
+      },
+      {
+        "id": 101,
+        "parent": 0,
+        "notused": 46,
+        "detail": "SEARCH et USING INDEX sqlite_autoindex_exam_types_1 (id=?) LEFT-JOIN"
+      },
+      {
+        "id": 120,
+        "parent": 0,
+        "notused": 47,
+        "detail": "SEARCH qc USING AUTOMATIC COVERING INDEX (subject_id=?) LEFT-JOIN"
+      },
+      {
+        "id": 138,
+        "parent": 0,
+        "notused": 47,
+        "detail": "SEARCH tc USING AUTOMATIC COVERING INDEX (subject_id=?) LEFT-JOIN"
+      },
+      {
+        "id": 190,
+        "parent": 0,
+        "notused": 0,
+        "detail": "USE TEMP B-TREE FOR ORDER BY"
+      }
+    ]
+  },
+  "automated": {
+    "testCommand": "npm test",
+    "testExitCode": 0,
+    "testFilesPassed": 133,
+    "testsPassed": 707,
+    "testsFailed": 0,
+    "maxWorkers": 4,
+    "frontendTypecheck": "passed",
+    "apiTypecheck": "passed",
+    "eslint": "passed-zero-warnings",
+    "productionBuild": "passed",
+    "bundleBudget": "passed",
+    "stagingBuild": "passed"
+  },
+  "stagingReverification": {
+    "command": "npx wrangler d1 migrations apply DB --env staging --remote",
+    "exitCode": 0,
+    "ledgerCurrentThrough": 101,
+    "expectedTriggers": 8,
+    "observedTriggers": 8,
+    "changedDatabaseAudit": false,
+    "workerVersion": "1f753322-00d4-4b1d-8a1b-42b6682231ce",
+    "pagesDeployment": "https://47ea4f02.brilla-study-platform.pages.dev",
+    "authenticatedQaPassed": 47,
+    "authenticatedQaFailed": 0,
+    "syntheticRecordsCleaned": true
+  }
+}

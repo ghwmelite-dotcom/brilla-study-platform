@@ -125,6 +125,7 @@ describe('/auth/register batched writes', () => {
     expect(statements[0].args[1]).toBe('new.student@example.com');
     expect(statements[0].args[3]).toBe('New Student');
     expect(statements[0].args[4]).toBe('student');
+    expect(statements[0].sql.match(/\?/g)).toHaveLength(statements[0].args.length);
 
     // 2. The generated share code is atomic with the user.
     expect(statements[1].sql).toContain('INSERT INTO affiliate_profiles');

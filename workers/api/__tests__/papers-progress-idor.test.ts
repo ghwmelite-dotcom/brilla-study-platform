@@ -92,7 +92,14 @@ describe('progress/papers IDOR fixes', () => {
     // in-progress attempt check → null (so the INSERT proceeds).
     const { db, calls } = makeDb(STUDENT, [], (sql) => {
       if (sql.includes('FROM paper_attempts')) return null;
-      if (sql.includes('FROM past_papers')) return { id: 'paper_1', time_allowed: 180 };
+      if (sql.includes('FROM rate_limits')) return null;
+      if (sql.includes('SELECT role, subscription_tier_id')) return { role: 'teacher' };
+      if (sql.includes('FROM subjects s')) {
+        return { id: 'subj_nsmq_math', slug: 'nsmq-mathematics', exam_type_slug: 'nsmq', question_count: 20 };
+      }
+      if (sql.includes('FROM past_papers')) {
+        return { id: 'paper_1', subject_id: 'subj_nsmq_math', time_allowed: 180, is_premium: 0 };
+      }
       return STUDENT;
     });
     const t = await token({ userId: 'attacker_1', role: 'student' });
@@ -114,7 +121,12 @@ describe('progress/papers IDOR fixes', () => {
   });
 
   it('GET /api/papers/attempts/:id/results is self-scoped (query override removed)', async () => {
-    const { db, calls } = makeDb(STUDENT);
+    const { db, calls } = makeDb(STUDENT, [], (sql) => {
+      if (sql.includes('FROM paper_attempts pa')) {
+        return { id: 'pa_1', user_id: 'attacker_1', paper_id: 'paper_1', status: 'in_progress' };
+      }
+      return STUDENT;
+    });
     const t = await token({ userId: 'attacker_1', role: 'student' });
     const res = await worker.fetch(
       new Request('http://x/api/papers/attempts/pa_1/results?userId=victim_1', {
@@ -127,7 +139,7 @@ describe('progress/papers IDOR fixes', () => {
     expect(select).toBeDefined();
     expect(select!.args).toEqual(['pa_1', 'attacker_1']);
     expect(select!.args).not.toContain('victim_1');
-    // Mocked first() returns the student row, so the attempt "exists" → 200.
+    // Mocked first() returns a real in-progress attempt shape, so safe resume data is available.
     expect(res.status).toBe(200);
   });
 });

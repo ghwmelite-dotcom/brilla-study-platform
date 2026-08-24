@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { ExamLayout, ExamQuestionCard } from '@/components/exam';
 import { DailyUsageIndicator, LimitReachedModal } from '@/components/subscription';
 import { api } from '@/lib/api';
+import { getQuestionBankError } from '@/lib/subjectAvailability';
 import { useExamStore } from '@/stores/examStore';
 import { useThemeStore } from '@/stores/themeStore';
 import { useUsageStore } from '@/stores/usageStore';
@@ -19,8 +20,8 @@ interface ApiQuestion {
   question_type: string;
   round_type: string;
   options: Array<{ id: string; text: string }> | null;
-  correct_answer: string;
-  explanation: string | null;
+  correct_answer?: string;
+  explanation?: string | null;
   difficulty: string;
   points: number;
   marks: number;
@@ -36,7 +37,7 @@ const transformQuestion = (q: ApiQuestion): Question => ({
   questionType: q.question_type as Question['questionType'],
   roundType: q.round_type as Question['roundType'],
   options: q.options as Question['options'],
-  correctAnswer: q.correct_answer,
+  correctAnswer: q.correct_answer || '',
   explanation: q.explanation || undefined,
   difficulty: q.difficulty as Question['difficulty'],
   points: q.points,
@@ -131,7 +132,7 @@ export default function ExamModePractice() {
         if (data && Array.isArray(data) && data.length > 0) {
           setQuestions(data.map(transformQuestion));
         } else {
-          setError(`No questions found for this topic. URL: ${url}, Response: ${JSON.stringify(data)}`);
+          setError(getQuestionBankError(res, 'No questions found for this topic.'));
         }
       } catch (err) {
         console.error('Failed to load questions:', err);
@@ -159,7 +160,6 @@ export default function ExamModePractice() {
     const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
 
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: answer }));
-    setAnsweredSet((prev) => new Set([...prev, currentQuestion.id]));
 
     try {
       // Submit answer to API (tracks usage for freemium)
@@ -187,7 +187,14 @@ export default function ExamModePractice() {
       }
 
       if (response.success && response.data) {
-        const { isCorrect, usage } = response.data;
+        const { isCorrect, correctAnswer, explanation, usage } = response.data;
+
+        setQuestions((current) => current.map((question) => (
+          question.id === currentQuestion.id
+            ? { ...question, correctAnswer, explanation }
+            : question
+        )));
+        setAnsweredSet((prev) => new Set([...prev, currentQuestion.id]));
 
         // Update local usage from API response
         if (usage) {
@@ -216,16 +223,12 @@ export default function ExamModePractice() {
       }
     } catch (error) {
       console.error('Failed to submit answer:', error);
-      // Fallback: still record result locally
-      const isCorrect = answer.toLowerCase().trim() === currentQuestion.correctAnswer.toLowerCase().trim();
-      setResults((prev) => [
-        ...prev.filter(r => r.questionId !== currentQuestion.id),
-        { questionId: currentQuestion.id, isCorrect, answer, timeTaken }
-      ]);
-
-      if (mode === 'drill') {
-        setShowFeedback(true);
-      }
+      setAnswers((current) => {
+        const next = { ...current };
+        delete next[currentQuestion.id];
+        return next;
+      });
+      setError('Your answer could not be submitted. Please retry before continuing.');
     }
   }, [currentQuestion, questionStartTime, showFeedback, mode, checkLimitReached, setUsageFromResponse]);
 
@@ -424,9 +427,15 @@ export default function ExamModePractice() {
         questionText={currentQuestion.questionText}
         questionType={currentQuestion.questionType as ComponentProps<typeof ExamQuestionCard>['questionType']}
         options={currentQuestion.options?.map((opt, i) => ({
-          id: `opt_${i}`,
+          id: typeof opt === 'string' ? String.fromCharCode(65 + i) : opt.id,
           text: typeof opt === 'string' ? opt : opt.text,
-          isCorrect: (typeof opt === 'string' ? opt : opt.text).toLowerCase() === currentQuestion.correctAnswer.toLowerCase()
+          isCorrect: Boolean(currentQuestion.correctAnswer)
+            && (
+              (typeof opt === 'string' ? String.fromCharCode(65 + i) : opt.id).toLowerCase()
+                === currentQuestion.correctAnswer.toLowerCase()
+              || (typeof opt === 'string' ? opt : opt.text).toLowerCase()
+                === currentQuestion.correctAnswer.toLowerCase()
+            )
         }))}
         selectedAnswer={answers[currentQuestion.id]}
         onAnswerSelect={handleAnswerSelect}
