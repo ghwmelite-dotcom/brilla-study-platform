@@ -122,15 +122,14 @@ function snapshot(db: Database.Database) {
 }
 
 describe('migration 100 question-bank integrity', () => {
-  it('keeps line comments outside the guarded CTE for Wrangler migration parsing', () => {
-    const guardStart = migrationSql.indexOf('WITH mapping(');
-    const guardTerminator = 'THEN 1 ELSE 0 END;';
-    const guardEnd = migrationSql.indexOf(guardTerminator, guardStart) + guardTerminator.length;
-    const guardedStatement = migrationSql.slice(guardStart, guardEnd);
+  it('stays below the remote D1 query limit with a worst-case CRLF checkout', () => {
+    const normalizedMigration = migrationSql.replace(/\r\n/g, '\n');
+    const crlfMigration = normalizedMigration.replace(/\n/g, '\r\n');
+    const migrationLedgerWrite = `
+INSERT INTO "d1_migrations" (name)
+values ('100_question_bank_integrity.sql');`;
 
-    expect(guardStart).toBeGreaterThan(-1);
-    expect(guardEnd).toBeGreaterThan(guardStart);
-    expect(guardedStatement).not.toMatch(/^\s*--/m);
+    expect(Buffer.byteLength(crlfMigration + migrationLedgerWrite, 'utf8')).toBeLessThan(19_500);
   });
 
   it('is deterministic, idempotent, and exactly reversible', () => {
