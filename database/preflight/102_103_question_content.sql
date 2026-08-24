@@ -26,7 +26,23 @@ SELECT
   (SELECT COUNT(*) FROM subjects
    WHERE id IN ('subj_math', 'subj_physics', 'subj_chemistry', 'subj_biology')) AS legacy_subjects,
   (SELECT COUNT(*) FROM questions
-   WHERE subject_id IN ('subj_math', 'subj_physics', 'subj_chemistry', 'subj_biology')) AS legacy_questions;
+   WHERE subject_id IN ('subj_math', 'subj_physics', 'subj_chemistry', 'subj_biology')) AS legacy_questions,
+  (SELECT COUNT(*) FROM guidance_sessions gs
+   WHERE gs.status = 'in_progress'
+     AND (
+       NOT json_valid(gs.questions)
+       OR json_type(CASE WHEN json_valid(gs.questions) THEN gs.questions ELSE '{}' END) IS NOT 'object'
+       OR json_type(CASE WHEN json_valid(gs.questions) THEN gs.questions ELSE '{}' END, '$.asked') IS NOT 'array'
+       OR json_type(CASE WHEN json_valid(gs.questions) THEN gs.questions ELSE '{}' END, '$.topicQueue') IS NOT 'array'
+     )) AS active_guidance_invalid_envelopes,
+  (SELECT COUNT(*)
+   FROM guidance_sessions gs
+   JOIN questions q ON q.id = json_extract(
+     CASE WHEN json_valid(gs.questions) THEN gs.questions ELSE '{}' END,
+     '$.pendingQuestionId'
+   )
+   JOIN subject_map m ON m.source_subject_id = q.subject_id
+   WHERE gs.status = 'in_progress' AND q.round_type IS NOT NULL) AS active_guidance_moved_pending;
 
 WITH ranked AS (
   SELECT id, round_type,
@@ -54,5 +70,43 @@ SELECT
     OR EXISTS (SELECT 1 FROM essay_questions x WHERE x.question_id = redundant.id)
     OR EXISTS (SELECT 1 FROM structured_question_parts x WHERE x.question_id = redundant.id)
     OR EXISTS (SELECT 1 FROM guidance_session_answers x WHERE x.question_id = redundant.id)
+    OR EXISTS (SELECT 1 FROM paper_attempt_answers x WHERE x.question_id = redundant.id)
+    OR EXISTS (
+      SELECT 1 FROM guidance_sessions x
+      WHERE x.status = 'in_progress'
+        AND (
+          NOT json_valid(x.questions)
+          OR json_type(CASE WHEN json_valid(x.questions) THEN x.questions ELSE '{}' END) IS NOT 'object'
+          OR json_type(CASE WHEN json_valid(x.questions) THEN x.questions ELSE '{}' END, '$.asked') IS NOT 'array'
+          OR json_type(CASE WHEN json_valid(x.questions) THEN x.questions ELSE '{}' END, '$.topicQueue') IS NOT 'array'
+          OR json_extract(
+       CASE WHEN json_valid(x.questions) THEN x.questions ELSE '{}' END,
+       '$.pendingQuestionId'
+          ) = redundant.id
+        )
+    )
+    OR EXISTS (
+      SELECT 1 FROM daily_challenges x
+      WHERE NOT json_valid(x.question_ids)
+         OR json_type(CASE WHEN json_valid(x.question_ids) THEN x.question_ids ELSE '[]' END) <> 'array'
+         OR EXISTS (
+           SELECT 1
+           FROM json_each(CASE WHEN json_valid(x.question_ids) THEN x.question_ids ELSE '[]' END) item
+           WHERE item.type = 'text' AND item.value = redundant.id
+         )
+    )
+    OR EXISTS (
+      SELECT 1 FROM team_battles x
+      WHERE x.question_ids IS NOT NULL
+        AND (
+          NOT json_valid(x.question_ids)
+          OR json_type(CASE WHEN json_valid(x.question_ids) THEN x.question_ids ELSE '[]' END) <> 'array'
+          OR EXISTS (
+            SELECT 1
+            FROM json_each(CASE WHEN json_valid(x.question_ids) THEN x.question_ids ELSE '[]' END) item
+            WHERE item.type = 'text' AND item.value = redundant.id
+          )
+        )
+    )
   THEN 1 ELSE 0 END), 0) AS referenced_redundant_rows
 FROM redundant;

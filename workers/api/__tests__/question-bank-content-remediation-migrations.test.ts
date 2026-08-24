@@ -98,6 +98,10 @@ function createFixture(): Database.Database {
     CREATE TABLE essay_questions (id TEXT PRIMARY KEY, question_id TEXT UNIQUE REFERENCES questions(id) ON DELETE CASCADE);
     CREATE TABLE structured_question_parts (id TEXT PRIMARY KEY, question_id TEXT REFERENCES questions(id) ON DELETE CASCADE);
     CREATE TABLE guidance_session_answers (id TEXT PRIMARY KEY, question_id TEXT REFERENCES questions(id) ON DELETE RESTRICT);
+    CREATE TABLE guidance_sessions (id TEXT PRIMARY KEY, status TEXT NOT NULL, questions TEXT NOT NULL);
+    CREATE TABLE paper_attempt_answers (id TEXT PRIMARY KEY, question_id TEXT REFERENCES questions(id) ON DELETE CASCADE);
+    CREATE TABLE daily_challenges (id TEXT PRIMARY KEY, question_ids TEXT NOT NULL);
+    CREATE TABLE team_battles (id TEXT PRIMARY KEY, question_ids TEXT);
 
     CREATE TRIGGER trg_questions_subject_exam_update
     BEFORE UPDATE OF subject_id, exam_type_id ON questions
@@ -162,14 +166,63 @@ function snapshot(db: Database.Database) {
     `).all(),
   };
 }
+function preflightResults(db: Database.Database) {
+  const statements = contentPreflight
+    .replace(/^--.*$/gm, '')
+    .split(';')
+    .map((statement) => statement.trim())
+    .filter(Boolean);
+
+  return statements.map((statement) => db.prepare(statement).get());
+}
+
 
 describe('question-bank content remediation migrations', () => {
   it('keeps the aggregate-only preflight executable before and after remediation', () => {
     const db = createFixture();
-    expect(() => db.exec(contentPreflight)).not.toThrow();
+    const beforePreflight = db.serialize();
+    expect(preflightResults(db)).toEqual([
+      {
+        source_rounds: 4,
+        target_rounds: 1,
+        unexpected_rounds: 0,
+        exam_mismatches: 0,
+        topic_mismatches: 0,
+        legacy_subjects: 4,
+        legacy_questions: 0,
+        active_guidance_invalid_envelopes: 0,
+        active_guidance_moved_pending: 0,
+      },
+      {
+        redundant_rows: 1,
+        redundant_round_rows: 0,
+        referenced_redundant_rows: 0,
+      },
+    ]);
+    expect(db.serialize()).toEqual(beforePreflight);
+
     db.exec(migration102);
     db.exec(migration103);
-    expect(() => db.exec(contentPreflight)).not.toThrow();
+    const afterPreflight = db.serialize();
+    expect(preflightResults(db)).toEqual([
+      {
+        source_rounds: 0,
+        target_rounds: 5,
+        unexpected_rounds: 0,
+        exam_mismatches: 0,
+        topic_mismatches: 0,
+        legacy_subjects: 4,
+        legacy_questions: 0,
+        active_guidance_invalid_envelopes: 0,
+        active_guidance_moved_pending: 0,
+      },
+      {
+        redundant_rows: 0,
+        redundant_round_rows: 0,
+        referenced_redundant_rows: 0,
+      },
+    ]);
+    expect(db.serialize()).toEqual(afterPreflight);
     db.close();
   });
 
@@ -213,6 +266,64 @@ describe('question-bank content remediation migrations', () => {
     db.close();
   });
 
+
+  it('nulls unmatched and ambiguous topic mappings while preserving rollback evidence', () => {
+    const db = createFixture();
+    db.exec(`
+      INSERT INTO topics(id, subject_id, name, slug) VALUES
+        ('topic_wassce_chem_unmatched', 'subj_wassce_chemistry', 'Organic', 'organic-source'),
+        ('topic_wassce_bio_ambiguous', 'subj_wassce_biology', 'Cells', 'cells-source'),
+        ('topic_nsmq_bio_cells_a', 'subj_nsmq_biology', ' cells ', 'cells-a'),
+        ('topic_nsmq_bio_cells_b', 'subj_nsmq_biology', 'CELLS', 'cells-b');
+      UPDATE questions SET topic_id = 'topic_wassce_chem_unmatched' WHERE id = 'q_chem_round';
+      UPDATE questions SET topic_id = 'topic_wassce_bio_ambiguous' WHERE id = 'q_bio_round';
+    `);
+    const before = snapshot(db);
+
+    db.exec(migration102);
+    expect(db.prepare(`
+      SELECT id, topic_id AS topicId FROM questions
+      WHERE id IN ('q_chem_round', 'q_bio_round') ORDER BY id
+    `).all()).toEqual([
+      { id: 'q_bio_round', topicId: null },
+      { id: 'q_chem_round', topicId: null },
+    ]);
+    expect(db.prepare(`
+      SELECT entity_id AS entityId, old_value AS oldValue, new_value AS newValue
+      FROM question_bank_remediation_log
+      WHERE migration_id = '102_nsmq_question_alignment'
+        AND field_name = 'topic_id'
+        AND entity_id IN ('q_chem_round', 'q_bio_round')
+      ORDER BY entity_id
+    `).all()).toEqual([
+      { entityId: 'q_bio_round', oldValue: 'topic_wassce_bio_ambiguous', newValue: null },
+      { entityId: 'q_chem_round', oldValue: 'topic_wassce_chem_unmatched', newValue: null },
+    ]);
+
+    db.exec(rollback102);
+    expect(snapshot(db)).toEqual(before);
+    expect(db.pragma('foreign_key_check')).toEqual([]);
+    db.close();
+  });
+
+  it.each([
+    ['a moved pending question', "INSERT INTO guidance_sessions(id, status, questions) VALUES ('guidance_move', 'in_progress', '{\"asked\":[],\"topicQueue\":[],\"pendingQuestionId\":\"q_math_round\"}')", 0, 1],
+    ['a malformed active envelope', "INSERT INTO guidance_sessions(id, status, questions) VALUES ('guidance_bad', 'in_progress', 'not-json')", 1, 0],
+  ])('fails migration 102 before mutation when Counselor Brie has %s', (_name, insertSql, invalid, moved) => {
+    const db = createFixture();
+    db.prepare(insertSql).run();
+    const before = snapshot(db);
+    expect(preflightResults(db)[0]).toMatchObject({
+      active_guidance_invalid_envelopes: invalid,
+      active_guidance_moved_pending: moved,
+    });
+
+    expect(() => db.exec(migration102)).toThrow();
+    expect(snapshot(db)).toEqual(before);
+    expect(db.prepare(`SELECT COUNT(*) AS count FROM question_bank_remediation_log`).get())
+      .toEqual({ count: 0 });
+    db.close();
+  });
   it('fails migration 102 before mutation when an unexpected subject owns NSMQ-format content', () => {
     const db = createFixture();
     db.prepare(`
@@ -282,6 +393,84 @@ describe('question-bank content remediation migrations', () => {
     expect(snapshot(db)).toEqual(before);
     expect(db.prepare(`SELECT COUNT(*) AS count FROM question_bank_question_archive`).get())
       .toEqual({ count: 0 });
+    db.close();
+  });
+
+  it.each([
+    ['paper attempt answer', "INSERT INTO paper_attempt_answers(id, question_id) VALUES ('paper_answer_1', 'q_clone_b')"],
+    ['Counselor Brie pending question', "INSERT INTO guidance_sessions(id, status, questions) VALUES ('guidance_ref', 'in_progress', '{\"asked\":[],\"topicQueue\":[],\"pendingQuestionId\":\"q_clone_b\"}')"],
+    ['daily challenge JSON', "INSERT INTO daily_challenges(id, question_ids) VALUES ('daily_1', '[\"q_clone_b\"]')"],
+    ['team battle JSON', "INSERT INTO team_battles(id, question_ids) VALUES ('battle_1', '[\"q_clone_b\"]')"],
+  ])('fails migration 103 before mutation for a redundant clone referenced by %s', (_name, insertSql) => {
+    const db = createFixture();
+    db.exec(migration102);
+    db.prepare(insertSql).run();
+    const before = snapshot(db);
+    expect(preflightResults(db)[1]).toEqual({
+      redundant_rows: 1,
+      redundant_round_rows: 0,
+      referenced_redundant_rows: 1,
+    });
+
+    expect(() => db.exec(migration103)).toThrow();
+    expect(snapshot(db)).toEqual(before);
+    expect(db.prepare(`SELECT COUNT(*) AS count FROM question_bank_question_archive`).get())
+      .toEqual({ count: 0 });
+    db.close();
+  });
+
+  it.each([
+    ['daily challenge', "INSERT INTO daily_challenges(id, question_ids) VALUES ('daily_bad', 'not-json')"],
+    ['team battle', "INSERT INTO team_battles(id, question_ids) VALUES ('battle_bad', '{\"q\":\"q_clone_b\"}')"],
+    ['Counselor Brie active envelope', "INSERT INTO guidance_sessions(id, status, questions) VALUES ('guidance_bad', 'in_progress', 'not-json')"],
+  ])('fails migration 103 before mutation for malformed %s question collections', (_name, insertSql) => {
+    const db = createFixture();
+    db.exec(migration102);
+    db.prepare(insertSql).run();
+    const before = snapshot(db);
+
+    expect(preflightResults(db)[1]).toEqual({
+      redundant_rows: 1,
+      redundant_round_rows: 0,
+      referenced_redundant_rows: 1,
+    });
+    expect(() => db.exec(migration103)).toThrow();
+    expect(snapshot(db)).toEqual(before);
+    expect(db.prepare(`SELECT COUNT(*) AS count FROM question_bank_question_archive`).get())
+      .toEqual({ count: 0 });
+    db.close();
+  });
+
+  it.each([
+    ['unreferenced', false],
+    ['referenced', true],
+  ])('fails migration 103 rerun before mutating a newly introduced %s clone', (_name, referenced) => {
+    const db = createFixture();
+    db.exec(migration102);
+    db.exec(migration103);
+    db.prepare(`
+      INSERT INTO questions(
+        id, topic_id, subject_id, exam_type_id, question_text, question_type,
+        round_type, options, correct_answer, explanation
+      )
+      SELECT 'q_clone_late', topic_id, subject_id, exam_type_id, question_text, question_type,
+        round_type, options, correct_answer, explanation
+      FROM questions WHERE id = 'q_clone_a'
+    `).run();
+    if (referenced) {
+      db.prepare(`
+        INSERT INTO paper_attempt_answers(id, question_id)
+        VALUES ('paper_answer_late', 'q_clone_late')
+      `).run();
+    }
+    const before = snapshot(db);
+
+    expect(() => db.exec(migration103)).toThrow();
+    expect(snapshot(db)).toEqual(before);
+    expect(db.prepare(`
+      SELECT COUNT(*) AS count FROM question_bank_question_archive
+      WHERE migration_id = '103_exact_question_deduplication'
+    `).get()).toEqual({ count: 1 });
     db.close();
   });
 });

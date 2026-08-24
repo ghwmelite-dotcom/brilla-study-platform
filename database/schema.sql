@@ -4945,6 +4945,12 @@ CREATE INDEX IF NOT EXISTS idx_essay_attempts_status ON essay_attempts(grading_s
 CREATE INDEX IF NOT EXISTS idx_essay_attempts_demo ON essay_attempts(is_demo_data, expires_at);
 CREATE INDEX IF NOT EXISTS idx_paper_attempt_answers_attempt ON paper_attempt_answers(paper_attempt_id);
 CREATE INDEX IF NOT EXISTS idx_paper_attempt_answers_demo ON paper_attempt_answers(is_demo_data, expires_at);
+CREATE INDEX IF NOT EXISTS idx_guidance_session_answers_question ON guidance_session_answers(question_id);
+CREATE INDEX IF NOT EXISTS idx_paper_attempt_answers_question ON paper_attempt_answers(question_id);
+CREATE INDEX IF NOT EXISTS idx_brain_teasers_question ON brain_teasers(question_id);
+
+
+
 CREATE INDEX IF NOT EXISTS idx_structured_parts_question ON structured_question_parts(question_id);
 CREATE INDEX IF NOT EXISTS idx_question_attempts_user ON question_attempts(user_id);
 CREATE INDEX IF NOT EXISTS idx_question_attempts_question ON question_attempts(question_id);

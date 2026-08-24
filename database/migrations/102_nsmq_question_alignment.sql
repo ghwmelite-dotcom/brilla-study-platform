@@ -40,6 +40,26 @@ SELECT CASE WHEN
     SELECT 1 FROM questions q JOIN topics t ON t.id = q.topic_id
     WHERE q.topic_id IS NOT NULL AND q.subject_id IS NOT t.subject_id
   )
+  AND NOT EXISTS (
+    SELECT 1 FROM guidance_sessions gs
+    WHERE gs.status = 'in_progress'
+      AND (
+        NOT json_valid(gs.questions)
+        OR json_type(CASE WHEN json_valid(gs.questions) THEN gs.questions ELSE '{}' END) IS NOT 'object'
+        OR json_type(CASE WHEN json_valid(gs.questions) THEN gs.questions ELSE '{}' END, '$.asked') IS NOT 'array'
+        OR json_type(CASE WHEN json_valid(gs.questions) THEN gs.questions ELSE '{}' END, '$.topicQueue') IS NOT 'array'
+      )
+  )
+  AND NOT EXISTS (
+    SELECT 1
+    FROM guidance_sessions gs
+    JOIN questions q ON q.id = json_extract(
+      CASE WHEN json_valid(gs.questions) THEN gs.questions ELSE '{}' END,
+      '$.pendingQuestionId'
+    )
+    JOIN subject_map m ON m.source_subject_id = q.subject_id
+    WHERE gs.status = 'in_progress' AND q.round_type IS NOT NULL
+  )
   AND (
     (
       (SELECT COUNT(*) FROM questions q JOIN subject_map m ON m.source_subject_id = q.subject_id

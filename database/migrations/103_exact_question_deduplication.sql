@@ -8,6 +8,13 @@ CREATE TABLE IF NOT EXISTS question_bank_question_archive (
 );
 CREATE INDEX IF NOT EXISTS idx_question_bank_question_archive_canonical
   ON question_bank_question_archive(migration_id, canonical_question_id);
+CREATE INDEX IF NOT EXISTS idx_guidance_session_answers_question
+  ON guidance_session_answers(question_id);
+CREATE INDEX IF NOT EXISTS idx_paper_attempt_answers_question
+  ON paper_attempt_answers(question_id);
+CREATE INDEX IF NOT EXISTS idx_brain_teasers_question
+  ON brain_teasers(question_id);
+
 
 CREATE TABLE IF NOT EXISTS _migration_103_guard (
   valid INTEGER NOT NULL CHECK (valid = 1)
@@ -47,12 +54,50 @@ SELECT CASE WHEN
       SELECT 1 FROM redundant r
       WHERE EXISTS (SELECT 1 FROM question_attempts x WHERE x.question_id = r.id)
          OR EXISTS (SELECT 1 FROM assessment_questions x WHERE x.question_id = r.id)
+         OR EXISTS (
+           SELECT 1 FROM guidance_sessions x
+           WHERE x.status = 'in_progress'
+             AND (
+               NOT json_valid(x.questions)
+               OR json_type(CASE WHEN json_valid(x.questions) THEN x.questions ELSE '{}' END) IS NOT 'object'
+               OR json_type(CASE WHEN json_valid(x.questions) THEN x.questions ELSE '{}' END, '$.asked') IS NOT 'array'
+               OR json_type(CASE WHEN json_valid(x.questions) THEN x.questions ELSE '{}' END, '$.topicQueue') IS NOT 'array'
+               OR json_extract(
+                 CASE WHEN json_valid(x.questions) THEN x.questions ELSE '{}' END,
+                 '$.pendingQuestionId'
+               ) = r.id
+             )
+         )
          OR EXISTS (SELECT 1 FROM tutor_messages x WHERE x.question_id = r.id)
          OR EXISTS (SELECT 1 FROM brain_teasers x WHERE x.question_id = r.id)
          OR EXISTS (SELECT 1 FROM essay_attempts x WHERE x.question_id = r.id)
          OR EXISTS (SELECT 1 FROM essay_questions x WHERE x.question_id = r.id)
          OR EXISTS (SELECT 1 FROM structured_question_parts x WHERE x.question_id = r.id)
          OR EXISTS (SELECT 1 FROM guidance_session_answers x WHERE x.question_id = r.id)
+         OR EXISTS (SELECT 1 FROM paper_attempt_answers x WHERE x.question_id = r.id)
+         OR EXISTS (
+           SELECT 1 FROM daily_challenges x
+           WHERE NOT json_valid(x.question_ids)
+              OR json_type(CASE WHEN json_valid(x.question_ids) THEN x.question_ids ELSE '[]' END) <> 'array'
+              OR EXISTS (
+                SELECT 1
+                FROM json_each(CASE WHEN json_valid(x.question_ids) THEN x.question_ids ELSE '[]' END) item
+                WHERE item.type = 'text' AND item.value = r.id
+              )
+         )
+         OR EXISTS (
+           SELECT 1 FROM team_battles x
+           WHERE x.question_ids IS NOT NULL
+             AND (
+               NOT json_valid(x.question_ids)
+               OR json_type(CASE WHEN json_valid(x.question_ids) THEN x.question_ids ELSE '[]' END) <> 'array'
+               OR EXISTS (
+                 SELECT 1
+                 FROM json_each(CASE WHEN json_valid(x.question_ids) THEN x.question_ids ELSE '[]' END) item
+                 WHERE item.type = 'text' AND item.value = r.id
+               )
+             )
+         )
     )
   )
   OR (
@@ -60,6 +105,7 @@ SELECT CASE WHEN
       SELECT 1 FROM question_bank_question_archive
       WHERE migration_id = '103_exact_question_deduplication'
     )
+    AND NOT EXISTS (SELECT 1 FROM redundant)
     AND NOT EXISTS (
       SELECT 1 FROM question_bank_question_archive a
       WHERE a.migration_id = '103_exact_question_deduplication'
