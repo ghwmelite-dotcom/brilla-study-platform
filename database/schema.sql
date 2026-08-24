@@ -4890,73 +4890,11 @@ CREATE INDEX IF NOT EXISTS idx_questions_round ON questions(round_type);
 CREATE INDEX IF NOT EXISTS idx_questions_difficulty ON questions(difficulty);
 CREATE INDEX IF NOT EXISTS idx_questions_paper_type ON questions(paper_type_id);
 CREATE INDEX IF NOT EXISTS idx_questions_type ON questions(question_type);
--- Durable question-bank relationship invariants. These prevent future imports
--- from recreating the repaired cross-subject topic or exam mismatches.
-CREATE TRIGGER IF NOT EXISTS trg_questions_subject_exam_insert
-BEFORE INSERT ON questions
-WHEN NEW.exam_type_id IS NOT NULL
-  AND NOT EXISTS (
-    SELECT 1 FROM subjects s
-    WHERE s.id = NEW.subject_id AND s.exam_type_id IS NEW.exam_type_id
-  )
-BEGIN
-  SELECT RAISE(ABORT, 'QUESTION_SUBJECT_EXAM_MISMATCH');
-END;
-
-CREATE TRIGGER IF NOT EXISTS trg_questions_subject_exam_update
-BEFORE UPDATE OF subject_id, exam_type_id ON questions
-WHEN NEW.exam_type_id IS NOT NULL
-  AND NOT EXISTS (
-    SELECT 1 FROM subjects s
-    WHERE s.id = NEW.subject_id AND s.exam_type_id IS NEW.exam_type_id
-  )
-BEGIN
-  SELECT RAISE(ABORT, 'QUESTION_SUBJECT_EXAM_MISMATCH');
-END;
-
-CREATE TRIGGER IF NOT EXISTS trg_questions_subject_topic_insert
-BEFORE INSERT ON questions
-WHEN NEW.topic_id IS NOT NULL
-  AND NOT EXISTS (
-    SELECT 1 FROM topics t
-    WHERE t.id = NEW.topic_id AND t.subject_id = NEW.subject_id
-  )
-BEGIN
-  SELECT RAISE(ABORT, 'QUESTION_SUBJECT_TOPIC_MISMATCH');
-END;
-
-CREATE TRIGGER IF NOT EXISTS trg_questions_subject_topic_update
-BEFORE UPDATE OF subject_id, topic_id ON questions
-WHEN NEW.topic_id IS NOT NULL
-  AND NOT EXISTS (
-    SELECT 1 FROM topics t
-    WHERE t.id = NEW.topic_id AND t.subject_id = NEW.subject_id
-  )
-BEGIN
-  SELECT RAISE(ABORT, 'QUESTION_SUBJECT_TOPIC_MISMATCH');
-END;
-
-CREATE TRIGGER IF NOT EXISTS trg_subject_exam_update_with_questions
-BEFORE UPDATE OF exam_type_id ON subjects
-WHEN EXISTS (
-  SELECT 1 FROM questions q
-  WHERE q.subject_id = OLD.id
-    AND q.exam_type_id IS NOT NULL
-    AND q.exam_type_id IS NOT NEW.exam_type_id
-)
-BEGIN
-  SELECT RAISE(ABORT, 'SUBJECT_EXAM_HAS_MISMATCHED_QUESTIONS');
-END;
-
-CREATE TRIGGER IF NOT EXISTS trg_topic_subject_update_with_questions
-BEFORE UPDATE OF subject_id ON topics
-WHEN EXISTS (
-  SELECT 1 FROM questions q
-  WHERE q.topic_id = OLD.id AND q.subject_id IS NOT NEW.subject_id
-)
-BEGIN
-  SELECT RAISE(ABORT, 'TOPIC_SUBJECT_HAS_MISMATCHED_QUESTIONS');
-END;
+-- The six data-dependent question-bank relationship triggers are installed by
+-- migration 100 only after it repairs the legacy seed relationships. Creating
+-- them here would reject that repairable historical seed before the migration
+-- can run. Fresh bootstrap verification therefore applies schema, seed, then
+-- migrations 100 and 101 in production order.
 CREATE INDEX IF NOT EXISTS idx_flashcard_reviews_user ON flashcard_reviews(user_id);
 CREATE INDEX IF NOT EXISTS idx_flashcard_reviews_next ON flashcard_reviews(user_id, next_review_at);
 CREATE INDEX IF NOT EXISTS idx_paper_files_paper ON past_paper_files(past_paper_id);

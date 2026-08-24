@@ -2,11 +2,11 @@
   "schemaVersion": 4,
   "release": "question-bank-integrity-100-101",
   "environment": "staging",
-  "verifiedAt": "2026-08-24T08:21:42.7528020Z",
+  "verifiedAt": "2026-08-24T09:38:37.7188548Z",
   "sourceBinding": {
     "baseCommit": "813dd8ed35498255520cf2d28fee475573970a1c",
     "manifestAlgorithm": "SHA-256 of sorted LF-joined '<gitBlobSha1> <path>' entries for every staged non-doc release path, with a final LF; docs are excluded to avoid self-reference",
-    "releaseContentManifestSha256": "e85cdd6f28440e583615a6099c584052559f1fe8f00f77d739d26ddfecfdb6c2",
+    "releaseContentManifestSha256": "03e76eb53af21ed447ed8edb6a6c03f501568589a3dc60e74933afdcac4717bb",
     "migration": {
       "path": "database/migrations/100_question_bank_integrity.sql",
       "gitBlobSha1": "e668cb3c70d43001b46cab59d3867f540c6c8693",
@@ -35,12 +35,14 @@
       "49e21cbb135c28a2c2ec20a0193516ef7878064e src/pages/Topics.tsx",
       "4fdc86809df313bf528c1980f2c98be9f34ce58d workers/api/__tests__/question-paper-lifecycle.test.ts",
       "5e269cb3c685e38a7d45e4aa7e41d13bde245ff1 package.json",
+      "5eb21cfbbf3c7a366a6136f10229a072a258b5c0 database/schema.sql",
       "62fdbc366c9f8a413b0da45c1c1b3ba03a1b20e9 database/migrations/101_atomic_question_allowance.sql",
       "633b75f9c509b9ae5195e60439c215f5c2988d80 src/pages/SubjectCatalog.test.tsx",
       "67051a326428a62bd21474a862104ef0028fb261 workers/api/__tests__/exam-boards-auth.test.ts",
       "790826b343802242e9bbac87f9a32cde71033ad8 src/config/freemiumConfig.test.ts",
       "83ad7bc83bf429727d8ec31a3dd319551b98c53e src/pages/Practice.tsx",
       "86b3271a6fc15691af7e6110960d8f2c3c15996f src/lib/subjectAvailability.ts",
+      "88cfd962bed630873bfa35196b8c7e111adf9d15 scripts/verify-db.cjs",
       "8ef46d32a53fc655069c4ad52f98f77785f00fec scripts/audit-question-bank.mjs",
       "8fe0134fe1e6341a06b98448cbde888dc5675335 workers/api/__tests__/atomic-question-allowance-migration.test.ts",
       "9a7176d31dd9d9bdfd344236f9a707ca054618ad scripts/qa-staging-authenticated.py",
@@ -50,7 +52,6 @@
       "c8d06d42bf92acd702cd322467058201fb6145fc database/rollbacks/101_atomic_question_allowance.sql",
       "ccb53660c894cac6c5c66255238e3f19e415f30b workers/api/exam-boards.ts",
       "cd28b10cc6242fca039a7e41d9d238071cd0f9ea shared/freemium-policy.ts",
-      "d39a7c6bd1f8f5418402eab1b02a2af479a8f1a1 database/schema.sql",
       "d7108fc14124702f1e17f0b8bed5adbff7503fd7 src/lib/subjectAvailability.test.ts",
       "e2e19216d02d52a1831bb5a8d621eecc616f69c8 src/hooks/useQuestions.ts",
       "e668cb3c70d43001b46cab59d3867f540c6c8693 database/migrations/100_question_bank_integrity.sql",
@@ -229,7 +230,8 @@
     "eslint": "passed-zero-warnings",
     "productionBuild": "passed",
     "bundleBudget": "passed",
-    "stagingBuild": "passed"
+    "stagingBuild": "passed",
+    "databaseBootstrapVerify": "passed-23-checks"
   },
   "stagingReverification": {
     "command": "npx wrangler d1 migrations apply DB --env staging --remote",
