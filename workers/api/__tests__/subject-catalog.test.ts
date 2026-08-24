@@ -49,6 +49,20 @@ describe("subject catalogue availability", () => {
     });
   });
 
+  it("classifies a wholly generated Edexcel batch as automated beta", () => {
+    expect(
+      mapSubjectCatalogRow({
+        id: "subj_edexcel_igcse_math",
+        question_count: 40,
+        automated_beta_count: 40,
+        topic_count: 4,
+      }),
+    ).toMatchObject({
+      questionCount: 40,
+      availabilityStatus: "available",
+      contentReviewStatus: "automated_beta",
+    });
+  });
   it("never turns invalid or negative counts into availability", () => {
     expect(
       mapSubjectCatalogRow({

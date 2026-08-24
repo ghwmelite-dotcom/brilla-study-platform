@@ -62,6 +62,18 @@ describe('practice subject availability', () => {
     });
   });
 
+  it('labels automated syllabus-aligned content as a beta practice bank', () => {
+    expect(getPracticeSubjectOption({
+      ...subject,
+      availabilityStatus: 'available',
+      questionCount: 40,
+      contentReviewStatus: 'automated_beta',
+    }, false)).toEqual({
+      value: 'mathematics',
+      label: 'Mathematics - Beta practice bank',
+      disabled: false,
+    });
+  });
   it('preserves the stable unavailable-bank API message', () => {
     expect(getQuestionBankError({
       code: 'SUBJECT_UNAVAILABLE',

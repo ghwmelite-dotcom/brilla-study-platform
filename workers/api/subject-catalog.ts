@@ -46,6 +46,7 @@ export function getSubjectAvailability(questionCount: number): SubjectAvailabili
 export function mapSubjectCatalogRow(row: Record<string, unknown>): Record<string, unknown> {
   const questionCount = toNonNegativeInteger(row.question_count);
   const topicCount = toNonNegativeInteger(row.topic_count);
+  const automatedBetaCount = toNonNegativeInteger(row.automated_beta_count);
   const availability = getSubjectAvailability(questionCount);
 
   return {
@@ -60,6 +61,8 @@ export function mapSubjectCatalogRow(row: Record<string, unknown>): Record<strin
     questionCount,
     topicCount,
     ...availability,
-    contentReviewStatus: questionCount > 0 ? 'legacy_unreviewed' : undefined,
+    contentReviewStatus: questionCount > 0
+      ? automatedBetaCount === questionCount ? 'automated_beta' : 'legacy_unreviewed'
+      : undefined,
   };
 }

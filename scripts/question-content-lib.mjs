@@ -1,10 +1,14 @@
-const VALID_STATUSES = new Set(['draft_academic_review', 'approved_for_staging', 'approved_for_production']);
+const VALID_STATUSES = new Set(['draft_automated_qa', 'approved_for_beta', 'approved_for_production']);
 const VALID_DIFFICULTIES = new Set(['easy', 'medium', 'hard']);
 const VALID_TYPES = new Set(['multiple_choice', 'short_answer', 'calculation']);
 const VALID_AOS = new Set(['AO1', 'AO2', 'AO3']);
 
 export function normalizeQuestionText(value) {
   return String(value ?? '').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+}
+
+export function normalizeOptionText(value) {
+  return String(value ?? '').normalize('NFKC').toLowerCase().replace(/\s+/gu, ' ').trim();
 }
 
 function requireText(errors, value, path, minimum = 1) {
@@ -43,10 +47,16 @@ export function validateQuestionBatch(batch, { mode = 'draft' } = {}) {
   if (batch.review?.authoringMethod !== 'original_curriculum_aligned') {
     errors.push('review.authoringMethod must be original_curriculum_aligned');
   }
+  if (batch.review?.qualityAssurance !== 'automated_beta') {
+    errors.push('review.qualityAssurance must be automated_beta');
+  }
   const releaseMode = mode === 'production' || batch.status === 'approved_for_production';
   if (releaseMode) {
-    requireText(errors, batch.review?.academicReviewer, 'review.academicReviewer', 3);
-    requireText(errors, batch.review?.reviewedAt, 'review.reviewedAt', 10);
+    requireText(errors, batch.review?.automatedChecksAt, 'review.automatedChecksAt', 10);
+    if (batch.release?.channel !== 'beta') errors.push('release.channel must be beta');
+    requireText(errors, batch.release?.contentLabel, 'release.contentLabel', 40);
+    if (batch.release?.officialExamBoardContent !== false) errors.push('release.officialExamBoardContent must be false');
+    if (batch.release?.feedbackEnabled !== true) errors.push('release.feedbackEnabled must be true');
   }
   if (!Array.isArray(batch.subjects) || batch.subjects.length === 0) errors.push('subjects must contain at least one subject');
 
@@ -112,7 +122,7 @@ export function validateQuestionBatch(batch, { mode = 'draft' } = {}) {
             requireText(errors, option?.text, `${optionPath}.text`, 1);
             requireText(errors, option?.rationale, `${optionPath}.rationale`, 20);
             labels.add(option?.label);
-            optionTexts.add(normalizeQuestionText(option?.text));
+            optionTexts.add(normalizeOptionText(option?.text));
           });
           if (labels.size !== 4) errors.push(`${path}.options labels must be A, B, C and D once each`);
           if (optionTexts.size !== 4) errors.push(`${path}.options texts must be unique`);
@@ -136,8 +146,8 @@ export function validateQuestionBatch(batch, { mode = 'draft' } = {}) {
 export function buildStagingManifest(batch) {
   const validation = validateQuestionBatch(batch, { mode: 'draft' });
   if (!validation.valid) throw new Error(`Cannot build staging manifest:\n${validation.errors.join('\n')}`);
-  if (!['approved_for_staging', 'approved_for_production'].includes(batch.status)) {
-    throw new Error('Batch must be approved_for_staging before an import manifest can be built');
+  if (!['approved_for_beta', 'approved_for_production'].includes(batch.status)) {
+    throw new Error('Batch must be approved_for_beta before an import manifest can be built');
   }
   return {
     schemaVersion: 1,
@@ -145,7 +155,8 @@ export function buildStagingManifest(batch) {
     batchId: batch.batchId,
     examTypeId: batch.examTypeId,
     productionEligible: batch.status === 'approved_for_production',
-    academicReviewer: batch.review.academicReviewer,
+    release: batch.release,
+    qualityAssurance: batch.review.qualityAssurance,
     subjects: batch.subjects.map((subject) => ({
       subjectId: subject.subjectId,
       specificationCode: subject.specificationCode,

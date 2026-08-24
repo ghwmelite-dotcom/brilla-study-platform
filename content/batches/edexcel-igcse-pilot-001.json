@@ -1,6 +1,6 @@
 {
   "batchId": "edexcel-igcse-pilot-001",
-  "status": "draft_academic_review",
+  "status": "draft_automated_qa",
   "examTypeId": "edexcel_igcse",
   "provenance": [
     {
@@ -30,9 +30,9 @@
   ],
   "review": {
     "authoringMethod": "original_curriculum_aligned",
-    "academicReviewer": null,
-    "reviewedAt": null,
-    "notes": "Original pilot items staged for independent academic review. This batch is intentionally ineligible for import or production."
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": null,
+    "notes": "Superseded 16-item pilot retained as a historical draft; the 160-item beta batch is the release source."
   },
   "subjects": [
     {

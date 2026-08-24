@@ -352,7 +352,7 @@ export interface Subject {
   questionCount?: number;
   availabilityStatus?: 'available' | 'limited' | 'unavailable' | 'unknown';
   availabilityReason?: string;
-  contentReviewStatus?: 'legacy_unreviewed';
+  contentReviewStatus?: 'legacy_unreviewed' | 'automated_beta';
   category?: SubjectCategory;
 }
 
