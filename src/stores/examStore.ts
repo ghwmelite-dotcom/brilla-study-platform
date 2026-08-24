@@ -79,8 +79,8 @@ export function mapApiSubject(subject: ApiSubject): Subject {
       ? subject.availabilityStatus
       : 'unknown',
     availabilityReason: subject.availabilityReason,
-    contentReviewStatus: subject.contentReviewStatus === 'legacy_unreviewed'
-      ? 'legacy_unreviewed'
+    contentReviewStatus: subject.contentReviewStatus === 'legacy_unreviewed' || subject.contentReviewStatus === 'automated_beta'
+      ? subject.contentReviewStatus
       : undefined,
   };
 }

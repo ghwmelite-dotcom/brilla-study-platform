@@ -367,6 +367,8 @@ export function SubjectCard({ subject, viewMode, isLocked, onLockedClick }: Subj
   const limited = subject.availabilityStatus === 'limited';
   const reviewPending = (subject.questionCount ?? 0) > 0
     && subject.contentReviewStatus === 'legacy_unreviewed';
+  const automatedBeta = (subject.questionCount ?? 0) > 0
+    && subject.contentReviewStatus === 'automated_beta';
   const label = getAvailabilityLabel(subject);
 
   const body = (
@@ -389,6 +391,7 @@ export function SubjectCard({ subject, viewMode, isLocked, onLockedClick }: Subj
           {limited && <Badge variant="warning" className="text-xs">Limited bank</Badge>}
           {unavailable && <Badge variant="neutral" className="text-xs">Not yet available</Badge>}
           {reviewPending && <Badge variant="neutral" className="text-xs">Academic review pending</Badge>}
+          {automatedBeta && <Badge variant="primary" className="text-xs">Beta practice bank</Badge>}
           {isLocked && !unavailable && <PremiumSubjectBadge size="sm" />}
         </div>
         <p className="mt-1 text-sm text-neutral-500 line-clamp-2">
@@ -410,7 +413,12 @@ export function SubjectCard({ subject, viewMode, isLocked, onLockedClick }: Subj
         </p>
         {reviewPending && (
           <p className="mt-1 text-xs text-neutral-600">
-            This question bank has not yet completed independent academic review.
+            This legacy question bank has not yet completed independent academic review.
+          </p>
+        )}
+        {automatedBeta && (
+          <p className="mt-1 text-xs text-neutral-600">
+            Original BrillaPrep syllabus-aligned practice content; not official exam-board questions.
           </p>
         )}
       </div>

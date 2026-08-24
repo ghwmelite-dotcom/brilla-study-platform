@@ -61,6 +61,14 @@ describe('SubjectCard availability behavior', () => {
     expect(html).toContain('has not yet completed independent academic review');
   });
 
+  it('labels automated content as a transparent beta bank without a reviewer warning', () => {
+    const html = renderToStaticMarkup(
+      <SubjectCard subject={{ ...baseSubject, contentReviewStatus: 'automated_beta' }} viewMode="grid" isLocked={false} onLockedClick={vi.fn()} />,
+    );
+    expect(html).toContain('Beta practice bank');
+    expect(html).toContain('not official exam-board questions');
+    expect(html).not.toContain('Academic review pending');
+  });
   it('does not show academic-review copy for an empty bank', () => {
     const html = renderToStaticMarkup(
       <SubjectCard

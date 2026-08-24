@@ -2126,12 +2126,14 @@ const subjectCatalogSelect = `
   SELECT s.*, sc.name AS category_name, sc.slug AS category_slug, sc.is_core,
          et.name AS exam_type_name, et.slug AS exam_type_slug,
          COALESCE(qc.question_count, 0) AS question_count,
+         COALESCE(qc.automated_beta_count, 0) AS automated_beta_count,
          COALESCE(tc.topic_count, 0) AS topic_count
   FROM subjects s
   LEFT JOIN subject_categories sc ON s.category_id = sc.id
   LEFT JOIN exam_types et ON s.exam_type_id = et.id
   LEFT JOIN (
-    SELECT subject_id, COUNT(*) AS question_count
+    SELECT subject_id, COUNT(*) AS question_count,
+           SUM(CASE WHEN id LIKE 'q_edx_%_b001_%' THEN 1 ELSE 0 END) AS automated_beta_count
     FROM questions
     GROUP BY subject_id
   ) qc ON qc.subject_id = s.id

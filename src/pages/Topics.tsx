@@ -360,6 +360,19 @@ export function TopicsPage() {
             </div>
           </Card>
         )}
+        {currentSubject.contentReviewStatus === 'automated_beta' && (
+          <Card className="border-sky-200 bg-sky-50 p-4" role="note">
+            <div className="flex items-start gap-3">
+              <BookOpen className="mt-0.5 w-5 h-5 text-sky-700" aria-hidden="true" />
+              <div>
+                <p className="font-medium text-sky-900">Beta practice bank</p>
+                <p className="text-sm text-sky-800">
+                  Original BrillaPrep practice content aligned to the published syllabus; not official exam-board questions. Please report any issue you find.
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {currentSubject.availabilityStatus === 'limited' && (
           <Card className="border-amber-200 bg-amber-50 p-4" role="status">
@@ -637,6 +650,7 @@ export function TopicsPage() {
           const checking = subject.availabilityStatus === 'unknown';
           const limited = subject.availabilityStatus === 'limited';
           const reviewPending = subject.contentReviewStatus === 'legacy_unreviewed';
+          const automatedBeta = subject.contentReviewStatus === 'automated_beta';
           const locked = !unavailable && !checking && isSubjectLocked(subject.slug);
 
           // Get topics for this subject from API
@@ -670,6 +684,7 @@ export function TopicsPage() {
                     <div className="flex items-center gap-2">
                       {limited && <Badge variant="warning">Limited bank</Badge>}
                       {reviewPending && <Badge variant="neutral">Academic review pending</Badge>}
+                      {automatedBeta && <Badge variant="primary">Beta practice bank</Badge>}
                       {locked && <PremiumSubjectBadge size="sm" />}
                       <Badge variant="neutral">{topicCount} topics</Badge>
                     </div>

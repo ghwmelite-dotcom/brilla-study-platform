@@ -9,7 +9,9 @@ export function getPracticeSubjectOption(subject: Subject, premiumLocked: boolea
 
   const reviewQualifier = subject.contentReviewStatus === 'legacy_unreviewed'
     ? ['Academic review pending']
-    : [];
+    : subject.contentReviewStatus === 'automated_beta'
+      ? ['Beta practice bank']
+      : [];
 
   if (unavailable) {
     label = `${subject.name} - ${['Not yet available', ...reviewQualifier].join(' - ')}`;

@@ -13,7 +13,7 @@ The machine-readable decision record is `content/subject-coverage-matrix.json`.
 3. Bind every question to an exact exam, subject, specification and syllabus topic.
 4. Require a worked explanation and plausible distractors for every multiple-choice item.
 5. Reject normalized duplicates, missing topic assignments, ambiguous answers and incorrect option shapes automatically.
-6. Require named human academic approval before a batch can be built for production.
+6. Require the automated beta release contract: deterministic validation, answer integrity, source provenance, duplicate rejection, a visible non-official-content label and an enabled learner correction channel.
 7. Keep a subject unavailable until approved content reaches the operational floor and topic coverage gate.
 
 ## Catalogue corrections
@@ -25,11 +25,11 @@ The machine-readable decision record is `content/subject-coverage-matrix.json`.
 ## Delivery sequence
 
 1. Pilot the pipeline on Pearson Edexcel International GCSE Mathematics A, Biology, Chemistry and Physics because the official specifications are explicit and current.
-2. Academic-review the pilot, load it into a non-production D1 database and run learner-path QA.
+2. Pass automated content QA, load the beta batch into a non-production D1 database and run learner-path QA.
 3. Expand WASSCE subjects in curriculum clusters: technical, visual arts, languages, religious studies, home economics and music.
-4. Recruit language-qualified reviewers before authoring any of the 11 BECE language banks.
-5. Promote only approved batches, then rerun the full question-bank audit and authenticated learner QA.
+4. Keep the 11 BECE language banks deferred until their language-specific source and validation rules are implemented; never mix languages into a generic bank.
+5. Promote only automated-beta-approved batches, then rerun the full question-bank audit and authenticated learner QA.
 
 ## Definition of ready
 
-A subject is not “populated” merely because it has a few rows. Ready means the approved bank meets all configured floors, covers the declared syllabus blueprint, passes automatic integrity checks, passes an academic review, and passes authenticated learner-path QA.
+A subject is not “populated” merely because it has a few rows. Ready means the beta bank meets all configured floors, covers the declared syllabus blueprint, passes automatic integrity checks, is clearly labelled as original BrillaPrep practice content rather than official exam-board material, exposes a correction path, and passes authenticated learner-path QA.
