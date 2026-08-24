@@ -174,7 +174,8 @@ def run_staging_sql(sql: str) -> None:
         env={**os.environ, "NO_COLOR": "1"},
     )
     if result.returncode != 0:
-        raise RuntimeError("Staging D1 operation failed")
+        detail = (result.stderr or result.stdout).strip()[-1000:]
+        raise RuntimeError(f"Staging D1 operation failed: {detail}")
 
 def query_staging_sql(sql: str) -> list[dict[str, Any]]:
     result = subprocess.run(
@@ -200,7 +201,8 @@ def query_staging_sql(sql: str) -> list[dict[str, Any]]:
         env={**os.environ, "NO_COLOR": "1"},
     )
     if result.returncode != 0:
-        raise RuntimeError("Staging D1 query failed")
+        detail = (result.stderr or result.stdout).strip()[-1000:]
+        raise RuntimeError(f"Staging D1 query failed: {detail}")
     payload = json.loads(result.stdout)
     return payload[0].get("results", []) if payload else []
 
@@ -208,8 +210,8 @@ def verify_staging_migration_ledger() -> None:
     rows = query_staging_sql("SELECT name FROM d1_migrations ORDER BY id;")
     remote_names = [row.get("name") for row in rows]
     local_names = sorted(path.name for path in (ROOT / "database" / "migrations").glob("*.sql"))
-    if remote_names != local_names or "101_atomic_question_allowance.sql" not in remote_names:
-        raise RuntimeError("Staging migration ledger is not current through migration 101")
+    if remote_names != local_names:
+        raise RuntimeError("Staging migration ledger does not match the repository migration set")
 
 
 def sql_literal(value: str) -> str:

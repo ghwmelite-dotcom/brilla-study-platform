@@ -1,15 +1,15 @@
 # Question Bank Integrity Remediation
 
-Status: STAGING RE-VERIFIED THROUGH MIGRATION 101; PRODUCTION RELEASE AUTHORIZED
+Status: MIGRATIONS 100-101 RELEASED; CONTENT REMEDIATION 102-103 VERIFIED ON STAGING, PRODUCTION AUTHORIZATION REQUIRED
 Owner: BrillaPrep
-Branch: `codex/remediate-question-bank-integrity`
-Date: 2026-08-23
+Branch: `codex/remediate-question-bank-content`
+Date: 2026-08-24
 
 ## Outcome
 
 Show every active subject truthfully, prevent zero-content practice journeys, keep limited banks usable, and repair only relationships proven by current data. Inventory is not curriculum certification.
 
-## Verified Production Baseline
+## Original Production Baseline Before Migrations 100-101
 
 - 77 active subjects: 40 populated, 37 empty.
 - 4,545 questions; all have non-empty answers/explanations; 121 explanations are shorter than 20 characters.
@@ -125,7 +125,7 @@ Production release authorization was granted on 2026-08-23. The production seque
 - Final staging replay installed all six durable question relationship triggers, and migration 101 installed two daily-allowance ceiling triggers; exam/topic mismatches and foreign-key violations remained zero. Cloudflare remote `PRAGMA quick_check` returned provider `SQLITE_NOMEM`, so it is explicitly unavailable rather than recorded as a pass; the local snapshot replay still returned `integrity_check = ok`.
 - Verified staging deployment: Worker `1f753322-00d4-4b1d-8a1b-42b6682231ce`; Pages `47ea4f02`; the stable `whiteboard-staging` alias resolves to the new Pages deployment. Staging email and Telegram non-secret variables were made explicit because Wrangler environments do not inherit top-level `vars`.
 - Staging query-plan verification used idx_questions_subject, idx_topics_subject, and idx_subjects_active; the exact raw plan is preserved in the evidence artifact and the read-only D1 execution reported changed_db: false, zero rows written, and 0.4564 ms SQL duration.
-## Production Sequence After Authorization
+## Production Sequence Used for Migrations 100-101
 
 1. Confirm fresh production backup and exact source commit.
 2. Re-run fail-closed preflight.
@@ -142,6 +142,37 @@ Runtime rollback redeploys the prior verified Worker/Pages source. Data rollback
 ## Later Content Releases
 
 NSMQ core sciences/mathematics, BECE languages split by supported language, underfilled WASSCE subjects, and international boards ship separately. Each requires provenance, curriculum mapping, answer/explanation review, duplicate/type balance checks, and human academic sign-off. Twenty questions is an operational floor, not a quality claim.
+
+## Content Remediation 102-103 - 2026-08-24
+
+The deeper audit separated relationship defects from editorial work:
+
+- Migration 102 re-homes NSMQ-format questions from four WASSCE subject IDs to the canonical NSMQ Mathematics, Physics, Chemistry, and Biology IDs. It transfers a topic only when the target subject has exactly one normalized-name match, preserves already-canonical rows, retires only the four empty generic legacy subject shells when they exist, and records every change in the durable remediation ledger.
+- The production catalogue is expected to change from 75 active / 40 populated / 35 unavailable to 71 active / 44 populated / 27 unavailable. The 27 remaining empty subjects have subject and syllabus metadata but no question source in the repository; they cannot be populated truthfully without licensed, provenanced content and academic sign-off.
+- Migration 103 archives and removes only redundant full-field clones whose relationship and content fields are identical except for IDs/timestamps and which have zero references in all known question-consumer tables. Rollback restores the complete archived rows.
+- Normalized-text collision groups are not necessarily safe duplicates. Most contain subject, answer, option, explanation, or relationship variants. They remain review items; normalized text alone is never a deletion key.
+- Null topic links have no deterministic one-topic shortcut. Topic assignment remains a curriculum-review task; no keyword, fuzzy, or AI guess is published automatically.
+- Explanations below 20 characters are classified as concise explanations for review. Many are valid equations or formulae, so length alone is not treated as a defect and no padding is generated.
+
+Automated evidence passes 21 focused migration/preflight/rollback tests and the complete 25-check clean schema/seed replay through migrations 100-103. Explicit Cloudflare account selection resolved API error 7403, and pinned aggregate-only audits completed against both staging and production. Migration SHA-256 values used for the exact-byte staging replay are `CC13E6D94567EE8B60C835CFF70DF2DBF40EF2F2712CCA18F90AB00EE786632E` for 102 and `2E880424C1A1F74919D080A373F23894CBBFF9037822B76CDD0E43D0C8CB64D3` for 103.
+
+Staging migrations 102 and 103 were applied on 2026-08-24. The post-migration audit reports 71 active subjects, 44 populated subjects, 27 unavailable subjects, 4,543 questions, 674 canonical NSMQ round questions, zero source-side NSMQ rows, zero exact-clone groups, zero referenced redundant rows, zero exam mismatches, and zero cross-subject topic mismatches. The two exact staging clones removed by migration 103 were both NSMQ-format rows. Remaining editorial review queues are 3,869 null topic links, 117 concise explanations, 235 normalized-text collision groups, and 234 conflict groups; none is safe for automatic rewriting or deletion.
+
+Wrangler's staging migration ledger records both files. A fresh staging export was captured, migration 103 was rolled back before migration 102, and the current repository bytes were then replayed in forward order. The post-migration authenticated suite passed 54/54 checks across NSMQ practice and answer-key redaction, Counselor Brie authorization, study-plan generation, automatic onboarding, browser runtime, premium/free boundaries, and cleanup; all eleven run-owned synthetic-data scopes returned zero residual rows.
+
+Production remains unchanged. Its verified baseline is 75 active subjects, 40 populated subjects, 35 unavailable subjects, 4,545 questions, 676 source-side NSMQ rows, 41 unreferenced exact redundant rows, one redundant NSMQ-format row, 3,532 null topic links, 121 concise explanations, 270 normalized-text collision groups, and 230 conflict groups. Preflight reports zero unexpected NSMQ owners, zero exam mismatches, zero cross-subject topic mismatches, and zero referenced redundant rows. Applying migrations 102 and 103 is therefore expected to produce 71 active subjects, 44 populated subjects, 27 unavailable subjects, 4,504 questions, 675 canonical NSMQ round questions, and zero exact clones; these remain release expectations until production is explicitly authorized and audited afterward.
+
+### Content-remediation release gate
+
+Completed on staging: Wrangler ledger alignment, aggregate audit, idempotent replay, authenticated NSMQ/Counselor/study-plan/browser QA, and zero-residual cleanup.
+
+Data rollback must run in reverse dependency order: `database/rollbacks/103_exact_question_deduplication.sql` before `database/rollbacks/102_nsmq_question_alignment.sql`. After either forward migration or rollback sequence, rerun the aggregate preflight, foreign-key checks, and authenticated smoke tests before changing the release freeze.
+
+Remaining production gate:
+
+1. Preserve a fresh production backup/time-travel point and rerun the pinned aggregate-only production preflight.
+2. Obtain explicit production authorization for migrations 102 and 103, then apply them in order and rerun the full audit. Do not infer authorization from the earlier migration 100/101 release.
+3. Run post-migration production API and authenticated student/admin QA before lifting the release freeze.
 
 ## Not in Scope
 

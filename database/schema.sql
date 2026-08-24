@@ -613,6 +613,17 @@ CREATE TABLE IF NOT EXISTS question_bank_remediation_log (
 CREATE INDEX IF NOT EXISTS idx_question_bank_remediation_log_release
     ON question_bank_remediation_log(migration_id, entity_type, entity_id);
 
+-- Source: migrations/103_exact_question_deduplication.sql
+CREATE TABLE IF NOT EXISTS question_bank_question_archive (
+    migration_id TEXT NOT NULL,
+    question_id TEXT NOT NULL,
+    canonical_question_id TEXT NOT NULL,
+    row_json TEXT NOT NULL CHECK (json_valid(row_json)),
+    archived_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (migration_id, question_id)
+);
+CREATE INDEX IF NOT EXISTS idx_question_bank_question_archive_canonical
+    ON question_bank_question_archive(migration_id, canonical_question_id);
 -- Source: schema.sql
 CREATE TABLE IF NOT EXISTS user_exam_preferences (
     id TEXT PRIMARY KEY,
@@ -4934,6 +4945,12 @@ CREATE INDEX IF NOT EXISTS idx_essay_attempts_status ON essay_attempts(grading_s
 CREATE INDEX IF NOT EXISTS idx_essay_attempts_demo ON essay_attempts(is_demo_data, expires_at);
 CREATE INDEX IF NOT EXISTS idx_paper_attempt_answers_attempt ON paper_attempt_answers(paper_attempt_id);
 CREATE INDEX IF NOT EXISTS idx_paper_attempt_answers_demo ON paper_attempt_answers(is_demo_data, expires_at);
+CREATE INDEX IF NOT EXISTS idx_guidance_session_answers_question ON guidance_session_answers(question_id);
+CREATE INDEX IF NOT EXISTS idx_paper_attempt_answers_question ON paper_attempt_answers(question_id);
+CREATE INDEX IF NOT EXISTS idx_brain_teasers_question ON brain_teasers(question_id);
+
+
+
 CREATE INDEX IF NOT EXISTS idx_structured_parts_question ON structured_question_parts(question_id);
 CREATE INDEX IF NOT EXISTS idx_question_attempts_user ON question_attempts(user_id);
 CREATE INDEX IF NOT EXISTS idx_question_attempts_question ON question_attempts(question_id);
