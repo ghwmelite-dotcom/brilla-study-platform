@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { ComponentProps } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { ExamLayout, ExamQuestionCard } from '@/components/exam';
 import { DailyUsageIndicator, LimitReachedModal } from '@/components/subscription';
 import { api } from '@/lib/api';
@@ -87,7 +87,9 @@ export default function ExamModePractice() {
   const [results, setResults] = useState<PracticeResult[]>([]);
   const [isLoading, setIsLoading] = useState(!passedQuestions);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAnswerSubmitting, setIsAnswerSubmitting] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [attemptError, setAttemptError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [startTime] = useState(Date.now());
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
@@ -149,7 +151,7 @@ export default function ExamModePractice() {
   const totalQuestions = questions.length;
 
   const handleAnswerSelect = useCallback(async (answer: string) => {
-    if (!currentQuestion || showFeedback) return;
+    if (!currentQuestion || showFeedback || isAnswerSubmitting) return;
 
     // Check if limit already reached
     if (checkLimitReached()) {
@@ -159,6 +161,8 @@ export default function ExamModePractice() {
 
     const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
 
+    setAttemptError(null);
+    setIsAnswerSubmitting(true);
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: answer }));
 
     try {
@@ -180,9 +184,19 @@ export default function ExamModePractice() {
         answer,
       });
 
-      if (!response.success && response.code === 'LIMIT_REACHED') {
-        // Daily limit reached
-        setShowLimitModal(true);
+      if (!response.success || !response.data) {
+        setAnswers((current) => {
+          const next = { ...current };
+          delete next[currentQuestion.id];
+          return next;
+        });
+
+        if (response.code === 'LIMIT_REACHED') {
+          setShowLimitModal(true);
+          return;
+        }
+
+        setAttemptError(response.error || 'Your answer could not be submitted. Please try again.');
         return;
       }
 
@@ -228,15 +242,18 @@ export default function ExamModePractice() {
         delete next[currentQuestion.id];
         return next;
       });
-      setError('Your answer could not be submitted. Please retry before continuing.');
+      setAttemptError('Your answer could not be submitted. Please retry before continuing.');
+    } finally {
+      setIsAnswerSubmitting(false);
     }
-  }, [currentQuestion, questionStartTime, showFeedback, mode, checkLimitReached, setUsageFromResponse]);
+  }, [currentQuestion, questionStartTime, showFeedback, isAnswerSubmitting, mode, checkLimitReached, setUsageFromResponse]);
 
   const handleNext = useCallback(() => {
     if (currentIndex < totalQuestions - 1) {
       setCurrentIndex((prev) => prev + 1);
       setQuestionStartTime(Date.now());
       setShowFeedback(false);
+      setAttemptError(null);
     }
   }, [currentIndex, totalQuestions]);
 
@@ -420,6 +437,7 @@ export default function ExamModePractice() {
       onMarkForReview={handleMarkForReview}
       onQuestionSelect={handleQuestionSelect}
       isSubmitting={isSubmitting}
+      isNextDisabled={isAnswerSubmitting || (mode !== 'speed' && !showFeedback)}
       examType={mode === 'speed' ? 'speed' : 'practice'}
     >
       <ExamQuestionCard
@@ -448,7 +466,28 @@ export default function ExamModePractice() {
         explanation={currentQuestion.explanation}
         timeLimit={mode === 'speed' ? currentQuestion.timeLimit || 10 : undefined}
         onTimeUp={mode === 'speed' ? handleNext : undefined}
+        isSubmitting={isAnswerSubmitting}
       />
+
+      {isAnswerSubmitting && (
+        <div role="status" className={cn(
+          'mx-6 mb-6 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm lg:mx-8',
+          isDark ? 'border-blue-400/20 bg-blue-400/10 text-blue-200' : 'border-blue-200 bg-blue-50 text-blue-800',
+        )}>
+          <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+          Checking your answer…
+        </div>
+      )}
+
+      {attemptError && !isAnswerSubmitting && (
+        <div role="alert" className={cn(
+          'mx-6 mb-6 flex items-start gap-2 rounded-xl border px-4 py-3 text-sm lg:mx-8',
+          isDark ? 'border-red-400/20 bg-red-400/10 text-red-200' : 'border-red-200 bg-red-50 text-red-800',
+        )}>
+          <AlertCircle aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{attemptError} Select your answer again to retry.</span>
+        </div>
+      )}
 
       {/* Daily usage indicator (for free users) */}
       {dailyUsage && !dailyUsage.isUnlimited && (

@@ -25,6 +25,7 @@ export interface ExamQuestionCardProps {
   difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
   timeLimit?: number;
   onTimeUp?: () => void;
+  isSubmitting?: boolean;
 }
 
 export function ExamQuestionCard({
@@ -43,6 +44,7 @@ export function ExamQuestionCard({
   difficulty,
   timeLimit,
   onTimeUp,
+  isSubmitting = false,
 }: ExamQuestionCardProps) {
   const [localTimeRemaining, setLocalTimeRemaining] = useState(timeLimit || 0);
   const [imageLoading, setImageLoading] = useState(!!imageUrl);
@@ -76,7 +78,7 @@ export function ExamQuestionCard({
   };
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="p-6 lg:p-8" aria-busy={isSubmitting}>
       {/* Question Header */}
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-center gap-3">
@@ -150,8 +152,8 @@ export function ExamQuestionCard({
             return (
               <button
                 key={option.id || index}
-                onClick={() => !showFeedback && onAnswerSelect(option.id)}
-                disabled={showFeedback}
+                onClick={() => !showFeedback && !isSubmitting && onAnswerSelect(option.id)}
+                disabled={showFeedback || isSubmitting}
                 className={cn(
                   'w-full flex items-center gap-4 p-4 lg:p-5 rounded-2xl border-2 text-left transition-all group',
                   !showFeedback && !isSelected && (isDark
@@ -159,7 +161,8 @@ export function ExamQuestionCard({
                     : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'),
                   !showFeedback && isSelected && 'border-blue-500/50 bg-blue-500/10',
                   showCorrect && 'border-emerald-500/50 bg-emerald-500/10',
-                  showWrong && 'border-red-500/50 bg-red-500/10'
+                  showWrong && 'border-red-500/50 bg-red-500/10',
+                  isSubmitting && 'cursor-wait opacity-75'
                 )}
               >
                 {/* Option letter */}
@@ -215,8 +218,8 @@ export function ExamQuestionCard({
             return (
               <button
                 key={option}
-                onClick={() => !showFeedback && onAnswerSelect(option.toLowerCase())}
-                disabled={showFeedback}
+                onClick={() => !showFeedback && !isSubmitting && onAnswerSelect(option.toLowerCase())}
+                disabled={showFeedback || isSubmitting}
                 className={cn(
                   'flex-1 py-5 rounded-2xl font-semibold text-lg border-2 transition-all',
                   !showFeedback && !isSelected && (isDark
@@ -224,7 +227,8 @@ export function ExamQuestionCard({
                     : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'),
                   !showFeedback && isSelected && (isDark ? 'border-blue-500/50 bg-blue-500/10 text-blue-400' : 'border-blue-500 bg-blue-50 text-blue-700'),
                   showCorrect && (isDark ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400' : 'border-emerald-500 bg-emerald-50 text-emerald-700'),
-                  showWrong && (isDark ? 'border-red-500/50 bg-red-500/10 text-red-400' : 'border-red-500 bg-red-50 text-red-700')
+                  showWrong && (isDark ? 'border-red-500/50 bg-red-500/10 text-red-400' : 'border-red-500 bg-red-50 text-red-700'),
+                  isSubmitting && 'cursor-wait opacity-75'
                 )}
               >
                 {option}
@@ -241,7 +245,7 @@ export function ExamQuestionCard({
             type="text"
             value={selectedAnswer || ''}
             onChange={(e) => onAnswerSelect(e.target.value)}
-            disabled={showFeedback}
+            disabled={showFeedback || isSubmitting}
             placeholder="Type your answer here..."
             className={cn(
               'w-full px-5 py-4 rounded-2xl border-2 text-lg',
@@ -272,7 +276,7 @@ export function ExamQuestionCard({
         <textarea
           value={selectedAnswer || ''}
           onChange={(e) => onAnswerSelect(e.target.value)}
-          disabled={showFeedback}
+          disabled={showFeedback || isSubmitting}
           placeholder="Write your essay answer here..."
           rows={8}
           className={cn(
