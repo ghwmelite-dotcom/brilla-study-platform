@@ -2132,10 +2132,14 @@ const subjectCatalogSelect = `
   LEFT JOIN subject_categories sc ON s.category_id = sc.id
   LEFT JOIN exam_types et ON s.exam_type_id = et.id
   LEFT JOIN (
-    SELECT subject_id, COUNT(*) AS question_count,
-           SUM(CASE WHEN id LIKE 'q_edx_%_b001_%' THEN 1 ELSE 0 END) AS automated_beta_count
-    FROM questions
-    GROUP BY subject_id
+    SELECT q.subject_id, COUNT(*) AS question_count,
+           COUNT(qcr.question_id) AS automated_beta_count
+    FROM questions q
+    LEFT JOIN question_content_releases qcr
+      ON qcr.question_id = q.id
+     AND qcr.quality_assurance = 'automated_beta'
+     AND qcr.release_channel = 'beta'
+    GROUP BY q.subject_id
   ) qc ON qc.subject_id = s.id
   LEFT JOIN (
     SELECT subject_id, COUNT(*) AS topic_count

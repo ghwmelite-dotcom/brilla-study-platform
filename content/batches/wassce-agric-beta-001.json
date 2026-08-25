@@ -1,0 +1,1484 @@
+{
+  "batchId": "wassce-agric-beta-001",
+  "status": "approved_for_production",
+  "examTypeId": "exam_wassce",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment, Ghana",
+      "title": "Agricultural Science Curriculum for Secondary Education",
+      "url": "https://nacca.gov.gh/wp-content/uploads/2025/04/Agricultural-Science-Curriculum.pdf",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-08-24T00:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep practice content aligned to Ghana’s published NaCCA Agricultural Science curriculum; not official WAEC or NaCCA examination material.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_wassce_agric",
+      "specificationCode": "NaCCA-SHS-AGSCI-2025",
+      "topics": [
+        {
+          "code": "AGSCI-1.1",
+          "title": "Agriculture and farming prospects",
+          "objective": "Explain the importance, enterprise opportunities and inclusive career prospects of agriculture in Ghana."
+        },
+        {
+          "code": "AGSCI-1.2",
+          "title": "Emerging technologies in agriculture",
+          "objective": "Apply digital, biological and controlled-environment technologies to agricultural production decisions."
+        },
+        {
+          "code": "AGSCI-1.3",
+          "title": "Agricultural machinery",
+          "objective": "Select, operate and maintain agricultural tools and machinery using safe and efficient practices."
+        },
+        {
+          "code": "AGSCI-2.1",
+          "title": "Economic production of crops",
+          "objective": "Plan market-oriented crop production, husbandry, harvesting, post-harvest handling and marketing."
+        },
+        {
+          "code": "AGSCI-2.2",
+          "title": "Economic production of animals",
+          "objective": "Apply husbandry, nutrition, health, biosecurity and enterprise records to animal production."
+        },
+        {
+          "code": "AGSCI-3.1",
+          "title": "Land tenure systems for agriculture",
+          "objective": "Compare land tenure arrangements and their effects on access, investment and sustainable farm management."
+        },
+        {
+          "code": "AGSCI-3.2",
+          "title": "Agricultural support systems",
+          "objective": "Use extension, finance, insurance, farmer organisations and market information to improve farm decisions."
+        },
+        {
+          "code": "AGSCI-4.1",
+          "title": "Climate variability and agricultural risk",
+          "objective": "Interpret weather and climate evidence and explain effects on yields, pests, water and rural livelihoods."
+        },
+        {
+          "code": "AGSCI-4.2",
+          "title": "Climate change adaptation",
+          "objective": "Select practical farm adjustments that reduce exposure and vulnerability to climate-related hazards."
+        },
+        {
+          "code": "AGSCI-4.3",
+          "title": "Climate change mitigation",
+          "objective": "Evaluate agricultural practices that reduce greenhouse-gas emissions or increase long-term carbon storage."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_was_agric_b001_001",
+          "original": true,
+          "topicCode": "AGSCI-1.1",
+          "type": "multiple_choice",
+          "prompt": "Which activity belongs to the agricultural value chain rather than only primary production?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Processing cassava into packaged gari for sale",
+              "rationale": "This is the supported answer. Agriculture includes production, processing, storage, transport and marketing. Turning cassava into packaged gari adds value and can create employment beyond the farm gate."
+            },
+            {
+              "label": "B",
+              "text": "Clearing land without producing anything",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Leaving harvested cassava exposed to rain",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Discarding all farm records",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Agriculture includes production, processing, storage, transport and marketing. Turning cassava into packaged gari adds value and can create employment beyond the farm gate. Therefore the correct answer is A: Processing cassava into packaged gari for sale.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_agric_b001_002",
+          "original": true,
+          "topicCode": "AGSCI-1.1",
+          "type": "multiple_choice",
+          "prompt": "A learner says agriculture is suitable only for men. Which response is most evidence-based?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Only heavy manual work counts as agriculture",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Agricultural enterprises require diverse skills and are open to every gender",
+              "rationale": "This is the supported answer. Modern agriculture includes science, finance, machinery, marketing and management. Ability, training and access to resources—not gender—determine participation and performance."
+            },
+            {
+              "label": "C",
+              "text": "Women can participate only in retailing",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Gender determines whether a person can learn agribusiness",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Modern agriculture includes science, finance, machinery, marketing and management. Ability, training and access to resources—not gender—determine participation and performance. Therefore the correct answer is B: Agricultural enterprises require diverse skills and are open to every gender.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_agric_b001_003",
+          "original": true,
+          "topicCode": "AGSCI-1.1",
+          "type": "multiple_choice",
+          "prompt": "Before starting a tomato enterprise, what should a student entrepreneur investigate first?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The colour of every competitor’s clothing",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Only the size of the available hoe",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Local demand, preferred varieties, prices and likely buyers",
+              "rationale": "This is the supported answer. A market survey identifies customer needs, seasonal prices and sales channels. That evidence guides production scale, variety choice, harvest timing and expected revenue."
+            },
+            {
+              "label": "D",
+              "text": "The number of unrelated shops in another region",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A market survey identifies customer needs, seasonal prices and sales channels. That evidence guides production scale, variety choice, harvest timing and expected revenue. Therefore the correct answer is C: Local demand, preferred varieties, prices and likely buyers.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_agric_b001_004",
+          "original": true,
+          "topicCode": "AGSCI-1.1",
+          "type": "multiple_choice",
+          "prompt": "Why should a small farm keep records of inputs, labour, sales and losses?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To guarantee that weather will remain favourable",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "To remove every biological risk",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "To replace observation of the farm",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "To calculate performance and make evidence-based enterprise decisions",
+              "rationale": "This is the supported answer. Complete records reveal costs, revenue, profit, mortality and yield trends. Comparing those figures helps the farmer correct waste and plan the next production cycle."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Complete records reveal costs, revenue, profit, mortality and yield trends. Comparing those figures helps the farmer correct waste and plan the next production cycle. Therefore the correct answer is D: To calculate performance and make evidence-based enterprise decisions.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_agric_b001_005",
+          "original": true,
+          "topicCode": "AGSCI-1.2",
+          "type": "multiple_choice",
+          "prompt": "How can a soil-moisture sensor improve irrigation management?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It can trigger watering when measured soil moisture falls below a useful threshold",
+              "rationale": "This is the supported answer. A moisture sensor supplies field evidence about water availability. Using that reading prevents unnecessary watering while reducing the risk of crop water stress."
+            },
+            {
+              "label": "B",
+              "text": "It permanently increases rainfall",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It identifies crop prices without data",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It sterilises the soil automatically",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A moisture sensor supplies field evidence about water availability. Using that reading prevents unnecessary watering while reducing the risk of crop water stress. Therefore the correct answer is A: It can trigger watering when measured soil moisture falls below a useful threshold.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_agric_b001_006",
+          "original": true,
+          "topicCode": "AGSCI-1.2",
+          "type": "multiple_choice",
+          "prompt": "What is a key advantage of using GPS guidance for field operations?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It makes fuel unnecessary",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It reduces overlapping passes and improves placement accuracy",
+              "rationale": "This is the supported answer. GPS guidance helps an operator follow consistent paths. Fewer overlaps can save seed, fertiliser, fuel and time while improving uniform field coverage."
+            },
+            {
+              "label": "C",
+              "text": "It guarantees that every seed germinates",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It replaces all machinery maintenance",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "GPS guidance helps an operator follow consistent paths. Fewer overlaps can save seed, fertiliser, fuel and time while improving uniform field coverage. Therefore the correct answer is B: It reduces overlapping passes and improves placement accuracy.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_agric_b001_007",
+          "original": true,
+          "topicCode": "AGSCI-1.2",
+          "type": "multiple_choice",
+          "prompt": "Which statement best describes hydroponic crop production?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Plants grow without light or nutrients",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Every crop is raised only in seawater",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Plants receive water and mineral nutrients without relying on field soil",
+              "rationale": "This is the supported answer. Hydroponics supplies roots with a managed nutrient solution and support medium where needed. Light, oxygen, water quality and nutrient concentration still require control."
+            },
+            {
+              "label": "D",
+              "text": "Roots are prevented from absorbing dissolved ions",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Hydroponics supplies roots with a managed nutrient solution and support medium where needed. Light, oxygen, water quality and nutrient concentration still require control. Therefore the correct answer is C: Plants receive water and mineral nutrients without relying on field soil.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_agric_b001_008",
+          "original": true,
+          "topicCode": "AGSCI-1.2",
+          "type": "multiple_choice",
+          "prompt": "Why might a farmer use a drone to inspect a large field?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To diagnose every disease with certainty from one photograph",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "To eliminate the need for agronomic knowledge",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "To change soil texture while flying",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "To locate uneven crop growth or stress for targeted ground checks",
+              "rationale": "This is the supported answer. Aerial images can reveal patterns that are hard to see from the ground. They guide inspection, but findings still need verification before treatment decisions are made."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Aerial images can reveal patterns that are hard to see from the ground. They guide inspection, but findings still need verification before treatment decisions are made. Therefore the correct answer is D: To locate uneven crop growth or stress for targeted ground checks.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_agric_b001_009",
+          "original": true,
+          "topicCode": "AGSCI-1.3",
+          "type": "multiple_choice",
+          "prompt": "Which implement is mainly used to turn and loosen soil during primary tillage?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A plough",
+              "rationale": "This is the supported answer. A plough cuts, lifts and turns the soil, helping bury residues and prepare land for later operations. Harrows generally perform finer secondary tillage."
+            },
+            {
+              "label": "B",
+              "text": "A knapsack sprayer",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A milking machine",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A grain moisture meter",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A plough cuts, lifts and turns the soil, helping bury residues and prepare land for later operations. Harrows generally perform finer secondary tillage. Therefore the correct answer is A: A plough.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_agric_b001_010",
+          "original": true,
+          "topicCode": "AGSCI-1.3",
+          "type": "multiple_choice",
+          "prompt": "Why is planter calibration necessary before sowing a field?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To increase tractor mass permanently",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "To deliver the intended seed rate and spacing",
+              "rationale": "This is the supported answer. Calibration relates machine settings, travel distance and seed output. Checking the result reduces waste and supports a plant population appropriate for the crop."
+            },
+            {
+              "label": "C",
+              "text": "To make all seeds genetically identical",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "To avoid checking seed size",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Calibration relates machine settings, travel distance and seed output. Checking the result reduces waste and supports a plant population appropriate for the crop. Therefore the correct answer is B: To deliver the intended seed rate and spacing.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_agric_b001_011",
+          "original": true,
+          "topicCode": "AGSCI-1.3",
+          "type": "multiple_choice",
+          "prompt": "What is the safest action before clearing material wrapped around a tractor power take-off shaft?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Pull the material while the shaft rotates slowly",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Step over the rotating shaft",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Shut down the engine, isolate power and wait for all movement to stop",
+              "rationale": "This is the supported answer. A rotating power take-off can entangle clothing or limbs within seconds. Isolation and complete stoppage are essential before inspection or clearing."
+            },
+            {
+              "label": "D",
+              "text": "Increase engine speed to throw it off",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A rotating power take-off can entangle clothing or limbs within seconds. Isolation and complete stoppage are essential before inspection or clearing. Therefore the correct answer is C: Shut down the engine, isolate power and wait for all movement to stop.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_agric_b001_012",
+          "original": true,
+          "topicCode": "AGSCI-1.3",
+          "type": "multiple_choice",
+          "prompt": "Which maintenance practice most directly reduces rapid wear of moving machine parts?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Leaving soil on metal surfaces after use",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Operating with loose fasteners",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Replacing clean oil with water",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Lubricating specified points at the recommended intervals",
+              "rationale": "This is the supported answer. Correct lubrication reduces friction and heat between moving surfaces. The manufacturer’s schedule and lubricant specification should be followed for reliable operation."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Correct lubrication reduces friction and heat between moving surfaces. The manufacturer’s schedule and lubricant specification should be followed for reliable operation. Therefore the correct answer is D: Lubricating specified points at the recommended intervals.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_agric_b001_013",
+          "original": true,
+          "topicCode": "AGSCI-2.1",
+          "type": "multiple_choice",
+          "prompt": "Why is crop rotation with a legume useful in a cereal production plan?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It can improve soil nitrogen supply and interrupt some pest cycles",
+              "rationale": "This is the supported answer. Legumes can add biologically fixed nitrogen when residues are managed well. Changing crop families can also disrupt organisms that depend on one host crop."
+            },
+            {
+              "label": "B",
+              "text": "It guarantees that weeds disappear permanently",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It removes the need for all soil testing",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It makes rainfall unnecessary",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Legumes can add biologically fixed nitrogen when residues are managed well. Changing crop families can also disrupt organisms that depend on one host crop. Therefore the correct answer is A: It can improve soil nitrogen supply and interrupt some pest cycles.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_agric_b001_014",
+          "original": true,
+          "topicCode": "AGSCI-2.1",
+          "type": "multiple_choice",
+          "prompt": "What is the first principle of integrated pest management?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Apply the highest pesticide dose every week",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Monitor the crop and combine suitable controls only when justified",
+              "rationale": "This is the supported answer. Integrated pest management uses identification, monitoring, prevention and compatible biological, cultural or chemical controls. Treatment is based on evidence and risk."
+            },
+            {
+              "label": "C",
+              "text": "Destroy all organisms found in the field",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Ignore economic damage thresholds",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Integrated pest management uses identification, monitoring, prevention and compatible biological, cultural or chemical controls. Treatment is based on evidence and risk. Therefore the correct answer is B: Monitor the crop and combine suitable controls only when justified.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_agric_b001_015",
+          "original": true,
+          "topicCode": "AGSCI-2.1",
+          "type": "multiple_choice",
+          "prompt": "A vegetable farmer harvests produce during the coolest part of the morning. What benefit is most likely?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The produce immediately becomes sterile",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Respiration stops permanently",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Lower field heat can slow water loss and quality deterioration",
+              "rationale": "This is the supported answer. Removing field heat and limiting dehydration help preserve fresh produce. Careful handling, shade and timely cooling further reduce post-harvest losses."
+            },
+            {
+              "label": "D",
+              "text": "Every bruise repairs itself",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Removing field heat and limiting dehydration help preserve fresh produce. Careful handling, shade and timely cooling further reduce post-harvest losses. Therefore the correct answer is C: Lower field heat can slow water loss and quality deterioration.",
+          "difficulty": "hard",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_agric_b001_016",
+          "original": true,
+          "topicCode": "AGSCI-2.1",
+          "type": "multiple_choice",
+          "prompt": "Which calculation gives gross margin for a crop enterprise?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Total assets minus rainfall",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Fixed costs plus every household expense",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Yield divided by the farmer’s age",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Revenue minus variable costs",
+              "rationale": "This is the supported answer. Gross margin compares enterprise income with costs that change with production, such as seed, fertiliser and hired labour. It supports comparison between enterprise options."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Gross margin compares enterprise income with costs that change with production, such as seed, fertiliser and hired labour. It supports comparison between enterprise options. Therefore the correct answer is D: Revenue minus variable costs.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_agric_b001_017",
+          "original": true,
+          "topicCode": "AGSCI-2.2",
+          "type": "multiple_choice",
+          "prompt": "Why should newly purchased animals be quarantined before joining an established flock?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To observe them and reduce the chance of introducing disease",
+              "rationale": "This is the supported answer. Quarantine separates new animals while health checks and required treatments are completed. This lowers the risk of spreading an undetected infection to the resident flock."
+            },
+            {
+              "label": "B",
+              "text": "To prevent them from eating forever",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "To make vaccination unnecessary",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "To increase stocking density immediately",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Quarantine separates new animals while health checks and required treatments are completed. This lowers the risk of spreading an undetected infection to the resident flock. Therefore the correct answer is A: To observe them and reduce the chance of introducing disease.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_agric_b001_018",
+          "original": true,
+          "topicCode": "AGSCI-2.2",
+          "type": "multiple_choice",
+          "prompt": "What makes an animal ration balanced?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It contains only the cheapest ingredient",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It supplies required nutrients in suitable amounts and proportions",
+              "rationale": "This is the supported answer. A balanced ration matches energy, protein, minerals, vitamins, fibre and water needs to the animal’s species, age, production stage and health."
+            },
+            {
+              "label": "C",
+              "text": "It provides protein but no water",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It is identical for every species and age",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A balanced ration matches energy, protein, minerals, vitamins, fibre and water needs to the animal’s species, age, production stage and health. Therefore the correct answer is B: It supplies required nutrients in suitable amounts and proportions.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_agric_b001_019",
+          "original": true,
+          "topicCode": "AGSCI-2.2",
+          "type": "multiple_choice",
+          "prompt": "Why must a farmer record vaccination dates and batch details?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To prove that no animal can ever become ill",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "To replace correct vaccine storage",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "To schedule protection, trace products and investigate health events",
+              "rationale": "This is the supported answer. Accurate health records support timely boosters and traceability. They also help a veterinarian assess failures, reactions and compliance with product directions."
+            },
+            {
+              "label": "D",
+              "text": "To avoid observing withdrawal instructions",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Accurate health records support timely boosters and traceability. They also help a veterinarian assess failures, reactions and compliance with product directions. Therefore the correct answer is C: To schedule protection, trace products and investigate health events.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_agric_b001_020",
+          "original": true,
+          "topicCode": "AGSCI-2.2",
+          "type": "multiple_choice",
+          "prompt": "In a fish pond, dissolved oxygen falls sharply before dawn. Which response is most appropriate?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Add more feed immediately",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Block all water movement",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Cover the pond completely with an airtight sheet",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Increase aeration and check stocking and feeding levels",
+              "rationale": "This is the supported answer. Respiration continues overnight while photosynthesis stops, so oxygen can reach its daily minimum near dawn. Aeration addresses the immediate risk while management causes are reviewed."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Respiration continues overnight while photosynthesis stops, so oxygen can reach its daily minimum near dawn. Aeration addresses the immediate risk while management causes are reviewed. Therefore the correct answer is D: Increase aeration and check stocking and feeding levels.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_agric_b001_021",
+          "original": true,
+          "topicCode": "AGSCI-3.1",
+          "type": "multiple_choice",
+          "prompt": "What is a leasehold interest in farmland?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A right to use land for an agreed period under stated conditions",
+              "rationale": "This is the supported answer. A lease grants possession and use for a defined term while ownership remains elsewhere. Written terms clarify duration, payment, permitted uses and responsibilities."
+            },
+            {
+              "label": "B",
+              "text": "Permanent ownership without any agreement",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Use of land for one day without consent",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A guarantee that rent can never change",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A lease grants possession and use for a defined term while ownership remains elsewhere. Written terms clarify duration, payment, permitted uses and responsibilities. Therefore the correct answer is A: A right to use land for an agreed period under stated conditions.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_agric_b001_022",
+          "original": true,
+          "topicCode": "AGSCI-3.1",
+          "type": "multiple_choice",
+          "prompt": "How can insecure land tenure discourage long-term farm investment?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It always increases access to credit",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A farmer may fear losing the land before the investment pays back",
+              "rationale": "This is the supported answer. Irrigation, soil improvement and tree crops may take years to recover their cost. Uncertain rights reduce confidence that the farmer will receive those future benefits."
+            },
+            {
+              "label": "C",
+              "text": "It makes trees mature faster",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It removes every boundary dispute automatically",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Irrigation, soil improvement and tree crops may take years to recover their cost. Uncertain rights reduce confidence that the farmer will receive those future benefits. Therefore the correct answer is B: A farmer may fear losing the land before the investment pays back.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_agric_b001_023",
+          "original": true,
+          "topicCode": "AGSCI-3.1",
+          "type": "multiple_choice",
+          "prompt": "Which action best reduces disputes before cultivating land obtained through customary arrangements?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Rely only on an unverified rumour",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Move boundary markers secretly",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Confirm the authorised grant, boundaries, witnesses and terms in a documented process",
+              "rationale": "This is the supported answer. Customary rights are legitimate but can involve several authorities and interests. Verification and clear documentation protect both the landholder and the farmer."
+            },
+            {
+              "label": "D",
+              "text": "Assume unused land has no recognised interests",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Customary rights are legitimate but can involve several authorities and interests. Verification and clear documentation protect both the landholder and the farmer. Therefore the correct answer is C: Confirm the authorised grant, boundaries, witnesses and terms in a documented process.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_agric_b001_024",
+          "original": true,
+          "topicCode": "AGSCI-3.1",
+          "type": "multiple_choice",
+          "prompt": "Under sharecropping, how is the landholder commonly compensated?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Only with ownership of all the farmer’s tools",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "By receiving the entire harvest regardless of terms",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "With rainfall measured during the season",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "With an agreed share of the farm output or proceeds",
+              "rationale": "This is the supported answer. Sharecropping arrangements divide output or revenue according to an agreed formula. Clear terms should cover inputs, risk, harvest measurement and each party’s share."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Sharecropping arrangements divide output or revenue according to an agreed formula. Clear terms should cover inputs, risk, harvest measurement and each party’s share. Therefore the correct answer is D: With an agreed share of the farm output or proceeds.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_agric_b001_025",
+          "original": true,
+          "topicCode": "AGSCI-3.2",
+          "type": "multiple_choice",
+          "prompt": "What is the central role of an agricultural extension officer?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Help farmers evaluate and apply relevant knowledge and technologies",
+              "rationale": "This is the supported answer. Extension connects research, local experience and practical advisory support. Participatory approaches help farmers adapt recommendations to their conditions."
+            },
+            {
+              "label": "B",
+              "text": "Set every market price by law",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Operate every farm on behalf of owners",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Replace all farmer experimentation",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Extension connects research, local experience and practical advisory support. Participatory approaches help farmers adapt recommendations to their conditions. Therefore the correct answer is A: Help farmers evaluate and apply relevant knowledge and technologies.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_agric_b001_026",
+          "original": true,
+          "topicCode": "AGSCI-3.2",
+          "type": "multiple_choice",
+          "prompt": "How can a farmer cooperative improve members’ bargaining position?",
+          "options": [
+            {
+              "label": "A",
+              "text": "By preventing members from keeping records",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "By pooling demand or produce to negotiate at useful scale",
+              "rationale": "This is the supported answer. Collective purchasing and marketing can reduce transaction costs and strengthen negotiation. Transparent governance and agreed quality standards remain essential."
+            },
+            {
+              "label": "C",
+              "text": "By hiding quality information from buyers",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "By eliminating every production cost",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Collective purchasing and marketing can reduce transaction costs and strengthen negotiation. Transparent governance and agreed quality standards remain essential. Therefore the correct answer is B: By pooling demand or produce to negotiate at useful scale.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_agric_b001_027",
+          "original": true,
+          "topicCode": "AGSCI-3.2",
+          "type": "multiple_choice",
+          "prompt": "Why should a farmer compare the effective cost and repayment schedule before taking credit?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Because interest never affects profitability",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Because all lenders offer identical terms",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "To confirm expected cash flow can service the loan without undermining the farm",
+              "rationale": "This is the supported answer. Loan principal, interest, fees and due dates affect working capital. A realistic cash-flow forecast shows whether income is likely to arrive before repayments fall due."
+            },
+            {
+              "label": "D",
+              "text": "To avoid preparing an enterprise budget",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Loan principal, interest, fees and due dates affect working capital. A realistic cash-flow forecast shows whether income is likely to arrive before repayments fall due. Therefore the correct answer is C: To confirm expected cash flow can service the loan without undermining the farm.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_agric_b001_028",
+          "original": true,
+          "topicCode": "AGSCI-3.2",
+          "type": "multiple_choice",
+          "prompt": "What risk does index-based agricultural insurance usually pay against?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Every individual loss without a policy condition",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Changes in the farmer’s preferred crop colour",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Guaranteed profit regardless of management",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A measured trigger such as rainfall falling below a defined threshold",
+              "rationale": "This is the supported answer. Index insurance pays when an agreed external measure crosses a threshold. It can speed settlement, but basis risk exists when the index differs from a farmer’s actual loss."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Index insurance pays when an agreed external measure crosses a threshold. It can speed settlement, but basis risk exists when the index differs from a farmer’s actual loss. Therefore the correct answer is D: A measured trigger such as rainfall falling below a defined threshold.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_agric_b001_029",
+          "original": true,
+          "topicCode": "AGSCI-4.1",
+          "type": "multiple_choice",
+          "prompt": "Which statement correctly distinguishes weather from climate?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Weather describes short-term conditions, while climate summarises long-term patterns",
+              "rationale": "This is the supported answer. Weather records conditions over short periods. Climate uses long-term statistics and patterns, although individual seasons can still differ from the average."
+            },
+            {
+              "label": "B",
+              "text": "Weather and climate always mean the same day",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Climate is measured for only one hour",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Weather cannot include rainfall",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Weather records conditions over short periods. Climate uses long-term statistics and patterns, although individual seasons can still differ from the average. Therefore the correct answer is A: Weather describes short-term conditions, while climate summarises long-term patterns.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_agric_b001_030",
+          "original": true,
+          "topicCode": "AGSCI-4.1",
+          "type": "multiple_choice",
+          "prompt": "How can a prolonged drought reduce crop yield?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It guarantees greater leaf expansion",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Water stress limits photosynthesis, nutrient movement and growth",
+              "rationale": "This is the supported answer. Insufficient water causes stomata to close and reduces cell expansion and nutrient transport. Timing matters because flowering and grain filling can be especially sensitive."
+            },
+            {
+              "label": "C",
+              "text": "It makes soil water permanently abundant",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It prevents every pest outbreak",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Insufficient water causes stomata to close and reduces cell expansion and nutrient transport. Timing matters because flowering and grain filling can be especially sensitive. Therefore the correct answer is B: Water stress limits photosynthesis, nutrient movement and growth.",
+          "difficulty": "hard",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_agric_b001_031",
+          "original": true,
+          "topicCode": "AGSCI-4.1",
+          "type": "multiple_choice",
+          "prompt": "Why should a farm analyse rainfall records across many years?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To predict an exact storm time years ahead",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "To remove all uncertainty from farming",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "To estimate variability and the likelihood of dry or wet periods",
+              "rationale": "This is the supported answer. Long records reveal onset, totals, distribution and extremes. They support risk planning, but forecasts and field observations are still needed for current decisions."
+            },
+            {
+              "label": "D",
+              "text": "To replace current weather forecasts",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Long records reveal onset, totals, distribution and extremes. They support risk planning, but forecasts and field observations are still needed for current decisions. Therefore the correct answer is C: To estimate variability and the likelihood of dry or wet periods.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_agric_b001_032",
+          "original": true,
+          "topicCode": "AGSCI-4.1",
+          "type": "multiple_choice",
+          "prompt": "Warmer conditions allow a crop pest to complete more generations in a season. What is the likely farm effect?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The pest must become harmless",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Crop resistance automatically doubles",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Temperature can no longer affect insect development",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Pest pressure may increase unless monitoring and control adapt",
+              "rationale": "This is the supported answer. Many insects develop faster within a suitable temperature range. More generations can raise population pressure, so surveillance and integrated management may need adjustment."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Many insects develop faster within a suitable temperature range. More generations can raise population pressure, so surveillance and integrated management may need adjustment. Therefore the correct answer is D: Pest pressure may increase unless monitoring and control adapt.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_agric_b001_033",
+          "original": true,
+          "topicCode": "AGSCI-4.2",
+          "type": "multiple_choice",
+          "prompt": "Which is an adaptation to increasing dry-season water shortages?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Harvesting rainwater and using efficient irrigation",
+              "rationale": "This is the supported answer. Water storage increases availability, while efficient delivery reduces losses. Together they lower vulnerability without claiming to prevent drought itself."
+            },
+            {
+              "label": "B",
+              "text": "Burning crop residues after every harvest",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Removing all soil cover",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Increasing water losses from leaking pipes",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Water storage increases availability, while efficient delivery reduces losses. Together they lower vulnerability without claiming to prevent drought itself. Therefore the correct answer is A: Harvesting rainwater and using efficient irrigation.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_agric_b001_034",
+          "original": true,
+          "topicCode": "AGSCI-4.2",
+          "type": "multiple_choice",
+          "prompt": "Why might a farmer adjust planting date using a credible seasonal forecast?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To guarantee that the forecast cannot be wrong",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "To better align sensitive crop stages with expected rainfall",
+              "rationale": "This is the supported answer. Forecasts provide probabilistic guidance rather than certainty. Combining them with local observations, suitable varieties and contingency plans improves the decision."
+            },
+            {
+              "label": "C",
+              "text": "To remove the need for seed selection",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "To make soil preparation irrelevant",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Forecasts provide probabilistic guidance rather than certainty. Combining them with local observations, suitable varieties and contingency plans improves the decision. Therefore the correct answer is B: To better align sensitive crop stages with expected rainfall.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_agric_b001_035",
+          "original": true,
+          "topicCode": "AGSCI-4.2",
+          "type": "multiple_choice",
+          "prompt": "How can drought-tolerant varieties support climate adaptation?",
+          "options": [
+            {
+              "label": "A",
+              "text": "They grow without any water",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "They eliminate every crop disease",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "They can maintain useful production under limited water better than susceptible varieties",
+              "rationale": "This is the supported answer. Tolerance reduces yield loss under defined stress conditions, but performance still depends on suitable soils, planting time, nutrients, pests and available moisture."
+            },
+            {
+              "label": "D",
+              "text": "They make good agronomy unnecessary",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Tolerance reduces yield loss under defined stress conditions, but performance still depends on suitable soils, planting time, nutrients, pests and available moisture. Therefore the correct answer is C: They can maintain useful production under limited water better than susceptible varieties.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_agric_b001_036",
+          "original": true,
+          "topicCode": "AGSCI-4.2",
+          "type": "multiple_choice",
+          "prompt": "What adaptation benefit can agroforestry provide on a farm?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Trees always increase competition without benefits",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It removes all need for crop management",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It guarantees identical yields every season",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Trees can moderate microclimate, protect soil and diversify products",
+              "rationale": "This is the supported answer. Well-designed tree–crop systems can supply shade, wind protection, organic matter and additional products. Species, spacing and management determine whether benefits exceed competition."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Well-designed tree–crop systems can supply shade, wind protection, organic matter and additional products. Species, spacing and management determine whether benefits exceed competition. Therefore the correct answer is D: Trees can moderate microclimate, protect soil and diversify products.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_agric_b001_037",
+          "original": true,
+          "topicCode": "AGSCI-4.3",
+          "type": "multiple_choice",
+          "prompt": "Which practice can increase carbon stored in agricultural soil?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Returning compost and maintaining protective organic matter",
+              "rationale": "This is the supported answer. Organic inputs and ground cover can build soil carbon when additions exceed losses. They may also improve structure and water retention under appropriate management."
+            },
+            {
+              "label": "B",
+              "text": "Burning residues openly",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Leaving soil bare throughout the year",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Removing every root after harvest",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Organic inputs and ground cover can build soil carbon when additions exceed losses. They may also improve structure and water retention under appropriate management. Therefore the correct answer is A: Returning compost and maintaining protective organic matter.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_agric_b001_038",
+          "original": true,
+          "topicCode": "AGSCI-4.3",
+          "type": "multiple_choice",
+          "prompt": "Why does avoiding open burning of crop residues help climate mitigation?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It causes carbon dioxide to disappear from the atmosphere",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It reduces immediate greenhouse-gas and smoke emissions while preserving material for other uses",
+              "rationale": "This is the supported answer. Open burning rapidly releases carbon and air pollutants. Residues may instead be composted, mulched or otherwise managed according to pest and soil conditions."
+            },
+            {
+              "label": "C",
+              "text": "It stops all decomposition permanently",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It guarantees zero emissions from farming",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Open burning rapidly releases carbon and air pollutants. Residues may instead be composted, mulched or otherwise managed according to pest and soil conditions. Therefore the correct answer is B: It reduces immediate greenhouse-gas and smoke emissions while preserving material for other uses.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_agric_b001_039",
+          "original": true,
+          "topicCode": "AGSCI-4.3",
+          "type": "multiple_choice",
+          "prompt": "How can applying nitrogen fertiliser at the correct rate and time reduce emissions?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It makes nitrogen chemically inactive forever",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It requires applying the whole annual rate during heavy rain",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It improves crop uptake and reduces excess nitrogen available for loss",
+              "rationale": "This is the supported answer. Matching application to crop demand improves nitrogen-use efficiency. Avoiding unnecessary or poorly timed inputs can reduce nitrous oxide and leaching losses."
+            },
+            {
+              "label": "D",
+              "text": "It removes the need to assess soil fertility",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Matching application to crop demand improves nitrogen-use efficiency. Avoiding unnecessary or poorly timed inputs can reduce nitrous oxide and leaching losses. Therefore the correct answer is C: It improves crop uptake and reduces excess nitrogen available for loss.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_agric_b001_040",
+          "original": true,
+          "topicCode": "AGSCI-4.3",
+          "type": "multiple_choice",
+          "prompt": "Which change can reduce fossil-fuel use for pumping irrigation water?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Running an oversized diesel pump continuously",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Allowing distribution pipes to leak",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Pumping water when storage is already full",
+              "rationale": "This is a plausible misconception, but it does not follow the agricultural principle or evidence established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Using an appropriately sized solar-powered pump with efficient water delivery",
+              "rationale": "This is the supported answer. A correctly designed solar system can replace fuel use during operation. Efficiency, maintenance, storage and responsible groundwater abstraction are still necessary."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A correctly designed solar system can replace fuel use during operation. Efficiency, maintenance, storage and responsible groundwater abstraction are still necessary. Therefore the correct answer is D: Using an appropriately sized solar-powered pump with efficient water delivery.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        }
+      ]
+    }
+  ]
+}

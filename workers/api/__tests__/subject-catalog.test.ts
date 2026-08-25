@@ -49,10 +49,10 @@ describe("subject catalogue availability", () => {
     });
   });
 
-  it("classifies a wholly generated Edexcel batch as automated beta", () => {
+  it("classifies a wholly database-backed beta batch as automated beta", () => {
     expect(
       mapSubjectCatalogRow({
-        id: "subj_edexcel_igcse_math",
+        id: "subj_wassce_agric",
         question_count: 40,
         automated_beta_count: 40,
         topic_count: 4,
@@ -127,9 +127,11 @@ function makeRouteDb(
         all: vi.fn(async () => ({
           results: sql.includes("q.past_paper_id = ?")
             ? (options.paperQuestionRows ?? [])
-            : sql.includes("FROM questions q")
-              ? (options.questionRows ?? [])
-              : (options.subjectRows ?? []),
+            : sql.includes("FROM subjects s")
+              ? (options.subjectRows ?? [])
+              : sql.includes("FROM questions q")
+                ? (options.questionRows ?? [])
+                : (options.subjectRows ?? []),
         })),
         run: vi.fn(async () => ({ success: true })),
       };
@@ -198,6 +200,14 @@ describe("public subject availability routes", () => {
     expect(calls.some(({ sql }) => sql.includes("s.is_active = 1"))).toBe(true);
     expect(
       calls.some(({ sql }) => sql.includes("COUNT(*) AS question_count")),
+    ).toBe(true);
+    expect(
+      calls.some(
+        ({ sql }) =>
+          sql.includes("question_content_releases") &&
+          sql.includes("qcr.quality_assurance = 'automated_beta'") &&
+          sql.includes("qcr.release_channel = 'beta'"),
+      ),
     ).toBe(true);
     expect(
       calls.some(({ sql }) => sql.includes("COUNT(*) AS topic_count")),
