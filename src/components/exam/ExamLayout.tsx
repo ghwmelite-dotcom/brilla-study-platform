@@ -40,6 +40,7 @@ export interface ExamLayoutProps {
   onMarkForReview?: () => void;
   onQuestionSelect?: (index: number) => void;
   isSubmitting?: boolean;
+  isNextDisabled?: boolean;
   showNavigation?: boolean;
   showQuestionNav?: boolean;
   examType?: 'practice' | 'mock' | 'assessment' | 'battle' | 'speed';
@@ -61,6 +62,7 @@ export function ExamLayout({
   onMarkForReview,
   onQuestionSelect,
   isSubmitting = false,
+  isNextDisabled = false,
   showNavigation = true,
   showQuestionNav = true,
   examType = 'practice',
@@ -507,10 +509,12 @@ export function ExamLayout({
               {/* Next / Finish */}
               <button
                 onClick={isLastQuestion ? () => setShowSubmitModal(true) : onNext}
+                disabled={isNextDisabled}
                 className={cn(
                   'flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all',
                   'bg-gradient-to-r text-white shadow-lg hover:shadow-xl hover:scale-105',
-                  isLastQuestion ? 'from-emerald-500 to-teal-500' : colors.primary
+                  isLastQuestion ? 'from-emerald-500 to-teal-500' : colors.primary,
+                  isNextDisabled && 'cursor-not-allowed opacity-50 hover:scale-100 hover:shadow-lg'
                 )}
               >
                 <span>{isLastQuestion ? 'Finish' : 'Next'}</span>
