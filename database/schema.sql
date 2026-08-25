@@ -3888,6 +3888,20 @@ CREATE TABLE IF NOT EXISTS questions (
     updated_at TEXT DEFAULT (datetime('now'))
 );
 
+-- Source: migrations/113_wassce_agric_beta_foundation.sql
+CREATE TABLE IF NOT EXISTS question_content_releases (
+    question_id TEXT PRIMARY KEY REFERENCES questions(id) ON DELETE CASCADE,
+    batch_id TEXT NOT NULL,
+    quality_assurance TEXT NOT NULL CHECK (quality_assurance IN ('automated_beta', 'human_reviewed')),
+    release_channel TEXT NOT NULL CHECK (release_channel IN ('beta', 'production')),
+    content_label TEXT NOT NULL,
+    source_url TEXT NOT NULL,
+    official_exam_board_content INTEGER NOT NULL DEFAULT 0 CHECK (official_exam_board_content IN (0, 1)),
+    feedback_enabled INTEGER NOT NULL DEFAULT 1 CHECK (feedback_enabled IN (0, 1)),
+    released_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_question_content_releases_batch ON question_content_releases(batch_id);
+
 -- Source: migrations/028_seed_past_papers_questions.sql
 -- LEFTOVER scratch table from 028_seed_past_papers_questions.sql:6 (an aborted
 -- table-rebuild: created and INSERTed into, never renamed or dropped). It does not

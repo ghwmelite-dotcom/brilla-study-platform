@@ -2,7 +2,7 @@
   "matrixVersion": "2026-08-24",
   "status": "authoritative_source_review_complete",
   "policy": {
-    "publicationThreshold": "Human academic approval is required before production publication.",
+    "publicationThreshold": "Production publication requires the automated beta contract: deterministic validation, source provenance, integrity guards, learner-visible non-official labelling and an enabled correction channel.",
     "copyright": "Only original questions may be authored. Official documents are used as curriculum blueprints, never copied as question text.",
     "availability": "A subject remains unavailable until its approved bank meets the operational coverage floor."
   },
