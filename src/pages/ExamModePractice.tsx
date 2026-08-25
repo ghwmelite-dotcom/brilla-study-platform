@@ -153,12 +153,6 @@ export default function ExamModePractice() {
   const handleAnswerSelect = useCallback(async (answer: string) => {
     if (!currentQuestion || showFeedback || isAnswerSubmitting) return;
 
-    // Check if limit already reached
-    if (checkLimitReached()) {
-      setShowLimitModal(true);
-      return;
-    }
-
     const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
 
     setAttemptError(null);
@@ -185,12 +179,6 @@ export default function ExamModePractice() {
       });
 
       if (!response.success || !response.data) {
-        setAnswers((current) => {
-          const next = { ...current };
-          delete next[currentQuestion.id];
-          return next;
-        });
-
         if (response.code === 'LIMIT_REACHED') {
           setShowLimitModal(true);
           return;
@@ -237,16 +225,11 @@ export default function ExamModePractice() {
       }
     } catch (error) {
       console.error('Failed to submit answer:', error);
-      setAnswers((current) => {
-        const next = { ...current };
-        delete next[currentQuestion.id];
-        return next;
-      });
       setAttemptError('Your answer could not be submitted. Please retry before continuing.');
     } finally {
       setIsAnswerSubmitting(false);
     }
-  }, [currentQuestion, questionStartTime, showFeedback, isAnswerSubmitting, mode, checkLimitReached, setUsageFromResponse]);
+  }, [currentQuestion, questionStartTime, showFeedback, isAnswerSubmitting, mode, setUsageFromResponse]);
 
   const handleNext = useCallback(() => {
     if (currentIndex < totalQuestions - 1) {
@@ -485,7 +468,20 @@ export default function ExamModePractice() {
           isDark ? 'border-red-400/20 bg-red-400/10 text-red-200' : 'border-red-200 bg-red-50 text-red-800',
         )}>
           <AlertCircle aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>{attemptError} Select your answer again to retry.</span>
+          <div className="flex flex-1 flex-wrap items-center justify-between gap-3">
+            <span>{attemptError} Your selection has been kept.</span>
+            <button
+              type="button"
+              onClick={() => {
+                const selectedAnswer = answers[currentQuestion.id];
+                if (selectedAnswer) void handleAnswerSelect(selectedAnswer);
+              }}
+              disabled={!answers[currentQuestion.id]}
+              className="rounded-lg border border-current/20 px-3 py-1.5 font-semibold transition-colors hover:bg-current/10 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Retry submission
+            </button>
+          </div>
         </div>
       )}
 

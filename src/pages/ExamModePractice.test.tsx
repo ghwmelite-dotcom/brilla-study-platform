@@ -123,6 +123,30 @@ afterEach(async () => {
 });
 
 describe('ExamModePractice question transition', () => {
+  it('submits an answer even when a stale client usage snapshot says the limit is reached', async () => {
+    mocks.checkLimitReached.mockReturnValue(true);
+    mocks.apiPost.mockResolvedValueOnce({
+      success: true,
+      data: {
+        isCorrect: true,
+        correctAnswer: 'A',
+        explanation: 'Topsoil contains the greatest concentration of humus.',
+        pointsEarned: 1,
+        usage: { used: 0, limit: -1, remaining: -1, isUnlimited: true, showUpgradePrompt: false },
+      },
+    });
+
+    const container = await renderPage();
+
+    await act(async () => {
+      findButton(container, 'Topsoil').click();
+      await Promise.resolve();
+    });
+
+    await vi.waitFor(() => expect(mocks.apiPost).toHaveBeenCalledOnce());
+    expect(mocks.apiPost).toHaveBeenCalledWith('/questions/agric-1/attempt', { answer: 'A' });
+  });
+
   it('surfaces a failed attempt, allows retry, and advances after the retry succeeds', async () => {
     mocks.apiPost
       .mockResolvedValueOnce({ success: false, error: 'Failed to submit answer' })
@@ -146,10 +170,11 @@ describe('ExamModePractice question transition', () => {
     });
 
     await vi.waitFor(() => expect(container.textContent).toContain('Failed to submit answer'));
+    expect(findButton(container, 'Topsoil').getAttribute('aria-pressed')).toBe('true');
     expect(findButton(container, 'Next').disabled).toBe(true);
 
     await act(async () => {
-      findButton(container, 'Topsoil').click();
+      findButton(container, 'Retry submission').click();
       await Promise.resolve();
     });
 
