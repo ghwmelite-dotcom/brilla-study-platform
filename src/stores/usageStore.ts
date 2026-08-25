@@ -4,7 +4,6 @@
  */
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { api } from '@/lib/api';
 import { DAILY_QUESTION_LIMIT } from '@/config';
 
@@ -42,9 +41,7 @@ const DEFAULT_USAGE: DailyUsage = {
   isUnlimited: false,
 };
 
-export const useUsageStore = create<UsageState>()(
-  persist(
-    (set, get) => ({
+export const useUsageStore = create<UsageState>((set, get) => ({
       // Initial state
       dailyUsage: null,
       isLoading: false,
@@ -143,15 +140,6 @@ export const useUsageStore = create<UsageState>()(
         if (dailyUsage.isUnlimited) return false;
         return dailyUsage.remaining <= 3 && dailyUsage.remaining > 0;
       },
-    }),
-    {
-      name: 'brilla-usage',
-      partialize: (state) => ({
-        dailyUsage: state.dailyUsage,
-        lastFetched: state.lastFetched,
-      }),
-    }
-  )
-);
+  }));
 
 export default useUsageStore;

@@ -151,7 +151,9 @@ export function ExamQuestionCard({
 
             return (
               <button
+                type="button"
                 key={option.id || index}
+                aria-pressed={isSelected}
                 onClick={() => !showFeedback && !isSubmitting && onAnswerSelect(option.id)}
                 disabled={showFeedback || isSubmitting}
                 className={cn(
