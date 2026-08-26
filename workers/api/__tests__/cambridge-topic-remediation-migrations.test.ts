@@ -57,6 +57,9 @@ describe("Cambridge topic remediation migrations 271-275", () => {
       if (/database\/(migrations|rollbacks|preflight)\/27[1-5]_/.test(file)) {
         expect(Buffer.byteLength(content, "utf8")).toBeLessThan(19_500);
         expect(content).not.toContain("CREATE TEMP VIEW");
+        expect(content).not.toMatch(/CREATE TEMP TABLE\s+\S+\s+AS/i);
+        expect(content).toContain("CREATE TEMP TABLE _sf(c INTEGER,n INTEGER,a INTEGER,b INTEGER);");
+        expect(content).toContain("INSERT INTO _sf(c,n,a,b) WITH RECURSIVE ");
         expect(content).not.toContain("DROP VIEW _sr");
         expect(content).not.toContain("CREATE TEMP TABLE _sr AS SELECT");
         expect(content).toContain("CREATE TEMP TABLE _sr (id TEXT,subject_id TEXT,topic_id TEXT,question_text TEXT,question_type TEXT,options TEXT,correct_answer TEXT,explanation TEXT,difficulty TEXT,points INTEGER,marks INTEGER,time_limit INTEGER);");

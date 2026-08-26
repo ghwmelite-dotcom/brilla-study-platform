@@ -93,7 +93,7 @@ function rowsFingerprint(rows, fields) {
 }
 const fpEquals = (table, fp) => `(SELECT c=${fp[0]} AND n=${fp[1]} AND a=${fp[2]} AND b=${fp[3]} FROM ${table})`;
 const fpState = (table, rows, fields) => fpEquals(table, rowsFingerprint(rows, fields));
-const fpSql = (alias, tableSql, orderBy, fields) => `CREATE TEMP TABLE ${alias} AS WITH RECURSIVE r(k,v) AS (SELECT row_number() OVER(ORDER BY ${orderBy}),json_array(${fields.join(',')}) ${tableSql}),w(k,i,n,a,b,v) AS (SELECT k,0,length(v),7,11,v FROM r UNION ALL SELECT k,i+1,n,(a*131+unicode(substr(v,i+1,1)))%${P1},(b*137+unicode(substr(v,i+1,1)))%${P2},v FROM w WHERE i<n),f AS (SELECT k,n,a,b FROM w WHERE i=n) SELECT count(*) c,coalesce(sum(n),0) n,coalesce(sum((a*k)%${P1})%${P1},0) a,coalesce(sum((b*k)%${P2})%${P2},0) b FROM f;`;
+const fpSql = (alias, tableSql, orderBy, fields) => `CREATE TEMP TABLE ${alias}(c INTEGER,n INTEGER,a INTEGER,b INTEGER);INSERT INTO ${alias}(c,n,a,b) WITH RECURSIVE r(k,v) AS (SELECT row_number() OVER(ORDER BY ${orderBy}),json_array(${fields.join(',')}) ${tableSql}),w(k,i,n,a,b,v) AS (SELECT k,0,length(v),7,11,v FROM r UNION ALL SELECT k,i+1,n,(a*131+unicode(substr(v,i+1,1)))%${P1},(b*137+unicode(substr(v,i+1,1)))%${P2},v FROM w WHERE i<n),f AS (SELECT k,n,a,b FROM w WHERE i=n) SELECT count(*) c,coalesce(sum(n),0) n,coalesce(sum((a*k)%${P1})%${P1},0) a,coalesce(sum((b*k)%${P2})%${P2},0) b FROM f;`;
 
 function fixture() {
   const db = new DatabaseSync(':memory:');
