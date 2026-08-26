@@ -40,8 +40,8 @@ learningPathApp.get('/recommendations', async (c) => {
         COALESCE(AVG(CASE WHEN qa.is_correct = 1 THEN 100 ELSE 0 END), 0) as mastery,
         COUNT(qa.id) as questions_attempted
       FROM topics t
-      LEFT JOIN subjects s ON t.subject_id = s.id
-      LEFT JOIN questions q ON q.topic_id = t.id
+      JOIN subjects s ON t.subject_id = s.id AND s.is_active = 1
+      JOIN questions q ON q.topic_id = t.id AND q.subject_id = t.subject_id
       LEFT JOIN question_attempts qa ON qa.question_id = q.id AND qa.user_id = ?
       GROUP BY t.id
       ORDER BY mastery ASC, questions_attempted ASC
@@ -108,7 +108,7 @@ learningPathApp.get('/exam-readiness/:examType', async (c) => {
       SELECT s.id, s.name, s.icon
       FROM subjects s
       LEFT JOIN exam_types et ON et.id = s.exam_type_id
-      WHERE et.slug = ? OR s.exam_type_id IS NULL
+      WHERE s.is_active = 1 AND (et.slug = ? OR s.exam_type_id IS NULL)
       ORDER BY s.name
     `).bind(examType).all();
 
@@ -126,16 +126,23 @@ learningPathApp.get('/exam-readiness/:examType', async (c) => {
           COUNT(DISTINCT CASE WHEN topic_mastery.mastery >= 70 THEN t.id END) AS mastered_topics,
           COALESCE(AVG(topic_mastery.mastery), 0) AS avg_mastery
         FROM subjects s
-        LEFT JOIN topics t ON t.subject_id = s.id
+        JOIN topics t ON t.subject_id = s.id
+          AND EXISTS (
+            SELECT 1 FROM questions eligible_q
+            WHERE eligible_q.topic_id = t.id
+              AND eligible_q.subject_id = t.subject_id
+          )
         LEFT JOIN (
           SELECT
             q.topic_id,
             AVG(CASE WHEN qa.is_correct = 1 THEN 100 ELSE 0 END) as mastery
           FROM questions q
+          JOIN topics qt ON qt.id = q.topic_id AND qt.subject_id = q.subject_id
+          JOIN subjects qs ON qs.id = q.subject_id AND qs.is_active = 1
           LEFT JOIN question_attempts qa ON qa.question_id = q.id AND qa.user_id = ?
           GROUP BY q.topic_id
         ) topic_mastery ON topic_mastery.topic_id = t.id
-        WHERE s.id IN (${placeholders})
+        WHERE s.is_active = 1 AND s.id IN (${placeholders})
         GROUP BY s.id
       `).bind(user.userId, ...subjectRows.map((s: any) => s.id)).all();
 
@@ -156,7 +163,8 @@ learningPathApp.get('/exam-readiness/:examType', async (c) => {
           t.name,
           COALESCE(AVG(CASE WHEN qa.is_correct = 1 THEN 100 ELSE 0 END), 0) as mastery
         FROM topics t
-        LEFT JOIN questions q ON q.topic_id = t.id
+        JOIN subjects s ON s.id = t.subject_id AND s.is_active = 1
+        JOIN questions q ON q.topic_id = t.id AND q.subject_id = t.subject_id
         LEFT JOIN question_attempts qa ON qa.question_id = q.id AND qa.user_id = ?
         WHERE t.subject_id IN (${placeholders})
         GROUP BY t.id
@@ -290,8 +298,8 @@ learningPathApp.post('/study-plan/generate', async (c) => {
         s.name as subject_name,
         COALESCE(AVG(CASE WHEN qa.is_correct = 1 THEN 100 ELSE 0 END), 0) as mastery
       FROM topics t
-      LEFT JOIN subjects s ON t.subject_id = s.id
-      LEFT JOIN questions q ON q.topic_id = t.id
+      JOIN subjects s ON t.subject_id = s.id AND s.is_active = 1
+      JOIN questions q ON q.topic_id = t.id AND q.subject_id = t.subject_id
       LEFT JOIN question_attempts qa ON qa.question_id = q.id AND qa.user_id = ?
       GROUP BY t.id
       HAVING mastery < 70

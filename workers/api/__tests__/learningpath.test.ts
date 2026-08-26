@@ -57,6 +57,13 @@ describe('learningpath question_attempts migration', () => {
     );
     expect(res.status).toBe(200);
     assertMasterySql(db.calls.map((c) => c.sql));
+    const recommendationQuery = db.calls.find((call) => call.sql.includes('COUNT(qa.id) as questions_attempted'));
+    expect(recommendationQuery?.sql).toMatch(
+      /JOIN subjects s ON t\.subject_id = s\.id AND s\.is_active = 1/,
+    );
+    expect(recommendationQuery?.sql).toMatch(
+      /JOIN questions q ON q\.topic_id = t\.id AND q\.subject_id = t\.subject_id/,
+    );
   });
 
   it('GET /api/learning/exam-readiness/:examType uses one grouped mastery query', async () => {
@@ -97,12 +104,25 @@ describe('learningpath question_attempts migration', () => {
     expect(body.data.subjects[1].readinessScore).toBe(0);
 
     assertMasterySql(db.calls.map((c) => c.sql));
+    const subjectQuery = db.calls.find((call) => /LEFT JOIN exam_types et/.test(call.sql));
+    expect(subjectQuery?.sql).toMatch(
+      /WHERE s\.is_active = 1 AND \(et\.slug = \? OR s\.exam_type_id IS NULL\)/,
+    );
 
     // The per-subject mastery loop is collapsed: exactly one grouped query,
     // bound with the user id plus every subject id from the subjects result.
     const grouped = db.calls.filter((c) => c.sql.includes('GROUP BY s.id'));
     expect(grouped).toHaveLength(1);
     expect(grouped[0].binds).toEqual(['user_1', 'sub_1', 'sub_2']);
+    expect(grouped[0].sql).toMatch(
+      /eligible_q\.topic_id = t\.id[\s\S]*eligible_q\.subject_id = t\.subject_id/,
+    );
+    expect(grouped[0].sql).toMatch(
+      /JOIN topics qt ON qt\.id = q\.topic_id AND qt\.subject_id = q\.subject_id/,
+    );
+    expect(grouped[0].sql).toMatch(
+      /JOIN subjects qs ON qs\.id = q\.subject_id AND qs\.is_active = 1/,
+    );
 
     // Task 16: the per-subject weak/strong topic loop is collapsed too —
     // exactly one grouped topics query over all subject ids, stitched in JS.
@@ -110,6 +130,12 @@ describe('learningpath question_attempts migration', () => {
     expect(topicsQueries).toHaveLength(1);
     expect(topicsQueries[0].sql).toMatch(/t\.subject_id IN \(/);
     expect(topicsQueries[0].binds).toEqual(['user_1', 'sub_1', 'sub_2']);
+    expect(topicsQueries[0].sql).toMatch(
+      /JOIN subjects s ON s\.id = t\.subject_id AND s\.is_active = 1/,
+    );
+    expect(topicsQueries[0].sql).toMatch(
+      /JOIN questions q ON q\.topic_id = t\.id AND q\.subject_id = t\.subject_id/,
+    );
 
     // Topic rows are stitched back onto the right subject.
     expect(body.data.subjects[0].weakTopics).toEqual([
@@ -132,5 +158,12 @@ describe('learningpath question_attempts migration', () => {
     );
     expect(res.status).toBe(200);
     assertMasterySql(db.calls.map((c) => c.sql));
+    const weakTopicQuery = db.calls.find((call) => call.sql.includes('HAVING mastery < 70'));
+    expect(weakTopicQuery?.sql).toMatch(
+      /JOIN subjects s ON t\.subject_id = s\.id AND s\.is_active = 1/,
+    );
+    expect(weakTopicQuery?.sql).toMatch(
+      /JOIN questions q ON q\.topic_id = t\.id AND q\.subject_id = t\.subject_id/,
+    );
   });
 });

@@ -195,6 +195,50 @@ describe("POST /api/questions/:id/attempt integrity", () => {
     expect(insert?.binds[10]).toEqual(expect.any(String));
   });
 
+  it.each(["nsmq_phy_rid_001", "nsmq_phy_rid_003"])(
+    "rejects quarantined NSMQ Physics question %s before grading",
+    async (questionId) => {
+      const db = createMockD1([
+        authHandler,
+        {
+          match: /FROM question_attempts qa/,
+          first: () => null,
+        },
+        {
+          match: /WITH usage/,
+          first: () => ({ request_count: 1, total_requests: 1 }),
+        },
+        {
+          match:
+            /subject_slug, et.slug AS exam_type_slug/,
+          first: () => null,
+        },
+      ]);
+      const response = await request(
+        db,
+        {
+          answer: "A",
+          timeTaken: 12,
+          clientRequestId: `quarantine_${questionId}`,
+        },
+        questionId,
+      );
+
+      expect(response.status).toBe(404);
+      const body = (await response.json()) as Record<string, unknown>;
+      expect(body).not.toHaveProperty("correctAnswer");
+      expect(body).not.toHaveProperty("explanation");
+      const read = db.calls.find(({ sql }) =>
+        sql.includes("subject_slug, et.slug AS exam_type_slug"),
+      );
+      expect(read?.sql).toContain("JOIN topics question_topic");
+      expect(read?.sql).toContain("question_topic.subject_id = q.subject_id");
+      expect(
+        db.calls.some(({ sql }) => /INSERT INTO question_attempts/.test(sql)),
+      ).toBe(false);
+    },
+  );
+
   it("returns 503 without reading the question when the fail-closed limiter backend is unavailable", async () => {
     const db = createMockD1([
       authHandler,

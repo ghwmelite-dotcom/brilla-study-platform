@@ -334,6 +334,8 @@ export async function getSubjectAttemptCount(db: D1Database, userId: string, sub
     SELECT COUNT(*) AS count
     FROM question_attempts qa
     JOIN questions q ON q.id = qa.question_id
+    JOIN topics t ON t.id = q.topic_id AND t.subject_id = q.subject_id
+    JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
     WHERE qa.user_id = ? AND q.subject_id = ?
       AND qa.created_at >= datetime('now', '-${RECENT_EVIDENCE_DAYS} days')
   `).bind(userId, subjectId).first<{ count: number }>();
@@ -347,7 +349,12 @@ export async function getMasteryReadiness(db: D1Database, userId: string, subjec
     ), 0) AS readiness
     FROM user_progress up
     JOIN topics t ON t.id = up.topic_id
+    JOIN subjects s ON s.id = t.subject_id AND s.is_active = 1
     WHERE up.user_id = ? AND t.subject_id = ?
+      AND EXISTS (
+        SELECT 1 FROM questions q
+        WHERE q.topic_id = t.id AND q.subject_id = t.subject_id
+      )
   `).bind(userId, subjectId).first<{ readiness: number }>();
   return Math.max(0, Math.min(100, Number(row?.readiness ?? 0)));
 }
@@ -358,6 +365,8 @@ async function getEvidenceSnapshot(db: D1Database, userId: string, subjectId: st
       SELECT COUNT(*) AS count, MAX(qa.created_at) AS freshness
       FROM question_attempts qa
       JOIN questions q ON q.id = qa.question_id
+      JOIN topics t ON t.id = q.topic_id AND t.subject_id = q.subject_id
+      JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
       WHERE qa.user_id = ? AND q.subject_id = ?
         AND qa.created_at >= datetime('now', '-${RECENT_EVIDENCE_DAYS} days')
     `).bind(userId, subjectId).first<{ count: number; freshness: string | null }>(),
@@ -367,8 +376,13 @@ async function getEvidenceSnapshot(db: D1Database, userId: string, subjectId: st
         COUNT(DISTINCT CASE WHEN COALESCE(up.questions_attempted, 0) > 0
           THEN t.id END) AS covered
       FROM topics t
+      JOIN subjects s ON s.id = t.subject_id AND s.is_active = 1
       LEFT JOIN user_progress up ON up.topic_id = t.id AND up.user_id = ?
       WHERE t.subject_id = ?
+        AND EXISTS (
+          SELECT 1 FROM questions q
+          WHERE q.topic_id = t.id AND q.subject_id = t.subject_id
+        )
     `).bind(userId, subjectId).first<{ total: number; covered: number }>(),
   ]);
   const evidenceCount = Number(attempts?.count ?? 0);
@@ -393,8 +407,13 @@ export async function upsertExamReadiness(
   const { results } = await db.prepare(`
     SELECT t.id, COALESCE(up.mastery_level, 0) AS mastery_level
     FROM topics t
+    JOIN subjects s ON s.id = t.subject_id AND s.is_active = 1
     LEFT JOIN user_progress up ON up.topic_id = t.id AND up.user_id = ?
     WHERE t.subject_id = ?
+      AND EXISTS (
+        SELECT 1 FROM questions q
+        WHERE q.topic_id = t.id AND q.subject_id = t.subject_id
+      )
   `).bind(userId, subjectId).all<{ id: string; mastery_level: number }>();
   const weak = results.filter((row) => Number(row.mastery_level) < 50).map((row) => row.id);
   const strong = results.filter((row) => Number(row.mastery_level) >= 70).map((row) => row.id);
@@ -446,7 +465,9 @@ function objectivePredicate(): string {
 async function questionById(db: D1Database, questionId: string): Promise<QuestionRow | null> {
   return db.prepare(`
     SELECT q.*, t.name AS topic_name
-    FROM questions q LEFT JOIN topics t ON t.id = q.topic_id
+    FROM questions q
+    JOIN topics t ON t.id = q.topic_id AND t.subject_id = q.subject_id
+    JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
     WHERE q.id = ? AND ${objectivePredicate()}
   `).bind(questionId).first<QuestionRow>();
 }
@@ -462,7 +483,9 @@ async function pickQuestion(
   const topicId = envelope.topicQueue[0] ?? null;
   const base = `
     SELECT q.*, t.name AS topic_name
-    FROM questions q LEFT JOIN topics t ON t.id = q.topic_id
+    FROM questions q
+    JOIN topics t ON t.id = q.topic_id AND t.subject_id = q.subject_id
+    JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
     WHERE q.subject_id = ? AND (q.exam_type_id = ? OR q.exam_type_id IS NULL)
       AND q.id NOT IN (SELECT value FROM json_each(?))
       AND ${objectivePredicate()}
@@ -480,15 +503,22 @@ async function pickQuestion(
     envelope.topicQueue = envelope.topicQueue.slice(1);
   }
   return db.prepare(`${base}
-    ORDER BY CASE WHEN q.topic_id IS NULL THEN 0 ELSE 1 END,
-      CASE q.difficulty WHEN ? THEN 0 WHEN 'medium' THEN 1 WHEN 'hard' THEN 2
+    ORDER BY CASE q.difficulty WHEN ? THEN 0 WHEN 'medium' THEN 1 WHEN 'hard' THEN 2
       WHEN 'easy' THEN 3 ELSE 4 END, q.id LIMIT 1
   `).bind(subjectId, examId, used, envelope.currentDifficulty).first<QuestionRow>();
 }
 
 async function topicQueue(db: D1Database, subjectId: string): Promise<string[]> {
   const { results } = await db.prepare(`
-    SELECT t.id FROM topics t WHERE t.subject_id = ? ORDER BY t.display_order ASC, t.id ASC
+    SELECT t.id
+    FROM topics t
+    JOIN subjects s ON s.id = t.subject_id AND s.is_active = 1
+    WHERE t.subject_id = ?
+      AND EXISTS (
+        SELECT 1 FROM questions q
+        WHERE q.topic_id = t.id AND q.subject_id = t.subject_id
+      )
+    ORDER BY t.display_order ASC, t.id ASC
   `).bind(subjectId).all<{ id: string }>();
   return results.map((row) => row.id);
 }
@@ -538,8 +568,13 @@ async function getRoadmap(db: D1Database, userId: string, examType: string, subj
       COALESCE(up.mastery_level, 0) AS mastery_score,
       COALESCE(up.questions_attempted, 0) AS questions_attempted
     FROM topics t
+    JOIN subjects s ON s.id = t.subject_id AND s.is_active = 1
     LEFT JOIN user_progress up ON up.topic_id = t.id AND up.user_id = ?
     WHERE t.subject_id = ?
+      AND EXISTS (
+        SELECT 1 FROM questions q
+        WHERE q.topic_id = t.id AND q.subject_id = t.subject_id
+      )
   `).bind(userId, subjectId).all<RoadmapRow>();
   const rank = { critical: 0, high: 1, medium: 2, low: 3 } as const;
   return results.map((row) => mapRoadmap(row, examType, subjectId))
@@ -843,6 +878,8 @@ guidanceApp.post('/assessment/:sessionId/answer', async (c) => {
     FROM guidance_session_answers gsa
     JOIN guidance_sessions gs ON gs.id = gsa.session_id
     JOIN questions q ON q.id = gsa.question_id
+    JOIN topics t ON t.id = q.topic_id AND t.subject_id = q.subject_id
+    JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
     WHERE gsa.session_id = ? AND gsa.idempotency_key = ? AND gs.user_id = ?
   `).bind(sessionId, idempotencyKey, userId).first<{ is_correct: number; question_id: string; explanation: string | null }>();
   if (replay) {

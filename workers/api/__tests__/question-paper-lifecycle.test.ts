@@ -201,7 +201,9 @@ function createDb(): Database.Database {
       ('subject_math', 'Core Mathematics', 'wassce-core-mathematics', 'exam_wassce'),
       ('subject_igcse', 'IGCSE Mathematics', 'igcse-mathematics', 'exam_igcse'),
       ('subject_unknown', 'Unknown Mathematics', 'unknown-mathematics', 'exam_unknown');
-    INSERT INTO topics (id, subject_id, name) VALUES ('topic_math', 'subject_math', 'Arithmetic');
+    INSERT INTO topics (id, subject_id, name) VALUES
+      ('topic_math', 'subject_math', 'Arithmetic'),
+      ('topic_igcse', 'subject_igcse', 'International Mathematics');
     INSERT INTO paper_types (id, name) VALUES ('paper_type_1', 'Paper 1');
     INSERT INTO past_papers (id, exam_type_id, subject_id, paper_type_id, year, title, total_marks, time_allowed)
     VALUES
@@ -213,7 +215,7 @@ function createDb(): Database.Database {
     ) VALUES
       ('q_free', 'topic_math', 'subject_math', 'exam_wassce', 'paper_1', 'What is 2 + 2?', 'multiple_choice', '[{"id":"A","text":"3"},{"id":"B","text":"4"}]', '4', 'Two plus two is four.', 3, 2, 1, 'A'),
       ('q_foreign', 'topic_math', 'subject_math', 'exam_wassce', 'paper_2', 'What is 3 + 3?', 'multiple_choice', '["5","6"]', 'B', 'Three plus three is six.', 3, 2, 1, 'A'),
-      ('q_igcse', NULL, 'subject_igcse', 'exam_igcse', NULL, 'International question', 'short_answer', NULL, 'answer', 'Explanation', 3, 1, 1, 'A'),
+      ('q_igcse', 'topic_igcse', 'subject_igcse', 'exam_igcse', NULL, 'International question', 'short_answer', NULL, 'answer', 'Explanation', 3, 1, 1, 'A'),
       ('q_unknown', NULL, 'subject_unknown', 'exam_unknown', NULL, 'Unknown board question', 'short_answer', NULL, 'answer', 'Explanation', 3, 1, 1, 'A');
     INSERT INTO paper_attempts (id, user_id, paper_id, status, time_allowed)
     VALUES ('attempt_1', 'student_1', 'paper_1', 'in_progress', 60);

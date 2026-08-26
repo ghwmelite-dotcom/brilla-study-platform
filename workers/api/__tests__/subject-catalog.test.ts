@@ -83,6 +83,7 @@ function makeRouteDb(
     subjectCount?: number | null;
     subjectRows?: Array<Record<string, unknown>>;
     questionRows?: Array<Record<string, unknown>>;
+    topicRows?: Array<Record<string, unknown>>;
     paperRow?: Record<string, unknown> | null;
     paperQuestionRows?: Array<Record<string, unknown>>;
   } = {},
@@ -141,11 +142,13 @@ function makeRouteDb(
         all: vi.fn(async () => ({
           results: sql.includes("q.past_paper_id = ?")
             ? (options.paperQuestionRows ?? [])
-            : sql.includes("FROM subjects s")
-              ? (options.subjectRows ?? [])
-              : sql.includes("FROM questions q")
-                ? (options.questionRows ?? [])
-                : (options.subjectRows ?? []),
+            : sql.includes("FROM topics t")
+              ? (options.topicRows ?? [])
+              : sql.includes("FROM subjects s")
+                ? (options.subjectRows ?? [])
+                : sql.includes("FROM questions q")
+                  ? (options.questionRows ?? [])
+                  : (options.subjectRows ?? []),
         })),
         run: vi.fn(async () => ({ success: true })),
       };
@@ -234,6 +237,77 @@ describe("public subject availability routes", () => {
     ).toBe(true);
   });
 
+  it("advertises only the 166 usable NSMQ Physics questions and excludes both quarantines", async () => {
+    const physics = makeRouteDb({
+      subjectRows: [
+        {
+          id: "subj_nsmq_physics",
+          name: "Physics",
+          slug: "physics",
+          exam_type_id: "exam_nsmq",
+          is_active: 1,
+          question_count: 166,
+          topic_count: 8,
+        },
+      ],
+      topicRows: [
+        { id: "topic-nsmq-physics-1", subject_id: "subj_nsmq_physics", question_count: 100 },
+        { id: "topic-nsmq-physics-2", subject_id: "subj_nsmq_physics", question_count: 66 },
+      ],
+      questionRows: [],
+    });
+
+    const catalogResponse = await worker.fetch(
+      new Request("http://test/api/subjects?exam_type=nsmq"),
+      routeEnv(physics.db),
+    );
+    const catalog = (await catalogResponse.json()) as {
+      data: Array<{ questionCount: number }>;
+    };
+    expect(catalog.data[0]?.questionCount).toBe(166);
+
+    const topicsResponse = await worker.fetch(
+      new Request("http://test/api/topics?subject=subj_nsmq_physics"),
+      routeEnv(physics.db),
+    );
+    const topics = (await topicsResponse.json()) as {
+      data: Array<{ question_count: number }>;
+    };
+    expect(
+      topics.data.reduce((sum, topic) => sum + Number(topic.question_count), 0),
+    ).toBe(catalog.data[0]?.questionCount);
+
+    for (const questionId of ["nsmq_phy_rid_001", "nsmq_phy_rid_003"]) {
+      const response = await worker.fetch(
+        await authenticatedRequest(`http://test/api/questions/${questionId}`),
+        routeEnv(physics.db),
+      );
+      expect(response.status).toBe(404);
+    }
+
+    const catalogueSql = physics.calls.find(({ sql }) =>
+      sql.includes("COUNT(*) AS question_count"),
+    )?.sql;
+    expect(catalogueSql).toContain("JOIN topics usable_topic");
+    expect(catalogueSql).toContain("usable_topic.subject_id = q.subject_id");
+
+    const topicSql = physics.calls.find(({ sql }) =>
+      sql.includes("COUNT(q.id) AS question_count"),
+    )?.sql;
+    expect(topicSql).toContain("q.subject_id = t.subject_id");
+
+    const quarantinedReads = physics.calls.filter(
+      ({ sql, args }) =>
+        sql.includes("WHERE q.id = ?") &&
+        (args.includes("nsmq_phy_rid_001") || args.includes("nsmq_phy_rid_003")),
+    );
+    expect(quarantinedReads).toHaveLength(2);
+    for (const { sql } of quarantinedReads) {
+      expect(sql).toContain("JOIN topics question_topic");
+      expect(sql).toContain("question_topic.subject_id = q.subject_id");
+    }
+  });
+
   it("returns active subject detail with slug-bound live counts and status metadata", async () => {
     const { db, calls } = makeRouteDb({ subjectCount: 20 });
     const response = await worker.fetch(
@@ -280,6 +354,13 @@ describe("public subject availability routes", () => {
     expect(
       calls.filter(({ sql }) => sql.includes("FROM questions q")),
     ).toHaveLength(0);
+    const availabilityCountSql = calls.find(({ sql }) =>
+      sql.includes("AS question_count"),
+    )?.sql;
+    expect(availabilityCountSql).toContain("COUNT(question_topic.id)");
+    expect(availabilityCountSql).toContain(
+      "question_topic.subject_id = q.subject_id",
+    );
   });
 
   it("returns 404 for an unknown or inactive subject", async () => {

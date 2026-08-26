@@ -2154,6 +2154,8 @@ const subjectCatalogSelect = `
     SELECT q.subject_id, COUNT(*) AS question_count,
            COUNT(qcr.question_id) AS automated_beta_count
     FROM questions q
+    JOIN topics usable_topic
+      ON usable_topic.id = q.topic_id AND usable_topic.subject_id = q.subject_id
     LEFT JOIN question_content_releases qcr
       ON qcr.question_id = q.id
      AND qcr.quality_assurance = 'automated_beta'
@@ -2233,7 +2235,8 @@ publicApp.get('/topics', async (c) => {
       SELECT t.*, COUNT(q.id) AS question_count
       FROM topics t
       JOIN subjects subject ON subject.id = t.subject_id AND subject.is_active = 1
-      LEFT JOIN questions q ON q.topic_id = t.id
+      LEFT JOIN questions q
+        ON q.topic_id = t.id AND q.subject_id = t.subject_id
     `;
     const params: string[] = [];
 
@@ -2327,21 +2330,25 @@ async function getQuestionReadContext(
   if (subjectIdentifier) {
     subject = await c.env.DB.prepare(`
       SELECT s.id, s.slug, et.slug AS exam_type_slug,
-             COUNT(q.id) AS question_count
+             COUNT(question_topic.id) AS question_count
       FROM subjects s
       JOIN exam_types et ON et.id = s.exam_type_id
       LEFT JOIN questions q ON q.subject_id = s.id
+      LEFT JOIN topics question_topic
+        ON question_topic.id = q.topic_id AND question_topic.subject_id = q.subject_id
       WHERE (s.id = ? OR s.slug = ?) AND s.is_active = 1
       GROUP BY s.id, s.slug, et.slug
     `).bind(subjectIdentifier, subjectIdentifier).first<SubjectBankAccessRow>();
   } else if (topicIdentifier) {
     subject = await c.env.DB.prepare(`
       SELECT s.id, s.slug, et.slug AS exam_type_slug,
-             COUNT(q.id) AS question_count
+             COUNT(question_topic.id) AS question_count
       FROM topics t
       JOIN subjects s ON s.id = t.subject_id AND s.is_active = 1
       JOIN exam_types et ON et.id = s.exam_type_id
       LEFT JOIN questions q ON q.subject_id = s.id
+      LEFT JOIN topics question_topic
+        ON question_topic.id = q.topic_id AND question_topic.subject_id = q.subject_id
       WHERE t.id = ?
       GROUP BY s.id, s.slug, et.slug
     `).bind(topicIdentifier).first<SubjectBankAccessRow>();
@@ -2405,6 +2412,8 @@ publicApp.get('/questions', async (c) => {
       SELECT q.*
       FROM questions q
       JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
+      JOIN topics question_topic
+        ON question_topic.id = q.topic_id AND question_topic.subject_id = q.subject_id
       JOIN exam_types et ON et.id = s.exam_type_id
       WHERE 1=1
     `;
@@ -2462,6 +2471,8 @@ publicApp.get('/questions/:id', async (c) => {
       SELECT q.*, s.slug AS subject_slug, et.slug AS exam_type_slug
       FROM questions q
       JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
+      JOIN topics question_topic
+        ON question_topic.id = q.topic_id AND question_topic.subject_id = q.subject_id
       JOIN exam_types et ON et.id = s.exam_type_id
       WHERE q.id = ?
     `).bind(id).first<Record<string, unknown>>();
@@ -3308,7 +3319,8 @@ publicApp.get('/papers/:id', async (c) => {
     const { results: questions } = await c.env.DB.prepare(`
       SELECT q.*, t.name as topic_name
       FROM questions q
-      LEFT JOIN topics t ON q.topic_id = t.id
+      JOIN topics t
+        ON t.id = q.topic_id AND t.subject_id = q.subject_id
       WHERE q.past_paper_id = ?
       ORDER BY q.section, q.question_number
     `).bind(id).all();
@@ -3337,7 +3349,9 @@ publicApp.get('/essays/:questionId', async (c) => {
       SELECT eq.*, q.question_text, q.marks, q.difficulty, s.name as subject_name
       FROM essay_questions eq
       JOIN questions q ON eq.question_id = q.id
-      JOIN subjects s ON q.subject_id = s.id
+      JOIN subjects s ON q.subject_id = s.id AND s.is_active = 1
+      JOIN topics question_topic
+        ON question_topic.id = q.topic_id AND question_topic.subject_id = q.subject_id
       WHERE eq.question_id = ?
     `).bind(questionId).first();
 
@@ -3500,7 +3514,13 @@ publicApp.get('/battles/available', async (c) => {
       LIMIT 20
     `).all();
 
-    return c.json({ success: true, data: results });
+    const safeBattles = results.map((row: Record<string, unknown>) => {
+      const safeBattle = { ...row };
+      delete safeBattle.questions;
+      return safeBattle;
+    });
+
+    return c.json({ success: true, data: safeBattles });
   } catch {
     return c.json({ success: false, error: 'Failed to fetch battles' }, 500);
   }
@@ -3534,10 +3554,45 @@ publicApp.get('/battles/:id', async (c) => {
       return c.json({ success: false, error: 'Battle not found' }, 404);
     }
 
-    // Parse questions if present
+    const parsedQuestions: unknown = battle.questions
+      ? JSON.parse(battle.questions as string)
+      : [];
+    const storedQuestions = Array.isArray(parsedQuestions)
+      ? parsedQuestions.filter(
+          (question): question is Record<string, unknown> =>
+            Boolean(question) && typeof question === 'object' && !Array.isArray(question),
+        )
+      : [];
+    const storedQuestionIds = [
+      ...new Set(
+        storedQuestions
+          .map((question) => question.id)
+          .filter((questionId): questionId is string => typeof questionId === 'string'),
+      ),
+    ];
+
+    let eligibleQuestionIds = new Set<string>();
+    if (storedQuestionIds.length > 0) {
+      const placeholders = storedQuestionIds.map(() => '?').join(', ');
+      const { results: eligibleQuestions } = await c.env.DB.prepare(`
+        SELECT q.id
+        FROM questions q
+        JOIN subjects subject
+          ON subject.id = q.subject_id AND subject.is_active = 1
+        JOIN topics question_topic
+          ON question_topic.id = q.topic_id AND question_topic.subject_id = q.subject_id
+        WHERE q.id IN (${placeholders})
+      `).bind(...storedQuestionIds).all<{ id: string }>();
+      eligibleQuestionIds = new Set(eligibleQuestions.map((question) => question.id));
+    }
+
+    const safeBattle = { ...battle };
+    delete safeBattle.questions;
     const data = {
-      ...battle,
-      questions: battle.questions ? JSON.parse(battle.questions as string) : [],
+      ...safeBattle,
+      questions: storedQuestions
+        .filter((question) => eligibleQuestionIds.has(String(question.id)))
+        .map((question) => sanitizeQuestionForStudent(question)),
     };
 
     return c.json({ success: true, data });
@@ -3925,6 +3980,9 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
              qa.points_earned, q.correct_answer, q.explanation
       FROM question_attempts qa
       JOIN questions q ON q.id = qa.question_id
+      JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
+      JOIN topics question_topic
+        ON question_topic.id = q.topic_id AND question_topic.subject_id = q.subject_id
       WHERE qa.user_id = ? AND qa.client_request_id = ?
     `).bind(userId, clientRequestId).first<{
       id: string;
@@ -3982,6 +4040,8 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
       SELECT q.*, s.slug AS subject_slug, et.slug AS exam_type_slug
       FROM questions q
       JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
+      JOIN topics question_topic
+        ON question_topic.id = q.topic_id AND question_topic.subject_id = q.subject_id
       JOIN exam_types et ON et.id = s.exam_type_id
       WHERE q.id = ?
     `).bind(questionId).first();
@@ -4741,17 +4801,20 @@ protectedApp.post('/battles', async (c) => {
   try {
     // Fetch random questions for the battle
     let questionsQuery = `
-      SELECT * FROM questions
-      WHERE question_type IN ('multiple_choice', 'direct_answer')
+      SELECT q.* FROM questions q
+      JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
+      JOIN topics question_topic
+        ON question_topic.id = q.topic_id AND question_topic.subject_id = q.subject_id
+      WHERE q.question_type IN ('multiple_choice', 'direct_answer')
     `;
     const params: (string | number)[] = [];
 
     if (subjectId) {
-      questionsQuery += ' AND subject_id = ?';
+      questionsQuery += ' AND q.subject_id = ?';
       params.push(subjectId);
     }
     if (difficulty) {
-      questionsQuery += ' AND difficulty = ?';
+      questionsQuery += ' AND q.difficulty = ?';
       params.push(difficulty);
     }
 
@@ -5125,6 +5188,10 @@ protectedApp.put('/papers/attempts/:attemptId/answer', async (c) => {
       SELECT pa.id, pa.paper_id, q.id AS question_id
       FROM paper_attempts pa
       JOIN questions q ON q.past_paper_id = pa.paper_id AND q.id = ?
+      JOIN subjects question_subject
+        ON question_subject.id = q.subject_id AND question_subject.is_active = 1
+      JOIN topics question_topic
+        ON question_topic.id = q.topic_id AND question_topic.subject_id = q.subject_id
       WHERE pa.id = ? AND pa.user_id = ? AND pa.status = 'in_progress'
     `).bind(questionId, attemptId, userId).first();
 
