@@ -1,0 +1,2964 @@
+{
+  "batchId": "wassce-technical-beta-002",
+  "status": "approved_for_production",
+  "examTypeId": "exam_wassce",
+  "provenance": [
+    {
+      "publisher": "West African Examinations Council, Ghana",
+      "title": "WASSCE for School Candidates technical subject catalogue",
+      "url": "https://waecgh.org/home/wassce-school/",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "West African Examinations Council, Ghana",
+      "title": "WASSCE for School Candidates 2026 final timetable",
+      "url": "https://waecgh.org/wp-content/uploads/2026/03/FINAL-TIMETABLE-FOR-WASSCE-SC-2026-GHANA-ONLY-NEW-TAD.pdf",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "West African Examinations Council, Ghana",
+      "title": "WASSCE 2023 Chief Examiners Report: Auto Mechanics 2 and 3",
+      "url": "https://waecgh.org/wp-content/uploads/2025/05/CHIEF-EXAMINERS-REPORTS.-WASSCE-SC-2023.pdf",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "West African Examinations Council, Ghana",
+      "title": "WASSCE for School Candidates technical subject catalogue",
+      "url": "https://waecgh.org/home/wassce-school/",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "West African Examinations Council, Ghana",
+      "title": "WASSCE for School Candidates 2026 final timetable",
+      "url": "https://waecgh.org/wp-content/uploads/2026/03/FINAL-TIMETABLE-FOR-WASSCE-SC-2026-GHANA-ONLY-NEW-TAD.pdf",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "West African Examinations Council, Ghana",
+      "title": "WASSCE 2023 Chief Examiners Report: Electronics 2 and 3",
+      "url": "https://waecgh.org/wp-content/uploads/2025/05/CHIEF-EXAMINERS-REPORTS.-WASSCE-SC-2023.pdf",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-08-26T00:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep curriculum-aligned technical practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_wassce_auto_mech",
+      "specificationCode": "BRILLA-WASSCE-AUTO-MECH-BETA-002",
+      "release": {
+        "contentLabel": "Original BrillaPrep transitional Auto Mechanics practice aligned to WAEC Ghana examiner evidence; not official WAEC examination material or a copied past paper.",
+        "sourceUrl": "https://waecgh.org/wp-content/uploads/2025/05/CHIEF-EXAMINERS-REPORTS.-WASSCE-SC-2023.pdf",
+        "officialExamBoardContent": false,
+        "feedbackEnabled": true
+      },
+      "topics": [
+        {
+          "code": "AM-1",
+          "title": "Workshop safety, tools and measurement",
+          "objective": "Select automotive workshop tools, apply safe working practices and interpret basic measurements."
+        },
+        {
+          "code": "AM-2",
+          "title": "Engine construction and operating principles",
+          "objective": "Explain four-stroke engine operation and identify the functions of major engine components."
+        },
+        {
+          "code": "AM-3",
+          "title": "Fuel, air intake and exhaust systems",
+          "objective": "Analyse petrol and diesel fuel delivery, air intake, combustion and exhaust-gas handling."
+        },
+        {
+          "code": "AM-4",
+          "title": "Lubrication and cooling systems",
+          "objective": "Explain pressure lubrication, coolant circulation, temperature control and related fault symptoms."
+        },
+        {
+          "code": "AM-5",
+          "title": "Starting, charging and ignition systems",
+          "objective": "Apply battery, starter, alternator and spark-ignition principles to automotive electrical faults."
+        },
+        {
+          "code": "AM-6",
+          "title": "Clutch, gearbox and final drive",
+          "objective": "Explain torque transmission through clutches, gearboxes, propeller shafts, differentials and drive shafts."
+        },
+        {
+          "code": "AM-7",
+          "title": "Steering, suspension and braking",
+          "objective": "Explain vehicle directional control, ride support and hydraulic braking operation and safety."
+        },
+        {
+          "code": "AM-8",
+          "title": "Wheels, tyres, maintenance and diagnosis",
+          "objective": "Interpret tyre data, plan preventive maintenance and diagnose common vehicle symptoms systematically."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_was_auto_mech_b002_001",
+          "original": true,
+          "topicCode": "AM-1",
+          "type": "multiple_choice",
+          "prompt": "Which tool applies a manufacturer-specified tightening torque to an engine fastener?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A torque wrench",
+              "rationale": "This is the supported answer. A torque wrench is calibrated to apply a selected turning moment, helping prevent fasteners from being left loose or overstressed."
+            },
+            {
+              "label": "B",
+              "text": "A breaker bar",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A ring spanner",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "An impact wrench",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A torque wrench is calibrated to apply a selected turning moment, helping prevent fasteners from being left loose or overstressed. Therefore the correct answer is A: A torque wrench.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_auto_mech_b002_002",
+          "original": true,
+          "topicCode": "AM-1",
+          "type": "multiple_choice",
+          "prompt": "What is the safest first action before raising a vehicle with a workshop jack?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Raise one side before applying the parking brake",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Park on firm level ground and secure the vehicle against movement",
+              "rationale": "This is the supported answer. Stable ground, wheel chocks and the parking brake reduce unintended movement before lifting; axle stands are then required before working underneath."
+            },
+            {
+              "label": "C",
+              "text": "Use the nearest body panel as the lifting point",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Rely on the hydraulic jack without wheel chocks",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Stable ground, wheel chocks and the parking brake reduce unintended movement before lifting; axle stands are then required before working underneath. Therefore the correct answer is B: Park on firm level ground and secure the vehicle against movement.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_auto_mech_b002_003",
+          "original": true,
+          "topicCode": "AM-1",
+          "type": "multiple_choice",
+          "prompt": "Which measuring instrument is most suitable for checking a crankshaft journal diameter accurately?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A vernier depth gauge",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A dial bore gauge",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "An outside micrometer",
+              "rationale": "This is the supported answer. An outside micrometer measures external diameters precisely enough to compare a journal with its wear and service limits."
+            },
+            {
+              "label": "D",
+              "text": "A feeler gauge",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "An outside micrometer measures external diameters precisely enough to compare a journal with its wear and service limits. Therefore the correct answer is C: An outside micrometer.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_auto_mech_b002_004",
+          "original": true,
+          "topicCode": "AM-1",
+          "type": "multiple_choice",
+          "prompt": "Why should compressed air not be directed at a person in an automotive workshop?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Its pressure is too low to move workshop debris",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It is safe when the nozzle is held at arm length",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Only the noise from the air jet presents a hazard",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It can drive particles into the eyes or body and cause serious injury",
+              "rationale": "This is the supported answer. Compressed air can propel debris at high speed or penetrate tissue, so guarded nozzles, eye protection and safe cleaning methods are essential."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Compressed air can propel debris at high speed or penetrate tissue, so guarded nozzles, eye protection and safe cleaning methods are essential. Therefore the correct answer is D: It can drive particles into the eyes or body and cause serious injury.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_auto_mech_b002_005",
+          "original": true,
+          "topicCode": "AM-1",
+          "type": "multiple_choice",
+          "prompt": "What does a vehicle hoist safety lock do after the vehicle is raised?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It mechanically supports the lift against unintended lowering",
+              "rationale": "This is the supported answer. The mechanical lock carries or secures the raised structure so a hydraulic pressure loss does not allow uncontrolled descent."
+            },
+            {
+              "label": "B",
+              "text": "It maintains support only by trapping hydraulic pressure",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It compensates for unequal vehicle weight automatically",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It prevents the hoist motor from restarting unexpectedly",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The mechanical lock carries or secures the raised structure so a hydraulic pressure loss does not allow uncontrolled descent. Therefore the correct answer is A: It mechanically supports the lift against unintended lowering.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_auto_mech_b002_006",
+          "original": true,
+          "topicCode": "AM-2",
+          "type": "multiple_choice",
+          "prompt": "During which four-stroke engine stroke are both valves normally closed while the piston moves upward?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The exhaust stroke",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The compression stroke",
+              "rationale": "This is the supported answer. On the compression stroke the trapped charge is compressed as the piston rises, requiring the inlet and exhaust valves to remain closed."
+            },
+            {
+              "label": "C",
+              "text": "The induction stroke",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The power stroke",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "On the compression stroke the trapped charge is compressed as the piston rises, requiring the inlet and exhaust valves to remain closed. Therefore the correct answer is B: The compression stroke.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_auto_mech_b002_007",
+          "original": true,
+          "topicCode": "AM-2",
+          "type": "multiple_choice",
+          "prompt": "What is the main function of piston rings in a reciprocating engine?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Locate the piston at top dead centre",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Transfer camshaft motion to the valves",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Seal combustion pressure while controlling oil on the cylinder wall",
+              "rationale": "This is the supported answer. Compression rings limit gas leakage and the oil-control ring regulates the oil film, supporting compression, lubrication and heat transfer."
+            },
+            {
+              "label": "D",
+              "text": "Control coolant flow through the cylinder head",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Compression rings limit gas leakage and the oil-control ring regulates the oil film, supporting compression, lubrication and heat transfer. Therefore the correct answer is C: Seal combustion pressure while controlling oil on the cylinder wall.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_auto_mech_b002_008",
+          "original": true,
+          "topicCode": "AM-2",
+          "type": "multiple_choice",
+          "prompt": "Which component converts the pistons’ reciprocating motion into rotary motion?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The camshaft",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The flywheel",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The connecting rod",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The crankshaft",
+              "rationale": "This is the supported answer. Connecting rods transmit piston force to offset crankpins, causing the crankshaft to rotate and deliver engine torque."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Connecting rods transmit piston force to offset crankpins, causing the crankshaft to rotate and deliver engine torque. Therefore the correct answer is D: The crankshaft.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_auto_mech_b002_009",
+          "original": true,
+          "topicCode": "AM-2",
+          "type": "multiple_choice",
+          "prompt": "What does engine compression ratio compare?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Cylinder volume at bottom dead centre with volume at top dead centre",
+              "rationale": "This is the supported answer. Compression ratio is the maximum cylinder volume divided by the minimum clearance volume and influences efficiency and combustion requirements."
+            },
+            {
+              "label": "B",
+              "text": "Swept volume with total engine displacement",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Combustion pressure before and after ignition",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Cylinder bore with piston stroke",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Compression ratio is the maximum cylinder volume divided by the minimum clearance volume and influences efficiency and combustion requirements. Therefore the correct answer is A: Cylinder volume at bottom dead centre with volume at top dead centre.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_auto_mech_b002_010",
+          "original": true,
+          "topicCode": "AM-2",
+          "type": "multiple_choice",
+          "prompt": "Why is valve clearance provided in a conventional valve train?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To increase valve lift as speed rises",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "To allow thermal expansion while ensuring the valves can fully close",
+              "rationale": "This is the supported answer. A correct cold clearance accommodates expansion of valve-train parts; too little can prevent sealing and too much causes noise and timing loss."
+            },
+            {
+              "label": "C",
+              "text": "To hold each valve slightly open during compression",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "To compensate for piston-ring wear",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A correct cold clearance accommodates expansion of valve-train parts; too little can prevent sealing and too much causes noise and timing loss. Therefore the correct answer is B: To allow thermal expansion while ensuring the valves can fully close.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_auto_mech_b002_011",
+          "original": true,
+          "topicCode": "AM-3",
+          "type": "multiple_choice",
+          "prompt": "What is the primary function of a petrol-engine fuel pump?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Meter the exact air-fuel ratio at each injector",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Return fuel vapour directly to the exhaust",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Deliver fuel from the tank to the engine fuel-metering system",
+              "rationale": "This is the supported answer. The fuel pump supplies petrol at the required flow and pressure to the carburettor or injection rail, not to lubrication or braking circuits."
+            },
+            {
+              "label": "D",
+              "text": "Maintain pressure in the engine oil galleries",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The fuel pump supplies petrol at the required flow and pressure to the carburettor or injection rail, not to lubrication or braking circuits. Therefore the correct answer is C: Deliver fuel from the tank to the engine fuel-metering system.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_auto_mech_b002_012",
+          "original": true,
+          "topicCode": "AM-3",
+          "type": "multiple_choice",
+          "prompt": "Why does a diesel engine use a high-pressure injection system?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To compress intake air before it enters the cylinder",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "To ignite each charge with an electrical spark",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "To meter lubricant into the combustion chamber",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "To atomise and meter fuel into highly compressed hot air",
+              "rationale": "This is the supported answer. Fine, correctly timed injection promotes mixing and auto-ignition in the cylinder after compression has raised the air temperature."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Fine, correctly timed injection promotes mixing and auto-ignition in the cylinder after compression has raised the air temperature. Therefore the correct answer is D: To atomise and meter fuel into highly compressed hot air.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_auto_mech_b002_013",
+          "original": true,
+          "topicCode": "AM-3",
+          "type": "multiple_choice",
+          "prompt": "What likely happens when an engine air filter becomes severely restricted?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Airflow falls, reducing performance and potentially enriching the mixture",
+              "rationale": "This is the supported answer. A blocked filter restricts intake air; the resulting mixture or airflow error can reduce power, increase fuel use and raise exhaust smoke."
+            },
+            {
+              "label": "B",
+              "text": "Intake airflow rises and the mixture becomes leaner",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Fuel pressure rises enough to improve acceleration",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Exhaust back pressure falls and engine speed increases",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A blocked filter restricts intake air; the resulting mixture or airflow error can reduce power, increase fuel use and raise exhaust smoke. Therefore the correct answer is A: Airflow falls, reducing performance and potentially enriching the mixture.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_auto_mech_b002_014",
+          "original": true,
+          "topicCode": "AM-3",
+          "type": "multiple_choice",
+          "prompt": "What is the purpose of a catalytic converter in the exhaust system?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Silence exhaust pulses by absorbing sound energy",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Reduce harmful exhaust pollutants through chemical reactions",
+              "rationale": "This is the supported answer. A catalyst promotes reactions that convert carbon monoxide, hydrocarbons and oxides of nitrogen into less harmful exhaust products when operating correctly."
+            },
+            {
+              "label": "C",
+              "text": "Measure oxygen content for the engine controller",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Recirculate exhaust gas into the intake manifold",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A catalyst promotes reactions that convert carbon monoxide, hydrocarbons and oxides of nitrogen into less harmful exhaust products when operating correctly. Therefore the correct answer is B: Reduce harmful exhaust pollutants through chemical reactions.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_auto_mech_b002_015",
+          "original": true,
+          "topicCode": "AM-3",
+          "type": "multiple_choice",
+          "prompt": "Which symptom most directly suggests a leaking exhaust manifold near the cylinder head?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A low booming sound only at the tailpipe",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A whistle that continues after the engine stops",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A sharp ticking noise that changes with engine speed",
+              "rationale": "This is the supported answer. Pulsed exhaust gas escaping at the manifold joint commonly produces a ticking sound that follows engine speed and may leave soot marks."
+            },
+            {
+              "label": "D",
+              "text": "A silent exhaust with unusually high back pressure",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Pulsed exhaust gas escaping at the manifold joint commonly produces a ticking sound that follows engine speed and may leave soot marks. Therefore the correct answer is C: A sharp ticking noise that changes with engine speed.",
+          "difficulty": "hard",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_auto_mech_b002_016",
+          "original": true,
+          "topicCode": "AM-4",
+          "type": "multiple_choice",
+          "prompt": "What is the main function of the engine oil pump?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Cool the lubricant by passing it through the radiator",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Regulate oil viscosity as engine speed changes",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Separate fuel that has entered the engine oil",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Circulate oil under pressure to moving engine parts",
+              "rationale": "This is the supported answer. The oil pump draws lubricant from the sump and supplies galleries feeding bearings and other moving surfaces to maintain a protective film."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The oil pump draws lubricant from the sump and supplies galleries feeding bearings and other moving surfaces to maintain a protective film. Therefore the correct answer is D: Circulate oil under pressure to moving engine parts.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_auto_mech_b002_017",
+          "original": true,
+          "topicCode": "AM-4",
+          "type": "multiple_choice",
+          "prompt": "Why is an engine thermostat used in the cooling system?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Control coolant flow so the engine reaches and maintains operating temperature",
+              "rationale": "This is the supported answer. The thermostat restricts radiator flow when cold and opens near its rated temperature, balancing warm-up speed with heat rejection."
+            },
+            {
+              "label": "B",
+              "text": "Increase coolant pressure whenever speed rises",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Keep maximum radiator flow from a cold start",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Switch the cooling fan on at every temperature",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The thermostat restricts radiator flow when cold and opens near its rated temperature, balancing warm-up speed with heat rejection. Therefore the correct answer is A: Control coolant flow so the engine reaches and maintains operating temperature.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_auto_mech_b002_018",
+          "original": true,
+          "topicCode": "AM-4",
+          "type": "multiple_choice",
+          "prompt": "What does a low oil-pressure warning require the driver to do?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Continue slowly until the next oil change",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Stop the engine safely and investigate before continued operation",
+              "rationale": "This is the supported answer. Insufficient oil pressure can damage bearings within seconds, so continuing to run the engine risks severe seizure or wear."
+            },
+            {
+              "label": "C",
+              "text": "Increase engine speed to force the warning lamp off",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Add coolant before checking lubricant level",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Insufficient oil pressure can damage bearings within seconds, so continuing to run the engine risks severe seizure or wear. Therefore the correct answer is B: Stop the engine safely and investigate before continued operation.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_auto_mech_b002_019",
+          "original": true,
+          "topicCode": "AM-4",
+          "type": "multiple_choice",
+          "prompt": "Why must a hot pressurised radiator cap not be removed suddenly?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Air entry will immediately seize the water pump",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Coolant pressure will force oil from the bearings",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Escaping pressure can release boiling coolant and cause burns",
+              "rationale": "This is the supported answer. Cooling-system pressure raises coolant boiling point; sudden opening can flash hot coolant into steam and eject it violently."
+            },
+            {
+              "label": "D",
+              "text": "The thermostat will remain permanently closed",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Cooling-system pressure raises coolant boiling point; sudden opening can flash hot coolant into steam and eject it violently. Therefore the correct answer is C: Escaping pressure can release boiling coolant and cause burns.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_auto_mech_b002_020",
+          "original": true,
+          "topicCode": "AM-4",
+          "type": "multiple_choice",
+          "prompt": "Which fault can cause both overheating and poor cabin-heater output?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A thermostat stuck partly open",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A cooling fan that runs continuously",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Coolant mixed at the correct concentration",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Low coolant level that prevents proper circulation",
+              "rationale": "This is the supported answer. Low coolant may leave passages and the heater core partly empty, reducing heat transfer while allowing engine hot spots and overheating."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Low coolant may leave passages and the heater core partly empty, reducing heat transfer while allowing engine hot spots and overheating. Therefore the correct answer is D: Low coolant level that prevents proper circulation.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_auto_mech_b002_021",
+          "original": true,
+          "topicCode": "AM-5",
+          "type": "multiple_choice",
+          "prompt": "What does a hydrometer measure in a serviceable lead-acid vehicle battery?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The relative density of the electrolyte",
+              "rationale": "This is the supported answer. Electrolyte relative density provides an indication of state of charge and cell condition when temperature and battery design are considered."
+            },
+            {
+              "label": "B",
+              "text": "Battery terminal voltage",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Electrolyte temperature",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Starter current draw",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Electrolyte relative density provides an indication of state of charge and cell condition when temperature and battery design are considered. Therefore the correct answer is A: The relative density of the electrolyte.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_auto_mech_b002_022",
+          "original": true,
+          "topicCode": "AM-5",
+          "type": "multiple_choice",
+          "prompt": "What is the starter motor’s function during engine starting?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Turn the alternator fast enough to charge the battery",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Crank the engine fast enough for combustion to begin",
+              "rationale": "This is the supported answer. The starter converts battery electrical energy into torque at the flywheel until the engine can sustain its own combustion cycle."
+            },
+            {
+              "label": "C",
+              "text": "Preheat the intake air before cranking",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Advance ignition timing until combustion begins",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The starter converts battery electrical energy into torque at the flywheel until the engine can sustain its own combustion cycle. Therefore the correct answer is B: Crank the engine fast enough for combustion to begin.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_auto_mech_b002_023",
+          "original": true,
+          "topicCode": "AM-5",
+          "type": "multiple_choice",
+          "prompt": "What is the alternator’s main function while the engine is running?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Provide all cranking torque to the flywheel",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Supply the ignition system only while starting",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Supply electrical loads and recharge the battery",
+              "rationale": "This is the supported answer. The belt-driven alternator generates electrical power, and its regulator controls charging voltage for the battery and vehicle systems."
+            },
+            {
+              "label": "D",
+              "text": "Regulate battery electrolyte density",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The belt-driven alternator generates electrical power, and its regulator controls charging voltage for the battery and vehicle systems. Therefore the correct answer is C: Supply electrical loads and recharge the battery.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_auto_mech_b002_024",
+          "original": true,
+          "topicCode": "AM-5",
+          "type": "multiple_choice",
+          "prompt": "In a spark-ignition engine, what does the ignition coil provide?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A high current at approximately battery voltage",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A timed low-voltage pulse at the plug gap",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A steady charging voltage for the starter motor",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A high voltage capable of producing a spark across the plug gap",
+              "rationale": "This is the supported answer. The coil transforms the low battery voltage into a high-voltage pulse so current can cross the spark-plug gap at the required time."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The coil transforms the low battery voltage into a high-voltage pulse so current can cross the spark-plug gap at the required time. Therefore the correct answer is D: A high voltage capable of producing a spark across the plug gap.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_auto_mech_b002_025",
+          "original": true,
+          "topicCode": "AM-5",
+          "type": "multiple_choice",
+          "prompt": "A battery reads about 12.6 V at rest but voltage collapses during cranking. What is the best next check?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Perform a battery load test and inspect high-current connections",
+              "rationale": "This is the supported answer. A normal open-circuit voltage can coexist with poor capacity or high connection resistance, which a load test and voltage-drop checks reveal."
+            },
+            {
+              "label": "B",
+              "text": "Check alternator output before testing the battery",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Replace the starter without a voltage-drop test",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Clean the spark plugs before checking the cables",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A normal open-circuit voltage can coexist with poor capacity or high connection resistance, which a load test and voltage-drop checks reveal. Therefore the correct answer is A: Perform a battery load test and inspect high-current connections.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_auto_mech_b002_026",
+          "original": true,
+          "topicCode": "AM-6",
+          "type": "multiple_choice",
+          "prompt": "What is the primary function of a vehicle clutch?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Multiply torque through the final-drive gears",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Connect and disconnect engine torque from the transmission smoothly",
+              "rationale": "This is the supported answer. The clutch permits progressive engagement for moving off and temporary disconnection for stopping or changing gears."
+            },
+            {
+              "label": "C",
+              "text": "Synchronise gearbox shaft speeds during every shift",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Allow the propeller shaft to change angle",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The clutch permits progressive engagement for moving off and temporary disconnection for stopping or changing gears. Therefore the correct answer is B: Connect and disconnect engine torque from the transmission smoothly.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_auto_mech_b002_027",
+          "original": true,
+          "topicCode": "AM-6",
+          "type": "multiple_choice",
+          "prompt": "Why are lower gearbox ratios used when a vehicle starts moving?",
+          "options": [
+            {
+              "label": "A",
+              "text": "They reduce wheel torque to prevent wheelspin",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "They give direct drive between input and output",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "They multiply torque at the driving wheels",
+              "rationale": "This is the supported answer. A low gear trades output speed for greater torque multiplication, helping overcome inertia and road resistance from rest."
+            },
+            {
+              "label": "D",
+              "text": "They lower engine speed for a given road speed",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A low gear trades output speed for greater torque multiplication, helping overcome inertia and road resistance from rest. Therefore the correct answer is C: They multiply torque at the driving wheels.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_auto_mech_b002_028",
+          "original": true,
+          "topicCode": "AM-6",
+          "type": "multiple_choice",
+          "prompt": "What is the function of a differential during cornering?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Lock both axle shafts to the same speed in every turn",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Change the gearbox ratio as steering angle increases",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Disconnect the inner driving wheel during a turn",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Allow the left and right driving wheels to rotate at different speeds",
+              "rationale": "This is the supported answer. The outside wheel travels farther in a turn, so differential gears permit speed difference while transmitting torque to both axle shafts."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The outside wheel travels farther in a turn, so differential gears permit speed difference while transmitting torque to both axle shafts. Therefore the correct answer is D: Allow the left and right driving wheels to rotate at different speeds.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_auto_mech_b002_029",
+          "original": true,
+          "topicCode": "AM-6",
+          "type": "multiple_choice",
+          "prompt": "Which symptom is most consistent with a slipping clutch?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Engine speed rises without a matching increase in vehicle speed",
+              "rationale": "This is the supported answer. A worn or contaminated friction surface cannot transmit full torque, so engine revolutions flare while road speed responds slowly."
+            },
+            {
+              "label": "B",
+              "text": "Vehicle speed rises while engine speed remains fixed",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The clutch pedal becomes firm with no free play",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The vehicle judders only while the brakes are applied",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A worn or contaminated friction surface cannot transmit full torque, so engine revolutions flare while road speed responds slowly. Therefore the correct answer is A: Engine speed rises without a matching increase in vehicle speed.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_auto_mech_b002_030",
+          "original": true,
+          "topicCode": "AM-6",
+          "type": "multiple_choice",
+          "prompt": "What does a universal joint permit in a propeller shaft?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A change in final-drive gear ratio",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Torque transmission between shafts operating at changing angles",
+              "rationale": "This is the supported answer. Universal joints accommodate angular movement caused by suspension and driveline geometry while continuing to transmit rotation."
+            },
+            {
+              "label": "C",
+              "text": "Axial sliding as shaft length changes",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Different left and right wheel speeds",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Universal joints accommodate angular movement caused by suspension and driveline geometry while continuing to transmit rotation. Therefore the correct answer is B: Torque transmission between shafts operating at changing angles.",
+          "difficulty": "hard",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_auto_mech_b002_031",
+          "original": true,
+          "topicCode": "AM-7",
+          "type": "multiple_choice",
+          "prompt": "What is the purpose of steering wheel toe adjustment?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Set the inward tilt of the wheel tops",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Set steering-axis inclination viewed from the side",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Set the specified relationship between the front edges of paired wheels",
+              "rationale": "This is the supported answer. Correct toe helps the tyres roll in the intended direction under load, reducing scrub, instability and abnormal tread wear."
+            },
+            {
+              "label": "D",
+              "text": "Remove free play from the steering gearbox",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Correct toe helps the tyres roll in the intended direction under load, reducing scrub, instability and abnormal tread wear. Therefore the correct answer is C: Set the specified relationship between the front edges of paired wheels.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_auto_mech_b002_032",
+          "original": true,
+          "topicCode": "AM-7",
+          "type": "multiple_choice",
+          "prompt": "What is a shock absorber designed to control?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The static ride height of the suspension",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The full vehicle weight without the springs",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The maximum steering angle of the front wheels",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Oscillation of the suspension springs",
+              "rationale": "This is the supported answer. The damper converts suspension motion into heat, preventing repeated bouncing while the spring continues to support vehicle weight."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The damper converts suspension motion into heat, preventing repeated bouncing while the spring continues to support vehicle weight. Therefore the correct answer is D: Oscillation of the suspension springs.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_auto_mech_b002_033",
+          "original": true,
+          "topicCode": "AM-7",
+          "type": "multiple_choice",
+          "prompt": "How does a hydraulic brake system transmit pedal force?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Pressure in confined brake fluid acts through the system",
+              "rationale": "This is the supported answer. Pedal force applied at the master cylinder creates hydraulic pressure that acts at wheel cylinders or caliper pistons."
+            },
+            {
+              "label": "B",
+              "text": "Mechanical rods transmit all pedal force to the wheels",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Engine vacuum flows through the brake pipes",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Electrical current drives each caliper piston directly",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Pedal force applied at the master cylinder creates hydraulic pressure that acts at wheel cylinders or caliper pistons. Therefore the correct answer is A: Pressure in confined brake fluid acts through the system.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_auto_mech_b002_034",
+          "original": true,
+          "topicCode": "AM-7",
+          "type": "multiple_choice",
+          "prompt": "What does a spongy brake pedal commonly indicate?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A seized caliper piston that prevents pedal travel",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Air in the hydraulic system or another source of fluid compressibility",
+              "rationale": "This is the supported answer. Unlike brake fluid, trapped air compresses noticeably, increasing pedal travel and reducing the immediate transmission of braking force."
+            },
+            {
+              "label": "C",
+              "text": "A failed brake booster with normal hydraulics",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Worn friction linings with no air in the system",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Unlike brake fluid, trapped air compresses noticeably, increasing pedal travel and reducing the immediate transmission of braking force. Therefore the correct answer is B: Air in the hydraulic system or another source of fluid compressibility.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_auto_mech_b002_035",
+          "original": true,
+          "topicCode": "AM-7",
+          "type": "multiple_choice",
+          "prompt": "Why is brake fluid kept clean and sealed from moisture?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Moisture raises the boiling point under heavy braking",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Water improves lubrication of master-cylinder seals",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Moisture lowers its boiling point and can promote corrosion",
+              "rationale": "This is the supported answer. Brake fluid absorbs moisture over time; contamination can cause vapour formation under heat and corrode hydraulic components."
+            },
+            {
+              "label": "D",
+              "text": "Contamination prevents corrosion inside steel pipes",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Brake fluid absorbs moisture over time; contamination can cause vapour formation under heat and corrode hydraulic components. Therefore the correct answer is C: Moisture lowers its boiling point and can promote corrosion.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_auto_mech_b002_036",
+          "original": true,
+          "topicCode": "AM-8",
+          "type": "multiple_choice",
+          "prompt": "In the tyre marking 205/55 R16, what does 205 represent?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The tyre aspect ratio as a percentage",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The wheel diameter in inches",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The tyre load index",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The nominal section width in millimetres",
+              "rationale": "This is the supported answer. The first number is nominal tyre section width in millimetres; 55 is aspect ratio and 16 is the wheel diameter in inches."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The first number is nominal tyre section width in millimetres; 55 is aspect ratio and 16 is the wheel diameter in inches. Therefore the correct answer is D: The nominal section width in millimetres.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_auto_mech_b002_037",
+          "original": true,
+          "topicCode": "AM-8",
+          "type": "multiple_choice",
+          "prompt": "What tool should be used to check tyre inflation pressure?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A calibrated tyre-pressure gauge",
+              "rationale": "This is the supported answer. A pressure gauge measures the air pressure directly so it can be compared with the vehicle manufacturer’s cold-pressure recommendation."
+            },
+            {
+              "label": "B",
+              "text": "A tread-depth gauge",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A wheel-nut torque wrench",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A dial indicator on the wheel rim",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A pressure gauge measures the air pressure directly so it can be compared with the vehicle manufacturer’s cold-pressure recommendation. Therefore the correct answer is A: A calibrated tyre-pressure gauge.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_auto_mech_b002_038",
+          "original": true,
+          "topicCode": "AM-8",
+          "type": "multiple_choice",
+          "prompt": "What tread pattern is most associated with persistent over-inflation?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Greater wear on both outer shoulders",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Greater wear along the centre of the tread",
+              "rationale": "This is the supported answer. Excess pressure tends to crown the tread so the centre carries a disproportionate load, although alignment and duty must also be checked."
+            },
+            {
+              "label": "C",
+              "text": "Feathered wear caused by incorrect toe",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Cupped wear caused by poor damping",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Excess pressure tends to crown the tread so the centre carries a disproportionate load, although alignment and duty must also be checked. Therefore the correct answer is B: Greater wear along the centre of the tread.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_auto_mech_b002_039",
+          "original": true,
+          "topicCode": "AM-8",
+          "type": "multiple_choice",
+          "prompt": "Why should diagnostic trouble codes not be treated as automatic proof that the named component is faulty?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The code proves the named sensor itself has failed",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Clearing the code confirms the fault is repaired",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A code identifies a detected circuit or system condition that still requires testing",
+              "rationale": "This is the supported answer. Wiring, connectors, mechanical faults or another sensor can cause the monitored condition, so tests and service information must confirm the cause."
+            },
+            {
+              "label": "D",
+              "text": "The named component should be replaced before circuit tests",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Wiring, connectors, mechanical faults or another sensor can cause the monitored condition, so tests and service information must confirm the cause. Therefore the correct answer is C: A code identifies a detected circuit or system condition that still requires testing.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_auto_mech_b002_040",
+          "original": true,
+          "topicCode": "AM-8",
+          "type": "multiple_choice",
+          "prompt": "Which maintenance action most directly helps prevent engine damage from a worn timing belt?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Inspect it only after a rattling noise develops",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Retension the old belt instead of replacing it",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Wait for visible cracking regardless of service interval",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Replace the belt and related parts at the specified interval",
+              "rationale": "This is the supported answer. Age and mileage weaken timing belts; scheduled replacement reduces the risk of sudden failure and piston-to-valve contact on interference engines."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Age and mileage weaken timing belts; scheduled replacement reduces the risk of sudden failure and piston-to-valve contact on interference engines. Therefore the correct answer is D: Replace the belt and related parts at the specified interval.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        }
+      ]
+    },
+    {
+      "subjectId": "subj_wassce_electronics",
+      "specificationCode": "BRILLA-WASSCE-ELECTRONICS-BETA-002",
+      "release": {
+        "contentLabel": "Original BrillaPrep transitional Electronics practice aligned to WAEC Ghana examiner evidence; not official WAEC examination material or a copied past paper.",
+        "sourceUrl": "https://waecgh.org/wp-content/uploads/2025/05/CHIEF-EXAMINERS-REPORTS.-WASSCE-SC-2023.pdf",
+        "officialExamBoardContent": false,
+        "feedbackEnabled": true
+      },
+      "topics": [
+        {
+          "code": "ELN-1",
+          "title": "Workshop safety and electronic measurement",
+          "objective": "Apply safe bench practice and use meters and oscilloscopes to measure electrical quantities."
+        },
+        {
+          "code": "ELN-2",
+          "title": "Direct-current circuits and passive components",
+          "objective": "Analyse resistor networks and explain capacitor and inductor behaviour in direct-current circuits."
+        },
+        {
+          "code": "ELN-3",
+          "title": "Alternating-current circuits and electromagnetism",
+          "objective": "Analyse sinusoidal quantities, RLC circuits, resonance, induction and stored magnetic energy."
+        },
+        {
+          "code": "ELN-4",
+          "title": "Semiconductor diodes and power supplies",
+          "objective": "Explain semiconductor junctions, rectification, filtering, regulation and power-supply faults."
+        },
+        {
+          "code": "ELN-5",
+          "title": "Transistors and amplifiers",
+          "objective": "Apply bipolar transistor bias, switching, gain and small-signal amplifier principles."
+        },
+        {
+          "code": "ELN-6",
+          "title": "Oscillators and waveform generation",
+          "objective": "Explain positive feedback, oscillation conditions and common waveform-generator applications."
+        },
+        {
+          "code": "ELN-7",
+          "title": "Digital electronics",
+          "objective": "Apply binary representation, logic gates, truth tables, flip-flops and counting circuits."
+        },
+        {
+          "code": "ELN-8",
+          "title": "Communication and control systems",
+          "objective": "Explain modulation, signal transmission, feedback and open- and closed-loop control systems."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_was_electronics_b002_001",
+          "original": true,
+          "topicCode": "ELN-1",
+          "type": "multiple_choice",
+          "prompt": "What should be done before changing components on an energised electronics bench circuit?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Disconnect the supply and discharge stored energy safely",
+              "rationale": "This is the supported answer. Isolation and controlled capacitor discharge prevent electric shock, burns and accidental component damage from stored charge."
+            },
+            {
+              "label": "B",
+              "text": "Switch off the supply but leave charged capacitors untouched",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Remove only the fuse while the circuit remains connected",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Short capacitor terminals directly with an uninsulated tool",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Isolation and controlled capacitor discharge prevent electric shock, burns and accidental component damage from stored charge. Therefore the correct answer is A: Disconnect the supply and discharge stored energy safely.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_electronics_b002_002",
+          "original": true,
+          "topicCode": "ELN-1",
+          "type": "multiple_choice",
+          "prompt": "How is a voltmeter connected when measuring the voltage across a resistor?",
+          "options": [
+            {
+              "label": "A",
+              "text": "In series with the resistor and load current",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "In parallel with the resistor",
+              "rationale": "This is the supported answer. A voltmeter compares potential at two points and therefore connects in parallel while presenting high input resistance."
+            },
+            {
+              "label": "C",
+              "text": "In parallel with the ammeter only",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Across the supply without identifying the resistor terminals",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A voltmeter compares potential at two points and therefore connects in parallel while presenting high input resistance. Therefore the correct answer is B: In parallel with the resistor.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_electronics_b002_003",
+          "original": true,
+          "topicCode": "ELN-1",
+          "type": "multiple_choice",
+          "prompt": "What is the purpose of a shunt resistor in an analogue ammeter?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Increase movement resistance by being connected in series",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Protect the movement by opening on overload",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Carry most of the measured current around the sensitive meter movement",
+              "rationale": "This is the supported answer. A low-value shunt shares current with the movement, extending current range while only the rated fraction flows through the coil."
+            },
+            {
+              "label": "D",
+              "text": "Adjust the pointer to zero before current flows",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A low-value shunt shares current with the movement, extending current range while only the rated fraction flows through the coil. Therefore the correct answer is C: Carry most of the measured current around the sensitive meter movement.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_electronics_b002_004",
+          "original": true,
+          "topicCode": "ELN-1",
+          "type": "multiple_choice",
+          "prompt": "What does the time-base control of an oscilloscope set?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The vertical voltage represented per division",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The trigger voltage that begins each sweep",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The brightness of the displayed trace",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The horizontal time represented per division",
+              "rationale": "This is the supported answer. The time base controls horizontal sweep rate, allowing period, frequency and timing relationships to be read from the graticule."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The time base controls horizontal sweep rate, allowing period, frequency and timing relationships to be read from the graticule. Therefore the correct answer is D: The horizontal time represented per division.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_electronics_b002_005",
+          "original": true,
+          "topicCode": "ELN-1",
+          "type": "multiple_choice",
+          "prompt": "Why is an oscilloscope probe ground lead connected only to an appropriate circuit reference?",
+          "options": [
+            {
+              "label": "A",
+              "text": "An incorrect ground connection can short a live point through protective earth",
+              "rationale": "This is the supported answer. Bench oscilloscope grounds are often earth-referenced, so careless connection can create a destructive high-current path and a shock hazard."
+            },
+            {
+              "label": "B",
+              "text": "The probe input isolates its ground from protective earth",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Any circuit point is safe because the lead has high resistance",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The ground reference affects only trace position, not current flow",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Bench oscilloscope grounds are often earth-referenced, so careless connection can create a destructive high-current path and a shock hazard. Therefore the correct answer is A: An incorrect ground connection can short a live point through protective earth.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_electronics_b002_006",
+          "original": true,
+          "topicCode": "ELN-2",
+          "type": "multiple_choice",
+          "prompt": "Two resistors of 3 kΩ and 6 kΩ are in parallel. What is their equivalent resistance?",
+          "options": [
+            {
+              "label": "A",
+              "text": "9 kΩ",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "2 kΩ",
+              "rationale": "This is the supported answer. For two parallel resistors, the product divided by the sum gives 18 divided by 9 kilohms, which equals 2 kΩ."
+            },
+            {
+              "label": "C",
+              "text": "4 kΩ",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "4.5 kΩ",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "For two parallel resistors, the product divided by the sum gives 18 divided by 9 kilohms, which equals 2 kΩ. Therefore the correct answer is B: 2 kΩ.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_electronics_b002_007",
+          "original": true,
+          "topicCode": "ELN-2",
+          "type": "multiple_choice",
+          "prompt": "What current flows through a 1 kΩ resistor connected across 5 V?",
+          "options": [
+            {
+              "label": "A",
+              "text": "0.005 mA",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "0.2 mA",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "5 mA",
+              "rationale": "This is the supported answer. Ohm’s law gives current as voltage divided by resistance: 5 V divided by 1000 Ω equals 0.005 A or 5 mA."
+            },
+            {
+              "label": "D",
+              "text": "5 A",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Ohm’s law gives current as voltage divided by resistance: 5 V divided by 1000 Ω equals 0.005 A or 5 mA. Therefore the correct answer is C: 5 mA.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_electronics_b002_008",
+          "original": true,
+          "topicCode": "ELN-2",
+          "type": "multiple_choice",
+          "prompt": "What happens to an ideal capacitor after it is fully charged from a steady direct-current source?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It remains a short circuit to steady current",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It loses all stored charge as soon as charging ends",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It continues drawing its initial charging current indefinitely",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It blocks steady current while retaining charge",
+              "rationale": "This is the supported answer. After the transient charging current falls to zero, an ideal capacitor presents an open circuit to steady DC and stores electric-field energy."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "After the transient charging current falls to zero, an ideal capacitor presents an open circuit to steady DC and stores electric-field energy. Therefore the correct answer is D: It blocks steady current while retaining charge.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_electronics_b002_009",
+          "original": true,
+          "topicCode": "ELN-2",
+          "type": "multiple_choice",
+          "prompt": "Which property of an inductor opposes a rapid change in its current?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Self-induced emf",
+              "rationale": "This is the supported answer. Changing current changes magnetic flux, inducing an emf whose polarity opposes the change according to Lenz’s law."
+            },
+            {
+              "label": "B",
+              "text": "The resistance of its winding alone",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Electric-field capacitance",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A mutually induced emf from the same coil",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Changing current changes magnetic flux, inducing an emf whose polarity opposes the change according to Lenz’s law. Therefore the correct answer is A: Self-induced emf.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_electronics_b002_010",
+          "original": true,
+          "topicCode": "ELN-2",
+          "type": "multiple_choice",
+          "prompt": "Why is a resistor placed in series with a light-emitting diode?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To hold the LED voltage at the full supply value",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "To limit current to a safe value",
+              "rationale": "This is the supported answer. An LED has a steep current-voltage characteristic, so a series resistor drops excess voltage and controls current within the device rating."
+            },
+            {
+              "label": "C",
+              "text": "To bypass the LED whenever it conducts",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "To make the LED conduct equally in both directions",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "An LED has a steep current-voltage characteristic, so a series resistor drops excess voltage and controls current within the device rating. Therefore the correct answer is B: To limit current to a safe value.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_electronics_b002_011",
+          "original": true,
+          "topicCode": "ELN-3",
+          "type": "multiple_choice",
+          "prompt": "What is the period of a 50 Hz sinusoidal waveform?",
+          "options": [
+            {
+              "label": "A",
+              "text": "5 ms",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "10 ms",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "20 ms",
+              "rationale": "This is the supported answer. Period is the reciprocal of frequency: one divided by 50 seconds equals 0.02 seconds, which is 20 milliseconds."
+            },
+            {
+              "label": "D",
+              "text": "50 ms",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Period is the reciprocal of frequency: one divided by 50 seconds equals 0.02 seconds, which is 20 milliseconds. Therefore the correct answer is C: 20 ms.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_electronics_b002_012",
+          "original": true,
+          "topicCode": "ELN-3",
+          "type": "multiple_choice",
+          "prompt": "How does inductive reactance change when frequency increases?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It decreases in inverse proportion to frequency",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It remains fixed for a given coil",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It becomes equal to resistance at every frequency",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It increases in direct proportion to frequency",
+              "rationale": "This is the supported answer. Inductive reactance is two pi times frequency times inductance, so increasing frequency increases opposition for a fixed coil."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Inductive reactance is two pi times frequency times inductance, so increasing frequency increases opposition for a fixed coil. Therefore the correct answer is D: It increases in direct proportion to frequency.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_electronics_b002_013",
+          "original": true,
+          "topicCode": "ELN-3",
+          "type": "multiple_choice",
+          "prompt": "At series resonance, how do inductive and capacitive reactances compare?",
+          "options": [
+            {
+              "label": "A",
+              "text": "They are equal in magnitude",
+              "rationale": "This is the supported answer. Equal opposite reactances cancel in a series RLC circuit, leaving impedance at its minimum resistive value."
+            },
+            {
+              "label": "B",
+              "text": "Both reactances become zero individually",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Inductive reactance is twice capacitive reactance",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Circuit resistance becomes infinite",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Equal opposite reactances cancel in a series RLC circuit, leaving impedance at its minimum resistive value. Therefore the correct answer is A: They are equal in magnitude.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_electronics_b002_014",
+          "original": true,
+          "topicCode": "ELN-3",
+          "type": "multiple_choice",
+          "prompt": "A 2 H inductor carries 3 A. How much energy is stored in its magnetic field?",
+          "options": [
+            {
+              "label": "A",
+              "text": "3 J",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "9 J",
+              "rationale": "This is the supported answer. Stored energy is one-half L times current squared, so one-half times 2 times 3 squared equals 9 joules."
+            },
+            {
+              "label": "C",
+              "text": "6 J",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "12 J",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Stored energy is one-half L times current squared, so one-half times 2 times 3 squared equals 9 joules. Therefore the correct answer is B: 9 J.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_electronics_b002_015",
+          "original": true,
+          "topicCode": "ELN-3",
+          "type": "multiple_choice",
+          "prompt": "What principle produces an emf when magnetic flux linkage changes?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The motor effect on a current-carrying conductor",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Electrostatic induction by a stationary charge",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Electromagnetic induction",
+              "rationale": "This is the supported answer. Faraday’s law relates induced emf to the rate of change of flux linkage, with polarity described by Lenz’s law."
+            },
+            {
+              "label": "D",
+              "text": "Resistive heating in the conductor",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Faraday’s law relates induced emf to the rate of change of flux linkage, with polarity described by Lenz’s law. Therefore the correct answer is C: Electromagnetic induction.",
+          "difficulty": "hard",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_electronics_b002_016",
+          "original": true,
+          "topicCode": "ELN-4",
+          "type": "multiple_choice",
+          "prompt": "When is a silicon p-n junction diode forward biased?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Its n-side is made positive relative to its p-side",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Both sides are held at the same potential",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Its p-side is connected through reverse breakdown only",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Its p-side is made positive relative to its n-side",
+              "rationale": "This is the supported answer. Forward bias reduces the junction barrier and permits substantial current after the applied voltage reaches the device’s operating region."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Forward bias reduces the junction barrier and permits substantial current after the applied voltage reaches the device’s operating region. Therefore the correct answer is D: Its p-side is made positive relative to its n-side.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_electronics_b002_017",
+          "original": true,
+          "topicCode": "ELN-4",
+          "type": "multiple_choice",
+          "prompt": "What is the output of an ideal full-wave rectifier before filtering?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Unidirectional pulses during both input half-cycles",
+              "rationale": "This is the supported answer. Full-wave rectification reverses the negative half-cycle so load current has one direction on both halves of the AC input."
+            },
+            {
+              "label": "B",
+              "text": "Unidirectional pulses during one input half-cycle only",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A sinusoid that still alternates about zero",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A constant DC level with no ripple",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Full-wave rectification reverses the negative half-cycle so load current has one direction on both halves of the AC input. Therefore the correct answer is A: Unidirectional pulses during both input half-cycles.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_electronics_b002_018",
+          "original": true,
+          "topicCode": "ELN-4",
+          "type": "multiple_choice",
+          "prompt": "What is the role of a reservoir capacitor after a rectifier?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Raise the rectifier frequency before the transformer",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Reduce ripple by supplying the load between waveform peaks",
+              "rationale": "This is the supported answer. The capacitor charges near rectified peaks and discharges into the load between them, smoothing the pulsating voltage."
+            },
+            {
+              "label": "C",
+              "text": "Hold the output at an exact value under every load",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Block all direct current from reaching the load",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The capacitor charges near rectified peaks and discharges into the load between them, smoothing the pulsating voltage. Therefore the correct answer is B: Reduce ripple by supplying the load between waveform peaks.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_electronics_b002_019",
+          "original": true,
+          "topicCode": "ELN-4",
+          "type": "multiple_choice",
+          "prompt": "Why is a Zener diode useful in a simple voltage regulator?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It maintains a constant forward voltage at any current",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It removes ripple without a series current-limiting element",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It maintains an approximately constant reverse voltage in breakdown",
+              "rationale": "This is the supported answer. A correctly biased Zener operates in controlled reverse breakdown, providing a reference or shunt-regulated voltage with current limiting."
+            },
+            {
+              "label": "D",
+              "text": "It increases transformer secondary voltage in breakdown",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A correctly biased Zener operates in controlled reverse breakdown, providing a reference or shunt-regulated voltage with current limiting. Therefore the correct answer is C: It maintains an approximately constant reverse voltage in breakdown.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_electronics_b002_020",
+          "original": true,
+          "topicCode": "ELN-4",
+          "type": "multiple_choice",
+          "prompt": "A bridge rectifier has one diode open-circuit. What is a likely output symptom?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Normal full-wave output with slightly lower peak voltage",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Zero output on both input half-cycles",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Normal output voltage with half the ripple frequency",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Reduced output with half-wave-like ripple",
+              "rationale": "This is the supported answer. An open bridge diode removes one conduction path, so only part of the AC cycle reaches the load and ripple increases."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "An open bridge diode removes one conduction path, so only part of the AC cycle reaches the load and ripple increases. Therefore the correct answer is D: Reduced output with half-wave-like ripple.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_electronics_b002_021",
+          "original": true,
+          "topicCode": "ELN-5",
+          "type": "multiple_choice",
+          "prompt": "Which bipolar transistor terminal controls collector current through a much smaller current?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The base",
+              "rationale": "This is the supported answer. In normal active operation, a relatively small base current controls a larger collector current, enabling amplification or switching."
+            },
+            {
+              "label": "B",
+              "text": "The emitter",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The collector",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The gate",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "In normal active operation, a relatively small base current controls a larger collector current, enabling amplification or switching. Therefore the correct answer is A: The base.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_electronics_b002_022",
+          "original": true,
+          "topicCode": "ELN-5",
+          "type": "multiple_choice",
+          "prompt": "A transistor has collector current 40 mA and base current 0.2 mA. What is its current gain?",
+          "options": [
+            {
+              "label": "A",
+              "text": "20",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "200",
+              "rationale": "This is the supported answer. Common-emitter current gain is collector current divided by base current, so 40 divided by 0.2 equals 200."
+            },
+            {
+              "label": "C",
+              "text": "80",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "800",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Common-emitter current gain is collector current divided by base current, so 40 divided by 0.2 equals 200. Therefore the correct answer is B: 200.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_electronics_b002_023",
+          "original": true,
+          "topicCode": "ELN-5",
+          "type": "multiple_choice",
+          "prompt": "In which region is a bipolar transistor intended to operate as a closed switch?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Cut-off",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The active region",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Saturation",
+              "rationale": "This is the supported answer. In saturation both junctions are driven so collector-emitter voltage is low and the device approximates a closed electronic switch."
+            },
+            {
+              "label": "D",
+              "text": "Reverse breakdown",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "In saturation both junctions are driven so collector-emitter voltage is low and the device approximates a closed electronic switch. Therefore the correct answer is C: Saturation.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_electronics_b002_024",
+          "original": true,
+          "topicCode": "ELN-5",
+          "type": "multiple_choice",
+          "prompt": "What defines Class A amplifier operation?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The device conducts for half of each input cycle",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The device conducts for less than half a cycle",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Two devices conduct on alternate half-cycles",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The active device conducts for the full input cycle",
+              "rationale": "This is the supported answer. A Class A stage is biased within the active region so conduction continues through 360 degrees of the signal cycle."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A Class A stage is biased within the active region so conduction continues through 360 degrees of the signal cycle. Therefore the correct answer is D: The active device conducts for the full input cycle.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_electronics_b002_025",
+          "original": true,
+          "topicCode": "ELN-5",
+          "type": "multiple_choice",
+          "prompt": "Why is an emitter bypass capacitor used in a common-emitter amplifier?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Increase AC gain while retaining DC bias stabilisation",
+              "rationale": "This is the supported answer. The capacitor provides a low-reactance AC path around the emitter resistor while the resistor continues to stabilise the DC operating point."
+            },
+            {
+              "label": "B",
+              "text": "Reduce AC gain while leaving DC bias unchanged",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Remove the emitter resistor from the DC bias path",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Couple the collector signal directly to the base",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The capacitor provides a low-reactance AC path around the emitter resistor while the resistor continues to stabilise the DC operating point. Therefore the correct answer is A: Increase AC gain while retaining DC bias stabilisation.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_electronics_b002_026",
+          "original": true,
+          "topicCode": "ELN-6",
+          "type": "multiple_choice",
+          "prompt": "What feedback condition is required to sustain sinusoidal oscillation?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Loop gain greater than unity with 180° net phase shift",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Loop gain magnitude of unity with total phase shift of 0° or 360°",
+              "rationale": "This is the supported answer. The Barkhausen condition requires reinforcing feedback of the correct phase and a loop-gain magnitude that sustains rather than grows or decays."
+            },
+            {
+              "label": "C",
+              "text": "Loop gain below unity with 360° net phase shift",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Zero feedback at the selected frequency",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The Barkhausen condition requires reinforcing feedback of the correct phase and a loop-gain magnitude that sustains rather than grows or decays. Therefore the correct answer is B: Loop gain magnitude of unity with total phase shift of 0° or 360°.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_electronics_b002_027",
+          "original": true,
+          "topicCode": "ELN-6",
+          "type": "multiple_choice",
+          "prompt": "Which oscillator commonly uses a crystal for high frequency stability?",
+          "options": [
+            {
+              "label": "A",
+              "text": "An RC phase-shift oscillator",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A Hartley oscillator",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A crystal-controlled oscillator",
+              "rationale": "This is the supported answer. Quartz has a high-Q mechanical resonance that provides a stable frequency-selective element in the feedback network."
+            },
+            {
+              "label": "D",
+              "text": "An astable multivibrator",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Quartz has a high-Q mechanical resonance that provides a stable frequency-selective element in the feedback network. Therefore the correct answer is C: A crystal-controlled oscillator.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_electronics_b002_028",
+          "original": true,
+          "topicCode": "ELN-6",
+          "type": "multiple_choice",
+          "prompt": "What waveform is produced directly by a relaxation oscillator that repeatedly charges and discharges a capacitor between thresholds?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A pure sinusoid from linear resonance",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A constant DC level after one charge cycle",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A single exponentially decaying pulse",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A non-sinusoidal periodic waveform such as a square or sawtooth wave",
+              "rationale": "This is the supported answer. Threshold switching and capacitor ramps create repeating abrupt transitions or ramps rather than a pure sinusoid."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Threshold switching and capacitor ramps create repeating abrupt transitions or ramps rather than a pure sinusoid. Therefore the correct answer is D: A non-sinusoidal periodic waveform such as a square or sawtooth wave.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_electronics_b002_029",
+          "original": true,
+          "topicCode": "ELN-6",
+          "type": "multiple_choice",
+          "prompt": "What is the purpose of an oscillator in a radio transmitter?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Generate a periodic carrier or reference signal",
+              "rationale": "This is the supported answer. Transmitters require a stable periodic signal that can be amplified, multiplied or modulated to carry information."
+            },
+            {
+              "label": "B",
+              "text": "Select and recover the incoming information signal",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Remove modulation from the transmitted carrier",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Hold the transmitter supply at a fixed DC voltage",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Transmitters require a stable periodic signal that can be amplified, multiplied or modulated to carry information. Therefore the correct answer is A: Generate a periodic carrier or reference signal.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_electronics_b002_030",
+          "original": true,
+          "topicCode": "ELN-6",
+          "type": "multiple_choice",
+          "prompt": "Why does excessive positive feedback make a linear amplifier unstable?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It always reduces loop gain below unity",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It can cause the circuit to generate unwanted sustained oscillations",
+              "rationale": "This is the supported answer. If loop magnitude and phase meet oscillation conditions unintentionally, disturbances are reinforced rather than damped."
+            },
+            {
+              "label": "C",
+              "text": "It guarantees a wider bandwidth without phase effects",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It shifts the bias point but cannot create an AC output",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "If loop magnitude and phase meet oscillation conditions unintentionally, disturbances are reinforced rather than damped. Therefore the correct answer is B: It can cause the circuit to generate unwanted sustained oscillations.",
+          "difficulty": "hard",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_electronics_b002_031",
+          "original": true,
+          "topicCode": "ELN-7",
+          "type": "multiple_choice",
+          "prompt": "What decimal value is represented by binary 1011?",
+          "options": [
+            {
+              "label": "A",
+              "text": "7",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "10",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "11",
+              "rationale": "This is the supported answer. Binary 1011 equals eight plus zero plus two plus one, giving a decimal value of eleven."
+            },
+            {
+              "label": "D",
+              "text": "13",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Binary 1011 equals eight plus zero plus two plus one, giving a decimal value of eleven. Therefore the correct answer is C: 11.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_electronics_b002_032",
+          "original": true,
+          "topicCode": "ELN-7",
+          "type": "multiple_choice",
+          "prompt": "When does a two-input AND gate output logic 1?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Whenever either input is logic 1",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Only when both inputs are logic 0",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Whenever the inputs differ",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Only when both inputs are logic 1",
+              "rationale": "This is the supported answer. The AND truth table produces a high output only for the input combination 1 and 1."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The AND truth table produces a high output only for the input combination 1 and 1. Therefore the correct answer is D: Only when both inputs are logic 1.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_electronics_b002_033",
+          "original": true,
+          "topicCode": "ELN-7",
+          "type": "multiple_choice",
+          "prompt": "Which logic gate outputs the inverse of its single input?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A NOT gate",
+              "rationale": "This is the supported answer. A NOT gate is an inverter: logic 0 becomes 1 and logic 1 becomes 0."
+            },
+            {
+              "label": "B",
+              "text": "An AND gate",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "An OR gate",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "An XOR gate",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A NOT gate is an inverter: logic 0 becomes 1 and logic 1 becomes 0. Therefore the correct answer is A: A NOT gate.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_electronics_b002_034",
+          "original": true,
+          "topicCode": "ELN-7",
+          "type": "multiple_choice",
+          "prompt": "What is the basic storage capability of a flip-flop?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It stores four binary bits",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It stores one binary bit",
+              "rationale": "This is the supported answer. A flip-flop has two stable states representing one bit and changes state in response to defined control or clock conditions."
+            },
+            {
+              "label": "C",
+              "text": "It stores one continuously variable analogue level",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It stores the duration of one clock pulse",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A flip-flop has two stable states representing one bit and changes state in response to defined control or clock conditions. Therefore the correct answer is B: It stores one binary bit.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_electronics_b002_035",
+          "original": true,
+          "topicCode": "ELN-7",
+          "type": "multiple_choice",
+          "prompt": "What does a binary counter do on successive valid clock pulses?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Produces one fixed state for every clock pulse",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Converts the clock amplitude into a decimal voltage",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Advances through a defined sequence of binary states",
+              "rationale": "This is the supported answer. Connected flip-flops change state according to the counter design, representing successive counts in binary form."
+            },
+            {
+              "label": "D",
+              "text": "Changes state only when the supply voltage increases",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Connected flip-flops change state according to the counter design, representing successive counts in binary form. Therefore the correct answer is C: Advances through a defined sequence of binary states.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_electronics_b002_036",
+          "original": true,
+          "topicCode": "ELN-8",
+          "type": "multiple_choice",
+          "prompt": "What is a carrier wave in a communication system?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The original low-frequency information signal",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A DC bias added only to power the transmitter",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Unwanted noise generated in the receiver",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A high-frequency signal whose parameter is varied to carry information",
+              "rationale": "This is the supported answer. A carrier provides the radio-frequency waveform whose amplitude, frequency or phase can be changed by the information signal."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A carrier provides the radio-frequency waveform whose amplitude, frequency or phase can be changed by the information signal. Therefore the correct answer is D: A high-frequency signal whose parameter is varied to carry information.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_electronics_b002_037",
+          "original": true,
+          "topicCode": "ELN-8",
+          "type": "multiple_choice",
+          "prompt": "In amplitude modulation, which carrier property follows the information signal?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Amplitude",
+              "rationale": "This is the supported answer. AM varies carrier amplitude in step with the modulating signal while carrier frequency ideally remains constant."
+            },
+            {
+              "label": "B",
+              "text": "Frequency",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Phase",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Pulse width",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "AM varies carrier amplitude in step with the modulating signal while carrier frequency ideally remains constant. Therefore the correct answer is A: Amplitude.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_electronics_b002_038",
+          "original": true,
+          "topicCode": "ELN-8",
+          "type": "multiple_choice",
+          "prompt": "What distinguishes a closed-loop control system from an open-loop system?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It follows a preset action without measuring the output",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It uses feedback about the output to influence control action",
+              "rationale": "This is the supported answer. Closed-loop control compares measured output with the desired value and adjusts action to reduce error."
+            },
+            {
+              "label": "C",
+              "text": "It requires a human operator for every correction",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It uses only the input command to determine control action",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Closed-loop control compares measured output with the desired value and adjusts action to reduce error. Therefore the correct answer is B: It uses feedback about the output to influence control action.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_electronics_b002_039",
+          "original": true,
+          "topicCode": "ELN-8",
+          "type": "multiple_choice",
+          "prompt": "Why can negative feedback improve amplifier accuracy?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It increases sensitivity to transistor gain variation",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It raises nonlinear distortion while increasing gain",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It reduces sensitivity to component gain changes and distortion",
+              "rationale": "This is the supported answer. Feeding back a controlled opposing fraction trades some gain for better linearity, bandwidth and stability."
+            },
+            {
+              "label": "D",
+              "text": "It narrows bandwidth while leaving gain unchanged",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Feeding back a controlled opposing fraction trades some gain for better linearity, bandwidth and stability. Therefore the correct answer is C: It reduces sensitivity to component gain changes and distortion.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_electronics_b002_040",
+          "original": true,
+          "topicCode": "ELN-8",
+          "type": "multiple_choice",
+          "prompt": "What is the function of a demodulator in a radio receiver?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Increase carrier power without recovering information",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Impose the information signal on a carrier",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Translate the received signal to a higher carrier frequency",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Recover the information signal from the modulated carrier",
+              "rationale": "This is the supported answer. After selection and amplification, demodulation extracts the original audio or data information from the received carrier waveform."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "After selection and amplification, demodulation extracts the original audio or data information from the received carrier waveform. Therefore the correct answer is D: Recover the information signal from the modulated carrier.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        }
+      ]
+    }
+  ]
+}

@@ -14,6 +14,7 @@ const deployments = JSON.parse(
   staging: { apiOrigin: string; pagesOrigin: string; database: string; databaseId: string };
 };
 const wranglerConfig = readFileSync(new URL('../../../wrangler.toml', import.meta.url), 'utf8');
+const pagesHeaders = readFileSync(new URL('../../../public/_headers', import.meta.url), 'utf8');
 
 const template = `Content-Security-Policy: img-src 'self' ${PRODUCTION_API_ORIGIN}; connect-src 'self' ${PRODUCTION_API_ORIGIN};`;
 
@@ -69,5 +70,39 @@ describe('Pages CSP API-origin generation', () => {
     }
     expect(deployments.staging.database).not.toBe(deployments.production.database);
     expect(deployments.staging.databaseId).not.toBe(deployments.production.databaseId);
+  });
+});
+
+describe('Pages CSP Cloudflare Web Analytics policy', () => {
+  const csp = pagesHeaders.match(/^\s*Content-Security-Policy:\s*(.+)$/m)?.[1];
+
+  it('allows the automatically injected analytics script and same-origin beacon endpoint', () => {
+    expect(csp).toBeDefined();
+
+    const scriptSrc = csp?.match(/(?:^|;)\s*script-src\s+([^;]+)/)?.[1].split(/\s+/);
+    const connectSrc = csp?.match(/(?:^|;)\s*connect-src\s+([^;]+)/)?.[1].split(/\s+/);
+
+    expect(scriptSrc).toEqual([
+      "'self'",
+      'https://challenges.cloudflare.com',
+      'https://static.cloudflareinsights.com',
+    ]);
+    expect(connectSrc).toEqual([
+      "'self'",
+      PRODUCTION_API_ORIGIN,
+      'https://challenges.cloudflare.com',
+    ]);
+  });
+
+  it('does not weaken script or connection policy with broad allowances', () => {
+    expect(csp).toBeDefined();
+
+    const scriptSrc = csp?.match(/(?:^|;)\s*script-src\s+([^;]+)/)?.[1].split(/\s+/);
+    const connectSrc = csp?.match(/(?:^|;)\s*connect-src\s+([^;]+)/)?.[1].split(/\s+/);
+
+    expect(scriptSrc).not.toContain("'unsafe-inline'");
+    expect(scriptSrc).not.toContain("'unsafe-eval'");
+    expect(scriptSrc?.some((value) => value === 'https:' || value.includes('*'))).toBe(false);
+    expect(connectSrc?.some((value) => value === 'https:' || value.includes('*'))).toBe(false);
   });
 });
