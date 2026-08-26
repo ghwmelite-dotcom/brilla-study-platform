@@ -18,6 +18,7 @@ import {
 import { Badge, Button, Card } from '@/components/common';
 import { DailyUsageIndicator, PremiumSubjectBadge } from '@/components/subscription';
 import { useExamStore } from '@/stores/examStore';
+import { useAuthStore } from '@/stores/authStore';
 import { useUsageStore } from '@/stores/usageStore';
 import { isCoreSubject } from '@/config';
 import { cn } from '@/utils';
@@ -62,6 +63,7 @@ export function SubjectCatalogPage() {
     fetchSubjects,
     fetchCategories,
   } = useExamStore();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const { dailyUsage, fetchDailyUsage } = useUsageStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -71,9 +73,12 @@ export function SubjectCatalogPage() {
   const isPremiumUser = dailyUsage?.isUnlimited || dailyUsage?.isPremium || false;
 
   useEffect(() => {
-    fetchDailyUsage();
     initializeExamData();
-  }, [fetchDailyUsage, initializeExamData]);
+  }, [initializeExamData]);
+
+  useEffect(() => {
+    if (isAuthenticated) void fetchDailyUsage();
+  }, [fetchDailyUsage, isAuthenticated]);
 
   useEffect(() => {
     fetchCategories(currentExamType);
