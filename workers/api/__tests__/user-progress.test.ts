@@ -27,6 +27,14 @@ const authHandler: MockHandler = {
 // Freemium usage-limits plumbing: non-premium student, no usage recorded.
 const usageHandlers: MockHandler[] = [
   {
+    match: /FROM question_attempts qa\s+JOIN questions q/,
+    first: () => null,
+  },
+  {
+    match: /WITH usage\(total_requests\) AS MATERIALIZED/,
+    first: () => ({ request_count: 1, total_requests: 1 }),
+  },
+  {
     match: /SELECT role, subscription_tier_id, subscription_expires_at, trial_expires_at/,
     first: () => ({
       role: 'student',
@@ -55,13 +63,13 @@ const writeHandlers: MockHandler[] = [
   { match: /UPDATE user_progress SET/ },
 ];
 
-async function attempt(db: unknown, questionId: string, answer: string) {
+async function attempt(db: unknown, questionId: string, answer: string, timeTaken = 0) {
   const t = await token({ userId: 'user_1', role: 'student' });
   return worker.fetch(
     new Request(`http://x/api/questions/${questionId}/attempt`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ answer }),
+      body: JSON.stringify({ answer, timeTaken, clientRequestId: 'request_user_progress_1' }),
     }),
     { DB: db as D1Database, JWT_SECRET },
   );
@@ -85,16 +93,18 @@ describe('POST /api/questions/:id/attempt user_progress write path', () => {
       ...writeHandlers,
     ]);
 
-    const res = await attempt(db, 'q1', 'A');
+    const res = await attempt(db, 'q1', 'A', 12);
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { success: boolean; data: { isCorrect: boolean } };
+    const body = (await res.json()) as { success: boolean; data: { attemptId: string; isCorrect: boolean } };
     expect(body.success).toBe(true);
+    expect(body.data.attemptId).toMatch(/^attempt_/);
     expect(body.data.isCorrect).toBe(true);
 
     const attemptInsert = db.calls.find((c) => /INSERT INTO question_attempts/.test(c.sql));
     expect(attemptInsert).toBeDefined();
     expect(attemptInsert!.binds[1]).toBe('user_1');
     expect(attemptInsert!.binds[4]).toBe(1); // is_correct
+    expect(attemptInsert!.binds[5]).toBe(12); // bounded client duration persisted on the owned attempt
 
     const upsert = db.calls.find((c) => /INSERT INTO user_progress/.test(c.sql));
     expect(upsert).toBeDefined();

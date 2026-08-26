@@ -3,7 +3,7 @@ import type { Context, MiddlewareHandler } from 'hono';
 import { cors } from 'hono/cors';
 import { sign } from 'hono/jwt';
 import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware';
-import { parseLimit, parseJsonBody } from './http';
+import { parseBoundedJsonBody, parseLimit, parseJsonBody } from './http';
 import type { JWTPayload } from 'hono/utils/jwt/types';
 import { getChatModel, getGenerationModel, getTtsModel, getVisionModel, unwrapAiText } from './ai-models';
 import { formatUntrustedAiData, normalizeAiGradingFeedback, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
@@ -129,6 +129,14 @@ interface AppVariables {
 type AppEnv = { Bindings: Env; Variables: AppVariables };
 
 const MAX_QUESTION_ANSWER_LENGTH = 10_000;
+const MAX_PRACTICE_SESSION_BODY_BYTES = 32 * 1024;
+const MAX_QUESTION_ATTEMPT_BODY_BYTES = 64 * 1024;
+const MAX_PRACTICE_SESSION_ATTEMPTS = 100;
+
+async function sha256Hex(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
 
 // =============================================
 // UTILITY FUNCTIONS
@@ -380,11 +388,22 @@ async function generateJWT(payload: UserPayload, secret: string): Promise<string
 // counselor.ts can share them without a circular import).
 
 // Helper to get rate limit error response
-function rateLimitResponse(c: any, result: RateLimitResult) {
+function rateLimitResponse(c: Context<AppEnv>, result: RateLimitResult) {
+  const retryAfter = result.retryAfter ?? 30;
+  c.header('Retry-After', String(retryAfter));
+  if (result.reason === 'backend_unavailable') {
+    return c.json({
+      success: false,
+      error: 'Request protection is temporarily unavailable. Please try again.',
+      code: 'RATE_LIMIT_UNAVAILABLE',
+      retryAfter,
+    }, 503);
+  }
   return c.json({
     success: false,
     error: 'Too many requests. Please try again later.',
-    retryAfter: result.retryAfter
+    code: 'RATE_LIMITED',
+    retryAfter,
   }, 429);
 }
 
@@ -3861,15 +3880,103 @@ protectedApp.get('/usage/core-subjects/:examType', async (c) => {
 // Submit answer
 protectedApp.post('/questions/:id/attempt', async (c) => {
   const questionId = c.req.param('id');
-  const body = await parseJsonBody(c);
-  const answer = typeof body?.answer === 'string' ? body.answer : '';
+  const parsedBody = await parseBoundedJsonBody(c, MAX_QUESTION_ATTEMPT_BODY_BYTES);
+  if (!parsedBody.ok) {
+    if (parsedBody.reason === 'too_large') {
+      return c.json({
+        success: false,
+        error: 'Question attempt payload is too large',
+        code: 'PAYLOAD_TOO_LARGE',
+      }, 413);
+    }
+    return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+  }
+  const body = parsedBody.body;
+  const answer = typeof body.answer === 'string' ? body.answer : '';
+  const clientRequestId = typeof body.clientRequestId === 'string'
+    && /^[A-Za-z0-9_-]{16,128}$/.test(body.clientRequestId)
+    ? body.clientRequestId
+    : null;
   if (!answer.trim() || answer.length > MAX_QUESTION_ANSWER_LENGTH) {
     return c.json({ success: false, error: 'A valid answer is required' }, 400);
   }
+  if (!clientRequestId) {
+    return c.json({ success: false, error: 'A valid client request ID is required' }, 400);
+  }
+  if (
+    body.timeTaken !== undefined
+    && (!Number.isSafeInteger(body.timeTaken) || (body.timeTaken as number) < 0 || (body.timeTaken as number) > 86_400)
+  ) {
+    return c.json({ success: false, error: 'A valid timeTaken value is required' }, 400);
+  }
+  const submittedTimeTaken = body.timeTaken === undefined ? 0 : body.timeTaken as number;
 
   const userId = getUserId(c)!;
 
   try {
+    const requestFingerprint = await sha256Hex(JSON.stringify({
+      questionId,
+      answer,
+      timeTaken: submittedTimeTaken,
+    }));
+
+    const findReplay = async () => c.env.DB.prepare(`
+      SELECT qa.id, qa.question_id, qa.request_fingerprint, qa.is_correct,
+             qa.points_earned, q.correct_answer, q.explanation
+      FROM question_attempts qa
+      JOIN questions q ON q.id = qa.question_id
+      WHERE qa.user_id = ? AND qa.client_request_id = ?
+    `).bind(userId, clientRequestId).first<{
+      id: string;
+      question_id: string;
+      request_fingerprint: string;
+      is_correct: number;
+      points_earned: number | null;
+      correct_answer: string;
+      explanation: string | null;
+    }>();
+
+    const replayResponse = async (replay: NonNullable<Awaited<ReturnType<typeof findReplay>>>) => {
+      if (replay.question_id !== questionId || replay.request_fingerprint !== requestFingerprint) {
+        return c.json({
+          success: false,
+          error: 'Client request ID was already used for different answer data',
+          code: 'IDEMPOTENCY_CONFLICT',
+        }, 409);
+      }
+
+      const usage = await getDailyUsage(userId, c.env.DB);
+      return c.json({
+        success: true,
+        data: {
+          attemptId: replay.id,
+          isCorrect: replay.is_correct === 1,
+          correctAnswer: replay.correct_answer,
+          explanation: replay.explanation,
+          pointsEarned: Math.max(0, replay.points_earned ?? 0),
+          usage: {
+            used: usage.used,
+            limit: usage.limit,
+            remaining: usage.remaining,
+            isUnlimited: usage.isUnlimited,
+            showUpgradePrompt: !usage.isUnlimited && usage.remaining <= 3,
+          },
+          idempotent: true,
+        },
+      });
+    };
+
+    const replay = await findReplay();
+    if (replay) return replayResponse(replay);
+
+    const rateLimit = await checkRateLimit(
+      c.env.DB,
+      userId,
+      'question-attempt-write',
+      RATE_LIMITS['question-attempt-write'],
+    );
+    if (!rateLimit.allowed) return rateLimitResponse(c, rateLimit);
+
     // Resolve through the active subject before exposing answer material.
     const question = await c.env.DB.prepare(`
       SELECT q.*, s.slug AS subject_slug, et.slug AS exam_type_slug
@@ -3917,13 +4024,15 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
     );
     const pointsEarned = isCorrect ? (question.points as number) : 0;
     const progress = await prepareAttemptProgress(c.env.DB, {
+      clientRequestId,
+      requestFingerprint,
       userId,
       questionId,
       topicId: (question.topic_id as string | null) ?? null,
       examTypeId: (question.exam_type_id as string | null) ?? null,
       userAnswer: answer,
       isCorrect,
-      timeTaken: 0,
+      timeTaken: submittedTimeTaken,
       points: (question.points as number | null) ?? 3,
     });
 
@@ -3931,11 +4040,11 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
     let remaining = -1;
     let limit = -1;
 
-    if (premium) {
-      await c.env.DB.batch(progress.statements);
-    } else {
-      const allowance = prepareQuestionAllowance(userId, c.env.DB);
-      try {
+    try {
+      if (premium) {
+        await c.env.DB.batch(progress.statements);
+      } else {
+        const allowance = prepareQuestionAllowance(userId, c.env.DB);
         const batchResults = await c.env.DB.batch([allowance, ...progress.statements]);
         const allowanceResult = batchResults[0] as {
           results?: Array<{ question_count?: unknown }>;
@@ -3946,22 +4055,25 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
           : DAILY_QUESTION_LIMIT - (freeAllowance?.remaining ?? DAILY_QUESTION_LIMIT) + 1;
         limit = DAILY_QUESTION_LIMIT;
         remaining = Math.max(0, limit - used);
-      } catch (writeError) {
-        const message = writeError instanceof Error ? writeError.message : String(writeError);
-        if (message.includes('DAILY_QUESTION_LIMIT_EXCEEDED')) {
-          const currentUsage = await getDailyUsage(userId, c.env.DB);
-          return c.json({
-            success: false,
-            error: 'Daily question limit reached',
-            code: 'LIMIT_REACHED',
-            data: {
-              usage: currentUsage,
-              message: `You've used all ${DAILY_QUESTION_LIMIT} questions for today. Upgrade for unlimited practice!`,
-            },
-          }, 403);
-        }
-        throw writeError;
       }
+    } catch (writeError) {
+      const concurrentReplay = await findReplay();
+      if (concurrentReplay) return replayResponse(concurrentReplay);
+
+      const message = writeError instanceof Error ? writeError.message : String(writeError);
+      if (message.includes('DAILY_QUESTION_LIMIT_EXCEEDED')) {
+        const currentUsage = await getDailyUsage(userId, c.env.DB);
+        return c.json({
+          success: false,
+          error: 'Daily question limit reached',
+          code: 'LIMIT_REACHED',
+          data: {
+            usage: currentUsage,
+            message: `You've used all ${DAILY_QUESTION_LIMIT} questions for today. Upgrade for unlimited practice!`,
+          },
+        }, 403);
+      }
+      throw writeError;
     }
 
     const isUnlimited = limit === -1;
@@ -3970,6 +4082,7 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
     return c.json({
       success: true,
       data: {
+        attemptId: progress.attemptId,
         isCorrect,
         correctAnswer: question.correct_answer,
         explanation: question.explanation,
@@ -3981,6 +4094,7 @@ protectedApp.post('/questions/:id/attempt', async (c) => {
           isUnlimited,
           showUpgradePrompt,
         },
+        idempotent: false,
       },
     });
   } catch (error) {
@@ -4059,18 +4173,213 @@ protectedApp.post('/practice/sessions', async (c) => {
     return c.json({ success: false, error: 'Unauthorized' }, 401);
   }
 
-  const { mode, subjectId, topicId, questionsCount, correctCount, totalTime, score } = await c.req.json();
+  const parsedBody = await parseBoundedJsonBody(c, MAX_PRACTICE_SESSION_BODY_BYTES);
+  if (!parsedBody.ok) {
+    if (parsedBody.reason === 'too_large') {
+      return c.json({ success: false, error: 'Practice session payload is too large' }, 413);
+    }
+    return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+  }
+  const body = parsedBody.body;
+
+  const allowedModes = new Set([
+    'topic_drill',
+    'speed_race',
+    'flashcard',
+    'competition_sim',
+    'past_paper',
+    'essay_practice',
+  ]);
+  const readOptionalId = (value: unknown, maximum = 128): string | null | undefined => {
+    if (value === undefined || value === null || value === '') return null;
+    if (typeof value !== 'string') return undefined;
+    const trimmed = value.trim();
+    return new RegExp(`^[A-Za-z0-9_-]{1,${maximum}}$`).test(trimmed) ? trimmed : undefined;
+  };
+
+  const mode = typeof body.mode === 'string' && allowedModes.has(body.mode) ? body.mode : null;
+  const subjectId = readOptionalId(body.subjectId);
+  const topicId = readOptionalId(body.topicId);
+  const clientRequestId = readOptionalId(body.clientRequestId, 128);
+  const attemptIds = Array.isArray(body.attemptIds)
+    ? body.attemptIds.map((attemptId) => readOptionalId(attemptId, 128))
+    : null;
+
+  if (
+    !mode
+    || subjectId === undefined
+    || topicId === undefined
+    || !clientRequestId
+    || !attemptIds
+    || attemptIds.length < 1
+    || attemptIds.length > MAX_PRACTICE_SESSION_ATTEMPTS
+    || attemptIds.some((attemptId) => !attemptId)
+    || new Set(attemptIds).size !== attemptIds.length
+  ) {
+    return c.json({ success: false, error: 'Invalid practice session payload' }, 400);
+  }
+  if (topicId && !subjectId) {
+    return c.json({ success: false, error: 'A topic requires a subject' }, 400);
+  }
 
   try {
+    const normalizedAttemptIds = [...attemptIds] as string[];
+    const requestFingerprint = await sha256Hex(JSON.stringify({
+      mode,
+      subjectId,
+      topicId,
+      attemptIds: [...normalizedAttemptIds].sort(),
+    }));
+
+    const findReplay = async () => c.env.DB.prepare(`
+      SELECT id, request_fingerprint, questions_count, correct_count, total_time, score
+      FROM practice_sessions
+      WHERE user_id = ? AND client_request_id = ?
+    `).bind(userId, clientRequestId).first<{
+      id: string;
+      request_fingerprint: string;
+      questions_count: number;
+      correct_count: number;
+      total_time: number;
+      score: number;
+    }>();
+
+    const replay = await findReplay();
+    if (replay) {
+      if (replay.request_fingerprint !== requestFingerprint) {
+        return c.json({ success: false, error: 'Client request ID was already used for different session data' }, 409);
+      }
+      return c.json({
+        success: true,
+        data: {
+          id: replay.id,
+          questionsCount: replay.questions_count,
+          correctCount: replay.correct_count,
+          totalTime: replay.total_time,
+          score: replay.score,
+          idempotent: true,
+        },
+      });
+    }
+
+    const rateLimit = await checkRateLimit(
+      c.env.DB,
+      userId,
+      'practice-session-save',
+      RATE_LIMITS['practice-session-save'],
+    );
+    if (!rateLimit.allowed) return rateLimitResponse(c, rateLimit);
+
+    if (subjectId) {
+      const subject = await c.env.DB.prepare(
+        'SELECT id FROM subjects WHERE id = ? AND is_active = 1'
+      ).bind(subjectId).first();
+      if (!subject) {
+        return c.json({ success: false, error: 'Subject not found' }, 404);
+      }
+    }
+
+    if (topicId) {
+      const topic = await c.env.DB.prepare(
+        'SELECT subject_id FROM topics WHERE id = ?'
+      ).bind(topicId).first<{ subject_id: string }>();
+      if (!topic) {
+        return c.json({ success: false, error: 'Topic not found' }, 404);
+      }
+      if (topic.subject_id !== subjectId) {
+        return c.json({ success: false, error: 'Topic does not belong to subject' }, 400);
+      }
+    }
+
+    const placeholders = normalizedAttemptIds.map(() => '?').join(', ');
+    const { results: attemptRows } = await c.env.DB.prepare(`
+      SELECT qa.id, qa.is_correct, qa.points_earned, qa.time_taken,
+             q.subject_id, q.topic_id, psa.session_id
+      FROM question_attempts qa
+      JOIN questions q ON q.id = qa.question_id
+      LEFT JOIN practice_session_attempts psa ON psa.attempt_id = qa.id
+      WHERE qa.user_id = ? AND qa.id IN (${placeholders})
+    `).bind(userId, ...normalizedAttemptIds).all<{
+      id: string;
+      is_correct: number;
+      points_earned: number | null;
+      time_taken: number;
+      subject_id: string;
+      topic_id: string | null;
+      session_id: string | null;
+    }>();
+
+    if (attemptRows.length !== normalizedAttemptIds.length) {
+      return c.json({ success: false, error: 'Invalid attempt references' }, 400);
+    }
+    if (attemptRows.some((attempt) => attempt.session_id !== null)) {
+      return c.json({ success: false, error: 'An attempt is already assigned to a completed session' }, 409);
+    }
+    if (subjectId && attemptRows.some((attempt) => attempt.subject_id !== subjectId)) {
+      return c.json({ success: false, error: 'Attempt does not belong to requested subject' }, 400);
+    }
+    if (topicId && attemptRows.some((attempt) => attempt.topic_id !== topicId)) {
+      return c.json({ success: false, error: 'Attempt does not belong to requested topic' }, 400);
+    }
+
+    const questionsCount = attemptRows.length;
+    const correctCount = attemptRows.reduce((sum, attempt) => sum + (attempt.is_correct === 1 ? 1 : 0), 0);
+    const totalTime = attemptRows.reduce((sum, attempt) => sum + Math.max(0, attempt.time_taken || 0), 0);
+    const score = attemptRows.reduce((sum, attempt) => sum + Math.max(0, attempt.points_earned || 0), 0);
+
     const id = `ps_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const demoFlags = getDemoDataFlags(userId);
 
-    await c.env.DB.prepare(`
-      INSERT INTO practice_sessions (id, user_id, mode, subject_id, topic_id, questions_count, correct_count, total_time, score, completed_at, is_demo_data, expires_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, ?)
-    `).bind(id, userId, mode, subjectId || null, topicId || null, questionsCount, correctCount, totalTime, score, demoFlags.is_demo_data, demoFlags.expires_at).run();
+    const insertSession = c.env.DB.prepare(`
+      INSERT INTO practice_sessions (
+        id, user_id, mode, subject_id, topic_id, questions_count, correct_count,
+        total_time, score, completed_at, is_demo_data, expires_at,
+        client_request_id, request_fingerprint
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, ?, ?, ?)
+    `).bind(
+      id,
+      userId,
+      mode,
+      subjectId || null,
+      topicId || null,
+      questionsCount,
+      correctCount,
+      totalTime,
+      score,
+      demoFlags.is_demo_data,
+      demoFlags.expires_at,
+      clientRequestId,
+      requestFingerprint,
+    );
+    const linkAttempts = normalizedAttemptIds.map((attemptId) => c.env.DB.prepare(`
+      INSERT INTO practice_session_attempts (session_id, attempt_id)
+      VALUES (?, ?)
+    `).bind(id, attemptId));
 
-    return c.json({ success: true, data: { id } });
+    try {
+      await c.env.DB.batch([insertSession, ...linkAttempts]);
+    } catch (writeError) {
+      const concurrentReplay = await findReplay();
+      if (concurrentReplay && concurrentReplay.request_fingerprint === requestFingerprint) {
+        return c.json({
+          success: true,
+          data: {
+            id: concurrentReplay.id,
+            questionsCount: concurrentReplay.questions_count,
+            correctCount: concurrentReplay.correct_count,
+            totalTime: concurrentReplay.total_time,
+            score: concurrentReplay.score,
+            idempotent: true,
+          },
+        });
+      }
+      throw writeError;
+    }
+
+    return c.json({
+      success: true,
+      data: { id, questionsCount, correctCount, totalTime, score, idempotent: false },
+    });
   } catch (error) {
     console.error('Failed to create practice session:', error);
     return c.json({ success: false, error: 'Failed to save practice session' }, 500);
