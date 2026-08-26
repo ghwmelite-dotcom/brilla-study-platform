@@ -1,9 +1,12 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateQuestionBatch } from './question-content-lib.mjs';
+import { normalizeQuestionText, validateQuestionBatch } from './question-content-lib.mjs';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const sourceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const outputRootArgument = process.argv.indexOf('--output-root');
+if (outputRootArgument >= 0 && !process.argv[outputRootArgument + 1]) throw new Error('--output-root requires a path');
+const outputRoot = outputRootArgument >= 0 ? resolve(process.argv[outputRootArgument + 1]) : sourceRoot;
 const generatedAt = '2026-08-26T00:00:00Z';
 const labels = ['A', 'B', 'C', 'D'];
 const difficulties = ['easy', 'medium', 'hard'];
@@ -11,84 +14,18 @@ const assessmentObjectives = ['AO1', 'AO2', 'AO3'];
 
 const item = (topicCode, prompt, correct, wrong, explanation) => ({ topicCode, prompt, correct, wrong, explanation });
 
-const commerce = {
-  key: 'commerce',
-  subjectId: 'subj_wassce_commerce',
-  specId: 'spec_wassce_commerce_waec',
-  specificationCode: 'WAEC-WASSCE-COMMERCE',
-  syllabusName: 'Commerce Detailed Syllabus',
-  sourceUrl: 'https://waecgh.org/wp-content/uploads/2024/07/COMMERCE.pdf',
-  totalPapers: 2,
-  contentLabel: 'Original BrillaPrep practice content aligned to the published WAEC Ghana Commerce syllabus; not official WAEC examination material.',
-  topics: [
-    ['COM-1', 'Commerce, production and occupation', 'Explain the scope of commerce, production, factors of production, occupation and division of labour.'],
-    ['COM-2', 'Business organisations', 'Compare ownership, formation, finance, advantages and limitations of common business organisations.'],
-    ['COM-3', 'Trade and distribution', 'Apply principles of home and foreign trade, wholesale, retail and channels of distribution.'],
-    ['COM-4', 'Transport, warehousing and communication', 'Evaluate how transport, storage and communication facilitate the movement of goods and information.'],
-    ['COM-5', 'Banking, money and finance', 'Explain banking services, payment instruments, credit and sources of business finance.'],
-    ['COM-6', 'Insurance and business risk', 'Apply insurance principles and distinguish common policies used to manage commercial risk.'],
-    ['COM-7', 'Marketing and consumer protection', 'Use marketing, advertising and consumer-protection principles in practical business decisions.'],
-    ['COM-8', 'E-commerce and business environment', 'Analyse e-commerce, business regulation and economic, social and technological environmental factors.'],
-  ],
-  facts: [
-    item('COM-1', 'Which statement best describes commerce?', 'Activities that facilitate the exchange and distribution of goods and services', ['Only the extraction of raw materials', 'Only manufacturing goods in factories', 'Any activity performed without exchange'], 'Commerce connects producers and consumers through trade and the services that support trade, including transport, banking, insurance, warehousing and communication.'),
-    item('COM-1', 'Which factor of production receives rent as its usual reward?', 'Land', ['Labour', 'Capital', 'Entrepreneurship'], 'Land includes natural resources used in production, and its payment is rent. Labour earns wages, capital earns interest, and entrepreneurship earns profit.'),
-    item('COM-1', 'A cocoa farmer, a chocolate factory worker and a retailer belong respectively to which occupational groups?', 'Primary, secondary and commercial', ['Secondary, primary and direct service', 'Commercial, primary and secondary', 'Direct service, commercial and primary'], 'The farmer extracts a natural product, the factory transforms it, and the retailer helps distribute the finished product to consumers.'),
-    item('COM-1', 'What is a likely advantage of division of labour in a factory?', 'Workers can specialise and increase output', ['Every worker must master every production stage', 'Production becomes independent of coordination', 'Repetition can never affect worker motivation'], 'Specialisation can improve speed and skill through repeated performance of a limited task, although excessive repetition can also create monotony.'),
-    item('COM-1', 'Why is an entrepreneur important in production?', 'The entrepreneur organises resources and bears business risk', ['The entrepreneur supplies only unskilled labour', 'The entrepreneur fixes all market prices', 'The entrepreneur removes the need for capital'], 'Entrepreneurs combine land, labour and capital, make decisions, innovate and accept the possibility that business outcomes may differ from plans.'),
-
-    item('COM-2', 'Which feature most clearly distinguishes a sole proprietorship?', 'One person owns and controls the business', ['Its shares must be sold on a stock exchange', 'It must have at least twenty partners', 'Government owns all of its assets'], 'A sole proprietorship is owned by one individual who normally controls decisions and receives profit while bearing unlimited liability.'),
-    item('COM-2', 'What is the main purpose of a partnership deed?', 'To record partners’ rights, duties and agreed business terms', ['To advertise products to the public', 'To replace every law governing partnerships', 'To guarantee that the partnership cannot dissolve'], 'A partnership deed reduces uncertainty by documenting capital contributions, profit sharing, responsibilities, admission, retirement and dispute procedures.'),
-    item('COM-2', 'What does limited liability protect a shareholder from?', 'Losing more than the amount committed to the company', ['A fall in the market value of shares', 'Every consequence of fraudulent conduct', 'The company making a trading loss'], 'A company is legally separate from its shareholders, so an ordinary shareholder’s financial exposure is generally limited to the unpaid amount on the shares.'),
-    item('COM-2', 'Which principle is central to a co-operative society?', 'Members jointly own it to advance shared economic interests', ['Voting power always depends only on wealth', 'Profit for outside investors is its sole purpose', 'Membership must be restricted to government officials'], 'Co-operatives are formed by members who pool resources and use democratic structures to obtain services or market benefits for the membership.'),
-    item('COM-2', 'Why might a public enterprise be established?', 'To provide an essential service with significant public interest', ['To prevent government from delivering infrastructure', 'To ensure that all services maximise short-term profit', 'To eliminate public accountability'], 'Public enterprises may provide strategic or essential services where access, long-term investment or national policy matters alongside financial performance.'),
-
-    item('COM-3', 'What is the basic difference between wholesale and retail trade?', 'Wholesalers mainly sell in bulk to businesses, while retailers sell to final consumers', ['Retailers always manufacture every item they sell', 'Wholesalers sell only services', 'There is no difference in the customers they serve'], 'Wholesalers commonly break the production-to-retail gap by buying large quantities, while retailers make suitable quantities available to final users.'),
-    item('COM-3', 'Which document sent by a seller shows goods supplied and the amount due?', 'Invoice', ['Enquiry', 'Debit card', 'Certificate of origin'], 'An invoice itemises goods, quantities, prices, discounts and the total payable, creating a commercial record of the credit sale.'),
-    item('COM-3', 'What does a bill of lading mainly provide in sea transport?', 'Evidence of receipt, carriage terms and title to shipped goods', ['A retail price list', 'A licence to operate a bank', 'A guarantee that goods cannot be damaged'], 'The carrier issues a bill of lading as a receipt and contract evidence, and the document can represent title to the specified goods.'),
-    item('COM-3', 'Why may a producer use an agent in a foreign market?', 'The agent can provide local market knowledge and arrange sales', ['The agent eliminates exchange-rate risk completely', 'The agent becomes the automatic owner of the factory', 'The agent makes customs rules irrelevant'], 'An agent can locate buyers, negotiate and advise on local practices for a commission, while ownership and commercial risk remain governed by the agreement.'),
-    item('COM-3', 'What is a major function of a wholesaler for a manufacturer?', 'Buying large quantities and reducing the manufacturer’s storage burden', ['Selling only one unit at a time to every consumer', 'Preventing products from reaching retailers', 'Setting national taxation policy'], 'By purchasing in bulk and holding stock, wholesalers help manufacturers maintain production and reach many retailers through fewer transactions.'),
-
-    item('COM-4', 'Which mode is generally most suitable for moving bulky low-value goods over a long international route?', 'Sea transport', ['Courier motorcycle', 'Air freight', 'Hand delivery'], 'Sea transport has high capacity and relatively low unit cost for bulky cargo, although it is slower than air transport.'),
-    item('COM-4', 'What is the commercial benefit of warehousing seasonal goods?', 'Supply can be held and released when consumers require it', ['Storage makes every product improve with age', 'Warehousing removes all insurance needs', 'Goods can no longer lose value'], 'Warehousing balances production and consumption across time, but stock must still be protected, recorded and managed against damage or obsolescence.'),
-    item('COM-4', 'Why is containerisation important in international trade?', 'Standard containers reduce repeated handling and support intermodal transport', ['Containers remove the need for documentation', 'Every container can carry any hazardous product without rules', 'Containers guarantee zero theft'], 'A sealed standard unit can transfer between ship, rail and road more efficiently, lowering handling time and some loss risks.'),
-    item('COM-4', 'Which communication method provides a durable formal record of agreed contract terms?', 'A signed written or authenticated electronic document', ['An unrecorded casual conversation', 'A rumour from a third party', 'An anonymous verbal message'], 'A retained, attributable document allows the parties to review what was offered and accepted and can support audit or dispute resolution.'),
-    item('COM-4', 'What is an important consideration when choosing transport for perishable goods?', 'Speed and the availability of suitable temperature control', ['Only the colour of the vehicle', 'The driver’s favourite route regardless of time', 'Whether the goods need no handling'], 'Perishables can deteriorate quickly, so delivery time, refrigeration, reliability, cost and product value must be balanced.'),
-
-    item('COM-5', 'Which bank service lets a business receive customer payments directly into its account?', 'Electronic funds transfer', ['A warehouse warrant', 'A trade mark', 'A consignment note'], 'Electronic transfers move value between accounts using authenticated payment systems and create transaction records for reconciliation.'),
-    item('COM-5', 'What is the main role of a central bank?', 'Manage monetary policy and support stability of the banking system', ['Sell household goods at retail', 'Operate every private company', 'Provide only long-term warehouse space'], 'A central bank issues or manages currency, implements monetary policy, holds reserves and performs regulatory or system-stability functions.'),
-    item('COM-5', 'Why might a profitable business still face a cash-flow problem?', 'Cash may be tied up in stock or unpaid customer accounts', ['Profit and cash are always identical', 'All profitable sales are paid immediately', 'Expenses never fall due before revenue'], 'Accounting profit can include credit sales, while wages and suppliers require cash. Timing differences can therefore create a liquidity shortage.'),
-    item('COM-5', 'Which source of finance is normally most suitable for a short temporary cash shortfall?', 'A bank overdraft within an agreed limit', ['Issuing permanent ordinary shares for one week', 'Selling all productive equipment', 'A thirty-year mortgage on stock'], 'An overdraft is flexible short-term bank credit charged on the amount used, though cost and repayment conditions must be assessed.'),
-    item('COM-5', 'What is the purpose of a letter of credit in foreign trade?', 'A bank conditionally undertakes payment when compliant documents are presented', ['It guarantees product quality after use', 'It removes all documentary requirements', 'It fixes the exchange rate forever'], 'A documentary credit reduces payment risk by linking the bank’s undertaking to presentation of specified documents within stated terms.'),
-
-    item('COM-6', 'Which insurance principle requires a person to stand to lose financially from the insured event?', 'Insurable interest', ['Contribution', 'Subrogation', 'Arbitration'], 'Insurable interest prevents insurance from becoming a wager by requiring a recognised financial or legal relationship with the subject matter.'),
-    item('COM-6', 'What does the principle of indemnity seek to achieve?', 'Restore the insured financially to the approximate pre-loss position', ['Allow the insured to profit from every loss', 'Pay every claim without evidence', 'Replace criminal law'], 'For indemnity policies, compensation is linked to the actual covered loss and policy limits rather than creating a gain from misfortune.'),
-    item('COM-6', 'Which policy is most directly associated with goods transported by sea?', 'Marine cargo insurance', ['Fidelity guarantee', 'Personal accident cover', 'Employer pension plan'], 'Marine cargo insurance covers specified transit risks for goods moved by sea and related stages, subject to policy terms and exclusions.'),
-    item('COM-6', 'Why must an applicant disclose material facts to an insurer?', 'They can affect whether the risk is accepted and on what terms', ['Disclosure guarantees that no claim will occur', 'Only the insurer has duties of honesty', 'Material facts never affect premiums'], 'Insurance pricing and acceptance depend on relevant risk information, so concealing a material fact can undermine the contract or a claim.'),
-    item('COM-6', 'What is reinsurance?', 'Insurance purchased by an insurer to share part of its risk', ['A customer insuring the same phone twice for profit', 'Replacing an expired driving licence', 'A retailer returning goods to a wholesaler'], 'Reinsurance spreads large or accumulated exposures across insurers and helps the original insurer manage capacity and solvency risk.'),
-
-    item('COM-7', 'What is market segmentation?', 'Dividing customers into groups with relevant shared characteristics', ['Charging every customer a random price', 'Producing without studying demand', 'Eliminating all product differences'], 'Segmentation helps a business tailor products, messages and channels to groups with similar needs, behaviour or purchasing power.'),
-    item('COM-7', 'Which element of the marketing mix concerns how a product reaches the customer?', 'Place', ['Product', 'Price', 'Promotion'], 'Place covers distribution channels, location, logistics and availability, while the other elements address the offer, charge and communication.'),
-    item('COM-7', 'Why should an advertisement avoid false performance claims?', 'They can mislead consumers and breach fair-trading obligations', ['False claims always improve long-term trust', 'Advertising is exempt from every law', 'Consumers never rely on product information'], 'Accurate claims support informed choice and sustainable trust, while deceptive claims can trigger complaints, sanctions and reputational damage.'),
-    item('COM-7', 'What is branding intended to do?', 'Create a recognisable identity that distinguishes an offering', ['Guarantee that the product is cheapest', 'Remove the need for consistent quality', 'Prevent competitors from advertising'], 'Names, symbols and associations help buyers recognise and evaluate an offering, but the brand promise must be supported by actual experience.'),
-    item('COM-7', 'Which evidence is most useful before launching a new retail product?', 'Research on customer needs, competitors, price and likely demand', ['The owner’s preference alone', 'A supplier’s colour choice only', 'An unrelated company’s payroll'], 'Market research reduces avoidable uncertainty by testing the target need, purchasing conditions, alternatives and commercial viability.'),
-
-    item('COM-8', 'What is a major benefit of e-commerce to a small retailer?', 'Customers can view and order products beyond the physical shop’s opening hours', ['Every online visitor must buy', 'Delivery and fraud risks disappear', 'Internet access becomes unnecessary'], 'An online channel can widen reach and availability, but the retailer must still manage payments, fulfilment, security and customer service.'),
-    item('COM-8', 'Which control most directly protects an online customer account?', 'Strong authentication and secure handling of credentials', ['Publishing passwords for convenience', 'Disabling transaction records', 'Accepting every login attempt without limits'], 'Authentication, protected credential storage and monitoring reduce account takeover risk and support trustworthy digital commerce.'),
-    item('COM-8', 'How can inflation affect a trading business?', 'It can raise input costs and reduce customers’ purchasing power', ['It guarantees that real profit rises', 'It prevents prices from changing', 'It removes the need for working capital'], 'Persistent price increases change costs, selling prices, cash needs and real consumer incomes, requiring budgets and pricing decisions to be reviewed.'),
-    item('COM-8', 'Which is a technological factor in the business environment?', 'Adoption of mobile payments and digital inventory systems', ['The age distribution of the population', 'A new consumer-protection statute', 'Changes in rainfall affecting farms'], 'Technology changes how firms produce, sell, communicate and control information, creating both efficiency opportunities and new operational risks.'),
-    item('COM-8', 'Why should a business keep accurate transaction records?', 'They support decisions, tax compliance, reconciliation and accountability', ['Records make internal controls unnecessary', 'Records guarantee that theft cannot occur', 'Only failed businesses need records'], 'Reliable records show what was sold, received and owed, enabling management review, statutory reporting and investigation of discrepancies.'),
-  ],
-};
-
 const islamic = {
   key: 'irs',
   subjectId: 'subj_wassce_irs',
-  specId: 'spec_wassce_irs_waec',
-  specificationCode: 'WAEC-WASSCE-IRS',
-  syllabusName: 'Islamic Religious Studies syllabus evidence',
-  sourceUrl: 'https://www.waeconline.org.ng/e-learning/Islamic/IRKmain.html',
-  totalPapers: 2,
+  specId: 'spec_wassce_irs_brilla_b001',
+  specificationCode: 'BRILLA-WASSCE-IRS-BETA-001',
+  syllabusName: 'BrillaPrep IRS beta content blueprint',
+  releaseSourceUrl: 'https://waecgh.org/home/wassce-school/',
+  assessmentInfo: 'Internal BrillaPrep evidence blueprint for a current WASSCE subject. It does not claim an official syllabus code, validity date or paper structure.',
+  sources: [
+    { publisher: 'West African Examinations Council, Ghana', title: 'WASSCE for School Candidates subject catalogue', url: 'https://waecgh.org/home/wassce-school/' },
+    { publisher: 'West African Examinations Council', title: 'Islamic Studies e-learning index', url: 'https://www.waeconline.org.ng/e-learning/Islamic/IRKmain.html' },
+  ],
   contentLabel: 'Original BrillaPrep practice content aligned to published WAEC Islamic Studies learning evidence; not official WAEC examination material.',
   topics: [
     ['IRS-1', 'The Qur’an and revelation', 'Explain revelation, preservation, structure and selected moral teachings of the Qur’an.'],
@@ -154,12 +91,17 @@ const islamic = {
 const electricity = {
   key: 'elect',
   subjectId: 'subj_wassce_elect_app',
-  specId: 'spec_wassce_elect_app_waec',
-  specificationCode: 'WAEC-WASSCE-APPLIED-ELECTRICITY',
-  syllabusName: 'Applied Electricity syllabus evidence',
-  sourceUrl: 'https://waecgh.org/wp-content/uploads/2023/12/Technical17.pdf',
-  totalPapers: 3,
-  contentLabel: 'Original BrillaPrep practice content aligned to published WAEC Ghana Applied Electricity evidence; not official WAEC examination material.',
+  specId: 'spec_wassce_elect_app_brilla_b001',
+  specificationCode: 'BRILLA-WASSCE-AEL-BETA-001',
+  syllabusName: 'BrillaPrep transitional Applied Electricity beta content blueprint',
+  releaseSourceUrl: 'https://waecgh.org/wp-content/uploads/2026/03/FINAL-TIMETABLE-FOR-WASSCE-SC-2026-GHANA-ONLY-NEW-TAD.pdf',
+  assessmentInfo: 'Internal BrillaPrep evidence blueprint for the outgoing Applied Electricity track examined during Ghana curriculum transition. New-curriculum learners use Applied Technology III (Electrical and Electronic Technology).',
+  sources: [
+    { publisher: 'West African Examinations Council, Ghana', title: 'WASSCE for School Candidates 2026 final timetable', url: 'https://waecgh.org/wp-content/uploads/2026/03/FINAL-TIMETABLE-FOR-WASSCE-SC-2026-GHANA-ONLY-NEW-TAD.pdf' },
+    { publisher: 'National Council for Curriculum and Assessment, Ghana', title: 'Applied Technology Curriculum', url: 'https://nacca.gov.gh/wp-content/uploads/2025/04/Applied-Technology-Curriculum.pdf' },
+    { publisher: 'West African Examinations Council, Ghana', title: 'Applied Electricity chief examiner evidence', url: 'https://waecgh.org/wp-content/uploads/2023/12/Technical17.pdf' },
+  ],
+  contentLabel: 'Original BrillaPrep transitional Applied Electricity practice; not official WAEC examination material and not the new Applied Technology III bank.',
   topics: [
     ['AEL-1', 'Electrical safety and quantities', 'Apply electrical safety and explain charge, current, voltage, resistance, power, energy and their units.'],
     ['AEL-2', 'Direct-current circuits', 'Analyse series, parallel and mixed direct-current circuits using circuit laws.'],
@@ -172,7 +114,7 @@ const electricity = {
   ],
   facts: [
     item('AEL-1', 'What should be done first before working on a mains electrical circuit?', 'Isolate the supply and verify that the circuit is de-energised', ['Touch a conductor to test it by sensation', 'Replace the fuse while current is flowing', 'Assume an open switch guarantees isolation'], 'Safe isolation requires disconnection, prevention of unintended reconnection and verification with suitable test equipment before conductors are handled.'),
-    item('AEL-1', 'What is the SI unit of electric current?', 'Ampere', ['Volt', 'Ohm', 'Watt'], 'Current is the rate of flow of electric charge and is measured in amperes, while voltage, resistance and power use different units.'),
+    item('AEL-1', 'A current meter reads 2.5 A. Which SI base unit is represented by the symbol A?', 'Ampere', ['Volt', 'Ohm', 'Watt'], 'Current is the rate of flow of electric charge and is measured in amperes, while voltage, resistance and power use different units.'),
     item('AEL-1', 'A 12 V device draws 2 A. What electrical power does it use?', '24 W', ['6 W', '10 W', '48 W'], 'Electrical power in a direct-current resistive load is P = VI, so 12 multiplied by 2 gives 24 watts.'),
     item('AEL-1', 'What does resistance describe?', 'Opposition to electric current flow', ['The rate of using electrical energy only', 'The amount of charge stored in every source', 'The magnetic direction of a compass'], 'Resistance relates voltage to current and is measured in ohms; material, length, cross-sectional area and temperature can affect it.'),
     item('AEL-1', 'Why must a person avoid using water on energised electrical equipment?', 'Water can create conductive paths and increase shock or fault risk', ['Water always raises insulation resistance', 'It safely isolates every live conductor', 'It guarantees that protective devices cannot operate'], 'Ordinary water and contaminants may conduct current, exposing people and equipment to shock, short-circuit and arc hazards.'),
@@ -184,13 +126,13 @@ const electricity = {
     item('AEL-2', 'A 6 Ω resistor carries 3 A. What is the voltage across it?', '18 V', ['2 V', '9 V', '36 V'], 'Ohm’s law gives V = IR. Multiplying 3 amperes by 6 ohms gives a potential difference of 18 volts.'),
 
     item('AEL-3', 'What does a capacitor store?', 'Electric charge and energy in an electric field', ['A continuous supply of fuel', 'Only magnetic poles', 'Mechanical torque without a field'], 'Separated conductors and a dielectric allow charge to accumulate, with energy stored in the electric field between them.'),
-    item('AEL-3', 'What is the unit of capacitance?', 'Farad', ['Henry', 'Weber', 'Tesla'], 'Capacitance is charge stored per unit potential difference and is measured in farads, commonly expressed in microfarads or smaller units.'),
+    item('AEL-3', 'A capacitor is marked 470 µF. Which named SI unit does the letter F represent?', 'Farad', ['Henry', 'Weber', 'Tesla'], 'Capacitance is charge stored per unit potential difference and is measured in farads, commonly expressed in microfarads or smaller units.'),
     item('AEL-3', 'How does capacitive reactance change when frequency increases?', 'It decreases', ['It increases linearly', 'It remains constant', 'It becomes resistance only'], 'Capacitive reactance is Xc = 1 divided by 2πfC, so higher frequency produces less opposition from a given capacitor.'),
     item('AEL-3', 'What is impedance in an alternating-current circuit?', 'The combined opposition of resistance and reactance', ['The direct-current charge of a battery', 'Only the physical size of a conductor', 'Power multiplied by time'], 'Impedance accounts for resistance and frequency-dependent reactance and is represented in ohms, often with magnitude and phase.'),
     item('AEL-3', 'Why is a high power factor generally desirable for an AC load?', 'It reduces current required for a given real power', ['It makes voltage and frequency irrelevant', 'It eliminates all energy loss', 'It causes every load to become capacitive'], 'When power factor is closer to unity, less current is needed to deliver the same useful power, reducing conductor and system losses.'),
 
-    item('AEL-4', 'What happens around a conductor carrying current?', 'A magnetic field is produced', ['Its resistance must become zero', 'All nearby metals become permanent magnets', 'Voltage can no longer be measured'], 'Moving electric charge produces a magnetic field whose direction around a straight conductor follows the right-hand grip rule.'),
-    item('AEL-4', 'What is electromagnetic induction?', 'Production of an emf when magnetic flux linkage changes', ['Creation of energy without a source', 'Permanent charging of every iron core', 'Conversion of resistance directly into mass'], 'Faraday’s law relates induced emf to the rate of change of magnetic flux linkage through a circuit.'),
+    item('AEL-4', 'A compass is placed beside a straight wire and deflects when the wire is energised. What produced the deflection?', 'A magnetic field is produced', ['Its resistance must become zero', 'All nearby metals become permanent magnets', 'Voltage can no longer be measured'], 'Moving electric charge produces a magnetic field whose direction around a straight conductor follows the right-hand grip rule.'),
+    item('AEL-4', 'A coil is moved through a magnetic field and a voltmeter briefly deflects. Which process produced the emf?', 'Production of an emf when magnetic flux linkage changes', ['Creation of energy without a source', 'Permanent charging of every iron core', 'Conversion of resistance directly into mass'], 'Faraday’s law relates induced emf to the rate of change of magnetic flux linkage through a circuit.'),
     item('AEL-4', 'Why is a transformer core laminated?', 'To reduce eddy-current losses', ['To increase winding resistance deliberately', 'To stop magnetic flux entirely', 'To convert AC directly into DC'], 'Thin insulated laminations interrupt circulating currents in the core, reducing heating and wasted power.'),
     item('AEL-4', 'An ideal transformer has 100 primary turns and 20 secondary turns with 240 V applied. What is the secondary voltage?', '48 V', ['12 V', '120 V', '1200 V'], 'For an ideal transformer, Vs divided by Vp equals Ns divided by Np. Thus 240 multiplied by 20 over 100 equals 48 volts.'),
     item('AEL-4', 'Why does a transformer require a changing magnetic flux?', 'A changing flux is needed to induce emf in the secondary winding', ['Steady DC automatically produces continuous secondary voltage', 'Flux must remain zero for energy transfer', 'The core supplies unlimited electrical energy'], 'Mutual induction depends on changing flux linkage, which is why ordinary transformers operate with alternating rather than steady direct current.'),
@@ -214,14 +156,14 @@ const electricity = {
     item('AEL-7', 'What operating state is intended when a transistor is used as a closed electronic switch?', 'Saturation', ['Cut-off', 'Reverse breakdown', 'Open-circuit bias only'], 'In saturation the transistor conducts strongly with a small collector-emitter voltage, while cut-off represents the open-switch state.'),
 
     item('AEL-8', 'What is the main safety purpose of protective earthing?', 'Provide a low-impedance fault path so protection disconnects exposed metal', ['Make all conductors carry normal load current through earth', 'Increase touch voltage during a fault', 'Replace overcurrent protection'], 'Earthing connects exposed conductive parts so a fault current can operate protective devices quickly and limit dangerous touch voltage.'),
-    item('AEL-8', 'What is the purpose of a fuse?', 'Open the circuit when current exceeds its safe value for sufficient time', ['Maintain current regardless of faults', 'Increase conductor temperature', 'Act as a normal on-off control switch'], 'A fuse element melts under excessive current, interrupting the circuit to reduce damage and fire risk when correctly rated and installed.'),
+    item('AEL-8', 'A correctly rated fuse melts during a sustained overcurrent. What protective action has it performed?', 'Open the circuit when current exceeds its safe value for sufficient time', ['Maintain current regardless of faults', 'Increase conductor temperature', 'Act as a normal on-off control switch'], 'A fuse element melts under excessive current, interrupting the circuit to reduce damage and fire risk when correctly rated and installed.'),
     item('AEL-8', 'Which device is designed to detect an imbalance between line and neutral currents?', 'Residual current device', ['Energy meter', 'Step-up transformer', 'Series resistor'], 'An RCD compares outgoing and returning current and disconnects when leakage exceeds its trip threshold, supplementing other protection.'),
     item('AEL-8', 'Why is electrical power transmitted at high voltage?', 'Higher voltage permits lower current and lower I²R loss for the same power', ['High voltage makes conductors have no resistance', 'It removes the need for insulation', 'It makes transformers unnecessary'], 'For a given power, raising voltage lowers current, and resistive line loss falls with the square of current, subject to insulation and equipment requirements.'),
-    item('AEL-8', 'What nominal low-voltage supply is commonly delivered to a single-phase consumer from a 415/240 V distribution system?', 'About 240 V between phase and neutral', ['About 11 kV between phase and neutral', 'Exactly 0 V at the service terminals', 'About 132 kV inside the consumer unit'], 'A three-phase four-wire distribution system provides roughly 415 V phase-to-phase and 240 V phase-to-neutral for single-phase loads.'),
+    item('AEL-8', 'In Ghana’s nominal 400/230 V low-voltage system, what voltage is supplied between one phase and neutral?', 'About 230 V', ['About 400 V', 'About 11 kV', 'Exactly 0 V'], 'Ghana’s nominal low-voltage distribution levels are 400 V phase-to-phase and 230 V phase-to-neutral, so a single-phase consumer receives about 230 V.'),
   ],
 };
 
-const subjects = [commerce, islamic, electricity];
+const subjects = [islamic, electricity];
 
 function mcq(subjectKey, index, source) {
   const correctIndex = index % 4;
@@ -254,12 +196,12 @@ const batch = {
   batchId: 'wassce-expansion-beta-001',
   status: 'approved_for_production',
   examTypeId: 'exam_wassce',
-  provenance: subjects.map((subject) => ({
-    publisher: subject.key === 'elect' ? 'West African Examinations Council, Ghana' : 'West African Examinations Council',
-    title: subject.syllabusName,
-    url: subject.sourceUrl,
+  provenance: subjects.flatMap((subject) => subject.sources.map((source) => ({
+    publisher: source.publisher,
+    title: source.title,
+    url: source.url,
     use: 'curriculum_blueprint_only',
-  })),
+  }))),
   review: { authoringMethod: 'original_curriculum_aligned', qualityAssurance: 'automated_beta', automatedChecksAt: generatedAt },
   release: {
     channel: 'beta',
@@ -275,71 +217,189 @@ const batch = {
   })),
 };
 
+async function collectExistingPrompts() {
+  const existing = new Map();
+  const seedSql = await readFile(resolve(sourceRoot, 'database/seed.sql'), 'utf8');
+  for (const match of seedSql.matchAll(/'(?:''|[^'])*'/g)) {
+    const literal = match[0].slice(1, -1).replaceAll("''", "'");
+    const normalized = normalizeQuestionText(literal);
+    if (normalized.length >= 18) existing.set(normalized, 'database/seed.sql');
+  }
+  const batchesDir = resolve(sourceRoot, 'content/batches');
+  for (const name of await readdir(batchesDir)) {
+    if (!name.endsWith('.json') || name === 'wassce-expansion-beta-001.json') continue;
+    const candidate = JSON.parse(await readFile(resolve(batchesDir, name), 'utf8'));
+    for (const subject of candidate.subjects ?? []) {
+      for (const question of subject.questions ?? []) {
+        const normalized = normalizeQuestionText(question.prompt);
+        if (normalized) existing.set(normalized, `content/batches/${name}`);
+      }
+    }
+  }
+  return existing;
+}
+
+const existingPrompts = await collectExistingPrompts();
+const duplicatePrompts = batch.subjects.flatMap((subject) => subject.questions)
+  .map((question) => ({ question, source: existingPrompts.get(normalizeQuestionText(question.prompt)) }))
+  .filter(({ source }) => source);
+if (duplicatePrompts.length) {
+  throw new Error(`Generated prompts duplicate existing content:\n${duplicatePrompts.map(({ question, source }) => `${question.id}: ${source}`).join('\n')}`);
+}
+
 const validation = validateQuestionBatch(batch, { mode: 'production' });
 if (!validation.valid) throw new Error(`Generated batch failed validation:\n${validation.errors.join('\n')}`);
 
 const sql = (value) => value == null ? 'NULL' : `'${String(value).replaceAll("'", "''")}'`;
 const topicId = (subject, code) => `topic_was_${subject.key}_${code.split('-').at(-1).toLowerCase()}`;
 const syllabusTopicId = (subject, code) => `st_was_${subject.key}_${code.split('-').at(-1).toLowerCase()}`;
-
-const foundation = [
-  '-- 119: WASSCE Commerce, Islamic Religious Studies and Applied Electricity beta blueprints.',
-  '-- Original BrillaPrep practice content only; official sources are used as curriculum blueprints.',
-  'PRAGMA foreign_keys = ON;',
-  "INSERT OR IGNORE INTO exam_boards (id, name, code, full_name, region, website_url, is_active, display_order) VALUES ('board_waec', 'WAEC', 'WAEC', 'West African Examinations Council', 'West Africa', 'https://waecgh.org/', 1, 1);",
+const canonicalQuestionFields = [
+  'topic_id', 'subject_id', 'exam_type_id', 'paper_type_id', 'past_paper_id',
+  'question_text', 'question_type', 'round_type', 'options', 'correct_answer',
+  'explanation', 'difficulty', 'points', 'marks', 'time_limit', 'question_number',
+  'section', 'is_compulsory', 'image_url', 'syllabus_topic_id', 'command_word',
+  'assessment_objective', 'source_paper_code', 'source_question_number', 'exam_board_id',
 ];
 
-for (const subject of subjects) {
-  foundation.push(`INSERT OR IGNORE INTO subject_specifications (id, exam_board_id, subject_id, exam_type_id, syllabus_code, syllabus_name, specification_year, valid_from, syllabus_pdf_url, total_papers, assessment_info, is_active, display_order) VALUES (${sql(subject.specId)}, 'board_waec', ${sql(subject.subjectId)}, 'exam_wassce', ${sql(subject.specificationCode)}, ${sql(subject.syllabusName)}, 'current published evidence', '2026-08-26', ${sql(subject.sourceUrl)}, ${subject.totalPapers}, 'Curriculum-aligned BrillaPrep beta blueprint; verify current examination notices and paper instructions separately.', 1, 1);`);
-  for (const [index, [code, title, objective]] of subject.topics.entries()) {
-    foundation.push(`INSERT OR IGNORE INTO topics (id, subject_id, name, slug, description, display_order) VALUES (${sql(topicId(subject, code))}, ${sql(subject.subjectId)}, ${sql(title)}, ${sql(`${subject.key}-${code.split('-').at(-1)}`)}, ${sql(objective)}, ${index + 1});`);
-    foundation.push(`INSERT OR IGNORE INTO syllabus_topics (id, specification_id, topic_code, title, description, assessment_objectives, display_order) VALUES (${sql(syllabusTopicId(subject, code))}, ${sql(subject.specId)}, ${sql(code)}, ${sql(title)}, ${sql(objective)}, ${sql(JSON.stringify(assessmentObjectives))}, ${index + 1});`);
-  }
+function questionValues(subject, question) {
+  const options = JSON.stringify(question.options.map(({ label, text }) => `${label}. ${text}`));
+  return {
+    topic_id: topicId(subject, question.topicCode),
+    subject_id: subject.subjectId,
+    exam_type_id: 'exam_wassce',
+    paper_type_id: null,
+    past_paper_id: null,
+    question_text: question.prompt,
+    question_type: 'multiple_choice',
+    round_type: null,
+    options,
+    correct_answer: question.correctAnswer,
+    explanation: question.workedSolution,
+    difficulty: question.difficulty,
+    points: question.marks,
+    marks: question.marks,
+    time_limit: 90,
+    question_number: null,
+    section: null,
+    is_compulsory: 1,
+    image_url: null,
+    syllabus_topic_id: syllabusTopicId(subject, question.topicCode),
+    command_word: question.commandWord,
+    assessment_objective: question.assessmentObjective,
+    source_paper_code: null,
+    source_question_number: null,
+    exam_board_id: 'board_waec',
+  };
 }
-foundation.push('CREATE TABLE IF NOT EXISTS _migration_119_guard (valid INTEGER NOT NULL CHECK (valid = 1));');
-foundation.push('DELETE FROM _migration_119_guard;');
-foundation.push("INSERT INTO _migration_119_guard(valid) SELECT CASE WHEN (SELECT COUNT(*) FROM topics WHERE id LIKE 'topic_was_commerce_%' OR id LIKE 'topic_was_irs_%' OR id LIKE 'topic_was_elect_%') = 24 AND (SELECT COUNT(*) FROM syllabus_topics WHERE specification_id IN ('spec_wassce_commerce_waec','spec_wassce_irs_waec','spec_wassce_elect_app_waec')) = 24 THEN 1 ELSE 0 END;");
-foundation.push('DROP TABLE _migration_119_guard;');
 
-const outBatch = resolve(root, 'content/batches/wassce-expansion-beta-001.json');
+function canonicalMatch(alias, values) {
+  return canonicalQuestionFields.map((field) => `${alias}.${field} IS ${sql(values[field])}`).join(' AND ');
+}
+
+function releaseMatch(alias, subject) {
+  return [
+    `${alias}.batch_id IS 'wassce-expansion-beta-001'`,
+    `${alias}.quality_assurance IS 'automated_beta'`,
+    `${alias}.release_channel IS 'beta'`,
+    `${alias}.content_label IS ${sql(subject.contentLabel)}`,
+    `${alias}.source_url IS ${sql(subject.releaseSourceUrl)}`,
+    `${alias}.official_exam_board_content IS 0`,
+    `${alias}.feedback_enabled IS 1`,
+  ].join(' AND ');
+}
+
+const outBatch = resolve(outputRoot, 'content/batches/wassce-expansion-beta-001.json');
 await mkdir(dirname(outBatch), { recursive: true });
 await writeFile(outBatch, `${JSON.stringify(batch, null, 2)}\n`);
 
 const migrationPaths = [];
-const foundationPath = resolve(root, 'database/migrations/119_wassce_expansion_beta_foundation.sql');
+const foundationPath = resolve(outputRoot, 'database/migrations/119_wassce_expansion_beta_foundation.sql');
+const foundation = [
+  '-- 119: BrillaPrep WASSCE beta blueprint specifications for IRS and transitional Applied Electricity.',
+  '-- These are internal evidence blueprints, not official WAEC specification records.',
+  'PRAGMA foreign_keys = ON;',
+  "INSERT OR IGNORE INTO exam_boards (id, name, code, full_name, region, website_url, is_active, display_order) VALUES ('board_waec', 'WAEC', 'WAEC', 'West African Examinations Council', 'West Africa', 'https://waecgh.org/', 1, 1);",
+];
+for (const subject of subjects) {
+  foundation.push(`INSERT OR IGNORE INTO subject_specifications (id, exam_board_id, subject_id, exam_type_id, syllabus_code, syllabus_name, specification_year, valid_from, syllabus_pdf_url, total_papers, assessment_info, is_active, display_order) VALUES (${sql(subject.specId)}, 'board_waec', ${sql(subject.subjectId)}, 'exam_wassce', ${sql(subject.specificationCode)}, ${sql(subject.syllabusName)}, NULL, NULL, ${sql(subject.releaseSourceUrl)}, 0, ${sql(subject.assessmentInfo)}, 1, 1);`);
+}
+foundation.push('CREATE TABLE IF NOT EXISTS _migration_119_guard (valid INTEGER NOT NULL CHECK (valid = 1));');
+foundation.push('DELETE FROM _migration_119_guard;');
+for (const subject of subjects) {
+  foundation.push(`INSERT INTO _migration_119_guard(valid) SELECT CASE WHEN EXISTS (SELECT 1 FROM subject_specifications WHERE id = ${sql(subject.specId)} AND exam_board_id IS 'board_waec' AND subject_id IS ${sql(subject.subjectId)} AND exam_type_id IS 'exam_wassce' AND syllabus_code IS ${sql(subject.specificationCode)} AND syllabus_name IS ${sql(subject.syllabusName)} AND specification_year IS NULL AND valid_from IS NULL AND syllabus_pdf_url IS ${sql(subject.releaseSourceUrl)} AND total_papers IS 0 AND assessment_info IS ${sql(subject.assessmentInfo)} AND is_active IS 1) THEN 1 ELSE 0 END;`);
+}
+foundation.push('DROP TABLE _migration_119_guard;');
+await mkdir(dirname(foundationPath), { recursive: true });
 await writeFile(foundationPath, `${foundation.join('\n')}\n`);
 migrationPaths.push(foundationPath);
 
 let migrationNumber = 120;
 for (const subject of subjects) {
+  const lines = [
+    `-- ${migrationNumber}: BrillaPrep WASSCE ${subject.syllabusName} beta topic blueprint.`,
+    '-- Internal evidence blueprint; not an official WAEC specification.',
+    'PRAGMA foreign_keys = ON;',
+  ];
+  for (const [index, [code, title, objective]] of subject.topics.entries()) {
+    lines.push(`INSERT OR IGNORE INTO topics (id, subject_id, name, slug, description, display_order) VALUES (${sql(topicId(subject, code))}, ${sql(subject.subjectId)}, ${sql(title)}, ${sql(`${subject.key}-${code.split('-').at(-1)}`)}, ${sql(objective)}, ${index + 1});`);
+    lines.push(`INSERT OR IGNORE INTO syllabus_topics (id, specification_id, topic_code, title, description, assessment_objectives, display_order) VALUES (${sql(syllabusTopicId(subject, code))}, ${sql(subject.specId)}, ${sql(code)}, ${sql(title)}, ${sql(objective)}, ${sql(JSON.stringify(assessmentObjectives))}, ${index + 1});`);
+  }
+  lines.push(`CREATE TABLE IF NOT EXISTS _migration_${migrationNumber}_guard (valid INTEGER NOT NULL CHECK (valid = 1));`);
+  lines.push(`DELETE FROM _migration_${migrationNumber}_guard;`);
+  for (const [index, [code, title, objective]] of subject.topics.entries()) {
+    lines.push(`INSERT INTO _migration_${migrationNumber}_guard(valid) SELECT CASE WHEN EXISTS (SELECT 1 FROM topics WHERE id = ${sql(topicId(subject, code))} AND subject_id IS ${sql(subject.subjectId)} AND name IS ${sql(title)} AND slug IS ${sql(`${subject.key}-${code.split('-').at(-1)}`)} AND description IS ${sql(objective)} AND display_order IS ${index + 1}) AND EXISTS (SELECT 1 FROM syllabus_topics WHERE id = ${sql(syllabusTopicId(subject, code))} AND specification_id IS ${sql(subject.specId)} AND topic_code IS ${sql(code)} AND title IS ${sql(title)} AND description IS ${sql(objective)} AND assessment_objectives IS ${sql(JSON.stringify(assessmentObjectives))} AND display_order IS ${index + 1}) THEN 1 ELSE 0 END;`);
+  }
+  lines.push(`DROP TABLE _migration_${migrationNumber}_guard;`);
+  const output = resolve(outputRoot, `database/migrations/${migrationNumber}_${subject.key}_beta_foundation.sql`);
+  await writeFile(output, `${lines.join('\n')}\n`);
+  migrationPaths.push(output);
+  migrationNumber += 1;
+}
+
+for (const subject of subjects) {
   const questions = batch.subjects.find((entry) => entry.subjectId === subject.subjectId).questions;
-  const statements = questions.map((question) => {
-    const options = JSON.stringify(question.options.map(({ label, text }) => `${label}. ${text}`));
-    return `INSERT OR IGNORE INTO questions (id, topic_id, subject_id, exam_type_id, question_text, question_type, options, correct_answer, explanation, difficulty, points, marks, time_limit, syllabus_topic_id, command_word, assessment_objective, exam_board_id) VALUES (${sql(question.id)}, ${sql(topicId(subject, question.topicCode))}, ${sql(subject.subjectId)}, 'exam_wassce', ${sql(question.prompt)}, 'multiple_choice', ${sql(options)}, ${sql(question.correctAnswer)}, ${sql(question.workedSolution)}, ${sql(question.difficulty)}, ${question.marks}, ${question.marks}, 90, ${sql(syllabusTopicId(subject, question.topicCode))}, ${sql(question.commandWord)}, ${sql(question.assessmentObjective)}, 'board_waec');`;
-  });
-  for (let part = 1; part <= 4; part += 1) {
-    const start = (part - 1) * 10;
-    const end = part * 10;
-    const firstId = questions[start].id;
-    const lastId = questions[end - 1].id;
+  for (let part = 1; part <= 8; part += 1) {
+    const partQuestions = questions.slice((part - 1) * 5, part * 5);
+    const ids = partQuestions.map((question) => question.id);
+    const guardTable = `_migration_${migrationNumber}_guard`;
     const lines = [
       `-- ${migrationNumber}: Original BrillaPrep WASSCE ${subject.syllabusName} beta questions, part ${part}.`,
       '-- Curriculum-aligned practice content; not official WAEC examination material.',
       'PRAGMA foreign_keys = ON;',
-      ...statements.slice(start, end),
-      `INSERT OR IGNORE INTO question_content_releases (question_id, batch_id, quality_assurance, release_channel, content_label, source_url, official_exam_board_content, feedback_enabled) SELECT id, 'wassce-expansion-beta-001', 'automated_beta', 'beta', ${sql(subject.contentLabel)}, ${sql(subject.sourceUrl)}, 0, 1 FROM questions WHERE id BETWEEN ${sql(firstId)} AND ${sql(lastId)};`,
+      `CREATE TABLE IF NOT EXISTS ${guardTable} (valid INTEGER NOT NULL CHECK (valid = 1));`,
+      `DELETE FROM ${guardTable};`,
     ];
-    if (subject === electricity && part === 4) {
-      lines.push('CREATE TABLE IF NOT EXISTS _migration_131_guard (valid INTEGER NOT NULL CHECK (valid = 1));');
-      lines.push('DELETE FROM _migration_131_guard;');
-      lines.push("INSERT INTO _migration_131_guard(valid) SELECT CASE WHEN (SELECT COUNT(*) FROM questions WHERE id LIKE 'q_was_commerce_b001_%' OR id LIKE 'q_was_irs_b001_%' OR id LIKE 'q_was_elect_b001_%') = 120 AND (SELECT COUNT(*) FROM question_content_releases WHERE batch_id = 'wassce-expansion-beta-001') = 120 THEN 1 ELSE 0 END;");
-      lines.push('DROP TABLE _migration_131_guard;');
+    for (const question of partQuestions) {
+      const values = questionValues(subject, question);
+      lines.push(`INSERT INTO ${guardTable}(valid) SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM questions q WHERE q.id = ${sql(question.id)} AND NOT (${canonicalMatch('q', values)})) AND NOT EXISTS (SELECT 1 FROM question_content_releases r WHERE r.question_id = ${sql(question.id)} AND NOT (${releaseMatch('r', subject)})) THEN 1 ELSE 0 END;`);
     }
-    const output = resolve(root, `database/migrations/${migrationNumber}_${subject.key}_beta_part_${part}.sql`);
+    for (const question of partQuestions) {
+      const values = questionValues(subject, question);
+      lines.push(`INSERT OR IGNORE INTO questions (id, ${canonicalQuestionFields.join(', ')}) VALUES (${sql(question.id)}, ${canonicalQuestionFields.map((field) => sql(values[field])).join(', ')});`);
+    }
+    lines.push(`INSERT OR IGNORE INTO question_content_releases (question_id, batch_id, quality_assurance, release_channel, content_label, source_url, official_exam_board_content, feedback_enabled) SELECT id, 'wassce-expansion-beta-001', 'automated_beta', 'beta', ${sql(subject.contentLabel)}, ${sql(subject.releaseSourceUrl)}, 0, 1 FROM questions WHERE id IN (${ids.map(sql).join(', ')});`);
+    lines.push(`DELETE FROM ${guardTable};`);
+    lines.push(`INSERT INTO ${guardTable}(valid) SELECT CASE WHEN (SELECT COUNT(*) FROM questions WHERE id IN (${ids.map(sql).join(', ')})) = 5 AND (SELECT COUNT(*) FROM question_content_releases r WHERE r.question_id IN (${ids.map(sql).join(', ')}) AND ${releaseMatch('r', subject)}) = 5 THEN 1 ELSE 0 END;`);
+    lines.push(`DROP TABLE ${guardTable};`);
+    const output = resolve(outputRoot, `database/migrations/${migrationNumber}_${subject.key}_beta_part_${part}.sql`);
     await writeFile(output, `${lines.join('\n')}\n`);
     migrationPaths.push(output);
     migrationNumber += 1;
   }
 }
+
+const allIds = batch.subjects.flatMap((entry) => entry.questions.map((question) => question.id));
+const finalGuardTable = `_migration_${migrationNumber}_guard`;
+const finalLines = [
+  `-- ${migrationNumber}: Final exact-set and relationship guard for WASSCE expansion beta batch 001.`,
+  'PRAGMA foreign_keys = ON;',
+  `CREATE TABLE IF NOT EXISTS ${finalGuardTable} (valid INTEGER NOT NULL CHECK (valid = 1));`,
+  `DELETE FROM ${finalGuardTable};`,
+  `INSERT INTO ${finalGuardTable}(valid) SELECT CASE WHEN (SELECT COUNT(*) FROM questions q JOIN topics t ON t.id = q.topic_id JOIN syllabus_topics st ON st.id = q.syllabus_topic_id JOIN subject_specifications ss ON ss.id = st.specification_id JOIN question_content_releases r ON r.question_id = q.id WHERE q.id IN (${allIds.map(sql).join(', ')}) AND q.subject_id = t.subject_id AND q.subject_id = ss.subject_id AND q.exam_type_id = ss.exam_type_id AND q.exam_board_id = ss.exam_board_id AND q.question_type = 'multiple_choice' AND json_valid(q.options) AND json_array_length(q.options) = 4 AND q.correct_answer IN ('A','B','C','D') AND length(q.explanation) >= 80 AND r.batch_id = 'wassce-expansion-beta-001' AND r.quality_assurance = 'automated_beta' AND r.release_channel = 'beta' AND r.official_exam_board_content = 0 AND r.feedback_enabled = 1) = 80 AND (SELECT COUNT(*) FROM question_content_releases WHERE batch_id = 'wassce-expansion-beta-001') = 80 THEN 1 ELSE 0 END;`,
+  `DROP TABLE ${finalGuardTable};`,
+];
+const finalOutput = resolve(outputRoot, `database/migrations/${migrationNumber}_wassce_expansion_beta_final_guard.sql`);
+await writeFile(finalOutput, `${finalLines.join('\n')}\n`);
+migrationPaths.push(finalOutput);
 
 console.log(JSON.stringify({ validation, outBatch, migrations: migrationPaths }, null, 2));

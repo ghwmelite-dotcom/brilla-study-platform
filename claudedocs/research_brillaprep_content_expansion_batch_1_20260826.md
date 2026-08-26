@@ -4,63 +4,57 @@ Date: 2026-08-26
 
 ## Executive summary
 
-Batch 1 should make three currently empty WASSCE subjects usable: Commerce, Islamic Religious Studies, and Applied Electricity. Each bank will contain 40 original BrillaPrep multiple-choice questions, topic and syllabus-topic bindings, worked explanations, WAEC provenance metadata, and an automated-beta label. The questions must not reproduce WAEC past-paper wording.
+Batch 1 makes two currently empty, current-or-transitional WASSCE subjects usable: Islamic Religious Studies and Applied Electricity. Each bank contains 40 original BrillaPrep multiple-choice questions across eight topics, exact topic and internal blueprint bindings, worked explanations, source provenance, and an automated-beta label. The content does not reproduce WAEC past-paper wording and is not represented as official WAEC material.
 
-The generic BECE `Ghanaian Language` subject must not receive a shared question bank. NaCCA recognises multiple approved Ghanaian languages, while BrillaPrep currently exposes the item as one undifferentiated subject. A shared bank would serve the wrong language to some learners. The correct next language phase is separate Ewe, Fante, and Ga banks (and an explicit language choice for BECE), with language-specific orthography checks.
+Commerce was removed from the batch after catalogue reconciliation. Although a WAEC-hosted Commerce syllabus exists, Commerce is absent from the current WAEC Ghana school-candidate subject catalogue and the 2026 timetable. The authoritative subject coverage record therefore remains `retire`; material from another examination route must not make that WASSCE subject appear available.
 
-The 3,492 existing questions without `topic_id` also require a separate remediation stream. Only 90 have a `syllabus_topic_id`, and a production aggregate query found zero exact title-based deterministic topic matches. Automatic bulk assignment would therefore guess and is excluded from this batch. All new questions will be fully topic-bound.
+Applied Electricity is retained only as a transitional bank. WAEC Ghana's 2026 timetable includes Applied Electricity papers 1, 2 and 3 for the outgoing track and separately includes Applied Technology III (Electrical and Electronic Technology) for the new curriculum. The bank and internal metadata explicitly state that it is not the new Applied Technology III bank.
 
-Confidence: high for Commerce and Applied Electricity coverage; medium-high for Islamic Religious Studies because the current official evidence is distributed across WAEC examination resources and reports rather than a single Ghana-hosted subject syllabus; high that the generic Ghanaian Language bank must be split before authoring.
+The generic BECE `Ghanaian Language` subject must not receive a shared question bank. WAEC assesses distinct Ghanaian languages, so a shared bank could serve learners the wrong language. The language phase remains separate, with language-specific source and orthography validation.
+
+The 3,492 existing questions without `topic_id` remain a separate remediation stream. Only 90 have a `syllabus_topic_id`, and the production aggregate found zero exact deterministic title matches. Bulk assignment would guess, so every new batch-1 question is topic-bound while legacy rows remain unchanged.
 
 ## Source-backed scope
 
-### Commerce
-
-Primary blueprint: WAEC Ghana, Commerce detailed syllabus: https://waecgh.org/wp-content/uploads/2024/07/COMMERCE.pdf
-
-The published syllabus begins with the meaning and scope of commerce, production, division of labour, business organisations, and location of industry, and continues across trade and its aids. WAEC's official e-learning index and chief examiner material confirm that assessment expects broad syllabus coverage and application rather than rote recall:
-
-- https://www.waeconline.org.ng/e-learning/Commerce/Commmain.html
-- https://waeconline.org.ng/e-learning/Commerce/comm240mc.html
-
-Batch blueprint: foundations and production; business organisations; trade and distribution; transport, warehousing and communication; banking and finance; insurance and risk; marketing and consumer protection; e-commerce and the business environment.
-
 ### Islamic Religious Studies
 
-Primary evidence:
+Current-subject and curriculum evidence:
 
-- WAEC official Islamic Studies e-learning index: https://www.waeconline.org.ng/e-learning/Islamic/IRKmain.html
+- WAEC Ghana WASSCE for School Candidates subject catalogue: https://waecgh.org/home/wassce-school/
+- WAEC Islamic Studies e-learning index: https://www.waeconline.org.ng/e-learning/Islamic/IRKmain.html
 - WAEC Ghana 2021 Humanities chief examiner report: https://waecgh.org/wp-content/uploads/2023/03/Humanities21.pdf
-- WAEC Ghana 2020 Humanities report: https://waecgh.org/wp-content/uploads/2023/03/Humanities20.pdf
+- WAEC Ghana 2020 Humanities chief examiner report: https://waecgh.org/wp-content/uploads/2023/03/Humanities20.pdf
 - NaCCA Religious and Moral Education curriculum: https://nacca.gov.gh/wp-content/uploads/2025/04/RELIGIOUS-AND-MORAL-EDUCATION-Curriculum.pdf
 
-WAEC evidence explicitly identifies Qur'anic interpretation and moral lessons, Hadith terminology and collections, Hadith versus Sunnah, the Five Pillars, the Prophet's life, Hudaybiyyah, Tayammum, Shari'ah, family law, and Islamic history as assessed areas. The bank will use original questions across those domains and avoid sectarian adjudication or unsupported legal advice.
+The bank covers the Qur'an and revelation; Hadith and Sunnah; the life of Prophet Muhammad; beliefs and pillars; worship and purification; Shari'ah and family/community life; early Islamic leadership and scholarship; and ethics and social responsibility. Questions avoid sectarian adjudication and unsupported personal legal advice.
 
-Batch blueprint: Qur'an and revelation; Hadith and Sunnah; life of Prophet Muhammad; beliefs and pillars; worship and purification; Shari'ah and family/community life; early Islamic leadership and scholarship; ethics and social responsibility.
+### Applied Electricity — transitional track
 
-### Applied Electricity
+Current and transition evidence:
 
-Primary evidence:
-
+- WAEC Ghana 2026 final timetable: https://waecgh.org/wp-content/uploads/2026/03/FINAL-TIMETABLE-FOR-WASSCE-SC-2026-GHANA-ONLY-NEW-TAD.pdf
+- WAEC Ghana WASSCE for School Candidates subject catalogue: https://waecgh.org/home/wassce-school/
 - NaCCA Applied Technology curriculum: https://nacca.gov.gh/wp-content/uploads/2025/04/Applied-Technology-Curriculum.pdf
 - WAEC Ghana Applied Electricity chief examiner evidence: https://waecgh.org/wp-content/uploads/2023/12/Technical17.pdf
-- WAEC Ghana current timetable page confirming the continuing subject/paper structure: https://waecgh.org/timetable/
+- Ghana Energy Commission electricity regulations: https://www.energycom.gov.gh/index.php/documents/category/40-electricity-regulations?download=162%3Aelectricity-regulations
 
-The official evidence covers electrical safety, generation/transmission/distribution, d.c. power and energy, R-C networks and impedance, electronics, transistor configurations, and practical work. The beta bank will focus on principles, safe practice and short calculations that can be represented reliably in text.
+The timetable simultaneously lists the outgoing Applied Electricity papers and the new Applied Technology III electrical/electronic papers. The transitional bank covers safety and quantities; d.c. circuits; capacitance and a.c. principles; magnetism and transformers; machines and generation; instruments and measurements; semiconductor electronics; and installation, protection and distribution. Ghana nominal low-voltage teaching uses 400 V phase-to-phase and 230 V phase-to-neutral.
 
-Batch blueprint: safety and quantities; d.c. circuits; capacitance and a.c. principles; magnetism and transformers; machines and generation; instruments and measurements; semiconductor electronics; installation, protection and distribution.
+## Metadata and release controls
 
-## Release controls
-
-- Stable IDs and `INSERT OR IGNORE` make every migration re-applicable.
-- Each subject receives eight topic rows, eight syllabus-topic rows, and 40 questions.
-- Every question has four JSON-valid options, one letter answer, a worked explanation, difficulty, marks, assessment objective, topic, syllabus topic, exam type and board.
+- `subject_specifications` rows are explicitly internal BrillaPrep evidence blueprints. They use `BRILLA-*` codes, not invented WAEC syllabus codes.
+- Unknown official specification year, validity date and paper count remain `NULL`, `NULL` and `0`; evidence pages are not presented as formal syllabus specifications.
+- Every question has four JSON-valid options, one A-D answer, a worked explanation, difficulty, marks, assessment objective, topic, syllabus topic, exam type and board.
 - `question_content_releases` marks every row `automated_beta`, `beta`, feedback-enabled, and explicitly not official exam-board content.
-- Integrity tests verify exact counts, foreign keys, duplicate-normalised prompts, provenance and migration size below the remote D1 limit.
-- Production application remains a separate approval gate after local tests, full suite, typechecks and production build pass.
+- Stable-ID preflight guards compare all canonical question fields and release provenance. A pre-existing mismatched row aborts rather than inheriting trusted batch provenance.
+- The generator rejects exact normalised prompt duplicates against existing checked-in batches and canonical seed SQL.
+- Tests regenerate JSON and all migrations into a temporary directory and require byte-for-byte parity with committed artifacts.
+- Production application remains a separate approval gate after review, the full suite, typechecks, lint, production build and authenticated learner QA pass.
 
 ## Deferred work
 
-1. Add explicit language selection for BECE Ghanaian Language and author separate Ewe, Fante and Ga banks with orthography validation.
-2. Remediate legacy missing topic assignments only where a reviewed deterministic mapping can be established; do not infer topics from loose keyword matching.
-3. Address short legacy explanations and conflicting normalised duplicates in subject-scoped, reversible migrations.
+1. Author Applied Technology III as a distinct new-curriculum bank; do not silently merge it with transitional Applied Electricity.
+2. Add explicit language selection and author language-specific Ghanaian banks with orthography validation.
+3. Populate the next verified current subjects in controlled clusters, beginning with a source-complete technical or language bank.
+4. Remediate legacy topic gaps only through reviewed deterministic mappings; do not infer topics from loose keyword matching.
+5. Address short legacy explanations and duplicate groups in subject-scoped, reversible migrations.
