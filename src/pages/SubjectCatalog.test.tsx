@@ -15,6 +15,10 @@ vi.mock('@/components/common', () => ({
 vi.mock('@/components/subscription', () => ({ DailyUsageIndicator: () => null, PremiumSubjectBadge: () => <span>Premium</span> }));
 vi.mock('@/stores/examStore', () => ({ useExamStore: () => mocks.examStore }));
 vi.mock('@/stores/usageStore', () => ({ useUsageStore: () => mocks.usageStore }));
+vi.mock('@/stores/authStore', () => ({
+  useAuthStore: (selector: (state: { isAuthenticated: boolean }) => unknown) =>
+    selector({ isAuthenticated: false }),
+}));
 vi.mock('@/lib/subjectIcons', () => ({ getSubjectIcon: () => () => null }));
 vi.mock('@/utils', () => ({ cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' ') }));
 

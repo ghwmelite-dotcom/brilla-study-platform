@@ -6,6 +6,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Zap, Crown, Clock } from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
 import { useUsageStore } from '@/stores/usageStore';
 import { formatTimeUntilReset } from '@/config';
 import { cn } from '@/utils';
@@ -22,11 +23,19 @@ export function DailyUsageIndicator({
   onUpgradeClick,
 }: DailyUsageIndicatorProps) {
   const navigate = useNavigate();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const { dailyUsage, isLoading, fetchDailyUsage } = useUsageStore();
 
   useEffect(() => {
-    fetchDailyUsage();
-  }, [fetchDailyUsage]);
+    if (isAuthenticated) {
+      void fetchDailyUsage();
+    }
+  }, [fetchDailyUsage, isAuthenticated]);
+
+  // The usage endpoint is protected. Public pages such as the subject
+  // catalogue may embed this component, so guests must not trigger a 401
+  // that the API client interprets as an expired authenticated session.
+  if (!isAuthenticated) return null;
 
   const handleUpgradeClick = () => {
     if (onUpgradeClick) {
