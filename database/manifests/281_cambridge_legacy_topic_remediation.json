@@ -1,0 +1,314 @@
+{
+  "release": "cambridge-legacy-topic-remediation-2026-08-26",
+  "status": "reviewed-local-preparation-only",
+  "migrationId": "281_cambridge_legacy_topic_remediation",
+  "sourceQuestionCount": 45,
+  "legacyMathematicsQuestionCount": 40,
+  "reassessedExceptionCount": 5,
+  "mappedQuestionCount": 45,
+  "retainedExceptionCount": 0,
+  "newTopics": [
+    {
+      "id": "topic_alevel_bio_ecology",
+      "subjectId": "subj_alevel_biology",
+      "name": "Ecology and Nutrient Cycles",
+      "slug": "ecology-and-nutrient-cycles",
+      "description": "Energy transfer, ecosystems, nutrient cycles and ecological relationships",
+      "displayOrder": 9,
+      "createdAt": "2026-08-26T00:00:00.000Z"
+    },
+    {
+      "id": "topic_alevel_fmath_power_series",
+      "subjectId": "subj_alevel_further_math",
+      "name": "Power Series and Expansions",
+      "slug": "power-series-and-expansions",
+      "description": "Taylor and Maclaurin expansions, convergence and approximation with power series",
+      "displayOrder": 12,
+      "createdAt": "2026-08-26T00:00:00.000Z"
+    }
+  ],
+  "corrections": [
+    {
+      "questionId": "q_alevel_maths_014",
+      "reason": "The source substituted x=3 even though it does not satisfy the logarithmic equation.",
+      "old": {
+        "correct_answer": "x = 3",
+        "explanation": "log₂[(x+3)(x-1)] = 3. (x+3)(x-1) = 8. x² + 2x - 3 = 8. x² + 2x - 11 = 0. x = 3 (rejecting negative)"
+      },
+      "new": {
+        "correct_answer": "x = -1 + 2√3 (approximately 2.464)",
+        "explanation": "Combining the logarithms gives (x + 3)(x - 1) = 8, so x² + 2x - 11 = 0. Hence x = -1 ± 2√3. The logarithm domain requires x > 1, leaving x = -1 + 2√3 (approximately 2.464)."
+      }
+    },
+    {
+      "questionId": "q_alevel_maths_024",
+      "reason": "The source calculation gives cos θ = 1/√50 but reports an inconsistent angle.",
+      "old": {
+        "correct_answer": "71.6° or 1.25 rad",
+        "explanation": "a·b = 3 - 2 = 1. |a| = √5, |b| = √10. cos θ = 1/(√5 × √10) = 1/√50. θ = 81.9° (or 71.6° depending on calculation)"
+      },
+      "new": {
+        "correct_answer": "81.9° or 1.43 rad",
+        "explanation": "a·b = 3 - 2 = 1, while |a| = √5 and |b| = √10. Therefore cos θ = 1/(√5 × √10) = 1/√50, so θ = arccos(1/√50) ≈ 81.9° ≈ 1.43 rad."
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "questionId": "q_alevel_bio_028",
+      "subjectId": "subj_alevel_biology",
+      "topicId": "topic_alevel_bio_ecology"
+    },
+    {
+      "questionId": "q_alevel_bio_029",
+      "subjectId": "subj_alevel_biology",
+      "topicId": "topic_alevel_bio_ecology"
+    },
+    {
+      "questionId": "q_alevel_fm_051",
+      "subjectId": "subj_alevel_further_math",
+      "topicId": "topic_alevel_fmath_power_series"
+    },
+    {
+      "questionId": "q_alevel_fm_052",
+      "subjectId": "subj_alevel_further_math",
+      "topicId": "topic_alevel_fmath_power_series"
+    },
+    {
+      "questionId": "q_alevel_fm_053",
+      "subjectId": "subj_alevel_further_math",
+      "topicId": "topic_alevel_fmath_integration"
+    },
+    {
+      "questionId": "q_alevel_maths_001",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_algebra"
+    },
+    {
+      "questionId": "q_alevel_maths_002",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_algebra"
+    },
+    {
+      "questionId": "q_alevel_maths_003",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_algebra"
+    },
+    {
+      "questionId": "q_alevel_maths_004",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_algebra"
+    },
+    {
+      "questionId": "q_alevel_maths_005",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_coord"
+    },
+    {
+      "questionId": "q_alevel_maths_006",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_calculus"
+    },
+    {
+      "questionId": "q_alevel_maths_007",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_sequences"
+    },
+    {
+      "questionId": "q_alevel_maths_008",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_sequences"
+    },
+    {
+      "questionId": "q_alevel_maths_009",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_sequences"
+    },
+    {
+      "questionId": "q_alevel_maths_010",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_trig"
+    },
+    {
+      "questionId": "q_alevel_maths_011",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_trig"
+    },
+    {
+      "questionId": "q_alevel_maths_012",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_trig"
+    },
+    {
+      "questionId": "q_alevel_maths_013",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_logs"
+    },
+    {
+      "questionId": "q_alevel_maths_014",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_logs"
+    },
+    {
+      "questionId": "q_alevel_maths_015",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_calculus"
+    },
+    {
+      "questionId": "q_alevel_maths_016",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_calculus"
+    },
+    {
+      "questionId": "q_alevel_maths_017",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_calculus"
+    },
+    {
+      "questionId": "q_alevel_maths_018",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_calculus"
+    },
+    {
+      "questionId": "q_alevel_maths_019",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_calculus"
+    },
+    {
+      "questionId": "q_alevel_maths_020",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_calculus"
+    },
+    {
+      "questionId": "q_alevel_maths_021",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_calculus"
+    },
+    {
+      "questionId": "q_alevel_maths_022",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_calculus"
+    },
+    {
+      "questionId": "q_alevel_maths_023",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_vectors"
+    },
+    {
+      "questionId": "q_alevel_maths_024",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_vectors"
+    },
+    {
+      "questionId": "q_alevel_maths_025",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_vectors"
+    },
+    {
+      "questionId": "q_alevel_maths_026",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_calculus"
+    },
+    {
+      "questionId": "q_alevel_maths_027",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_stats"
+    },
+    {
+      "questionId": "q_alevel_maths_028",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_stats"
+    },
+    {
+      "questionId": "q_alevel_maths_029",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_stats"
+    },
+    {
+      "questionId": "q_alevel_maths_030",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_stats"
+    },
+    {
+      "questionId": "q_alevel_maths_031",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_stats"
+    },
+    {
+      "questionId": "q_alevel_maths_032",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_stats"
+    },
+    {
+      "questionId": "q_alevel_maths_033",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_mechanics"
+    },
+    {
+      "questionId": "q_alevel_maths_034",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_mechanics"
+    },
+    {
+      "questionId": "q_alevel_maths_035",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_mechanics"
+    },
+    {
+      "questionId": "q_alevel_maths_036",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_mechanics"
+    },
+    {
+      "questionId": "q_alevel_maths_037",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_mechanics"
+    },
+    {
+      "questionId": "q_alevel_maths_038",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_mechanics"
+    },
+    {
+      "questionId": "q_alevel_maths_039",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_mechanics"
+    },
+    {
+      "questionId": "q_alevel_maths_040",
+      "subjectId": "subj_alevel_math",
+      "topicId": "topic_alevel_math_mechanics"
+    }
+  ],
+  "fingerprints": {
+    "source": [
+      45,
+      10426,
+      1518901327,
+      1859246228
+    ],
+    "target": [
+      45,
+      11595,
+      1168531717,
+      231219804
+    ],
+    "topics": [
+      2,
+      480,
+      1431506052,
+      676813555
+    ],
+    "logs": [
+      49,
+      6281,
+      1792803168,
+      2128848288
+    ]
+  },
+  "catalogueDecision": {
+    "filterRequired": false,
+    "reason": "Every reviewed row has a defensible topic after two narrow taxonomy additions and two deterministic answer corrections.",
+    "invariant": "For every Cambridge subject, raw question count equals the sum of topic question counts after migration 281."
+  }
+}
