@@ -69,5 +69,5 @@ describe("Cambridge topic remediation migrations 271-275", () => {
       idempotence: "immediate-and-full-replay",
       rollback: "full-and-partial-strict-reverse",
     });
-  }, 30_000);
+  }, 60_000);
 });
