@@ -54,8 +54,12 @@ describe("Cambridge topic remediation migrations 271-275", () => {
       expect(
         readFileSync(new URL(`../../../${file}`, import.meta.url), "utf8"),
       ).toBe(content);
-      if (/database\/(migrations|rollbacks)\/27[1-5]_/.test(file)) {
+      if (/database\/(migrations|rollbacks|preflight)\/27[1-5]_/.test(file)) {
         expect(Buffer.byteLength(content, "utf8")).toBeLessThan(19_500);
+        expect(content).not.toContain("CREATE TEMP VIEW");
+        expect(content).not.toContain("DROP VIEW _sr");
+        expect(content).toContain("CREATE TEMP TABLE _sr AS SELECT");
+        expect(content).toContain("DROP TABLE _sr");
       }
     }
   });

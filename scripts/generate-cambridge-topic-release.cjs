@@ -147,14 +147,14 @@ function mapTable(name, rows) {
   for (const row of rows) { const ids = groups.get(row.topicId) ?? []; ids.push(row.questionId); groups.set(row.topicId, ids); }
   return `CREATE TEMP TABLE ${name}(question_id TEXT PRIMARY KEY,topic_id TEXT NOT NULL);${[...groups].map(([topicId, questionIds]) => `INSERT INTO ${name} SELECT column1,${sql(topicId)} FROM(VALUES${questionIds.map((questionId) => `(${sql(questionId)})`).join(',')});`).join('')}`;
 }
-const stateFpTable = (name) => fpSql(name, 'FROM _sr', 'id', STATE_FIELDS);
+const stateFpTable = (name) => fpSql(name, `FROM questions WHERE ${SCOPE_SQL}`, 'id', STATE_FIELDS);
 const topicFpTable = (name) => fpSql(name, `FROM topics WHERE id IN(${NEW_TOPICS.map((topic) => sql(topic.id)).join(',')})`, 'id', TOPIC_FIELDS);
 const logFpTable = (name) => fpSql(name, `FROM question_bank_remediation_log WHERE migration_id IN(${IDS.map(sql).join(',')})`, LOG_ORDER.join(','), LOG_FIELDS);
-const scopeView = () => `CREATE TEMP VIEW _sr AS SELECT * FROM questions WHERE ${SCOPE_SQL};`;
+const scopeTable = () => `CREATE TEMP TABLE _sr AS SELECT * FROM questions WHERE ${SCOPE_SQL};`;
 function topicSpecsSql() { return `CREATE TEMP TABLE _ts(id TEXT PRIMARY KEY,subject_id TEXT NOT NULL,name TEXT NOT NULL,slug TEXT NOT NULL,description TEXT NOT NULL,display_order INTEGER NOT NULL,created_at TEXT NOT NULL);INSERT INTO _ts VALUES${NEW_TOPICS.map((topic) => `(${[topic.id,topic.subjectId,topic.name,topic.slug,topic.description,topic.displayOrder,topic.createdAt].map(sql).join(',')})`).join(',')};`; }
-function supportTables(includeSpecs = false) { return `${includeSpecs ? topicSpecsSql() : ''}${scopeView()}${stateFpTable('_sf')}${topicFpTable('_tf')}${logFpTable('_lf')}`; }
+function supportTables(includeSpecs = false) { return `${includeSpecs ? topicSpecsSql() : ''}${scopeTable()}${stateFpTable('_sf')}${topicFpTable('_tf')}${logFpTable('_lf')}`; }
 const dropFingerprints = () => 'DROP TABLE _lf;DROP TABLE _tf;DROP TABLE _sf;';
-const dropSupport = (includeSpecs = false) => `${dropFingerprints()}DROP VIEW _sr;${includeSpecs ? 'DROP TABLE _ts;' : ''}`;
+const dropSupport = (includeSpecs = false) => `${dropFingerprints()}DROP TABLE _sr;${includeSpecs ? 'DROP TABLE _ts;' : ''}`;
 function topicGuard(model, firstRun) {
   const ids = NEW_TOPICS.map((topic) => sql(topic.id)).join(','); const exact = fpEquals('_tf', rowsFingerprint(model.topicRows, TOPIC_FIELDS));
   const collision = firstRun ? "NOT EXISTS(SELECT 1 FROM _ts s JOIN topics t ON t.subject_id=s.subject_id AND t.id<>s.id AND (t.name=s.name OR t.slug=s.slug))" : `NOT EXISTS(SELECT 1 FROM topics n JOIN topics o ON o.subject_id=n.subject_id AND o.id<>n.id AND (o.name=n.name OR o.slug=n.slug) WHERE n.id IN(${ids}))`;
