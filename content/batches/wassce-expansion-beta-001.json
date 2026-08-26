@@ -1,0 +1,2946 @@
+{
+  "batchId": "wassce-expansion-beta-001",
+  "status": "approved_for_production",
+  "examTypeId": "exam_wassce",
+  "provenance": [
+    {
+      "publisher": "West African Examinations Council, Ghana",
+      "title": "WASSCE for School Candidates subject catalogue",
+      "url": "https://waecgh.org/home/wassce-school/",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "West African Examinations Council",
+      "title": "Islamic Studies e-learning index",
+      "url": "https://www.waeconline.org.ng/e-learning/Islamic/IRKmain.html",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "West African Examinations Council, Ghana",
+      "title": "WASSCE for School Candidates 2026 final timetable",
+      "url": "https://waecgh.org/wp-content/uploads/2026/03/FINAL-TIMETABLE-FOR-WASSCE-SC-2026-GHANA-ONLY-NEW-TAD.pdf",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "National Council for Curriculum and Assessment, Ghana",
+      "title": "Applied Technology Curriculum",
+      "url": "https://nacca.gov.gh/wp-content/uploads/2025/04/Applied-Technology-Curriculum.pdf",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "West African Examinations Council, Ghana",
+      "title": "Applied Electricity chief examiner evidence",
+      "url": "https://waecgh.org/wp-content/uploads/2023/12/Technical17.pdf",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-08-26T00:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep curriculum-aligned practice content; not official WAEC examination material.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_wassce_irs",
+      "specificationCode": "BRILLA-WASSCE-IRS-BETA-001",
+      "topics": [
+        {
+          "code": "IRS-1",
+          "title": "The Qur’an and revelation",
+          "objective": "Explain revelation, preservation, structure and selected moral teachings of the Qur’an."
+        },
+        {
+          "code": "IRS-2",
+          "title": "Hadith and Sunnah",
+          "objective": "Distinguish Hadith and Sunnah and explain authentication, classification and major collections."
+        },
+        {
+          "code": "IRS-3",
+          "title": "Life of Prophet Muhammad",
+          "objective": "Explain major events in the Prophet’s life and lessons from Makkah and Madinah."
+        },
+        {
+          "code": "IRS-4",
+          "title": "Beliefs and pillars of Islam",
+          "objective": "Apply the articles of faith and Five Pillars to Muslim belief and conduct."
+        },
+        {
+          "code": "IRS-5",
+          "title": "Worship and purification",
+          "objective": "Explain purification, prayer, fasting and lawful concessions in worship."
+        },
+        {
+          "code": "IRS-6",
+          "title": "Shari’ah, family and community life",
+          "objective": "Explain sources and purposes of Shari’ah and principles for responsible family and community life."
+        },
+        {
+          "code": "IRS-7",
+          "title": "Early Islamic leadership and scholarship",
+          "objective": "Evaluate leadership and contributions to preservation, administration and scholarship in early Islam."
+        },
+        {
+          "code": "IRS-8",
+          "title": "Islamic ethics and social responsibility",
+          "objective": "Apply Islamic moral teachings to justice, care, honesty, peace and stewardship."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_was_irs_b001_001",
+          "original": true,
+          "topicCode": "IRS-1",
+          "type": "multiple_choice",
+          "prompt": "What does wahy mean in the context of the Qur’an?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Divine revelation communicated by Allah to a prophet",
+              "rationale": "This is the supported answer. Wahy refers to divine communication to prophets. Muslims believe the Qur’an was revealed to Prophet Muhammad through the angel Jibril."
+            },
+            {
+              "label": "B",
+              "text": "A private opinion of a historian",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Any poem written in Arabic",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A ruling made only by a merchant",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Wahy refers to divine communication to prophets. Muslims believe the Qur’an was revealed to Prophet Muhammad through the angel Jibril. Therefore the correct answer is A: Divine revelation communicated by Allah to a prophet.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_irs_b001_002",
+          "original": true,
+          "topicCode": "IRS-1",
+          "type": "multiple_choice",
+          "prompt": "Which caliph initiated the first official collection of the Qur’an into one compilation after many reciters died?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Uthman ibn Affan",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Abu Bakr",
+              "rationale": "This is the supported answer. Abu Bakr authorised the collection after the Battle of Yamamah, with Zayd ibn Thabit leading the careful compilation work."
+            },
+            {
+              "label": "C",
+              "text": "Umar ibn Abd al-Aziz",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Ali ibn Abi Talib",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Abu Bakr authorised the collection after the Battle of Yamamah, with Zayd ibn Thabit leading the careful compilation work. Therefore the correct answer is B: Abu Bakr.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_irs_b001_003",
+          "original": true,
+          "topicCode": "IRS-1",
+          "type": "multiple_choice",
+          "prompt": "Why did Caliph Uthman distribute standard copies of the Qur’an?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To add new chapters",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "To translate the text into only one local language",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "To preserve unity in recitation and prevent disputes over written forms",
+              "rationale": "This is the supported answer. As Islam spread, differences in recitation practice risked dispute. Standard copies based on the established compilation protected textual unity."
+            },
+            {
+              "label": "D",
+              "text": "To replace memorisation with trade records",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "As Islam spread, differences in recitation practice risked dispute. Standard copies based on the established compilation protected textual unity. Therefore the correct answer is C: To preserve unity in recitation and prevent disputes over written forms.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_irs_b001_004",
+          "original": true,
+          "topicCode": "IRS-1",
+          "type": "multiple_choice",
+          "prompt": "What central moral duty appears in Qur’an 17:23 alongside worshipping Allah alone?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Avoiding all lawful work",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Refusing hospitality to travellers",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Keeping knowledge secret",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Showing kindness and respect to parents",
+              "rationale": "This is the supported answer. The passage joins monotheism with excellent treatment of parents, especially patience, respectful speech and care when they are old."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The passage joins monotheism with excellent treatment of parents, especially patience, respectful speech and care when they are old. Therefore the correct answer is D: Showing kindness and respect to parents.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_irs_b001_005",
+          "original": true,
+          "topicCode": "IRS-1",
+          "type": "multiple_choice",
+          "prompt": "What is a surah in the Qur’an?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A chapter of the Qur’an",
+              "rationale": "This is the supported answer. The Qur’an is organised into chapters called suwar, each containing verses called ayat and identified by an established name."
+            },
+            {
+              "label": "B",
+              "text": "A transmitter in a Hadith chain",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A voluntary charity only",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A school of architecture",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The Qur’an is organised into chapters called suwar, each containing verses called ayat and identified by an established name. Therefore the correct answer is A: A chapter of the Qur’an.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_irs_b001_006",
+          "original": true,
+          "topicCode": "IRS-2",
+          "type": "multiple_choice",
+          "prompt": "What is the isnad of a Hadith?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The main mosque of a city",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The chain of people who transmitted the report",
+              "rationale": "This is the supported answer. Hadith scholars examine the isnad to identify transmitters and assess continuity and reliability alongside analysis of the reported text."
+            },
+            {
+              "label": "C",
+              "text": "The legal ruling derived from trade",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The written chapter heading",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Hadith scholars examine the isnad to identify transmitters and assess continuity and reliability alongside analysis of the reported text. Therefore the correct answer is B: The chain of people who transmitted the report.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_irs_b001_007",
+          "original": true,
+          "topicCode": "IRS-2",
+          "type": "multiple_choice",
+          "prompt": "What is the matn of a Hadith?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The chain of transmitters",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A tax on agricultural produce",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The actual reported wording or content",
+              "rationale": "This is the supported answer. A Hadith has a chain of transmission and a reported text. Both require examination when scholars assess authenticity and meaning."
+            },
+            {
+              "label": "D",
+              "text": "The direction of prayer",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A Hadith has a chain of transmission and a reported text. Both require examination when scholars assess authenticity and meaning. Therefore the correct answer is C: The actual reported wording or content.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_irs_b001_008",
+          "original": true,
+          "topicCode": "IRS-2",
+          "type": "multiple_choice",
+          "prompt": "Which description best fits a sahih Hadith?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Every story circulated without a chain",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A report known to contain a fabricated narrator",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Any statement that agrees with personal preference",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A report meeting strong conditions of continuity and reliable transmission",
+              "rationale": "This is the supported answer. Sahih classification depends on connected transmission, trustworthy precise narrators and freedom from disqualifying irregularity or hidden defect."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Sahih classification depends on connected transmission, trustworthy precise narrators and freedom from disqualifying irregularity or hidden defect. Therefore the correct answer is D: A report meeting strong conditions of continuity and reliable transmission.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_irs_b001_009",
+          "original": true,
+          "topicCode": "IRS-2",
+          "type": "multiple_choice",
+          "prompt": "How does Sunnah differ from an individual Hadith report?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Sunnah is the Prophet’s normative example, while Hadith reports transmit information about it",
+              "rationale": "This is the supported answer. Hadith is a vehicle through which sayings, actions and approvals are reported, while Sunnah describes the Prophetic model followed in Muslim life."
+            },
+            {
+              "label": "B",
+              "text": "Sunnah is a chapter of the Qur’an",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Hadith is always later custom with no chain",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The two terms refer only to buildings",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Hadith is a vehicle through which sayings, actions and approvals are reported, while Sunnah describes the Prophetic model followed in Muslim life. Therefore the correct answer is A: Sunnah is the Prophet’s normative example, while Hadith reports transmit information about it.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_irs_b001_010",
+          "original": true,
+          "topicCode": "IRS-2",
+          "type": "multiple_choice",
+          "prompt": "Why was Umar ibn Abd al-Aziz important in Hadith history?",
+          "options": [
+            {
+              "label": "A",
+              "text": "He prohibited all written scholarship",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "He ordered scholars to collect Hadith before knowledge and transmitters were lost",
+              "rationale": "This is the supported answer. His official encouragement helped move Hadith collection toward organised preservation at a time when knowledgeable transmitters were disappearing."
+            },
+            {
+              "label": "C",
+              "text": "He replaced the Qur’an with biographies",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "He was the first caller to prayer in Makkah",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "His official encouragement helped move Hadith collection toward organised preservation at a time when knowledgeable transmitters were disappearing. Therefore the correct answer is B: He ordered scholars to collect Hadith before knowledge and transmitters were lost.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_irs_b001_011",
+          "original": true,
+          "topicCode": "IRS-3",
+          "type": "multiple_choice",
+          "prompt": "What does Hijrah refer to in the Prophet’s life?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The first revelation at Hira",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The rebuilding of the Ka’bah before prophethood",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The migration from Makkah to Madinah",
+              "rationale": "This is the supported answer. The Hijrah established a secure Muslim community in Madinah and marks the starting point used for the Islamic lunar calendar."
+            },
+            {
+              "label": "D",
+              "text": "The farewell sermon at Arafah",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The Hijrah established a secure Muslim community in Madinah and marks the starting point used for the Islamic lunar calendar. Therefore the correct answer is C: The migration from Makkah to Madinah.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_irs_b001_012",
+          "original": true,
+          "topicCode": "IRS-3",
+          "type": "multiple_choice",
+          "prompt": "What was a key lesson of the brotherhood formed between the Muhajirun and Ansar?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Tribal status must determine all rights",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Migrants should remain permanently isolated",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Wealth should never be shared",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Community solidarity can overcome displacement and social division",
+              "rationale": "This is the supported answer. The pairing supported displaced Makkan Muslims and strengthened mutual responsibility in the new Madinan community."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The pairing supported displaced Makkan Muslims and strengthened mutual responsibility in the new Madinan community. Therefore the correct answer is D: Community solidarity can overcome displacement and social division.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_irs_b001_013",
+          "original": true,
+          "topicCode": "IRS-3",
+          "type": "multiple_choice",
+          "prompt": "Why was the Treaty of Hudaybiyyah strategically important?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A period of peace created wider opportunities for contact and peaceful propagation",
+              "rationale": "This is the supported answer. Although some terms initially seemed difficult, the truce reduced conflict and allowed communication that contributed to rapid community growth."
+            },
+            {
+              "label": "B",
+              "text": "It ended every later disagreement immediately",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It required Muslims to abandon Madinah",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It prohibited all future pilgrimage",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Although some terms initially seemed difficult, the truce reduced conflict and allowed communication that contributed to rapid community growth. Therefore the correct answer is A: A period of peace created wider opportunities for contact and peaceful propagation.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_irs_b001_014",
+          "original": true,
+          "topicCode": "IRS-3",
+          "type": "multiple_choice",
+          "prompt": "What happened during the first revelation?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The Prophet was crowned king of Makkah",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The angel Jibril commanded the Prophet to read or recite",
+              "rationale": "This is the supported answer. Islamic tradition records that the first verses of Surah al-Alaq were revealed through Jibril while the Prophet was in the cave of Hira."
+            },
+            {
+              "label": "C",
+              "text": "The Qur’an was printed as a complete book",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The Ka’bah was moved to Madinah",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Islamic tradition records that the first verses of Surah al-Alaq were revealed through Jibril while the Prophet was in the cave of Hira. Therefore the correct answer is B: The angel Jibril commanded the Prophet to read or recite.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_irs_b001_015",
+          "original": true,
+          "topicCode": "IRS-3",
+          "type": "multiple_choice",
+          "prompt": "Which quality did the title al-Amin recognise in Muhammad before prophethood?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Military rank",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Ownership of every caravan",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Trustworthiness",
+              "rationale": "This is the supported answer. People in Makkah recognised Muhammad as trustworthy and dependable, a character quality central to his later mission and leadership."
+            },
+            {
+              "label": "D",
+              "text": "Authority as a Roman governor",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "People in Makkah recognised Muhammad as trustworthy and dependable, a character quality central to his later mission and leadership. Therefore the correct answer is C: Trustworthiness.",
+          "difficulty": "hard",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_irs_b001_016",
+          "original": true,
+          "topicCode": "IRS-4",
+          "type": "multiple_choice",
+          "prompt": "What does tawhid mean in Islamic belief?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Worship of several independent deities",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Rejection of all prophets",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A method of commercial accounting",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Belief in the absolute oneness of Allah",
+              "rationale": "This is the supported answer. Tawhid is the foundation of Islamic belief: Allah alone is the creator and deserves worship without partners or rivals."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Tawhid is the foundation of Islamic belief: Allah alone is the creator and deserves worship without partners or rivals. Therefore the correct answer is D: Belief in the absolute oneness of Allah.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_irs_b001_017",
+          "original": true,
+          "topicCode": "IRS-4",
+          "type": "multiple_choice",
+          "prompt": "Which is one of the Five Pillars of Islam?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Zakah",
+              "rationale": "This is the supported answer. Zakah is obligatory almsgiving on qualifying wealth and links worship with purification of wealth and responsibility toward eligible recipients."
+            },
+            {
+              "label": "B",
+              "text": "Tribal superiority",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Monastic isolation",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Fortune telling",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Zakah is obligatory almsgiving on qualifying wealth and links worship with purification of wealth and responsibility toward eligible recipients. Therefore the correct answer is A: Zakah.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_irs_b001_018",
+          "original": true,
+          "topicCode": "IRS-4",
+          "type": "multiple_choice",
+          "prompt": "What is the primary declaration contained in the Shahadah?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Every nation must use one language",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "There is no deity worthy of worship except Allah and Muhammad is His messenger",
+              "rationale": "This is the supported answer. The testimony expresses monotheism and acceptance of Muhammad’s prophethood, forming the verbal foundation of Muslim commitment."
+            },
+            {
+              "label": "C",
+              "text": "Wealth determines spiritual rank",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Only scholars are accountable for conduct",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The testimony expresses monotheism and acceptance of Muhammad’s prophethood, forming the verbal foundation of Muslim commitment. Therefore the correct answer is B: There is no deity worthy of worship except Allah and Muhammad is His messenger.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_irs_b001_019",
+          "original": true,
+          "topicCode": "IRS-4",
+          "type": "multiple_choice",
+          "prompt": "What does belief in qadar affirm?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Human beings have no moral accountability",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Planning for the future is forbidden",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Allah’s knowledge and decree while humans remain responsible for chosen actions",
+              "rationale": "This is the supported answer. Belief in divine decree encourages trust in Allah without cancelling effort, choice, planning or accountability for deliberate conduct."
+            },
+            {
+              "label": "D",
+              "text": "Natural causes never operate",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Belief in divine decree encourages trust in Allah without cancelling effort, choice, planning or accountability for deliberate conduct. Therefore the correct answer is C: Allah’s knowledge and decree while humans remain responsible for chosen actions.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_irs_b001_020",
+          "original": true,
+          "topicCode": "IRS-4",
+          "type": "multiple_choice",
+          "prompt": "Who are the messengers in Islamic belief?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Angels who became human permanently",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Rulers selected only by wealth",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Authors of every historical book",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Human beings chosen by Allah to convey guidance",
+              "rationale": "This is the supported answer. Muslims believe Allah selected messengers from humanity, gave them revelation and made them models of faithful conduct."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Muslims believe Allah selected messengers from humanity, gave them revelation and made them models of faithful conduct. Therefore the correct answer is D: Human beings chosen by Allah to convey guidance.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_irs_b001_021",
+          "original": true,
+          "topicCode": "IRS-5",
+          "type": "multiple_choice",
+          "prompt": "When is tayammum permitted?",
+          "options": [
+            {
+              "label": "A",
+              "text": "When water is unavailable or its use would cause genuine harm",
+              "rationale": "This is the supported answer. Tayammum is a lawful dry purification using clean earth under recognised necessity; it is not a convenience that replaces usable water without cause."
+            },
+            {
+              "label": "B",
+              "text": "Whenever a person wishes to avoid all preparation",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Only after completing the prayer",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "When clean water is freely available and safe",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Tayammum is a lawful dry purification using clean earth under recognised necessity; it is not a convenience that replaces usable water without cause. Therefore the correct answer is A: When water is unavailable or its use would cause genuine harm.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_irs_b001_022",
+          "original": true,
+          "topicCode": "IRS-5",
+          "type": "multiple_choice",
+          "prompt": "Which prayer is performed in congregation on Friday in place of the normal midday prayer for those obligated to attend?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Tahajjud",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Jumu’ah",
+              "rationale": "This is the supported answer. Jumu’ah includes a sermon and congregational prayer and has special communal significance in weekly Muslim worship."
+            },
+            {
+              "label": "C",
+              "text": "Witr",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Janazah",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Jumu’ah includes a sermon and congregational prayer and has special communal significance in weekly Muslim worship. Therefore the correct answer is B: Jumu’ah.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_irs_b001_023",
+          "original": true,
+          "topicCode": "IRS-5",
+          "type": "multiple_choice",
+          "prompt": "What is the purpose of wudu before prayer?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A substitute for every ethical duty",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A guarantee that no mistake can occur",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Ritual purification and readiness for worship",
+              "rationale": "This is the supported answer. Wudu uses prescribed washing to prepare for prayer, joining physical cleanliness with conscious spiritual readiness."
+            },
+            {
+              "label": "D",
+              "text": "A method of calculating Zakah",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Wudu uses prescribed washing to prepare for prayer, joining physical cleanliness with conscious spiritual readiness. Therefore the correct answer is C: Ritual purification and readiness for worship.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_irs_b001_024",
+          "original": true,
+          "topicCode": "IRS-5",
+          "type": "multiple_choice",
+          "prompt": "During which month is the obligatory fast observed?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Muharram only",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Rabi al-Awwal",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Dhu al-Qadah",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Ramadan",
+              "rationale": "This is the supported answer. Fasting Ramadan is a pillar of Islam and trains self-restraint, gratitude, devotion and awareness of people in need."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Fasting Ramadan is a pillar of Islam and trains self-restraint, gratitude, devotion and awareness of people in need. Therefore the correct answer is D: Ramadan.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_irs_b001_025",
+          "original": true,
+          "topicCode": "IRS-5",
+          "type": "multiple_choice",
+          "prompt": "What is the qiblah?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The direction of the Ka’bah faced during prayer",
+              "rationale": "This is the supported answer. Facing the qiblah unifies worshippers in direction while prayer remains directed to Allah rather than to the building itself."
+            },
+            {
+              "label": "B",
+              "text": "The sermon delivered after every meal",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The charity due on crops",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The chain of a Hadith",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Facing the qiblah unifies worshippers in direction while prayer remains directed to Allah rather than to the building itself. Therefore the correct answer is A: The direction of the Ka’bah faced during prayer.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_irs_b001_026",
+          "original": true,
+          "topicCode": "IRS-6",
+          "type": "multiple_choice",
+          "prompt": "Which two primary sources form the foundation of Shari’ah?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Local rumour and personal desire",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The Qur’an and Sunnah",
+              "rationale": "This is the supported answer. Islamic law begins with the Qur’an and authenticated Prophetic Sunnah, with disciplined methods used for matters requiring further interpretation."
+            },
+            {
+              "label": "C",
+              "text": "Trade records and poetry alone",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Astronomy and architecture",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Islamic law begins with the Qur’an and authenticated Prophetic Sunnah, with disciplined methods used for matters requiring further interpretation. Therefore the correct answer is B: The Qur’an and Sunnah.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_irs_b001_027",
+          "original": true,
+          "topicCode": "IRS-6",
+          "type": "multiple_choice",
+          "prompt": "What is ijma in Islamic legal reasoning?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A private dream treated as public law",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Any custom even when it contradicts revelation",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Qualified scholarly consensus on a matter",
+              "rationale": "This is the supported answer. Ijma refers to recognised consensus among qualified scholars and is treated within legal theory as a source after the foundational texts."
+            },
+            {
+              "label": "D",
+              "text": "A commercial partnership deed",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Ijma refers to recognised consensus among qualified scholars and is treated within legal theory as a source after the foundational texts. Therefore the correct answer is C: Qualified scholarly consensus on a matter.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_irs_b001_028",
+          "original": true,
+          "topicCode": "IRS-6",
+          "type": "multiple_choice",
+          "prompt": "What is qiyas in Islamic legal reasoning?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Replacing revelation with personal preference",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Memorising a chapter without understanding",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Cancelling every earlier judgment",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Reasoning by analogy from an established ruling and its effective cause",
+              "rationale": "This is the supported answer. Qiyas applies a known rule to a new case that shares the relevant underlying cause, using disciplined rather than arbitrary comparison."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Qiyas applies a known rule to a new case that shares the relevant underlying cause, using disciplined rather than arbitrary comparison. Therefore the correct answer is D: Reasoning by analogy from an established ruling and its effective cause.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_irs_b001_029",
+          "original": true,
+          "topicCode": "IRS-6",
+          "type": "multiple_choice",
+          "prompt": "What should guide custody decisions concerning a child after family separation?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The child’s welfare within applicable Islamic and lawful responsibilities",
+              "rationale": "This is the supported answer. Al-hadanah concerns care and upbringing. Responsible decisions protect the child’s welfare and rights rather than treating custody as retaliation."
+            },
+            {
+              "label": "B",
+              "text": "Using the child to punish the other parent",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Ignoring care, safety and development",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Awarding custody solely by wealth",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Al-hadanah concerns care and upbringing. Responsible decisions protect the child’s welfare and rights rather than treating custody as retaliation. Therefore the correct answer is A: The child’s welfare within applicable Islamic and lawful responsibilities.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_irs_b001_030",
+          "original": true,
+          "topicCode": "IRS-6",
+          "type": "multiple_choice",
+          "prompt": "Why is a marriage contract important in Islam?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It removes the need for free consent",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It establishes a lawful union with recognised mutual rights and responsibilities",
+              "rationale": "This is the supported answer. Nikah is a serious covenant requiring consent and defined responsibilities, including dignity, support and fair treatment within the marriage."
+            },
+            {
+              "label": "C",
+              "text": "It permits concealment of agreed obligations",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It makes kindness between spouses optional",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Nikah is a serious covenant requiring consent and defined responsibilities, including dignity, support and fair treatment within the marriage. Therefore the correct answer is B: It establishes a lawful union with recognised mutual rights and responsibilities.",
+          "difficulty": "hard",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_irs_b001_031",
+          "original": true,
+          "topicCode": "IRS-7",
+          "type": "multiple_choice",
+          "prompt": "What title is commonly given to Abu Bakr as the first caliph?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Al-Faruq",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Dhu al-Nurayn",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Al-Siddiq",
+              "rationale": "This is the supported answer. Abu Bakr was known as al-Siddiq, reflecting his truthfulness and steadfast affirmation of the Prophet."
+            },
+            {
+              "label": "D",
+              "text": "Saifullah",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Abu Bakr was known as al-Siddiq, reflecting his truthfulness and steadfast affirmation of the Prophet. Therefore the correct answer is C: Al-Siddiq.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_irs_b001_032",
+          "original": true,
+          "topicCode": "IRS-7",
+          "type": "multiple_choice",
+          "prompt": "Which caliph is especially associated with organising provinces and public administration as the state expanded?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Abu Lahab",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Abu Jahl",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Walid ibn al-Mughira",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Umar ibn al-Khattab",
+              "rationale": "This is the supported answer. Umar developed administrative, judicial and welfare arrangements and was known for accountability as Muslim territories expanded."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Umar developed administrative, judicial and welfare arrangements and was known for accountability as Muslim territories expanded. Therefore the correct answer is D: Umar ibn al-Khattab.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_irs_b001_033",
+          "original": true,
+          "topicCode": "IRS-7",
+          "type": "multiple_choice",
+          "prompt": "Why is Uthman ibn Affan called Dhu al-Nurayn?",
+          "options": [
+            {
+              "label": "A",
+              "text": "He married two daughters of Prophet Muhammad in succession",
+              "rationale": "This is the supported answer. The title means possessor of the two lights and refers to his marriages to Ruqayyah and, after her death, Umm Kulthum."
+            },
+            {
+              "label": "B",
+              "text": "He led two migrations in the same day",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "He compiled two different Qur’ans",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "He built two Ka’bahs",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The title means possessor of the two lights and refers to his marriages to Ruqayyah and, after her death, Umm Kulthum. Therefore the correct answer is A: He married two daughters of Prophet Muhammad in succession.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_irs_b001_034",
+          "original": true,
+          "topicCode": "IRS-7",
+          "type": "multiple_choice",
+          "prompt": "Which contribution is strongly associated with Ali ibn Abi Talib?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Opposition to the first revelation",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Knowledge, courage and close service to the Prophet",
+              "rationale": "This is the supported answer. Ali was among the earliest Muslims, was raised close to the Prophet and became known for learning, judgment and courage."
+            },
+            {
+              "label": "C",
+              "text": "Rule as a Byzantine emperor",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Prohibition of learning",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Ali was among the earliest Muslims, was raised close to the Prophet and became known for learning, judgment and courage. Therefore the correct answer is B: Knowledge, courage and close service to the Prophet.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_irs_b001_035",
+          "original": true,
+          "topicCode": "IRS-7",
+          "type": "multiple_choice",
+          "prompt": "Why did Muslim scholars develop detailed narrator criticism?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To prevent any Hadith from being studied",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "To judge people only by their wealth",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "To distinguish reliable reports from weak or fabricated ones",
+              "rationale": "This is the supported answer. Biographical and transmission analysis protected religious knowledge by checking memory, integrity, chronology and opportunities for narrators to meet."
+            },
+            {
+              "label": "D",
+              "text": "To replace the Qur’an with genealogy",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Biographical and transmission analysis protected religious knowledge by checking memory, integrity, chronology and opportunities for narrators to meet. Therefore the correct answer is C: To distinguish reliable reports from weak or fabricated ones.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_irs_b001_036",
+          "original": true,
+          "topicCode": "IRS-8",
+          "type": "multiple_choice",
+          "prompt": "What does amanah require in business dealings?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Concealing defects from buyers",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Changing agreed measures secretly",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Breaking promises whenever profit increases",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Trustworthiness and faithful discharge of responsibility",
+              "rationale": "This is the supported answer. Amanah requires honesty with property, information and obligations, making it central to trustworthy trade and public responsibility."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Amanah requires honesty with property, information and obligations, making it central to trustworthy trade and public responsibility. Therefore the correct answer is D: Trustworthiness and faithful discharge of responsibility.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_irs_b001_037",
+          "original": true,
+          "topicCode": "IRS-8",
+          "type": "multiple_choice",
+          "prompt": "What social purpose does Zakah serve?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Purifying qualifying wealth and supporting eligible people and causes",
+              "rationale": "This is the supported answer. Zakah combines worship with structured social support and reminds owners that wealth carries duties toward the wider community."
+            },
+            {
+              "label": "B",
+              "text": "Increasing inequality as an objective",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Replacing every voluntary good deed",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Funding only luxury consumption",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Zakah combines worship with structured social support and reminds owners that wealth carries duties toward the wider community. Therefore the correct answer is A: Purifying qualifying wealth and supporting eligible people and causes.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_irs_b001_038",
+          "original": true,
+          "topicCode": "IRS-8",
+          "type": "multiple_choice",
+          "prompt": "Which conduct best reflects adl?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Favouring relatives regardless of evidence",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Acting justly even when personal interest points elsewhere",
+              "rationale": "This is the supported answer. Adl means justice and fairness. Islamic ethics require consistent standards and protection of rights rather than biased advantage."
+            },
+            {
+              "label": "C",
+              "text": "Using different measures for buyers and sellers",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Withholding every worker’s agreed wage",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Adl means justice and fairness. Islamic ethics require consistent standards and protection of rights rather than biased advantage. Therefore the correct answer is B: Acting justly even when personal interest points elsewhere.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_irs_b001_039",
+          "original": true,
+          "topicCode": "IRS-8",
+          "type": "multiple_choice",
+          "prompt": "How should disagreement be handled according to Islamic ethics?",
+          "options": [
+            {
+              "label": "A",
+              "text": "With insults and deliberate falsehood",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "By assuming every opponent is dishonest",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "With evidence, respectful speech and a sincere search for reconciliation",
+              "rationale": "This is the supported answer. Truthfulness, restraint and peacemaking protect dignity and make resolution more likely even when the parties continue to disagree."
+            },
+            {
+              "label": "D",
+              "text": "By spreading unverified accusations",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Truthfulness, restraint and peacemaking protect dignity and make resolution more likely even when the parties continue to disagree. Therefore the correct answer is C: With evidence, respectful speech and a sincere search for reconciliation.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_irs_b001_040",
+          "original": true,
+          "topicCode": "IRS-8",
+          "type": "multiple_choice",
+          "prompt": "What does stewardship of the earth imply?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Natural resources have no moral value",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Waste is acceptable when ownership is private",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Future generations have no interests",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "People should use resources responsibly and avoid waste and harm",
+              "rationale": "This is the supported answer. The idea of khalifah frames human power as accountable stewardship, encouraging beneficial use, moderation and protection from corruption or needless damage."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The idea of khalifah frames human power as accountable stewardship, encouraging beneficial use, moderation and protection from corruption or needless damage. Therefore the correct answer is D: People should use resources responsibly and avoid waste and harm.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        }
+      ]
+    },
+    {
+      "subjectId": "subj_wassce_elect_app",
+      "specificationCode": "BRILLA-WASSCE-AEL-BETA-001",
+      "topics": [
+        {
+          "code": "AEL-1",
+          "title": "Electrical safety and quantities",
+          "objective": "Apply electrical safety and explain charge, current, voltage, resistance, power, energy and their units."
+        },
+        {
+          "code": "AEL-2",
+          "title": "Direct-current circuits",
+          "objective": "Analyse series, parallel and mixed direct-current circuits using circuit laws."
+        },
+        {
+          "code": "AEL-3",
+          "title": "Capacitance and alternating current",
+          "objective": "Explain capacitance and analyse basic alternating-current quantities, reactance, impedance and power factor."
+        },
+        {
+          "code": "AEL-4",
+          "title": "Magnetism and transformers",
+          "objective": "Apply electromagnetic principles to coils, induction and transformer operation."
+        },
+        {
+          "code": "AEL-5",
+          "title": "Electrical machines and generation",
+          "objective": "Explain operating principles and applications of generators and motors."
+        },
+        {
+          "code": "AEL-6",
+          "title": "Electrical instruments and measurement",
+          "objective": "Select and connect instruments safely to measure common electrical quantities."
+        },
+        {
+          "code": "AEL-7",
+          "title": "Semiconductor electronics",
+          "objective": "Explain diodes, transistors, rectification, switching and basic electronic circuits."
+        },
+        {
+          "code": "AEL-8",
+          "title": "Installation, protection and distribution",
+          "objective": "Apply wiring, earthing, protection and electrical supply-distribution principles."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_was_elect_b001_001",
+          "original": true,
+          "topicCode": "AEL-1",
+          "type": "multiple_choice",
+          "prompt": "What should be done first before working on a mains electrical circuit?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Isolate the supply and verify that the circuit is de-energised",
+              "rationale": "This is the supported answer. Safe isolation requires disconnection, prevention of unintended reconnection and verification with suitable test equipment before conductors are handled."
+            },
+            {
+              "label": "B",
+              "text": "Touch a conductor to test it by sensation",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Replace the fuse while current is flowing",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Assume an open switch guarantees isolation",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Safe isolation requires disconnection, prevention of unintended reconnection and verification with suitable test equipment before conductors are handled. Therefore the correct answer is A: Isolate the supply and verify that the circuit is de-energised.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_elect_b001_002",
+          "original": true,
+          "topicCode": "AEL-1",
+          "type": "multiple_choice",
+          "prompt": "A current meter reads 2.5 A. Which SI base unit is represented by the symbol A?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Volt",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Ampere",
+              "rationale": "This is the supported answer. Current is the rate of flow of electric charge and is measured in amperes, while voltage, resistance and power use different units."
+            },
+            {
+              "label": "C",
+              "text": "Ohm",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Watt",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Current is the rate of flow of electric charge and is measured in amperes, while voltage, resistance and power use different units. Therefore the correct answer is B: Ampere.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_elect_b001_003",
+          "original": true,
+          "topicCode": "AEL-1",
+          "type": "multiple_choice",
+          "prompt": "A 12 V device draws 2 A. What electrical power does it use?",
+          "options": [
+            {
+              "label": "A",
+              "text": "6 W",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "10 W",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "24 W",
+              "rationale": "This is the supported answer. Electrical power in a direct-current resistive load is P = VI, so 12 multiplied by 2 gives 24 watts."
+            },
+            {
+              "label": "D",
+              "text": "48 W",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Electrical power in a direct-current resistive load is P = VI, so 12 multiplied by 2 gives 24 watts. Therefore the correct answer is C: 24 W.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_elect_b001_004",
+          "original": true,
+          "topicCode": "AEL-1",
+          "type": "multiple_choice",
+          "prompt": "What does resistance describe?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The rate of using electrical energy only",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The amount of charge stored in every source",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The magnetic direction of a compass",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Opposition to electric current flow",
+              "rationale": "This is the supported answer. Resistance relates voltage to current and is measured in ohms; material, length, cross-sectional area and temperature can affect it."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Resistance relates voltage to current and is measured in ohms; material, length, cross-sectional area and temperature can affect it. Therefore the correct answer is D: Opposition to electric current flow.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_elect_b001_005",
+          "original": true,
+          "topicCode": "AEL-1",
+          "type": "multiple_choice",
+          "prompt": "Why must a person avoid using water on energised electrical equipment?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Water can create conductive paths and increase shock or fault risk",
+              "rationale": "This is the supported answer. Ordinary water and contaminants may conduct current, exposing people and equipment to shock, short-circuit and arc hazards."
+            },
+            {
+              "label": "B",
+              "text": "Water always raises insulation resistance",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It safely isolates every live conductor",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It guarantees that protective devices cannot operate",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Ordinary water and contaminants may conduct current, exposing people and equipment to shock, short-circuit and arc hazards. Therefore the correct answer is A: Water can create conductive paths and increase shock or fault risk.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_elect_b001_006",
+          "original": true,
+          "topicCode": "AEL-2",
+          "type": "multiple_choice",
+          "prompt": "Two resistors of 4 Ω and 6 Ω are connected in series. What is their total resistance?",
+          "options": [
+            {
+              "label": "A",
+              "text": "2.4 Ω",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "10 Ω",
+              "rationale": "This is the supported answer. Series resistances add because the same current passes through each component, giving 4 plus 6 equals 10 ohms."
+            },
+            {
+              "label": "C",
+              "text": "5 Ω",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "24 Ω",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Series resistances add because the same current passes through each component, giving 4 plus 6 equals 10 ohms. Therefore the correct answer is B: 10 Ω.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_elect_b001_007",
+          "original": true,
+          "topicCode": "AEL-2",
+          "type": "multiple_choice",
+          "prompt": "What quantity is the same through all components in a series circuit?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Voltage across each component",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Resistance of each component",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Current",
+              "rationale": "This is the supported answer. A series path has no branch, so the same current flows through every component while supply voltage is divided among them."
+            },
+            {
+              "label": "D",
+              "text": "Power used by each component",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A series path has no branch, so the same current flows through every component while supply voltage is divided among them. Therefore the correct answer is C: Current.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_elect_b001_008",
+          "original": true,
+          "topicCode": "AEL-2",
+          "type": "multiple_choice",
+          "prompt": "Two identical resistors are connected in parallel. How does their equivalent resistance compare with one resistor?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It is twice the resistance",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It is unchanged",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It is zero for every resistor value",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It is half the resistance of one resistor",
+              "rationale": "This is the supported answer. For two equal parallel resistors, conductances add, producing an equivalent resistance R divided by 2."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "For two equal parallel resistors, conductances add, producing an equivalent resistance R divided by 2. Therefore the correct answer is D: It is half the resistance of one resistor.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_elect_b001_009",
+          "original": true,
+          "topicCode": "AEL-2",
+          "type": "multiple_choice",
+          "prompt": "What does Kirchhoff’s current law state at a junction?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Total current entering equals total current leaving",
+              "rationale": "This is the supported answer. The law follows conservation of charge: charge cannot continually accumulate at an ideal circuit node."
+            },
+            {
+              "label": "B",
+              "text": "All branch voltages must be zero",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Resistance is independent of material",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Power can be created at a junction",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The law follows conservation of charge: charge cannot continually accumulate at an ideal circuit node. Therefore the correct answer is A: Total current entering equals total current leaving.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_elect_b001_010",
+          "original": true,
+          "topicCode": "AEL-2",
+          "type": "multiple_choice",
+          "prompt": "A 6 Ω resistor carries 3 A. What is the voltage across it?",
+          "options": [
+            {
+              "label": "A",
+              "text": "2 V",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "18 V",
+              "rationale": "This is the supported answer. Ohm’s law gives V = IR. Multiplying 3 amperes by 6 ohms gives a potential difference of 18 volts."
+            },
+            {
+              "label": "C",
+              "text": "9 V",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "36 V",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Ohm’s law gives V = IR. Multiplying 3 amperes by 6 ohms gives a potential difference of 18 volts. Therefore the correct answer is B: 18 V.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_elect_b001_011",
+          "original": true,
+          "topicCode": "AEL-3",
+          "type": "multiple_choice",
+          "prompt": "What does a capacitor store?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A continuous supply of fuel",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Only magnetic poles",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Electric charge and energy in an electric field",
+              "rationale": "This is the supported answer. Separated conductors and a dielectric allow charge to accumulate, with energy stored in the electric field between them."
+            },
+            {
+              "label": "D",
+              "text": "Mechanical torque without a field",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Separated conductors and a dielectric allow charge to accumulate, with energy stored in the electric field between them. Therefore the correct answer is C: Electric charge and energy in an electric field.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_elect_b001_012",
+          "original": true,
+          "topicCode": "AEL-3",
+          "type": "multiple_choice",
+          "prompt": "A capacitor is marked 470 µF. Which named SI unit does the letter F represent?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Henry",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Weber",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Tesla",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Farad",
+              "rationale": "This is the supported answer. Capacitance is charge stored per unit potential difference and is measured in farads, commonly expressed in microfarads or smaller units."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Capacitance is charge stored per unit potential difference and is measured in farads, commonly expressed in microfarads or smaller units. Therefore the correct answer is D: Farad.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_elect_b001_013",
+          "original": true,
+          "topicCode": "AEL-3",
+          "type": "multiple_choice",
+          "prompt": "How does capacitive reactance change when frequency increases?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It decreases",
+              "rationale": "This is the supported answer. Capacitive reactance is Xc = 1 divided by 2πfC, so higher frequency produces less opposition from a given capacitor."
+            },
+            {
+              "label": "B",
+              "text": "It increases linearly",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It remains constant",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It becomes resistance only",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Capacitive reactance is Xc = 1 divided by 2πfC, so higher frequency produces less opposition from a given capacitor. Therefore the correct answer is A: It decreases.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_elect_b001_014",
+          "original": true,
+          "topicCode": "AEL-3",
+          "type": "multiple_choice",
+          "prompt": "What is impedance in an alternating-current circuit?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The direct-current charge of a battery",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The combined opposition of resistance and reactance",
+              "rationale": "This is the supported answer. Impedance accounts for resistance and frequency-dependent reactance and is represented in ohms, often with magnitude and phase."
+            },
+            {
+              "label": "C",
+              "text": "Only the physical size of a conductor",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Power multiplied by time",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Impedance accounts for resistance and frequency-dependent reactance and is represented in ohms, often with magnitude and phase. Therefore the correct answer is B: The combined opposition of resistance and reactance.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_elect_b001_015",
+          "original": true,
+          "topicCode": "AEL-3",
+          "type": "multiple_choice",
+          "prompt": "Why is a high power factor generally desirable for an AC load?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It makes voltage and frequency irrelevant",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It eliminates all energy loss",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It reduces current required for a given real power",
+              "rationale": "This is the supported answer. When power factor is closer to unity, less current is needed to deliver the same useful power, reducing conductor and system losses."
+            },
+            {
+              "label": "D",
+              "text": "It causes every load to become capacitive",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "When power factor is closer to unity, less current is needed to deliver the same useful power, reducing conductor and system losses. Therefore the correct answer is C: It reduces current required for a given real power.",
+          "difficulty": "hard",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_elect_b001_016",
+          "original": true,
+          "topicCode": "AEL-4",
+          "type": "multiple_choice",
+          "prompt": "A compass is placed beside a straight wire and deflects when the wire is energised. What produced the deflection?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Its resistance must become zero",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "All nearby metals become permanent magnets",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Voltage can no longer be measured",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A magnetic field is produced",
+              "rationale": "This is the supported answer. Moving electric charge produces a magnetic field whose direction around a straight conductor follows the right-hand grip rule."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Moving electric charge produces a magnetic field whose direction around a straight conductor follows the right-hand grip rule. Therefore the correct answer is D: A magnetic field is produced.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_elect_b001_017",
+          "original": true,
+          "topicCode": "AEL-4",
+          "type": "multiple_choice",
+          "prompt": "A coil is moved through a magnetic field and a voltmeter briefly deflects. Which process produced the emf?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Production of an emf when magnetic flux linkage changes",
+              "rationale": "This is the supported answer. Faraday’s law relates induced emf to the rate of change of magnetic flux linkage through a circuit."
+            },
+            {
+              "label": "B",
+              "text": "Creation of energy without a source",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Permanent charging of every iron core",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Conversion of resistance directly into mass",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Faraday’s law relates induced emf to the rate of change of magnetic flux linkage through a circuit. Therefore the correct answer is A: Production of an emf when magnetic flux linkage changes.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_elect_b001_018",
+          "original": true,
+          "topicCode": "AEL-4",
+          "type": "multiple_choice",
+          "prompt": "Why is a transformer core laminated?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To increase winding resistance deliberately",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "To reduce eddy-current losses",
+              "rationale": "This is the supported answer. Thin insulated laminations interrupt circulating currents in the core, reducing heating and wasted power."
+            },
+            {
+              "label": "C",
+              "text": "To stop magnetic flux entirely",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "To convert AC directly into DC",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Thin insulated laminations interrupt circulating currents in the core, reducing heating and wasted power. Therefore the correct answer is B: To reduce eddy-current losses.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_elect_b001_019",
+          "original": true,
+          "topicCode": "AEL-4",
+          "type": "multiple_choice",
+          "prompt": "An ideal transformer has 100 primary turns and 20 secondary turns with 240 V applied. What is the secondary voltage?",
+          "options": [
+            {
+              "label": "A",
+              "text": "12 V",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "120 V",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "48 V",
+              "rationale": "This is the supported answer. For an ideal transformer, Vs divided by Vp equals Ns divided by Np. Thus 240 multiplied by 20 over 100 equals 48 volts."
+            },
+            {
+              "label": "D",
+              "text": "1200 V",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "For an ideal transformer, Vs divided by Vp equals Ns divided by Np. Thus 240 multiplied by 20 over 100 equals 48 volts. Therefore the correct answer is C: 48 V.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_elect_b001_020",
+          "original": true,
+          "topicCode": "AEL-4",
+          "type": "multiple_choice",
+          "prompt": "Why does a transformer require a changing magnetic flux?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Steady DC automatically produces continuous secondary voltage",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Flux must remain zero for energy transfer",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The core supplies unlimited electrical energy",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A changing flux is needed to induce emf in the secondary winding",
+              "rationale": "This is the supported answer. Mutual induction depends on changing flux linkage, which is why ordinary transformers operate with alternating rather than steady direct current."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Mutual induction depends on changing flux linkage, which is why ordinary transformers operate with alternating rather than steady direct current. Therefore the correct answer is D: A changing flux is needed to induce emf in the secondary winding.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_elect_b001_021",
+          "original": true,
+          "topicCode": "AEL-5",
+          "type": "multiple_choice",
+          "prompt": "What energy conversion occurs in an electric motor?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Electrical energy to mechanical energy",
+              "rationale": "This is the supported answer. Motor conductors carrying current in a magnetic field experience force, producing torque and mechanical output."
+            },
+            {
+              "label": "B",
+              "text": "Mechanical energy to electrical energy",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Thermal energy to nuclear energy",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Chemical energy directly to light only",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Motor conductors carrying current in a magnetic field experience force, producing torque and mechanical output. Therefore the correct answer is A: Electrical energy to mechanical energy.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_elect_b001_022",
+          "original": true,
+          "topicCode": "AEL-5",
+          "type": "multiple_choice",
+          "prompt": "What energy conversion occurs in a generator?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Electrical energy to stored chemical energy only",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Mechanical energy to electrical energy",
+              "rationale": "This is the supported answer. A prime mover changes magnetic flux linkage with windings, inducing an emf and converting mechanical input to electrical output."
+            },
+            {
+              "label": "C",
+              "text": "Light energy to mass",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Resistance to magnetic charge",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A prime mover changes magnetic flux linkage with windings, inducing an emf and converting mechanical input to electrical output. Therefore the correct answer is B: Mechanical energy to electrical energy.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_elect_b001_023",
+          "original": true,
+          "topicCode": "AEL-5",
+          "type": "multiple_choice",
+          "prompt": "What is the function of the split-ring commutator in a simple DC motor?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Increase supply frequency",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Store charge like a capacitor",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Reverse armature current each half-turn to maintain torque direction",
+              "rationale": "This is the supported answer. The commutator changes current direction relative to the field so the forces continue to turn the armature in the same rotational direction."
+            },
+            {
+              "label": "D",
+              "text": "Disconnect the magnetic field permanently",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The commutator changes current direction relative to the field so the forces continue to turn the armature in the same rotational direction. Therefore the correct answer is C: Reverse armature current each half-turn to maintain torque direction.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_elect_b001_024",
+          "original": true,
+          "topicCode": "AEL-5",
+          "type": "multiple_choice",
+          "prompt": "Why is a starter used with many motors?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To remove the need for a supply",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "To make the rotor weightless",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "To prevent every mechanical fault",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "To limit excessive starting current and provide control or protection",
+              "rationale": "This is the supported answer. At start, back emf may be low and current high. A starter controls energisation and can add overload or undervoltage protection."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "At start, back emf may be low and current high. A starter controls energisation and can add overload or undervoltage protection. Therefore the correct answer is D: To limit excessive starting current and provide control or protection.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_elect_b001_025",
+          "original": true,
+          "topicCode": "AEL-5",
+          "type": "multiple_choice",
+          "prompt": "What mainly determines the synchronous speed of an AC machine?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Supply frequency and number of poles",
+              "rationale": "This is the supported answer. Synchronous speed follows 120 times frequency divided by pole count, so higher pole count lowers speed at a fixed frequency."
+            },
+            {
+              "label": "B",
+              "text": "Only the colour of the windings",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Bearing diameter alone",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Insulation resistance only",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Synchronous speed follows 120 times frequency divided by pole count, so higher pole count lowers speed at a fixed frequency. Therefore the correct answer is A: Supply frequency and number of poles.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_elect_b001_026",
+          "original": true,
+          "topicCode": "AEL-6",
+          "type": "multiple_choice",
+          "prompt": "How should an ammeter be connected to measure circuit current?",
+          "options": [
+            {
+              "label": "A",
+              "text": "In parallel across the supply",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "In series with the circuit branch",
+              "rationale": "This is the supported answer. An ammeter must carry the branch current and has low internal resistance, so parallel connection could create a dangerous high current."
+            },
+            {
+              "label": "C",
+              "text": "Across an open switch only",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Without completing a current path",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "An ammeter must carry the branch current and has low internal resistance, so parallel connection could create a dangerous high current. Therefore the correct answer is B: In series with the circuit branch.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_elect_b001_027",
+          "original": true,
+          "topicCode": "AEL-6",
+          "type": "multiple_choice",
+          "prompt": "How should a voltmeter be connected?",
+          "options": [
+            {
+              "label": "A",
+              "text": "In series with every load",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Directly across a current transformer secondary left open",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "In parallel across the two points",
+              "rationale": "This is the supported answer. A voltmeter measures potential difference and has high internal resistance, so it is connected across the component or points of interest."
+            },
+            {
+              "label": "D",
+              "text": "Only to earth with no second lead",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A voltmeter measures potential difference and has high internal resistance, so it is connected across the component or points of interest. Therefore the correct answer is C: In parallel across the two points.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_elect_b001_028",
+          "original": true,
+          "topicCode": "AEL-6",
+          "type": "multiple_choice",
+          "prompt": "What does a continuity test determine?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The exact power factor of a live installation",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The colour code of every cable",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The future lifetime of a motor",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Whether a low-resistance conducting path exists",
+              "rationale": "This is the supported answer. With the circuit safely isolated, a continuity test checks whether conductors and connections form an unbroken path."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "With the circuit safely isolated, a continuity test checks whether conductors and connections form an unbroken path. Therefore the correct answer is D: Whether a low-resistance conducting path exists.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_elect_b001_029",
+          "original": true,
+          "topicCode": "AEL-6",
+          "type": "multiple_choice",
+          "prompt": "Why must resistance normally be measured on a de-energised circuit?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The meter supplies its own test current and external voltage can damage it or mislead the reading",
+              "rationale": "This is the supported answer. Ohmmeters use an internal source; applying them to live circuits creates unsafe conditions and invalid or damaging current paths."
+            },
+            {
+              "label": "B",
+              "text": "Resistance exists only when power is off",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "An ohmmeter generates mains voltage",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Isolation makes every resistance zero",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Ohmmeters use an internal source; applying them to live circuits creates unsafe conditions and invalid or damaging current paths. Therefore the correct answer is A: The meter supplies its own test current and external voltage can damage it or mislead the reading.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_elect_b001_030",
+          "original": true,
+          "topicCode": "AEL-6",
+          "type": "multiple_choice",
+          "prompt": "What is the purpose of an insulation-resistance test?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Measure rotational speed",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Assess resistance between conductors and earth or other conductors",
+              "rationale": "This is the supported answer. High insulation resistance indicates that unintended leakage paths are limited, while low readings may identify moisture, damage or contamination."
+            },
+            {
+              "label": "C",
+              "text": "Set the supply frequency",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Determine the price of electricity",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "High insulation resistance indicates that unintended leakage paths are limited, while low readings may identify moisture, damage or contamination. Therefore the correct answer is B: Assess resistance between conductors and earth or other conductors.",
+          "difficulty": "hard",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_elect_b001_031",
+          "original": true,
+          "topicCode": "AEL-7",
+          "type": "multiple_choice",
+          "prompt": "What is the main property of a semiconductor diode?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It amplifies without any bias or supply",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It has zero resistance in both directions",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It conducts readily in one direction and blocks in the other within ratings",
+              "rationale": "This is the supported answer. A p-n junction diode permits forward current after its characteristic threshold and restricts reverse current until breakdown conditions."
+            },
+            {
+              "label": "D",
+              "text": "It stores mechanical energy",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A p-n junction diode permits forward current after its characteristic threshold and restricts reverse current until breakdown conditions. Therefore the correct answer is C: It conducts readily in one direction and blocks in the other within ratings.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_elect_b001_032",
+          "original": true,
+          "topicCode": "AEL-7",
+          "type": "multiple_choice",
+          "prompt": "What is the purpose of a rectifier?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Increase mechanical speed",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Convert DC into sound only",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Measure insulation resistance",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Convert alternating current into unidirectional current",
+              "rationale": "This is the supported answer. Diodes arranged as half-wave or full-wave rectifiers steer alternating input so the load current has one principal direction."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Diodes arranged as half-wave or full-wave rectifiers steer alternating input so the load current has one principal direction. Therefore the correct answer is D: Convert alternating current into unidirectional current.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_elect_b001_033",
+          "original": true,
+          "topicCode": "AEL-7",
+          "type": "multiple_choice",
+          "prompt": "In a bipolar junction transistor, which terminal controls a much larger collector current?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Base",
+              "rationale": "This is the supported answer. A relatively small base current controls collector-emitter current in the active or switching operating regions of a BJT."
+            },
+            {
+              "label": "B",
+              "text": "Case",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Heat sink",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Insulator",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A relatively small base current controls collector-emitter current in the active or switching operating regions of a BJT. Therefore the correct answer is A: Base.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_elect_b001_034",
+          "original": true,
+          "topicCode": "AEL-7",
+          "type": "multiple_choice",
+          "prompt": "What is the function of a smoothing capacitor after a rectifier?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Increase ripple deliberately",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Reduce ripple in the rectified output voltage",
+              "rationale": "This is the supported answer. The capacitor charges near voltage peaks and releases energy between them, reducing variations in the unregulated DC output."
+            },
+            {
+              "label": "C",
+              "text": "Block all direct current to the load",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Create magnetic rotation",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The capacitor charges near voltage peaks and releases energy between them, reducing variations in the unregulated DC output. Therefore the correct answer is B: Reduce ripple in the rectified output voltage.",
+          "difficulty": "easy",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_elect_b001_035",
+          "original": true,
+          "topicCode": "AEL-7",
+          "type": "multiple_choice",
+          "prompt": "What operating state is intended when a transistor is used as a closed electronic switch?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Cut-off",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Reverse breakdown",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Saturation",
+              "rationale": "This is the supported answer. In saturation the transistor conducts strongly with a small collector-emitter voltage, while cut-off represents the open-switch state."
+            },
+            {
+              "label": "D",
+              "text": "Open-circuit bias only",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "In saturation the transistor conducts strongly with a small collector-emitter voltage, while cut-off represents the open-switch state. Therefore the correct answer is C: Saturation.",
+          "difficulty": "medium",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_elect_b001_036",
+          "original": true,
+          "topicCode": "AEL-8",
+          "type": "multiple_choice",
+          "prompt": "What is the main safety purpose of protective earthing?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Make all conductors carry normal load current through earth",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Increase touch voltage during a fault",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Replace overcurrent protection",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Provide a low-impedance fault path so protection disconnects exposed metal",
+              "rationale": "This is the supported answer. Earthing connects exposed conductive parts so a fault current can operate protective devices quickly and limit dangerous touch voltage."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Earthing connects exposed conductive parts so a fault current can operate protective devices quickly and limit dangerous touch voltage. Therefore the correct answer is D: Provide a low-impedance fault path so protection disconnects exposed metal.",
+          "difficulty": "hard",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_elect_b001_037",
+          "original": true,
+          "topicCode": "AEL-8",
+          "type": "multiple_choice",
+          "prompt": "A correctly rated fuse melts during a sustained overcurrent. What protective action has it performed?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Open the circuit when current exceeds its safe value for sufficient time",
+              "rationale": "This is the supported answer. A fuse element melts under excessive current, interrupting the circuit to reduce damage and fire risk when correctly rated and installed."
+            },
+            {
+              "label": "B",
+              "text": "Maintain current regardless of faults",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Increase conductor temperature",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Act as a normal on-off control switch",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A fuse element melts under excessive current, interrupting the circuit to reduce damage and fire risk when correctly rated and installed. Therefore the correct answer is A: Open the circuit when current exceeds its safe value for sufficient time.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_was_elect_b001_038",
+          "original": true,
+          "topicCode": "AEL-8",
+          "type": "multiple_choice",
+          "prompt": "Which device is designed to detect an imbalance between line and neutral currents?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Energy meter",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Residual current device",
+              "rationale": "This is the supported answer. An RCD compares outgoing and returning current and disconnects when leakage exceeds its trip threshold, supplementing other protection."
+            },
+            {
+              "label": "C",
+              "text": "Step-up transformer",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Series resistor",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "An RCD compares outgoing and returning current and disconnects when leakage exceeds its trip threshold, supplementing other protection. Therefore the correct answer is B: Residual current device.",
+          "difficulty": "medium",
+          "marks": 2,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_was_elect_b001_039",
+          "original": true,
+          "topicCode": "AEL-8",
+          "type": "multiple_choice",
+          "prompt": "Why is electrical power transmitted at high voltage?",
+          "options": [
+            {
+              "label": "A",
+              "text": "High voltage makes conductors have no resistance",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It removes the need for insulation",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Higher voltage permits lower current and lower I²R loss for the same power",
+              "rationale": "This is the supported answer. For a given power, raising voltage lowers current, and resistive line loss falls with the square of current, subject to insulation and equipment requirements."
+            },
+            {
+              "label": "D",
+              "text": "It makes transformers unnecessary",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "For a given power, raising voltage lowers current, and resistive line loss falls with the square of current, subject to insulation and equipment requirements. Therefore the correct answer is C: Higher voltage permits lower current and lower I²R loss for the same power.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_was_elect_b001_040",
+          "original": true,
+          "topicCode": "AEL-8",
+          "type": "multiple_choice",
+          "prompt": "In Ghana’s nominal 400/230 V low-voltage system, what voltage is supplied between one phase and neutral?",
+          "options": [
+            {
+              "label": "A",
+              "text": "About 400 V",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "About 11 kV",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Exactly 0 V",
+              "rationale": "This option is a plausible misconception, but it does not follow the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "About 230 V",
+              "rationale": "This is the supported answer. Ghana’s nominal low-voltage distribution levels are 400 V phase-to-phase and 230 V phase-to-neutral, so a single-phase consumer receives about 230 V."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Ghana’s nominal low-voltage distribution levels are 400 V phase-to-phase and 230 V phase-to-neutral, so a single-phase consumer receives about 230 V. Therefore the correct answer is D: About 230 V.",
+          "difficulty": "easy",
+          "marks": 3,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        }
+      ]
+    }
+  ]
+}
