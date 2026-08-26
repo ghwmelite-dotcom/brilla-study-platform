@@ -1,0 +1,8 @@
+{
+  "release": "wassce-remaining-null-topic-audit-2026-08-26",
+  "scope": "Active WASSCE null-topic questions excluding subj_wassce_elect_math",
+  "totalExpectedNullTopicCount": 1500,
+  "totalMappedQuestionCount": 1500,
+  "totalExceptionCount": 0,
+  "subjects": []
+}

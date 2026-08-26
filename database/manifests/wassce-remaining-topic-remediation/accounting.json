@@ -1,0 +1,186 @@
+{
+  "release": "wassce-remaining-null-topic-audit-2026-08-26",
+  "subjectId": "subj_wassce_accounting",
+  "subjectName": "Financial Accounting",
+  "expectedNullTopicCount": 105,
+  "mappedQuestionCount": 105,
+  "exceptionCount": 0,
+  "mappingGroups": [
+    {
+      "topicId": "topic_acc_intro",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed 2023/2024 concepts, accounting-equation and principle stems.",
+      "questionIds": [
+        "q_acc_2023_001",
+        "q_acc_2023_002",
+        "q_acc_2023_003",
+        "q_acc_2023_004",
+        "q_acc_2023_005",
+        "q_acc_2023_006",
+        "q_acc_2023_007",
+        "q_acc_2023_008",
+        "q_acc_2023_009",
+        "q_acc_2023_010",
+        "q_acc_2024_001",
+        "q_acc_2024_003",
+        "q_acc_2024_004",
+        "q_acc_2024_005",
+        "q_acc_2024_008",
+        "q_acc_2024_009"
+      ]
+    },
+    {
+      "topicId": "topic_acc_books",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed journal, day-book, cash-book and source-document stems plus the q_acc_jour source prefix.",
+      "questionIds": [
+        "q_acc_2023_016",
+        "q_acc_2023_017",
+        "q_acc_2023_019",
+        "q_acc_2023_020",
+        "q_acc_2024_002",
+        "q_acc_2024_006",
+        "q_acc_2024_007",
+        "q_acc_2024_011",
+        "q_acc_2024_012",
+        "q_acc_2024_016",
+        "q_acc_2024_017",
+        "q_acc_2024_018",
+        "q_acc_2024_019",
+        "q_acc_jour_001",
+        "q_acc_jour_002",
+        "q_acc_jour_003",
+        "q_acc_jour_004",
+        "q_acc_jour_005"
+      ]
+    },
+    {
+      "topicId": "topic_acc_ledger",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed debit/credit, account-balance, ledger and control-account stems.",
+      "questionIds": [
+        "q_acc_2023_011",
+        "q_acc_2023_012",
+        "q_acc_2023_013",
+        "q_acc_2023_014",
+        "q_acc_2023_015",
+        "q_acc_2023_018",
+        "q_acc_2023_030",
+        "q_acc_2024_013",
+        "q_acc_2024_014",
+        "q_acc_2024_015",
+        "q_acc_2024_020",
+        "q_acc_2024_045",
+        "q_acc_2024_046",
+        "q_acc_2024_047",
+        "q_acc_2024_048"
+      ]
+    },
+    {
+      "topicId": "topic_acc_trial",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed trial-balance purpose and balance stems.",
+      "questionIds": [
+        "q_acc_2023_021",
+        "q_acc_2023_029",
+        "q_acc_2024_010"
+      ]
+    },
+    {
+      "topicId": "topic_acc_errors",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed error-of-omission, principle, original-entry, transposition, compensating-error and suspense stems.",
+      "questionIds": [
+        "q_acc_2023_022",
+        "q_acc_2023_023",
+        "q_acc_2023_024",
+        "q_acc_2023_025",
+        "q_acc_2023_026",
+        "q_acc_2023_027",
+        "q_acc_2023_028"
+      ]
+    },
+    {
+      "topicId": "topic_acc_bank",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed bank-reconciliation, unpresented-cheque, deposit-in-transit, bank-charge and dishonoured-cheque stems.",
+      "questionIds": [
+        "q_acc_2024_041",
+        "q_acc_2024_042",
+        "q_acc_2024_043",
+        "q_acc_2024_044",
+        "q_acc_2024_049",
+        "q_acc_2024_050"
+      ]
+    },
+    {
+      "topicId": "topic_acc_depreciation",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed asset-depreciation, net-book-value, disposal and accumulated-depreciation stems.",
+      "questionIds": [
+        "q_acc_2024_031",
+        "q_acc_2024_032",
+        "q_acc_2024_033",
+        "q_acc_2024_036",
+        "q_acc_2024_039",
+        "q_acc_2024_040"
+      ]
+    },
+    {
+      "topicId": "topic_acc_final",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed trading, final-account, adjustment, manufacturing-account and balance-sheet stems.",
+      "questionIds": [
+        "q_acc_2023_031",
+        "q_acc_2023_032",
+        "q_acc_2023_033",
+        "q_acc_2023_034",
+        "q_acc_2023_035",
+        "q_acc_2023_036",
+        "q_acc_2023_037",
+        "q_acc_2023_038",
+        "q_acc_2023_039",
+        "q_acc_2023_040",
+        "q_acc_2023_041",
+        "q_acc_2023_042",
+        "q_acc_2023_043",
+        "q_acc_2023_044",
+        "q_acc_2024_021",
+        "q_acc_2024_022",
+        "q_acc_2024_023",
+        "q_acc_2024_024",
+        "q_acc_2024_025",
+        "q_acc_2024_026",
+        "q_acc_2024_027",
+        "q_acc_2024_028",
+        "q_acc_2024_029",
+        "q_acc_2024_030",
+        "q_acc_2024_034",
+        "q_acc_2024_035",
+        "q_acc_2024_037",
+        "q_acc_2024_038"
+      ]
+    },
+    {
+      "topicId": "topic_acc_partnership",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed partnership appropriation and current-account stems.",
+      "questionIds": [
+        "q_acc_2023_045",
+        "q_acc_2023_046",
+        "q_acc_2023_047"
+      ]
+    },
+    {
+      "topicId": "topic_acc_nonprofit",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed surplus, subscriptions and receipts-and-payments stems.",
+      "questionIds": [
+        "q_acc_2023_048",
+        "q_acc_2023_049",
+        "q_acc_2023_050"
+      ]
+    }
+  ],
+  "reviewedExceptions": []
+}

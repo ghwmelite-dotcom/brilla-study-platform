@@ -1,0 +1,148 @@
+{
+  "release": "nsmq-null-topic-remediation-audit-2026-08-26",
+  "status": "reviewed-exceptions-no-guessing",
+  "exceptionCount": 15,
+  "reasonCounts": {
+    "AMBIGUOUS_BETWEEN_TOPICS": 1,
+    "CONTENT_DEFECT_BLOCKS_CLASSIFICATION": 1,
+    "OUTSIDE_CURRENT_TAXONOMY": 11,
+    "TAXONOMY_GAP": 2
+  },
+  "exceptions": [
+    {
+      "questionId": "nsmq_chem_r1_019",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "reasonCode": "TAXONOMY_GAP",
+      "reviewNote": "The item assesses greenhouse-gas identity/environmental chemistry, which is not represented by the current six Chemistry topics.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "222d9b3348650e48db23d463ddbae4b183e82c8b07666f7999da6d8c7a4e1a77"
+    },
+    {
+      "questionId": "nsmq_math_rid_002",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "reasonCode": "OUTSIDE_CURRENT_TAXONOMY",
+      "reviewNote": "Wordplay, general-knowledge or lateral-logic riddle; assigning Algebra/Geometry/Statistics would guess rather than follow assessed content.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "06c56f55fb0ac2513a5e2c2b6a6518c755456c5a845c25d18f7e45718f8dfef0"
+    },
+    {
+      "questionId": "nsmq_math_rid_003",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "reasonCode": "OUTSIDE_CURRENT_TAXONOMY",
+      "reviewNote": "Wordplay, general-knowledge or lateral-logic riddle; assigning Algebra/Geometry/Statistics would guess rather than follow assessed content.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "9521f508783da34673ba9bb084ed8facffd09de129c2fcc7ecc69130f1fdd48a"
+    },
+    {
+      "questionId": "nsmq_math_rid_004",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "reasonCode": "OUTSIDE_CURRENT_TAXONOMY",
+      "reviewNote": "Wordplay, general-knowledge or lateral-logic riddle; assigning Algebra/Geometry/Statistics would guess rather than follow assessed content.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "ea1ab92ceda65c9be4f6d042517109075081dd69e559f4fba81066960a9e1bc9"
+    },
+    {
+      "questionId": "nsmq_math_rid_009",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "reasonCode": "OUTSIDE_CURRENT_TAXONOMY",
+      "reviewNote": "Wordplay, general-knowledge or lateral-logic riddle; assigning Algebra/Geometry/Statistics would guess rather than follow assessed content.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "66962de4b12619d5c50b5f8abf57cbae386e32362dc45b0d3f7db63f5f2ba8ad"
+    },
+    {
+      "questionId": "nsmq_math_rid_010",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "reasonCode": "OUTSIDE_CURRENT_TAXONOMY",
+      "reviewNote": "Wordplay, general-knowledge or lateral-logic riddle; assigning Algebra/Geometry/Statistics would guess rather than follow assessed content.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "4dd3c62171ad292ac04a5b523fdbeb3ddb61ecfff630d35ba3d79c2f50980c65"
+    },
+    {
+      "questionId": "nsmq_math_rid_011",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "reasonCode": "OUTSIDE_CURRENT_TAXONOMY",
+      "reviewNote": "Wordplay, general-knowledge or lateral-logic riddle; assigning Algebra/Geometry/Statistics would guess rather than follow assessed content.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "e675c77e38a47aa4511b6c474ad88745eec0be4e9aa3e092cac9aa33f2aea7d4"
+    },
+    {
+      "questionId": "nsmq_math_rid_012",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "reasonCode": "CONTENT_DEFECT_BLOCKS_CLASSIFICATION",
+      "reviewNote": "The stated answer and worked explanation contradict the riddle constraints; topic assignment must wait for content correction.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "06bc914efe059c0613be393e32e9a40d455a667448953c2de9d59182458b4394"
+    },
+    {
+      "questionId": "nsmq_math_rid_013",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "reasonCode": "OUTSIDE_CURRENT_TAXONOMY",
+      "reviewNote": "Wordplay, general-knowledge or lateral-logic riddle; assigning Algebra/Geometry/Statistics would guess rather than follow assessed content.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "bc951bf763175b48b2b66848d22e7f258017249de6cae8af9b402b49b3afd50c"
+    },
+    {
+      "questionId": "nsmq_math_rid_015",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "reasonCode": "OUTSIDE_CURRENT_TAXONOMY",
+      "reviewNote": "Wordplay, general-knowledge or lateral-logic riddle; assigning Algebra/Geometry/Statistics would guess rather than follow assessed content.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "7b9c54e5c6d4062b9314c0c79bda518c1d80889083e40e40b0489290da1341bd"
+    },
+    {
+      "questionId": "nsmq_math_sr_022",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "speed_race",
+      "reasonCode": "OUTSIDE_CURRENT_TAXONOMY",
+      "reviewNote": "Roman numerals are not represented by the current Algebra/Geometry/Trigonometry/Calculus/Statistics taxonomy.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "7bb50aec69175cb52db9c74b35ea5df596fdb48b4732427884ecff96d7824198"
+    },
+    {
+      "questionId": "nsmq_math_tf_020",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "reasonCode": "TAXONOMY_GAP",
+      "reviewNote": "The statement assesses set theory, for which the current NSMQ Mathematics taxonomy has no topic.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "a89bd45709fa292a8f39e1c3a46e804e4aef8a4cd16ee8748e73ad5fb93f641b"
+    },
+    {
+      "questionId": "nsmq_phy_rid_001",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "reasonCode": "OUTSIDE_CURRENT_TAXONOMY",
+      "reviewNote": "The postage-stamp answer is general wordplay and does not assess Physics.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "6255c9b72b8926b03f7f2a36c9ac4d0541132071c6ce681c358b0598ae02c6e4"
+    },
+    {
+      "questionId": "nsmq_phy_rid_003",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "reasonCode": "OUTSIDE_CURRENT_TAXONOMY",
+      "reviewNote": "The footsteps answer is lateral wordplay and does not assess Physics.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "35ae102a6d830d833a9e7275f9ea058ae98f1f2743743770ddabec990f5ca025"
+    },
+    {
+      "questionId": "nsmq_phy_rid_012",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "reasonCode": "AMBIGUOUS_BETWEEN_TOPICS",
+      "reviewNote": "The answer is explicitly “Kinetic energy / Heat,” spanning Mechanics and Thermodynamics; selecting one would discard the source ambiguity.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "6c7855b76b6f3bf214ecb9551a8f5b633ae9d6c62a4ea421fdf229973ca9ea88"
+    }
+  ]
+}

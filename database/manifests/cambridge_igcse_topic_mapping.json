@@ -1,0 +1,1024 @@
+{
+  "release": "cambridge-topic-remediation-audit-2026-08-26",
+  "examFamily": "cambridge-igcse",
+  "examTypeId": "igcse",
+  "syllabusBoard": "Cambridge International",
+  "taxonomySource": "database/prod-patches/096_seed_topics_for_empty_subjects.sql",
+  "scopeRule": "Question identity is derived from the reviewed archive source files and canonical subject IDs. Legacy rows that omit questions.exam_type_id remain in-family through their subject identity.",
+  "mappingPolicy": "Map only when reviewed source section and assessed concept agree with one existing same-subject topic. Otherwise record a reviewed exception.",
+  "expectedNullTopicCohort": 225,
+  "mappedQuestionCount": 203,
+  "exceptionCount": 22,
+  "subjects": [
+    {
+      "subjectId": "subj_igcse_physics",
+      "subjectName": "Physics",
+      "syllabusCode": "0625",
+      "expectedQuestionCount": 50,
+      "sourceFiles": [
+        "database/migrations/archive/077_seed_oalevel_questions.sql"
+      ],
+      "mappingGroups": [
+        {
+          "topicId": "topic_igcse_physics_mechanics",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql"
+          ],
+          "sourceSections": [
+            "General Physics",
+            "Additional topics"
+          ],
+          "evidence": "Reviewed motion, mass, density, forces, energy, pressure, momentum and deformation questions.",
+          "questionIds": [
+            "q_igcse_phy_001",
+            "q_igcse_phy_002",
+            "q_igcse_phy_003",
+            "q_igcse_phy_004",
+            "q_igcse_phy_005",
+            "q_igcse_phy_006",
+            "q_igcse_phy_007",
+            "q_igcse_phy_008",
+            "q_igcse_phy_009",
+            "q_igcse_phy_010",
+            "q_igcse_phy_011",
+            "q_igcse_phy_012",
+            "q_igcse_phy_013",
+            "q_igcse_phy_014",
+            "q_igcse_phy_015",
+            "q_igcse_phy_016",
+            "q_igcse_phy_017",
+            "q_igcse_phy_018",
+            "q_igcse_phy_019",
+            "q_igcse_phy_020",
+            "q_igcse_phy_041",
+            "q_igcse_phy_042",
+            "q_igcse_phy_043",
+            "q_igcse_phy_044",
+            "q_igcse_phy_045",
+            "q_igcse_phy_046",
+            "q_igcse_phy_047",
+            "q_igcse_phy_048"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_physics_thermal",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql"
+          ],
+          "sourceSections": [
+            "Thermal Physics",
+            "Additional topics"
+          ],
+          "evidence": "Reviewed particle model, heat transfer, specific heat capacity and latent heat questions.",
+          "questionIds": [
+            "q_igcse_phy_021",
+            "q_igcse_phy_022",
+            "q_igcse_phy_023",
+            "q_igcse_phy_024",
+            "q_igcse_phy_025",
+            "q_igcse_phy_049",
+            "q_igcse_phy_050"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_physics_waves",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql"
+          ],
+          "sourceSections": [
+            "Waves"
+          ],
+          "evidence": "Contiguous reviewed waves, light and electromagnetic-spectrum source block.",
+          "questionIds": [
+            "q_igcse_phy_026",
+            "q_igcse_phy_027",
+            "q_igcse_phy_028",
+            "q_igcse_phy_029",
+            "q_igcse_phy_030"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_physics_electricity",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql"
+          ],
+          "sourceSections": [
+            "Electricity"
+          ],
+          "evidence": "Contiguous reviewed current, resistance, circuits, power and transmission source block.",
+          "questionIds": [
+            "q_igcse_phy_031",
+            "q_igcse_phy_032",
+            "q_igcse_phy_033",
+            "q_igcse_phy_034",
+            "q_igcse_phy_035"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_physics_nuclear",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql"
+          ],
+          "sourceSections": [
+            "Nuclear Physics"
+          ],
+          "evidence": "Contiguous reviewed radioactivity and atomic-nucleus source block.",
+          "questionIds": [
+            "q_igcse_phy_036",
+            "q_igcse_phy_037",
+            "q_igcse_phy_038",
+            "q_igcse_phy_039",
+            "q_igcse_phy_040"
+          ]
+        }
+      ],
+      "mappedQuestionCount": 50,
+      "exceptionCount": 0,
+      "topicCounts": {
+        "topic_igcse_physics_mechanics": 28,
+        "topic_igcse_physics_thermal": 7,
+        "topic_igcse_physics_waves": 5,
+        "topic_igcse_physics_electricity": 5,
+        "topic_igcse_physics_nuclear": 5
+      },
+      "mappedQuestionIds": [
+        "q_igcse_phy_001",
+        "q_igcse_phy_002",
+        "q_igcse_phy_003",
+        "q_igcse_phy_004",
+        "q_igcse_phy_005",
+        "q_igcse_phy_006",
+        "q_igcse_phy_007",
+        "q_igcse_phy_008",
+        "q_igcse_phy_009",
+        "q_igcse_phy_010",
+        "q_igcse_phy_011",
+        "q_igcse_phy_012",
+        "q_igcse_phy_013",
+        "q_igcse_phy_014",
+        "q_igcse_phy_015",
+        "q_igcse_phy_016",
+        "q_igcse_phy_017",
+        "q_igcse_phy_018",
+        "q_igcse_phy_019",
+        "q_igcse_phy_020",
+        "q_igcse_phy_021",
+        "q_igcse_phy_022",
+        "q_igcse_phy_023",
+        "q_igcse_phy_024",
+        "q_igcse_phy_025",
+        "q_igcse_phy_026",
+        "q_igcse_phy_027",
+        "q_igcse_phy_028",
+        "q_igcse_phy_029",
+        "q_igcse_phy_030",
+        "q_igcse_phy_031",
+        "q_igcse_phy_032",
+        "q_igcse_phy_033",
+        "q_igcse_phy_034",
+        "q_igcse_phy_035",
+        "q_igcse_phy_036",
+        "q_igcse_phy_037",
+        "q_igcse_phy_038",
+        "q_igcse_phy_039",
+        "q_igcse_phy_040",
+        "q_igcse_phy_041",
+        "q_igcse_phy_042",
+        "q_igcse_phy_043",
+        "q_igcse_phy_044",
+        "q_igcse_phy_045",
+        "q_igcse_phy_046",
+        "q_igcse_phy_047",
+        "q_igcse_phy_048",
+        "q_igcse_phy_049",
+        "q_igcse_phy_050"
+      ],
+      "exceptionQuestionIds": []
+    },
+    {
+      "subjectId": "subj_igcse_chemistry",
+      "subjectName": "Chemistry",
+      "syllabusCode": "0620",
+      "expectedQuestionCount": 40,
+      "sourceFiles": [
+        "database/migrations/archive/077_seed_oalevel_questions.sql",
+        "database/migrations/archive/079_more_chemistry_questions.sql"
+      ],
+      "mappingGroups": [
+        {
+          "topicId": "topic_igcse_chem_atomic",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Chemistry",
+            "Atomic Structure"
+          ],
+          "evidence": "Reviewed atomic-number and isotope questions.",
+          "questionIds": [
+            "q_igcse_chem_001",
+            "q_igcse_chem_016"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_chem_bonding",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Chemistry",
+            "Bonding and Structure"
+          ],
+          "evidence": "Reviewed ionic/covalent bonding and structure-property questions.",
+          "questionIds": [
+            "q_igcse_chem_003",
+            "q_igcse_chem_012",
+            "q_igcse_chem_017",
+            "q_igcse_chem_018"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_chem_stoichiometry",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Chemistry",
+            "Stoichiometry"
+          ],
+          "evidence": "Reviewed equation balancing, formula mass, mole and composition questions.",
+          "questionIds": [
+            "q_igcse_chem_002",
+            "q_igcse_chem_004",
+            "q_igcse_chem_013",
+            "q_igcse_chem_019"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_chem_reactions",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/079_more_chemistry_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Chemistry",
+            "Rates of Reaction"
+          ],
+          "evidence": "Reviewed rate, catalyst, equilibrium, thermal-decomposition and reversible-reaction questions.",
+          "questionIds": [
+            "q_igcse_chem_009",
+            "q_igcse_chem_011",
+            "q_igcse_chem_014",
+            "q_igcse_chem_015",
+            "q_igcse_chem_021",
+            "q_igcse_chem_029",
+            "q_igcse_chem_030"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_chem_acids",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/079_more_chemistry_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Chemistry",
+            "Acids, Bases and Salts"
+          ],
+          "evidence": "Reviewed pH, neutralisation and acid-carbonate questions.",
+          "questionIds": [
+            "q_igcse_chem_005",
+            "q_igcse_chem_007",
+            "q_igcse_chem_026"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_chem_metals",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/079_more_chemistry_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Chemistry",
+            "Metals and Reactivity"
+          ],
+          "evidence": "Reviewed metal-acid reactions, reactivity order, extraction and corrosion questions.",
+          "questionIds": [
+            "q_igcse_chem_025",
+            "q_igcse_chem_028",
+            "q_igcse_chem_033",
+            "q_igcse_chem_034",
+            "q_igcse_chem_035"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_chem_organic",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/079_more_chemistry_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Chemistry",
+            "Organic Chemistry"
+          ],
+          "evidence": "Reviewed hydrocarbons, crude oil, combustion, addition, polymerisation and cracking questions.",
+          "questionIds": [
+            "q_igcse_chem_010",
+            "q_igcse_chem_022",
+            "q_igcse_chem_023",
+            "q_igcse_chem_024",
+            "q_igcse_chem_036",
+            "q_igcse_chem_037",
+            "q_igcse_chem_038",
+            "q_igcse_chem_039",
+            "q_igcse_chem_040"
+          ]
+        }
+      ],
+      "mappedQuestionCount": 34,
+      "exceptionCount": 6,
+      "topicCounts": {
+        "topic_igcse_chem_atomic": 2,
+        "topic_igcse_chem_bonding": 4,
+        "topic_igcse_chem_stoichiometry": 4,
+        "topic_igcse_chem_reactions": 7,
+        "topic_igcse_chem_acids": 3,
+        "topic_igcse_chem_metals": 5,
+        "topic_igcse_chem_organic": 9
+      },
+      "mappedQuestionIds": [
+        "q_igcse_chem_001",
+        "q_igcse_chem_002",
+        "q_igcse_chem_003",
+        "q_igcse_chem_004",
+        "q_igcse_chem_005",
+        "q_igcse_chem_007",
+        "q_igcse_chem_009",
+        "q_igcse_chem_010",
+        "q_igcse_chem_011",
+        "q_igcse_chem_012",
+        "q_igcse_chem_013",
+        "q_igcse_chem_014",
+        "q_igcse_chem_015",
+        "q_igcse_chem_016",
+        "q_igcse_chem_017",
+        "q_igcse_chem_018",
+        "q_igcse_chem_019",
+        "q_igcse_chem_021",
+        "q_igcse_chem_022",
+        "q_igcse_chem_023",
+        "q_igcse_chem_024",
+        "q_igcse_chem_025",
+        "q_igcse_chem_026",
+        "q_igcse_chem_028",
+        "q_igcse_chem_029",
+        "q_igcse_chem_030",
+        "q_igcse_chem_033",
+        "q_igcse_chem_034",
+        "q_igcse_chem_035",
+        "q_igcse_chem_036",
+        "q_igcse_chem_037",
+        "q_igcse_chem_038",
+        "q_igcse_chem_039",
+        "q_igcse_chem_040"
+      ],
+      "exceptionQuestionIds": [
+        "q_igcse_chem_006",
+        "q_igcse_chem_008",
+        "q_igcse_chem_020",
+        "q_igcse_chem_027",
+        "q_igcse_chem_031",
+        "q_igcse_chem_032"
+      ]
+    },
+    {
+      "subjectId": "subj_igcse_biology",
+      "subjectName": "Biology",
+      "syllabusCode": "0610",
+      "expectedQuestionCount": 40,
+      "sourceFiles": [
+        "database/migrations/archive/077_seed_oalevel_questions.sql",
+        "database/migrations/archive/078_more_biology_questions.sql"
+      ],
+      "mappingGroups": [
+        {
+          "topicId": "topic_igcse_bio_cells",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Biology",
+            "Cells and Organization"
+          ],
+          "evidence": "Reviewed nucleus and plant-cell organelle questions.",
+          "questionIds": [
+            "q_igcse_bio_001",
+            "q_igcse_bio_002"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_bio_molecules",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Biology",
+            "Cells and Organization"
+          ],
+          "evidence": "Reviewed enzyme and biological-molecule questions.",
+          "questionIds": [
+            "q_igcse_bio_005",
+            "q_igcse_bio_017"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_bio_nutrition",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Biology",
+            "Nutrition and Digestion"
+          ],
+          "evidence": "Reviewed photosynthesis, leaf adaptation and digestion questions.",
+          "questionIds": [
+            "q_igcse_bio_003",
+            "q_igcse_bio_010",
+            "q_igcse_bio_013"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_bio_transport",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/078_more_biology_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Biology",
+            "Circulation"
+          ],
+          "evidence": "Reviewed blood, heart, vessel and transpiration questions.",
+          "questionIds": [
+            "q_igcse_bio_004",
+            "q_igcse_bio_009",
+            "q_igcse_bio_014",
+            "q_igcse_bio_015",
+            "q_igcse_bio_019",
+            "q_igcse_bio_020",
+            "q_igcse_bio_027",
+            "q_igcse_bio_028",
+            "q_igcse_bio_029",
+            "q_igcse_bio_030"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_bio_respiration",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/078_more_biology_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Biology",
+            "Gas Exchange and Respiration"
+          ],
+          "evidence": "Reviewed respiration, lungs and alveolar gas-exchange questions.",
+          "questionIds": [
+            "q_igcse_bio_006",
+            "q_igcse_bio_018",
+            "q_igcse_bio_021",
+            "q_igcse_bio_026"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_bio_reproduction",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/078_more_biology_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Biology",
+            "Reproduction"
+          ],
+          "evidence": "Reviewed gamete formation, fertilisation and placenta questions.",
+          "questionIds": [
+            "q_igcse_bio_011",
+            "q_igcse_bio_036",
+            "q_igcse_bio_037"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_bio_genetics",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Biology"
+          ],
+          "evidence": "Reviewed chromosome, inheritance and variation/natural-selection questions.",
+          "questionIds": [
+            "q_igcse_bio_008",
+            "q_igcse_bio_012",
+            "q_igcse_bio_023"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_bio_ecology",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/078_more_biology_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Biology",
+            "Ecology"
+          ],
+          "evidence": "Reviewed food-chain, trophic-energy, producer, carbon-cycle and biodiversity questions.",
+          "questionIds": [
+            "q_igcse_bio_024",
+            "q_igcse_bio_025",
+            "q_igcse_bio_038",
+            "q_igcse_bio_039",
+            "q_igcse_bio_040"
+          ]
+        }
+      ],
+      "mappedQuestionCount": 32,
+      "exceptionCount": 8,
+      "topicCounts": {
+        "topic_igcse_bio_cells": 2,
+        "topic_igcse_bio_molecules": 2,
+        "topic_igcse_bio_nutrition": 3,
+        "topic_igcse_bio_transport": 10,
+        "topic_igcse_bio_respiration": 4,
+        "topic_igcse_bio_reproduction": 3,
+        "topic_igcse_bio_genetics": 3,
+        "topic_igcse_bio_ecology": 5
+      },
+      "mappedQuestionIds": [
+        "q_igcse_bio_001",
+        "q_igcse_bio_002",
+        "q_igcse_bio_003",
+        "q_igcse_bio_004",
+        "q_igcse_bio_005",
+        "q_igcse_bio_006",
+        "q_igcse_bio_008",
+        "q_igcse_bio_009",
+        "q_igcse_bio_010",
+        "q_igcse_bio_011",
+        "q_igcse_bio_012",
+        "q_igcse_bio_013",
+        "q_igcse_bio_014",
+        "q_igcse_bio_015",
+        "q_igcse_bio_017",
+        "q_igcse_bio_018",
+        "q_igcse_bio_019",
+        "q_igcse_bio_020",
+        "q_igcse_bio_021",
+        "q_igcse_bio_023",
+        "q_igcse_bio_024",
+        "q_igcse_bio_025",
+        "q_igcse_bio_026",
+        "q_igcse_bio_027",
+        "q_igcse_bio_028",
+        "q_igcse_bio_029",
+        "q_igcse_bio_030",
+        "q_igcse_bio_036",
+        "q_igcse_bio_037",
+        "q_igcse_bio_038",
+        "q_igcse_bio_039",
+        "q_igcse_bio_040"
+      ],
+      "exceptionQuestionIds": [
+        "q_igcse_bio_007",
+        "q_igcse_bio_016",
+        "q_igcse_bio_022",
+        "q_igcse_bio_031",
+        "q_igcse_bio_032",
+        "q_igcse_bio_033",
+        "q_igcse_bio_034",
+        "q_igcse_bio_035"
+      ]
+    },
+    {
+      "subjectId": "subj_igcse_math",
+      "subjectName": "Mathematics",
+      "syllabusCode": "0580",
+      "expectedQuestionCount": 40,
+      "sourceFiles": [
+        "database/migrations/archive/077_seed_oalevel_questions.sql",
+        "database/migrations/archive/080_more_maths_questions.sql"
+      ],
+      "mappingGroups": [
+        {
+          "topicId": "topic_igcse_math_number",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/080_more_maths_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Mathematics",
+            "Number"
+          ],
+          "evidence": "Reviewed standard form, percentages, proportion, powers, factors, multiples and fraction questions.",
+          "questionIds": [
+            "q_igcse_math_014",
+            "q_igcse_math_015",
+            "q_igcse_math_016",
+            "q_igcse_math_020",
+            "q_igcse_math_021",
+            "q_igcse_math_022",
+            "q_igcse_math_023",
+            "q_igcse_math_024",
+            "q_igcse_math_025"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_math_algebra",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/080_more_maths_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Mathematics",
+            "Algebra"
+          ],
+          "evidence": "Reviewed expressions, equations, sequences, quadratics and inequalities questions.",
+          "questionIds": [
+            "q_igcse_math_001",
+            "q_igcse_math_002",
+            "q_igcse_math_003",
+            "q_igcse_math_004",
+            "q_igcse_math_005",
+            "q_igcse_math_017",
+            "q_igcse_math_026",
+            "q_igcse_math_027",
+            "q_igcse_math_028",
+            "q_igcse_math_029"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_math_functions",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/080_more_maths_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Mathematics",
+            "Algebra"
+          ],
+          "evidence": "Reviewed linear-graph gradient and equation questions.",
+          "questionIds": [
+            "q_igcse_math_006",
+            "q_igcse_math_030"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_math_geometry",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/080_more_maths_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Mathematics",
+            "Geometry"
+          ],
+          "evidence": "Reviewed triangle/polygon angle and regular-polygon questions.",
+          "questionIds": [
+            "q_igcse_math_018",
+            "q_igcse_math_019",
+            "q_igcse_math_031",
+            "q_igcse_math_032",
+            "q_igcse_math_033"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_math_mensuration",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/080_more_maths_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Mathematics",
+            "Mensuration"
+          ],
+          "evidence": "Reviewed area, circumference, volume and surface-area questions.",
+          "questionIds": [
+            "q_igcse_math_007",
+            "q_igcse_math_008",
+            "q_igcse_math_009",
+            "q_igcse_math_034",
+            "q_igcse_math_035",
+            "q_igcse_math_036"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_math_trig",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/080_more_maths_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Mathematics",
+            "Trigonometry"
+          ],
+          "evidence": "Reviewed trigonometric-ratio and Pythagoras questions.",
+          "questionIds": [
+            "q_igcse_math_010",
+            "q_igcse_math_011",
+            "q_igcse_math_037",
+            "q_igcse_math_038"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_math_stats",
+          "sourceFiles": [
+            "database/migrations/archive/077_seed_oalevel_questions.sql",
+            "database/migrations/archive/080_more_maths_questions.sql"
+          ],
+          "sourceSections": [
+            "IGCSE Mathematics",
+            "Statistics and Probability"
+          ],
+          "evidence": "Reviewed mean, median and probability questions.",
+          "questionIds": [
+            "q_igcse_math_012",
+            "q_igcse_math_013",
+            "q_igcse_math_039",
+            "q_igcse_math_040"
+          ]
+        }
+      ],
+      "mappedQuestionCount": 40,
+      "exceptionCount": 0,
+      "topicCounts": {
+        "topic_igcse_math_number": 9,
+        "topic_igcse_math_algebra": 10,
+        "topic_igcse_math_functions": 2,
+        "topic_igcse_math_geometry": 5,
+        "topic_igcse_math_mensuration": 6,
+        "topic_igcse_math_trig": 4,
+        "topic_igcse_math_stats": 4
+      },
+      "mappedQuestionIds": [
+        "q_igcse_math_001",
+        "q_igcse_math_002",
+        "q_igcse_math_003",
+        "q_igcse_math_004",
+        "q_igcse_math_005",
+        "q_igcse_math_006",
+        "q_igcse_math_007",
+        "q_igcse_math_008",
+        "q_igcse_math_009",
+        "q_igcse_math_010",
+        "q_igcse_math_011",
+        "q_igcse_math_012",
+        "q_igcse_math_013",
+        "q_igcse_math_014",
+        "q_igcse_math_015",
+        "q_igcse_math_016",
+        "q_igcse_math_017",
+        "q_igcse_math_018",
+        "q_igcse_math_019",
+        "q_igcse_math_020",
+        "q_igcse_math_021",
+        "q_igcse_math_022",
+        "q_igcse_math_023",
+        "q_igcse_math_024",
+        "q_igcse_math_025",
+        "q_igcse_math_026",
+        "q_igcse_math_027",
+        "q_igcse_math_028",
+        "q_igcse_math_029",
+        "q_igcse_math_030",
+        "q_igcse_math_031",
+        "q_igcse_math_032",
+        "q_igcse_math_033",
+        "q_igcse_math_034",
+        "q_igcse_math_035",
+        "q_igcse_math_036",
+        "q_igcse_math_037",
+        "q_igcse_math_038",
+        "q_igcse_math_039",
+        "q_igcse_math_040"
+      ],
+      "exceptionQuestionIds": []
+    },
+    {
+      "subjectId": "subj_igcse_add_math",
+      "subjectName": "Additional Mathematics",
+      "syllabusCode": "0606",
+      "expectedQuestionCount": 55,
+      "sourceFiles": [
+        "database/migrations/archive/083_igcse_add_math_questions.sql"
+      ],
+      "mappingGroups": [
+        {
+          "topicId": "topic_igcse_addmath_quadratics",
+          "sourceFiles": [
+            "database/migrations/archive/083_igcse_add_math_questions.sql"
+          ],
+          "sourceSections": [
+            "Quadratic Functions & Equations",
+            "Inequalities",
+            "Additional Questions"
+          ],
+          "evidence": "Reviewed quadratics, inequalities, simultaneous-equation and polynomial-root questions.",
+          "questionIds": [
+            "q_igcse_addmath_001",
+            "q_igcse_addmath_002",
+            "q_igcse_addmath_003",
+            "q_igcse_addmath_004",
+            "q_igcse_addmath_005",
+            "q_igcse_addmath_006",
+            "q_igcse_addmath_007",
+            "q_igcse_addmath_055"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_addmath_functions",
+          "sourceFiles": [
+            "database/migrations/archive/083_igcse_add_math_questions.sql"
+          ],
+          "sourceSections": [
+            "Functions"
+          ],
+          "evidence": "Contiguous reviewed composition, inverse, modulus and range source block.",
+          "questionIds": [
+            "q_igcse_addmath_008",
+            "q_igcse_addmath_009",
+            "q_igcse_addmath_010",
+            "q_igcse_addmath_011",
+            "q_igcse_addmath_012"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_addmath_logs",
+          "sourceFiles": [
+            "database/migrations/archive/083_igcse_add_math_questions.sql"
+          ],
+          "sourceSections": [
+            "Logarithms and Exponentials"
+          ],
+          "evidence": "Contiguous reviewed logarithm and exponential source block.",
+          "questionIds": [
+            "q_igcse_addmath_013",
+            "q_igcse_addmath_014",
+            "q_igcse_addmath_015",
+            "q_igcse_addmath_016",
+            "q_igcse_addmath_017",
+            "q_igcse_addmath_018"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_addmath_trig",
+          "sourceFiles": [
+            "database/migrations/archive/083_igcse_add_math_questions.sql"
+          ],
+          "sourceSections": [
+            "Trigonometry",
+            "Additional Questions"
+          ],
+          "evidence": "Reviewed radians, identities, equations, exact values and double-angle questions.",
+          "questionIds": [
+            "q_igcse_addmath_019",
+            "q_igcse_addmath_020",
+            "q_igcse_addmath_021",
+            "q_igcse_addmath_022",
+            "q_igcse_addmath_023",
+            "q_igcse_addmath_024",
+            "q_igcse_addmath_050",
+            "q_igcse_addmath_054"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_addmath_coord",
+          "sourceFiles": [
+            "database/migrations/archive/083_igcse_add_math_questions.sql"
+          ],
+          "sourceSections": [
+            "Coordinate Geometry"
+          ],
+          "evidence": "Reviewed circle equation, tangent and coordinate-geometry source block.",
+          "questionIds": [
+            "q_igcse_addmath_025",
+            "q_igcse_addmath_026",
+            "q_igcse_addmath_027",
+            "q_igcse_addmath_028"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_addmath_differentiation",
+          "sourceFiles": [
+            "database/migrations/archive/083_igcse_add_math_questions.sql"
+          ],
+          "sourceSections": [
+            "Coordinate Geometry",
+            "Calculus - Differentiation",
+            "Additional Questions"
+          ],
+          "evidence": "Reviewed normal/tangent, derivative, stationary-point, rate-of-change and optimisation questions.",
+          "questionIds": [
+            "q_igcse_addmath_029",
+            "q_igcse_addmath_030",
+            "q_igcse_addmath_031",
+            "q_igcse_addmath_032",
+            "q_igcse_addmath_033",
+            "q_igcse_addmath_034",
+            "q_igcse_addmath_035",
+            "q_igcse_addmath_036",
+            "q_igcse_addmath_051",
+            "q_igcse_addmath_053"
+          ]
+        },
+        {
+          "topicId": "topic_igcse_addmath_integration",
+          "sourceFiles": [
+            "database/migrations/archive/083_igcse_add_math_questions.sql"
+          ],
+          "sourceSections": [
+            "Calculus - Integration",
+            "Additional Questions"
+          ],
+          "evidence": "Reviewed indefinite, definite, substitution, area and integration-by-parts questions.",
+          "questionIds": [
+            "q_igcse_addmath_037",
+            "q_igcse_addmath_038",
+            "q_igcse_addmath_039",
+            "q_igcse_addmath_040",
+            "q_igcse_addmath_041",
+            "q_igcse_addmath_052"
+          ]
+        }
+      ],
+      "mappedQuestionCount": 47,
+      "exceptionCount": 8,
+      "topicCounts": {
+        "topic_igcse_addmath_quadratics": 8,
+        "topic_igcse_addmath_functions": 5,
+        "topic_igcse_addmath_logs": 6,
+        "topic_igcse_addmath_trig": 8,
+        "topic_igcse_addmath_coord": 4,
+        "topic_igcse_addmath_differentiation": 10,
+        "topic_igcse_addmath_integration": 6
+      },
+      "mappedQuestionIds": [
+        "q_igcse_addmath_001",
+        "q_igcse_addmath_002",
+        "q_igcse_addmath_003",
+        "q_igcse_addmath_004",
+        "q_igcse_addmath_005",
+        "q_igcse_addmath_006",
+        "q_igcse_addmath_007",
+        "q_igcse_addmath_008",
+        "q_igcse_addmath_009",
+        "q_igcse_addmath_010",
+        "q_igcse_addmath_011",
+        "q_igcse_addmath_012",
+        "q_igcse_addmath_013",
+        "q_igcse_addmath_014",
+        "q_igcse_addmath_015",
+        "q_igcse_addmath_016",
+        "q_igcse_addmath_017",
+        "q_igcse_addmath_018",
+        "q_igcse_addmath_019",
+        "q_igcse_addmath_020",
+        "q_igcse_addmath_021",
+        "q_igcse_addmath_022",
+        "q_igcse_addmath_023",
+        "q_igcse_addmath_024",
+        "q_igcse_addmath_025",
+        "q_igcse_addmath_026",
+        "q_igcse_addmath_027",
+        "q_igcse_addmath_028",
+        "q_igcse_addmath_029",
+        "q_igcse_addmath_030",
+        "q_igcse_addmath_031",
+        "q_igcse_addmath_032",
+        "q_igcse_addmath_033",
+        "q_igcse_addmath_034",
+        "q_igcse_addmath_035",
+        "q_igcse_addmath_036",
+        "q_igcse_addmath_037",
+        "q_igcse_addmath_038",
+        "q_igcse_addmath_039",
+        "q_igcse_addmath_040",
+        "q_igcse_addmath_041",
+        "q_igcse_addmath_050",
+        "q_igcse_addmath_051",
+        "q_igcse_addmath_052",
+        "q_igcse_addmath_053",
+        "q_igcse_addmath_054",
+        "q_igcse_addmath_055"
+      ],
+      "exceptionQuestionIds": [
+        "q_igcse_addmath_042",
+        "q_igcse_addmath_043",
+        "q_igcse_addmath_044",
+        "q_igcse_addmath_045",
+        "q_igcse_addmath_046",
+        "q_igcse_addmath_047",
+        "q_igcse_addmath_048",
+        "q_igcse_addmath_049"
+      ]
+    }
+  ]
+}

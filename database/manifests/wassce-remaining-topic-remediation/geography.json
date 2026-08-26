@@ -1,0 +1,189 @@
+{
+  "release": "wassce-remaining-null-topic-audit-2026-08-26",
+  "subjectId": "subj_wassce_geography",
+  "subjectName": "Geography",
+  "expectedNullTopicCount": 115,
+  "mappedQuestionCount": 115,
+  "exceptionCount": 0,
+  "mappingGroups": [
+    {
+      "topicId": "topic_geo_physical",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed rocks, landforms, tectonics, rivers and earth-structure blocks.",
+      "questionIds": [
+        "q_geo_2023_001",
+        "q_geo_2023_002",
+        "q_geo_2023_003",
+        "q_geo_2023_004",
+        "q_geo_2023_005",
+        "q_geo_2023_006",
+        "q_geo_2023_007",
+        "q_geo_2023_008",
+        "q_geo_2023_009",
+        "q_geo_2023_010",
+        "q_geo_2024_001",
+        "q_geo_2024_002",
+        "q_geo_2024_003",
+        "q_geo_2024_004",
+        "q_geo_2024_005",
+        "q_geo_2024_006",
+        "q_geo_2024_007",
+        "q_geo_2024_008",
+        "q_geo_2024_009",
+        "q_geo_2024_010",
+        "q_geog_phys_001",
+        "q_geog_phys_002",
+        "q_geog_phys_003",
+        "q_geog_phys_004",
+        "q_geog_phys_005"
+      ]
+    },
+    {
+      "topicId": "topic_geo_climate",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed weather instruments, winds, rainfall, atmosphere and climate stems.",
+      "questionIds": [
+        "q_geo_2023_011",
+        "q_geo_2023_013",
+        "q_geo_2023_014",
+        "q_geo_2023_016",
+        "q_geo_2023_018",
+        "q_geo_2024_011",
+        "q_geo_2024_012",
+        "q_geo_2024_013",
+        "q_geo_2024_014",
+        "q_geo_2024_015",
+        "q_geo_2024_016",
+        "q_geo_2024_017",
+        "q_geo_2024_018",
+        "q_geo_2024_019",
+        "q_geo_2024_020",
+        "q_geog_clim_001",
+        "q_geog_clim_002",
+        "q_geog_clim_003",
+        "q_geog_clim_004",
+        "q_geog_clim_005"
+      ]
+    },
+    {
+      "topicId": "topic_geo_vegetation",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed savanna, mangrove, desert vegetation, deforestation and rainforest stems.",
+      "questionIds": [
+        "q_geo_2023_012",
+        "q_geo_2023_015",
+        "q_geo_2023_017",
+        "q_geo_2023_019",
+        "q_geo_2023_020"
+      ]
+    },
+    {
+      "topicId": "topic_geo_mapwork",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed scale, contour, bearing, grid, latitude and map-symbol blocks.",
+      "questionIds": [
+        "q_geo_2023_021",
+        "q_geo_2023_022",
+        "q_geo_2023_023",
+        "q_geo_2023_024",
+        "q_geo_2023_025",
+        "q_geo_2023_026",
+        "q_geo_2023_027",
+        "q_geo_2023_028",
+        "q_geo_2023_029",
+        "q_geo_2023_030",
+        "q_geo_2024_021",
+        "q_geo_2024_022",
+        "q_geo_2024_023",
+        "q_geo_2024_024",
+        "q_geo_2024_025",
+        "q_geo_2024_026",
+        "q_geo_2024_027",
+        "q_geo_2024_028",
+        "q_geo_2024_029",
+        "q_geo_2024_030",
+        "q_geog_map_001",
+        "q_geog_map_002",
+        "q_geog_map_003",
+        "q_geog_map_004",
+        "q_geog_map_005"
+      ]
+    },
+    {
+      "topicId": "topic_geo_population",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed population growth, density, migration and population-pyramid stems.",
+      "questionIds": [
+        "q_geo_2023_031",
+        "q_geo_2024_031",
+        "q_geo_2024_032",
+        "q_geo_2024_034",
+        "q_geo_2024_035",
+        "q_geo_2024_038"
+      ]
+    },
+    {
+      "topicId": "topic_geo_settlement",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed settlement pattern, CBD, urbanization, site and slum stems.",
+      "questionIds": [
+        "q_geo_2024_033",
+        "q_geo_2024_036",
+        "q_geo_2024_037",
+        "q_geo_2024_039",
+        "q_geo_2024_040"
+      ]
+    },
+    {
+      "topicId": "topic_geo_resources",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed agriculture, fishing, industry, resources, sustainability and tourism stems.",
+      "questionIds": [
+        "q_geo_2023_032",
+        "q_geo_2023_033",
+        "q_geo_2023_034",
+        "q_geo_2023_035",
+        "q_geo_2023_036",
+        "q_geo_2023_037",
+        "q_geo_2023_038",
+        "q_geo_2023_039",
+        "q_geo_2023_040",
+        "q_geo_2024_041",
+        "q_geo_2024_042",
+        "q_geo_2024_043",
+        "q_geo_2024_044",
+        "q_geo_2024_045",
+        "q_geo_2024_046",
+        "q_geo_2024_047",
+        "q_geo_2024_049",
+        "q_geo_2024_050"
+      ]
+    },
+    {
+      "topicId": "topic_geo_ghana",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed Volta, Ghanaian port and Akosombo stems.",
+      "questionIds": [
+        "q_geo_2023_045",
+        "q_geo_2023_049",
+        "q_geo_2023_050"
+      ]
+    },
+    {
+      "topicId": "topic_geo_africa",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed African deserts, lakes, rivers, rift valley, mountains, ECOWAS, mining and Sahel stems.",
+      "questionIds": [
+        "q_geo_2023_041",
+        "q_geo_2023_042",
+        "q_geo_2023_043",
+        "q_geo_2023_044",
+        "q_geo_2023_046",
+        "q_geo_2023_047",
+        "q_geo_2023_048",
+        "q_geo_2024_048"
+      ]
+    }
+  ],
+  "reviewedExceptions": []
+}

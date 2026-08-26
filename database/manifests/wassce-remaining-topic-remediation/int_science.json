@@ -1,0 +1,174 @@
+{
+  "release": "wassce-remaining-null-topic-audit-2026-08-26",
+  "subjectId": "subj_wassce_int_science",
+  "subjectName": "Integrated Science",
+  "expectedNullTopicCount": 100,
+  "mappedQuestionCount": 100,
+  "exceptionCount": 0,
+  "mappingGroups": [
+    {
+      "topicId": "topic_wassce_intsci_cells",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed cell structure, living characteristics, photosynthesis and plant-life stems.",
+      "questionIds": [
+        "q_sci_2023_001",
+        "q_sci_2023_006",
+        "q_sci_2023_010",
+        "q_sci_2023_018",
+        "q_sci_2024_001",
+        "q_sci_2024_002",
+        "q_sci_2024_004",
+        "q_sci_2024_006",
+        "q_sci_2024_018"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_intsci_body",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed blood, skeleton, senses, digestion, nervous system, hormones and body-system stems.",
+      "questionIds": [
+        "q_sci_2023_002",
+        "q_sci_2023_004",
+        "q_sci_2023_005",
+        "q_sci_2023_007",
+        "q_sci_2023_008",
+        "q_sci_2023_011",
+        "q_sci_2023_012",
+        "q_sci_2023_013",
+        "q_sci_2023_014",
+        "q_sci_2023_015",
+        "q_sci_2024_003",
+        "q_sci_2024_007",
+        "q_sci_2024_009",
+        "q_sci_2024_010",
+        "q_sci_2024_013",
+        "q_sci_2024_015",
+        "q_sci_2024_019",
+        "q_sci_2024_020"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_intsci_reproduction",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed heredity, DNA and reproduction stems.",
+      "questionIds": [
+        "q_sci_2023_009",
+        "q_sci_2023_017",
+        "q_sci_2024_008",
+        "q_sci_2024_011"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_intsci_matter",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed atoms, elements, compounds, states, metals, mixtures and physical/chemical change stems.",
+      "questionIds": [
+        "q_sci_2023_021",
+        "q_sci_2023_023",
+        "q_sci_2023_024",
+        "q_sci_2023_025",
+        "q_sci_2023_026",
+        "q_sci_2023_027",
+        "q_sci_2023_028",
+        "q_sci_2023_029",
+        "q_sci_2023_030",
+        "q_sci_2023_031",
+        "q_sci_2023_032",
+        "q_sci_2023_034",
+        "q_sci_2023_035",
+        "q_sci_2024_021",
+        "q_sci_2024_022",
+        "q_sci_2024_024",
+        "q_sci_2024_025",
+        "q_sci_2024_026",
+        "q_sci_2024_027",
+        "q_sci_2024_028",
+        "q_sci_2024_029",
+        "q_sci_2024_030",
+        "q_sci_2024_031",
+        "q_sci_2024_032",
+        "q_sci_2024_034",
+        "q_sci_2024_035"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_intsci_acids",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed alkali, pH and acid-reaction stems.",
+      "questionIds": [
+        "q_sci_2023_022",
+        "q_sci_2023_033",
+        "q_sci_2024_023",
+        "q_sci_2024_033"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_intsci_energy",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed mechanics, energy, circuits, machines, work, force and electricity stems.",
+      "questionIds": [
+        "q_sci_2023_003",
+        "q_sci_2023_036",
+        "q_sci_2023_038",
+        "q_sci_2023_039",
+        "q_sci_2023_040",
+        "q_sci_2023_041",
+        "q_sci_2023_042",
+        "q_sci_2023_043",
+        "q_sci_2023_044",
+        "q_sci_2023_048",
+        "q_sci_2023_049",
+        "q_sci_2023_050",
+        "q_sci_2024_017",
+        "q_sci_2024_036",
+        "q_sci_2024_037",
+        "q_sci_2024_039",
+        "q_sci_2024_040",
+        "q_sci_2024_042",
+        "q_sci_2024_044",
+        "q_sci_2024_046",
+        "q_sci_2024_047",
+        "q_sci_2024_049"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_intsci_waves",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed reflection, refraction, light, sound, frequency, mirrors, wavelength and rainbow stems.",
+      "questionIds": [
+        "q_sci_2023_037",
+        "q_sci_2023_045",
+        "q_sci_2023_046",
+        "q_sci_2023_047",
+        "q_sci_2024_038",
+        "q_sci_2024_041",
+        "q_sci_2024_043",
+        "q_sci_2024_045",
+        "q_sci_2024_048",
+        "q_sci_2024_050"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_intsci_agric",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed carbon-cycle/ecosystem and plant-transpiration stems.",
+      "questionIds": [
+        "q_sci_2023_016",
+        "q_sci_2024_016"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_intsci_health",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed vaccination, communicable disease, STI, malaria and greenhouse/pollution stems.",
+      "questionIds": [
+        "q_sci_2023_019",
+        "q_sci_2023_020",
+        "q_sci_2024_005",
+        "q_sci_2024_012",
+        "q_sci_2024_014"
+      ]
+    }
+  ],
+  "reviewedExceptions": []
+}

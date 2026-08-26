@@ -1,0 +1,844 @@
+{
+  "release": "nsmq-null-topic-remediation-audit-2026-08-26",
+  "status": "reviewed-audit-no-migrations",
+  "subjectId": "subj_nsmq_math",
+  "subjectName": "Mathematics",
+  "sourceSubjectId": "subj_wassce_core_math",
+  "sourceNullTopicCount": 92,
+  "mappedCount": 81,
+  "exceptionCount": 11,
+  "roundTotals": {
+    "problem_of_day": 20,
+    "riddles": 15,
+    "round_one": 30,
+    "speed_race": 7,
+    "true_false": 20
+  },
+  "mappedRoundTotals": {
+    "problem_of_day": 20,
+    "riddles": 6,
+    "round_one": 30,
+    "speed_race": 6,
+    "true_false": 19
+  },
+  "topicCounts": {
+    "topic_algebra": 39,
+    "topic_calculus": 5,
+    "topic_geometry": 19,
+    "topic_quadratic": 2,
+    "topic_statistics": 11,
+    "topic_trigonometry": 5
+  },
+  "mappings": [
+    {
+      "questionId": "nsmq_math_pod_001",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Equations, rates, indices, financial growth, radicals and logarithms are explicit in the prompt and worked solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "8c1635195eca7c5ac2439acdb31d6000bbb60af566b4ed03cbbc18e62becd7b9"
+    },
+    {
+      "questionId": "nsmq_math_pod_002",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Equations, rates, indices, financial growth, radicals and logarithms are explicit in the prompt and worked solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "c141d93317270d13f8c0d08a94c7cdb3fc652b2da484968f7450a432dd418b98"
+    },
+    {
+      "questionId": "nsmq_math_pod_003",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Pythagoras, mensuration, angles or coordinate geometry is explicit in the prompt and solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "9093041d824a9a0cc7db5258e67eddc0b98e463bdf20e8c8de36115509df1cc6"
+    },
+    {
+      "questionId": "nsmq_math_pod_004",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_statistics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Sequences, probability, averages or permutations are explicit; these follow the repository Statistics & Probability grouping convention.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "ade755189378f4bdf9c9c6a46d4432f610d4295320c45a563ab4670dd8696f57"
+    },
+    {
+      "questionId": "nsmq_math_pod_005",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Equations, rates, indices, financial growth, radicals and logarithms are explicit in the prompt and worked solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "c7e6ceea8d67268dc0a83e7c6837f07261c16611387ff40564c113a7f291d733"
+    },
+    {
+      "questionId": "nsmq_math_pod_006",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Pythagoras, mensuration, angles or coordinate geometry is explicit in the prompt and solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "4dbded434e85246cba64f9f4ef495bb508c6d977ca8a921c22b1bf1e32ef0a4a"
+    },
+    {
+      "questionId": "nsmq_math_pod_007",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Equations, rates, indices, financial growth, radicals and logarithms are explicit in the prompt and worked solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "b9edbc0d828d14f93aa90f653d7e887dbf808ba911ded930b3bbfce3dc11091b"
+    },
+    {
+      "questionId": "nsmq_math_pod_008",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_statistics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Sequences, probability, averages or permutations are explicit; these follow the repository Statistics & Probability grouping convention.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "5c73ad09befd9de7a8fd87058d482f6b12ecff821eafb5fb50063bfc0fcc96cd"
+    },
+    {
+      "questionId": "nsmq_math_pod_009",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Equations, rates, indices, financial growth, radicals and logarithms are explicit in the prompt and worked solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "b2fd7f6ad298392b78aaf3b8bd32cb11055ee7cc700c3d06125e86098b2928f7"
+    },
+    {
+      "questionId": "nsmq_math_pod_010",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Pythagoras, mensuration, angles or coordinate geometry is explicit in the prompt and solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "242d752d821de2cd1b7bde1b8ee32c5210f7babb7bf9e04481fa85a88d6144c7"
+    },
+    {
+      "questionId": "nsmq_math_pod_011",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_quadratic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The equal-roots discriminant condition is explicitly assessed.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "630d5ad50cac65faa90e23bdbb255164f304106bfd0ce3c1e4a8169dd7af1879"
+    },
+    {
+      "questionId": "nsmq_math_pod_012",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Equations, rates, indices, financial growth, radicals and logarithms are explicit in the prompt and worked solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "fa4df262dfd569dac4a01412de3ad8461104c88e8542077c66608b42ddb1b1ec"
+    },
+    {
+      "questionId": "nsmq_math_pod_013",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Pythagoras, mensuration, angles or coordinate geometry is explicit in the prompt and solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "234d51303237ac2582e9a549dea99bf4614d6aabcd39165277143a4a99f1520a"
+    },
+    {
+      "questionId": "nsmq_math_pod_014",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_calculus",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly requires a definite integral.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "752c021e534c00287d0c4d4955056d5669cec6d783fe3a62a316d7e5fb588d4b"
+    },
+    {
+      "questionId": "nsmq_math_pod_015",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Pythagoras, mensuration, angles or coordinate geometry is explicit in the prompt and solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "cc8cd59dea8fb4dcfd997e0cb5b597856baa7f357f34af08c06252da18a3ba53"
+    },
+    {
+      "questionId": "nsmq_math_pod_016",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Equations, rates, indices, financial growth, radicals and logarithms are explicit in the prompt and worked solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "4af3b1484b81adb38efa8086febe8169609f357c21a6051e54e1cba9c0790d29"
+    },
+    {
+      "questionId": "nsmq_math_pod_017",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_statistics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Sequences, probability, averages or permutations are explicit; these follow the repository Statistics & Probability grouping convention.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "e7196427aead15581355628f541325aefdc60c7dd7a4eeff13d9079f57636c33"
+    },
+    {
+      "questionId": "nsmq_math_pod_018",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Equations, rates, indices, financial growth, radicals and logarithms are explicit in the prompt and worked solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "de57497a37b64fd49ccf5ac64195350cb599716bdcce34b883ad9711fe5677a9"
+    },
+    {
+      "questionId": "nsmq_math_pod_019",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Pythagoras, mensuration, angles or coordinate geometry is explicit in the prompt and solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "c9daaef4a0914df0077c2435ea7a56a8923ad5b0b22915c775b7841fa532f5a7"
+    },
+    {
+      "questionId": "nsmq_math_pod_020",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "problem_of_day",
+      "topicId": "topic_statistics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Sequences, probability, averages or permutations are explicit; these follow the repository Statistics & Probability grouping convention.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "bf3ffe795ff1168bf465e49157ae93427f7f390a79d43c6842ea30796f924f36"
+    },
+    {
+      "questionId": "nsmq_math_rid_001",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The riddle has an explicit numerical or algebraic constraint with a determinate solution.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "8bfc55fa3b40625d3bed173f7ebf35d51a2073996dd1ad9463c634f97e93b68a"
+    },
+    {
+      "questionId": "nsmq_math_rid_005",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The riddle has an explicit numerical or algebraic constraint with a determinate solution.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "e96e333ca3e18d011f08361348ca001d1557b63537a0b574efeda427a742b3ed"
+    },
+    {
+      "questionId": "nsmq_math_rid_006",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The answer is explicitly the geometric definition of an angle.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "b53de6a32d4eedc989840ba8e6033c5f88192189bffa8a551657a61f5a6732f3"
+    },
+    {
+      "questionId": "nsmq_math_rid_007",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The riddle has an explicit numerical or algebraic constraint with a determinate solution.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "0f99e6d2d55a72bb43edeba95f542945688df2fdb8a9a623c98dc0dde5ed5cb6"
+    },
+    {
+      "questionId": "nsmq_math_rid_008",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The riddle has an explicit numerical or algebraic constraint with a determinate solution.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "adf94e62871cda053955fb18f58cf155b34f480b44e151c8b724ddd5a423a7be"
+    },
+    {
+      "questionId": "nsmq_math_rid_014",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The riddle has an explicit numerical or algebraic constraint with a determinate solution.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "9b658430ae0a24c52f9a5dc904d1cce93132b158e67c71260735f7db39ad793d"
+    },
+    {
+      "questionId": "nsmq_math_r1_001",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses algebraic evaluation, number operations, ratios, indices, logarithms or functions.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "be2eeca8d97896296eef9f7f1a6cd092a5bdfa8e7c450144a825842b79eed7cb"
+    },
+    {
+      "questionId": "nsmq_math_r1_002",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses algebraic evaluation, number operations, ratios, indices, logarithms or functions.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "8344d0940281676b32f45bc877ad33dbe1c3bc1001acbe0c99d668ff2c9a6959"
+    },
+    {
+      "questionId": "nsmq_math_r1_003",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses polygon angles, mensuration or coordinate geometry.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "7c404a816f7a174627f16a11e03b7443211b655fbb49ab70e5f33e88332cd591"
+    },
+    {
+      "questionId": "nsmq_math_r1_004",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses algebraic evaluation, number operations, ratios, indices, logarithms or functions.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "fac40bb56df639dc947a87ac1d4051528da843a967c0744010d3ec6211e75d65"
+    },
+    {
+      "questionId": "nsmq_math_r1_005",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_calculus",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Differentiation or integration is explicit in the prompt.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "6df5431ba7d964e8c3ef1174e0a9713de6f3feb1dcefdbc1fe7056afdd63591b"
+    },
+    {
+      "questionId": "nsmq_math_r1_006",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses algebraic evaluation, number operations, ratios, indices, logarithms or functions.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "a6d141249968176cfdc59f23e24842a1f568663b0afe7117b43adc8204ddaa86"
+    },
+    {
+      "questionId": "nsmq_math_r1_007",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses polygon angles, mensuration or coordinate geometry.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "28cf2f80f90ab95449119bf0e68c089d0135431fd5d7bc38a61a65a9722aa070"
+    },
+    {
+      "questionId": "nsmq_math_r1_008",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses algebraic evaluation, number operations, ratios, indices, logarithms or functions.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "dfe975544b0cb7a8924481169381637a2c2be10454e5560c56c99ee167bf3d2d"
+    },
+    {
+      "questionId": "nsmq_math_r1_009",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_statistics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Sequences, probability, factorial counting or descriptive statistics are explicit.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "2716fbffb2a81e2d18639c539c0c8ecc6867d79a32b03756eac1515ec6aff7ab"
+    },
+    {
+      "questionId": "nsmq_math_r1_010",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_trigonometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Trigonometric ratios or identities are explicit in the prompt.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "f65cb2ac7aa9f8ac8191f6934b8b705afacedc440f5a2adb34d2548f74947777"
+    },
+    {
+      "questionId": "nsmq_math_r1_011",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses algebraic evaluation, number operations, ratios, indices, logarithms or functions.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "ae3c3c2e7289545ade10b3a4c8919d23e12afe025721b87cada0f0c2b2261fd5"
+    },
+    {
+      "questionId": "nsmq_math_r1_012",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_statistics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Sequences, probability, factorial counting or descriptive statistics are explicit.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "23f07b279eee6220a89e6e9eff3bf1093ef4ef2d83d70f17f45eba1b52109955"
+    },
+    {
+      "questionId": "nsmq_math_r1_013",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses polygon angles, mensuration or coordinate geometry.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "56de70a585e9ce3c6f527771ceefe4f7bfaeba7a8ffb67cb8ead6369e57a1172"
+    },
+    {
+      "questionId": "nsmq_math_r1_014",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_calculus",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Differentiation or integration is explicit in the prompt.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "74d5136db4ad2e05b955c9c25b6cb80ee57e74b1e4b53d7ee335a619796a2fa6"
+    },
+    {
+      "questionId": "nsmq_math_r1_015",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses algebraic evaluation, number operations, ratios, indices, logarithms or functions.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "cf5b7dcfe8dfd412f84564f40d245138c3764bf684a9fce0e2c4f33c1fa35ab6"
+    },
+    {
+      "questionId": "nsmq_math_r1_016",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses algebraic evaluation, number operations, ratios, indices, logarithms or functions.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "7636b05689a1bad9b2f37a01fbceab5126ba8b1b6b0567d87ca1cef78ff4069f"
+    },
+    {
+      "questionId": "nsmq_math_r1_017",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_statistics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Sequences, probability, factorial counting or descriptive statistics are explicit.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "10aef256deda947decd93660c25b951e8e9d1b1e16b7654e9582e2ee5441a82c"
+    },
+    {
+      "questionId": "nsmq_math_r1_018",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses algebraic evaluation, number operations, ratios, indices, logarithms or functions.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "3712de8611ac000b7cfed142d40a715feba3584a2ff6152ff6e3e2b02b920dc6"
+    },
+    {
+      "questionId": "nsmq_math_r1_019",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses algebraic evaluation, number operations, ratios, indices, logarithms or functions.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "cea3578c14f9edf0bdf364cf16c59556b439b458b8a6a196ec0d567e1dd5c373"
+    },
+    {
+      "questionId": "nsmq_math_r1_020",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_trigonometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Trigonometric ratios or identities are explicit in the prompt.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "fc895bba22b74c3c33099ba11a9e1540a59bf703a6f1995499f6a1218fe7a9b0"
+    },
+    {
+      "questionId": "nsmq_math_r1_021",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses polygon angles, mensuration or coordinate geometry.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "c3a9267b2e1e68ec926c8636277c3bf20e40afa29f6d43ae28e375e7d07e32f2"
+    },
+    {
+      "questionId": "nsmq_math_r1_022",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses algebraic evaluation, number operations, ratios, indices, logarithms or functions.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "7034e8d6cc90ca6931254f9b63ab87a7a47cdae2928749f1d46c0d5668652ff4"
+    },
+    {
+      "questionId": "nsmq_math_r1_023",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_quadratic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The question explicitly asks for the quadratic formula.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "a552cd5687a4bf95f6f36af24ef4e2ad939a2e818732808740fc43eb13e2539b"
+    },
+    {
+      "questionId": "nsmq_math_r1_024",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses algebraic evaluation, number operations, ratios, indices, logarithms or functions.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "dedb4f8cb832cd5c54b3082543d00b7b9351378e4b2164473b971e00c059f78c"
+    },
+    {
+      "questionId": "nsmq_math_r1_025",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses algebraic evaluation, number operations, ratios, indices, logarithms or functions.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "632d035f77ab3ce233d9dd143f2b3e5cadad3e2ca689bbc1396f3b0187f76edb"
+    },
+    {
+      "questionId": "nsmq_math_r1_026",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses polygon angles, mensuration or coordinate geometry.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "a431570a9020e0ac0eace5391f36faa8cef50d2b238271fddcc08ca8bbf19d2e"
+    },
+    {
+      "questionId": "nsmq_math_r1_027",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses polygon angles, mensuration or coordinate geometry.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "48b5c8025b0ec4e359f18ddc2855080588a23aebc887b46cfec6e9a68ddc3859"
+    },
+    {
+      "questionId": "nsmq_math_r1_028",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_statistics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Sequences, probability, factorial counting or descriptive statistics are explicit.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "121089cb8c6188cdd4c5161070ed0882f72fb3ed22d2c0841a829a4f2b933d73"
+    },
+    {
+      "questionId": "nsmq_math_r1_029",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses algebraic evaluation, number operations, ratios, indices, logarithms or functions.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "27666a15b9e4950364ea3de7ab61a099bd4f677d2b4788c7e45302001fb61801"
+    },
+    {
+      "questionId": "nsmq_math_r1_030",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "round_one",
+      "topicId": "topic_trigonometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Trigonometric ratios or identities are explicit in the prompt.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "12ff7aaa25cfc54ddbde28c0afc1956a4f3c2a3309b4bb6a3f2293d7e969b374"
+    },
+    {
+      "questionId": "nsmq_math_sr_021",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "speed_race",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Logarithms, roots and index laws are explicit in the prompt and solution.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "8fb560ac93ed50dfecc55fa3f48bdb9db206b5d6cea5194c13def94b8c259a23"
+    },
+    {
+      "questionId": "nsmq_math_sr_023",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "speed_race",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Logarithms, roots and index laws are explicit in the prompt and solution.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "78aefc8b49a27558e0e68217f714015b5f4eff28076f17569cf830530e717f38"
+    },
+    {
+      "questionId": "nsmq_math_sr_024",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "speed_race",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Logarithms, roots and index laws are explicit in the prompt and solution.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "086b733455f9e164a17f253979aca7b20d26f089e9e4579f56676f2bad42289d"
+    },
+    {
+      "questionId": "nsmq_math_sr_025",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "speed_race",
+      "topicId": "topic_statistics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The Fibonacci sequence is explicit and follows the repository sequence-grouping convention.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "e1dc8c0275199195f0385b6a3fe4f218358ab093a8cf3ea9bc14b07fc5ab317f"
+    },
+    {
+      "questionId": "q_speed_002",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "speed_race",
+      "topicId": "topic_algebra",
+      "classificationSource": "production-inventory-plus-base-seed-explicit-topic",
+      "evidence": "The preserved pre-squash base seed explicitly binds this exact subject/round/content row to topic_algebra; the production read-only inventory confirms the same ID is currently null-topic.",
+      "provenance": "database/seeds/seed_base.sql",
+      "contentFingerprint": "4a76ba043f3a77ea7b1b866abe4e2000394c6a8659791ca482dcaba79eb4ac8e"
+    },
+    {
+      "questionId": "q_speed_006",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "speed_race",
+      "topicId": "topic_trigonometry",
+      "classificationSource": "production-inventory-plus-base-seed-explicit-topic",
+      "evidence": "The preserved pre-squash base seed explicitly binds this exact subject/round/content row to topic_trigonometry; the production read-only inventory confirms the same ID is currently null-topic.",
+      "provenance": "database/seeds/seed_base.sql",
+      "contentFingerprint": "6641882cdf957274e7014583227cffba5387a1a8b98a4b508ded8dc298907656"
+    },
+    {
+      "questionId": "nsmq_math_tf_001",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns number properties, algebraic signs, logarithms, functions or roots.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "947ec996ed2db6fdbedd83345bd14e41848d9dbf0df240089b2c69eae6617337"
+    },
+    {
+      "questionId": "nsmq_math_tf_002",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns number properties, algebraic signs, logarithms, functions or roots.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "148cd4563374cbe28510fe9b1ad4dbbd821f11ab11d0cea5833ec838e2545f21"
+    },
+    {
+      "questionId": "nsmq_math_tf_003",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns Euclidean shapes, angles, gradients or symmetry.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "c89d16de4ae160197250a0afbc46d4b84bd33e519fb6238dcdda061810ec0e84"
+    },
+    {
+      "questionId": "nsmq_math_tf_004",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns number properties, algebraic signs, logarithms, functions or roots.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "47479972c1b8a021e4f41a1e78341e800a95ddad387801e47e0d2287e8bfb42b"
+    },
+    {
+      "questionId": "nsmq_math_tf_005",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_calculus",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns a derivative or integral.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "89475244729460de92ab8ac46e47e1b5d3a659b1845ce4d436032ceab1ad1893"
+    },
+    {
+      "questionId": "nsmq_math_tf_006",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns Euclidean shapes, angles, gradients or symmetry.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "d5ed0f3324fe7e6e87aa9916b93a7ee0109e9a4d4f2d4dd8ee1ea13d912e03d8"
+    },
+    {
+      "questionId": "nsmq_math_tf_007",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns number properties, algebraic signs, logarithms, functions or roots.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "340c1a35cae194eda7c2fdd7a7b8c3918c5d643da6a84fe2bc61e4cf88a17dba"
+    },
+    {
+      "questionId": "nsmq_math_tf_008",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns number properties, algebraic signs, logarithms, functions or roots.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "133f665e2bf420f0074bf7ca85cfb3e0b436536258b086329af81f715eb975e7"
+    },
+    {
+      "questionId": "nsmq_math_tf_009",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns number properties, algebraic signs, logarithms, functions or roots.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "8761748fb3a8862aa429e43ed4670789c749a169afe29934a050e8cb4ac5e739"
+    },
+    {
+      "questionId": "nsmq_math_tf_010",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns Euclidean shapes, angles, gradients or symmetry.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "bb43791dcee207ec193b4aa954eb408a1bbde58a49ed97d5bad31be552bd5e11"
+    },
+    {
+      "questionId": "nsmq_math_tf_011",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_statistics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement concerns a median or factorial, matching the existing statistics/counting grouping.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "51cfe8df6e30fa690bfc99a7586774b39f4eabf221f089c1146ef55e36867003"
+    },
+    {
+      "questionId": "nsmq_math_tf_012",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_trigonometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement is explicitly a trigonometric identity.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "cc7fcd0ed2adea57e96417aebfcfb8b0699fbf423512347bf98db72aaca9bfa2"
+    },
+    {
+      "questionId": "nsmq_math_tf_013",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns number properties, algebraic signs, logarithms, functions or roots.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "acce721f0ecb9dc1e23ec8853db92733378195422a29a482c394d6328c79bb3a"
+    },
+    {
+      "questionId": "nsmq_math_tf_014",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_statistics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement concerns a median or factorial, matching the existing statistics/counting grouping.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "aa3a73d52ab599c86dd3f6198aae33455046bb10fd29f41ae0eba14c869fc587"
+    },
+    {
+      "questionId": "nsmq_math_tf_015",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns Euclidean shapes, angles, gradients or symmetry.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "216a5527e3b8ea3af0e160ddbd4757e625e52bd7918df8f6dd04ae2e7aa1ab33"
+    },
+    {
+      "questionId": "nsmq_math_tf_016",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns Euclidean shapes, angles, gradients or symmetry.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "19be10ec11aca0b04082970f118b0c78223eb51e7c35004791d44ad0603b05a1"
+    },
+    {
+      "questionId": "nsmq_math_tf_017",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_calculus",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns a derivative or integral.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "b403d8ee38594cc119fe7a224ff3542843a4b0098f1e99b2ab31d0670b9c1ef0"
+    },
+    {
+      "questionId": "nsmq_math_tf_018",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_geometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns Euclidean shapes, angles, gradients or symmetry.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "903a40a28428807c247e2e8180dc1c04df262b7470c0185a379e35ae94186c79"
+    },
+    {
+      "questionId": "nsmq_math_tf_019",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "true_false",
+      "topicId": "topic_algebra",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns number properties, algebraic signs, logarithms, functions or roots.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "5146162c7a8cc164cd2da7514cbd52fb6b1453126b1a693283a1a5070990e2e9"
+    }
+  ]
+}

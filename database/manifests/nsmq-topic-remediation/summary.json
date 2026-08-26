@@ -1,0 +1,72 @@
+{
+  "release": "nsmq-null-topic-remediation-audit-2026-08-26",
+  "status": "inventory-reconciled-reviewed-audit-no-migrations",
+  "declaredOperationalNullTopicCount": 375,
+  "repositoryReconstructedNullTopicCount": 370,
+  "unreconciledInventoryCount": 0,
+  "mappedCount": 360,
+  "exceptionCount": 15,
+  "reviewedDispositionCount": 375,
+  "rootCause": "Legacy round-specific NSMQ inserts retained subject and round provenance but did not consistently bind canonical topics. Migration 102 preserves only a unique same-name topic. The squashed seed reconstructs 370 unresolved rows; five additional production-null speed rows are recoverable without guessing because database/seeds/seed_base.sql preserves their exact subject, content and original canonical topic.",
+  "evidenceBasis": [
+    "database/seed.sql (materialized legacy question rows)",
+    "database/migrations/102_nsmq_question_alignment.sql (subject alignment and unique-name topic preservation)",
+    "database/migrations/archive/040_nsmq_round_one.sql through 044_nsmq_riddles.sql (round-specific provenance)",
+    "database/seed.sql NSMQ topics (current canonical taxonomy and subject ownership)",
+    "database/seeds/seed_base.sql (explicit original topic bindings for five production-only null-topic speed rows)",
+    "authoritative production read-only D1 inventory supplied 2026-08-26 (375 IDs and subject totals; no content copied from production)"
+  ],
+  "generationContract": "Subject and round must match the reconstructed source row; target topic must be owned by that subject; every reconstructed null-topic row must have exactly one mapping or reviewed exception; prompt/answer/explanation drift changes the SHA-256 fingerprint.",
+  "migrationArtifactsCreated": false,
+  "subjectTotals": {
+    "subj_nsmq_math": {
+      "sourceNullTopicCount": 92,
+      "mappedCount": 81,
+      "exceptionCount": 11,
+      "roundTotals": {
+        "problem_of_day": 20,
+        "riddles": 15,
+        "round_one": 30,
+        "speed_race": 7,
+        "true_false": 20
+      }
+    },
+    "subj_nsmq_physics": {
+      "sourceNullTopicCount": 111,
+      "mappedCount": 108,
+      "exceptionCount": 3,
+      "roundTotals": {
+        "problem_of_day": 20,
+        "riddles": 15,
+        "round_one": 30,
+        "speed_race": 26,
+        "true_false": 20
+      }
+    },
+    "subj_nsmq_chemistry": {
+      "sourceNullTopicCount": 86,
+      "mappedCount": 85,
+      "exceptionCount": 1,
+      "roundTotals": {
+        "problem_of_day": 20,
+        "riddles": 15,
+        "round_one": 30,
+        "true_false": 20,
+        "speed_race": 1
+      }
+    },
+    "subj_nsmq_biology": {
+      "sourceNullTopicCount": 86,
+      "mappedCount": 86,
+      "exceptionCount": 0,
+      "roundTotals": {
+        "problem_of_day": 20,
+        "riddles": 15,
+        "round_one": 30,
+        "true_false": 20,
+        "speed_race": 1
+      }
+    }
+  },
+  "liveOnlyRowsRecoveredFromBaseSeed": 5
+}

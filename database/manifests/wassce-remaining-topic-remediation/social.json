@@ -1,0 +1,167 @@
+{
+  "release": "wassce-remaining-null-topic-audit-2026-08-26",
+  "subjectId": "subj_wassce_social",
+  "subjectName": "Social Studies",
+  "expectedNullTopicCount": 100,
+  "mappedQuestionCount": 100,
+  "exceptionCount": 0,
+  "mappingGroups": [
+    {
+      "topicId": "topic_wassce_social_self",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed adolescence, substance abuse, peer pressure, self-esteem and personal social-problem stems.",
+      "questionIds": [
+        "q_soc_2023_013",
+        "q_soc_2023_015",
+        "q_soc_2023_016",
+        "q_soc_2023_017",
+        "q_soc_2024_016",
+        "q_soc_2024_023",
+        "q_soc_2024_024",
+        "q_soc_2024_027"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_social_culture",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed family, tolerance, stereotypes, nationalism, African identity, culture and national-unity stems.",
+      "questionIds": [
+        "q_soc_2023_008",
+        "q_soc_2023_012",
+        "q_soc_2023_018",
+        "q_soc_2023_019",
+        "q_soc_2023_028",
+        "q_soc_2023_029",
+        "q_soc_2023_030",
+        "q_soc_2023_031",
+        "q_soc_2023_032",
+        "q_soc_2023_033",
+        "q_soc_2024_020",
+        "q_soc_2024_021",
+        "q_soc_2024_022",
+        "q_soc_2024_025",
+        "q_soc_2024_026",
+        "q_soc_2024_028",
+        "q_soc_2024_030",
+        "q_soc_2024_033",
+        "q_soc_2024_039",
+        "q_soc_2024_040",
+        "q_soc_2024_041",
+        "q_soc_2024_048"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_social_governance",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed arms of government, decentralization, elections, media, constitution and good-governance stems.",
+      "questionIds": [
+        "q_soc_2023_021",
+        "q_soc_2023_022",
+        "q_soc_2023_023",
+        "q_soc_2023_024",
+        "q_soc_2023_025",
+        "q_soc_2023_041",
+        "q_soc_2023_042",
+        "q_soc_2023_043",
+        "q_soc_2023_044",
+        "q_soc_2024_031",
+        "q_soc_2024_032",
+        "q_soc_2024_034",
+        "q_soc_2024_035",
+        "q_soc_2024_036",
+        "q_soc_2024_038",
+        "q_soc_2024_042",
+        "q_soc_2024_043",
+        "q_soc_2024_044",
+        "q_soc_2024_045",
+        "q_soc_2024_047",
+        "q_soc_2024_049",
+        "q_soc_2024_050"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_social_citizenship",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed child rights, human rights, civic duties, voting and active-citizenship stems.",
+      "questionIds": [
+        "q_soc_2023_014",
+        "q_soc_2023_026",
+        "q_soc_2023_027",
+        "q_soc_2023_036",
+        "q_soc_2023_050",
+        "q_soc_2024_017",
+        "q_soc_2024_019",
+        "q_soc_2024_029",
+        "q_soc_2024_037",
+        "q_soc_2024_046"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_social_population",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed population growth, migration and family-planning stems.",
+      "questionIds": [
+        "q_soc_2023_002",
+        "q_soc_2023_003",
+        "q_soc_2023_011",
+        "q_soc_2024_018"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_social_environment",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed sanitation, pollution, conservation, climate, resources and sustainability stems.",
+      "questionIds": [
+        "q_soc_2023_001",
+        "q_soc_2023_004",
+        "q_soc_2023_005",
+        "q_soc_2023_006",
+        "q_soc_2023_007",
+        "q_soc_2023_010",
+        "q_soc_2023_048",
+        "q_soc_2024_001",
+        "q_soc_2024_002",
+        "q_soc_2024_003",
+        "q_soc_2024_004",
+        "q_soc_2024_005",
+        "q_soc_2024_006",
+        "q_soc_2024_007",
+        "q_soc_2024_008",
+        "q_soc_2024_009",
+        "q_soc_2024_011",
+        "q_soc_2024_012",
+        "q_soc_2024_014",
+        "q_soc_2024_015"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_social_economy",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed tourism, globalization, taxation, unemployment, inflation, banking, community development, entrepreneurship and poverty stems.",
+      "questionIds": [
+        "q_soc_2023_009",
+        "q_soc_2023_034",
+        "q_soc_2023_035",
+        "q_soc_2023_037",
+        "q_soc_2023_038",
+        "q_soc_2023_039",
+        "q_soc_2023_040",
+        "q_soc_2023_045",
+        "q_soc_2023_046",
+        "q_soc_2023_047",
+        "q_soc_2024_010",
+        "q_soc_2024_013"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_social_peace",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed conflict resolution and national-security stems.",
+      "questionIds": [
+        "q_soc_2023_020",
+        "q_soc_2023_049"
+      ]
+    }
+  ],
+  "reviewedExceptions": []
+}

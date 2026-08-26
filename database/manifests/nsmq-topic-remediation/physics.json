@@ -1,0 +1,1113 @@
+{
+  "release": "nsmq-null-topic-remediation-audit-2026-08-26",
+  "status": "reviewed-audit-no-migrations",
+  "subjectId": "subj_nsmq_physics",
+  "subjectName": "Physics",
+  "sourceSubjectId": "subj_wassce_physics",
+  "sourceNullTopicCount": 111,
+  "mappedCount": 108,
+  "exceptionCount": 3,
+  "roundTotals": {
+    "problem_of_day": 20,
+    "riddles": 15,
+    "round_one": 30,
+    "speed_race": 26,
+    "true_false": 20
+  },
+  "mappedRoundTotals": {
+    "problem_of_day": 20,
+    "riddles": 12,
+    "round_one": 30,
+    "speed_race": 26,
+    "true_false": 20
+  },
+  "topicCounts": {
+    "topic_electricity": 27,
+    "topic_mechanics": 45,
+    "topic_modern_physics": 4,
+    "topic_thermodynamics": 4,
+    "topic_waves": 28
+  },
+  "mappings": [
+    {
+      "questionId": "nsmq_phy_pod_001",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses kinematics, energy, momentum, force, buoyancy or oscillation mechanics.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "5770fcf787a57ff8b48e5afe7b0fd6b0fa9867f1334f246b1ad2515f05fd53e9"
+    },
+    {
+      "questionId": "nsmq_phy_pod_002",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses kinematics, energy, momentum, force, buoyancy or oscillation mechanics.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "f5673faec52c60485a5ab93e698bb61c80417cba151da1b1e8f9c6a46dad101c"
+    },
+    {
+      "questionId": "nsmq_phy_pod_003",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses circuits, transformers, capacitance, fields or electrical energy.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "c87f5ece49a89eff4c718fa5bf4571ec087ed735919aa2fd424da8c910b330de"
+    },
+    {
+      "questionId": "nsmq_phy_pod_004",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Wave speed or geometrical optics is explicit in the prompt and solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "2c281b9a954b5498fb5461e4ca21b448e74ee875e5b778278601227ec1dc0a1c"
+    },
+    {
+      "questionId": "nsmq_phy_pod_005",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses circuits, transformers, capacitance, fields or electrical energy.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "2424cfc73cdb3319cd53fd1cdf5966161aa4afcc3383cc9d8e45c26bc06e4ad0"
+    },
+    {
+      "questionId": "nsmq_phy_pod_006",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses kinematics, energy, momentum, force, buoyancy or oscillation mechanics.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "13ca7554f9aa43986d385159e39246a1b259e51edab90c0aecb4c41f973b0661"
+    },
+    {
+      "questionId": "nsmq_phy_pod_007",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses circuits, transformers, capacitance, fields or electrical energy.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "6a0f48020186d0510684e874976357bae05ec5fe4c2721de7a1ab06cb4b0dde3"
+    },
+    {
+      "questionId": "nsmq_phy_pod_008",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Wave speed or geometrical optics is explicit in the prompt and solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "1149812e9aba3659b2af5a0a22970860c485a7422cb7894175cfc75c61446a7a"
+    },
+    {
+      "questionId": "nsmq_phy_pod_009",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses kinematics, energy, momentum, force, buoyancy or oscillation mechanics.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "44e3cac8b317bf74994607919992a510dd69b204832c3803d90dab73dd83eb64"
+    },
+    {
+      "questionId": "nsmq_phy_pod_010",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses circuits, transformers, capacitance, fields or electrical energy.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "3558f0624b0fb211e8a9baf3198651ecfd779a5592f08b4d208ab54162db6ca4"
+    },
+    {
+      "questionId": "nsmq_phy_pod_011",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses kinematics, energy, momentum, force, buoyancy or oscillation mechanics.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "fb0b48a61e83685d3188ab02087733456c9639d729bd2ac5ff0263fb595577d7"
+    },
+    {
+      "questionId": "nsmq_phy_pod_012",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses kinematics, energy, momentum, force, buoyancy or oscillation mechanics.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "4b5eb36f13005aaf1674c5a9aadea0319441438a79a55b4de32ab5d565fcdf9f"
+    },
+    {
+      "questionId": "nsmq_phy_pod_013",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses kinematics, energy, momentum, force, buoyancy or oscillation mechanics.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "fe5cc313b0c27021a3d5e37d90d7482a103d2e25d942271721a3aa05467f2cef"
+    },
+    {
+      "questionId": "nsmq_phy_pod_014",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Wave speed or geometrical optics is explicit in the prompt and solution.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "4adc33ffdaac43bc8937b92b1a59588efcf7fda8952f09a0ba8dd6c9b52fb2da"
+    },
+    {
+      "questionId": "nsmq_phy_pod_015",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_thermodynamics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly applies specific heat capacity.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "bdc29724b750545e283c33dfa98251738fdfd28adc5cac034764d4c4d4053dca"
+    },
+    {
+      "questionId": "nsmq_phy_pod_016",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses circuits, transformers, capacitance, fields or electrical energy.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "22214b4fccb749169f0a21e438ef1a9f6392dbf05b90e210f0632d4f8b80ee1c"
+    },
+    {
+      "questionId": "nsmq_phy_pod_017",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses kinematics, energy, momentum, force, buoyancy or oscillation mechanics.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "bb8d19ea33234fd2f6f99caf2bf77903b9f19f3f722e57669383653ff2b78d0f"
+    },
+    {
+      "questionId": "nsmq_phy_pod_018",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses circuits, transformers, capacitance, fields or electrical energy.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "b3bd5edb2cf13ac756e6dd76b2d908ca87bd9360569f3b1a62fcd29d3c7f8278"
+    },
+    {
+      "questionId": "nsmq_phy_pod_019",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses kinematics, energy, momentum, force, buoyancy or oscillation mechanics.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "88172e936404f2cc84dfd4af33b45517d997363a9038dde1e9ba6df5d936473d"
+    },
+    {
+      "questionId": "nsmq_phy_pod_020",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "problem_of_day",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses circuits, transformers, capacitance, fields or electrical energy.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "b4d60338fd188de3a0b8b002793278e0df0ee6d2bde8804cf423898eb9c7b355"
+    },
+    {
+      "questionId": "nsmq_phy_rid_002",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The answer explicitly identifies gravity, mass, wind motion or mechanical potential energy.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "fde543439e4038e2a94bb67c456dede5a87aa806443c85ebe4ab37435d529bf7"
+    },
+    {
+      "questionId": "nsmq_phy_rid_004",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "topicId": "topic_thermodynamics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Combustion, oxygen and heat are the explicit physical clues.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "8bc58ce9848161252ee9eafb0a50f9ef3805251641c1922861175ce053ac0ab6"
+    },
+    {
+      "questionId": "nsmq_phy_rid_005",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The answer explicitly identifies light or sound and its wave behaviour.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "f1a4f2a547d0412d75ff7627a3753197eff02da9acfe22af1392827e03919b4c"
+    },
+    {
+      "questionId": "nsmq_phy_rid_006",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The answer explicitly identifies gravity, mass, wind motion or mechanical potential energy.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "246e9f69c9af427f25c74b013a813d8d628a7f0a562e8c48568a8b6bb1dd860c"
+    },
+    {
+      "questionId": "nsmq_phy_rid_007",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The answer explicitly identifies gravity, mass, wind motion or mechanical potential energy.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "0967d266bf853f3dfeaf41f8f0d25a7215911cf197db81cf77d5f3be8db2f173"
+    },
+    {
+      "questionId": "nsmq_phy_rid_008",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The answer explicitly concerns magnetism/electron flow.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "d1d753ec5052d44d12acadeed7514aebc482a0083d9c6c3e08ce3cb8d95edeba"
+    },
+    {
+      "questionId": "nsmq_phy_rid_009",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "topicId": "topic_modern_physics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The answer explicitly identifies an atom and nuclear fission.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "9d47c893274cbdafc0c7e1bfbeec897383da2b045a488a7d270fa609e0b95b3a"
+    },
+    {
+      "questionId": "nsmq_phy_rid_010",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The answer explicitly identifies gravity, mass, wind motion or mechanical potential energy.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "91867b385ea0dcb39affca632708269cef2bf096365674c674e4de8004332ccc"
+    },
+    {
+      "questionId": "nsmq_phy_rid_011",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The answer explicitly identifies light or sound and its wave behaviour.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "c1eb40ce6195875948fc57ca0e76dd207693e6a04c97da83812bd779f98e7844"
+    },
+    {
+      "questionId": "nsmq_phy_rid_013",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The answer explicitly concerns magnetism/electron flow.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "02e4c7b4105e85b9a41b1df2663fda0f3f64c8c6c67c2b68ce0d8eeee7a06549"
+    },
+    {
+      "questionId": "nsmq_phy_rid_014",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The answer explicitly identifies gravity, mass, wind motion or mechanical potential energy.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "90ebc88fde6ddf84b8970afe7d6c3eae37da8ba86a94bedcd4dbdf40a2a707d7"
+    },
+    {
+      "questionId": "nsmq_phy_rid_015",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The answer explicitly identifies light or sound and its wave behaviour.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "4c0758c2aef2782799c359968e04f33afa89a174be3d362c39ec74ec473ce11d"
+    },
+    {
+      "questionId": "nsmq_phy_r1_001",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns current, resistance, charge, circuits or magnetic flux.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "c3b574a1c0db65092d9ebf1ca19d8410fdcef9d3f30d7502e36278de33ce943d"
+    },
+    {
+      "questionId": "nsmq_phy_r1_002",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns light, sound, frequency, wavelength, mirrors, lenses or refraction.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "5229698c45698945660136d295d65605e478facdf3403f5127392dd074a89c67"
+    },
+    {
+      "questionId": "nsmq_phy_r1_003",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses force, motion, energy, pressure, momentum or vector mechanics.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "020d9c59bcf2b1270003d580638d9fbf4d3f70573921b91b487b19fcac7605fd"
+    },
+    {
+      "questionId": "nsmq_phy_r1_004",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns light, sound, frequency, wavelength, mirrors, lenses or refraction.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "550d811d85d69feaf56e9a3ba64442bf39b10a1936e5cf48d95afa8063a2ae61"
+    },
+    {
+      "questionId": "nsmq_phy_r1_005",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses force, motion, energy, pressure, momentum or vector mechanics.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "71648f2744feb2d07d0779143bd6dff687ee6ab7749162d1fc03b2428b7ca1c8"
+    },
+    {
+      "questionId": "nsmq_phy_r1_006",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_modern_physics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly identifies a subatomic particle.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "b3d721a4e047d2eb0e51aa2ace4a17fc8b85a34916ff55a99d0fd3b5eacfb4c6"
+    },
+    {
+      "questionId": "nsmq_phy_r1_007",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns light, sound, frequency, wavelength, mirrors, lenses or refraction.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "8a57df5095b638ad13499ceca769dfc9455bebed14e5a8f5c1adf399e8902704"
+    },
+    {
+      "questionId": "nsmq_phy_r1_008",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns current, resistance, charge, circuits or magnetic flux.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "8f1e085f9f809d39808920d6d6bae74468dbee0fa742de574d93fa6abe23b265"
+    },
+    {
+      "questionId": "nsmq_phy_r1_009",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns light, sound, frequency, wavelength, mirrors, lenses or refraction.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "862fb4803d8509261703bb405d1ba3024d649eaa57a081fa45dc6bb8773a1864"
+    },
+    {
+      "questionId": "nsmq_phy_r1_010",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses force, motion, energy, pressure, momentum or vector mechanics.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "12716540ed84552b6bff70ef75dd2959c2d5ced835fd9dbe67693377de166582"
+    },
+    {
+      "questionId": "nsmq_phy_r1_011",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns light, sound, frequency, wavelength, mirrors, lenses or refraction.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "bca04355f4c676bc94e78cfd618eeade52373fbcf9cbecabaebe298329c7075b"
+    },
+    {
+      "questionId": "nsmq_phy_r1_012",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses force, motion, energy, pressure, momentum or vector mechanics.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "304d55f54451bcc31289062e70eab77390c6eeca4819816857ce4e190b88de03"
+    },
+    {
+      "questionId": "nsmq_phy_r1_013",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns current, resistance, charge, circuits or magnetic flux.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "d7719460cb0c4f639c6b37f937d7cc34d5b7dcc6ad015c2076c6d97b9081304b"
+    },
+    {
+      "questionId": "nsmq_phy_r1_014",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns light, sound, frequency, wavelength, mirrors, lenses or refraction.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "7e65e50e4563f101a243cd5ac574708d766fdab296eb61a95f7239a1898add5c"
+    },
+    {
+      "questionId": "nsmq_phy_r1_015",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses force, motion, energy, pressure, momentum or vector mechanics.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "786fd4b4c502e2fcc8e31be2a3a1801f4c7e414ca8e8660a0c671018ca4335e9"
+    },
+    {
+      "questionId": "nsmq_phy_r1_016",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses force, motion, energy, pressure, momentum or vector mechanics.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "bef6efc34b7f53e9f1ed8141f3b79926f941dd5da7bc23eafc8755c865cdc2a3"
+    },
+    {
+      "questionId": "nsmq_phy_r1_017",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns current, resistance, charge, circuits or magnetic flux.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "d607a72de13fed2e68880dccd7fd1816ef0ba28a519fdc9fc8d003df435377e6"
+    },
+    {
+      "questionId": "nsmq_phy_r1_018",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns light, sound, frequency, wavelength, mirrors, lenses or refraction.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "017fc547bb7a2c5edd16c2df10d620d541fcceca15bd9587168e5c09efaa1153"
+    },
+    {
+      "questionId": "nsmq_phy_r1_019",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses force, motion, energy, pressure, momentum or vector mechanics.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "b9645a63d029c6c5dfa6b168061cb2fdec4dd1062b53bf7c77e0ad4cc9d77cf2"
+    },
+    {
+      "questionId": "nsmq_phy_r1_020",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses force, motion, energy, pressure, momentum or vector mechanics.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "b0aa984e5e308973542c42a98f1ab05bf626b1e0c3dcd8e772866f7633a8a478"
+    },
+    {
+      "questionId": "nsmq_phy_r1_021",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses force, motion, energy, pressure, momentum or vector mechanics.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "f0e3bfeb2effc28a25e0812bd28c81dbf4bd83a8ac3ff768a95c042203cab9b7"
+    },
+    {
+      "questionId": "nsmq_phy_r1_022",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses force, motion, energy, pressure, momentum or vector mechanics.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "395243da4b80a92113f8c5dda52698d14406da9a0d5e3a2bec836674f61b2c76"
+    },
+    {
+      "questionId": "nsmq_phy_r1_023",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns light, sound, frequency, wavelength, mirrors, lenses or refraction.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "3049829584d4d27dda2e3d258fb5b102c9d98b336174cf8ebc3aaa33c60da75a"
+    },
+    {
+      "questionId": "nsmq_phy_r1_024",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses force, motion, energy, pressure, momentum or vector mechanics.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "249219f010a1028f16ab78d8b14ab37c6b6c202da9bec70bd3aed4dba305dd57"
+    },
+    {
+      "questionId": "nsmq_phy_r1_025",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns light, sound, frequency, wavelength, mirrors, lenses or refraction.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "2a57fd86d1868f5c080d580eda4b2b9789a4d1f84357225bd725977c8e79b434"
+    },
+    {
+      "questionId": "nsmq_phy_r1_026",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns current, resistance, charge, circuits or magnetic flux.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "07cc25cec4eeb83248ca9c644f6d36be928f51d4e76d347c901e5b0dea66d3ac"
+    },
+    {
+      "questionId": "nsmq_phy_r1_027",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns current, resistance, charge, circuits or magnetic flux.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "375e019a920bde2590c0558a59df740a6f5d7e746018a2b1b23768240d32e8fa"
+    },
+    {
+      "questionId": "nsmq_phy_r1_028",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns light, sound, frequency, wavelength, mirrors, lenses or refraction.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "d918e63678c00a7efe8b4a4bd8487f5bc1f695570760fda316e98d9eaefbd241"
+    },
+    {
+      "questionId": "nsmq_phy_r1_029",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns light, sound, frequency, wavelength, mirrors, lenses or refraction.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "e58f3206606568cc17792e3052797a7bd433fc21d97024e472d3e01c0d9c7c00"
+    },
+    {
+      "questionId": "nsmq_phy_r1_030",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "round_one",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns current, resistance, charge, circuits or magnetic flux.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "9ca768f3dc1340bc6ab961b4dd906a44efcac264c17766904e085863394e980a"
+    },
+    {
+      "questionId": "nsmq_phy_sr_001",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly asks for a mechanics quantity, law, unit or machine relation.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "901a0dc30b9ebf32d78c036ba8153856a2c237958d48ad3e0dad5bbbd487a325"
+    },
+    {
+      "questionId": "nsmq_phy_sr_002",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns sound, mirrors, wavelength, incidence or refraction.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "59e3460da7d88c5639ce6d8683b30c5c29d42952bd08bfffa7246b43d20bbd40"
+    },
+    {
+      "questionId": "nsmq_phy_sr_003",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly asks for a mechanics quantity, law, unit or machine relation.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "3fd77be97ee164769cb95bb199130bc1b914020dd9abbc8a9cff7792ea897565"
+    },
+    {
+      "questionId": "nsmq_phy_sr_004",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly asks for a mechanics quantity, law, unit or machine relation.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "0458d7bab3923ec06243e4996b5c329bd65176fd8e15ebda9bed5750319a61a3"
+    },
+    {
+      "questionId": "nsmq_phy_sr_005",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns resistance, capacitance, generation, charge, voltage or circuits.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "285591a5d3951a26c08e81b7f920fe4748e175e9b7bb7b0b847472e1a57b9e36"
+    },
+    {
+      "questionId": "nsmq_phy_sr_006",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly asks for a mechanics quantity, law, unit or machine relation.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "41a943d4a777ed8eceda84802ff56311515a3dd8e2f27f3554d5557ee443aa7d"
+    },
+    {
+      "questionId": "nsmq_phy_sr_007",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly asks for a mechanics quantity, law, unit or machine relation.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "6fb1ee8c3a6cc31be2b1848ae085b09494715118934ba79cd23dca7317da1037"
+    },
+    {
+      "questionId": "nsmq_phy_sr_008",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns sound, mirrors, wavelength, incidence or refraction.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "b1bc221fbe8b05efc3d0348a5db6232038714f837dc45392826dd4a1e53c07d2"
+    },
+    {
+      "questionId": "nsmq_phy_sr_009",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_thermodynamics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly converts or identifies temperature.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "7731d32f879cdc3993d3b5a97d6ced1915e680ec1752b4a6f618703381496c69"
+    },
+    {
+      "questionId": "nsmq_phy_sr_010",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly asks for a mechanics quantity, law, unit or machine relation.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "fce87194312ffa98a2e69ebe64c43ae3e45e1ab8f9163521fd072a5ae0c1b8f9"
+    },
+    {
+      "questionId": "nsmq_phy_sr_011",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_modern_physics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly identifies a subatomic particle.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "b5b79b6e5c1e95f093e51983079d5f2581b4c1791ea24529cc16c2e2f4a0a3c6"
+    },
+    {
+      "questionId": "nsmq_phy_sr_012",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns sound, mirrors, wavelength, incidence or refraction.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "a1ac6997416165f7aafb59354e9d2f30abcb26bef01021444bab2d1293ec116c"
+    },
+    {
+      "questionId": "nsmq_phy_sr_013",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_thermodynamics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly converts or identifies temperature.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "facba8fd302cf97f4c313f6f8d45328289f7d353ee1f454943661f714c3ace6b"
+    },
+    {
+      "questionId": "nsmq_phy_sr_014",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly asks for a mechanics quantity, law, unit or machine relation.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "230698a1f571c48cba715e70b59e4edad4a0bab02269dddadb2bbbed800053c0"
+    },
+    {
+      "questionId": "nsmq_phy_sr_015",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns sound, mirrors, wavelength, incidence or refraction.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "a9a1843e8d32e805b60610757886095a23880655bf9605dd0a8f611e9a071220"
+    },
+    {
+      "questionId": "nsmq_phy_sr_016",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns resistance, capacitance, generation, charge, voltage or circuits.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "cd206c3c37d2e66ca2e09daece83e8f69f7f4223d718cf4189ec82361c2cfcb3"
+    },
+    {
+      "questionId": "nsmq_phy_sr_017",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly asks for a mechanics quantity, law, unit or machine relation.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "543d976cb002e50a7da72ae229641180e0df90cadd5b4994a8243d81284243ca"
+    },
+    {
+      "questionId": "nsmq_phy_sr_018",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly asks for a mechanics quantity, law, unit or machine relation.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "10cf108cf3a987c654dfc1f1cdb1075e793cf269767aeeee93c5dce01366846c"
+    },
+    {
+      "questionId": "nsmq_phy_sr_019",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns resistance, capacitance, generation, charge, voltage or circuits.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "c4591b68bbf9a6ae30944fd5fd3754ee0d9eac9bfc2925ff0ede1ed350a96360"
+    },
+    {
+      "questionId": "nsmq_phy_sr_020",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly asks for a mechanics quantity, law, unit or machine relation.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "662ac99871649afec75b0d5e556518895839c2b531da41cebb39b0af735e30fd"
+    },
+    {
+      "questionId": "nsmq_phy_sr_021",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly asks for a mechanics quantity, law, unit or machine relation.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "c96d0a4bf6e6bc64ba8073eabef5823b0511c72bcbbbf8fa4aae28b60aa503cb"
+    },
+    {
+      "questionId": "nsmq_phy_sr_022",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns resistance, capacitance, generation, charge, voltage or circuits.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "9e3ab21661bc86234a62ecefcfe5e083a6cf48eeabf336a4f56625e96c734894"
+    },
+    {
+      "questionId": "nsmq_phy_sr_023",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns resistance, capacitance, generation, charge, voltage or circuits.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "79901728a43189ca32019c355fabef512721c1924a5dd6a2c8bd201671c4a8d0"
+    },
+    {
+      "questionId": "nsmq_phy_sr_024",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns resistance, capacitance, generation, charge, voltage or circuits.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "f4e01fadb149dd9cf9cdae3192eef11e2e17861a7d8c8cf77a227b486cceb2e3"
+    },
+    {
+      "questionId": "nsmq_phy_sr_025",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns sound, mirrors, wavelength, incidence or refraction.",
+      "provenance": "database/migrations/archive/041_nsmq_speed_race.sql",
+      "contentFingerprint": "f1dec504b17377dd4be883f564aaac28c43732bbc0e117c233890b8ea4543918"
+    },
+    {
+      "questionId": "q_speed_003",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_mechanics",
+      "classificationSource": "production-inventory-plus-base-seed-explicit-topic",
+      "evidence": "The preserved pre-squash base seed explicitly binds this exact subject/round/content row to topic_mechanics; the production read-only inventory confirms the same ID is currently null-topic.",
+      "provenance": "database/seeds/seed_base.sql",
+      "contentFingerprint": "8903117aa9b4c5c2bef0e1e1447308f0a95922567aec8d59f8e7f5e9002d7615"
+    },
+    {
+      "questionId": "nsmq_phy_tf_001",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns propagation, optics, wavelength, reflection or refraction.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "e2e4842744a0c35c703623760d0e558229b1fc3a23c45a7bedb3fe50f320379c"
+    },
+    {
+      "questionId": "nsmq_phy_tf_002",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns momentum, energy, gravity, vectors, machines, density or equilibrium.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "729a188c502b8ae78b40fe650a5ddbc1d0ae9a2a7c70e32cf0ea5e435abc5c1a"
+    },
+    {
+      "questionId": "nsmq_phy_tf_003",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns propagation, optics, wavelength, reflection or refraction.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "10eec7a989e43138462c4871f80b86a26fb89286beb4882188aa19088a6fa4f8"
+    },
+    {
+      "questionId": "nsmq_phy_tf_004",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns momentum, energy, gravity, vectors, machines, density or equilibrium.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "adf2671e300e6f6ad0ade6a4499f3ff4e897c0add84787b39f2acb7436f9502a"
+    },
+    {
+      "questionId": "nsmq_phy_tf_005",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns charge, circuits, transformers or current.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "83449e5218d052c81f7d2f3e91b2e3c7de31dda239ea10453ebe6878b4597511"
+    },
+    {
+      "questionId": "nsmq_phy_tf_006",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns charge, circuits, transformers or current.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "ec69276d8114ec27f591b0942972446526ce023a416c1c934b0c86b79d8a3104"
+    },
+    {
+      "questionId": "nsmq_phy_tf_007",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns momentum, energy, gravity, vectors, machines, density or equilibrium.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "7b835edd1c27e024492c62516113d74535c450d1bf2b825855a127bd1107a103"
+    },
+    {
+      "questionId": "nsmq_phy_tf_008",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns propagation, optics, wavelength, reflection or refraction.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "bd55c94d9f7c6fab4f0a9b5aa73f670705e2f3cbaf87eac7941bf7afeb44e760"
+    },
+    {
+      "questionId": "nsmq_phy_tf_009",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns propagation, optics, wavelength, reflection or refraction.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "ebb3425c8b782cdab9d79ef2594de622c00b5d3425402bdca30b6f7757dd759f"
+    },
+    {
+      "questionId": "nsmq_phy_tf_010",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns charge, circuits, transformers or current.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "6acf67ebe92276d4c4f7ad8bfe39823b52e1520fe79e545060217e21fcd66528"
+    },
+    {
+      "questionId": "nsmq_phy_tf_011",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns momentum, energy, gravity, vectors, machines, density or equilibrium.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "1ac224ff7da16bf8b18abcc0e005b67a7f453c6cf0d91afb9f6e2be2e5bb4de6"
+    },
+    {
+      "questionId": "nsmq_phy_tf_012",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns momentum, energy, gravity, vectors, machines, density or equilibrium.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "67c27cf9c86e1f1e1b3e38df308b0fd431c177f98954bbe85932498e56e2100c"
+    },
+    {
+      "questionId": "nsmq_phy_tf_013",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns momentum, energy, gravity, vectors, machines, density or equilibrium.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "8f157a2bd3f2430ade9333c82573ea815476146372d2e460f607c01200e76aaf"
+    },
+    {
+      "questionId": "nsmq_phy_tf_014",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns propagation, optics, wavelength, reflection or refraction.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "69466d90a9c63733c9c4d722335458ee00ce1aec456e8ed86ac715a660dafbf9"
+    },
+    {
+      "questionId": "nsmq_phy_tf_015",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_modern_physics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly compares ionising radiation.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "9db1d4260ffda5df2c1858098acd3f69501b5f68b740d23c4365739a1abfbe27"
+    },
+    {
+      "questionId": "nsmq_phy_tf_016",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns charge, circuits, transformers or current.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "b79db1e3791e389b94bbe482dd6264e238591ad9148ad39509e89f7066483c8f"
+    },
+    {
+      "questionId": "nsmq_phy_tf_017",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns momentum, energy, gravity, vectors, machines, density or equilibrium.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "f080387bef9daee3bc224da8425ceb2250999f60f7c7fde6956b636c68679842"
+    },
+    {
+      "questionId": "nsmq_phy_tf_018",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_mechanics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns momentum, energy, gravity, vectors, machines, density or equilibrium.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "c1e1dfcc1f5586f3f8ed6e36f9aa0eadd2d6f0b2654a1ff4e1c3b21915515a2c"
+    },
+    {
+      "questionId": "nsmq_phy_tf_019",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_waves",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns propagation, optics, wavelength, reflection or refraction.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "473bb486f170bc19a0b4604736de0c70cf3eb6e84c79156942917f63fdee8bd7"
+    },
+    {
+      "questionId": "nsmq_phy_tf_020",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "true_false",
+      "topicId": "topic_electricity",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns charge, circuits, transformers or current.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "57dd4ab821a3cef295d46bd3f52f6568ae35a35b5d153a9f105a5e1f3d0f4abd"
+    }
+  ]
+}

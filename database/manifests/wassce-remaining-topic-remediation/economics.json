@@ -1,0 +1,203 @@
+{
+  "release": "wassce-remaining-null-topic-audit-2026-08-26",
+  "subjectId": "subj_wassce_economics",
+  "subjectName": "Economics",
+  "expectedNullTopicCount": 115,
+  "mappedQuestionCount": 115,
+  "exceptionCount": 0,
+  "mappingGroups": [
+    {
+      "topicId": "topic_eco_intro",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed scarcity, choice, opportunity cost, factors of production and economic-system stems.",
+      "questionIds": [
+        "q_eco_2023_001",
+        "q_eco_2023_002",
+        "q_eco_2023_003",
+        "q_eco_2023_004",
+        "q_eco_2023_005",
+        "q_eco_2023_006",
+        "q_eco_2023_007",
+        "q_eco_2023_008",
+        "q_eco_2023_009",
+        "q_eco_2023_010",
+        "q_eco_2024_001",
+        "q_eco_2024_002",
+        "q_eco_2024_003",
+        "q_eco_2024_004",
+        "q_eco_2024_005",
+        "q_eco_2024_006",
+        "q_eco_2024_007",
+        "q_eco_2024_008",
+        "q_eco_2024_009",
+        "q_eco_2024_010",
+        "q_econ_basic_001",
+        "q_econ_basic_002",
+        "q_econ_basic_003",
+        "q_econ_basic_004",
+        "q_econ_basic_005"
+      ]
+    },
+    {
+      "topicId": "topic_eco_demand",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed demand, supply, equilibrium, price-control, complements and substitutes stems.",
+      "questionIds": [
+        "q_eco_2023_011",
+        "q_eco_2023_012",
+        "q_eco_2023_014",
+        "q_eco_2023_015",
+        "q_eco_2023_016",
+        "q_eco_2023_018",
+        "q_eco_2023_019",
+        "q_eco_2024_011",
+        "q_eco_2024_012",
+        "q_eco_2024_013",
+        "q_eco_2024_014",
+        "q_eco_2024_018",
+        "q_eco_2024_019",
+        "q_eco_2024_020",
+        "q_econ_ds_001",
+        "q_econ_ds_002",
+        "q_econ_ds_003",
+        "q_econ_ds_004"
+      ]
+    },
+    {
+      "topicId": "topic_eco_elasticity",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed demand/supply elasticity and responsiveness stems.",
+      "questionIds": [
+        "q_eco_2023_013",
+        "q_eco_2023_017",
+        "q_eco_2023_020",
+        "q_eco_2024_015",
+        "q_eco_2024_016",
+        "q_eco_2024_017",
+        "q_econ_ds_005"
+      ]
+    },
+    {
+      "topicId": "topic_eco_production",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed marginal returns, division of labour, short-run and economies-of-scale stems.",
+      "questionIds": [
+        "q_eco_2024_021",
+        "q_eco_2024_025",
+        "q_eco_2024_026",
+        "q_eco_2024_028"
+      ]
+    },
+    {
+      "topicId": "topic_eco_costs",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed fixed, average and marginal cost stems.",
+      "questionIds": [
+        "q_eco_2024_022",
+        "q_eco_2024_023",
+        "q_eco_2024_024",
+        "q_eco_2024_027"
+      ]
+    },
+    {
+      "topicId": "topic_eco_markets",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed perfect competition, monopoly, oligopoly, cartel and price-discrimination blocks.",
+      "questionIds": [
+        "q_eco_2023_021",
+        "q_eco_2023_022",
+        "q_eco_2023_023",
+        "q_eco_2023_024",
+        "q_eco_2023_025",
+        "q_eco_2023_026",
+        "q_eco_2023_027",
+        "q_eco_2023_028",
+        "q_eco_2024_029",
+        "q_eco_2024_030",
+        "q_eco_2024_031",
+        "q_eco_2024_032",
+        "q_eco_2024_033",
+        "q_eco_2024_034",
+        "q_eco_2024_035"
+      ]
+    },
+    {
+      "topicId": "topic_eco_money",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed money, banking, inflation and monetary-policy stems.",
+      "questionIds": [
+        "q_eco_2023_029",
+        "q_eco_2023_030",
+        "q_eco_2023_031",
+        "q_eco_2023_032",
+        "q_eco_2023_033",
+        "q_eco_2023_034",
+        "q_eco_2024_036",
+        "q_eco_2024_037",
+        "q_eco_2024_038",
+        "q_eco_2024_039",
+        "q_eco_2024_042",
+        "q_econ_money_001",
+        "q_econ_money_002",
+        "q_econ_money_003",
+        "q_econ_money_004",
+        "q_econ_money_005"
+      ]
+    },
+    {
+      "topicId": "topic_eco_national",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed GDP and multiplier stems that directly match national-income coverage.",
+      "questionIds": [
+        "q_eco_2023_042",
+        "q_eco_2024_040",
+        "q_eco_2024_041"
+      ]
+    },
+    {
+      "topicId": "topic_eco_trade",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed comparative advantage, tariffs, balance of trade, exchange rates, ECOWAS and FDI stems.",
+      "questionIds": [
+        "q_eco_2023_035",
+        "q_eco_2023_043",
+        "q_eco_2023_044",
+        "q_eco_2023_045",
+        "q_eco_2023_046",
+        "q_eco_2023_047",
+        "q_eco_2023_048",
+        "q_eco_2023_049",
+        "q_eco_2023_050",
+        "q_eco_2024_043",
+        "q_eco_2024_044",
+        "q_eco_2024_045",
+        "q_eco_2024_046",
+        "q_eco_2024_047",
+        "q_eco_2024_050"
+      ]
+    },
+    {
+      "topicId": "topic_eco_public_finance",
+      "evidenceBasis": "official-curriculum-and-reviewed-question-semantics",
+      "evidence": "Official WAEC Economics topic 17 covers public finance; reviewed rows assess fiscal policy, taxation, public goods, budget deficits, externalities and privatization.",
+      "questionIds": [
+        "q_eco_2023_036",
+        "q_eco_2023_037",
+        "q_eco_2023_038",
+        "q_eco_2023_039",
+        "q_eco_2023_040",
+        "q_eco_2023_041"
+      ]
+    },
+    {
+      "topicId": "topic_eco_development",
+      "evidenceBasis": "official-curriculum-and-reviewed-question-semantics",
+      "evidence": "Official WAEC Economics topic 18 covers economic development and planning; reviewed rows assess development versus growth and the Human Development Index.",
+      "questionIds": [
+        "q_eco_2024_048",
+        "q_eco_2024_049"
+      ]
+    }
+  ],
+  "reviewedExceptions": []
+}

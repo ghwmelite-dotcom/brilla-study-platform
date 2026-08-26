@@ -1,0 +1,817 @@
+{
+  "release": "cambridge-topic-taxonomy-proposal-2026-08-26",
+  "status": "proposal-only-no-migration",
+  "policy": "Add only bounded same-subject topics named by an official current Cambridge syllabus. Do not use generic General Reasoning, Additional Pure or Ecology buckets to conceal out-of-syllabus rows.",
+  "baseline": {
+    "sourceQuestionCount": 455,
+    "mappedQuestionCount": 401,
+    "exceptionCount": 54
+  },
+  "proposal": {
+    "topicCount": 15,
+    "mappingCount": 49,
+    "readyAfterTaxonomyApprovalCount": 48,
+    "contentGatedMappingCount": 1,
+    "retainedExceptionCount": 5,
+    "projectedMappedAfterApprovalAndCorrections": 450,
+    "projectedExceptionCount": 5
+  },
+  "familyCounts": {
+    "cambridge-igcse": {
+      "sourceQuestions": 225,
+      "baselineMapped": 203,
+      "proposedMappings": 22,
+      "retainedExceptions": 0,
+      "projectedMappedAfterApprovalAndCorrections": 225
+    },
+    "cambridge-a-level": {
+      "sourceQuestions": 230,
+      "baselineMapped": 198,
+      "proposedMappings": 27,
+      "retainedExceptions": 5,
+      "projectedMappedAfterApprovalAndCorrections": 225
+    }
+  },
+  "subjectCounts": {
+    "subj_alevel_biology": {
+      "proposedMappings": 3,
+      "retainedExceptions": 2
+    },
+    "subj_alevel_further_math": {
+      "proposedMappings": 15,
+      "retainedExceptions": 3
+    },
+    "subj_alevel_math": {
+      "proposedMappings": 2,
+      "retainedExceptions": 0
+    },
+    "subj_alevel_physics": {
+      "proposedMappings": 7,
+      "retainedExceptions": 0
+    },
+    "subj_igcse_add_math": {
+      "proposedMappings": 8,
+      "retainedExceptions": 0
+    },
+    "subj_igcse_biology": {
+      "proposedMappings": 8,
+      "retainedExceptions": 0
+    },
+    "subj_igcse_chemistry": {
+      "proposedMappings": 6,
+      "retainedExceptions": 0
+    }
+  },
+  "sourceDocuments": {
+    "igcseChemistry": {
+      "title": "Cambridge IGCSE Chemistry 0620 syllabus for 2026, 2027 and 2028",
+      "url": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf"
+    },
+    "igcseBiology": {
+      "title": "Cambridge IGCSE Biology 0610 syllabus for 2026, 2027 and 2028",
+      "url": "https://www.cambridgeinternational.org/Images/697203-2026-2028-syllabus.pdf"
+    },
+    "igcseAdditionalMathematics": {
+      "title": "Cambridge IGCSE Additional Mathematics 0606 syllabus for 2025, 2026 and 2027",
+      "url": "https://www.cambridgeinternational.org/Images/662470-2025-2027-syllabus.pdf"
+    },
+    "alevelPhysics": {
+      "title": "Cambridge International AS & A Level Physics 9702 syllabus for 2025, 2026 and 2027",
+      "url": "https://www.cambridgeinternational.org/Images/664565-2025-2027-syllabus.pdf"
+    },
+    "alevelBiology": {
+      "title": "Cambridge International AS & A Level Biology 9700 syllabus for 2025, 2026 and 2027",
+      "url": "https://www.cambridgeinternational.org/Images/664560-2025-2027-syllabus.pdf"
+    },
+    "alevelMathematics": {
+      "title": "Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027",
+      "url": "https://www.cambridgeinternational.org/Images/697427-2026-2027-syllabus.pdf"
+    },
+    "alevelFurtherMathematics": {
+      "title": "Cambridge International AS & A Level Further Mathematics 9231 syllabus for 2026 and 2027",
+      "url": "https://www.cambridgeinternational.org/Images/697357-2026-2027-syllabus.pdf"
+    }
+  },
+  "proposedTopics": [
+    {
+      "proposedTopicId": "topic_igcse_chem_electrolysis",
+      "subjectId": "subj_igcse_chemistry",
+      "examFamily": "cambridge-igcse",
+      "title": "Electrolysis",
+      "syllabusCode": "0620",
+      "syllabusSection": "4.1 Electrolysis",
+      "sourceDocument": "igcseChemistry",
+      "rationale": "The official Chemistry syllabus names Electrolysis as a discrete content section, so these electrode-product questions do not require a broader inferred label.",
+      "questionIds": [
+        "q_igcse_chem_008",
+        "q_igcse_chem_031",
+        "q_igcse_chem_032"
+      ],
+      "contentGateQuestionIds": [],
+      "status": "taxonomy-proposed"
+    },
+    {
+      "proposedTopicId": "topic_igcse_chem_analysis",
+      "subjectId": "subj_igcse_chemistry",
+      "examFamily": "cambridge-igcse",
+      "title": "Experimental Techniques and Chemical Analysis",
+      "syllabusCode": "0620",
+      "syllabusSection": "12 Experimental techniques and chemical analysis",
+      "sourceDocument": "igcseChemistry",
+      "rationale": "The official Chemistry syllabus includes qualitative analysis and tests for gases in this section.",
+      "questionIds": [
+        "q_igcse_chem_006",
+        "q_igcse_chem_020",
+        "q_igcse_chem_027"
+      ],
+      "contentGateQuestionIds": [],
+      "status": "taxonomy-proposed"
+    },
+    {
+      "proposedTopicId": "topic_igcse_bio_cell_transport",
+      "subjectId": "subj_igcse_biology",
+      "examFamily": "cambridge-igcse",
+      "title": "Movement into and out of Cells",
+      "syllabusCode": "0610",
+      "syllabusSection": "3 Movement into and out of cells",
+      "sourceDocument": "igcseBiology",
+      "rationale": "Diffusion and osmosis are expressly grouped under the official Movement into and out of cells section.",
+      "questionIds": [
+        "q_igcse_bio_007",
+        "q_igcse_bio_016"
+      ],
+      "contentGateQuestionIds": [],
+      "status": "taxonomy-proposed"
+    },
+    {
+      "proposedTopicId": "topic_igcse_bio_excretion",
+      "subjectId": "subj_igcse_biology",
+      "examFamily": "cambridge-igcse",
+      "title": "Excretion in Humans",
+      "syllabusCode": "0610",
+      "syllabusSection": "13 Excretion in humans",
+      "sourceDocument": "igcseBiology",
+      "rationale": "The official Biology syllabus has a discrete Excretion in humans section covering kidney and urea questions.",
+      "questionIds": [
+        "q_igcse_bio_031",
+        "q_igcse_bio_032",
+        "q_igcse_bio_033"
+      ],
+      "contentGateQuestionIds": [],
+      "status": "taxonomy-proposed"
+    },
+    {
+      "proposedTopicId": "topic_igcse_bio_coordination",
+      "subjectId": "subj_igcse_biology",
+      "examFamily": "cambridge-igcse",
+      "title": "Coordination and Response",
+      "syllabusCode": "0610",
+      "syllabusSection": "14 Coordination and response",
+      "sourceDocument": "igcseBiology",
+      "rationale": "The official top-level section includes nervous control, hormones and homeostasis, matching all three reviewed rows without inventing narrower local topics.",
+      "questionIds": [
+        "q_igcse_bio_022",
+        "q_igcse_bio_034",
+        "q_igcse_bio_035"
+      ],
+      "contentGateQuestionIds": [],
+      "status": "taxonomy-proposed"
+    },
+    {
+      "proposedTopicId": "topic_igcse_addmath_series",
+      "subjectId": "subj_igcse_add_math",
+      "examFamily": "cambridge-igcse",
+      "title": "Series",
+      "syllabusCode": "0606",
+      "syllabusSection": "12 Series",
+      "sourceDocument": "igcseAdditionalMathematics",
+      "rationale": "The official Series section contains arithmetic and geometric progressions and the binomial theorem assessed by this contiguous source block.",
+      "questionIds": [
+        "q_igcse_addmath_042",
+        "q_igcse_addmath_043",
+        "q_igcse_addmath_044",
+        "q_igcse_addmath_045",
+        "q_igcse_addmath_046",
+        "q_igcse_addmath_047",
+        "q_igcse_addmath_048",
+        "q_igcse_addmath_049"
+      ],
+      "contentGateQuestionIds": [],
+      "status": "taxonomy-proposed"
+    },
+    {
+      "proposedTopicId": "topic_alevel_phys_medical",
+      "subjectId": "subj_alevel_physics",
+      "examFamily": "cambridge-a-level",
+      "title": "Medical Physics",
+      "syllabusCode": "9702",
+      "syllabusSection": "24 Medical physics",
+      "sourceDocument": "alevelPhysics",
+      "rationale": "The official Physics syllabus names Medical physics as a discrete A Level topic.",
+      "questionIds": [
+        "q_alevel_phy_029",
+        "q_alevel_phy_030"
+      ],
+      "contentGateQuestionIds": [],
+      "status": "taxonomy-proposed"
+    },
+    {
+      "proposedTopicId": "topic_alevel_phys_particles",
+      "subjectId": "subj_alevel_physics",
+      "examFamily": "cambridge-a-level",
+      "title": "Particle Physics",
+      "syllabusCode": "9702",
+      "syllabusSection": "11 Particle physics",
+      "sourceDocument": "alevelPhysics",
+      "rationale": "The official Physics syllabus names Particle physics as a discrete content topic matching the particle-model source block.",
+      "questionIds": [
+        "q_alevel_phy_036",
+        "q_alevel_phy_037",
+        "q_alevel_phy_038",
+        "q_alevel_phy_039",
+        "q_alevel_phy_040"
+      ],
+      "contentGateQuestionIds": [],
+      "status": "taxonomy-proposed"
+    },
+    {
+      "proposedTopicId": "topic_alevel_bio_immunity",
+      "subjectId": "subj_alevel_biology",
+      "examFamily": "cambridge-a-level",
+      "title": "Immunity",
+      "syllabusCode": "9700",
+      "syllabusSection": "11 Immunity",
+      "sourceDocument": "alevelBiology",
+      "rationale": "The official Biology syllabus expressly covers immune responses, antigens, memory cells and vaccination under Immunity.",
+      "questionIds": [
+        "q_alevel_bio_025",
+        "q_alevel_bio_026",
+        "q_alevel_bio_027"
+      ],
+      "contentGateQuestionIds": [],
+      "status": "taxonomy-proposed"
+    },
+    {
+      "proposedTopicId": "topic_alevel_math_diffeq",
+      "subjectId": "subj_alevel_math",
+      "examFamily": "cambridge-a-level",
+      "title": "Differential Equations",
+      "syllabusCode": "9709",
+      "syllabusSection": "3.8 Differential equations",
+      "sourceDocument": "alevelMathematics",
+      "rationale": "The official Mathematics syllabus defines Differential equations as a discrete Pure Mathematics 3 section.",
+      "questionIds": [
+        "q_alevel_math_031",
+        "q_alevel_math_032"
+      ],
+      "contentGateQuestionIds": [],
+      "status": "taxonomy-proposed"
+    },
+    {
+      "proposedTopicId": "topic_alevel_fmath_summation",
+      "subjectId": "subj_alevel_further_math",
+      "examFamily": "cambridge-a-level",
+      "title": "Summation of Series",
+      "syllabusCode": "9231",
+      "syllabusSection": "1.3 Summation of series",
+      "sourceDocument": "alevelFurtherMathematics",
+      "rationale": "The official Further Mathematics syllabus separately names Summation of series.",
+      "questionIds": [
+        "q_alevel_fm_038",
+        "q_alevel_fm_039",
+        "q_alevel_fm_040",
+        "q_alevel_fm_041"
+      ],
+      "contentGateQuestionIds": [],
+      "status": "taxonomy-proposed"
+    },
+    {
+      "proposedTopicId": "topic_alevel_fmath_induction",
+      "subjectId": "subj_alevel_further_math",
+      "examFamily": "cambridge-a-level",
+      "title": "Proof by Induction",
+      "syllabusCode": "9231",
+      "syllabusSection": "1.7 Proof by induction",
+      "sourceDocument": "alevelFurtherMathematics",
+      "rationale": "The official Further Mathematics syllabus separately names Proof by induction.",
+      "questionIds": [
+        "q_alevel_fm_042",
+        "q_alevel_fm_043"
+      ],
+      "contentGateQuestionIds": [],
+      "status": "taxonomy-proposed"
+    },
+    {
+      "proposedTopicId": "topic_alevel_fmath_polynomial_roots",
+      "subjectId": "subj_alevel_further_math",
+      "examFamily": "cambridge-a-level",
+      "title": "Roots of Polynomial Equations",
+      "syllabusCode": "9231",
+      "syllabusSection": "1.1 Roots of polynomial equations",
+      "sourceDocument": "alevelFurtherMathematics",
+      "rationale": "The official Further Mathematics syllabus separately names Roots of polynomial equations.",
+      "questionIds": [
+        "q_alevel_fm_044",
+        "q_alevel_fm_045",
+        "q_alevel_fm_046",
+        "q_alevel_fm_047"
+      ],
+      "contentGateQuestionIds": [],
+      "status": "taxonomy-proposed"
+    },
+    {
+      "proposedTopicId": "topic_alevel_fmath_vectors",
+      "subjectId": "subj_alevel_further_math",
+      "examFamily": "cambridge-a-level",
+      "title": "Vectors",
+      "syllabusCode": "9231",
+      "syllabusSection": "1.6 Vectors",
+      "sourceDocument": "alevelFurtherMathematics",
+      "rationale": "The official Vectors section covers vector products, planes and distances; q_alevel_fm_050 remains content-gated until its answer is corrected.",
+      "questionIds": [
+        "q_alevel_fm_048",
+        "q_alevel_fm_049",
+        "q_alevel_fm_050"
+      ],
+      "contentGateQuestionIds": [
+        "q_alevel_fm_050"
+      ],
+      "status": "taxonomy-proposed-content-gated"
+    },
+    {
+      "proposedTopicId": "topic_alevel_fmath_integration",
+      "subjectId": "subj_alevel_further_math",
+      "examFamily": "cambridge-a-level",
+      "title": "Integration",
+      "syllabusCode": "9231",
+      "syllabusSection": "2.4 Integration",
+      "sourceDocument": "alevelFurtherMathematics",
+      "rationale": "The official Integration section explicitly covers arc lengths and reduction formulae.",
+      "questionIds": [
+        "q_alevel_fm_054",
+        "q_alevel_fm_055"
+      ],
+      "contentGateQuestionIds": [],
+      "status": "taxonomy-proposed"
+    }
+  ],
+  "proposedMappings": [
+    {
+      "questionId": "q_alevel_bio_025",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_biology",
+      "proposedTopicId": "topic_alevel_bio_immunity",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_bio_026",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_biology",
+      "proposedTopicId": "topic_alevel_bio_immunity",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_bio_027",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_biology",
+      "proposedTopicId": "topic_alevel_bio_immunity",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_fm_038",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_summation",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_fm_039",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_summation",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_fm_040",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_summation",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_fm_041",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_summation",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_fm_042",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_induction",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_fm_043",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_induction",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_fm_044",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_polynomial_roots",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_fm_045",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_polynomial_roots",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_fm_046",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_polynomial_roots",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_fm_047",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_polynomial_roots",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_fm_048",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_vectors",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_fm_049",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_vectors",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_fm_050",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_vectors",
+      "status": "blocked-content-correction"
+    },
+    {
+      "questionId": "q_alevel_fm_054",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_integration",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_fm_055",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "proposedTopicId": "topic_alevel_fmath_integration",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_math_031",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_math",
+      "proposedTopicId": "topic_alevel_math_diffeq",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_math_032",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_math",
+      "proposedTopicId": "topic_alevel_math_diffeq",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_phy_029",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_physics",
+      "proposedTopicId": "topic_alevel_phys_medical",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_phy_030",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_physics",
+      "proposedTopicId": "topic_alevel_phys_medical",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_phy_036",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_physics",
+      "proposedTopicId": "topic_alevel_phys_particles",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_phy_037",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_physics",
+      "proposedTopicId": "topic_alevel_phys_particles",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_phy_038",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_physics",
+      "proposedTopicId": "topic_alevel_phys_particles",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_phy_039",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_physics",
+      "proposedTopicId": "topic_alevel_phys_particles",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_alevel_phy_040",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_physics",
+      "proposedTopicId": "topic_alevel_phys_particles",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_addmath_042",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_add_math",
+      "proposedTopicId": "topic_igcse_addmath_series",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_addmath_043",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_add_math",
+      "proposedTopicId": "topic_igcse_addmath_series",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_addmath_044",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_add_math",
+      "proposedTopicId": "topic_igcse_addmath_series",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_addmath_045",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_add_math",
+      "proposedTopicId": "topic_igcse_addmath_series",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_addmath_046",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_add_math",
+      "proposedTopicId": "topic_igcse_addmath_series",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_addmath_047",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_add_math",
+      "proposedTopicId": "topic_igcse_addmath_series",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_addmath_048",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_add_math",
+      "proposedTopicId": "topic_igcse_addmath_series",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_addmath_049",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_add_math",
+      "proposedTopicId": "topic_igcse_addmath_series",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_bio_007",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_biology",
+      "proposedTopicId": "topic_igcse_bio_cell_transport",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_bio_016",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_biology",
+      "proposedTopicId": "topic_igcse_bio_cell_transport",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_bio_022",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_biology",
+      "proposedTopicId": "topic_igcse_bio_coordination",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_bio_031",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_biology",
+      "proposedTopicId": "topic_igcse_bio_excretion",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_bio_032",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_biology",
+      "proposedTopicId": "topic_igcse_bio_excretion",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_bio_033",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_biology",
+      "proposedTopicId": "topic_igcse_bio_excretion",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_bio_034",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_biology",
+      "proposedTopicId": "topic_igcse_bio_coordination",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_bio_035",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_biology",
+      "proposedTopicId": "topic_igcse_bio_coordination",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_chem_006",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_chemistry",
+      "proposedTopicId": "topic_igcse_chem_analysis",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_chem_008",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_chemistry",
+      "proposedTopicId": "topic_igcse_chem_electrolysis",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_chem_020",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_chemistry",
+      "proposedTopicId": "topic_igcse_chem_analysis",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_chem_027",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_chemistry",
+      "proposedTopicId": "topic_igcse_chem_analysis",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_chem_031",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_chemistry",
+      "proposedTopicId": "topic_igcse_chem_electrolysis",
+      "status": "ready-after-taxonomy-approval"
+    },
+    {
+      "questionId": "q_igcse_chem_032",
+      "examFamily": "cambridge-igcse",
+      "subjectId": "subj_igcse_chemistry",
+      "proposedTopicId": "topic_igcse_chem_electrolysis",
+      "status": "ready-after-taxonomy-approval"
+    }
+  ],
+  "retainedExceptions": [
+    {
+      "questionId": "q_alevel_bio_028",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_biology",
+      "sourceFile": "database/migrations/archive/083_alevel_biology_questions.sql",
+      "sourceSection": "Ecology",
+      "reasonCode": "taxonomy-gap",
+      "missingConcept": "ecosystem energy transfer and nutrient cycles",
+      "reason": "The reviewed question assesses ecosystem energy transfer and nutrient cycles, but the current same-subject topic taxonomy has no matching topic. Assigning a broader topic would be a guess.",
+      "requiredTaxonomyAction": "Add and review a same-subject topic covering ecosystem energy transfer and nutrient cycles before mapping these rows.",
+      "reviewStatus": "reviewed-retained-exception",
+      "classification": "out-of-current-syllabus-general-biology",
+      "sourceDocument": "alevelBiology",
+      "rationale": "Trophic-level energy transfer is general ecology content but is not a named content point in the current 9700 topic overview; creating a broad Ecology topic would overstate current-syllabus alignment."
+    },
+    {
+      "questionId": "q_alevel_bio_029",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_biology",
+      "sourceFile": "database/migrations/archive/083_alevel_biology_questions.sql",
+      "sourceSection": "Ecology",
+      "reasonCode": "taxonomy-gap",
+      "missingConcept": "ecosystem energy transfer and nutrient cycles",
+      "reason": "The reviewed question assesses ecosystem energy transfer and nutrient cycles, but the current same-subject topic taxonomy has no matching topic. Assigning a broader topic would be a guess.",
+      "requiredTaxonomyAction": "Add and review a same-subject topic covering ecosystem energy transfer and nutrient cycles before mapping these rows.",
+      "reviewStatus": "reviewed-retained-exception",
+      "classification": "out-of-current-syllabus-general-biology",
+      "sourceDocument": "alevelBiology",
+      "rationale": "The nitrogen cycle is general ecology content but is not a named content point in the current 9700 topic overview; no bounded current-syllabus topic supports it."
+    },
+    {
+      "questionId": "q_alevel_fm_051",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "sourceFile": "database/migrations/archive/084_alevel_further_math_questions.sql",
+      "sourceSection": "Additional Questions",
+      "reasonCode": "taxonomy-gap",
+      "missingConcept": "Maclaurin series and advanced integration techniques",
+      "reason": "The reviewed question assesses Maclaurin series and advanced integration techniques, but the current same-subject topic taxonomy has no matching topic. Assigning a broader topic would be a guess.",
+      "requiredTaxonomyAction": "Add and review a same-subject topic covering Maclaurin series and advanced integration techniques before mapping these rows.",
+      "reviewStatus": "reviewed-retained-exception",
+      "classification": "out-of-current-syllabus-additional-pure",
+      "sourceDocument": "alevelFurtherMathematics",
+      "rationale": "Maclaurin or Taylor series are not listed in the current 9231 content sections. A generic Additional Pure topic would not be an official syllabus topic."
+    },
+    {
+      "questionId": "q_alevel_fm_052",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "sourceFile": "database/migrations/archive/084_alevel_further_math_questions.sql",
+      "sourceSection": "Additional Questions",
+      "reasonCode": "taxonomy-gap",
+      "missingConcept": "Maclaurin series and advanced integration techniques",
+      "reason": "The reviewed question assesses Maclaurin series and advanced integration techniques, but the current same-subject topic taxonomy has no matching topic. Assigning a broader topic would be a guess.",
+      "requiredTaxonomyAction": "Add and review a same-subject topic covering Maclaurin series and advanced integration techniques before mapping these rows.",
+      "reviewStatus": "reviewed-retained-exception",
+      "classification": "out-of-current-syllabus-additional-pure",
+      "sourceDocument": "alevelFurtherMathematics",
+      "rationale": "Maclaurin or Taylor series are not listed in the current 9231 content sections. A generic Additional Pure topic would not be an official syllabus topic."
+    },
+    {
+      "questionId": "q_alevel_fm_053",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "sourceFile": "database/migrations/archive/084_alevel_further_math_questions.sql",
+      "sourceSection": "Additional Questions",
+      "reasonCode": "taxonomy-gap",
+      "missingConcept": "Maclaurin series and advanced integration techniques",
+      "reason": "The reviewed question assesses Maclaurin series and advanced integration techniques, but the current same-subject topic taxonomy has no matching topic. Assigning a broader topic would be a guess.",
+      "requiredTaxonomyAction": "Add and review a same-subject topic covering Maclaurin series and advanced integration techniques before mapping these rows.",
+      "reviewStatus": "reviewed-retained-exception",
+      "classification": "out-of-current-syllabus-additional-pure",
+      "sourceDocument": "alevelFurtherMathematics",
+      "rationale": "Improper integration with an infinite limit is not specified in the current 9231 Integration section, so this row remains supplemental rather than being forced into the official topic."
+    }
+  ],
+  "contentCorrectionProposals": [
+    {
+      "questionId": "q_alevel_fm_050",
+      "sourceFile": "database/migrations/archive/084_alevel_further_math_questions.sql",
+      "defect": "incorrect-correct-answer",
+      "mappingGate": "topic_alevel_fmath_vectors",
+      "before": {
+        "correctAnswer": "1 unit",
+        "explanation": "d = |2(1) + 2(2) + 1(3) - 10|/√(4+4+1) = |2 + 4 + 3 - 10|/3 = |-1|/3 = 1/3... Actually: d = |9-10|/3 = 1/3"
+      },
+      "after": {
+        "correctAnswer": "1/3 unit",
+        "explanation": "For 2x + 2y + z - 10 = 0, d = |2(1) + 2(2) + 3 - 10|/√(2² + 2² + 1²) = |9 - 10|/3 = 1/3 unit."
+      },
+      "proof": "The point-to-plane distance formula gives |Ax0 + By0 + Cz0 + D|/√(A²+B²+C²) = |2+4+3-10|/√9 = 1/3, not 1.",
+      "status": "correction-proposed-not-applied"
+    },
+    {
+      "questionId": "q_alevel_fm_051",
+      "sourceFile": "database/migrations/archive/084_alevel_further_math_questions.sql",
+      "defect": "duplicate-equivalent-options",
+      "mappingGate": null,
+      "before": {
+        "optionA": "A. 1 + x + x²/2 + x³/6",
+        "optionD": "D. 1 + x + x²/2! + x³/3!",
+        "correctAnswer": "A"
+      },
+      "after": {
+        "optionA": "A. 1 + x + x²/2 + x³/6",
+        "optionD": "D. 1 + x + x²/2 + x³/3",
+        "correctAnswer": "A",
+        "explanation": "Since eˣ = Σ(xⁿ/n!), its expansion through x³ is 1 + x + x²/2! + x³/3! = 1 + x + x²/2 + x³/6."
+      },
+      "proof": "The original D is identical to A because 2! = 2 and 3! = 6. Replacing only D with a cubic coefficient of 1/3 restores one unambiguous correct option while preserving A.",
+      "status": "correction-proposed-not-applied"
+    }
+  ]
+}
