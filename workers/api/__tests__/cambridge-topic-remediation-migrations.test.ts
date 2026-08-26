@@ -58,7 +58,9 @@ describe("Cambridge topic remediation migrations 271-275", () => {
         expect(Buffer.byteLength(content, "utf8")).toBeLessThan(19_500);
         expect(content).not.toContain("CREATE TEMP VIEW");
         expect(content).not.toContain("DROP VIEW _sr");
-        expect(content).toContain("CREATE TEMP TABLE _sr AS SELECT");
+        expect(content).not.toContain("CREATE TEMP TABLE _sr AS SELECT");
+        expect(content).toContain("CREATE TEMP TABLE _sr (id TEXT,subject_id TEXT,topic_id TEXT,question_text TEXT,question_type TEXT,options TEXT,correct_answer TEXT,explanation TEXT,difficulty TEXT,points INTEGER,marks INTEGER,time_limit INTEGER);");
+        expect(content).toContain("INSERT INTO _sr (id,subject_id,topic_id,question_text,question_type,options,correct_answer,explanation,difficulty,points,marks,time_limit) SELECT id,subject_id,topic_id,question_text,question_type,options,correct_answer,explanation,difficulty,points,marks,time_limit FROM questions WHERE ");
         expect(content).toContain("DROP TABLE _sr");
       }
     }

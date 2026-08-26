@@ -147,10 +147,12 @@ function mapTable(name, rows) {
   for (const row of rows) { const ids = groups.get(row.topicId) ?? []; ids.push(row.questionId); groups.set(row.topicId, ids); }
   return `CREATE TEMP TABLE ${name}(question_id TEXT PRIMARY KEY,topic_id TEXT NOT NULL);${[...groups].map(([topicId, questionIds]) => `INSERT INTO ${name} SELECT column1,${sql(topicId)} FROM(VALUES${questionIds.map((questionId) => `(${sql(questionId)})`).join(',')});`).join('')}`;
 }
-const stateFpTable = (name) => fpSql(name, `FROM questions WHERE ${SCOPE_SQL}`, 'id', STATE_FIELDS);
+const SCOPE_COLUMNS = 'id,subject_id,topic_id,question_text,question_type,options,correct_answer,explanation,difficulty,points,marks,time_limit';
+const SCOPE_SCHEMA = 'id TEXT,subject_id TEXT,topic_id TEXT,question_text TEXT,question_type TEXT,options TEXT,correct_answer TEXT,explanation TEXT,difficulty TEXT,points INTEGER,marks INTEGER,time_limit INTEGER';
+const stateFpTable = (name) => fpSql(name, 'FROM (SELECT q.* FROM questions q JOIN _sr s ON s.id=q.id)', 'id', STATE_FIELDS);
 const topicFpTable = (name) => fpSql(name, `FROM topics WHERE id IN(${NEW_TOPICS.map((topic) => sql(topic.id)).join(',')})`, 'id', TOPIC_FIELDS);
 const logFpTable = (name) => fpSql(name, `FROM question_bank_remediation_log WHERE migration_id IN(${IDS.map(sql).join(',')})`, LOG_ORDER.join(','), LOG_FIELDS);
-const scopeTable = () => `CREATE TEMP TABLE _sr AS SELECT * FROM questions WHERE ${SCOPE_SQL};`;
+const scopeTable = () => `CREATE TEMP TABLE _sr (${SCOPE_SCHEMA});INSERT INTO _sr (${SCOPE_COLUMNS}) SELECT ${SCOPE_COLUMNS} FROM questions WHERE ${SCOPE_SQL};`;
 function topicSpecsSql() { return `CREATE TEMP TABLE _ts(id TEXT PRIMARY KEY,subject_id TEXT NOT NULL,name TEXT NOT NULL,slug TEXT NOT NULL,description TEXT NOT NULL,display_order INTEGER NOT NULL,created_at TEXT NOT NULL);INSERT INTO _ts VALUES${NEW_TOPICS.map((topic) => `(${[topic.id,topic.subjectId,topic.name,topic.slug,topic.description,topic.displayOrder,topic.createdAt].map(sql).join(',')})`).join(',')};`; }
 function supportTables(includeSpecs = false) { return `${includeSpecs ? topicSpecsSql() : ''}${scopeTable()}${stateFpTable('_sf')}${topicFpTable('_tf')}${logFpTable('_lf')}`; }
 const dropFingerprints = () => 'DROP TABLE _lf;DROP TABLE _tf;DROP TABLE _sf;';
