@@ -51,11 +51,12 @@ const mocks = vi.hoisted(() => ({
   fetchDailyUsage: vi.fn(),
   setUsageFromResponse: vi.fn(),
   checkLimitReached: vi.fn(() => false),
+  searchParams: 'mode=drill&subject=wassce-agricultural-science&topic=soil-science&count=2',
 }));
 
 vi.mock('react-router-dom', () => ({
   useNavigate: () => mocks.navigate,
-  useSearchParams: () => [new URLSearchParams('mode=drill&subject=wassce-agricultural-science&count=2')],
+  useSearchParams: () => [new URLSearchParams(mocks.searchParams)],
   useLocation: () => ({ state: { questions } }),
 }));
 vi.mock('@/lib/api', () => ({ api: { post: mocks.apiPost, get: vi.fn() } }));
@@ -107,12 +108,34 @@ function findButton(container: HTMLElement, text: string): HTMLButtonElement {
   return button;
 }
 
+function findLastExactButton(container: HTMLElement, text: string): HTMLButtonElement {
+  const buttons = Array.from(container.querySelectorAll('button'))
+    .filter((candidate) => candidate.textContent?.trim() === text);
+  const button = buttons.at(-1);
+  if (!button) throw new Error(`Button not found: ${text}`);
+  return button;
+}
+
+function successfulAttempt(explanation: string) {
+  return {
+    success: true,
+    data: {
+      isCorrect: true,
+      correctAnswer: 'A',
+      explanation,
+      pointsEarned: 1,
+      usage: { used: 0, limit: -1, remaining: -1, isUnlimited: true, showUpgradePrompt: false },
+    },
+  };
+}
+
 beforeEach(() => {
   mocks.apiPost.mockReset();
   mocks.navigate.mockReset();
   mocks.fetchDailyUsage.mockReset();
   mocks.setUsageFromResponse.mockReset();
   mocks.checkLimitReached.mockReset().mockReturnValue(false);
+  mocks.searchParams = 'mode=drill&subject=wassce-agricultural-science&topic=soil-science&count=2';
 });
 
 afterEach(async () => {
@@ -182,5 +205,101 @@ describe('ExamModePractice question transition', () => {
     await act(async () => findButton(container, 'Next').click());
     expect(container.textContent).toContain('Question 2');
     expect(container.textContent).toContain('Which practice reduces soil erosion?');
+  });
+
+  it('saves the completed drill before results navigation and retries without losing answers', async () => {
+    mocks.apiPost
+      .mockResolvedValueOnce(successfulAttempt('Topsoil contains the greatest concentration of humus.'))
+      .mockResolvedValueOnce(successfulAttempt('Contour ploughing slows surface runoff.'))
+      .mockResolvedValueOnce({ success: false, error: 'Session storage unavailable' })
+      .mockResolvedValueOnce({ success: true, data: { id: 'session-1' } });
+
+    const container = await renderPage();
+
+    await act(async () => {
+      findButton(container, 'Topsoil').click();
+      await Promise.resolve();
+    });
+    await vi.waitFor(() => expect(findButton(container, 'Next').disabled).toBe(false));
+    await act(async () => findButton(container, 'Next').click());
+
+    await act(async () => {
+      findButton(container, 'Contour ploughing').click();
+      await Promise.resolve();
+    });
+    await vi.waitFor(() => expect(findButton(container, 'Finish').disabled).toBe(false));
+    await act(async () => findButton(container, 'Finish').click());
+
+    expect(container.textContent).toContain('Submit Exam?');
+    expect(container.textContent).toContain('You have answered all questions.');
+
+    await act(async () => {
+      findLastExactButton(container, 'Submit').click();
+      await Promise.resolve();
+    });
+
+    await vi.waitFor(() => expect(container.textContent).toContain('Session storage unavailable'));
+    expect(mocks.navigate.mock.calls.some(([path]) => path === '/practice/results')).toBe(false);
+    expect(container.textContent).toContain('Your completed answers are still here.');
+    expect(container.textContent).toContain('Question 2');
+    expect(findButton(container, 'Contour ploughing').getAttribute('aria-pressed')).toBe('true');
+
+    const firstSave = mocks.apiPost.mock.calls[2];
+    expect(firstSave[0]).toBe('/practice/sessions');
+    expect(firstSave[1]).toMatchObject({
+      mode: 'topic_drill',
+      subjectId: 'wassce-agricultural-science',
+      topicId: 'soil-science',
+      questionsCount: 2,
+      correctCount: 2,
+      score: 2,
+      answers: [
+        { questionId: 'agric-1', isCorrect: true, answer: 'A' },
+        { questionId: 'agric-2', isCorrect: true, answer: 'A' },
+      ],
+    });
+    expect(firstSave[1]).not.toHaveProperty('subject_id');
+    expect(firstSave[1]).not.toHaveProperty('questions_count');
+    expect(firstSave[1]).not.toHaveProperty('correct_count');
+    expect(firstSave[1]).not.toHaveProperty('total_time');
+
+    await act(async () => {
+      findButton(container, 'Retry session save').click();
+      await Promise.resolve();
+    });
+
+    await vi.waitFor(() => expect(mocks.navigate).toHaveBeenCalledWith(
+      '/practice/results',
+      expect.objectContaining({
+        state: expect.objectContaining({
+          totalQuestions: 2,
+          correctCount: 2,
+          score: 2,
+        }),
+      }),
+    ));
+    expect(mocks.apiPost.mock.calls.filter(([path]) => path === '/practice/sessions')).toHaveLength(2);
+  });
+
+  it('does not attribute a subject-wide mixed-topic drill to the first question topic', async () => {
+    mocks.searchParams = 'mode=drill&subject=wassce-agricultural-science&count=2';
+    mocks.apiPost.mockResolvedValueOnce({ success: true, data: { id: 'session-subject-wide' } });
+
+    const container = await renderPage();
+    await act(async () => findButton(container, 'Submit').click());
+    expect(container.textContent).toContain('Submit Exam?');
+
+    await act(async () => {
+      findLastExactButton(container, 'Submit').click();
+      await Promise.resolve();
+    });
+
+    await vi.waitFor(() => expect(mocks.apiPost).toHaveBeenCalledWith(
+      '/practice/sessions',
+      expect.objectContaining({
+        subjectId: 'wassce-agricultural-science',
+        topicId: null,
+      }),
+    ));
   });
 });
