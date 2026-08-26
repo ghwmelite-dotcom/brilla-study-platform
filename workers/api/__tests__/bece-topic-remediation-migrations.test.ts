@@ -80,6 +80,15 @@ function scalar(db: Database.Database, sql: string): number {
   return (db.prepare(sql).get() as { count: number }).count;
 }
 
+function snapshotNonBeceQuestionTopics(db: Database.Database) {
+  return db.prepare(`
+    SELECT q.id, q.subject_id AS subjectId, s.exam_type_id AS examTypeId, q.topic_id AS topicId
+    FROM questions q JOIN subjects s ON s.id = q.subject_id
+    WHERE s.exam_type_id <> 'exam_bece'
+    ORDER BY q.id
+  `).all();
+}
+
 describe('BECE topic remediation migrations 224-236', () => {
   it.each(migrationNames.map((name, index) => [name, migrations[index]]))(
     'keeps %s below the remote D1 query limit with CRLF and migration ledger SQL',
@@ -176,6 +185,20 @@ describe('BECE topic remediation migrations 224-236', () => {
       SELECT COUNT(*) AS count FROM question_bank_remediation_log
       WHERE migration_id LIKE '2%_bece_topic_%'
     `)).toBe(1040);
+    expect(db.pragma('foreign_key_check')).toEqual([]);
+    db.close();
+  });
+
+  it('preserves every non-BECE question topic through apply and rollback', () => {
+    const db = createFixture();
+    const before = snapshotNonBeceQuestionTopics(db);
+    expect(before.length).toBeGreaterThan(0);
+
+    applyAll(db);
+    expect(snapshotNonBeceQuestionTopics(db)).toEqual(before);
+
+    for (let index = rollbacks.length - 1; index >= 0; index--) db.exec(rollbacks[index]);
+    expect(snapshotNonBeceQuestionTopics(db)).toEqual(before);
     expect(db.pragma('foreign_key_check')).toEqual([]);
     db.close();
   });

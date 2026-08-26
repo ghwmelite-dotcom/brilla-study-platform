@@ -1,0 +1,1520 @@
+{
+  "batchId": "bece-bdt-gap-beta-001",
+  "status": "approved_for_beta",
+  "examTypeId": "exam_bece",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment, Ghana",
+      "title": "Common Core Programme curricula for Junior High School",
+      "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-08-26T00:00:00Z",
+    "semanticDuplicateReview": {
+      "method": "human_cross_level_review_plus_normalized_and_token_overlap_gates",
+      "rewrittenPairs": [
+        {
+          "questionId": "q_bece_bdt_gap_b001_004",
+          "priorQuestionId": "q_was_building_b003_018"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_005",
+          "priorQuestionId": "q_was_building_b003_012"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_007",
+          "priorQuestionId": "q_was_building_b003_016"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_008",
+          "priorQuestionId": "q_was_building_b003_032"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_012",
+          "priorQuestionId": "q_was_building_b003_007"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_013",
+          "priorQuestionId": "q_was_building_b003_009"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_015",
+          "priorQuestionId": "q_was_elect_b001_037"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_017",
+          "priorQuestionId": "q_was_elect_b001_036"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_021",
+          "priorQuestionId": "q_was_elect_b001_001"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_007",
+          "priorQuestionId": "q_was_agric_b001_013"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_015",
+          "priorQuestionId": "q_was_agric_b001_014"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_019",
+          "priorQuestionId": "q_was_agric_b001_018"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_021",
+          "priorQuestionId": "q_was_agric_b001_017"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_034",
+          "priorQuestionId": "q_was_agric_b001_036"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_037",
+          "priorQuestionId": "q_was_agric_b001_004"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_039",
+          "priorQuestionId": "q_was_agric_b001_015"
+        }
+      ],
+      "unresolvedAllowedOverlaps": []
+    }
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep practice content aligned to Ghana’s published NaCCA Common Core Programme curricula; not official WAEC or NaCCA examination material.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true,
+    "rationaleAvailability": "manifest_only_runtime_question_schema_does_not_store_option_rationales"
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_bece_bdt",
+      "specificationCode": "NaCCA-CCP-BDT-GAPS-2026",
+      "topics": [
+        {
+          "code": "BDT-CONSTRUCTION",
+          "title": "Construction and Structures",
+          "objective": "Apply safe construction principles, materials, measurements and processes to simple Ghanaian building contexts."
+        },
+        {
+          "code": "BDT-ELECTRICAL",
+          "title": "Electrical and Electronic Systems",
+          "objective": "Apply basic circuit, domestic wiring, energy-use and electrical-safety principles."
+        },
+        {
+          "code": "BDT-ENTREPRENEURSHIP",
+          "title": "Entrepreneurship",
+          "objective": "Use planning, costing, marketing, record-keeping and quality principles in small product enterprises."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_bece_bdt_gap_b001_001",
+          "original": true,
+          "topicCode": "BDT-CONSTRUCTION",
+          "type": "multiple_choice",
+          "prompt": "Which option is a natural structure rather than a structure made by people?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The branching trunk of a tree",
+              "rationale": "This option is correct. A tree develops its own load-supporting trunk and branches through natural growth, whereas the other structures are designed and assembled by people."
+            },
+            {
+              "label": "B",
+              "text": "A classroom desk",
+              "rationale": "The response “A classroom desk” points to the wrong property. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The branching trunk of a tree” is defensible because a tree develops its own load-supporting trunk and branches through natural growth, whereas the other structures are designed and assembled by people."
+            },
+            {
+              "label": "C",
+              "text": "A block footbridge",
+              "rationale": "A learner choosing “A block footbridge” would be relying on the wrong criterion. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “The branching trunk of a tree” is defensible because a tree develops its own load-supporting trunk and branches through natural growth, whereas the other structures are designed and assembled by people."
+            },
+            {
+              "label": "D",
+              "text": "A bicycle frame",
+              "rationale": "Selecting “A bicycle frame” misclassifies the idea being tested. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The branching trunk of a tree” is defensible because a tree develops its own load-supporting trunk and branches through natural growth, whereas the other structures are designed and assembled by people."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A tree develops its own load-supporting trunk and branches through natural growth, whereas the other structures are designed and assembled by people. Therefore the correct answer is A: The branching trunk of a tree.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_002",
+          "original": true,
+          "topicCode": "BDT-CONSTRUCTION",
+          "type": "multiple_choice",
+          "prompt": "Which object is best classified as a frame structure?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A whole coconut shell",
+              "rationale": "The claim “A whole coconut shell” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A classroom stool made from joined legs and rails” is defensible because a frame structure carries loads through connected members such as legs and rails, rather than through a continuous shell or a solid mass."
+            },
+            {
+              "label": "B",
+              "text": "A solid clay brick",
+              "rationale": "The claim “A solid clay brick” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A classroom stool made from joined legs and rails” is defensible because a frame structure carries loads through connected members such as legs and rails, rather than through a continuous shell or a solid mass."
+            },
+            {
+              "label": "C",
+              "text": "A mound of compacted soil",
+              "rationale": "Using “A mound of compacted soil” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A classroom stool made from joined legs and rails” is defensible because a frame structure carries loads through connected members such as legs and rails, rather than through a continuous shell or a solid mass."
+            },
+            {
+              "label": "D",
+              "text": "A classroom stool made from joined legs and rails",
+              "rationale": "This option is correct. A frame structure carries loads through connected members such as legs and rails, rather than through a continuous shell or a solid mass."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A frame structure carries loads through connected members such as legs and rails, rather than through a continuous shell or a solid mass. Therefore the correct answer is D: A classroom stool made from joined legs and rails.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_003",
+          "original": true,
+          "topicCode": "BDT-CONSTRUCTION",
+          "type": "multiple_choice",
+          "prompt": "Why can an empty beverage can support a small load before its wall is crushed?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Its hollow space creates extra material",
+              "rationale": "Treating “Its hollow space creates extra material” as correct overlooks the decisive condition. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Its thin continuous shell spreads the load around its surface” is defensible because a shell structure uses its shaped continuous surface to distribute forces efficiently, although a dent or excessive load can make the thin wall buckle."
+            },
+            {
+              "label": "B",
+              "text": "Its thin continuous shell spreads the load around its surface",
+              "rationale": "This option is correct. A shell structure uses its shaped continuous surface to distribute forces efficiently, although a dent or excessive load can make the thin wall buckle."
+            },
+            {
+              "label": "C",
+              "text": "The printed label carries all the force",
+              "rationale": "The option “The printed label carries all the force” describes a different outcome from the one supported by the evidence. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Its thin continuous shell spreads the load around its surface” is defensible because a shell structure uses its shaped continuous surface to distribute forces efficiently, although a dent or excessive load can make the thin wall buckle."
+            },
+            {
+              "label": "D",
+              "text": "Air inside permanently prevents deformation",
+              "rationale": "The option “Air inside permanently prevents deformation” describes a different outcome from the one supported by the evidence. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Its thin continuous shell spreads the load around its surface” is defensible because a shell structure uses its shaped continuous surface to distribute forces efficiently, although a dent or excessive load can make the thin wall buckle."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A shell structure uses its shaped continuous surface to distribute forces efficiently, although a dent or excessive load can make the thin wall buckle. Therefore the correct answer is B: Its thin continuous shell spreads the load around its surface.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_004",
+          "original": true,
+          "topicCode": "BDT-CONSTRUCTION",
+          "type": "multiple_choice",
+          "prompt": "A learner is making a wooden stool. Which members transfer the seat load toward the floor?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The decorative paint only",
+              "rationale": "The claim “The decorative paint only” conflicts with the relationship described in the stem. It focuses on an incidental appearance or administrative detail that cannot perform the technical function being assessed. By contrast, “The legs acting as load-supporting members” is defensible because the stool legs form the main load path from the seat to the floor, so their strength, alignment and joints determine whether the stool supports a user safely."
+            },
+            {
+              "label": "B",
+              "text": "The pencil marks on the seat",
+              "rationale": "Using “The pencil marks on the seat” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The legs acting as load-supporting members” is defensible because the stool legs form the main load path from the seat to the floor, so their strength, alignment and joints determine whether the stool supports a user safely."
+            },
+            {
+              "label": "C",
+              "text": "The legs acting as load-supporting members",
+              "rationale": "This option is correct. The stool legs form the main load path from the seat to the floor, so their strength, alignment and joints determine whether the stool supports a user safely."
+            },
+            {
+              "label": "D",
+              "text": "The unused wood offcuts",
+              "rationale": "The claim “The unused wood offcuts” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The legs acting as load-supporting members” is defensible because the stool legs form the main load path from the seat to the floor, so their strength, alignment and joints determine whether the stool supports a user safely."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The stool legs form the main load path from the seat to the floor, so their strength, alignment and joints determine whether the stool supports a user safely. Therefore the correct answer is C: The legs acting as load-supporting members.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_005",
+          "original": true,
+          "topicCode": "BDT-CONSTRUCTION",
+          "type": "multiple_choice",
+          "prompt": "Which change would usually make a tall model tower more stable?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Widen its base while keeping heavy parts low",
+              "rationale": "This option is correct. A wider support base and lower centre of gravity make it harder for the line of action of the weight to pass outside the base and overturn the tower."
+            },
+            {
+              "label": "B",
+              "text": "Narrow its base and raise its mass",
+              "rationale": "That choice, “Narrow its base and raise its mass”, substitutes a distractor feature for the tested principle. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Widen its base while keeping heavy parts low” is defensible because a wider support base and lower centre of gravity make it harder for the line of action of the weight to pass outside the base and overturn the tower."
+            },
+            {
+              "label": "C",
+              "text": "Remove every lower brace",
+              "rationale": "Treating “Remove every lower brace” as correct overlooks the decisive condition. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Widen its base while keeping heavy parts low” is defensible because a wider support base and lower centre of gravity make it harder for the line of action of the weight to pass outside the base and overturn the tower."
+            },
+            {
+              "label": "D",
+              "text": "Place it on an uneven loose surface",
+              "rationale": "Using “Place it on an uneven loose surface” would apply the concept in the wrong context. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Widen its base while keeping heavy parts low” is defensible because a wider support base and lower centre of gravity make it harder for the line of action of the weight to pass outside the base and overturn the tower."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A wider support base and lower centre of gravity make it harder for the line of action of the weight to pass outside the base and overturn the tower. Therefore the correct answer is A: Widen its base while keeping heavy parts low.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_006",
+          "original": true,
+          "topicCode": "BDT-CONSTRUCTION",
+          "type": "multiple_choice",
+          "prompt": "Why is a diagonal member added across a rectangular wooden frame?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It makes every joint flexible",
+              "rationale": "The option “It makes every joint flexible” describes a different outcome from the one supported by the evidence. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It forms triangles that resist the frame changing shape” is defensible because a rectangle can rack into a sloping shape, but diagonal bracing divides it into triangles whose geometry resists distortion under side loads."
+            },
+            {
+              "label": "B",
+              "text": "It removes the need for accurate joints",
+              "rationale": "Choosing “It removes the need for accurate joints” follows a different rule from the one required here. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It forms triangles that resist the frame changing shape” is defensible because a rectangle can rack into a sloping shape, but diagonal bracing divides it into triangles whose geometry resists distortion under side loads."
+            },
+            {
+              "label": "C",
+              "text": "It increases height without supporting load",
+              "rationale": "Choosing “It increases height without supporting load” follows a different rule from the one required here. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It forms triangles that resist the frame changing shape” is defensible because a rectangle can rack into a sloping shape, but diagonal bracing divides it into triangles whose geometry resists distortion under side loads."
+            },
+            {
+              "label": "D",
+              "text": "It forms triangles that resist the frame changing shape",
+              "rationale": "This option is correct. A rectangle can rack into a sloping shape, but diagonal bracing divides it into triangles whose geometry resists distortion under side loads."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A rectangle can rack into a sloping shape, but diagonal bracing divides it into triangles whose geometry resists distortion under side loads. Therefore the correct answer is D: It forms triangles that resist the frame changing shape.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_007",
+          "original": true,
+          "topicCode": "BDT-CONSTRUCTION",
+          "type": "multiple_choice",
+          "prompt": "A cord in a simple model bridge is pulled tight by a load. How is that member acting?",
+          "options": [
+            {
+              "label": "A",
+              "text": "As a strut carrying compression",
+              "rationale": "That choice, “As a strut carrying compression”, substitutes a distractor feature for the tested principle. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “As a tie carrying tension” is defensible because a tie resists a pulling force and is therefore in tension; a strut instead resists a pushing force and is mainly in compression."
+            },
+            {
+              "label": "B",
+              "text": "As a tie carrying tension",
+              "rationale": "This option is correct. A tie resists a pulling force and is therefore in tension; a strut instead resists a pushing force and is mainly in compression."
+            },
+            {
+              "label": "C",
+              "text": "As a hinge producing rotation",
+              "rationale": "Using “As a hinge producing rotation” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “As a tie carrying tension” is defensible because a tie resists a pulling force and is therefore in tension; a strut instead resists a pushing force and is mainly in compression."
+            },
+            {
+              "label": "D",
+              "text": "As a shell enclosing a space",
+              "rationale": "Using “As a shell enclosing a space” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “As a tie carrying tension” is defensible because a tie resists a pulling force and is therefore in tension; a strut instead resists a pushing force and is mainly in compression."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A tie resists a pulling force and is therefore in tension; a strut instead resists a pushing force and is mainly in compression. Therefore the correct answer is B: As a tie carrying tension.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_008",
+          "original": true,
+          "topicCode": "BDT-CONSTRUCTION",
+          "type": "multiple_choice",
+          "prompt": "In a simple lever used to lift a stone, what is the role of the pivot?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It supplies electrical current",
+              "rationale": "Selecting “It supplies electrical current” misclassifies the idea being tested. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It is the fixed point about which the lever turns” is defensible because the pivot or fulcrum provides the turning point, allowing an effort applied at one distance to create a turning effect on the load."
+            },
+            {
+              "label": "B",
+              "text": "It is the fixed point about which the lever turns",
+              "rationale": "This option is correct. The pivot or fulcrum provides the turning point, allowing an effort applied at one distance to create a turning effect on the load."
+            },
+            {
+              "label": "C",
+              "text": "It permanently joins the load to the ground",
+              "rationale": "Accepting “It permanently joins the load to the ground” would bypass the reasoning the item requires. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It is the fixed point about which the lever turns” is defensible because the pivot or fulcrum provides the turning point, allowing an effort applied at one distance to create a turning effect on the load."
+            },
+            {
+              "label": "D",
+              "text": "It measures the stone’s temperature",
+              "rationale": "That choice, “It measures the stone’s temperature”, substitutes a distractor feature for the tested principle. It focuses on an incidental appearance or administrative detail that cannot perform the technical function being assessed. By contrast, “It is the fixed point about which the lever turns” is defensible because the pivot or fulcrum provides the turning point, allowing an effort applied at one distance to create a turning effect on the load."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The pivot or fulcrum provides the turning point, allowing an effort applied at one distance to create a turning effect on the load. Therefore the correct answer is B: It is the fixed point about which the lever turns.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_009",
+          "original": true,
+          "topicCode": "BDT-CONSTRUCTION",
+          "type": "multiple_choice",
+          "prompt": "Two card strips are joined with paper fasteners so movement of one moves the other. What has been made?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A solid mass structure",
+              "rationale": "Choosing “A solid mass structure” follows a different rule from the one required here. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A linkage that transfers motion between members” is defensible because pivoted members in a linkage transmit and change motion, which learners can observe by moving one strip and tracking the response of the connected strip."
+            },
+            {
+              "label": "B",
+              "text": "A waterproof shell",
+              "rationale": "The option “A waterproof shell” describes a different outcome from the one supported by the evidence. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A linkage that transfers motion between members” is defensible because pivoted members in a linkage transmit and change motion, which learners can observe by moving one strip and tracking the response of the connected strip."
+            },
+            {
+              "label": "C",
+              "text": "An electrical insulator",
+              "rationale": "That choice, “An electrical insulator”, substitutes a distractor feature for the tested principle. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A linkage that transfers motion between members” is defensible because pivoted members in a linkage transmit and change motion, which learners can observe by moving one strip and tracking the response of the connected strip."
+            },
+            {
+              "label": "D",
+              "text": "A linkage that transfers motion between members",
+              "rationale": "This option is correct. Pivoted members in a linkage transmit and change motion, which learners can observe by moving one strip and tracking the response of the connected strip."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Pivoted members in a linkage transmit and change motion, which learners can observe by moving one strip and tracking the response of the connected strip. Therefore the correct answer is D: A linkage that transfers motion between members.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_010",
+          "original": true,
+          "topicCode": "BDT-CONSTRUCTION",
+          "type": "multiple_choice",
+          "prompt": "Before building a model bridge from drinking straws, what should a learner do first?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Sketch the design and identify dimensions, joints and loads",
+              "rationale": "This option is correct. A labelled sketch turns the design need into dimensions, member positions, joint choices and an intended load path that can be tested after construction."
+            },
+            {
+              "label": "B",
+              "text": "Join materials randomly before choosing a size",
+              "rationale": "Choosing “Join materials randomly before choosing a size” follows a different rule from the one required here. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Sketch the design and identify dimensions, joints and loads” is defensible because a labelled sketch turns the design need into dimensions, member positions, joint choices and an intended load path that can be tested after construction."
+            },
+            {
+              "label": "C",
+              "text": "Decorate every straw before planning",
+              "rationale": "The claim “Decorate every straw before planning” conflicts with the relationship described in the stem. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Sketch the design and identify dimensions, joints and loads” is defensible because a labelled sketch turns the design need into dimensions, member positions, joint choices and an intended load path that can be tested after construction."
+            },
+            {
+              "label": "D",
+              "text": "Assume any joint will carry the same load",
+              "rationale": "Accepting “Assume any joint will carry the same load” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Sketch the design and identify dimensions, joints and loads” is defensible because a labelled sketch turns the design need into dimensions, member positions, joint choices and an intended load path that can be tested after construction."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A labelled sketch turns the design need into dimensions, member positions, joint choices and an intended load path that can be tested after construction. Therefore the correct answer is A: Sketch the design and identify dimensions, joints and loads.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Sequence",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_011",
+          "original": true,
+          "topicCode": "BDT-CONSTRUCTION",
+          "type": "multiple_choice",
+          "prompt": "A square card frame collapses sideways during testing. Which improvement directly addresses the weakness?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Cut away one complete side",
+              "rationale": "The claim “Cut away one complete side” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Add a diagonal brace between opposite corners” is defensible because the diagonal converts the flexible square into triangular regions and provides a direct member to resist the sideways force causing the frame to rack."
+            },
+            {
+              "label": "B",
+              "text": "Make the corner holes much larger",
+              "rationale": "That choice, “Make the corner holes much larger”, substitutes a distractor feature for the tested principle. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Add a diagonal brace between opposite corners” is defensible because the diagonal converts the flexible square into triangular regions and provides a direct member to resist the sideways force causing the frame to rack."
+            },
+            {
+              "label": "C",
+              "text": "Add a diagonal brace between opposite corners",
+              "rationale": "This option is correct. The diagonal converts the flexible square into triangular regions and provides a direct member to resist the sideways force causing the frame to rack."
+            },
+            {
+              "label": "D",
+              "text": "Attach a loose label to the centre",
+              "rationale": "Selecting “Attach a loose label to the centre” misclassifies the idea being tested. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Add a diagonal brace between opposite corners” is defensible because the diagonal converts the flexible square into triangular regions and provides a direct member to resist the sideways force causing the frame to rack."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The diagonal converts the flexible square into triangular regions and provides a direct member to resist the sideways force causing the frame to rack. Therefore the correct answer is C: Add a diagonal brace between opposite corners.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_012",
+          "original": true,
+          "topicCode": "BDT-CONSTRUCTION",
+          "type": "multiple_choice",
+          "prompt": "Which procedure is safest when cutting thin wood for a class structure project?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Hold the wood in the air near the blade",
+              "rationale": "A learner choosing “Hold the wood in the air near the blade” would be relying on the wrong criterion. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Mark the cut, secure the wood and cut away from the body” is defensible because accurate marking, firm support and a cutting direction away from the body reduce slipping, poor fit and injury during a simple construction task."
+            },
+            {
+              "label": "B",
+              "text": "Cut toward the supporting hand",
+              "rationale": "That choice, “Cut toward the supporting hand”, substitutes a distractor feature for the tested principle. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Mark the cut, secure the wood and cut away from the body” is defensible because accurate marking, firm support and a cutting direction away from the body reduce slipping, poor fit and injury during a simple construction task."
+            },
+            {
+              "label": "C",
+              "text": "Skip measurement and force the tool",
+              "rationale": "The proposed answer “Skip measurement and force the tool” cannot be reconciled with the stated conditions. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Mark the cut, secure the wood and cut away from the body” is defensible because accurate marking, firm support and a cutting direction away from the body reduce slipping, poor fit and injury during a simple construction task."
+            },
+            {
+              "label": "D",
+              "text": "Mark the cut, secure the wood and cut away from the body",
+              "rationale": "This option is correct. Accurate marking, firm support and a cutting direction away from the body reduce slipping, poor fit and injury during a simple construction task."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Accurate marking, firm support and a cutting direction away from the body reduce slipping, poor fit and injury during a simple construction task. Therefore the correct answer is D: Mark the cut, secure the wood and cut away from the body.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_013",
+          "original": true,
+          "topicCode": "BDT-CONSTRUCTION",
+          "type": "multiple_choice",
+          "prompt": "A glued joint in a model frame separates during a load test. What should the learner investigate first?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Whether the frame colour was bright enough",
+              "rationale": "Accepting “Whether the frame colour was bright enough” would bypass the reasoning the item requires. It focuses on an incidental appearance or administrative detail that cannot perform the technical function being assessed. By contrast, “Whether the surfaces were clean, fitted and allowed to set” is defensible because adhesive joints depend on suitable clean contact surfaces, close fit and enough setting time, so these process conditions should be checked before redesigning the frame."
+            },
+            {
+              "label": "B",
+              "text": "Whether the ruler had printed numbers",
+              "rationale": "The claim “Whether the ruler had printed numbers” conflicts with the relationship described in the stem. It focuses on an incidental appearance or administrative detail that cannot perform the technical function being assessed. By contrast, “Whether the surfaces were clean, fitted and allowed to set” is defensible because adhesive joints depend on suitable clean contact surfaces, close fit and enough setting time, so these process conditions should be checked before redesigning the frame."
+            },
+            {
+              "label": "C",
+              "text": "Whether the surfaces were clean, fitted and allowed to set",
+              "rationale": "This option is correct. Adhesive joints depend on suitable clean contact surfaces, close fit and enough setting time, so these process conditions should be checked before redesigning the frame."
+            },
+            {
+              "label": "D",
+              "text": "Whether unused card was stored nearby",
+              "rationale": "The proposed answer “Whether unused card was stored nearby” cannot be reconciled with the stated conditions. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Whether the surfaces were clean, fitted and allowed to set” is defensible because adhesive joints depend on suitable clean contact surfaces, close fit and enough setting time, so these process conditions should be checked before redesigning the frame."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Adhesive joints depend on suitable clean contact surfaces, close fit and enough setting time, so these process conditions should be checked before redesigning the frame. Therefore the correct answer is C: Whether the surfaces were clean, fitted and allowed to set.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_014",
+          "original": true,
+          "topicCode": "BDT-CONSTRUCTION",
+          "type": "multiple_choice",
+          "prompt": "How should learners compare two model bridge designs fairly?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Use different loads and make no records",
+              "rationale": "The claim “Use different loads and make no records” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Apply the same increasing load and record when each design deforms” is defensible because a fair test controls the loading method and records deformation or failure, producing evidence about how efficiently each structure supports the intended load."
+            },
+            {
+              "label": "B",
+              "text": "Apply the same increasing load and record when each design deforms",
+              "rationale": "This option is correct. A fair test controls the loading method and records deformation or failure, producing evidence about how efficiently each structure supports the intended load."
+            },
+            {
+              "label": "C",
+              "text": "Judge only by colour",
+              "rationale": "The proposed answer “Judge only by colour” cannot be reconciled with the stated conditions. It focuses on an incidental appearance or administrative detail that cannot perform the technical function being assessed. By contrast, “Apply the same increasing load and record when each design deforms” is defensible because a fair test controls the loading method and records deformation or failure, producing evidence about how efficiently each structure supports the intended load."
+            },
+            {
+              "label": "D",
+              "text": "Test one bridge on a table and throw the other",
+              "rationale": "Choosing “Test one bridge on a table and throw the other” follows a different rule from the one required here. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Apply the same increasing load and record when each design deforms” is defensible because a fair test controls the loading method and records deformation or failure, producing evidence about how efficiently each structure supports the intended load."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A fair test controls the loading method and records deformation or failure, producing evidence about how efficiently each structure supports the intended load. Therefore the correct answer is B: Apply the same increasing load and record when each design deforms.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_015",
+          "original": true,
+          "topicCode": "BDT-ELECTRICAL",
+          "type": "multiple_choice",
+          "prompt": "A 3 A appliance is fitted with a 5 A fuse. Why would replacing it with a 13 A fuse reduce protection?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The higher-rated fuse may not melt before the appliance wiring overheats",
+              "rationale": "This option is correct. A fuse rating should be just above normal operating current but below the level that the appliance cable can safely carry, so an oversized fuse may permit damaging current."
+            },
+            {
+              "label": "B",
+              "text": "The higher-rated fuse always lowers supply voltage",
+              "rationale": "Treating “The higher-rated fuse always lowers supply voltage” as correct overlooks the decisive condition. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “The higher-rated fuse may not melt before the appliance wiring overheats” is defensible because a fuse rating should be just above normal operating current but below the level that the appliance cable can safely carry, so an oversized fuse may permit damaging current."
+            },
+            {
+              "label": "C",
+              "text": "A 13 A fuse stores dangerous current after switch-off",
+              "rationale": "Accepting “A 13 A fuse stores dangerous current after switch-off” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The higher-rated fuse may not melt before the appliance wiring overheats” is defensible because a fuse rating should be just above normal operating current but below the level that the appliance cable can safely carry, so an oversized fuse may permit damaging current."
+            },
+            {
+              "label": "D",
+              "text": "The appliance will immediately use exactly 13 A",
+              "rationale": "Choosing “The appliance will immediately use exactly 13 A” follows a different rule from the one required here. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The higher-rated fuse may not melt before the appliance wiring overheats” is defensible because a fuse rating should be just above normal operating current but below the level that the appliance cable can safely carry, so an oversized fuse may permit damaging current."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A fuse rating should be just above normal operating current but below the level that the appliance cable can safely carry, so an oversized fuse may permit damaging current. Therefore the correct answer is A: The higher-rated fuse may not melt before the appliance wiring overheats.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_016",
+          "original": true,
+          "topicCode": "BDT-ELECTRICAL",
+          "type": "multiple_choice",
+          "prompt": "Which wire should a single-pole light switch interrupt?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The live wire",
+              "rationale": "This option is correct. Interrupting the live conductor isolates dangerous voltage from the lamp holder when off; switching only neutral can leave parts live."
+            },
+            {
+              "label": "B",
+              "text": "The earth wire",
+              "rationale": "The response “The earth wire” points to the wrong property. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The live wire” is defensible because interrupting the live conductor isolates dangerous voltage from the lamp holder when off; switching only neutral can leave parts live."
+            },
+            {
+              "label": "C",
+              "text": "Live and neutral joined",
+              "rationale": "Accepting “Live and neutral joined” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The live wire” is defensible because interrupting the live conductor isolates dangerous voltage from the lamp holder when off; switching only neutral can leave parts live."
+            },
+            {
+              "label": "D",
+              "text": "A disconnected spare wire",
+              "rationale": "That choice, “A disconnected spare wire”, substitutes a distractor feature for the tested principle. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The live wire” is defensible because interrupting the live conductor isolates dangerous voltage from the lamp holder when off; switching only neutral can leave parts live."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Interrupting the live conductor isolates dangerous voltage from the lamp holder when off; switching only neutral can leave parts live. Therefore the correct answer is A: The live wire.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_017",
+          "original": true,
+          "topicCode": "BDT-ELECTRICAL",
+          "type": "multiple_choice",
+          "prompt": "A fault makes the metal case of a kettle live. Which sequence explains how earthing protects a user?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The earth wire raises the case voltage safely",
+              "rationale": "Here, “The earth wire raises the case voltage safely” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Fault current flows through earth and causes the protective device to disconnect” is defensible because the low-resistance earth path carries a large fault current that makes the fuse or circuit breaker operate, disconnecting the supply instead of leaving exposed metal live."
+            },
+            {
+              "label": "B",
+              "text": "Normal load current is stored in the metal case",
+              "rationale": "Using “Normal load current is stored in the metal case” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Fault current flows through earth and causes the protective device to disconnect” is defensible because the low-resistance earth path carries a large fault current that makes the fuse or circuit breaker operate, disconnecting the supply instead of leaving exposed metal live."
+            },
+            {
+              "label": "C",
+              "text": "Fault current flows through earth and causes the protective device to disconnect",
+              "rationale": "This option is correct. The low-resistance earth path carries a large fault current that makes the fuse or circuit breaker operate, disconnecting the supply instead of leaving exposed metal live."
+            },
+            {
+              "label": "D",
+              "text": "The neutral wire is removed so the case remains live",
+              "rationale": "The claim “The neutral wire is removed so the case remains live” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Fault current flows through earth and causes the protective device to disconnect” is defensible because the low-resistance earth path carries a large fault current that makes the fuse or circuit breaker operate, disconnecting the supply instead of leaving exposed metal live."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The low-resistance earth path carries a large fault current that makes the fuse or circuit breaker operate, disconnecting the supply instead of leaving exposed metal live. Therefore the correct answer is C: Fault current flows through earth and causes the protective device to disconnect.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_018",
+          "original": true,
+          "topicCode": "BDT-ELECTRICAL",
+          "type": "multiple_choice",
+          "prompt": "Why are household lamps normally connected in parallel?",
+          "options": [
+            {
+              "label": "A",
+              "text": "They must share one small voltage",
+              "rationale": "The claim “They must share one small voltage” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Each receives supply voltage and can operate independently” is defensible because parallel branches place each lamp across the supply, so each receives intended voltage and another branch can continue independently."
+            },
+            {
+              "label": "B",
+              "text": "One failure must stop all lamps",
+              "rationale": "Using “One failure must stop all lamps” would apply the concept in the wrong context. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Each receives supply voltage and can operate independently” is defensible because parallel branches place each lamp across the supply, so each receives intended voltage and another branch can continue independently."
+            },
+            {
+              "label": "C",
+              "text": "Parallel wiring blocks current",
+              "rationale": "Choosing “Parallel wiring blocks current” follows a different rule from the one required here. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Each receives supply voltage and can operate independently” is defensible because parallel branches place each lamp across the supply, so each receives intended voltage and another branch can continue independently."
+            },
+            {
+              "label": "D",
+              "text": "Each receives supply voltage and can operate independently",
+              "rationale": "This option is correct. Parallel branches place each lamp across the supply, so each receives intended voltage and another branch can continue independently."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Parallel branches place each lamp across the supply, so each receives intended voltage and another branch can continue independently. Therefore the correct answer is D: Each receives supply voltage and can operate independently.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_019",
+          "original": true,
+          "topicCode": "BDT-ELECTRICAL",
+          "type": "multiple_choice",
+          "prompt": "Which material suitably covers a flexible copper appliance cord?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Bare steel wool",
+              "rationale": "Here, “Bare steel wool” represents the misconception rather than the valid conclusion. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Electrical-grade plastic insulation” is defensible because electrical-grade plastic resists current flow and bends with the cable, reducing accidental contact with the conducting copper core."
+            },
+            {
+              "label": "B",
+              "text": "Electrical-grade plastic insulation",
+              "rationale": "This option is correct. Electrical-grade plastic resists current flow and bends with the cable, reducing accidental contact with the conducting copper core."
+            },
+            {
+              "label": "C",
+              "text": "Wet cotton thread",
+              "rationale": "Using “Wet cotton thread” would apply the concept in the wrong context. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Electrical-grade plastic insulation” is defensible because electrical-grade plastic resists current flow and bends with the cable, reducing accidental contact with the conducting copper core."
+            },
+            {
+              "label": "D",
+              "text": "Aluminium foil",
+              "rationale": "The response “Aluminium foil” points to the wrong property. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Electrical-grade plastic insulation” is defensible because electrical-grade plastic resists current flow and bends with the cable, reducing accidental contact with the conducting copper core."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Electrical-grade plastic resists current flow and bends with the cable, reducing accidental contact with the conducting copper core. Therefore the correct answer is B: Electrical-grade plastic insulation.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_020",
+          "original": true,
+          "topicCode": "BDT-ELECTRICAL",
+          "type": "multiple_choice",
+          "prompt": "What condition most directly causes a socket circuit overload?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The room has many chairs",
+              "rationale": "The claim “The room has many chairs” conflicts with the relationship described in the stem. It focuses on an incidental appearance or administrative detail that cannot perform the technical function being assessed. By contrast, “Appliances demand more current than the circuit is rated to carry” is defensible because an overload occurs when combined appliance current exceeds the safe rating of conductors or protection, causing dangerous heating."
+            },
+            {
+              "label": "B",
+              "text": "Appliances demand more current than the circuit is rated to carry",
+              "rationale": "This option is correct. An overload occurs when combined appliance current exceeds the safe rating of conductors or protection, causing dangerous heating."
+            },
+            {
+              "label": "C",
+              "text": "A lamp is off",
+              "rationale": "The proposed answer “A lamp is off” cannot be reconciled with the stated conditions. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Appliances demand more current than the circuit is rated to carry” is defensible because an overload occurs when combined appliance current exceeds the safe rating of conductors or protection, causing dangerous heating."
+            },
+            {
+              "label": "D",
+              "text": "The earth wire is coloured correctly",
+              "rationale": "Selecting “The earth wire is coloured correctly” misclassifies the idea being tested. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Appliances demand more current than the circuit is rated to carry” is defensible because an overload occurs when combined appliance current exceeds the safe rating of conductors or protection, causing dangerous heating."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "An overload occurs when combined appliance current exceeds the safe rating of conductors or protection, causing dangerous heating. Therefore the correct answer is B: Appliances demand more current than the circuit is rated to carry.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_021",
+          "original": true,
+          "topicCode": "BDT-ELECTRICAL",
+          "type": "multiple_choice",
+          "prompt": "A wall switch is off but a tester still detects voltage at the fitting. What should the learner conclude?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The circuit must be isolated at the supply and proved dead before any work",
+              "rationale": "This option is correct. A local switch may be wired incorrectly or may not isolate every live conductor, so safe work requires supply isolation and verification with a suitable tester."
+            },
+            {
+              "label": "B",
+              "text": "The wall switch alone guarantees safe isolation",
+              "rationale": "Choosing “The wall switch alone guarantees safe isolation” follows a different rule from the one required here. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The circuit must be isolated at the supply and proved dead before any work” is defensible because a local switch may be wired incorrectly or may not isolate every live conductor, so safe work requires supply isolation and verification with a suitable tester."
+            },
+            {
+              "label": "C",
+              "text": "Wet hands will remove the remaining voltage",
+              "rationale": "A learner choosing “Wet hands will remove the remaining voltage” would be relying on the wrong criterion. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “The circuit must be isolated at the supply and proved dead before any work” is defensible because a local switch may be wired incorrectly or may not isolate every live conductor, so safe work requires supply isolation and verification with a suitable tester."
+            },
+            {
+              "label": "D",
+              "text": "A larger breaker will make the fitting safe",
+              "rationale": "Here, “A larger breaker will make the fitting safe” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The circuit must be isolated at the supply and proved dead before any work” is defensible because a local switch may be wired incorrectly or may not isolate every live conductor, so safe work requires supply isolation and verification with a suitable tester."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A local switch may be wired incorrectly or may not isolate every live conductor, so safe work requires supply isolation and verification with a suitable tester. Therefore the correct answer is A: The circuit must be isolated at the supply and proved dead before any work.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_022",
+          "original": true,
+          "topicCode": "BDT-ELECTRICAL",
+          "type": "multiple_choice",
+          "prompt": "What shows an intentional conductor junction in a circuit drawing?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A north arrow",
+              "rationale": "Selecting “A north arrow” misclassifies the idea being tested. It focuses on an incidental appearance or administrative detail that cannot perform the technical function being assessed. By contrast, “A solid dot at the conductor intersection” is defensible because a solid junction dot distinguishes a true electrical connection from crossing conductors that pass without joining."
+            },
+            {
+              "label": "B",
+              "text": "A roof triangle",
+              "rationale": "The option “A roof triangle” describes a different outcome from the one supported by the evidence. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A solid dot at the conductor intersection” is defensible because a solid junction dot distinguishes a true electrical connection from crossing conductors that pass without joining."
+            },
+            {
+              "label": "C",
+              "text": "A solid dot at the conductor intersection",
+              "rationale": "This option is correct. A solid junction dot distinguishes a true electrical connection from crossing conductors that pass without joining."
+            },
+            {
+              "label": "D",
+              "text": "A broken dimension line",
+              "rationale": "The response “A broken dimension line” points to the wrong property. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A solid dot at the conductor intersection” is defensible because a solid junction dot distinguishes a true electrical connection from crossing conductors that pass without joining."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A solid junction dot distinguishes a true electrical connection from crossing conductors that pass without joining. Therefore the correct answer is C: A solid dot at the conductor intersection.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_023",
+          "original": true,
+          "topicCode": "BDT-ELECTRICAL",
+          "type": "multiple_choice",
+          "prompt": "Why should electrical work never be done with wet hands?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Water turns off the grid",
+              "rationale": "The proposed answer “Water turns off the grid” cannot be reconciled with the stated conditions. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Moisture can lower skin resistance and increase shock current” is defensible because moisture can reduce the body’s resistance, allowing a larger and more dangerous current through a person contacting a live part."
+            },
+            {
+              "label": "B",
+              "text": "Wet hands thicken insulation",
+              "rationale": "A learner choosing “Wet hands thicken insulation” would be relying on the wrong criterion. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Moisture can lower skin resistance and increase shock current” is defensible because moisture can reduce the body’s resistance, allowing a larger and more dangerous current through a person contacting a live part."
+            },
+            {
+              "label": "C",
+              "text": "Moisture stops current",
+              "rationale": "Accepting “Moisture stops current” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Moisture can lower skin resistance and increase shock current” is defensible because moisture can reduce the body’s resistance, allowing a larger and more dangerous current through a person contacting a live part."
+            },
+            {
+              "label": "D",
+              "text": "Moisture can lower skin resistance and increase shock current",
+              "rationale": "This option is correct. Moisture can reduce the body’s resistance, allowing a larger and more dangerous current through a person contacting a live part."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Moisture can reduce the body’s resistance, allowing a larger and more dangerous current through a person contacting a live part. Therefore the correct answer is D: Moisture can lower skin resistance and increase shock current.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_024",
+          "original": true,
+          "topicCode": "BDT-ELECTRICAL",
+          "type": "multiple_choice",
+          "prompt": "What does a circuit breaker do after detecting serious overcurrent?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Generate extra current",
+              "rationale": "Treating “Generate extra current” as correct overlooks the decisive condition. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Open the circuit automatically; it can be reset after the fault is cleared” is defensible because a breaker trips to disconnect unsafe current and can normally be reset only after the underlying fault has been corrected."
+            },
+            {
+              "label": "B",
+              "text": "Join live and neutral",
+              "rationale": "Accepting “Join live and neutral” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Open the circuit automatically; it can be reset after the fault is cleared” is defensible because a breaker trips to disconnect unsafe current and can normally be reset only after the underlying fault has been corrected."
+            },
+            {
+              "label": "C",
+              "text": "Open the circuit automatically; it can be reset after the fault is cleared",
+              "rationale": "This option is correct. A breaker trips to disconnect unsafe current and can normally be reset only after the underlying fault has been corrected."
+            },
+            {
+              "label": "D",
+              "text": "Hide damaged insulation",
+              "rationale": "Using “Hide damaged insulation” would apply the concept in the wrong context. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “Open the circuit automatically; it can be reset after the fault is cleared” is defensible because a breaker trips to disconnect unsafe current and can normally be reset only after the underlying fault has been corrected."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A breaker trips to disconnect unsafe current and can normally be reset only after the underlying fault has been corrected. Therefore the correct answer is C: Open the circuit automatically; it can be reset after the fault is cleared.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_025",
+          "original": true,
+          "topicCode": "BDT-ELECTRICAL",
+          "type": "multiple_choice",
+          "prompt": "Which action reduces electrical energy waste in a classroom?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Leave idle chargers powered",
+              "rationale": "The claim “Leave idle chargers powered” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Switch off unused lights and equipment at the source” is defensible because turning unused loads off prevents unnecessary consumption and reduces avoidable heat, operating cost and equipment wear."
+            },
+            {
+              "label": "B",
+              "text": "Keep damaged cables",
+              "rationale": "The option “Keep damaged cables” describes a different outcome from the one supported by the evidence. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Switch off unused lights and equipment at the source” is defensible because turning unused loads off prevents unnecessary consumption and reduces avoidable heat, operating cost and equipment wear."
+            },
+            {
+              "label": "C",
+              "text": "Block equipment ventilation",
+              "rationale": "The response “Block equipment ventilation” points to the wrong property. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “Switch off unused lights and equipment at the source” is defensible because turning unused loads off prevents unnecessary consumption and reduces avoidable heat, operating cost and equipment wear."
+            },
+            {
+              "label": "D",
+              "text": "Switch off unused lights and equipment at the source",
+              "rationale": "This option is correct. Turning unused loads off prevents unnecessary consumption and reduces avoidable heat, operating cost and equipment wear."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Turning unused loads off prevents unnecessary consumption and reduces avoidable heat, operating cost and equipment wear. Therefore the correct answer is D: Switch off unused lights and equipment at the source.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_026",
+          "original": true,
+          "topicCode": "BDT-ELECTRICAL",
+          "type": "multiple_choice",
+          "prompt": "A person is receiving an electric shock. What is the safest first response?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Disconnect electricity without directly touching the person",
+              "rationale": "This option is correct. The supply should be isolated before contact because touching the casualty while current flows can shock the rescuer too."
+            },
+            {
+              "label": "B",
+              "text": "Pull them with wet hands",
+              "rationale": "The option “Pull them with wet hands” describes a different outcome from the one supported by the evidence. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Disconnect electricity without directly touching the person” is defensible because the supply should be isolated before contact because touching the casualty while current flows can shock the rescuer too."
+            },
+            {
+              "label": "C",
+              "text": "Pour water on the appliance",
+              "rationale": "The proposed answer “Pour water on the appliance” cannot be reconciled with the stated conditions. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Disconnect electricity without directly touching the person” is defensible because the supply should be isolated before contact because touching the casualty while current flows can shock the rescuer too."
+            },
+            {
+              "label": "D",
+              "text": "Hold the bare conductor",
+              "rationale": "Choosing “Hold the bare conductor” follows a different rule from the one required here. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Disconnect electricity without directly touching the person” is defensible because the supply should be isolated before contact because touching the casualty while current flows can shock the rescuer too."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The supply should be isolated before contact because touching the casualty while current flows can shock the rescuer too. Therefore the correct answer is A: Disconnect electricity without directly touching the person.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_027",
+          "original": true,
+          "topicCode": "BDT-ELECTRICAL",
+          "type": "multiple_choice",
+          "prompt": "What matters most when selecting a replacement fuse?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The wall colour",
+              "rationale": "Using “The wall colour” would apply the concept in the wrong context. It focuses on an incidental appearance or administrative detail that cannot perform the technical function being assessed. By contrast, “The circuit’s specified current rating and fuse type” is defensible because a replacement must match the protective design so it carries normal current but interrupts a fault before equipment exceeds safe limits."
+            },
+            {
+              "label": "B",
+              "text": "The circuit’s specified current rating and fuse type",
+              "rationale": "This option is correct. A replacement must match the protective design so it carries normal current but interrupts a fault before equipment exceeds safe limits."
+            },
+            {
+              "label": "C",
+              "text": "The owner’s age",
+              "rationale": "Choosing “The owner’s age” follows a different rule from the one required here. It focuses on an incidental appearance or administrative detail that cannot perform the technical function being assessed. By contrast, “The circuit’s specified current rating and fuse type” is defensible because a replacement must match the protective design so it carries normal current but interrupts a fault before equipment exceeds safe limits."
+            },
+            {
+              "label": "D",
+              "text": "The appliance name length",
+              "rationale": "The claim “The appliance name length” conflicts with the relationship described in the stem. It focuses on an incidental appearance or administrative detail that cannot perform the technical function being assessed. By contrast, “The circuit’s specified current rating and fuse type” is defensible because a replacement must match the protective design so it carries normal current but interrupts a fault before equipment exceeds safe limits."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A replacement must match the protective design so it carries normal current but interrupts a fault before equipment exceeds safe limits. Therefore the correct answer is B: The circuit’s specified current rating and fuse type.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Select",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_028",
+          "original": true,
+          "topicCode": "BDT-ENTREPRENEURSHIP",
+          "type": "multiple_choice",
+          "prompt": "Why conduct market research before producing an item for sale?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To learn what customers need, value and will buy",
+              "rationale": "This option is correct. Market research supplies evidence about customers, alternatives, prices and demand, helping design an offer with a realistic chance of sale."
+            },
+            {
+              "label": "B",
+              "text": "To guarantee sales at any price",
+              "rationale": "Choosing “To guarantee sales at any price” follows a different rule from the one required here. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “To learn what customers need, value and will buy” is defensible because market research supplies evidence about customers, alternatives, prices and demand, helping design an offer with a realistic chance of sale."
+            },
+            {
+              "label": "C",
+              "text": "To avoid competitors",
+              "rationale": "Selecting “To avoid competitors” misclassifies the idea being tested. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “To learn what customers need, value and will buy” is defensible because market research supplies evidence about customers, alternatives, prices and demand, helping design an offer with a realistic chance of sale."
+            },
+            {
+              "label": "D",
+              "text": "To replace costs with guesses",
+              "rationale": "The response “To replace costs with guesses” points to the wrong property. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To learn what customers need, value and will buy” is defensible because market research supplies evidence about customers, alternatives, prices and demand, helping design an offer with a realistic chance of sale."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Market research supplies evidence about customers, alternatives, prices and demand, helping design an offer with a realistic chance of sale. Therefore the correct answer is A: To learn what customers need, value and will buy.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_029",
+          "original": true,
+          "topicCode": "BDT-ENTREPRENEURSHIP",
+          "type": "multiple_choice",
+          "prompt": "Which cost changes most when a craft business makes more units?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Annual registration already paid",
+              "rationale": "The response “Annual registration already paid” points to the wrong property. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Material used for the additional units” is defensible because material consumption rises with output and is a variable cost, while rent and long-lived equipment do not change unit by unit."
+            },
+            {
+              "label": "B",
+              "text": "Material used for the additional units",
+              "rationale": "This option is correct. Material consumption rises with output and is a variable cost, while rent and long-lived equipment do not change unit by unit."
+            },
+            {
+              "label": "C",
+              "text": "Fixed monthly rent",
+              "rationale": "The response “Fixed monthly rent” points to the wrong property. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Material used for the additional units” is defensible because material consumption rises with output and is a variable cost, while rent and long-lived equipment do not change unit by unit."
+            },
+            {
+              "label": "D",
+              "text": "A permanent workbench",
+              "rationale": "Using “A permanent workbench” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Material used for the additional units” is defensible because material consumption rises with output and is a variable cost, while rent and long-lived equipment do not change unit by unit."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Material consumption rises with output and is a variable cost, while rent and long-lived equipment do not change unit by unit. Therefore the correct answer is B: Material used for the additional units.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_030",
+          "original": true,
+          "topicCode": "BDT-ENTREPRENEURSHIP",
+          "type": "multiple_choice",
+          "prompt": "How is profit calculated for a small production period?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Add costs to borrowing",
+              "rationale": "That choice, “Add costs to borrowing”, substitutes a distractor feature for the tested principle. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Subtract total costs from sales revenue” is defensible because profit is the amount remaining after relevant costs are deducted from revenue, so incomplete cost records give a misleading result."
+            },
+            {
+              "label": "B",
+              "text": "Subtract revenue from customers",
+              "rationale": "The proposed answer “Subtract revenue from customers” cannot be reconciled with the stated conditions. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Subtract total costs from sales revenue” is defensible because profit is the amount remaining after relevant costs are deducted from revenue, so incomplete cost records give a misleading result."
+            },
+            {
+              "label": "C",
+              "text": "Multiply price by owner age",
+              "rationale": "The option “Multiply price by owner age” describes a different outcome from the one supported by the evidence. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Subtract total costs from sales revenue” is defensible because profit is the amount remaining after relevant costs are deducted from revenue, so incomplete cost records give a misleading result."
+            },
+            {
+              "label": "D",
+              "text": "Subtract total costs from sales revenue",
+              "rationale": "This option is correct. Profit is the amount remaining after relevant costs are deducted from revenue, so incomplete cost records give a misleading result."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Profit is the amount remaining after relevant costs are deducted from revenue, so incomplete cost records give a misleading result. Therefore the correct answer is D: Subtract total costs from sales revenue.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_031",
+          "original": true,
+          "topicCode": "BDT-ENTREPRENEURSHIP",
+          "type": "multiple_choice",
+          "prompt": "What does a value proposition explain?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Only the owner’s hobbies",
+              "rationale": "Accepting “Only the owner’s hobbies” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The useful benefit that makes the product worth choosing” is defensible because a value proposition connects product features to a customer need and distinguishes the offer from available alternatives."
+            },
+            {
+              "label": "B",
+              "text": "Why defects should be ignored",
+              "rationale": "Choosing “Why defects should be ignored” follows a different rule from the one required here. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The useful benefit that makes the product worth choosing” is defensible because a value proposition connects product features to a customer need and distinguishes the offer from available alternatives."
+            },
+            {
+              "label": "C",
+              "text": "The useful benefit that makes the product worth choosing",
+              "rationale": "This option is correct. A value proposition connects product features to a customer need and distinguishes the offer from available alternatives."
+            },
+            {
+              "label": "D",
+              "text": "How to hide price",
+              "rationale": "The option “How to hide price” describes a different outcome from the one supported by the evidence. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “The useful benefit that makes the product worth choosing” is defensible because a value proposition connects product features to a customer need and distinguishes the offer from available alternatives."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A value proposition connects product features to a customer need and distinguishes the offer from available alternatives. Therefore the correct answer is C: The useful benefit that makes the product worth choosing.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_032",
+          "original": true,
+          "topicCode": "BDT-ENTREPRENEURSHIP",
+          "type": "multiple_choice",
+          "prompt": "Why record daily sales and expenses separately?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To make receipts unverifiable",
+              "rationale": "A learner choosing “To make receipts unverifiable” would be relying on the wrong criterion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “To track cash movement and performance accurately” is defensible because separate records show what the business earned and spent, support profit checks and make unusual losses easier to investigate."
+            },
+            {
+              "label": "B",
+              "text": "To mix household money",
+              "rationale": "That choice, “To mix household money”, substitutes a distractor feature for the tested principle. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “To track cash movement and performance accurately” is defensible because separate records show what the business earned and spent, support profit checks and make unusual losses easier to investigate."
+            },
+            {
+              "label": "C",
+              "text": "To stop returns",
+              "rationale": "Choosing “To stop returns” follows a different rule from the one required here. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To track cash movement and performance accurately” is defensible because separate records show what the business earned and spent, support profit checks and make unusual losses easier to investigate."
+            },
+            {
+              "label": "D",
+              "text": "To track cash movement and performance accurately",
+              "rationale": "This option is correct. Separate records show what the business earned and spent, support profit checks and make unusual losses easier to investigate."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Separate records show what the business earned and spent, support profit checks and make unusual losses easier to investigate. Therefore the correct answer is D: To track cash movement and performance accurately.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_033",
+          "original": true,
+          "topicCode": "BDT-ENTREPRENEURSHIP",
+          "type": "multiple_choice",
+          "prompt": "What is the break-even point?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The sales level where total revenue equals total cost",
+              "rationale": "This option is correct. At break-even the enterprise covers fixed and variable costs but has not made a profit, so later sales can contribute to profit."
+            },
+            {
+              "label": "B",
+              "text": "When nobody knows the product",
+              "rationale": "Selecting “When nobody knows the product” misclassifies the idea being tested. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The sales level where total revenue equals total cost” is defensible because at break-even the enterprise covers fixed and variable costs but has not made a profit, so later sales can contribute to profit."
+            },
+            {
+              "label": "C",
+              "text": "The highest imagined price",
+              "rationale": "The claim “The highest imagined price” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The sales level where total revenue equals total cost” is defensible because at break-even the enterprise covers fixed and variable costs but has not made a profit, so later sales can contribute to profit."
+            },
+            {
+              "label": "D",
+              "text": "When every cost is zero",
+              "rationale": "A learner choosing “When every cost is zero” would be relying on the wrong criterion. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “The sales level where total revenue equals total cost” is defensible because at break-even the enterprise covers fixed and variable costs but has not made a profit, so later sales can contribute to profit."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "At break-even the enterprise covers fixed and variable costs but has not made a profit, so later sales can contribute to profit. Therefore the correct answer is A: The sales level where total revenue equals total cost.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Define",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_034",
+          "original": true,
+          "topicCode": "BDT-ENTREPRENEURSHIP",
+          "type": "multiple_choice",
+          "prompt": "Which pricing approach is most responsible?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Copy an unrelated high price",
+              "rationale": "The response “Copy an unrelated high price” points to the wrong property. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Calculate costs, customer value and realistic market prices” is defensible because sound pricing covers relevant costs, reflects product value and remains credible against alternatives while sustaining quality."
+            },
+            {
+              "label": "B",
+              "text": "Calculate costs, customer value and realistic market prices",
+              "rationale": "This option is correct. Sound pricing covers relevant costs, reflects product value and remains credible against alternatives while sustaining quality."
+            },
+            {
+              "label": "C",
+              "text": "Ignore labour and materials",
+              "rationale": "Treating “Ignore labour and materials” as correct overlooks the decisive condition. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “Calculate costs, customer value and realistic market prices” is defensible because sound pricing covers relevant costs, reflects product value and remains credible against alternatives while sustaining quality."
+            },
+            {
+              "label": "D",
+              "text": "Change prices randomly",
+              "rationale": "Accepting “Change prices randomly” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Calculate costs, customer value and realistic market prices” is defensible because sound pricing covers relevant costs, reflects product value and remains credible against alternatives while sustaining quality."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Sound pricing covers relevant costs, reflects product value and remains credible against alternatives while sustaining quality. Therefore the correct answer is B: Calculate costs, customer value and realistic market prices.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Evaluate",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_035",
+          "original": true,
+          "topicCode": "BDT-ENTREPRENEURSHIP",
+          "type": "multiple_choice",
+          "prompt": "How can customer feedback improve a product?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Prove complaints are dishonest",
+              "rationale": "Treating “Prove complaints are dishonest” as correct overlooks the decisive condition. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Reveal defects and unmet needs for the next revision” is defensible because structured feedback identifies recurring user problems and priorities that the maker can verify before improving the design."
+            },
+            {
+              "label": "B",
+              "text": "Remove the need to test",
+              "rationale": "The proposed answer “Remove the need to test” cannot be reconciled with the stated conditions. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “Reveal defects and unmet needs for the next revision” is defensible because structured feedback identifies recurring user problems and priorities that the maker can verify before improving the design."
+            },
+            {
+              "label": "C",
+              "text": "Reveal defects and unmet needs for the next revision",
+              "rationale": "This option is correct. Structured feedback identifies recurring user problems and priorities that the maker can verify before improving the design."
+            },
+            {
+              "label": "D",
+              "text": "Guarantee one design suits all",
+              "rationale": "Accepting “Guarantee one design suits all” would bypass the reasoning the item requires. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Reveal defects and unmet needs for the next revision” is defensible because structured feedback identifies recurring user problems and priorities that the maker can verify before improving the design."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Structured feedback identifies recurring user problems and priorities that the maker can verify before improving the design. Therefore the correct answer is C: Reveal defects and unmet needs for the next revision.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_036",
+          "original": true,
+          "topicCode": "BDT-ENTREPRENEURSHIP",
+          "type": "multiple_choice",
+          "prompt": "What is the purpose of quality control?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Hide defective units",
+              "rationale": "A learner choosing “Hide defective units” would be relying on the wrong criterion. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “Check that outputs consistently meet agreed requirements” is defensible because quality control compares work with defined standards at useful stages, allowing faults to be corrected before products reach customers."
+            },
+            {
+              "label": "B",
+              "text": "Check that outputs consistently meet agreed requirements",
+              "rationale": "This option is correct. Quality control compares work with defined standards at useful stages, allowing faults to be corrected before products reach customers."
+            },
+            {
+              "label": "C",
+              "text": "Increase unmeasured waste",
+              "rationale": "The claim “Increase unmeasured waste” conflicts with the relationship described in the stem. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “Check that outputs consistently meet agreed requirements” is defensible because quality control compares work with defined standards at useful stages, allowing faults to be corrected before products reach customers."
+            },
+            {
+              "label": "D",
+              "text": "Avoid dimensions",
+              "rationale": "Accepting “Avoid dimensions” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Check that outputs consistently meet agreed requirements” is defensible because quality control compares work with defined standards at useful stages, allowing faults to be corrected before products reach customers."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Quality control compares work with defined standards at useful stages, allowing faults to be corrected before products reach customers. Therefore the correct answer is B: Check that outputs consistently meet agreed requirements.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_037",
+          "original": true,
+          "topicCode": "BDT-ENTREPRENEURSHIP",
+          "type": "multiple_choice",
+          "prompt": "Why keep business and household money separate?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To prevent budgets",
+              "rationale": "Treating “To prevent budgets” as correct overlooks the decisive condition. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To know the enterprise’s true cash position” is defensible because separating funds makes income, costs and drawings traceable and helps the owner decide what the enterprise can safely spend."
+            },
+            {
+              "label": "B",
+              "text": "To hide withdrawals",
+              "rationale": "Here, “To hide withdrawals” represents the misconception rather than the valid conclusion. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To know the enterprise’s true cash position” is defensible because separating funds makes income, costs and drawings traceable and helps the owner decide what the enterprise can safely spend."
+            },
+            {
+              "label": "C",
+              "text": "To know the enterprise’s true cash position",
+              "rationale": "This option is correct. Separating funds makes income, costs and drawings traceable and helps the owner decide what the enterprise can safely spend."
+            },
+            {
+              "label": "D",
+              "text": "To remove receipts",
+              "rationale": "The option “To remove receipts” describes a different outcome from the one supported by the evidence. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To know the enterprise’s true cash position” is defensible because separating funds makes income, costs and drawings traceable and helps the owner decide what the enterprise can safely spend."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Separating funds makes income, costs and drawings traceable and helps the owner decide what the enterprise can safely spend. Therefore the correct answer is C: To know the enterprise’s true cash position.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Interpret",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_038",
+          "original": true,
+          "topicCode": "BDT-ENTREPRENEURSHIP",
+          "type": "multiple_choice",
+          "prompt": "What does positive cash flow mean for a period?",
+          "options": [
+            {
+              "label": "A",
+              "text": "More cash entered the business than left it",
+              "rationale": "This option is correct. Positive cash flow means receipts exceeded payments for that period, although profitability and future obligations still need review."
+            },
+            {
+              "label": "B",
+              "text": "There were no sales",
+              "rationale": "The claim “There were no sales” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “More cash entered the business than left it” is defensible because positive cash flow means receipts exceeded payments for that period, although profitability and future obligations still need review."
+            },
+            {
+              "label": "C",
+              "text": "All sales were unpaid",
+              "rationale": "The claim “All sales were unpaid” conflicts with the relationship described in the stem. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “More cash entered the business than left it” is defensible because positive cash flow means receipts exceeded payments for that period, although profitability and future obligations still need review."
+            },
+            {
+              "label": "D",
+              "text": "Payment dates were ignored",
+              "rationale": "Accepting “Payment dates were ignored” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “More cash entered the business than left it” is defensible because positive cash flow means receipts exceeded payments for that period, although profitability and future obligations still need review."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Positive cash flow means receipts exceeded payments for that period, although profitability and future obligations still need review. Therefore the correct answer is A: More cash entered the business than left it.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Interpret",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_039",
+          "original": true,
+          "topicCode": "BDT-ENTREPRENEURSHIP",
+          "type": "multiple_choice",
+          "prompt": "Which advertising statement is ethical?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A false no-failure claim",
+              "rationale": "The response “A false no-failure claim” points to the wrong property. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A truthful description of tested features and actual price” is defensible because ethical promotion gives customers accurate material information and avoids deceptive claims, supporting informed choice and trust."
+            },
+            {
+              "label": "B",
+              "text": "A hidden charge",
+              "rationale": "The claim “A hidden charge” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A truthful description of tested features and actual price” is defensible because ethical promotion gives customers accurate material information and avoids deceptive claims, supporting informed choice and trust."
+            },
+            {
+              "label": "C",
+              "text": "A fabricated endorsement",
+              "rationale": "That choice, “A fabricated endorsement”, substitutes a distractor feature for the tested principle. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A truthful description of tested features and actual price” is defensible because ethical promotion gives customers accurate material information and avoids deceptive claims, supporting informed choice and trust."
+            },
+            {
+              "label": "D",
+              "text": "A truthful description of tested features and actual price",
+              "rationale": "This option is correct. Ethical promotion gives customers accurate material information and avoids deceptive claims, supporting informed choice and trust."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Ethical promotion gives customers accurate material information and avoids deceptive claims, supporting informed choice and trust. Therefore the correct answer is D: A truthful description of tested features and actual price.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_bdt_gap_b001_040",
+          "original": true,
+          "topicCode": "BDT-ENTREPRENEURSHIP",
+          "type": "multiple_choice",
+          "prompt": "Why prepare a business plan before seeking a small loan?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To guarantee approval",
+              "rationale": "A learner choosing “To guarantee approval” would be relying on the wrong criterion. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “To explain market, operations, costs, risks and repayment capacity” is defensible because a business plan organizes enterprise assumptions and helps owner and lender judge whether expected cash flows support repayment."
+            },
+            {
+              "label": "B",
+              "text": "To replace records",
+              "rationale": "Using “To replace records” would apply the concept in the wrong context. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To explain market, operations, costs, risks and repayment capacity” is defensible because a business plan organizes enterprise assumptions and helps owner and lender judge whether expected cash flows support repayment."
+            },
+            {
+              "label": "C",
+              "text": "To explain market, operations, costs, risks and repayment capacity",
+              "rationale": "This option is correct. A business plan organizes enterprise assumptions and helps owner and lender judge whether expected cash flows support repayment."
+            },
+            {
+              "label": "D",
+              "text": "To prove conditions never change",
+              "rationale": "A learner choosing “To prove conditions never change” would be relying on the wrong criterion. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “To explain market, operations, costs, risks and repayment capacity” is defensible because a business plan organizes enterprise assumptions and helps owner and lender judge whether expected cash flows support repayment."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A business plan organizes enterprise assumptions and helps owner and lender judge whether expected cash flows support repayment. Therefore the correct answer is C: To explain market, operations, costs, risks and repayment capacity.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        }
+      ]
+    }
+  ]
+}

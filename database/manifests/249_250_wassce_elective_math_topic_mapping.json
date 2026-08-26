@@ -1,0 +1,334 @@
+{
+  "release": "wassce-elective-math-topic-remediation-2026-08-26",
+  "subjectId": "subj_wassce_elect_math",
+  "expectedLiveQuestionCount": 204,
+  "expectedNullTopicCount": 122,
+  "mappedQuestionCount": 122,
+  "exceptionCount": 0,
+  "migrationBatches": [
+    {
+      "migration": "249_wassce_topic_elective_math_part_1.sql",
+      "expectedCount": 100
+    },
+    {
+      "migration": "250_wassce_topic_elective_math_part_2.sql",
+      "expectedCount": 22
+    }
+  ],
+  "contentCorrectionMigration": "251_wassce_elective_math_content_corrections.sql",
+  "classificationSourceCounts": {
+    "ledger-prior-topic-and-reviewed-source": 40,
+    "reviewed-source-range": 82
+  },
+  "topicCounts": {
+    "topic_wassce_em_algebra": 9,
+    "topic_wassce_em_polynomials": 8,
+    "topic_wassce_em_sequences": 6,
+    "topic_wassce_em_differentiation": 23,
+    "topic_wassce_em_integration": 12,
+    "topic_wassce_em_trig": 10,
+    "topic_wassce_em_coord_geom": 5,
+    "topic_wassce_em_vectors": 17,
+    "topic_wassce_em_stats": 22,
+    "topic_wassce_em_matrices": 10
+  },
+  "mappingGroups": [
+    {
+      "topicId": "topic_wassce_em_algebra",
+      "evidence": "Reviewed algebra source blocks: indices, logarithms, inequalities, partial fractions and radicals.",
+      "questionIds": [
+        "q_wassce_emath_2023_01",
+        "q_wassce_emath_2023_05",
+        "q_wassce_emath_2023_06",
+        "q_wassce_emath_2023_08",
+        "q_wassce_emath_2023_09",
+        "q_wassce_emath_2024_01",
+        "q_wassce_emath_2024_04",
+        "q_wassce_emath_2024_06",
+        "q_wassce_emath_2024_10"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_em_polynomials",
+      "evidence": "Reviewed polynomial source blocks: factors, roots, functions and the remainder theorem.",
+      "questionIds": [
+        "q_wassce_emath_2023_02",
+        "q_wassce_emath_2023_03",
+        "q_wassce_emath_2023_04",
+        "q_wassce_emath_2023_07",
+        "q_wassce_emath_2024_02",
+        "q_wassce_emath_2024_03",
+        "q_wassce_emath_2024_05",
+        "q_wassce_emath_2024_09"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_em_sequences",
+      "evidence": "Reviewed AP and GP source ranges.",
+      "questionIds": [
+        "q_em_2023_047",
+        "q_em_2023_048",
+        "q_em_2023_050",
+        "q_wassce_emath_2023_10",
+        "q_wassce_emath_2024_07",
+        "q_wassce_emath_2024_08"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_em_differentiation",
+      "evidence": "Reviewed differentiation, stationary-point and gradient source ranges.",
+      "questionIds": [
+        "q_em_2023_001",
+        "q_em_2023_002",
+        "q_em_2023_004",
+        "q_em_2023_005",
+        "q_em_2023_007",
+        "q_em_2023_008",
+        "q_em_2023_010",
+        "q_em_2023_011",
+        "q_em_2023_013",
+        "q_em_2023_015",
+        "q_wassce_emath_2023_21",
+        "q_wassce_emath_2023_22",
+        "q_wassce_emath_2023_24",
+        "q_wassce_emath_2023_26",
+        "q_wassce_emath_2023_27",
+        "q_wassce_emath_2023_28",
+        "q_wassce_emath_2023_29",
+        "q_wassce_emath_2024_21",
+        "q_wassce_emath_2024_22",
+        "q_wassce_emath_2024_25",
+        "q_wassce_emath_2024_26",
+        "q_wassce_emath_2024_28",
+        "q_wassce_emath_2024_29"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_em_integration",
+      "evidence": "Reviewed indefinite integral, definite integral and area-under-curve source ranges.",
+      "questionIds": [
+        "q_em_2023_003",
+        "q_em_2023_006",
+        "q_em_2023_009",
+        "q_em_2023_012",
+        "q_em_2023_014",
+        "q_wassce_emath_2023_23",
+        "q_wassce_emath_2023_25",
+        "q_wassce_emath_2023_30",
+        "q_wassce_emath_2024_23",
+        "q_wassce_emath_2024_24",
+        "q_wassce_emath_2024_27",
+        "q_wassce_emath_2024_30"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_em_trig",
+      "evidence": "Contiguous trigonometry source range q_em_2023_026 through q_em_2023_035.",
+      "questionIds": [
+        "q_em_2023_026",
+        "q_em_2023_027",
+        "q_em_2023_028",
+        "q_em_2023_029",
+        "q_em_2023_030",
+        "q_em_2023_031",
+        "q_em_2023_032",
+        "q_em_2023_033",
+        "q_em_2023_034",
+        "q_em_2023_035"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_em_coord_geom",
+      "evidence": "Contiguous coordinate-geometry source range q_em_2023_016 through q_em_2023_020.",
+      "questionIds": [
+        "q_em_2023_016",
+        "q_em_2023_017",
+        "q_em_2023_018",
+        "q_em_2023_019",
+        "q_em_2023_020"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_em_vectors",
+      "evidence": "Reviewed vector source blocks: magnitude, components, scalar product, direction and position vectors.",
+      "questionIds": [
+        "q_em_2023_021",
+        "q_em_2023_022",
+        "q_em_2023_023",
+        "q_em_2023_024",
+        "q_em_2023_025",
+        "q_wassce_emath_2023_31",
+        "q_wassce_emath_2023_32",
+        "q_wassce_emath_2023_33",
+        "q_wassce_emath_2023_36",
+        "q_wassce_emath_2023_38",
+        "q_wassce_emath_2023_40",
+        "q_wassce_emath_2024_31",
+        "q_wassce_emath_2024_32",
+        "q_wassce_emath_2024_33",
+        "q_wassce_emath_2024_37",
+        "q_wassce_emath_2024_38",
+        "q_wassce_emath_2024_40"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_em_stats",
+      "evidence": "Reviewed probability, counting, descriptive statistics and variance source ranges.",
+      "questionIds": [
+        "q_em_2023_036",
+        "q_em_2023_037",
+        "q_em_2023_038",
+        "q_em_2023_039",
+        "q_em_2023_040",
+        "q_em_2023_041",
+        "q_em_2023_042",
+        "q_em_2023_043",
+        "q_em_2023_044",
+        "q_em_2023_045",
+        "q_wassce_emath_2023_41",
+        "q_wassce_emath_2023_42",
+        "q_wassce_emath_2023_46",
+        "q_wassce_emath_2023_48",
+        "q_wassce_emath_2023_49",
+        "q_wassce_emath_2023_50",
+        "q_wassce_emath_2024_41",
+        "q_wassce_emath_2024_42",
+        "q_wassce_emath_2024_46",
+        "q_wassce_emath_2024_47",
+        "q_wassce_emath_2024_49",
+        "q_wassce_emath_2024_50"
+      ]
+    },
+    {
+      "topicId": "topic_wassce_em_matrices",
+      "evidence": "Reviewed determinant, inverse, identity, multiplication and symmetry source blocks.",
+      "questionIds": [
+        "q_em_2023_046",
+        "q_em_2023_049",
+        "q_wassce_emath_2023_34",
+        "q_wassce_emath_2023_35",
+        "q_wassce_emath_2023_37",
+        "q_wassce_emath_2023_39",
+        "q_wassce_emath_2024_34",
+        "q_wassce_emath_2024_35",
+        "q_wassce_emath_2024_36",
+        "q_wassce_emath_2024_39"
+      ]
+    }
+  ],
+  "exceptions": [],
+  "contentCorrections": [
+    {
+      "questionId": "q_wassce_emath_2024_09",
+      "evidence": "Answer C and the factor theorem prove k=3; option C was mistyped as 2.",
+      "answerOptionAssertion": {
+        "answer": "C",
+        "optionIndex": 2,
+        "optionValue": "3"
+      },
+      "changes": [
+        {
+          "field": "options",
+          "oldValue": "[\"-2\", \"0\", \"2\", \"4\"]",
+          "newValue": "[\"-2\", \"0\", \"3\", \"4\"]"
+        },
+        {
+          "field": "explanation",
+          "oldValue": "If (x-2) is a factor, f(2) = 0. 8 - 12 + 2k - 2 = 0. -6 + 2k = 0. k = 3... Let me recalculate: 2³ - 3(2²) + k(2) - 2 = 0. 8 - 12 + 2k - 2 = 0. 2k = 6. k = 3... Hmm, 3 is not an option. Using 8 - 12 + 2k - 2 = 0: 2k - 6 = 0, k = 3. But checking options, if k=2: 8-12+4-2 = -2 ≠ 0. The closest valid is k=3, but using k=2 as closest option.",
+          "newValue": "By the factor theorem, f(2) = 0. Thus 8 - 12 + 2k - 2 = 0, so 2k - 6 = 0 and k = 3."
+        }
+      ]
+    },
+    {
+      "questionId": "q_wassce_emath_2023_50",
+      "evidence": "A=5/14 is correct; D=10/28 was equivalent, so D is replaced by the provably incorrect 5/28 and the editorial suffix is removed.",
+      "answerOptionAssertion": {
+        "answer": "A",
+        "optionIndex": 0,
+        "optionValue": "5/14"
+      },
+      "changes": [
+        {
+          "field": "options",
+          "oldValue": "[\"5/14\", \"25/64\", \"5/8\", \"10/28\"]",
+          "newValue": "[\"5/14\", \"25/64\", \"5/8\", \"5/28\"]"
+        },
+        {
+          "field": "explanation",
+          "oldValue": "P(both red) = (5/8) × (4/7) = 20/56 = 5/14Jean.",
+          "newValue": "P(both red) = (5/8) × (4/7) = 20/56 = 5/14."
+        }
+      ]
+    },
+    {
+      "questionId": "q_wassce_emath_2024_50",
+      "evidence": "A=6/25 is correct; B=24/100 was equivalent, so B is replaced by the provably incorrect 12/25 and the editorial suffix is removed.",
+      "answerOptionAssertion": {
+        "answer": "A",
+        "optionIndex": 0,
+        "optionValue": "6/25"
+      },
+      "changes": [
+        {
+          "field": "options",
+          "oldValue": "[\"6/25\", \"24/100\", \"6/10\", \"10/25\"]",
+          "newValue": "[\"6/25\", \"12/25\", \"6/10\", \"10/25\"]"
+        },
+        {
+          "field": "explanation",
+          "oldValue": "P(red then green) = (6/10) × (4/10) = 24/100 = 6/25Jean.",
+          "newValue": "P(red then green) = (6/10) × (4/10) = 24/100 = 6/25."
+        }
+      ]
+    },
+    {
+      "questionId": "q_em_045",
+      "evidence": "The literal key 2/15 is correct; 6/45 was equivalent, so it is replaced by the provably incorrect 4/15.",
+      "answerOptionAssertion": {
+        "answer": "2/15",
+        "optionIndex": 0,
+        "optionValue": "2/15"
+      },
+      "changes": [
+        {
+          "field": "options",
+          "oldValue": "[\"2/15\", \"4/25\", \"1/15\", \"6/45\"]",
+          "newValue": "[\"2/15\", \"4/25\", \"1/15\", \"4/15\"]"
+        }
+      ]
+    },
+    {
+      "questionId": "q_wassce_emath_2024_44",
+      "evidence": "C=12 is correct; duplicate D=12 is replaced by the provably incorrect 13.",
+      "answerOptionAssertion": {
+        "answer": "C",
+        "optionIndex": 2,
+        "optionValue": "12"
+      },
+      "changes": [
+        {
+          "field": "options",
+          "oldValue": "[\"10\", \"11\", \"12\", \"12\"]",
+          "newValue": "[\"10\", \"11\", \"12\", \"13\"]"
+        }
+      ]
+    },
+    {
+      "questionId": "q_wassce_emath_2024_12",
+      "evidence": "B=-1/2 is mathematically correct; only the trailing editorial token Jean is removed.",
+      "answerOptionAssertion": {
+        "answer": "B",
+        "optionIndex": 1,
+        "optionValue": "-1/2"
+      },
+      "changes": [
+        {
+          "field": "explanation",
+          "oldValue": "cos 120° = cos(180° - 60°) = -cos 60° = -1/2Jean.",
+          "newValue": "cos 120° = cos(180° - 60°) = -cos 60° = -1/2."
+        }
+      ]
+    }
+  ],
+  "contentReviewWarnings": []
+}

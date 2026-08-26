@@ -90,6 +90,7 @@ export default function ExamModePractice() {
   const [isAnswerSubmitting, setIsAnswerSubmitting] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [attemptError, setAttemptError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [startTime] = useState(Date.now());
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
@@ -268,7 +269,10 @@ export default function ExamModePractice() {
   }, [currentQuestion]);
 
   const handleSubmit = useCallback(async () => {
+    if (isSubmitting) return;
+
     setIsSubmitting(true);
+    setSubmitError(null);
     const totalTime = Math.floor((Date.now() - startTime) / 1000);
     const correctCount = results.filter(r => r.isCorrect).length;
     const score = results.reduce((acc, r) => {
@@ -278,32 +282,41 @@ export default function ExamModePractice() {
 
     try {
       // Save session to API
-      await api.post('/practice/sessions', {
+      const response = await api.post<{ id: string }>('/practice/sessions', {
         mode: mode === 'speed' ? 'speed_race' : 'topic_drill',
-        subject_id: subject !== 'all' ? subject : null,
-        questions_count: totalQuestions,
-        correct_count: correctCount,
-        total_time: totalTime,
-        score,
-        answers: results,
-      });
-    } catch (error) {
-      console.error('Failed to save session:', error);
-    }
-
-    // Navigate to results
-    navigate('/practice/results', {
-      state: {
-        mode,
-        totalQuestions,
+        subjectId: subject !== 'all' ? subject : questions[0]?.subjectId || null,
+        topicId: topic || null,
+        questionsCount: totalQuestions,
         correctCount,
         totalTime,
         score,
-        results,
-        questions,
-      },
-    });
-  }, [startTime, results, questions, mode, subject, totalQuestions, navigate]);
+        answers: results,
+      });
+
+      if (!response.success || !response.data?.id) {
+        setSubmitError(response.error || 'Your completed practice session could not be saved.');
+        return;
+      }
+
+      // Navigate only after the Worker confirms persistence.
+      navigate('/practice/results', {
+        state: {
+          mode,
+          totalQuestions,
+          correctCount,
+          totalTime,
+          score,
+          results,
+          questions,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to save session:', error);
+      setSubmitError('Your completed practice session could not be saved.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [isSubmitting, startTime, results, questions, mode, subject, topic, totalQuestions, navigate]);
 
   const handleExit = useCallback(() => {
     navigate('/practice');
@@ -480,6 +493,25 @@ export default function ExamModePractice() {
               className="rounded-lg border border-current/20 px-3 py-1.5 font-semibold transition-colors hover:bg-current/10 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Retry submission
+            </button>
+          </div>
+        </div>
+      )}
+
+      {submitError && !isSubmitting && (
+        <div role="alert" className={cn(
+          'mx-6 mb-6 flex items-start gap-2 rounded-xl border px-4 py-3 text-sm lg:mx-8',
+          isDark ? 'border-red-400/20 bg-red-400/10 text-red-200' : 'border-red-200 bg-red-50 text-red-800',
+        )}>
+          <AlertCircle aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
+          <div className="flex flex-1 flex-wrap items-center justify-between gap-3">
+            <span>{submitError} Your completed answers are still here.</span>
+            <button
+              type="button"
+              onClick={() => void handleSubmit()}
+              className="rounded-lg border border-current/20 px-3 py-1.5 font-semibold transition-colors hover:bg-current/10"
+            >
+              Retry session save
             </button>
           </div>
         </div>

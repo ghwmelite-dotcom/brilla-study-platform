@@ -1,0 +1,1510 @@
+{
+  "batchId": "bece-science-agric-beta-001",
+  "status": "approved_for_beta",
+  "examTypeId": "exam_bece",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment, Ghana",
+      "title": "Common Core Programme curricula for Junior High School",
+      "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-08-26T00:00:00Z",
+    "semanticDuplicateReview": {
+      "method": "human_cross_level_review_plus_normalized_and_token_overlap_gates",
+      "rewrittenPairs": [
+        {
+          "questionId": "q_bece_bdt_gap_b001_004",
+          "priorQuestionId": "q_was_building_b003_018"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_005",
+          "priorQuestionId": "q_was_building_b003_012"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_007",
+          "priorQuestionId": "q_was_building_b003_016"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_008",
+          "priorQuestionId": "q_was_building_b003_032"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_012",
+          "priorQuestionId": "q_was_building_b003_007"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_013",
+          "priorQuestionId": "q_was_building_b003_009"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_015",
+          "priorQuestionId": "q_was_elect_b001_037"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_017",
+          "priorQuestionId": "q_was_elect_b001_036"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_021",
+          "priorQuestionId": "q_was_elect_b001_001"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_007",
+          "priorQuestionId": "q_was_agric_b001_013"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_015",
+          "priorQuestionId": "q_was_agric_b001_014"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_019",
+          "priorQuestionId": "q_was_agric_b001_018"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_021",
+          "priorQuestionId": "q_was_agric_b001_017"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_034",
+          "priorQuestionId": "q_was_agric_b001_036"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_037",
+          "priorQuestionId": "q_was_agric_b001_004"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_039",
+          "priorQuestionId": "q_was_agric_b001_015"
+        }
+      ],
+      "unresolvedAllowedOverlaps": []
+    }
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep practice content aligned to Ghana’s published NaCCA Common Core Programme curricula; not official WAEC or NaCCA examination material.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true,
+    "rationaleAvailability": "manifest_only_runtime_question_schema_does_not_store_option_rationales"
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_bece_science",
+      "specificationCode": "NaCCA-CCP-SCI-AGRIC-2026",
+      "topics": [
+        {
+          "code": "SCI-AGRIC",
+          "title": "Agriculture and Food Production",
+          "objective": "Apply soil, crop, animal, food-preservation and sustainable-production principles to local contexts."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_bece_science_agric_b001_001",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Which soil type usually holds the most water?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Sandy soil",
+              "rationale": "Here, “Sandy soil” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Clay soil” is defensible because clay has very small particles and pore spaces, so water drains more slowly and is retained more strongly than in sandy soil."
+            },
+            {
+              "label": "B",
+              "text": "Gravel",
+              "rationale": "The claim “Gravel” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Clay soil” is defensible because clay has very small particles and pore spaces, so water drains more slowly and is retained more strongly than in sandy soil."
+            },
+            {
+              "label": "C",
+              "text": "Coarse stones",
+              "rationale": "A learner choosing “Coarse stones” would be relying on the wrong criterion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Clay soil” is defensible because clay has very small particles and pore spaces, so water drains more slowly and is retained more strongly than in sandy soil."
+            },
+            {
+              "label": "D",
+              "text": "Clay soil",
+              "rationale": "This option is correct. Clay has very small particles and pore spaces, so water drains more slowly and is retained more strongly than in sandy soil."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Clay has very small particles and pore spaces, so water drains more slowly and is retained more strongly than in sandy soil. Therefore the correct answer is D: Clay soil.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_science_agric_b001_002",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Why is loam often suitable for crop growth?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It balances drainage, water retention, air and nutrients",
+              "rationale": "This option is correct. Loam combines sand, silt, clay and organic matter in proportions that support roots, drainage, aeration and nutrient supply."
+            },
+            {
+              "label": "B",
+              "text": "It contains no mineral particles",
+              "rationale": "The claim “It contains no mineral particles” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It balances drainage, water retention, air and nutrients” is defensible because loam combines sand, silt, clay and organic matter in proportions that support roots, drainage, aeration and nutrient supply."
+            },
+            {
+              "label": "C",
+              "text": "It prevents every pest",
+              "rationale": "That choice, “It prevents every pest”, substitutes a distractor feature for the tested principle. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It balances drainage, water retention, air and nutrients” is defensible because loam combines sand, silt, clay and organic matter in proportions that support roots, drainage, aeration and nutrient supply."
+            },
+            {
+              "label": "D",
+              "text": "It never needs organic matter",
+              "rationale": "Here, “It never needs organic matter” represents the misconception rather than the valid conclusion. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It balances drainage, water retention, air and nutrients” is defensible because loam combines sand, silt, clay and organic matter in proportions that support roots, drainage, aeration and nutrient supply."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Loam combines sand, silt, clay and organic matter in proportions that support roots, drainage, aeration and nutrient supply. Therefore the correct answer is A: It balances drainage, water retention, air and nutrients.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_003",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "What does soil pH measure?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The number of earthworms",
+              "rationale": "Treating “The number of earthworms” as correct overlooks the decisive condition. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “How acidic or alkaline the soil is” is defensible because soil pH expresses acidity or alkalinity and affects nutrient availability and the activity of many soil organisms."
+            },
+            {
+              "label": "B",
+              "text": "The soil’s total mass",
+              "rationale": "Treating “The soil’s total mass” as correct overlooks the decisive condition. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “How acidic or alkaline the soil is” is defensible because soil pH expresses acidity or alkalinity and affects nutrient availability and the activity of many soil organisms."
+            },
+            {
+              "label": "C",
+              "text": "How acidic or alkaline the soil is",
+              "rationale": "This option is correct. Soil pH expresses acidity or alkalinity and affects nutrient availability and the activity of many soil organisms."
+            },
+            {
+              "label": "D",
+              "text": "The height of crops",
+              "rationale": "Choosing “The height of crops” follows a different rule from the one required here. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “How acidic or alkaline the soil is” is defensible because soil pH expresses acidity or alkalinity and affects nutrient availability and the activity of many soil organisms."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Soil pH expresses acidity or alkalinity and affects nutrient availability and the activity of many soil organisms. Therefore the correct answer is C: How acidic or alkaline the soil is.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Define",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_science_agric_b001_004",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "How does humus improve soil?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It seals all pore spaces",
+              "rationale": "The response “It seals all pore spaces” points to the wrong property. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It adds nutrients and improves structure and water holding” is defensible because humus from decomposed material contributes nutrients, binds particles into stable aggregates and helps soil retain useful moisture."
+            },
+            {
+              "label": "B",
+              "text": "It removes all organisms",
+              "rationale": "The claim “It removes all organisms” conflicts with the relationship described in the stem. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It adds nutrients and improves structure and water holding” is defensible because humus from decomposed material contributes nutrients, binds particles into stable aggregates and helps soil retain useful moisture."
+            },
+            {
+              "label": "C",
+              "text": "It turns soil into rock",
+              "rationale": "Here, “It turns soil into rock” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It adds nutrients and improves structure and water holding” is defensible because humus from decomposed material contributes nutrients, binds particles into stable aggregates and helps soil retain useful moisture."
+            },
+            {
+              "label": "D",
+              "text": "It adds nutrients and improves structure and water holding",
+              "rationale": "This option is correct. Humus from decomposed material contributes nutrients, binds particles into stable aggregates and helps soil retain useful moisture."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Humus from decomposed material contributes nutrients, binds particles into stable aggregates and helps soil retain useful moisture. Therefore the correct answer is D: It adds nutrients and improves structure and water holding.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_005",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Which practice reduces erosion on a sloping farm?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Making channels straight downhill",
+              "rationale": "That choice, “Making channels straight downhill”, substitutes a distractor feature for the tested principle. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Planting along contour lines” is defensible because contour farming slows runoff across the slope, allowing more infiltration and reducing the water’s ability to carry soil away."
+            },
+            {
+              "label": "B",
+              "text": "Leaving soil bare",
+              "rationale": "That choice, “Leaving soil bare”, substitutes a distractor feature for the tested principle. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Planting along contour lines” is defensible because contour farming slows runoff across the slope, allowing more infiltration and reducing the water’s ability to carry soil away."
+            },
+            {
+              "label": "C",
+              "text": "Planting along contour lines",
+              "rationale": "This option is correct. Contour farming slows runoff across the slope, allowing more infiltration and reducing the water’s ability to carry soil away."
+            },
+            {
+              "label": "D",
+              "text": "Burning all residues",
+              "rationale": "The proposed answer “Burning all residues” cannot be reconciled with the stated conditions. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Planting along contour lines” is defensible because contour farming slows runoff across the slope, allowing more infiltration and reducing the water’s ability to carry soil away."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Contour farming slows runoff across the slope, allowing more infiltration and reducing the water’s ability to carry soil away. Therefore the correct answer is C: Planting along contour lines.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_006",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Why is mulch placed around crops?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To stop roots receiving air",
+              "rationale": "Choosing “To stop roots receiving air” follows a different rule from the one required here. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To reduce evaporation, suppress weeds and protect soil” is defensible because mulch covers the surface, conserving moisture, reducing weed emergence and cushioning soil against raindrop impact."
+            },
+            {
+              "label": "B",
+              "text": "To reduce evaporation, suppress weeds and protect soil",
+              "rationale": "This option is correct. Mulch covers the surface, conserving moisture, reducing weed emergence and cushioning soil against raindrop impact."
+            },
+            {
+              "label": "C",
+              "text": "To increase runoff speed",
+              "rationale": "Treating “To increase runoff speed” as correct overlooks the decisive condition. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To reduce evaporation, suppress weeds and protect soil” is defensible because mulch covers the surface, conserving moisture, reducing weed emergence and cushioning soil against raindrop impact."
+            },
+            {
+              "label": "D",
+              "text": "To attract every crop pest",
+              "rationale": "Using “To attract every crop pest” would apply the concept in the wrong context. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “To reduce evaporation, suppress weeds and protect soil” is defensible because mulch covers the surface, conserving moisture, reducing weed emergence and cushioning soil against raindrop impact."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Mulch covers the surface, conserving moisture, reducing weed emergence and cushioning soil against raindrop impact. Therefore the correct answer is B: To reduce evaporation, suppress weeds and protect soil.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_007",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Two plots grew maize last season. One is planted with cowpea before maize returns; the other repeats maize. What benefit is expected in the first plot?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The cowpea phase can improve nitrogen supply and interrupt maize-specific pests",
+              "rationale": "This option is correct. Cowpea is a legume associated with nitrogen-fixing bacteria, and changing the host crop can interrupt pests and diseases that build up under continuous maize."
+            },
+            {
+              "label": "B",
+              "text": "Cowpea removes every soil nutrient before maize",
+              "rationale": "Treating “Cowpea removes every soil nutrient before maize” as correct overlooks the decisive condition. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “The cowpea phase can improve nitrogen supply and interrupt maize-specific pests” is defensible because cowpea is a legume associated with nitrogen-fixing bacteria, and changing the host crop can interrupt pests and diseases that build up under continuous maize."
+            },
+            {
+              "label": "C",
+              "text": "Repeating maize always eliminates crop diseases",
+              "rationale": "That choice, “Repeating maize always eliminates crop diseases”, substitutes a distractor feature for the tested principle. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “The cowpea phase can improve nitrogen supply and interrupt maize-specific pests” is defensible because cowpea is a legume associated with nitrogen-fixing bacteria, and changing the host crop can interrupt pests and diseases that build up under continuous maize."
+            },
+            {
+              "label": "D",
+              "text": "The rotation makes rainfall unnecessary",
+              "rationale": "That choice, “The rotation makes rainfall unnecessary”, substitutes a distractor feature for the tested principle. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “The cowpea phase can improve nitrogen supply and interrupt maize-specific pests” is defensible because cowpea is a legume associated with nitrogen-fixing bacteria, and changing the host crop can interrupt pests and diseases that build up under continuous maize."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Cowpea is a legume associated with nitrogen-fixing bacteria, and changing the host crop can interrupt pests and diseases that build up under continuous maize. Therefore the correct answer is A: The cowpea phase can improve nitrogen supply and interrupt maize-specific pests.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_science_agric_b001_008",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Which seed is best for planting?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A healthy mature seed of a suitable variety",
+              "rationale": "This option is correct. Healthy mature seed with known varietal qualities has a better chance of germinating uniformly and establishing vigorous plants."
+            },
+            {
+              "label": "B",
+              "text": "A mouldy damaged seed",
+              "rationale": "Choosing “A mouldy damaged seed” follows a different rule from the one required here. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A healthy mature seed of a suitable variety” is defensible because healthy mature seed with known varietal qualities has a better chance of germinating uniformly and establishing vigorous plants."
+            },
+            {
+              "label": "C",
+              "text": "An immature shrivelled seed",
+              "rationale": "Using “An immature shrivelled seed” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A healthy mature seed of a suitable variety” is defensible because healthy mature seed with known varietal qualities has a better chance of germinating uniformly and establishing vigorous plants."
+            },
+            {
+              "label": "D",
+              "text": "A seed from an unknown diseased plant",
+              "rationale": "That choice, “A seed from an unknown diseased plant”, substitutes a distractor feature for the tested principle. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A healthy mature seed of a suitable variety” is defensible because healthy mature seed with known varietal qualities has a better chance of germinating uniformly and establishing vigorous plants."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Healthy mature seed with known varietal qualities has a better chance of germinating uniformly and establishing vigorous plants. Therefore the correct answer is A: A healthy mature seed of a suitable variety.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Select",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_009",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "What three conditions are generally needed for seed germination?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Salt, smoke and darkness only",
+              "rationale": "Using “Salt, smoke and darkness only” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Water, oxygen and suitable temperature” is defensible because water activates metabolism, oxygen supports respiration and a suitable temperature allows enzymes to function during germination."
+            },
+            {
+              "label": "B",
+              "text": "Fertiliser, pesticide and wind",
+              "rationale": "Using “Fertiliser, pesticide and wind” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Water, oxygen and suitable temperature” is defensible because water activates metabolism, oxygen supports respiration and a suitable temperature allows enzymes to function during germination."
+            },
+            {
+              "label": "C",
+              "text": "Water, oxygen and suitable temperature",
+              "rationale": "This option is correct. Water activates metabolism, oxygen supports respiration and a suitable temperature allows enzymes to function during germination."
+            },
+            {
+              "label": "D",
+              "text": "Clay, stones and bright paint",
+              "rationale": "The option “Clay, stones and bright paint” describes a different outcome from the one supported by the evidence. It focuses on an incidental appearance or administrative detail that cannot perform the technical function being assessed. By contrast, “Water, oxygen and suitable temperature” is defensible because water activates metabolism, oxygen supports respiration and a suitable temperature allows enzymes to function during germination."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Water activates metabolism, oxygen supports respiration and a suitable temperature allows enzymes to function during germination. Therefore the correct answer is C: Water, oxygen and suitable temperature.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_010",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Why is correct crop spacing important?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It guarantees every seed survives",
+              "rationale": "Accepting “It guarantees every seed survives” would bypass the reasoning the item requires. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It limits competition while allowing useful field coverage” is defensible because appropriate spacing balances access to light, water and nutrients with plant population, air movement and management access."
+            },
+            {
+              "label": "B",
+              "text": "It removes all labour",
+              "rationale": "Selecting “It removes all labour” misclassifies the idea being tested. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It limits competition while allowing useful field coverage” is defensible because appropriate spacing balances access to light, water and nutrients with plant population, air movement and management access."
+            },
+            {
+              "label": "C",
+              "text": "It makes soil nutrients unlimited",
+              "rationale": "The proposed answer “It makes soil nutrients unlimited” cannot be reconciled with the stated conditions. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It limits competition while allowing useful field coverage” is defensible because appropriate spacing balances access to light, water and nutrients with plant population, air movement and management access."
+            },
+            {
+              "label": "D",
+              "text": "It limits competition while allowing useful field coverage",
+              "rationale": "This option is correct. Appropriate spacing balances access to light, water and nutrients with plant population, air movement and management access."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Appropriate spacing balances access to light, water and nutrients with plant population, air movement and management access. Therefore the correct answer is D: It limits competition while allowing useful field coverage.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_011",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Why are seedlings hardened before transplanting?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To stop all future growth",
+              "rationale": "The response “To stop all future growth” points to the wrong property. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “To prepare them gradually for harsher field conditions” is defensible because gradual exposure to lower water, greater light and wind reduces transplant shock when protected seedlings move to the field."
+            },
+            {
+              "label": "B",
+              "text": "To prepare them gradually for harsher field conditions",
+              "rationale": "This option is correct. Gradual exposure to lower water, greater light and wind reduces transplant shock when protected seedlings move to the field."
+            },
+            {
+              "label": "C",
+              "text": "To remove their roots",
+              "rationale": "The claim “To remove their roots” conflicts with the relationship described in the stem. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To prepare them gradually for harsher field conditions” is defensible because gradual exposure to lower water, greater light and wind reduces transplant shock when protected seedlings move to the field."
+            },
+            {
+              "label": "D",
+              "text": "To make watering impossible",
+              "rationale": "Accepting “To make watering impossible” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “To prepare them gradually for harsher field conditions” is defensible because gradual exposure to lower water, greater light and wind reduces transplant shock when protected seedlings move to the field."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Gradual exposure to lower water, greater light and wind reduces transplant shock when protected seedlings move to the field. Therefore the correct answer is B: To prepare them gradually for harsher field conditions.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_012",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Which irrigation method delivers water near individual plant roots through small outlets?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Broadcast burning",
+              "rationale": "The proposed answer “Broadcast burning” cannot be reconciled with the stated conditions. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Drip irrigation” is defensible because drip systems apply controlled amounts near root zones, reducing evaporation and runoff when designed and maintained correctly."
+            },
+            {
+              "label": "B",
+              "text": "Drip irrigation",
+              "rationale": "This option is correct. Drip systems apply controlled amounts near root zones, reducing evaporation and runoff when designed and maintained correctly."
+            },
+            {
+              "label": "C",
+              "text": "Wind erosion",
+              "rationale": "Here, “Wind erosion” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Drip irrigation” is defensible because drip systems apply controlled amounts near root zones, reducing evaporation and runoff when designed and maintained correctly."
+            },
+            {
+              "label": "D",
+              "text": "Dry threshing",
+              "rationale": "Using “Dry threshing” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Drip irrigation” is defensible because drip systems apply controlled amounts near root zones, reducing evaporation and runoff when designed and maintained correctly."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Drip systems apply controlled amounts near root zones, reducing evaporation and runoff when designed and maintained correctly. Therefore the correct answer is B: Drip irrigation.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_science_agric_b001_013",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Why is field drainage important after heavy rain?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It prevents prolonged waterlogging and root oxygen shortage",
+              "rationale": "This option is correct. Excess water fills soil pores and restricts oxygen needed for root respiration, so drainage protects many crops from waterlogging."
+            },
+            {
+              "label": "B",
+              "text": "It keeps roots permanently submerged",
+              "rationale": "Accepting “It keeps roots permanently submerged” would bypass the reasoning the item requires. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It prevents prolonged waterlogging and root oxygen shortage” is defensible because excess water fills soil pores and restricts oxygen needed for root respiration, so drainage protects many crops from waterlogging."
+            },
+            {
+              "label": "C",
+              "text": "It removes every nutrient instantly",
+              "rationale": "The response “It removes every nutrient instantly” points to the wrong property. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It prevents prolonged waterlogging and root oxygen shortage” is defensible because excess water fills soil pores and restricts oxygen needed for root respiration, so drainage protects many crops from waterlogging."
+            },
+            {
+              "label": "D",
+              "text": "It guarantees drought",
+              "rationale": "Here, “It guarantees drought” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It prevents prolonged waterlogging and root oxygen shortage” is defensible because excess water fills soil pores and restricts oxygen needed for root respiration, so drainage protects many crops from waterlogging."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Excess water fills soil pores and restricts oxygen needed for root respiration, so drainage protects many crops from waterlogging. Therefore the correct answer is A: It prevents prolonged waterlogging and root oxygen shortage.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_014",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Why should weeds be controlled early?",
+          "options": [
+            {
+              "label": "A",
+              "text": "They always improve crop yield",
+              "rationale": "Choosing “They always improve crop yield” follows a different rule from the one required here. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “They compete with young crops for light, water and nutrients” is defensible because young crops are vulnerable to competition; early control helps the intended plants establish before weeds capture limited resources."
+            },
+            {
+              "label": "B",
+              "text": "They prevent every disease",
+              "rationale": "A learner choosing “They prevent every disease” would be relying on the wrong criterion. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “They compete with young crops for light, water and nutrients” is defensible because young crops are vulnerable to competition; early control helps the intended plants establish before weeds capture limited resources."
+            },
+            {
+              "label": "C",
+              "text": "They compete with young crops for light, water and nutrients",
+              "rationale": "This option is correct. Young crops are vulnerable to competition; early control helps the intended plants establish before weeds capture limited resources."
+            },
+            {
+              "label": "D",
+              "text": "They manufacture fertiliser",
+              "rationale": "Selecting “They manufacture fertiliser” misclassifies the idea being tested. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “They compete with young crops for light, water and nutrients” is defensible because young crops are vulnerable to competition; early control helps the intended plants establish before weeds capture limited resources."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Young crops are vulnerable to competition; early control helps the intended plants establish before weeds capture limited resources. Therefore the correct answer is C: They compete with young crops for light, water and nutrients.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_015",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Monitoring shows a few leaf-eating insects but damage remains below the action threshold. What fits integrated pest management?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Apply the highest pesticide dose immediately",
+              "rationale": "The response “Apply the highest pesticide dose immediately” points to the wrong property. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Continue monitoring and avoid an unnecessary pesticide treatment” is defensible because integrated pest management uses monitoring and action thresholds so control is applied only when justified, conserving beneficial organisms and avoiding needless pesticide exposure."
+            },
+            {
+              "label": "B",
+              "text": "Destroy beneficial insects around the crop",
+              "rationale": "Selecting “Destroy beneficial insects around the crop” misclassifies the idea being tested. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Continue monitoring and avoid an unnecessary pesticide treatment” is defensible because integrated pest management uses monitoring and action thresholds so control is applied only when justified, conserving beneficial organisms and avoiding needless pesticide exposure."
+            },
+            {
+              "label": "C",
+              "text": "Ignore future changes in pest numbers",
+              "rationale": "Using “Ignore future changes in pest numbers” would apply the concept in the wrong context. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “Continue monitoring and avoid an unnecessary pesticide treatment” is defensible because integrated pest management uses monitoring and action thresholds so control is applied only when justified, conserving beneficial organisms and avoiding needless pesticide exposure."
+            },
+            {
+              "label": "D",
+              "text": "Continue monitoring and avoid an unnecessary pesticide treatment",
+              "rationale": "This option is correct. Integrated pest management uses monitoring and action thresholds so control is applied only when justified, conserving beneficial organisms and avoiding needless pesticide exposure."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Integrated pest management uses monitoring and action thresholds so control is applied only when justified, conserving beneficial organisms and avoiding needless pesticide exposure. Therefore the correct answer is D: Continue monitoring and avoid an unnecessary pesticide treatment.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_science_agric_b001_016",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Which practice is safest when applying an approved pesticide?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Mix with bare hands",
+              "rationale": "Treating “Mix with bare hands” as correct overlooks the decisive condition. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Follow the label and use specified protective equipment” is defensible because the label defines dose, protection, timing and disposal requirements that reduce exposure, residues and environmental harm."
+            },
+            {
+              "label": "B",
+              "text": "Spray against strong wind",
+              "rationale": "The proposed answer “Spray against strong wind” cannot be reconciled with the stated conditions. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Follow the label and use specified protective equipment” is defensible because the label defines dose, protection, timing and disposal requirements that reduce exposure, residues and environmental harm."
+            },
+            {
+              "label": "C",
+              "text": "Follow the label and use specified protective equipment",
+              "rationale": "This option is correct. The label defines dose, protection, timing and disposal requirements that reduce exposure, residues and environmental harm."
+            },
+            {
+              "label": "D",
+              "text": "Store it in a drink bottle",
+              "rationale": "The claim “Store it in a drink bottle” conflicts with the relationship described in the stem. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Follow the label and use specified protective equipment” is defensible because the label defines dose, protection, timing and disposal requirements that reduce exposure, residues and environmental harm."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The label defines dose, protection, timing and disposal requirements that reduce exposure, residues and environmental harm. Therefore the correct answer is C: Follow the label and use specified protective equipment.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_science_agric_b001_017",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Which tool is most suitable for loosening soil around established plants?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A thermometer",
+              "rationale": "Treating “A thermometer” as correct overlooks the decisive condition. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A hand fork” is defensible because a hand fork loosens and aerates small soil areas with controlled movement, reducing the chance of severe root damage."
+            },
+            {
+              "label": "B",
+              "text": "A measuring cylinder",
+              "rationale": "Treating “A measuring cylinder” as correct overlooks the decisive condition. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A hand fork” is defensible because a hand fork loosens and aerates small soil areas with controlled movement, reducing the chance of severe root damage."
+            },
+            {
+              "label": "C",
+              "text": "A soldering iron",
+              "rationale": "Here, “A soldering iron” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A hand fork” is defensible because a hand fork loosens and aerates small soil areas with controlled movement, reducing the chance of severe root damage."
+            },
+            {
+              "label": "D",
+              "text": "A hand fork",
+              "rationale": "This option is correct. A hand fork loosens and aerates small soil areas with controlled movement, reducing the chance of severe root damage."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A hand fork loosens and aerates small soil areas with controlled movement, reducing the chance of severe root damage. Therefore the correct answer is D: A hand fork.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Select",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_science_agric_b001_018",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Why should farm tools be cleaned and dried after use?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To reduce corrosion, contamination and premature wear",
+              "rationale": "This option is correct. Removing soil and moisture limits rust and transfer of pests, while inspection after cleaning reveals damage needing repair."
+            },
+            {
+              "label": "B",
+              "text": "To make blades permanently blunt",
+              "rationale": "The claim “To make blades permanently blunt” conflicts with the relationship described in the stem. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “To reduce corrosion, contamination and premature wear” is defensible because removing soil and moisture limits rust and transfer of pests, while inspection after cleaning reveals damage needing repair."
+            },
+            {
+              "label": "C",
+              "text": "To increase soil on metal",
+              "rationale": "The proposed answer “To increase soil on metal” cannot be reconciled with the stated conditions. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To reduce corrosion, contamination and premature wear” is defensible because removing soil and moisture limits rust and transfer of pests, while inspection after cleaning reveals damage needing repair."
+            },
+            {
+              "label": "D",
+              "text": "To avoid safe storage",
+              "rationale": "Selecting “To avoid safe storage” misclassifies the idea being tested. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “To reduce corrosion, contamination and premature wear” is defensible because removing soil and moisture limits rust and transfer of pests, while inspection after cleaning reveals damage needing repair."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Removing soil and moisture limits rust and transfer of pests, while inspection after cleaning reveals damage needing repair. Therefore the correct answer is A: To reduce corrosion, contamination and premature wear.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_019",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "A farmer feeds growing chicks only crushed maize. Which change would make the ration more balanced?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Remove water so the maize is concentrated",
+              "rationale": "That choice, “Remove water so the maize is concentrated”, substitutes a distractor feature for the tested principle. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “Add suitable protein, mineral and vitamin sources and provide clean water” is defensible because maize supplies much of the energy but growing chicks also need adequate protein, minerals, vitamins and water in proportions suited to their age and production needs."
+            },
+            {
+              "label": "B",
+              "text": "Add suitable protein, mineral and vitamin sources and provide clean water",
+              "rationale": "This option is correct. Maize supplies much of the energy but growing chicks also need adequate protein, minerals, vitamins and water in proportions suited to their age and production needs."
+            },
+            {
+              "label": "C",
+              "text": "Use the same maize-only ration for every production stage",
+              "rationale": "Using “Use the same maize-only ration for every production stage” would apply the concept in the wrong context. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Add suitable protein, mineral and vitamin sources and provide clean water” is defensible because maize supplies much of the energy but growing chicks also need adequate protein, minerals, vitamins and water in proportions suited to their age and production needs."
+            },
+            {
+              "label": "D",
+              "text": "Choose ingredients only by their colour",
+              "rationale": "Treating “Choose ingredients only by their colour” as correct overlooks the decisive condition. It focuses on an incidental appearance or administrative detail that cannot perform the technical function being assessed. By contrast, “Add suitable protein, mineral and vitamin sources and provide clean water” is defensible because maize supplies much of the energy but growing chicks also need adequate protein, minerals, vitamins and water in proportions suited to their age and production needs."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Maize supplies much of the energy but growing chicks also need adequate protein, minerals, vitamins and water in proportions suited to their age and production needs. Therefore the correct answer is B: Add suitable protein, mineral and vitamin sources and provide clean water.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_020",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Why must livestock housing be ventilated?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To remove excess heat, moisture and harmful gases",
+              "rationale": "This option is correct. Ventilation supplies fresh air and reduces heat, humidity and gases that can stress animals and promote respiratory disease."
+            },
+            {
+              "label": "B",
+              "text": "To create permanent darkness",
+              "rationale": "That choice, “To create permanent darkness”, substitutes a distractor feature for the tested principle. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “To remove excess heat, moisture and harmful gases” is defensible because ventilation supplies fresh air and reduces heat, humidity and gases that can stress animals and promote respiratory disease."
+            },
+            {
+              "label": "C",
+              "text": "To stop all air movement",
+              "rationale": "The response “To stop all air movement” points to the wrong property. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “To remove excess heat, moisture and harmful gases” is defensible because ventilation supplies fresh air and reduces heat, humidity and gases that can stress animals and promote respiratory disease."
+            },
+            {
+              "label": "D",
+              "text": "To increase ammonia buildup",
+              "rationale": "Accepting “To increase ammonia buildup” would bypass the reasoning the item requires. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To remove excess heat, moisture and harmful gases” is defensible because ventilation supplies fresh air and reduces heat, humidity and gases that can stress animals and promote respiratory disease."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Ventilation supplies fresh air and reduces heat, humidity and gases that can stress animals and promote respiratory disease. Therefore the correct answer is A: To remove excess heat, moisture and harmful gases.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_021",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "A newly purchased goat coughs during its separate observation period. What is the best next action?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Move it into the herd so all animals are exposed together",
+              "rationale": "Selecting “Move it into the herd so all animals are exposed together” misclassifies the idea being tested. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Keep it separated and obtain an animal-health assessment before herd contact” is defensible because continuing separation while the symptom is assessed reduces the chance of introducing an infectious disease and allows treatment or testing before herd contact."
+            },
+            {
+              "label": "B",
+              "text": "Keep it separated and obtain an animal-health assessment before herd contact",
+              "rationale": "This option is correct. Continuing separation while the symptom is assessed reduces the chance of introducing an infectious disease and allows treatment or testing before herd contact."
+            },
+            {
+              "label": "C",
+              "text": "End observation because it has already been purchased",
+              "rationale": "Choosing “End observation because it has already been purchased” follows a different rule from the one required here. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Keep it separated and obtain an animal-health assessment before herd contact” is defensible because continuing separation while the symptom is assessed reduces the chance of introducing an infectious disease and allows treatment or testing before herd contact."
+            },
+            {
+              "label": "D",
+              "text": "Crowd it with young animals to keep it warm",
+              "rationale": "Selecting “Crowd it with young animals to keep it warm” misclassifies the idea being tested. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Keep it separated and obtain an animal-health assessment before herd contact” is defensible because continuing separation while the symptom is assessed reduces the chance of introducing an infectious disease and allows treatment or testing before herd contact."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Continuing separation while the symptom is assessed reduces the chance of introducing an infectious disease and allows treatment or testing before herd contact. Therefore the correct answer is B: Keep it separated and obtain an animal-health assessment before herd contact.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_science_agric_b001_022",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "What is the purpose of vaccination in farm animals?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To cure every existing injury",
+              "rationale": "Here, “To cure every existing injury” represents the misconception rather than the valid conclusion. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “To stimulate specific immunity before likely exposure” is defensible because vaccines prepare the immune system to respond more effectively to particular pathogens, but hygiene and biosecurity remain necessary."
+            },
+            {
+              "label": "B",
+              "text": "To replace clean water",
+              "rationale": "Choosing “To replace clean water” follows a different rule from the one required here. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To stimulate specific immunity before likely exposure” is defensible because vaccines prepare the immune system to respond more effectively to particular pathogens, but hygiene and biosecurity remain necessary."
+            },
+            {
+              "label": "C",
+              "text": "To eliminate all management",
+              "rationale": "The claim “To eliminate all management” conflicts with the relationship described in the stem. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “To stimulate specific immunity before likely exposure” is defensible because vaccines prepare the immune system to respond more effectively to particular pathogens, but hygiene and biosecurity remain necessary."
+            },
+            {
+              "label": "D",
+              "text": "To stimulate specific immunity before likely exposure",
+              "rationale": "This option is correct. Vaccines prepare the immune system to respond more effectively to particular pathogens, but hygiene and biosecurity remain necessary."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Vaccines prepare the immune system to respond more effectively to particular pathogens, but hygiene and biosecurity remain necessary. Therefore the correct answer is D: To stimulate specific immunity before likely exposure.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_023",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Which animal is a ruminant?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A chicken",
+              "rationale": "Accepting “A chicken” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A goat” is defensible because goats are ruminants with specialised stomach compartments that support microbial digestion and rumination of fibrous feed."
+            },
+            {
+              "label": "B",
+              "text": "A pig",
+              "rationale": "That choice, “A pig”, substitutes a distractor feature for the tested principle. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A goat” is defensible because goats are ruminants with specialised stomach compartments that support microbial digestion and rumination of fibrous feed."
+            },
+            {
+              "label": "C",
+              "text": "A goat",
+              "rationale": "This option is correct. Goats are ruminants with specialised stomach compartments that support microbial digestion and rumination of fibrous feed."
+            },
+            {
+              "label": "D",
+              "text": "A tilapia",
+              "rationale": "Accepting “A tilapia” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A goat” is defensible because goats are ruminants with specialised stomach compartments that support microbial digestion and rumination of fibrous feed."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Goats are ruminants with specialised stomach compartments that support microbial digestion and rumination of fibrous feed. Therefore the correct answer is C: A goat.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_science_agric_b001_024",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Why keep breeding and birth records for livestock?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To guarantee identical offspring",
+              "rationale": "Choosing “To guarantee identical offspring” follows a different rule from the one required here. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “To track performance, parentage and health events” is defensible because reliable records support selection, expected birth dates, health follow-up and evaluation of reproductive performance."
+            },
+            {
+              "label": "B",
+              "text": "To avoid animal identification",
+              "rationale": "The claim “To avoid animal identification” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “To track performance, parentage and health events” is defensible because reliable records support selection, expected birth dates, health follow-up and evaluation of reproductive performance."
+            },
+            {
+              "label": "C",
+              "text": "To replace observation",
+              "rationale": "Selecting “To replace observation” misclassifies the idea being tested. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To track performance, parentage and health events” is defensible because reliable records support selection, expected birth dates, health follow-up and evaluation of reproductive performance."
+            },
+            {
+              "label": "D",
+              "text": "To track performance, parentage and health events",
+              "rationale": "This option is correct. Reliable records support selection, expected birth dates, health follow-up and evaluation of reproductive performance."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Reliable records support selection, expected birth dates, health follow-up and evaluation of reproductive performance. Therefore the correct answer is D: To track performance, parentage and health events.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_025",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "How does drying preserve food?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It removes water needed by many spoilage organisms",
+              "rationale": "This option is correct. Lower water availability slows microbial growth and many chemical changes, although dried food still needs clean protected storage."
+            },
+            {
+              "label": "B",
+              "text": "It adds unlimited moisture",
+              "rationale": "The proposed answer “It adds unlimited moisture” cannot be reconciled with the stated conditions. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It removes water needed by many spoilage organisms” is defensible because lower water availability slows microbial growth and many chemical changes, although dried food still needs clean protected storage."
+            },
+            {
+              "label": "C",
+              "text": "It makes food sterile forever",
+              "rationale": "The option “It makes food sterile forever” describes a different outcome from the one supported by the evidence. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It removes water needed by many spoilage organisms” is defensible because lower water availability slows microbial growth and many chemical changes, although dried food still needs clean protected storage."
+            },
+            {
+              "label": "D",
+              "text": "It increases enzyme activity without limit",
+              "rationale": "A learner choosing “It increases enzyme activity without limit” would be relying on the wrong criterion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It removes water needed by many spoilage organisms” is defensible because lower water availability slows microbial growth and many chemical changes, although dried food still needs clean protected storage."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Lower water availability slows microbial growth and many chemical changes, although dried food still needs clean protected storage. Therefore the correct answer is A: It removes water needed by many spoilage organisms.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_026",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Why can salting help preserve fish?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It supplies oxygen to bacteria",
+              "rationale": "A learner choosing “It supplies oxygen to bacteria” would be relying on the wrong criterion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It lowers available water and inhibits many microorganisms” is defensible because a sufficiently salty environment draws water from tissues and microbes, slowing growth when combined with hygienic handling."
+            },
+            {
+              "label": "B",
+              "text": "It lowers available water and inhibits many microorganisms",
+              "rationale": "This option is correct. A sufficiently salty environment draws water from tissues and microbes, slowing growth when combined with hygienic handling."
+            },
+            {
+              "label": "C",
+              "text": "It guarantees no contamination",
+              "rationale": "The claim “It guarantees no contamination” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It lowers available water and inhibits many microorganisms” is defensible because a sufficiently salty environment draws water from tissues and microbes, slowing growth when combined with hygienic handling."
+            },
+            {
+              "label": "D",
+              "text": "It converts fish into grain",
+              "rationale": "Accepting “It converts fish into grain” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It lowers available water and inhibits many microorganisms” is defensible because a sufficiently salty environment draws water from tissues and microbes, slowing growth when combined with hygienic handling."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A sufficiently salty environment draws water from tissues and microbes, slowing growth when combined with hygienic handling. Therefore the correct answer is B: It lowers available water and inhibits many microorganisms.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_science_agric_b001_027",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "How does refrigeration slow food spoilage?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It removes every microbe instantly",
+              "rationale": "The response “It removes every microbe instantly” points to the wrong property. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Low temperature reduces microbial growth and reaction rates” is defensible because cooling slows microbial multiplication and enzyme activity but does not sterilise food, so safe handling and time limits still matter."
+            },
+            {
+              "label": "B",
+              "text": "It adds sunlight",
+              "rationale": "Selecting “It adds sunlight” misclassifies the idea being tested. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Low temperature reduces microbial growth and reaction rates” is defensible because cooling slows microbial multiplication and enzyme activity but does not sterilise food, so safe handling and time limits still matter."
+            },
+            {
+              "label": "C",
+              "text": "Low temperature reduces microbial growth and reaction rates",
+              "rationale": "This option is correct. Cooling slows microbial multiplication and enzyme activity but does not sterilise food, so safe handling and time limits still matter."
+            },
+            {
+              "label": "D",
+              "text": "It raises food temperature",
+              "rationale": "Treating “It raises food temperature” as correct overlooks the decisive condition. It focuses on an incidental appearance or administrative detail that cannot perform the technical function being assessed. By contrast, “Low temperature reduces microbial growth and reaction rates” is defensible because cooling slows microbial multiplication and enzyme activity but does not sterilise food, so safe handling and time limits still matter."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Cooling slows microbial multiplication and enzyme activity but does not sterilise food, so safe handling and time limits still matter. Therefore the correct answer is C: Low temperature reduces microbial growth and reaction rates.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_028",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "What is pasteurisation intended to do?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Burn food to ash",
+              "rationale": "The option “Burn food to ash” describes a different outcome from the one supported by the evidence. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Reduce harmful microorganisms using controlled heating” is defensible because pasteurisation applies a defined time and temperature to reduce pathogens and spoilage organisms while limiting quality damage."
+            },
+            {
+              "label": "B",
+              "text": "Reduce harmful microorganisms using controlled heating",
+              "rationale": "This option is correct. Pasteurisation applies a defined time and temperature to reduce pathogens and spoilage organisms while limiting quality damage."
+            },
+            {
+              "label": "C",
+              "text": "Freeze food permanently",
+              "rationale": "The option “Freeze food permanently” describes a different outcome from the one supported by the evidence. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Reduce harmful microorganisms using controlled heating” is defensible because pasteurisation applies a defined time and temperature to reduce pathogens and spoilage organisms while limiting quality damage."
+            },
+            {
+              "label": "D",
+              "text": "Add soil organisms",
+              "rationale": "The proposed answer “Add soil organisms” cannot be reconciled with the stated conditions. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Reduce harmful microorganisms using controlled heating” is defensible because pasteurisation applies a defined time and temperature to reduce pathogens and spoilage organisms while limiting quality damage."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Pasteurisation applies a defined time and temperature to reduce pathogens and spoilage organisms while limiting quality damage. Therefore the correct answer is B: Reduce harmful microorganisms using controlled heating.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_029",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Why wash hands before handling harvested food?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To make food heavier",
+              "rationale": "Treating “To make food heavier” as correct overlooks the decisive condition. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “To reduce transfer of dirt and harmful microorganisms” is defensible because clean hands reduce cross-contamination from soil, animals, waste and other sources during preparation, packing or storage."
+            },
+            {
+              "label": "B",
+              "text": "To replace clean equipment",
+              "rationale": "Treating “To replace clean equipment” as correct overlooks the decisive condition. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To reduce transfer of dirt and harmful microorganisms” is defensible because clean hands reduce cross-contamination from soil, animals, waste and other sources during preparation, packing or storage."
+            },
+            {
+              "label": "C",
+              "text": "To reduce transfer of dirt and harmful microorganisms",
+              "rationale": "This option is correct. Clean hands reduce cross-contamination from soil, animals, waste and other sources during preparation, packing or storage."
+            },
+            {
+              "label": "D",
+              "text": "To increase contamination",
+              "rationale": "That choice, “To increase contamination”, substitutes a distractor feature for the tested principle. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To reduce transfer of dirt and harmful microorganisms” is defensible because clean hands reduce cross-contamination from soil, animals, waste and other sources during preparation, packing or storage."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Clean hands reduce cross-contamination from soil, animals, waste and other sources during preparation, packing or storage. Therefore the correct answer is C: To reduce transfer of dirt and harmful microorganisms.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_030",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Why should bruised fruits be separated during storage?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Damage speeds spoilage and can affect nearby produce",
+              "rationale": "This option is correct. Broken tissues lose water and are more open to microorganisms, so sorting reduces spread and protects sound produce."
+            },
+            {
+              "label": "B",
+              "text": "Bruising always improves quality",
+              "rationale": "That choice, “Bruising always improves quality”, substitutes a distractor feature for the tested principle. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Damage speeds spoilage and can affect nearby produce” is defensible because broken tissues lose water and are more open to microorganisms, so sorting reduces spread and protects sound produce."
+            },
+            {
+              "label": "C",
+              "text": "Damaged fruit stops respiration",
+              "rationale": "Choosing “Damaged fruit stops respiration” follows a different rule from the one required here. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Damage speeds spoilage and can affect nearby produce” is defensible because broken tissues lose water and are more open to microorganisms, so sorting reduces spread and protects sound produce."
+            },
+            {
+              "label": "D",
+              "text": "It becomes permanently sterile",
+              "rationale": "Selecting “It becomes permanently sterile” misclassifies the idea being tested. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Damage speeds spoilage and can affect nearby produce” is defensible because broken tissues lose water and are more open to microorganisms, so sorting reduces spread and protects sound produce."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Broken tissues lose water and are more open to microorganisms, so sorting reduces spread and protects sound produce. Therefore the correct answer is A: Damage speeds spoilage and can affect nearby produce.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_031",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Which storage condition best protects dry maize grain?",
+          "options": [
+            {
+              "label": "A",
+              "text": "An open wet floor",
+              "rationale": "The option “An open wet floor” describes a different outcome from the one supported by the evidence. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “A clean, dry, pest-resistant container” is defensible because dry grain in a clean sealed or pest-resistant store is less vulnerable to mould, insects, rodents and re-wetting."
+            },
+            {
+              "label": "B",
+              "text": "A leaking roof",
+              "rationale": "Using “A leaking roof” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A clean, dry, pest-resistant container” is defensible because dry grain in a clean sealed or pest-resistant store is less vulnerable to mould, insects, rodents and re-wetting."
+            },
+            {
+              "label": "C",
+              "text": "A warm pile mixed with refuse",
+              "rationale": "Using “A warm pile mixed with refuse” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A clean, dry, pest-resistant container” is defensible because dry grain in a clean sealed or pest-resistant store is less vulnerable to mould, insects, rodents and re-wetting."
+            },
+            {
+              "label": "D",
+              "text": "A clean, dry, pest-resistant container",
+              "rationale": "This option is correct. Dry grain in a clean sealed or pest-resistant store is less vulnerable to mould, insects, rodents and re-wetting."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Dry grain in a clean sealed or pest-resistant store is less vulnerable to mould, insects, rodents and re-wetting. Therefore the correct answer is D: A clean, dry, pest-resistant container.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Select",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_032",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Which description correctly defines compost?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Fresh plastic waste",
+              "rationale": "The proposed answer “Fresh plastic waste” cannot be reconciled with the stated conditions. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Decomposed organic material used to improve soil” is defensible because controlled decomposition converts plant and suitable animal residues into stable organic matter that can improve soil properties."
+            },
+            {
+              "label": "B",
+              "text": "Pure table salt",
+              "rationale": "Here, “Pure table salt” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Decomposed organic material used to improve soil” is defensible because controlled decomposition converts plant and suitable animal residues into stable organic matter that can improve soil properties."
+            },
+            {
+              "label": "C",
+              "text": "Decomposed organic material used to improve soil",
+              "rationale": "This option is correct. Controlled decomposition converts plant and suitable animal residues into stable organic matter that can improve soil properties."
+            },
+            {
+              "label": "D",
+              "text": "Crushed glass fertiliser",
+              "rationale": "The option “Crushed glass fertiliser” describes a different outcome from the one supported by the evidence. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Decomposed organic material used to improve soil” is defensible because controlled decomposition converts plant and suitable animal residues into stable organic matter that can improve soil properties."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Controlled decomposition converts plant and suitable animal residues into stable organic matter that can improve soil properties. Therefore the correct answer is C: Decomposed organic material used to improve soil.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Define",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_science_agric_b001_033",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Why should fresh manure be managed before application near food crops?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It may carry pathogens and release nutrients unpredictably",
+              "rationale": "This option is correct. Proper composting and timing reduce pathogen risk and nutrient losses while making manure safer and more useful to crops."
+            },
+            {
+              "label": "B",
+              "text": "It contains no nutrients",
+              "rationale": "Accepting “It contains no nutrients” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It may carry pathogens and release nutrients unpredictably” is defensible because proper composting and timing reduce pathogen risk and nutrient losses while making manure safer and more useful to crops."
+            },
+            {
+              "label": "C",
+              "text": "It is always dry and sterile",
+              "rationale": "That choice, “It is always dry and sterile”, substitutes a distractor feature for the tested principle. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It may carry pathogens and release nutrients unpredictably” is defensible because proper composting and timing reduce pathogen risk and nutrient losses while making manure safer and more useful to crops."
+            },
+            {
+              "label": "D",
+              "text": "It cannot affect water quality",
+              "rationale": "Here, “It cannot affect water quality” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It may carry pathogens and release nutrients unpredictably” is defensible because proper composting and timing reduce pathogen risk and nutrient losses while making manure safer and more useful to crops."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Proper composting and timing reduce pathogen risk and nutrient losses while making manure safer and more useful to crops. Therefore the correct answer is A: It may carry pathogens and release nutrients unpredictably.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Evaluate",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_science_agric_b001_034",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "A dry, windy farm needs soil protection without heavily shading its food crops. Which agroforestry design is most suitable?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Plant dense tall trees throughout every crop row without pruning",
+              "rationale": "That choice, “Plant dense tall trees throughout every crop row without pruning”, substitutes a distractor feature for the tested principle. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Place suitable windbreak trees at planned spacing and manage their crowns” is defensible because a planned windbreak reduces wind speed and erosion, while suitable spacing and crown management limit competition and excessive shade on the crop area."
+            },
+            {
+              "label": "B",
+              "text": "Remove all woody plants and leave the soil exposed",
+              "rationale": "Using “Remove all woody plants and leave the soil exposed” would apply the concept in the wrong context. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Place suitable windbreak trees at planned spacing and manage their crowns” is defensible because a planned windbreak reduces wind speed and erosion, while suitable spacing and crown management limit competition and excessive shade on the crop area."
+            },
+            {
+              "label": "C",
+              "text": "Choose tree positions without considering wind direction",
+              "rationale": "Accepting “Choose tree positions without considering wind direction” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Place suitable windbreak trees at planned spacing and manage their crowns” is defensible because a planned windbreak reduces wind speed and erosion, while suitable spacing and crown management limit competition and excessive shade on the crop area."
+            },
+            {
+              "label": "D",
+              "text": "Place suitable windbreak trees at planned spacing and manage their crowns",
+              "rationale": "This option is correct. A planned windbreak reduces wind speed and erosion, while suitable spacing and crown management limit competition and excessive shade on the crop area."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A planned windbreak reduces wind speed and erosion, while suitable spacing and crown management limit competition and excessive shade on the crop area. Therefore the correct answer is D: Place suitable windbreak trees at planned spacing and manage their crowns.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_science_agric_b001_035",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Why avoid overstocking a fish pond?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It creates unlimited food",
+              "rationale": "Choosing “It creates unlimited food” follows a different rule from the one required here. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Too many fish can reduce oxygen and worsen water quality” is defensible because excess biomass increases respiration, waste and competition, so stocking density must match pond volume and management capacity."
+            },
+            {
+              "label": "B",
+              "text": "Too many fish can reduce oxygen and worsen water quality",
+              "rationale": "This option is correct. Excess biomass increases respiration, waste and competition, so stocking density must match pond volume and management capacity."
+            },
+            {
+              "label": "C",
+              "text": "It prevents waste buildup",
+              "rationale": "The option “It prevents waste buildup” describes a different outcome from the one supported by the evidence. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Too many fish can reduce oxygen and worsen water quality” is defensible because excess biomass increases respiration, waste and competition, so stocking density must match pond volume and management capacity."
+            },
+            {
+              "label": "D",
+              "text": "It guarantees faster growth",
+              "rationale": "Using “It guarantees faster growth” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Too many fish can reduce oxygen and worsen water quality” is defensible because excess biomass increases respiration, waste and competition, so stocking density must match pond volume and management capacity."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Excess biomass increases respiration, waste and competition, so stocking density must match pond volume and management capacity. Therefore the correct answer is B: Too many fish can reduce oxygen and worsen water quality.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_science_agric_b001_036",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "What is one purpose of crop rotation beyond soil fertility?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To keep the same host continuously",
+              "rationale": "Selecting “To keep the same host continuously” misclassifies the idea being tested. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “To interrupt pests and diseases dependent on one crop” is defensible because changing crop families can break life cycles of organisms that multiply when a susceptible host is grown repeatedly."
+            },
+            {
+              "label": "B",
+              "text": "To eliminate rainfall needs",
+              "rationale": "The option “To eliminate rainfall needs” describes a different outcome from the one supported by the evidence. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “To interrupt pests and diseases dependent on one crop” is defensible because changing crop families can break life cycles of organisms that multiply when a susceptible host is grown repeatedly."
+            },
+            {
+              "label": "C",
+              "text": "To interrupt pests and diseases dependent on one crop",
+              "rationale": "This option is correct. Changing crop families can break life cycles of organisms that multiply when a susceptible host is grown repeatedly."
+            },
+            {
+              "label": "D",
+              "text": "To make records useless",
+              "rationale": "Using “To make records useless” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “To interrupt pests and diseases dependent on one crop” is defensible because changing crop families can break life cycles of organisms that multiply when a susceptible host is grown repeatedly."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Changing crop families can break life cycles of organisms that multiply when a susceptible host is grown repeatedly. Therefore the correct answer is C: To interrupt pests and diseases dependent on one crop.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_science_agric_b001_037",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "A farmer used 8 bags of fertiliser to harvest 24 crates, then 10 bags to harvest 25 crates. What can the records help the farmer investigate?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Whether the extra input produced enough additional output to justify its cost",
+              "rationale": "This option is correct. Linked input, cost and harvest records allow the farmer to compare marginal output and value, investigate other causes and decide whether the extra input was efficient."
+            },
+            {
+              "label": "B",
+              "text": "Whether record keeping can guarantee next season’s rainfall",
+              "rationale": "The proposed answer “Whether record keeping can guarantee next season’s rainfall” cannot be reconciled with the stated conditions. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Whether the extra input produced enough additional output to justify its cost” is defensible because linked input, cost and harvest records allow the farmer to compare marginal output and value, investigate other causes and decide whether the extra input was efficient."
+            },
+            {
+              "label": "C",
+              "text": "Whether field inspection is no longer needed",
+              "rationale": "Here, “Whether field inspection is no longer needed” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Whether the extra input produced enough additional output to justify its cost” is defensible because linked input, cost and harvest records allow the farmer to compare marginal output and value, investigate other causes and decide whether the extra input was efficient."
+            },
+            {
+              "label": "D",
+              "text": "Whether the lower yield should be hidden",
+              "rationale": "The proposed answer “Whether the lower yield should be hidden” cannot be reconciled with the stated conditions. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Whether the extra input produced enough additional output to justify its cost” is defensible because linked input, cost and harvest records allow the farmer to compare marginal output and value, investigate other causes and decide whether the extra input was efficient."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Linked input, cost and harvest records allow the farmer to compare marginal output and value, investigate other causes and decide whether the extra input was efficient. Therefore the correct answer is A: Whether the extra input produced enough additional output to justify its cost.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Interpret",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_science_agric_b001_038",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Which practice supports sustainable soil fertility?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Apply fertiliser without measurement",
+              "rationale": "That choice, “Apply fertiliser without measurement”, substitutes a distractor feature for the tested principle. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Combine tested nutrient inputs with organic matter and erosion control” is defensible because integrated fertility management matches crop needs while building soil condition and limiting nutrient and topsoil losses."
+            },
+            {
+              "label": "B",
+              "text": "Burn all residues yearly",
+              "rationale": "That choice, “Burn all residues yearly”, substitutes a distractor feature for the tested principle. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Combine tested nutrient inputs with organic matter and erosion control” is defensible because integrated fertility management matches crop needs while building soil condition and limiting nutrient and topsoil losses."
+            },
+            {
+              "label": "C",
+              "text": "Leave soil bare",
+              "rationale": "The option “Leave soil bare” describes a different outcome from the one supported by the evidence. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Combine tested nutrient inputs with organic matter and erosion control” is defensible because integrated fertility management matches crop needs while building soil condition and limiting nutrient and topsoil losses."
+            },
+            {
+              "label": "D",
+              "text": "Combine tested nutrient inputs with organic matter and erosion control",
+              "rationale": "This option is correct. Integrated fertility management matches crop needs while building soil condition and limiting nutrient and topsoil losses."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Integrated fertility management matches crop needs while building soil condition and limiting nutrient and topsoil losses. Therefore the correct answer is D: Combine tested nutrient inputs with organic matter and erosion control.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Evaluate",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_science_agric_b001_039",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Vegetables must travel several hours to market without refrigeration. Which harvest plan best protects quality?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Harvest at midday and leave produce in direct sun",
+              "rationale": "The response “Harvest at midday and leave produce in direct sun” points to the wrong property. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Harvest in the cool morning, keep produce shaded and begin transport promptly” is defensible because cool-morning harvest, shade and prompt transport limit field heat and moisture loss during the period before controlled cooling is available."
+            },
+            {
+              "label": "B",
+              "text": "Harvest in the cool morning, keep produce shaded and begin transport promptly",
+              "rationale": "This option is correct. Cool-morning harvest, shade and prompt transport limit field heat and moisture loss during the period before controlled cooling is available."
+            },
+            {
+              "label": "C",
+              "text": "Pile bruised and sound produce together overnight",
+              "rationale": "Here, “Pile bruised and sound produce together overnight” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Harvest in the cool morning, keep produce shaded and begin transport promptly” is defensible because cool-morning harvest, shade and prompt transport limit field heat and moisture loss during the period before controlled cooling is available."
+            },
+            {
+              "label": "D",
+              "text": "Wash with unsafe water and seal while hot",
+              "rationale": "A learner choosing “Wash with unsafe water and seal while hot” would be relying on the wrong criterion. It recommends an unsafe condition or action and ignores the hazard-control step central to the item. By contrast, “Harvest in the cool morning, keep produce shaded and begin transport promptly” is defensible because cool-morning harvest, shade and prompt transport limit field heat and moisture loss during the period before controlled cooling is available."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Cool-morning harvest, shade and prompt transport limit field heat and moisture loss during the period before controlled cooling is available. Therefore the correct answer is B: Harvest in the cool morning, keep produce shaded and begin transport promptly.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_science_agric_b001_040",
+          "original": true,
+          "topicCode": "SCI-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "What makes a farming practice climate-resilient?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It guarantees weather",
+              "rationale": "Using “It guarantees weather” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It reduces exposure or helps production recover from climate stress” is defensible because resilient practices such as water conservation and crop diversity reduce vulnerability without pretending that climate uncertainty disappears."
+            },
+            {
+              "label": "B",
+              "text": "It reduces exposure or helps production recover from climate stress",
+              "rationale": "This option is correct. Resilient practices such as water conservation and crop diversity reduce vulnerability without pretending that climate uncertainty disappears."
+            },
+            {
+              "label": "C",
+              "text": "It ignores local evidence",
+              "rationale": "The proposed answer “It ignores local evidence” cannot be reconciled with the stated conditions. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It reduces exposure or helps production recover from climate stress” is defensible because resilient practices such as water conservation and crop diversity reduce vulnerability without pretending that climate uncertainty disappears."
+            },
+            {
+              "label": "D",
+              "text": "It removes every risk",
+              "rationale": "Here, “It removes every risk” represents the misconception rather than the valid conclusion. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It reduces exposure or helps production recover from climate stress” is defensible because resilient practices such as water conservation and crop diversity reduce vulnerability without pretending that climate uncertainty disappears."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Resilient practices such as water conservation and crop diversity reduce vulnerability without pretending that climate uncertainty disappears. Therefore the correct answer is B: It reduces exposure or helps production recover from climate stress.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        }
+      ]
+    }
+  ]
+}
