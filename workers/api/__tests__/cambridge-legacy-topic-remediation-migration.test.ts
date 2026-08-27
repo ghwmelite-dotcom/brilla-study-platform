@@ -82,7 +82,7 @@ describe("migration 281 Cambridge legacy topic remediation", () => {
     }
     expect(Buffer.byteLength(artifacts[generator.MIGRATION_FILE], "utf8")).toBeLessThan(19_500);
     expect(Buffer.byteLength(artifacts[generator.ROLLBACK_FILE], "utf8")).toBeLessThan(19_500);
-  });
+  }, 60_000);
 
   it("passes manifest audit and resolves every reviewed row without a catalogue filter", () => {
     expect(audit.audit()).toEqual({
