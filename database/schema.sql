@@ -761,7 +761,11 @@ CREATE TABLE IF NOT EXISTS battles (
     winner_id TEXT REFERENCES users(id),
     created_at TEXT DEFAULT (datetime('now')),
     started_at TEXT,
-    completed_at TEXT
+    completed_at TEXT,
+    -- added by migrations/282_battle_demo_data_integrity.sql
+    is_demo_data INTEGER NOT NULL DEFAULT 0 CHECK (is_demo_data IN (0, 1)),
+    -- added by migrations/282_battle_demo_data_integrity.sql
+    expires_at TEXT
 );
 
 -- Source: schema.sql
@@ -2275,7 +2279,11 @@ CREATE TABLE IF NOT EXISTS battle_answers (
     is_correct INTEGER,
     time_taken INTEGER,
     points_earned INTEGER DEFAULT 0,
-    answered_at TEXT DEFAULT (datetime('now'))
+    answered_at TEXT DEFAULT (datetime('now')),
+    -- added by migrations/282_battle_demo_data_integrity.sql
+    is_demo_data INTEGER NOT NULL DEFAULT 0 CHECK (is_demo_data IN (0, 1)),
+    -- added by migrations/282_battle_demo_data_integrity.sql
+    expires_at TEXT
 );
 
 -- Source: schema.sql
@@ -4519,6 +4527,8 @@ CREATE INDEX IF NOT EXISTS idx_house_points_period ON house_points(period);
 CREATE INDEX IF NOT EXISTS idx_battles_status ON battles(status);
 CREATE INDEX IF NOT EXISTS idx_battles_challenger ON battles(challenger_id);
 CREATE INDEX IF NOT EXISTS idx_battles_opponent ON battles(opponent_id);
+CREATE INDEX IF NOT EXISTS idx_battles_demo ON battles(is_demo_data, expires_at);
+CREATE INDEX IF NOT EXISTS idx_battle_answers_demo ON battle_answers(is_demo_data, expires_at);
 CREATE INDEX IF NOT EXISTS idx_chat_teacher_assignments_teacher ON chat_teacher_assignments(teacher_id);
 CREATE INDEX IF NOT EXISTS idx_chat_teacher_assignments_subject ON chat_teacher_assignments(subject_id);
 CREATE INDEX IF NOT EXISTS idx_parent_links_parent ON parent_student_links(parent_id);

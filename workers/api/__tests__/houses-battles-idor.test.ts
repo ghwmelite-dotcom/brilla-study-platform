@@ -66,6 +66,9 @@ describe('houses/battles IDOR fixes', () => {
     // challenger_id is the 2nd bound param — must be the attacker, not 'victim_1'.
     expect(insert!.args[1]).toBe('attacker_1');
     expect(insert!.args).not.toContain('victim_1');
+    expect(insert!.sql).toContain('is_demo_data, expires_at');
+    expect(insert!.args[6]).toBe(0);
+    expect(insert!.args[7]).toBeNull();
 
     const body = (await res.json()) as { data: { challengerId: string } };
     expect(body.data.challengerId).toBe('attacker_1');
@@ -96,6 +99,9 @@ describe('houses/battles IDOR fixes', () => {
     expect(select).toBeDefined();
     expect(select!.args.slice(0, 5)).toEqual(['user_1', 'user_1', 'user_1', 'user_1', 'user_1']);
     expect(select!.args).not.toContain('victim_1');
+    expect(select!.sql).toContain('(b.expires_at IS NULL OR b.expires_at > ?)');
+    expect(select!.args[5]).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(select!.args[6]).toBe(20);
   });
 
   it('GET /api/battles/history returns rows in the Competition-page shape (your_score/opponent)', async () => {

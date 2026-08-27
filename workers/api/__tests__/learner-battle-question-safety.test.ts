@@ -80,7 +80,7 @@ const env = (db: D1Database) => ({
 
 describe("public battle question safety", () => {
   it("omits stored question payloads from the available battle list", async () => {
-    const { db } = makeBattleDb();
+    const { db, calls } = makeBattleDb();
     const response = await worker.fetch(
       new Request("http://test/api/battles/available"),
       env(db),
@@ -90,6 +90,10 @@ describe("public battle question safety", () => {
     const body = (await response.json()) as { data: Row[] };
     expect(body.data).toHaveLength(1);
     expect(body.data[0]).not.toHaveProperty("questions");
+    const availableSql = calls.find((sql) => sql.includes("FROM battles b"));
+    expect(availableSql).toContain(
+      "(b.expires_at IS NULL OR b.expires_at > ?)",
+    );
   });
 
   it("revalidates historical battle questions and withholds answer material", async () => {
@@ -115,6 +119,10 @@ describe("public battle question safety", () => {
     expect(body.data.questions[0]).not.toHaveProperty("explanation");
     expect(body.data.questions.map((question) => question.id)).not.toContain(
       "nsmq_phy_rid_001",
+    );
+    const battleSql = calls.find((sql) => sql.includes("WHERE b.id = ?"));
+    expect(battleSql).toContain(
+      "(b.expires_at IS NULL OR b.expires_at > ?)",
     );
 
     const eligibilitySql = calls.find((sql) =>

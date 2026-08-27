@@ -3501,6 +3501,7 @@ publicApp.get('/houses/:id/members', async (c) => {
 
 // Get available battles to join
 publicApp.get('/battles/available', async (c) => {
+  const now = new Date().toISOString();
   try {
     const { results } = await c.env.DB.prepare(`
       SELECT b.*,
@@ -3510,9 +3511,10 @@ publicApp.get('/battles/available', async (c) => {
       JOIN users u ON b.challenger_id = u.id
       LEFT JOIN subjects s ON b.subject_id = s.id
       WHERE b.status = 'waiting'
+        AND (b.expires_at IS NULL OR b.expires_at > ?)
       ORDER BY b.created_at DESC
       LIMIT 20
-    `).all();
+    `).bind(now).all();
 
     const safeBattles = results.map((row: Record<string, unknown>) => {
       const safeBattle = { ...row };
@@ -3536,6 +3538,7 @@ publicApp.get('/battles/available', async (c) => {
 // Get battle by ID
 publicApp.get('/battles/:id', async (c) => {
   const id = c.req.param('id');
+  const now = new Date().toISOString();
 
   try {
     const battle = await c.env.DB.prepare(`
@@ -3548,7 +3551,8 @@ publicApp.get('/battles/:id', async (c) => {
       LEFT JOIN users o ON b.opponent_id = o.id
       LEFT JOIN subjects s ON b.subject_id = s.id
       WHERE b.id = ?
-    `).bind(id).first();
+        AND (b.expires_at IS NULL OR b.expires_at > ?)
+    `).bind(id, now).first();
 
     if (!battle) {
       return c.json({ success: false, error: 'Battle not found' }, 404);
@@ -3670,6 +3674,7 @@ publicApp.get('/flashcards/public', async (c) => {
 app.get('/api/battles/history', requireAuth, async (c) => {
   const userId = getUserId(c)!;
   const limit = parseLimit(c, 20);
+  const now = new Date().toISOString();
 
   try {
     const { results } = await c.env.DB.prepare(`
@@ -3693,10 +3698,11 @@ app.get('/api/battles/history', requireAuth, async (c) => {
       JOIN users c ON b.challenger_id = c.id
       LEFT JOIN users o ON b.opponent_id = o.id
       LEFT JOIN subjects s ON b.subject_id = s.id
-      WHERE b.challenger_id = ? OR b.opponent_id = ?
+      WHERE (b.challenger_id = ? OR b.opponent_id = ?)
+        AND (b.expires_at IS NULL OR b.expires_at > ?)
       ORDER BY b.created_at DESC
       LIMIT ?
-    `).bind(userId, userId, userId, userId, userId, limit).all();
+    `).bind(userId, userId, userId, userId, userId, now, limit).all();
 
     // Shape the rows the way the Competition page consumes them
     // (your_score/opponent_score relative to the JWT user, opponent object).
@@ -4877,11 +4883,13 @@ protectedApp.post('/battles/:id/join', async (c) => {
   const battleId = c.req.param('id');
   const userId = getUserId(c)!;
 
+  const now = new Date().toISOString();
   try {
     // Check if battle exists and is waiting
     const battle = await c.env.DB.prepare(`
       SELECT * FROM battles WHERE id = ? AND status = 'waiting'
-    `).bind(battleId).first();
+        AND (expires_at IS NULL OR expires_at > ?)
+    `).bind(battleId, now).first();
 
     if (!battle) {
       return c.json({ success: false, error: 'Battle not found or already started' }, 404);
@@ -4928,11 +4936,13 @@ protectedApp.post('/battles/:id/answer', async (c) => {
   const { questionIndex, answer, timeTaken } = await c.req.json();
   const userId = getUserId(c)!;
 
+  const now = new Date().toISOString();
   try {
     // Get battle
     const battle = await c.env.DB.prepare(`
       SELECT * FROM battles WHERE id = ? AND status = 'active'
-    `).bind(battleId).first();
+        AND (expires_at IS NULL OR expires_at > ?)
+    `).bind(battleId, now).first();
 
     if (!battle) {
       return c.json({ success: false, error: 'Battle not found or not active' }, 404);
@@ -5028,10 +5038,12 @@ protectedApp.post('/battles/:id/cancel', async (c) => {
   const battleId = c.req.param('id');
   const userId = getUserId(c)!;
 
+  const now = new Date().toISOString();
   try {
     const battle = await c.env.DB.prepare(`
       SELECT * FROM battles WHERE id = ? AND status IN ('waiting', 'active')
-    `).bind(battleId).first();
+        AND (expires_at IS NULL OR expires_at > ?)
+    `).bind(battleId, now).first();
 
     if (!battle) {
       return c.json({ success: false, error: 'Battle not found or already finished' }, 404);
