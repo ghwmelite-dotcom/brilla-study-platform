@@ -1,9 +1,8 @@
 -- Rollback 279: restore exact ledger-backed legacy NSMQ topic values to NULL.
 PRAGMA foreign_keys=ON;
-CREATE TABLE IF NOT EXISTS _nsmq_legacy_rb_279_expected(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS _nsmq_legacy_rb_279_expected(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,k TEXT NOT NULL,t TEXT);
 DELETE FROM _nsmq_legacy_rb_279_expected;
-INSERT INTO _nsmq_legacy_rb_279_expected VALUES
-  ('nsmq_chem_sr_016','subj_nsmq_chemistry','speed_race','topic_bonding'),
+WITH source(q,s,r,k) AS (VALUES ('nsmq_chem_sr_016','subj_nsmq_chemistry','speed_race','topic_bonding'),
   ('nsmq_chem_sr_017','subj_nsmq_chemistry','speed_race','topic_atomic'),
   ('nsmq_chem_sr_018','subj_nsmq_chemistry','speed_race','topic_atomic'),
   ('nsmq_chem_sr_019','subj_nsmq_chemistry','speed_race','topic_organic'),
@@ -92,7 +91,33 @@ INSERT INTO _nsmq_legacy_rb_279_expected VALUES
   ('nsmq_math_sr_033','subj_nsmq_math','speed_race','topic_algebra'),
   ('nsmq_math_sr_034','subj_nsmq_math','speed_race','topic_algebra'),
   ('nsmq_math_sr_035','subj_nsmq_math','speed_race','topic_algebra'),
-  ('nsmq_math_sr_036','subj_nsmq_math','speed_race','topic_geometry');
+  ('nsmq_math_sr_036','subj_nsmq_math','speed_race','topic_geometry')),
+candidates(k,s,t,p) AS (VALUES ('topic_atomic','subj_nsmq_chemistry','topic_nsmq_chem_atomic','0'),
+  ('topic_atomic','subj_nsmq_chemistry','topic_atomic','1'),
+  ('topic_bonding','subj_nsmq_chemistry','topic_nsmq_chem_bonding','0'),
+  ('topic_bonding','subj_nsmq_chemistry','topic_bonding','1'),
+  ('topic_electrochemistry','subj_nsmq_chemistry','topic_nsmq_chem_electrochemistry','0'),
+  ('topic_electrochemistry','subj_nsmq_chemistry','topic_electrochemistry','1'),
+  ('topic_equilibrium','subj_nsmq_chemistry','topic_nsmq_chem_equilibrium','0'),
+  ('topic_equilibrium','subj_nsmq_chemistry','topic_equilibrium','1'),
+  ('topic_organic','subj_nsmq_chemistry','topic_nsmq_chem_organic','0'),
+  ('topic_organic','subj_nsmq_chemistry','topic_organic','1'),
+  ('topic_stoichiometry','subj_nsmq_chemistry','topic_nsmq_chem_stoichiometry','0'),
+  ('topic_stoichiometry','subj_nsmq_chemistry','topic_stoichiometry','1'),
+  ('topic_algebra','subj_nsmq_math','topic_nsmq_math_algebra','0'),
+  ('topic_algebra','subj_nsmq_math','topic_algebra','1'),
+  ('topic_geometry','subj_nsmq_math','topic_nsmq_math_geometry','0'),
+  ('topic_geometry','subj_nsmq_math','topic_geometry','1'),
+  ('topic_statistics','subj_nsmq_math','topic_nsmq_math_statistics','0'),
+  ('topic_statistics','subj_nsmq_math','topic_statistics','1'))
+INSERT INTO _nsmq_legacy_rb_279_expected
+SELECT source.q,source.s,source.r,source.k,(
+  SELECT MIN(c.t) FROM candidates c
+  JOIN topics t ON t.id=c.t AND t.subject_id=c.s
+  JOIN subjects s ON s.id=t.subject_id
+  WHERE c.k=source.k AND c.s=source.s AND s.exam_type_id='exam_nsmq' AND s.is_active=1
+  HAVING COUNT(*)=1
+) FROM source;
 CREATE TABLE IF NOT EXISTS _nsmq_legacy_rb_279_guard(valid INTEGER NOT NULL CHECK(valid=1));
 DELETE FROM _nsmq_legacy_rb_279_guard;
 INSERT INTO _nsmq_legacy_rb_279_guard(valid)

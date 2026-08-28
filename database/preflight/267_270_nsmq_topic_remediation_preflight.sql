@@ -1,9 +1,8 @@
 -- Aggregate fail-closed preflight for NSMQ remediation 267-270.
 PRAGMA foreign_keys=ON;
-CREATE TABLE IF NOT EXISTS _nsmq_pre_expected(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT NOT NULL,m INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS _nsmq_pre_expected(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT,m INTEGER NOT NULL);
 DELETE FROM _nsmq_pre_expected;
-INSERT INTO _nsmq_pre_expected VALUES
-  ('nsmq_math_rid_012','subj_nsmq_math','riddles','topic_nsmq_math_general_reasoning','267'),
+WITH source(q,s,r,k,m) AS (VALUES ('nsmq_math_rid_012','subj_nsmq_math','riddles','topic_nsmq_math_general_reasoning','267'),
   ('nsmq_phy_rid_012','subj_nsmq_physics','riddles','topic_thermodynamics','267'),
   ('nsmq_bio_pod_001','subj_nsmq_biology','problem_of_day','topic_genetics','267'),
   ('nsmq_bio_pod_002','subj_nsmq_biology','problem_of_day','topic_genetics','267'),
@@ -375,7 +374,20 @@ INSERT INTO _nsmq_pre_expected VALUES
   ('nsmq_phy_tf_017','subj_nsmq_physics','true_false','topic_mechanics','270'),
   ('nsmq_phy_tf_018','subj_nsmq_physics','true_false','topic_mechanics','270'),
   ('nsmq_phy_tf_019','subj_nsmq_physics','true_false','topic_waves','270'),
-  ('nsmq_phy_tf_020','subj_nsmq_physics','true_false','topic_electricity','270');
+  ('nsmq_phy_tf_020','subj_nsmq_physics','true_false','topic_electricity','270'))
+INSERT INTO _nsmq_pre_expected
+SELECT source.q,source.s,source.r,coalesce((
+  SELECT MIN(t.id) FROM topics t
+  JOIN subjects s ON s.id=t.subject_id
+  WHERE t.id IN (source.k,CASE source.s
+    WHEN 'subj_nsmq_math' THEN 'topic_nsmq_math_'||substr(source.k,7)
+    WHEN 'subj_nsmq_physics' THEN 'topic_nsmq_phys_'||substr(source.k,7)
+    WHEN 'subj_nsmq_chemistry' THEN 'topic_nsmq_chem_'||substr(source.k,7)
+    WHEN 'subj_nsmq_biology' THEN 'topic_nsmq_bio_'||substr(source.k,7)
+    ELSE source.k END) AND t.subject_id=source.s
+    AND s.exam_type_id='exam_nsmq' AND s.is_active=1
+  HAVING COUNT(*)=1
+),CASE WHEN source.k IN ('topic_nsmq_math_general_reasoning','topic_nsmq_math_numeration','topic_nsmq_math_sets','topic_nsmq_chem_environmental') AND source.s IS CASE source.k WHEN 'topic_nsmq_math_general_reasoning' THEN 'subj_nsmq_math' WHEN 'topic_nsmq_math_numeration' THEN 'subj_nsmq_math' WHEN 'topic_nsmq_math_sets' THEN 'subj_nsmq_math' WHEN 'topic_nsmq_chem_environmental' THEN 'subj_nsmq_chemistry' END THEN source.k END),source.m FROM source;
 CREATE TABLE IF NOT EXISTS _nsmq_pre_exceptions(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL);
 DELETE FROM _nsmq_pre_exceptions;
 INSERT INTO _nsmq_pre_exceptions VALUES
@@ -387,6 +399,8 @@ INSERT INTO _nsmq_pre_guard(valid)
 SELECT CASE WHEN
   (SELECT COUNT(*) FROM _nsmq_pre_expected)=373
   AND (SELECT COUNT(*) FROM _nsmq_pre_exceptions)=2
+  AND NOT EXISTS (SELECT 1 FROM _nsmq_pre_expected WHERE t IS NULL)
+  AND NOT EXISTS (SELECT 1 FROM (SELECT s FROM _nsmq_pre_expected UNION SELECT s FROM _nsmq_pre_exceptions) e LEFT JOIN subjects s ON s.id=e.s WHERE s.id IS NULL OR s.exam_type_id<>'exam_nsmq' OR s.is_active<>1)
   AND (SELECT COUNT(*) FROM questions q JOIN _nsmq_pre_expected e ON e.q=q.id WHERE q.subject_id IS e.s AND q.round_type IS e.r AND q.topic_id IS NULL)=373
   AND (SELECT COUNT(*) FROM questions q JOIN _nsmq_pre_exceptions e ON e.q=q.id WHERE q.subject_id IS e.s AND q.round_type IS e.r AND q.topic_id IS NULL)=2
   AND EXISTS (SELECT 1 FROM questions WHERE id='nsmq_math_rid_012'

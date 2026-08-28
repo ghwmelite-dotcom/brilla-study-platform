@@ -1,9 +1,8 @@
 -- 269: NSMQ null-topic remediation part 3/4 (100 exact mappings).
 PRAGMA foreign_keys=ON;
-CREATE TABLE IF NOT EXISTS _migration_269_expected(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS _migration_269_expected(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT);
 DELETE FROM _migration_269_expected;
-INSERT INTO _migration_269_expected VALUES
-  ('nsmq_math_rid_007','subj_nsmq_math','riddles','topic_algebra'),
+WITH source(q,s,r,k) AS (VALUES ('nsmq_math_rid_007','subj_nsmq_math','riddles','topic_algebra'),
   ('nsmq_math_rid_008','subj_nsmq_math','riddles','topic_algebra'),
   ('nsmq_math_rid_009','subj_nsmq_math','riddles','topic_nsmq_math_general_reasoning'),
   ('nsmq_math_rid_010','subj_nsmq_math','riddles','topic_nsmq_math_general_reasoning'),
@@ -102,17 +101,28 @@ INSERT INTO _migration_269_expected VALUES
   ('nsmq_phy_rid_015','subj_nsmq_physics','riddles','topic_waves'),
   ('nsmq_phy_r1_001','subj_nsmq_physics','round_one','topic_electricity'),
   ('nsmq_phy_r1_002','subj_nsmq_physics','round_one','topic_waves'),
-  ('nsmq_phy_r1_003','subj_nsmq_physics','round_one','topic_mechanics');
+  ('nsmq_phy_r1_003','subj_nsmq_physics','round_one','topic_mechanics'))
+INSERT INTO _migration_269_expected
+SELECT source.q,source.s,source.r,coalesce((
+  SELECT MIN(t.id) FROM topics t
+  JOIN subjects s ON s.id=t.subject_id
+  WHERE t.id IN (source.k,CASE source.s
+    WHEN 'subj_nsmq_math' THEN 'topic_nsmq_math_'||substr(source.k,7)
+    WHEN 'subj_nsmq_physics' THEN 'topic_nsmq_phys_'||substr(source.k,7)
+    WHEN 'subj_nsmq_chemistry' THEN 'topic_nsmq_chem_'||substr(source.k,7)
+    WHEN 'subj_nsmq_biology' THEN 'topic_nsmq_bio_'||substr(source.k,7)
+    ELSE source.k END) AND t.subject_id=source.s
+    AND s.exam_type_id='exam_nsmq' AND s.is_active=1
+  HAVING COUNT(*)=1
+),NULL) FROM source;
 CREATE TABLE IF NOT EXISTS _migration_269_guard(valid INTEGER NOT NULL CHECK(valid=1));
 DELETE FROM _migration_269_guard;
 INSERT INTO _migration_269_guard(valid)
 SELECT CASE WHEN
   (SELECT COUNT(*) FROM _migration_269_expected)=100
   AND (SELECT COUNT(*) FROM questions q JOIN _migration_269_expected e ON e.q=q.id)=100
+  AND NOT EXISTS (SELECT 1 FROM _migration_269_expected WHERE t IS NULL)
   AND NOT EXISTS (SELECT 1 FROM _migration_269_expected e LEFT JOIN subjects s ON s.id=e.s WHERE s.id IS NULL OR s.exam_type_id IS NOT 'exam_nsmq' OR s.is_active<>1)
-  AND NOT EXISTS (SELECT 1 FROM _migration_269_expected e LEFT JOIN topics t ON t.id=e.t WHERE
-    (e.t NOT IN ('topic_nsmq_math_general_reasoning','topic_nsmq_math_numeration','topic_nsmq_math_sets','topic_nsmq_chem_environmental') AND (t.id IS NULL OR t.subject_id IS NOT e.s))
-    OR (e.t IN ('topic_nsmq_math_general_reasoning','topic_nsmq_math_numeration','topic_nsmq_math_sets','topic_nsmq_chem_environmental') AND e.s IS NOT CASE e.t WHEN 'topic_nsmq_math_general_reasoning' THEN 'subj_nsmq_math' WHEN 'topic_nsmq_math_numeration' THEN 'subj_nsmq_math' WHEN 'topic_nsmq_math_sets' THEN 'subj_nsmq_math' WHEN 'topic_nsmq_chem_environmental' THEN 'subj_nsmq_chemistry' END))
   AND ((SELECT COUNT(*) FROM question_bank_remediation_log WHERE migration_id='267_nsmq_topic_remediation_part_1')=103
       AND (SELECT COUNT(*) FROM question_bank_remediation_log l JOIN questions q ON q.id=l.entity_id JOIN topics t ON t.id=l.new_value
         WHERE l.migration_id='267_nsmq_topic_remediation_part_1' AND l.entity_type='question' AND l.field_name='topic_id' AND l.old_value IS NULL AND q.topic_id IS l.new_value AND q.subject_id IS t.subject_id)=100

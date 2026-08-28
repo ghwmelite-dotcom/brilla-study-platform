@@ -24,6 +24,12 @@ type ReviewedException = {
   reasonCode: string;
   disposition: string;
 };
+type TopicResolution = {
+  logicalTopicId: string;
+  subjectId: string;
+  candidateTopicIds: string[];
+};
+
 type Plan = {
   status: string;
   authoritativeInventoryCount: number;
@@ -40,6 +46,7 @@ type Plan = {
     slug: string;
   }>;
   mappings: Mapping[];
+  topicResolutions: TopicResolution[];
   reviewedExceptions: ReviewedException[];
 };
 type QuestionState = {
@@ -99,7 +106,7 @@ const postflightSql = readFileSync(
   "utf8",
 );
 
-function setup(): Database.Database {
+function setup(taxonomy: "staging-generic" | "production-prefixed" = "staging-generic"): Database.Database {
   const db = new Database(":memory:");
   for (const file of [
     "../../../database/schema.sql",
@@ -111,7 +118,61 @@ function setup(): Database.Database {
     "../../../database/migrations/103_exact_question_deduplication.sql",
   ])
     db.exec(readFileSync(new URL(file, import.meta.url), "utf8"));
+  if (taxonomy === "production-prefixed") makeProductionPrefixedTaxonomy(db);
   return db;
+}
+
+function makeProductionPrefixedTaxonomy(db: Database.Database): void {
+  const inventory = [...plan.mappings, ...plan.reviewedExceptions].map(
+    (row) => row.questionId,
+  );
+  db.prepare(
+    `DELETE FROM questions WHERE id NOT IN (${inventory.map(() => "?").join(",")})`,
+  ).run(...inventory);
+  db.exec("DROP TRIGGER IF EXISTS trg_topic_subject_update_with_questions");
+  const oldSubject = new Map<string, string>([
+    ["subj_nsmq_math", "subj_math"],
+    ["subj_nsmq_physics", "subj_physics"],
+    ["subj_nsmq_chemistry", "subj_chemistry"],
+    ["subj_nsmq_biology", "subj_biology"],
+  ]);
+  const cloneLegacySubject = db.prepare(`
+    INSERT OR IGNORE INTO subjects(id,name,slug,icon,color,description,display_order,exam_type_id,category_id,waec_code,is_active,created_at)
+    SELECT ?,name||' Legacy',slug||'-legacy-compat',icon,color,description,display_order,NULL,category_id,waec_code,0,created_at
+    FROM subjects WHERE id=?
+  `);
+  for (const [currentSubjectId, legacySubjectId] of oldSubject) {
+    cloneLegacySubject.run(legacySubjectId, currentSubjectId);
+  }
+  const clone = db.prepare(`
+    INSERT INTO topics(id,subject_id,parent_id,name,slug,description,theory_content,key_formulas,display_order,created_at)
+    SELECT ?,?,NULL,name,slug||'-production-compat',description,theory_content,key_formulas,display_order,created_at
+    FROM topics WHERE id=?
+  `);
+  const move = db.prepare("UPDATE topics SET subject_id=? WHERE id=?");
+  for (const resolution of plan.topicResolutions) {
+    if (resolution.candidateTopicIds.length !== 2) continue;
+    const [canonicalTopicId, logicalTopicId] = resolution.candidateTopicIds;
+    if (logicalTopicId !== resolution.logicalTopicId) {
+      throw new Error(`Unexpected staging fallback for ${resolution.logicalTopicId}`);
+    }
+    clone.run(canonicalTopicId, resolution.subjectId, logicalTopicId);
+    const legacySubjectId = oldSubject.get(resolution.subjectId);
+    if (!legacySubjectId) throw new Error(`Missing legacy subject for ${resolution.subjectId}`);
+    move.run(legacySubjectId, logicalTopicId);
+  }
+}
+
+function cloneCanonicalCandidate(
+  db: Database.Database,
+  resolution: TopicResolution,
+): void {
+  const [canonicalTopicId, logicalTopicId] = resolution.candidateTopicIds;
+  db.prepare(`
+    INSERT INTO topics(id,subject_id,parent_id,name,slug,description,theory_content,key_formulas,display_order,created_at)
+    SELECT ?,?,NULL,name,slug||'-ambiguous',description,theory_content,key_formulas,display_order,created_at
+    FROM topics WHERE id=?
+  `).run(canonicalTopicId, resolution.subjectId, logicalTopicId);
 }
 
 function applyAll(db: Database.Database): void {
@@ -175,6 +236,59 @@ describe("NSMQ topic remediation migrations 267-270", () => {
         ).toHaveLength(1);
       }
     }
+  });
+
+  it("resolves the production-prefixed taxonomy while ignoring wrong-owner generic IDs", () => {
+    const db = setup("production-prefixed");
+    db.exec(preflightSql);
+    applyAll(db);
+    db.exec(postflightSql);
+    const expectedByLogical = new Map(
+      plan.topicResolutions.map((resolution) => [
+        resolution.logicalTopicId,
+        resolution.candidateTopicIds[0],
+      ]),
+    );
+    const actual = db.prepare("SELECT topic_id FROM questions WHERE id=?");
+    for (const mapping of plan.mappings) {
+      expect(actual.get(mapping.questionId)).toEqual({
+        topic_id: expectedByLogical.get(mapping.topicId),
+      });
+    }
+    expect(
+      db.prepare(`
+        SELECT COUNT(*) AS count FROM questions q
+        JOIN topics t ON t.id=q.topic_id
+        JOIN subjects s ON s.id=t.subject_id
+        WHERE q.id IN (${plan.mappings.map(() => "?").join(",")})
+          AND t.subject_id=q.subject_id AND s.exam_type_id='exam_nsmq' AND s.is_active=1
+      `).get(...plan.mappings.map((row) => row.questionId)),
+    ).toEqual({ count: 373 });
+    db.close();
+  });
+
+  it("fails closed when both canonical and generic candidates are valid", () => {
+    const resolution = plan.topicResolutions.find(
+      (item) =>
+        item.candidateTopicIds.length === 2 &&
+        plan.mappings.some(
+          (mapping) =>
+            mapping.migrationId === plan.migrationIds[0] &&
+            mapping.topicId === item.logicalTopicId,
+        ),
+    );
+    if (!resolution) throw new Error("Missing ambiguous-candidate fixture");
+    const db = setup();
+    const baselineLogs = db
+      .prepare("SELECT COUNT(*) AS count FROM question_bank_remediation_log")
+      .get();
+    cloneCanonicalCandidate(db, resolution);
+    expectGuardFailure(() => db.exec(preflightSql));
+    expectGuardFailure(() => db.exec(migrationSql[0]));
+    expect(
+      db.prepare("SELECT COUNT(*) AS count FROM question_bank_remediation_log").get(),
+    ).toEqual(baselineLogs);
+    db.close();
   });
 
   it("preflight proves the exact 375-row source disposition and rejects content drift", () => {

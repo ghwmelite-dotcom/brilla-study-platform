@@ -5,6 +5,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { execFileSync } = require("node:child_process");
 const Database = require("better-sqlite3");
+const { buildTopicResolutions } = require("./nsmq-topic-identity-resolver.cjs");
 
 const ROOT = path.join(__dirname, "..");
 const MANIFEST_PATH = path.join(ROOT, "database", "manifests", "nsmq-topic-remediation", "legacy-null-topic-plan-278-280.json");
@@ -172,10 +173,17 @@ function validateTaxonomy(mappings) {
   db.exec(fs.readFileSync(path.join(ROOT, "database", "schema.sql"), "utf8"));
   db.exec(fs.readFileSync(path.join(ROOT, "database", "seed.sql"), "utf8"));
   db.prepare("INSERT OR IGNORE INTO topics(id,subject_id,parent_id,name,slug,description,theory_content,key_formulas,display_order,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)").run("topic_nsmq_chem_environmental", "subj_nsmq_chemistry", null, "Environmental Chemistry", "environmental-chemistry", "Chemical processes and substances affecting the atmosphere and environment.", null, null, 7, "2026-08-26T00:00:00.000Z");
-  const topic = db.prepare("SELECT subject_id FROM topics WHERE id=?");
-  for (const mapping of mappings) {
-    const owner = topic.get(mapping.topicId);
-    if (!owner || owner.subject_id !== mapping.subjectId) throw new Error(`Topic ownership drift for ${mapping.questionId}`);
+  const topic = db.prepare(`SELECT t.id FROM topics t JOIN subjects s ON s.id=t.subject_id
+    WHERE t.id=? AND t.subject_id=? AND s.exam_type_id='exam_nsmq' AND s.is_active=1`);
+  for (const resolution of buildTopicResolutions(mappings)) {
+    const valid = resolution.candidateTopicIds.filter((topicId) =>
+      topic.get(topicId, resolution.subjectId),
+    );
+    if (valid.length !== 1) {
+      throw new Error(
+        `Topic resolution drift for ${resolution.logicalTopicId}: expected exactly one valid candidate, got ${valid.length}`,
+      );
+    }
   }
   db.close();
 }
@@ -241,7 +249,8 @@ function buildPlan(sourceRows = loadArchiveRows(), source = "staging-d1-identity
     subjectTotals: countBy([...mappings, ...quarantines], "subjectId"),
     topicCounts: countBy(mappings, "topicId"),
     evidenceDefinitions: EVIDENCE,
-    generationContract: "Every staging null-topic NSMQ row has exactly one disposition; mappings require exact ID, subject, round and source-content fingerprint; topics must be owned by the same NSMQ subject; non-subject riddles remain quarantined and unusable.",
+    generationContract: "Every staging null-topic NSMQ row has exactly one disposition; mappings require exact ID, subject, round and source-content fingerprint; each logical topic must resolve to exactly one existing topic owned by the expected active NSMQ subject; zero or multiple candidates fail closed; non-subject riddles remain quarantined and unusable.",
+    topicResolutions: buildTopicResolutions(mappings),
     mappings: mappings.map((row) => ({ ...row, migrationId: migrationByQuestion.get(row.questionId) })),
     quarantines,
     generatedAt: "deterministic-no-runtime-timestamp",
@@ -275,8 +284,35 @@ function valuesSql(rows) {
 }
 
 function mappingTable(name, rows, withMigration = false) {
-  const columns = withMigration ? "q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT NOT NULL,m INTEGER NOT NULL" : "q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT NOT NULL";
-  return `CREATE TABLE IF NOT EXISTS ${name}(${columns});\nDELETE FROM ${name};\nINSERT INTO ${name} VALUES\n  ${valuesSql(rows.map((row) => [row.questionId, row.subjectId, row.roundType, row.topicId, ...(withMigration ? [Number(row.migrationId.slice(0, 3))] : [])]))};`;
+  const columns = withMigration ? "q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,k TEXT NOT NULL,t TEXT,m INTEGER NOT NULL" : "q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,k TEXT NOT NULL,t TEXT";
+  const sourceColumns = withMigration ? "q,s,r,k,m" : "q,s,r,k";
+  const sourceValues = rows.map((row) => [
+    row.questionId,
+    row.subjectId,
+    row.roundType,
+    row.topicId,
+    ...(withMigration ? [Number(row.migrationId.slice(0, 3))] : []),
+  ]);
+  const candidates = buildTopicResolutions(rows).flatMap((resolution) =>
+    resolution.candidateTopicIds.map((topicId, priority) => [
+      resolution.logicalTopicId,
+      resolution.subjectId,
+      topicId,
+      priority,
+    ]),
+  );
+  return `CREATE TABLE IF NOT EXISTS ${name}(${columns});
+DELETE FROM ${name};
+WITH source(${sourceColumns}) AS (VALUES ${valuesSql(sourceValues)}),
+candidates(k,s,t,p) AS (VALUES ${valuesSql(candidates)})
+INSERT INTO ${name}
+SELECT source.q,source.s,source.r,source.k,(
+  SELECT MIN(c.t) FROM candidates c
+  JOIN topics t ON t.id=c.t AND t.subject_id=c.s
+  JOIN subjects s ON s.id=t.subject_id
+  WHERE c.k=source.k AND c.s=source.s AND s.exam_type_id='exam_nsmq' AND s.is_active=1
+  HAVING COUNT(*)=1
+),${withMigration ? "source.m" : ""} FROM source;`.replace(", FROM source", " FROM source");
 }
 
 function quarantineTable(name, rows) {
