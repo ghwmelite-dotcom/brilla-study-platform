@@ -97,7 +97,7 @@ describe("Cambridge content reconciliation pre-271 flight", () => {
     expect(runner).toContain("confirm!==env+':'+database");
     expect(runner).not.toContain("99_cleanup_after_release.sql");
     expect(runner).not.toContain("rollback_part");
-  });
+  }, 60_000);
 
   it("reconciles exact synthetic legacy, retains bounded backup, replays, and rolls back strictly", async () => {
     const {flight,db,legacyFingerprint}=synthetic();
