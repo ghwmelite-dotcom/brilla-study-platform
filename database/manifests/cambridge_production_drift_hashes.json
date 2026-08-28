@@ -1,0 +1,2339 @@
+{
+  "release": "cambridge-production-content-reconciliation",
+  "status": "sanitized-hash-evidence",
+  "capturedFrom": "production-read-only",
+  "scopeCount": 455,
+  "driftRowCount": 144,
+  "fieldCounts": {
+    "id": 0,
+    "subject_id": 0,
+    "topic_id": 0,
+    "question_text": 123,
+    "question_type": 33,
+    "options": 41,
+    "correct_answer": 75,
+    "explanation": 138,
+    "difficulty": 37,
+    "points": 40,
+    "marks": 43,
+    "time_limit": 40
+  },
+  "legacyContentFingerprint": [
+    455,
+    117972,
+    1030233046,
+    1195448697
+  ],
+  "reviewedContentFingerprint": [
+    455,
+    124240,
+    305310544,
+    1080580318
+  ],
+  "legacyBackupFingerprint": [
+    144,
+    32503,
+    1580321453,
+    1219992424
+  ],
+  "rows": [
+    {
+      "id": "q_alevel_math_001",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_001",
+        "n": 182,
+        "a": 687629837,
+        "b": 884670079
+      }
+    },
+    {
+      "id": "q_alevel_math_002",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_002",
+        "n": 231,
+        "a": 1292438448,
+        "b": 1319929414
+      }
+    },
+    {
+      "id": "q_alevel_math_003",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_003",
+        "n": 231,
+        "a": 24087502,
+        "b": 1777826458
+      }
+    },
+    {
+      "id": "q_alevel_math_004",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_004",
+        "n": 166,
+        "a": 45442564,
+        "b": 466954255
+      }
+    },
+    {
+      "id": "q_alevel_math_005",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_005",
+        "n": 210,
+        "a": 623282307,
+        "b": 2082560801
+      }
+    },
+    {
+      "id": "q_alevel_math_006",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_006",
+        "n": 213,
+        "a": 1466311684,
+        "b": 826402013
+      }
+    },
+    {
+      "id": "q_alevel_math_007",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_007",
+        "n": 218,
+        "a": 66756065,
+        "b": 393558442
+      }
+    },
+    {
+      "id": "q_alevel_math_008",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_008",
+        "n": 204,
+        "a": 2054638471,
+        "b": 2077554182
+      }
+    },
+    {
+      "id": "q_alevel_math_009",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_009",
+        "n": 199,
+        "a": 1524222258,
+        "b": 2015055020
+      }
+    },
+    {
+      "id": "q_alevel_math_010",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_010",
+        "n": 174,
+        "a": 182626685,
+        "b": 109024163
+      }
+    },
+    {
+      "id": "q_alevel_math_011",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "correct_answer",
+        "explanation",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_011",
+        "n": 241,
+        "a": 1628253013,
+        "b": 1965587447
+      }
+    },
+    {
+      "id": "q_alevel_math_012",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_012",
+        "n": 191,
+        "a": 1792205516,
+        "b": 896757929
+      }
+    },
+    {
+      "id": "q_alevel_math_013",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_013",
+        "n": 155,
+        "a": 212536205,
+        "b": 1229174797
+      }
+    },
+    {
+      "id": "q_alevel_math_014",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_014",
+        "n": 221,
+        "a": 772119508,
+        "b": 1344309358
+      }
+    },
+    {
+      "id": "q_alevel_math_015",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_015",
+        "n": 200,
+        "a": 395952040,
+        "b": 2082836876
+      }
+    },
+    {
+      "id": "q_alevel_math_016",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_016",
+        "n": 180,
+        "a": 1453838014,
+        "b": 1723867985
+      }
+    },
+    {
+      "id": "q_alevel_math_017",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "points",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_017",
+        "n": 175,
+        "a": 1440547336,
+        "b": 955566530
+      }
+    },
+    {
+      "id": "q_alevel_math_018",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_018",
+        "n": 222,
+        "a": 1637904257,
+        "b": 1887213987
+      }
+    },
+    {
+      "id": "q_alevel_math_019",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_019",
+        "n": 158,
+        "a": 460169873,
+        "b": 805707280
+      }
+    },
+    {
+      "id": "q_alevel_math_020",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_020",
+        "n": 155,
+        "a": 1980803307,
+        "b": 1911449472
+      }
+    },
+    {
+      "id": "q_alevel_math_021",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_021",
+        "n": 226,
+        "a": 1866850301,
+        "b": 2052511915
+      }
+    },
+    {
+      "id": "q_alevel_math_022",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_022",
+        "n": 184,
+        "a": 476031202,
+        "b": 1830630689
+      }
+    },
+    {
+      "id": "q_alevel_math_023",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_023",
+        "n": 166,
+        "a": 353124296,
+        "b": 1740935206
+      }
+    },
+    {
+      "id": "q_alevel_math_024",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_024",
+        "n": 269,
+        "a": 463549345,
+        "b": 144062998
+      }
+    },
+    {
+      "id": "q_alevel_math_025",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_025",
+        "n": 308,
+        "a": 1534816650,
+        "b": 469447513
+      }
+    },
+    {
+      "id": "q_alevel_math_026",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_026",
+        "n": 252,
+        "a": 384219856,
+        "b": 284134791
+      }
+    },
+    {
+      "id": "q_alevel_math_027",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_027",
+        "n": 221,
+        "a": 948360865,
+        "b": 1552435177
+      }
+    },
+    {
+      "id": "q_alevel_math_028",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_028",
+        "n": 211,
+        "a": 1547704258,
+        "b": 2099971163
+      }
+    },
+    {
+      "id": "q_alevel_math_029",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_029",
+        "n": 168,
+        "a": 81972827,
+        "b": 996407344
+      }
+    },
+    {
+      "id": "q_alevel_math_030",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_030",
+        "n": 174,
+        "a": 1707926031,
+        "b": 941338967
+      }
+    },
+    {
+      "id": "q_alevel_math_031",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_031",
+        "n": 336,
+        "a": 649214333,
+        "b": 1486526601
+      }
+    },
+    {
+      "id": "q_alevel_math_032",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_032",
+        "n": 237,
+        "a": 183088112,
+        "b": 1066772315
+      }
+    },
+    {
+      "id": "q_alevel_math_033",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "points",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_033",
+        "n": 214,
+        "a": 734736471,
+        "b": 842002864
+      }
+    },
+    {
+      "id": "q_alevel_math_034",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_034",
+        "n": 232,
+        "a": 244096700,
+        "b": 205397788
+      }
+    },
+    {
+      "id": "q_alevel_math_035",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_035",
+        "n": 257,
+        "a": 1739228958,
+        "b": 1390790962
+      }
+    },
+    {
+      "id": "q_alevel_math_036",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_036",
+        "n": 181,
+        "a": 188884617,
+        "b": 1559754639
+      }
+    },
+    {
+      "id": "q_alevel_math_037",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_037",
+        "n": 263,
+        "a": 1420518946,
+        "b": 132352530
+      }
+    },
+    {
+      "id": "q_alevel_math_038",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_038",
+        "n": 307,
+        "a": 500121071,
+        "b": 2021244221
+      }
+    },
+    {
+      "id": "q_alevel_math_039",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_039",
+        "n": 283,
+        "a": 1863447955,
+        "b": 1629586131
+      }
+    },
+    {
+      "id": "q_alevel_math_040",
+      "subjectId": "subj_alevel_math",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "correct_answer",
+        "explanation",
+        "points",
+        "marks",
+        "time_limit"
+      ],
+      "legacyContentHash": {
+        "id": "q_alevel_math_040",
+        "n": 339,
+        "a": 887492526,
+        "b": 2082979312
+      }
+    },
+    {
+      "id": "q_igcse_bio_001",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "options",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_001",
+        "n": 293,
+        "a": 813242746,
+        "b": 184280146
+      }
+    },
+    {
+      "id": "q_igcse_bio_002",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_002",
+        "n": 220,
+        "a": 1755486967,
+        "b": 1954574325
+      }
+    },
+    {
+      "id": "q_igcse_bio_003",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_003",
+        "n": 191,
+        "a": 2093406108,
+        "b": 234577841
+      }
+    },
+    {
+      "id": "q_igcse_bio_004",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_004",
+        "n": 281,
+        "a": 1497304138,
+        "b": 1852132603
+      }
+    },
+    {
+      "id": "q_igcse_bio_005",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_005",
+        "n": 278,
+        "a": 1412484168,
+        "b": 596746770
+      }
+    },
+    {
+      "id": "q_igcse_bio_006",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_006",
+        "n": 242,
+        "a": 686649352,
+        "b": 920043842
+      }
+    },
+    {
+      "id": "q_igcse_bio_007",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_007",
+        "n": 241,
+        "a": 899755841,
+        "b": 133051472
+      }
+    },
+    {
+      "id": "q_igcse_bio_008",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_008",
+        "n": 205,
+        "a": 70345337,
+        "b": 582843209
+      }
+    },
+    {
+      "id": "q_igcse_bio_009",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_009",
+        "n": 249,
+        "a": 2018640371,
+        "b": 1176229400
+      }
+    },
+    {
+      "id": "q_igcse_bio_010",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_010",
+        "n": 274,
+        "a": 1264091824,
+        "b": 664179783
+      }
+    },
+    {
+      "id": "q_igcse_bio_011",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_011",
+        "n": 241,
+        "a": 1807283854,
+        "b": 1404852944
+      }
+    },
+    {
+      "id": "q_igcse_bio_012",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_012",
+        "n": 231,
+        "a": 79493669,
+        "b": 1304613309
+      }
+    },
+    {
+      "id": "q_igcse_bio_013",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_013",
+        "n": 272,
+        "a": 2022813034,
+        "b": 248121932
+      }
+    },
+    {
+      "id": "q_igcse_bio_014",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "options",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_014",
+        "n": 283,
+        "a": 1598657874,
+        "b": 36833661
+      }
+    },
+    {
+      "id": "q_igcse_bio_015",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_015",
+        "n": 286,
+        "a": 2077231127,
+        "b": 1711723213
+      }
+    },
+    {
+      "id": "q_igcse_bio_016",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "marks"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_016",
+        "n": 285,
+        "a": 1230866933,
+        "b": 186191022
+      }
+    },
+    {
+      "id": "q_igcse_bio_017",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "options",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_017",
+        "n": 268,
+        "a": 1858284192,
+        "b": 285273511
+      }
+    },
+    {
+      "id": "q_igcse_bio_018",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "marks"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_018",
+        "n": 260,
+        "a": 1424524441,
+        "b": 1672007463
+      }
+    },
+    {
+      "id": "q_igcse_bio_019",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "marks"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_019",
+        "n": 267,
+        "a": 668162455,
+        "b": 1925748146
+      }
+    },
+    {
+      "id": "q_igcse_bio_020",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "options",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_020",
+        "n": 276,
+        "a": 1049008819,
+        "b": 1979181944
+      }
+    },
+    {
+      "id": "q_igcse_bio_021",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "marks"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_021",
+        "n": 284,
+        "a": 2017613102,
+        "b": 69410968
+      }
+    },
+    {
+      "id": "q_igcse_bio_022",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_022",
+        "n": 256,
+        "a": 1559075001,
+        "b": 123851833
+      }
+    },
+    {
+      "id": "q_igcse_bio_023",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "marks"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_023",
+        "n": 285,
+        "a": 954424732,
+        "b": 179949121
+      }
+    },
+    {
+      "id": "q_igcse_bio_024",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "marks"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_024",
+        "n": 259,
+        "a": 1942038448,
+        "b": 1128842533
+      }
+    },
+    {
+      "id": "q_igcse_bio_025",
+      "subjectId": "subj_igcse_biology",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_bio_025",
+        "n": 307,
+        "a": 2083147323,
+        "b": 1479027840
+      }
+    },
+    {
+      "id": "q_igcse_chem_001",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_001",
+        "n": 279,
+        "a": 456943787,
+        "b": 784105644
+      }
+    },
+    {
+      "id": "q_igcse_chem_002",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_002",
+        "n": 185,
+        "a": 2082919916,
+        "b": 1998303353
+      }
+    },
+    {
+      "id": "q_igcse_chem_003",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_003",
+        "n": 252,
+        "a": 2031263851,
+        "b": 954659441
+      }
+    },
+    {
+      "id": "q_igcse_chem_004",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_004",
+        "n": 172,
+        "a": 186738185,
+        "b": 2002792795
+      }
+    },
+    {
+      "id": "q_igcse_chem_005",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "options",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_005",
+        "n": 258,
+        "a": 781612428,
+        "b": 460105014
+      }
+    },
+    {
+      "id": "q_igcse_chem_006",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_006",
+        "n": 190,
+        "a": 1988946111,
+        "b": 372848618
+      }
+    },
+    {
+      "id": "q_igcse_chem_007",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_007",
+        "n": 191,
+        "a": 622947295,
+        "b": 1679531372
+      }
+    },
+    {
+      "id": "q_igcse_chem_008",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_008",
+        "n": 258,
+        "a": 304215432,
+        "b": 1300650769
+      }
+    },
+    {
+      "id": "q_igcse_chem_009",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_009",
+        "n": 249,
+        "a": 1893171570,
+        "b": 287062250
+      }
+    },
+    {
+      "id": "q_igcse_chem_010",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_010",
+        "n": 216,
+        "a": 1408403841,
+        "b": 2130611563
+      }
+    },
+    {
+      "id": "q_igcse_chem_011",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_011",
+        "n": 217,
+        "a": 630702094,
+        "b": 2095878321
+      }
+    },
+    {
+      "id": "q_igcse_chem_012",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_012",
+        "n": 278,
+        "a": 1418137023,
+        "b": 2062687216
+      }
+    },
+    {
+      "id": "q_igcse_chem_013",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_013",
+        "n": 180,
+        "a": 1487548782,
+        "b": 525519622
+      }
+    },
+    {
+      "id": "q_igcse_chem_014",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_014",
+        "n": 262,
+        "a": 1311545350,
+        "b": 1382892963
+      }
+    },
+    {
+      "id": "q_igcse_chem_015",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "options",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_015",
+        "n": 288,
+        "a": 185200607,
+        "b": 1408562847
+      }
+    },
+    {
+      "id": "q_igcse_chem_017",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "marks"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_017",
+        "n": 229,
+        "a": 1329710242,
+        "b": 640201316
+      }
+    },
+    {
+      "id": "q_igcse_chem_018",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "marks"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_018",
+        "n": 252,
+        "a": 1762437512,
+        "b": 1028571052
+      }
+    },
+    {
+      "id": "q_igcse_chem_019",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "marks"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_019",
+        "n": 263,
+        "a": 1053335450,
+        "b": 808335594
+      }
+    },
+    {
+      "id": "q_igcse_chem_020",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "marks"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_020",
+        "n": 271,
+        "a": 289377255,
+        "b": 6175429
+      }
+    },
+    {
+      "id": "q_igcse_chem_021",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "difficulty",
+        "marks"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_021",
+        "n": 326,
+        "a": 70296232,
+        "b": 403191655
+      }
+    },
+    {
+      "id": "q_igcse_chem_022",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_022",
+        "n": 163,
+        "a": 482133798,
+        "b": 1772634171
+      }
+    },
+    {
+      "id": "q_igcse_chem_023",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_023",
+        "n": 180,
+        "a": 2112907580,
+        "b": 1030479330
+      }
+    },
+    {
+      "id": "q_igcse_chem_024",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "options",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_024",
+        "n": 286,
+        "a": 890889650,
+        "b": 604541614
+      }
+    },
+    {
+      "id": "q_igcse_chem_025",
+      "subjectId": "subj_igcse_chemistry",
+      "differingFields": [
+        "question_text",
+        "question_type",
+        "options",
+        "correct_answer",
+        "explanation",
+        "marks"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_chem_025",
+        "n": 286,
+        "a": 1706969526,
+        "b": 2115710379
+      }
+    },
+    {
+      "id": "q_igcse_math_001",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_001",
+        "n": 141,
+        "a": 845381671,
+        "b": 1697968926
+      }
+    },
+    {
+      "id": "q_igcse_math_002",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_002",
+        "n": 159,
+        "a": 1072114574,
+        "b": 83217018
+      }
+    },
+    {
+      "id": "q_igcse_math_003",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_003",
+        "n": 119,
+        "a": 1965419964,
+        "b": 2041672701
+      }
+    },
+    {
+      "id": "q_igcse_math_004",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_004",
+        "n": 159,
+        "a": 681610905,
+        "b": 822277670
+      }
+    },
+    {
+      "id": "q_igcse_math_005",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_005",
+        "n": 168,
+        "a": 2035230726,
+        "b": 148353981
+      }
+    },
+    {
+      "id": "q_igcse_math_006",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_006",
+        "n": 188,
+        "a": 1503308391,
+        "b": 2057775603
+      }
+    },
+    {
+      "id": "q_igcse_math_007",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_007",
+        "n": 156,
+        "a": 18419593,
+        "b": 263020056
+      }
+    },
+    {
+      "id": "q_igcse_math_008",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_008",
+        "n": 164,
+        "a": 1926679618,
+        "b": 665320618
+      }
+    },
+    {
+      "id": "q_igcse_math_009",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_009",
+        "n": 173,
+        "a": 2023314822,
+        "b": 1848829607
+      }
+    },
+    {
+      "id": "q_igcse_math_010",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_010",
+        "n": 178,
+        "a": 2081227270,
+        "b": 875436958
+      }
+    },
+    {
+      "id": "q_igcse_math_011",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_011",
+        "n": 163,
+        "a": 2027446339,
+        "b": 1877762869
+      }
+    },
+    {
+      "id": "q_igcse_math_012",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_012",
+        "n": 172,
+        "a": 1814406057,
+        "b": 447597924
+      }
+    },
+    {
+      "id": "q_igcse_math_013",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_013",
+        "n": 141,
+        "a": 1312517574,
+        "b": 1435976765
+      }
+    },
+    {
+      "id": "q_igcse_math_014",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_014",
+        "n": 145,
+        "a": 813912883,
+        "b": 818036534
+      }
+    },
+    {
+      "id": "q_igcse_math_015",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_015",
+        "n": 136,
+        "a": 958016837,
+        "b": 1414597337
+      }
+    },
+    {
+      "id": "q_igcse_math_016",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_016",
+        "n": 176,
+        "a": 1745322666,
+        "b": 503197316
+      }
+    },
+    {
+      "id": "q_igcse_math_017",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_017",
+        "n": 151,
+        "a": 2071200644,
+        "b": 1897269226
+      }
+    },
+    {
+      "id": "q_igcse_math_018",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_018",
+        "n": 186,
+        "a": 487731173,
+        "b": 2015259011
+      }
+    },
+    {
+      "id": "q_igcse_math_019",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_019",
+        "n": 154,
+        "a": 1976622031,
+        "b": 48012300
+      }
+    },
+    {
+      "id": "q_igcse_math_020",
+      "subjectId": "subj_igcse_math",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_math_020",
+        "n": 113,
+        "a": 1405446229,
+        "b": 1279366942
+      }
+    },
+    {
+      "id": "q_igcse_phy_002",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_002",
+        "n": 300,
+        "a": 1771224877,
+        "b": 681653795
+      }
+    },
+    {
+      "id": "q_igcse_phy_003",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_003",
+        "n": 305,
+        "a": 1873930905,
+        "b": 1679820344
+      }
+    },
+    {
+      "id": "q_igcse_phy_005",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_005",
+        "n": 255,
+        "a": 925294647,
+        "b": 1541416962
+      }
+    },
+    {
+      "id": "q_igcse_phy_007",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_007",
+        "n": 257,
+        "a": 306654383,
+        "b": 1519487085
+      }
+    },
+    {
+      "id": "q_igcse_phy_008",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_008",
+        "n": 215,
+        "a": 966705157,
+        "b": 1320834248
+      }
+    },
+    {
+      "id": "q_igcse_phy_010",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_010",
+        "n": 313,
+        "a": 749969060,
+        "b": 445069461
+      }
+    },
+    {
+      "id": "q_igcse_phy_012",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_012",
+        "n": 266,
+        "a": 1980819517,
+        "b": 430270712
+      }
+    },
+    {
+      "id": "q_igcse_phy_013",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "options",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_013",
+        "n": 282,
+        "a": 734794077,
+        "b": 412432994
+      }
+    },
+    {
+      "id": "q_igcse_phy_014",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_014",
+        "n": 192,
+        "a": 2005953388,
+        "b": 894266643
+      }
+    },
+    {
+      "id": "q_igcse_phy_015",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_015",
+        "n": 216,
+        "a": 1065343145,
+        "b": 67124847
+      }
+    },
+    {
+      "id": "q_igcse_phy_016",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_016",
+        "n": 209,
+        "a": 1929394605,
+        "b": 1417009277
+      }
+    },
+    {
+      "id": "q_igcse_phy_017",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_017",
+        "n": 243,
+        "a": 1148649183,
+        "b": 267325663
+      }
+    },
+    {
+      "id": "q_igcse_phy_018",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_018",
+        "n": 219,
+        "a": 1710294826,
+        "b": 163329344
+      }
+    },
+    {
+      "id": "q_igcse_phy_019",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_019",
+        "n": 191,
+        "a": 1494807798,
+        "b": 1273331804
+      }
+    },
+    {
+      "id": "q_igcse_phy_020",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_020",
+        "n": 252,
+        "a": 1562001660,
+        "b": 1690709625
+      }
+    },
+    {
+      "id": "q_igcse_phy_021",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_021",
+        "n": 272,
+        "a": 101480475,
+        "b": 1745579887
+      }
+    },
+    {
+      "id": "q_igcse_phy_022",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_022",
+        "n": 257,
+        "a": 1152158599,
+        "b": 164689793
+      }
+    },
+    {
+      "id": "q_igcse_phy_023",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_023",
+        "n": 194,
+        "a": 1819253804,
+        "b": 718338417
+      }
+    },
+    {
+      "id": "q_igcse_phy_024",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "options",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_024",
+        "n": 253,
+        "a": 605277302,
+        "b": 274989660
+      }
+    },
+    {
+      "id": "q_igcse_phy_025",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_025",
+        "n": 231,
+        "a": 1433581821,
+        "b": 391522966
+      }
+    },
+    {
+      "id": "q_igcse_phy_026",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_026",
+        "n": 210,
+        "a": 654560408,
+        "b": 316731581
+      }
+    },
+    {
+      "id": "q_igcse_phy_027",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_027",
+        "n": 275,
+        "a": 1492696789,
+        "b": 1039373906
+      }
+    },
+    {
+      "id": "q_igcse_phy_028",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_028",
+        "n": 255,
+        "a": 1858090059,
+        "b": 1718588862
+      }
+    },
+    {
+      "id": "q_igcse_phy_029",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "options",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_029",
+        "n": 304,
+        "a": 597088413,
+        "b": 2043158731
+      }
+    },
+    {
+      "id": "q_igcse_phy_030",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_030",
+        "n": 237,
+        "a": 1124328650,
+        "b": 201072308
+      }
+    },
+    {
+      "id": "q_igcse_phy_031",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_031",
+        "n": 175,
+        "a": 1690791545,
+        "b": 119732832
+      }
+    },
+    {
+      "id": "q_igcse_phy_032",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_032",
+        "n": 160,
+        "a": 980136656,
+        "b": 1765989876
+      }
+    },
+    {
+      "id": "q_igcse_phy_033",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "options"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_033",
+        "n": 267,
+        "a": 874878365,
+        "b": 116269882
+      }
+    },
+    {
+      "id": "q_igcse_phy_034",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_034",
+        "n": 177,
+        "a": 885529829,
+        "b": 1265005345
+      }
+    },
+    {
+      "id": "q_igcse_phy_035",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "correct_answer",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_035",
+        "n": 231,
+        "a": 1316344182,
+        "b": 853532283
+      }
+    },
+    {
+      "id": "q_igcse_phy_036",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "options",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_036",
+        "n": 270,
+        "a": 2125586072,
+        "b": 1059681984
+      }
+    },
+    {
+      "id": "q_igcse_phy_037",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_037",
+        "n": 262,
+        "a": 411549186,
+        "b": 1112088255
+      }
+    },
+    {
+      "id": "q_igcse_phy_038",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_038",
+        "n": 186,
+        "a": 1390474497,
+        "b": 743569932
+      }
+    },
+    {
+      "id": "q_igcse_phy_039",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text",
+        "explanation"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_039",
+        "n": 218,
+        "a": 870445320,
+        "b": 1997389062
+      }
+    },
+    {
+      "id": "q_igcse_phy_040",
+      "subjectId": "subj_igcse_physics",
+      "differingFields": [
+        "question_text"
+      ],
+      "legacyContentHash": {
+        "id": "q_igcse_phy_040",
+        "n": 193,
+        "a": 910605876,
+        "b": 255216281
+      }
+    }
+  ]
+}
