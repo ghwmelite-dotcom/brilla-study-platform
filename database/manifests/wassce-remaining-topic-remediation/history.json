@@ -1,0 +1,71 @@
+{
+  "release": "wassce-remaining-null-topic-audit-2026-08-26",
+  "subjectId": "subj_wassce_history",
+  "subjectName": "History",
+  "expectedNullTopicCount": 25,
+  "mappedQuestionCount": 25,
+  "exceptionCount": 0,
+  "mappingGroups": [
+    {
+      "topicId": "topic_hist_au",
+      "evidenceBasis": "id-prefix-and-reviewed-question-semantics",
+      "evidence": "The q_his_au prefix and reviewed OAU/AU stems match exactly.",
+      "questionIds": [
+        "q_his_au_001",
+        "q_his_au_002",
+        "q_his_au_003",
+        "q_his_au_004",
+        "q_his_au_005"
+      ]
+    },
+    {
+      "topicId": "topic_hist_world2",
+      "evidenceBasis": "id-prefix-and-reviewed-question-semantics",
+      "evidence": "The q_his_cw prefix and reviewed Cold War stems match exactly.",
+      "questionIds": [
+        "q_his_cw_001",
+        "q_his_cw_002",
+        "q_his_cw_003",
+        "q_his_cw_004",
+        "q_his_cw_005"
+      ]
+    },
+    {
+      "topicId": "topic_hist_nigeria",
+      "evidenceBasis": "id-prefix-and-reviewed-question-semantics",
+      "evidence": "The q_his_nig prefix and reviewed Nigerian history stems match exactly.",
+      "questionIds": [
+        "q_his_nig_001",
+        "q_his_nig_002",
+        "q_his_nig_003",
+        "q_his_nig_004",
+        "q_his_nig_005"
+      ]
+    },
+    {
+      "topicId": "topic_hist_postcolonial",
+      "evidenceBasis": "id-prefix-and-reviewed-question-semantics",
+      "evidence": "The q_his_post prefix and reviewed post-colonial Africa stems match exactly.",
+      "questionIds": [
+        "q_his_post_001",
+        "q_his_post_002",
+        "q_his_post_003",
+        "q_his_post_004",
+        "q_his_post_005"
+      ]
+    },
+    {
+      "topicId": "topic_hist_world1",
+      "evidenceBasis": "id-prefix-and-reviewed-question-semantics",
+      "evidence": "The q_his_ww prefix and reviewed World War stems match exactly.",
+      "questionIds": [
+        "q_his_ww_001",
+        "q_his_ww_002",
+        "q_his_ww_003",
+        "q_his_ww_004",
+        "q_his_ww_005"
+      ]
+    }
+  ],
+  "reviewedExceptions": []
+}

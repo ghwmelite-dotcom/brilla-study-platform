@@ -22,6 +22,81 @@ quickPlayApp.use('*', requireAuth);
 
 // Helper to generate unique ID
 const generateId = () => `qp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+const QUICK_PLAY_SESSION_TOKEN_PREFIX = 'qps1';
+interface QuickPlaySessionToken {
+  sessionId: string;
+  questionIds: string[];
+}
+
+function bytesToBase64Url(bytes: Uint8Array): string {
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/u, '');
+}
+
+function stringToBase64Url(value: string): string {
+  return bytesToBase64Url(new TextEncoder().encode(value));
+}
+
+function base64UrlToString(value: string): string {
+  const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
+  const binary = atob(padded);
+  return new TextDecoder().decode(Uint8Array.from(binary, (character) => character.charCodeAt(0)));
+}
+
+async function signSessionPayload(payload: string, secret: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  return bytesToBase64Url(new Uint8Array(
+    await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payload)),
+  ));
+}
+
+async function createQuestionBoundSessionId(
+  sessionId: string,
+  questionIds: string[],
+  secret: string,
+): Promise<string> {
+  const payload = stringToBase64Url(JSON.stringify({ sessionId, questionIds }));
+  const signature = await signSessionPayload(payload, secret);
+  return `${QUICK_PLAY_SESSION_TOKEN_PREFIX}.${payload}.${signature}`;
+}
+
+async function readQuestionBoundSessionId(token: unknown, secret: string): Promise<QuickPlaySessionToken | null> {
+  if (typeof token !== 'string') return null;
+  const [prefix, payload, signature, extra] = token.split('.');
+  if (prefix !== QUICK_PLAY_SESSION_TOKEN_PREFIX || !payload || !signature || extra !== undefined) return null;
+
+  const expected = await signSessionPayload(payload, secret);
+  if (expected.length !== signature.length) return null;
+  let difference = 0;
+  for (let index = 0; index < expected.length; index += 1) {
+    difference |= expected.charCodeAt(index) ^ signature.charCodeAt(index);
+  }
+  if (difference !== 0) return null;
+
+  try {
+    const parsed = JSON.parse(base64UrlToString(payload)) as Partial<QuickPlaySessionToken>;
+    if (
+      typeof parsed.sessionId !== 'string'
+      || !Array.isArray(parsed.questionIds)
+      || parsed.questionIds.length === 0
+      || parsed.questionIds.length > 100
+      || parsed.questionIds.some((id) => typeof id !== 'string' || id.length === 0)
+    ) return null;
+    return { sessionId: parsed.sessionId, questionIds: [...new Set(parsed.questionIds)] };
+  } catch {
+    return null;
+  }
+}
+
+
 
 // =============================================
 // QUICK PLAY ENDPOINTS
@@ -42,8 +117,12 @@ quickPlayApp.get('/daily-challenge', async (c) => {
     if (!challenge) {
       // Get random questions for the challenge
       const questions = await c.env.DB.prepare(`
-        SELECT id FROM questions
-        WHERE difficulty IN ('easy', 'medium')
+        SELECT q.id
+        FROM questions q
+        JOIN topics t ON t.id = q.topic_id AND t.subject_id = q.subject_id
+        JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
+        WHERE q.topic_id IS NOT NULL
+          AND q.difficulty IN ('easy', 'medium')
         ORDER BY RANDOM()
         LIMIT 5
       `).all();
@@ -120,9 +199,9 @@ quickPlayApp.post('/start', async (c) => {
       SELECT q.id, q.question_text, q.options, q.correct_answer, q.explanation,
              q.difficulty, t.name as topic_name, s.name as subject_name
       FROM questions q
-      LEFT JOIN topics t ON q.topic_id = t.id
-      LEFT JOIN subjects s ON q.subject_id = s.id
-      WHERE 1=1
+      JOIN topics t ON t.id = q.topic_id AND t.subject_id = q.subject_id
+      JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
+      WHERE q.topic_id IS NOT NULL
     `;
     const params: any[] = [];
 
@@ -139,9 +218,13 @@ quickPlayApp.post('/start', async (c) => {
     params.push(questionCount);
 
     const questions = await c.env.DB.prepare(query).bind(...params).all();
+    const selectedQuestionIds = questions.results.map((question) => (question as { id: string }).id);
+    if (selectedQuestionIds.length === 0) {
+      return c.json({ success: false, error: 'No usable questions available' }, 409);
+    }
 
     // Create session
-    const sessionId = generateId();
+    const sessionId = await createQuestionBoundSessionId(generateId(), selectedQuestionIds, c.env.JWT_SECRET);
     await c.env.DB.prepare(`
       INSERT INTO quick_play_sessions (id, user_id, game_type, subject_id, started_at)
       VALUES (?, ?, ?, ?, datetime('now'))
@@ -197,6 +280,20 @@ quickPlayApp.post('/submit', async (c) => {
       ? Math.min(Math.max(Math.round(timeTaken), 0), 3_600_000) // clamp 0..60min
       : 0;
 
+    const sessionToken = await readQuestionBoundSessionId(sessionId, c.env.JWT_SECRET);
+    if (!sessionToken) {
+      return c.json({ success: false, error: 'Invalid quick play session' }, 400);
+    }
+
+    const validatedAnswers = answers as Array<{ questionId: string; answer: string }>;
+    const ids = [...new Set(validatedAnswers.map((answer) => answer.questionId))];
+    if (ids.length !== answers.length) {
+      return c.json({ success: false, error: 'Duplicate question answers are not allowed' }, 400);
+    }
+    const selectedQuestionIds = new Set(sessionToken.questionIds);
+    if (ids.some((id) => !selectedQuestionIds.has(id))) {
+      return c.json({ success: false, error: 'Question is not part of this quick play session' }, 400);
+    }
     // Get session
     const session = await c.env.DB.prepare(
       'SELECT * FROM quick_play_sessions WHERE id = ? AND user_id = ?'
@@ -211,14 +308,21 @@ quickPlayApp.post('/submit', async (c) => {
     }
 
     // Calculate score — one batched query instead of a per-answer SELECT.
-    const ids = [...new Set(answers.map((a: any) => a.questionId as string))];
     const { results: questions } = await c.env.DB.prepare(
-      `SELECT id, correct_answer, explanation FROM questions WHERE id IN (${ids.map(() => '?').join(',')})`
+      `SELECT q.id, q.correct_answer, q.explanation
+       FROM questions q
+       JOIN topics t ON t.id = q.topic_id AND t.subject_id = q.subject_id
+       JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
+       WHERE q.topic_id IS NOT NULL
+         AND q.id IN (${ids.map(() => '?').join(',')})`
     ).bind(...ids).all();
+    if (questions.length !== ids.length) {
+      return c.json({ success: false, error: 'Session contains unavailable questions' }, 409);
+    }
     const byId = new Map((questions as any[]).map((q) => [q.id, q]));
 
     let correctCount = 0;
-    const results = answers.map((a: any) => {
+    const results = validatedAnswers.map((a) => {
       const q = byId.get(a.questionId);
       const isCorrect = q ? q.correct_answer === a.answer : false;
       if (isCorrect) correctCount++;

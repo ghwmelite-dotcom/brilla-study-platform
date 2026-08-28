@@ -1,0 +1,23 @@
+{
+  "release": "wassce-remaining-null-topic-audit-2026-08-26",
+  "subjectId": "subj_wassce_ict",
+  "subjectName": "Information & Comm. Technology",
+  "expectedNullTopicCount": 5,
+  "mappedQuestionCount": 5,
+  "exceptionCount": 0,
+  "mappingGroups": [
+    {
+      "topicId": "topic_ict_wordproc",
+      "evidenceBasis": "id-prefix-and-reviewed-question-semantics",
+      "evidence": "The q_ict_wp prefix and all reviewed Microsoft Word stems match Word Processing.",
+      "questionIds": [
+        "q_ict_wp_001",
+        "q_ict_wp_002",
+        "q_ict_wp_003",
+        "q_ict_wp_004",
+        "q_ict_wp_005"
+      ]
+    }
+  ],
+  "reviewedExceptions": []
+}

@@ -79,15 +79,21 @@ teamBattlesApp.post('/create', async (c) => {
     const { subjectId, topicId, totalQuestions = 10, timePerQuestion = 30 } = body;
 
     // Get random questions
-    let query = 'SELECT id FROM questions WHERE 1=1';
+    let query = `
+      SELECT q.id
+      FROM questions q
+      JOIN topics t ON t.id = q.topic_id AND t.subject_id = q.subject_id
+      JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
+      WHERE q.topic_id IS NOT NULL
+    `;
     const params: any[] = [];
 
     if (subjectId) {
-      query += ' AND subject_id = ?';
+      query += ' AND q.subject_id = ?';
       params.push(subjectId);
     }
     if (topicId) {
-      query += ' AND topic_id = ?';
+      query += ' AND q.topic_id = ?';
       params.push(topicId);
     }
 
@@ -399,9 +405,13 @@ teamBattlesApp.post('/:battleId/answer', async (c) => {
     const body = await c.req.json();
     const { questionId, answer } = body;
 
+    if (typeof questionId !== 'string' || questionId.length === 0 || typeof answer !== 'string') {
+      return c.json({ success: false, error: 'Invalid answer payload' }, 400);
+    }
+
     const battle = await c.env.DB.prepare(
       'SELECT * FROM team_battles WHERE id = ? AND status = \'active\''
-    ).bind(battleId).first();
+    ).bind(battleId).first<{ question_ids: string | null }>();
 
     if (!battle) {
       return c.json({ success: false, error: 'Battle not active' }, 400);
@@ -416,11 +426,34 @@ teamBattlesApp.post('/:battleId/answer', async (c) => {
     }
 
     // Check answer
-    const question = await c.env.DB.prepare(
-      'SELECT correct_answer FROM questions WHERE id = ?'
-    ).bind(questionId).first();
+    let selectedQuestionIds: unknown;
+    try {
+      selectedQuestionIds = JSON.parse(battle.question_ids || '[]');
+    } catch {
+      return c.json({ success: false, error: 'Battle question set is unavailable' }, 409);
+    }
+    if (
+      !Array.isArray(selectedQuestionIds)
+      || selectedQuestionIds.some((id) => typeof id !== 'string')
+      || !selectedQuestionIds.includes(questionId)
+    ) {
+      return c.json({ success: false, error: 'Question is not part of this battle' }, 400);
+    }
 
-    const isCorrect = question?.correct_answer === answer;
+    const question = await c.env.DB.prepare(
+      `SELECT q.correct_answer
+       FROM questions q
+       JOIN topics t ON t.id = q.topic_id AND t.subject_id = q.subject_id
+       JOIN subjects s ON s.id = q.subject_id AND s.is_active = 1
+       WHERE q.topic_id IS NOT NULL
+         AND q.id = ?`
+    ).bind(questionId).first<{ correct_answer: string }>();
+
+    if (!question) {
+      return c.json({ success: false, error: 'Question is unavailable' }, 409);
+    }
+
+    const isCorrect = question.correct_answer === answer;
     const points = isCorrect ? 10 : 0;
 
     // Update member score

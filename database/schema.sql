@@ -761,7 +761,11 @@ CREATE TABLE IF NOT EXISTS battles (
     winner_id TEXT REFERENCES users(id),
     created_at TEXT DEFAULT (datetime('now')),
     started_at TEXT,
-    completed_at TEXT
+    completed_at TEXT,
+    -- added by migrations/282_battle_demo_data_integrity.sql
+    is_demo_data INTEGER NOT NULL DEFAULT 0 CHECK (is_demo_data IN (0, 1)),
+    -- added by migrations/282_battle_demo_data_integrity.sql
+    expires_at TEXT
 );
 
 -- Source: schema.sql
@@ -2275,7 +2279,11 @@ CREATE TABLE IF NOT EXISTS battle_answers (
     is_correct INTEGER,
     time_taken INTEGER,
     points_earned INTEGER DEFAULT 0,
-    answered_at TEXT DEFAULT (datetime('now'))
+    answered_at TEXT DEFAULT (datetime('now')),
+    -- added by migrations/282_battle_demo_data_integrity.sql
+    is_demo_data INTEGER NOT NULL DEFAULT 0 CHECK (is_demo_data IN (0, 1)),
+    -- added by migrations/282_battle_demo_data_integrity.sql
+    expires_at TEXT
 );
 
 -- Source: schema.sql
@@ -3723,7 +3731,18 @@ CREATE TABLE IF NOT EXISTS practice_sessions (
     -- added by migrations/019_add_demo_data_isolation.sql
     is_demo_data INTEGER DEFAULT 0,
     -- added by migrations/019_add_demo_data_isolation.sql
-    expires_at TEXT
+    expires_at TEXT,
+    -- added by migrations/276_practice_session_integrity.sql
+    client_request_id TEXT,
+    request_fingerprint TEXT
+);
+
+-- Source: migrations/276_practice_session_integrity.sql
+CREATE TABLE IF NOT EXISTS practice_session_attempts (
+    session_id TEXT NOT NULL REFERENCES practice_sessions(id) ON DELETE CASCADE,
+    attempt_id TEXT NOT NULL PRIMARY KEY REFERENCES question_attempts(id) ON DELETE RESTRICT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(session_id, attempt_id)
 );
 
 -- Source: migrations/027_teacher_bonus_tutoring.sql
@@ -4275,7 +4294,10 @@ CREATE TABLE IF NOT EXISTS question_attempts (
     -- added by migrations/019_add_demo_data_isolation.sql
     is_demo_data INTEGER DEFAULT 0,
     -- added by migrations/019_add_demo_data_isolation.sql
-    expires_at TEXT
+    expires_at TEXT,
+    -- added by migrations/277_answer_attempt_integrity.sql
+    client_request_id TEXT,
+    request_fingerprint TEXT
 );
 
 -- Source: migrations/004_add_assessment_system.sql
@@ -4462,6 +4484,8 @@ CREATE INDEX IF NOT EXISTS idx_affiliate_campaigns_active ON affiliate_campaigns
 CREATE INDEX IF NOT EXISTS idx_affiliate_campaigns_dates ON affiliate_campaigns(start_date, end_date);
 CREATE INDEX IF NOT EXISTS idx_rate_limits_lookup
 ON rate_limits(identifier, endpoint, window_start);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_rate_limits_bucket_unique
+ON rate_limits(identifier, endpoint, window_start);
 CREATE INDEX IF NOT EXISTS idx_rate_limits_window
 ON rate_limits(window_start);
 CREATE INDEX IF NOT EXISTS idx_events_active ON seasonal_events(is_active, start_date);
@@ -4503,6 +4527,8 @@ CREATE INDEX IF NOT EXISTS idx_house_points_period ON house_points(period);
 CREATE INDEX IF NOT EXISTS idx_battles_status ON battles(status);
 CREATE INDEX IF NOT EXISTS idx_battles_challenger ON battles(challenger_id);
 CREATE INDEX IF NOT EXISTS idx_battles_opponent ON battles(opponent_id);
+CREATE INDEX IF NOT EXISTS idx_battles_demo ON battles(is_demo_data, expires_at);
+CREATE INDEX IF NOT EXISTS idx_battle_answers_demo ON battle_answers(is_demo_data, expires_at);
 CREATE INDEX IF NOT EXISTS idx_chat_teacher_assignments_teacher ON chat_teacher_assignments(teacher_id);
 CREATE INDEX IF NOT EXISTS idx_chat_teacher_assignments_subject ON chat_teacher_assignments(subject_id);
 CREATE INDEX IF NOT EXISTS idx_parent_links_parent ON parent_student_links(parent_id);
@@ -4882,6 +4908,10 @@ CREATE INDEX IF NOT EXISTS idx_paper_attempts_demo ON paper_attempts(is_demo_dat
 CREATE INDEX IF NOT EXISTS idx_practice_sessions_exam ON practice_sessions(exam_type_id);
 CREATE INDEX IF NOT EXISTS idx_practice_sessions_paper ON practice_sessions(past_paper_id);
 CREATE INDEX IF NOT EXISTS idx_practice_sessions_demo ON practice_sessions(is_demo_data, expires_at);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_practice_sessions_user_client_request
+ON practice_sessions(user_id, client_request_id) WHERE client_request_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_practice_session_attempts_session
+ON practice_session_attempts(session_id);
 CREATE INDEX IF NOT EXISTS idx_bonus_students_bonus ON teacher_bonus_students(bonus_id);
 CREATE INDEX IF NOT EXISTS idx_bonus_students_student ON teacher_bonus_students(student_id);
 CREATE INDEX IF NOT EXISTS idx_bonus_students_qualified ON teacher_bonus_students(is_qualified);
@@ -4970,6 +5000,9 @@ CREATE INDEX IF NOT EXISTS idx_question_attempts_user ON question_attempts(user_
 CREATE INDEX IF NOT EXISTS idx_question_attempts_question ON question_attempts(question_id);
 CREATE INDEX IF NOT EXISTS idx_question_attempts_demo ON question_attempts(is_demo_data, expires_at);
 CREATE INDEX IF NOT EXISTS idx_assessment_questions_assessment ON assessment_questions(assessment_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_question_attempts_user_client_request
+ON question_attempts(user_id, client_request_id)
+WHERE client_request_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_assessment_questions_question ON assessment_questions(question_id);
 CREATE INDEX IF NOT EXISTS idx_assessment_questions_order ON assessment_questions(assessment_id, display_order);
 CREATE INDEX IF NOT EXISTS idx_tutor_messages_conversation ON tutor_messages(conversation_id);

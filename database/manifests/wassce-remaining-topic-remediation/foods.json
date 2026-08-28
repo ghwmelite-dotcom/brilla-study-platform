@@ -1,0 +1,59 @@
+{
+  "release": "wassce-remaining-null-topic-audit-2026-08-26",
+  "subjectId": "subj_wassce_foods",
+  "subjectName": "Foods and Nutrition",
+  "expectedNullTopicCount": 20,
+  "mappedQuestionCount": 20,
+  "exceptionCount": 0,
+  "mappingGroups": [
+    {
+      "topicId": "topic_fn_catering",
+      "evidenceBasis": "id-prefix-and-reviewed-question-semantics",
+      "evidence": "The q_food_cat source prefix and all reviewed stems are catering operations.",
+      "questionIds": [
+        "q_food_cat_001",
+        "q_food_cat_002",
+        "q_food_cat_003",
+        "q_food_cat_004",
+        "q_food_cat_005"
+      ]
+    },
+    {
+      "topicId": "topic_fn_special_diets",
+      "evidenceBasis": "id-prefix-and-reviewed-question-semantics",
+      "evidence": "The q_food_diet source prefix and all reviewed stems are special-diet requirements.",
+      "questionIds": [
+        "q_food_diet_001",
+        "q_food_diet_002",
+        "q_food_diet_003",
+        "q_food_diet_004",
+        "q_food_diet_005"
+      ]
+    },
+    {
+      "topicId": "topic_fn_food_prep",
+      "evidenceBasis": "id-prefix-and-reviewed-question-semantics",
+      "evidence": "The q_food_prep source prefix and reviewed cooking/storage stems match Food Preparation.",
+      "questionIds": [
+        "q_food_prep_001",
+        "q_food_prep_002",
+        "q_food_prep_003",
+        "q_food_prep_004",
+        "q_food_prep_005"
+      ]
+    },
+    {
+      "topicId": "topic_fn_food_science",
+      "evidenceBasis": "id-prefix-and-reviewed-question-semantics",
+      "evidence": "The q_food_sci source prefix and reviewed protein, carbohydrate, oxidation, emulsification and gelatinization stems match Food Science.",
+      "questionIds": [
+        "q_food_sci_001",
+        "q_food_sci_002",
+        "q_food_sci_003",
+        "q_food_sci_004",
+        "q_food_sci_005"
+      ]
+    }
+  ],
+  "reviewedExceptions": []
+}

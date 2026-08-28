@@ -21,3 +21,63 @@ export async function parseJsonBody(c: Context): Promise<Record<string, any> | n
   }
 }
 
+export type BoundedJsonBodyResult =
+  | { ok: true; body: Record<string, unknown> }
+  | { ok: false; reason: 'invalid_json' | 'too_large' };
+
+/**
+ * Read a JSON object without buffering more than maxBytes. Content-Length is
+ * only an early rejection hint; the streamed byte count is authoritative so a
+ * missing or forged header cannot bypass the limit.
+ */
+export async function parseBoundedJsonBody(
+  c: Context,
+  maxBytes: number,
+): Promise<BoundedJsonBodyResult> {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1) {
+    throw new Error('maxBytes must be a positive safe integer');
+  }
+
+  const declaredLengthHeader = c.req.header('content-length');
+  if (declaredLengthHeader && /^\d+$/.test(declaredLengthHeader)) {
+    const declaredLength = Number(declaredLengthHeader);
+    if (Number.isSafeInteger(declaredLength) && declaredLength > maxBytes) {
+      return { ok: false, reason: 'too_large' };
+    }
+  }
+
+  const stream = c.req.raw.body;
+  if (!stream) return { ok: false, reason: 'invalid_json' };
+
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    totalBytes += value.byteLength;
+    if (totalBytes > maxBytes) {
+      await reader.cancel().catch(() => undefined);
+      return { ok: false, reason: 'too_large' };
+    }
+    chunks.push(value);
+  }
+
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  try {
+    const parsed = JSON.parse(new TextDecoder().decode(bytes)) as unknown;
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return { ok: false, reason: 'invalid_json' };
+    }
+    return { ok: true, body: parsed as Record<string, unknown> };
+  } catch {
+    return { ok: false, reason: 'invalid_json' };
+  }
+}

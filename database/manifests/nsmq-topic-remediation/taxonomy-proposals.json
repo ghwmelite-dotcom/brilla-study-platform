@@ -1,0 +1,160 @@
+{
+  "release": "nsmq-null-topic-remediation-audit-2026-08-26",
+  "status": "proposal-only-final-dispositions-no-migrations",
+  "authoritativeInventoryCount": 375,
+  "existingTopicMappingCount": 360,
+  "currentExceptionCount": 15,
+  "proposedNewTopicCount": 4,
+  "rowsCoveredByProposedTopics": 12,
+  "rowsResolvedByExistingTopicAfterReview": 1,
+  "correctedContentMappingCount": 1,
+  "resolvedWithExceptionCount": 2,
+  "finalDefensibleDispositionCount": 375,
+  "unresolvedDispositionCount": 0,
+  "proposals": [
+    {
+      "subjectId": "subj_nsmq_math",
+      "proposedTopicId": "topic_nsmq_math_general_reasoning",
+      "proposedName": "General Reasoning",
+      "roundScope": [
+        "riddles"
+      ],
+      "affectedQuestionIds": [
+        "nsmq_math_rid_002",
+        "nsmq_math_rid_003",
+        "nsmq_math_rid_004",
+        "nsmq_math_rid_009",
+        "nsmq_math_rid_010",
+        "nsmq_math_rid_011",
+        "nsmq_math_rid_012",
+        "nsmq_math_rid_013"
+      ],
+      "rationale": "These Mathematics-owned Riddle rows assess lateral, constraint-based or word reasoning rather than Algebra, Geometry, Trigonometry, Calculus or Statistics. A Riddle-bounded General Reasoning topic is more truthful than forcing an academic topic."
+    },
+    {
+      "subjectId": "subj_nsmq_math",
+      "proposedTopicId": "topic_nsmq_math_numeration",
+      "proposedName": "Numeration & Number Systems",
+      "roundScope": [
+        "riddles",
+        "speed_race"
+      ],
+      "affectedQuestionIds": [
+        "nsmq_math_rid_015",
+        "nsmq_math_sr_022"
+      ],
+      "rationale": "Number-word representation and Roman numerals are explicit, coherent Mathematics content but are absent from the current taxonomy."
+    },
+    {
+      "subjectId": "subj_nsmq_math",
+      "proposedTopicId": "topic_nsmq_math_sets",
+      "proposedName": "Sets",
+      "roundScope": [
+        "true_false"
+      ],
+      "affectedQuestionIds": [
+        "nsmq_math_tf_020"
+      ],
+      "rationale": "The item explicitly assesses the empty-set subset rule; none of the current Mathematics topics represents set theory."
+    },
+    {
+      "subjectId": "subj_nsmq_chemistry",
+      "proposedTopicId": "topic_nsmq_chem_environmental",
+      "proposedName": "Environmental Chemistry",
+      "roundScope": [
+        "round_one"
+      ],
+      "affectedQuestionIds": [
+        "nsmq_chem_r1_019"
+      ],
+      "rationale": "The item explicitly assesses carbon dioxide as a greenhouse gas; Environmental Chemistry avoids misclassifying it as Atomic Structure or Stoichiometry."
+    }
+  ],
+  "existingTopicResolutions": [
+    {
+      "questionId": "nsmq_phy_rid_012",
+      "subjectId": "subj_nsmq_physics",
+      "topicId": "topic_thermodynamics",
+      "rationale": "The clues “hot,” “cold,” and molecular speed make temperature and thermal energy the dominant assessed concept; Thermodynamics is an existing same-subject topic."
+    }
+  ],
+  "resolvedWithExceptions": [
+    {
+      "questionId": "nsmq_phy_rid_001",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "reasonCode": "misclassified_general_riddle",
+      "disposition": "pending_separate_general_reasoning_bank",
+      "rationale": "The postage-stamp answer is general wordplay with no Physics signal. Creating a Physics topic for it would mislead students; retain it as an explicit reviewed exception until a separate general-reasoning bank exists."
+    },
+    {
+      "questionId": "nsmq_phy_rid_003",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "riddles",
+      "reasonCode": "misclassified_general_riddle",
+      "disposition": "pending_separate_general_reasoning_bank",
+      "rationale": "The footsteps answer is lateral wordplay with no Physics signal. Creating a Physics topic for it would mislead students; retain it as an explicit reviewed exception until a separate general-reasoning bank exists."
+    }
+  ],
+  "contentCorrections": [
+    {
+      "questionId": "nsmq_math_rid_012",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "riddles",
+      "proposedTopicId": "topic_nsmq_math_general_reasoning",
+      "derivation": "Let the last digit be d. The digits are 3d, 3d-1, 2d, d. Since the first digit is nonzero and at most 9, d is 1, 2 or 3. d=1 repeats 2; d=2 gives 6542; d=3 gives 9863.",
+      "changes": [
+        {
+          "field": "question_text",
+          "before": "I am a 4-digit number. All my digits are different. My first digit is 3 times my last digit. My second digit is one less than my first. My third digit is double my last digit. What number am I?",
+          "after": "I am a 4-digit number. All my digits are different. My first digit is 3 times my last digit. My second digit is one less than my first. My third digit is double my last digit. What numbers can I be?"
+        },
+        {
+          "field": "correct_answer",
+          "before": "3624",
+          "after": "6542 or 9863"
+        },
+        {
+          "field": "explanation",
+          "before": "Last=2, First=6, no wait... Let me recalculate: 3×1=3, 3-1=2, 2×1=2, last=1 → but not 4 digits. Try: 6521 (6=3×2, 5=6-1, 2=2×1, 1). Actually: 3624",
+          "after": "Let the last digit be d, so the digits are 3d, 3d−1, 2d, d. The only possible last digits are 1, 2, and 3. When d=1, the digit 2 repeats, so it is invalid. When d=2, the number is 6542; when d=3, the number is 9863. Both satisfy every stated constraint."
+        }
+      ],
+      "evidence": "The complete finite digit search proves two solutions. The prompt is pluralized so the corrected answer is complete without adding or silently changing a constraint."
+    }
+  ],
+  "liveOnlyRowsRecoveredWithoutTaxonomyAddition": [
+    {
+      "questionId": "q_speed_002",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "speed_race",
+      "topicId": "topic_algebra"
+    },
+    {
+      "questionId": "q_speed_006",
+      "subjectId": "subj_nsmq_math",
+      "roundType": "speed_race",
+      "topicId": "topic_trigonometry"
+    },
+    {
+      "questionId": "q_speed_003",
+      "subjectId": "subj_nsmq_physics",
+      "roundType": "speed_race",
+      "topicId": "topic_mechanics"
+    },
+    {
+      "questionId": "q_speed_004",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "speed_race",
+      "topicId": "topic_atomic"
+    },
+    {
+      "questionId": "q_speed_005",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "speed_race",
+      "topicId": "topic_cells"
+    }
+  ],
+  "migrationArtifactsCreated": false,
+  "sourceContentMutated": false
+}

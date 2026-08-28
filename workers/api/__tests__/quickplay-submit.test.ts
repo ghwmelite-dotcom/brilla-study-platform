@@ -18,6 +18,27 @@ async function token(payload: object) {
   );
 }
 
+async function boundSessionId(questionIds: string[]) {
+  const payload = btoa(JSON.stringify({ sessionId: 'sess_1', questionIds }))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/u, '');
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(JWT_SECRET),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const signatureBytes = new Uint8Array(
+    await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payload)),
+  );
+  let binary = '';
+  for (const byte of signatureBytes) binary += String.fromCharCode(byte);
+  const signature = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/u, '');
+  return `qps1.${payload}.${signature}`;
+}
+
 const authHandler: MockHandler = {
   match: /SELECT role, status, is_active, session_version FROM users/,
   first: () => ({ role: 'student', status: 'approved', is_active: 1 }),
@@ -93,14 +114,14 @@ describe('POST /api/quickplay/submit payload validation and batched grading', ()
       authHandler,
       sessionHandler,
       {
-        match: /SELECT id, correct_answer, explanation FROM questions WHERE id IN/,
+        match: /SELECT q\.id, q\.correct_answer, q\.explanation/,
         all: () => ({ results: [{ id: 'q1', correct_answer: 'A', explanation: 'because' }] }),
       },
       ...writeHandlers,
     ]);
 
     const res = await submit(db, {
-      sessionId: 'sess_1',
+      sessionId: await boundSessionId(['q1']),
       answers: [{ questionId: 'q1', answer: 'A' }],
       timeTaken: -5000,
     });
@@ -129,7 +150,7 @@ describe('POST /api/quickplay/submit payload validation and batched grading', ()
       authHandler,
       sessionHandler,
       {
-        match: /SELECT id, correct_answer, explanation FROM questions WHERE id IN/,
+        match: /SELECT q\.id, q\.correct_answer, q\.explanation/,
         all: (binds) => ({
           results: (binds as string[]).map((id) => ({
             id,
@@ -141,12 +162,12 @@ describe('POST /api/quickplay/submit payload validation and batched grading', ()
       ...writeHandlers,
     ]);
 
-    const res = await submit(db, { sessionId: 'sess_1', answers, timeTaken: 45000 });
+    const res = await submit(db, { sessionId: await boundSessionId(answers.map((a) => a.questionId)), answers, timeTaken: 45000 });
     expect(res.status).toBe(200);
 
     const questionQueries = db.calls.filter((c) => /FROM questions/.test(c.sql));
     expect(questionQueries).toHaveLength(1);
-    expect(questionQueries[0].sql).toMatch(/WHERE id IN \(\?,\?,\?,\?,\?,\?,\?,\?,\?,\?\)/);
+    expect(questionQueries[0].sql).toMatch(/q\.id IN \(\?,\?,\?,\?,\?,\?,\?,\?,\?,\?\)/);
     expect(questionQueries[0].binds).toEqual(answers.map((a) => a.questionId));
 
     const body = (await res.json()) as {
@@ -156,5 +177,48 @@ describe('POST /api/quickplay/submit payload validation and batched grading', ()
     expect(body.data.correctAnswers).toBe(10);
     expect(body.data.totalQuestions).toBe(10);
     expect(body.data.results).toHaveLength(10);
+
+  });
+  it('rejects an arbitrary question ID before reading answer material', async () => {
+    const db = createMockD1([authHandler]);
+
+    const res = await submit(db, {
+      sessionId: await boundSessionId(['q1']),
+      answers: [{ questionId: 'q_quarantined', answer: 'A' }],
+      timeTaken: 1000,
+    });
+
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(JSON.stringify(body)).not.toContain('correctAnswer');
+    expect(JSON.stringify(body)).not.toContain('explanation');
+    expect(db.calls.some((call) => /FROM questions/.test(call.sql))).toBe(false);
+    expect(db.calls.some((call) => /UPDATE quick_play_sessions/.test(call.sql))).toBe(false);
+  });
+
+  it('fails closed when a selected question is quarantined before submission', async () => {
+    const db = createMockD1([
+      authHandler,
+      sessionHandler,
+      {
+        match: /SELECT q\.id, q\.correct_answer, q\.explanation/,
+        all: () => ({ results: [] }),
+      },
+    ]);
+
+    const res = await submit(db, {
+      sessionId: await boundSessionId(['q_quarantined']),
+      answers: [{ questionId: 'q_quarantined', answer: 'A' }],
+      timeTaken: 1000,
+    });
+
+    expect(res.status).toBe(409);
+    const body = await res.json();
+    expect(JSON.stringify(body)).not.toContain('correctAnswer');
+    expect(JSON.stringify(body)).not.toContain('explanation');
+    const questionQuery = db.calls.find((call) => /FROM questions q/.test(call.sql));
+    expect(questionQuery?.sql).toMatch(/JOIN topics t ON t\.id = q\.topic_id AND t\.subject_id = q\.subject_id/);
+    expect(questionQuery?.sql).toMatch(/JOIN subjects s ON s\.id = q\.subject_id AND s\.is_active = 1/);
+    expect(db.calls.some((call) => /UPDATE quick_play_sessions/.test(call.sql))).toBe(false);
   });
 });

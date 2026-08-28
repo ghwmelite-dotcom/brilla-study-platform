@@ -2,6 +2,8 @@ import { getDemoDataFlags } from './demoUtils';
 
 export interface AttemptProgressInput {
   attemptId?: string;
+  clientRequestId?: string | null;
+  requestFingerprint?: string | null;
   userId: string;
   questionId: string;
   topicId: string | null;
@@ -43,8 +45,9 @@ export async function prepareAttemptProgress(
   const attempt = db.prepare(`
     INSERT INTO question_attempts (
       id, user_id, question_id, user_answer, is_correct, time_taken,
-      points_earned, is_demo_data, expires_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      points_earned, is_demo_data, expires_at, client_request_id,
+      request_fingerprint
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     attemptId,
     input.userId,
@@ -55,6 +58,8 @@ export async function prepareAttemptProgress(
     pointsEarned,
     demo.is_demo_data,
     demo.expires_at,
+    input.clientRequestId ?? null,
+    input.requestFingerprint ?? null,
   );
 
   if (!input.topicId) {

@@ -1,0 +1,884 @@
+{
+  "release": "nsmq-null-topic-remediation-audit-2026-08-26",
+  "status": "reviewed-audit-no-migrations",
+  "subjectId": "subj_nsmq_chemistry",
+  "subjectName": "Chemistry",
+  "sourceSubjectId": "subj_wassce_chemistry",
+  "sourceNullTopicCount": 86,
+  "mappedCount": 85,
+  "exceptionCount": 1,
+  "roundTotals": {
+    "problem_of_day": 20,
+    "riddles": 15,
+    "round_one": 30,
+    "true_false": 20,
+    "speed_race": 1
+  },
+  "mappedRoundTotals": {
+    "problem_of_day": 20,
+    "riddles": 15,
+    "round_one": 29,
+    "true_false": 20,
+    "speed_race": 1
+  },
+  "topicCounts": {
+    "topic_atomic": 25,
+    "topic_bonding": 12,
+    "topic_electrochemistry": 5,
+    "topic_equilibrium": 17,
+    "topic_organic": 6,
+    "topic_stoichiometry": 20
+  },
+  "mappings": [
+    {
+      "questionId": "nsmq_chem_pod_001",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses moles, formulae, balancing, concentration, gas volume or reacting masses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "a9823b0f51e2c144521fc5995452a69926eb51b07e77aaca5490770e11a9cd77"
+    },
+    {
+      "questionId": "nsmq_chem_pod_002",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses moles, formulae, balancing, concentration, gas volume or reacting masses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "3bacf41f8c56117eb78b50b92bd4d1006dad814150a22bf07d3f6ad48f6e6371"
+    },
+    {
+      "questionId": "nsmq_chem_pod_003",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses moles, formulae, balancing, concentration, gas volume or reacting masses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "2f3f31e0ef45af899564cab2fd9b1f1cf25614d3151806590fc6b90978941b86"
+    },
+    {
+      "questionId": "nsmq_chem_pod_004",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses moles, formulae, balancing, concentration, gas volume or reacting masses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "6d5db242bd5f2b7d12805fac312f4288e04329064781f44a80409df9531b92a3"
+    },
+    {
+      "questionId": "nsmq_chem_pod_005",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses moles, formulae, balancing, concentration, gas volume or reacting masses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "4efa3e614ade0de32bc723c7d6aeedb7f24cb162b30699312e614aa8ca49e99e"
+    },
+    {
+      "questionId": "nsmq_chem_pod_006",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns pH, thermodynamic spontaneity or entropy.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "24e45a77b15ba3132f6857aaed52743ad51d0d9db713c5815dbdf5f90c9c9de9"
+    },
+    {
+      "questionId": "nsmq_chem_pod_007",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses moles, formulae, balancing, concentration, gas volume or reacting masses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "b9a080be6b7e64e75111e0622affbd1b23d1af331f23a78671b8519c64357ca9"
+    },
+    {
+      "questionId": "nsmq_chem_pod_008",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_organic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns a hydrocarbon formula or structural isomers.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "327cd376825b74aae9ce93a9813d623bbe2beada09e19c0becc18b4c1851a376"
+    },
+    {
+      "questionId": "nsmq_chem_pod_009",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_electrochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly determines an oxidation state.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "983607bb4ac79bc7c83510b0b36cd8c74e215254962746c83ce8dc4d7bb19604"
+    },
+    {
+      "questionId": "nsmq_chem_pod_010",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses moles, formulae, balancing, concentration, gas volume or reacting masses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "bd5d40819d233369294a34946f13f6067ed333dc1efaa3e7ecb4347a345a3a99"
+    },
+    {
+      "questionId": "nsmq_chem_pod_011",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses moles, formulae, balancing, concentration, gas volume or reacting masses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "a3c114f19d6384b5a3b243be70b898dd1226edb550bc636f2f9abf69115158aa"
+    },
+    {
+      "questionId": "nsmq_chem_pod_012",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses moles, formulae, balancing, concentration, gas volume or reacting masses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "b354e34b4e2a5779c40c58e7c6d12fe4af0e87d19764bdff9b0665e505a820e7"
+    },
+    {
+      "questionId": "nsmq_chem_pod_013",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The calculation explicitly concerns electron count or electron mass.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "58fa972d4c56e6ff5966212217829941c0d0c3d2ffb5398e8d786b2138c762a3"
+    },
+    {
+      "questionId": "nsmq_chem_pod_014",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The worked solution explicitly uses moles, formulae, balancing, concentration, gas volume or reacting masses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "3840fb65b286c8d7278e801fd64aafe8decf4c0e3049427afefa2554a4129a51"
+    },
+    {
+      "questionId": "nsmq_chem_pod_015",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns pH, thermodynamic spontaneity or entropy.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "ac6fd8a6fbbc2c09400e7059e184c097b47a4022eddbaab2089b00a10bbe8b50"
+    },
+    {
+      "questionId": "nsmq_chem_pod_016",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns pH, thermodynamic spontaneity or entropy.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "2d0947211ad337e305b30aeefc9cd502331b5f71937c5d5d7cac6c122ffb7fff"
+    },
+    {
+      "questionId": "nsmq_chem_pod_017",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The calculation explicitly concerns electron count or electron mass.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "f0e9a4c972836e902f84d232818e4fec7aad225fae8f6f3edb7401ac19dfede6"
+    },
+    {
+      "questionId": "nsmq_chem_pod_018",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns pH, thermodynamic spontaneity or entropy.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "ebf1cd0cdefcb30eaca61b55779babf7cf81acd0918171c0d82e27a61edf9901"
+    },
+    {
+      "questionId": "nsmq_chem_pod_019",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_organic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns a hydrocarbon formula or structural isomers.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "a319ece4af1bdef7c5a36fdae96df5b0b9e64d0deda80ec582ff2ff5a547654f"
+    },
+    {
+      "questionId": "nsmq_chem_pod_020",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "problem_of_day",
+      "topicId": "topic_bonding",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly asks for molecular bond order.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "1a43cfd8f881e308df13ccc5ae81873262cf38dc4e6b7406ef39402c6ea76661"
+    },
+    {
+      "questionId": "nsmq_chem_rid_001",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_electrochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "Rusting is explicitly identified as oxidation.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "0bb9732864bc931ed714bed183ed0247d38ca9d606b2eb424eb9a69767aa9f15"
+    },
+    {
+      "questionId": "nsmq_chem_rid_002",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_organic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clue explicitly identifies carbon as the basis of organic chemistry.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "e6c134ca44c5d91a55fed8c1278a1ced47809d16152c5b266ff4680b4bbd67cd"
+    },
+    {
+      "questionId": "nsmq_chem_rid_003",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify an element by atomic number, physical properties or periodic group.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "4c71f5e82a8a1b857d1f625ed3307ee440821bd92dc34cb5e5442fe4f2ab242b"
+    },
+    {
+      "questionId": "nsmq_chem_rid_004",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify an element by atomic number, physical properties or periodic group.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "86640d655fc2e9ca0bf1977ea2c29efa6369d1ef1070ce7f4cc2ed8696e4bb27"
+    },
+    {
+      "questionId": "nsmq_chem_rid_005",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify an element by atomic number, physical properties or periodic group.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "af4ffd8e48589a0d1ed1c0fa08e3181641e02da3401cc248db77295c733ea245"
+    },
+    {
+      "questionId": "nsmq_chem_rid_006",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues identify carbon dioxide through reactions and composition.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "0e71dd070f2d1f983c73a50493fb3a37c4e870d0de186694a63cb41acd582401"
+    },
+    {
+      "questionId": "nsmq_chem_rid_007",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_bonding",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify a molecular/ionic compound and its composition or molecular behaviour.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "c6df38b8b6b67607f919e15f161ea5835f74acfb857780e2f220038a2e27c6f9"
+    },
+    {
+      "questionId": "nsmq_chem_rid_008",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify an element by atomic number, physical properties or periodic group.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "a6f442816cc88d8f587e370e1f5f91ba227a50f765ce1c50a74bb879fbb19644"
+    },
+    {
+      "questionId": "nsmq_chem_rid_009",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify an element by atomic number, physical properties or periodic group.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "bf2ae071b80b50050906b65e769e1cee99ffdf71bac0196b664a8729a6ca46be"
+    },
+    {
+      "questionId": "nsmq_chem_rid_010",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_bonding",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify a molecular/ionic compound and its composition or molecular behaviour.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "a62d66bb08300a2128a98f05836561963b6f8c89bc7514dc6645d02dbd0b92ff"
+    },
+    {
+      "questionId": "nsmq_chem_rid_011",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly concern acid-base indication or catalysis/kinetics.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "876bbefc5f2156bbc817af066ba2123ce9a20a20d0ad3acef6f1579bd8f3a84d"
+    },
+    {
+      "questionId": "nsmq_chem_rid_012",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify an element by atomic number, physical properties or periodic group.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "2734df767b823cfb24c6559a7c99200cf99d7f772c9e1e1e28fd6ee7f2c3a5f8"
+    },
+    {
+      "questionId": "nsmq_chem_rid_013",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly concern acid-base indication or catalysis/kinetics.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "77fb926310f0a40ecab3bcb73af56a48950cf2bc126b377a0d961569a914d1e8"
+    },
+    {
+      "questionId": "nsmq_chem_rid_014",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_bonding",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify a molecular/ionic compound and its composition or molecular behaviour.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "86375d62f1de9f3981120d586107f39c20f3e65d09ac2f56d8db0668032ea652"
+    },
+    {
+      "questionId": "nsmq_chem_rid_015",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "riddles",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify an element by atomic number, physical properties or periodic group.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "c5f45bbb9fe018e5b07a5d164d19c585c5edce493fbc429631acb0a7033cdbad"
+    },
+    {
+      "questionId": "nsmq_chem_r1_001",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses atomic number, shells, elements, periodic groups or electron configuration.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "c4789e231002b5fc0010f92ed7cddfd24cbfc9dbc433aaa92e0394435f9db0bf"
+    },
+    {
+      "questionId": "nsmq_chem_r1_002",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns formulae, moles, reaction products, gas volume or percentage composition.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "f0328d147929be8d6a164c04ff86bb41f446ac5ab4efb4ecb756fa20b638bae1"
+    },
+    {
+      "questionId": "nsmq_chem_r1_003",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses atomic number, shells, elements, periodic groups or electron configuration.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "e4411510539cf4d24913825348ae5b123818c6a5a37d6b0142a30da51d641efc"
+    },
+    {
+      "questionId": "nsmq_chem_r1_004",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns pH, phase equilibrium, neutralisation or catalysis.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "fc9a5973fcb74dde0672692c7f463185bf1eeb6cc1842d9475bc63f4c40dbfe0"
+    },
+    {
+      "questionId": "nsmq_chem_r1_005",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses atomic number, shells, elements, periodic groups or electron configuration.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "d7a2b42af4ffd80720e49a13b2ece2952d9667e20e458d1ce8ec67cf8a052980"
+    },
+    {
+      "questionId": "nsmq_chem_r1_006",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_bonding",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns compound identity, valency, bonding or molecular geometry.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "b52a292b2694571ae4019e22c4f8b060bf9d6e08cb34e39ba004514941364dda"
+    },
+    {
+      "questionId": "nsmq_chem_r1_007",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns formulae, moles, reaction products, gas volume or percentage composition.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "d4eeb5456a0f9faed0d1a037ce2a657e0fab87c5cf36e9f68e92c59f67386f3b"
+    },
+    {
+      "questionId": "nsmq_chem_r1_008",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_bonding",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns compound identity, valency, bonding or molecular geometry.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "8872c7acc4cb6a33a31f9ba98ade00abb6d0246601a1d9013ff61dc80a6afef5"
+    },
+    {
+      "questionId": "nsmq_chem_r1_009",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_bonding",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns compound identity, valency, bonding or molecular geometry.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "c9327a4ccceb1409037910b2fc3b23cdf20386e1448d91fe52fdca596078d3b6"
+    },
+    {
+      "questionId": "nsmq_chem_r1_010",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns formulae, moles, reaction products, gas volume or percentage composition.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "6264be3bebd92837b520753a2e578d46fba8a31b46ce773104132d2be434cbc7"
+    },
+    {
+      "questionId": "nsmq_chem_r1_011",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns formulae, moles, reaction products, gas volume or percentage composition.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "2f082d4113e838e4ef0bb9e390ae3f6df6f03dd85f54412370b656030dc60a4d"
+    },
+    {
+      "questionId": "nsmq_chem_r1_012",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses atomic number, shells, elements, periodic groups or electron configuration.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "28bd17cba9faa37c180ca0e6e25ca0681f0212c16f0ca6bbae9872ee987f838e"
+    },
+    {
+      "questionId": "nsmq_chem_r1_013",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns formulae, moles, reaction products, gas volume or percentage composition.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "769fda0aae8652f14e452bc3d12d4a5bc780a03c9c540dbd17c4aa163e8d7d11"
+    },
+    {
+      "questionId": "nsmq_chem_r1_014",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_bonding",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns compound identity, valency, bonding or molecular geometry.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "28f80997ec91101c5d1ba17f5a15552c9b3341dc58798a85b1a5d6afde45788e"
+    },
+    {
+      "questionId": "nsmq_chem_r1_015",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns pH, phase equilibrium, neutralisation or catalysis.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "52d11c9b0221aa81e3d519f9a10c9315fc4b8ced043570bb04a9580828f70748"
+    },
+    {
+      "questionId": "nsmq_chem_r1_016",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_organic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns an organic functional group or IUPAC name.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "e63ff2c0b805fac9ceac48a1661d64d8a9f14234ab86799af57c7d0305f2480a"
+    },
+    {
+      "questionId": "nsmq_chem_r1_017",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses atomic number, shells, elements, periodic groups or electron configuration.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "dc3c390a97bf0cf5b214fd21dbb0cbcaed7119cf8ebfd9422d694dd9c45d0e2a"
+    },
+    {
+      "questionId": "nsmq_chem_r1_018",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_electrochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly determines an oxidation state.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "3a806f508c1e0d7d16c2d2ec1e78612cd71696721c28bbfe1ff85cf52055d052"
+    },
+    {
+      "questionId": "nsmq_chem_r1_020",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns pH, phase equilibrium, neutralisation or catalysis.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "b1274d79dbd4e61499b42e1810fbd6d2474fec3b863e642bb7ebc6bd17a37253"
+    },
+    {
+      "questionId": "nsmq_chem_r1_021",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses atomic number, shells, elements, periodic groups or electron configuration.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "e97e0ab7e0078ca813fe03804a6dc9ce0dbe499f6a2393fd5302316fcbcf587e"
+    },
+    {
+      "questionId": "nsmq_chem_r1_022",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses atomic number, shells, elements, periodic groups or electron configuration.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "47b37f7e38c0391fdd5a3ef83494f52550baa3c0d37a9e1dbe6cc4298ac3fcd3"
+    },
+    {
+      "questionId": "nsmq_chem_r1_023",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_organic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns an organic functional group or IUPAC name.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "ffe61a31d0befedc2508702a3c8fae182b537ca1bd4cce68033b886f6610d15e"
+    },
+    {
+      "questionId": "nsmq_chem_r1_024",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns formulae, moles, reaction products, gas volume or percentage composition.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "593e773467300ae5cc9fc08927c0da05979056efcb6be5c9e496b783757888f1"
+    },
+    {
+      "questionId": "nsmq_chem_r1_025",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns pH, phase equilibrium, neutralisation or catalysis.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "ad23e2275a62825a0b463de8ae1de26717defb1364cf9b7038b9036c4b9f6c4a"
+    },
+    {
+      "questionId": "nsmq_chem_r1_026",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_bonding",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns compound identity, valency, bonding or molecular geometry.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "54637a44eaaeb8739efbee1a51fce6e2d5209d66abf4d95821e9f45a94c205ef"
+    },
+    {
+      "questionId": "nsmq_chem_r1_027",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses atomic number, shells, elements, periodic groups or electron configuration.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "b10691ff5d7505142ac9f99325a7053642318d8ee02dbb6e15b1706c3fa82d95"
+    },
+    {
+      "questionId": "nsmq_chem_r1_028",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns formulae, moles, reaction products, gas volume or percentage composition.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "ba1f29a20bbec2a873589233445cd8a8d95d95693d4997730ac897aef79cc652"
+    },
+    {
+      "questionId": "nsmq_chem_r1_029",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly assesses atomic number, shells, elements, periodic groups or electron configuration.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "5e7f814501775a315538fa5649e6b306c8add7b45a0470f141aad7bfb58c1c94"
+    },
+    {
+      "questionId": "nsmq_chem_r1_030",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "round_one",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns formulae, moles, reaction products, gas volume or percentage composition.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "948af62d6e6c0ff6d4d3c8032d43ff960435d26a22c686bc75d9e4d1ac0c21e1"
+    },
+    {
+      "questionId": "q_speed_004",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "speed_race",
+      "topicId": "topic_atomic",
+      "classificationSource": "production-inventory-plus-base-seed-explicit-topic",
+      "evidence": "The preserved pre-squash base seed explicitly binds this exact subject/round/content row to topic_atomic; the production read-only inventory confirms the same ID is currently null-topic.",
+      "provenance": "database/seeds/seed_base.sql",
+      "contentFingerprint": "9d377a92168a14270638c9792f8a29f2167f9a99746dda2c225fb1bb70927a98"
+    },
+    {
+      "questionId": "nsmq_chem_tf_001",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns elements, isotopes, atomic number, valence shells, allotropes or electron location.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "f09c418192f9e7638a16716adb1ee01fda4de9d1f4c8a029c39ec1fc3ac006d0"
+    },
+    {
+      "questionId": "nsmq_chem_tf_002",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns elements, isotopes, atomic number, valence shells, allotropes or electron location.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "18b6eeed59bf7a0b542bbd70bfa9f46980f0f62063e19aa6826c7ef7dd925ab2"
+    },
+    {
+      "questionId": "nsmq_chem_tf_003",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns acids, reversibility, kinetics, pH, energetics, catalysts or proton donation.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "d09c4f73440f1b4dd814380c905e6eb09aad676fc903ad6fb64ee3d8076eb830"
+    },
+    {
+      "questionId": "nsmq_chem_tf_004",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_bonding",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns covalent, ionic or hydrogen bonding.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "99e2dd55f0f934dace80da891deed98546089532d94a64e372b33b50760fffce"
+    },
+    {
+      "questionId": "nsmq_chem_tf_005",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns elements, isotopes, atomic number, valence shells, allotropes or electron location.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "673bd317188981f7920fa3511a1f8d29aa9c81f121cccebe525e56c933288d80"
+    },
+    {
+      "questionId": "nsmq_chem_tf_006",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns acids, reversibility, kinetics, pH, energetics, catalysts or proton donation.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "433649329c057f2c05c753137206d35613b572b3d35fd20dfdfbe2b85be58cc8"
+    },
+    {
+      "questionId": "nsmq_chem_tf_007",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns elements, isotopes, atomic number, valence shells, allotropes or electron location.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "e1b44aa17a349bc402c5da0ab2f57897c3241d6213927c3b3e7b0eb1b464d153"
+    },
+    {
+      "questionId": "nsmq_chem_tf_008",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_electrochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns oxidation/reduction or electrolysis.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "9cece92d499c3ffce94c56ee187b2d3613fada62c708c5c5ddc3cbabf5af0cdd"
+    },
+    {
+      "questionId": "nsmq_chem_tf_009",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns acids, reversibility, kinetics, pH, energetics, catalysts or proton donation.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "59f8b80fcd961eda3847f4be9e92db732525e54bd38ab807155897411e34eb54"
+    },
+    {
+      "questionId": "nsmq_chem_tf_010",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns elements, isotopes, atomic number, valence shells, allotropes or electron location.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "a73fde5efb747235b7718bbab949479b2d84cda3722bf6dbd0749b3bf0e52589"
+    },
+    {
+      "questionId": "nsmq_chem_tf_011",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_atomic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns elements, isotopes, atomic number, valence shells, allotropes or electron location.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "cf5335344d5468cb45a5f3352bee10965d1f6b020139dcdb5d1baf9e18701b47"
+    },
+    {
+      "questionId": "nsmq_chem_tf_012",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns acids, reversibility, kinetics, pH, energetics, catalysts or proton donation.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "ffe581c0af873df83392ad03a008515c05adc4c984f1d57ed8aa2e44e76d7770"
+    },
+    {
+      "questionId": "nsmq_chem_tf_013",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns acids, reversibility, kinetics, pH, energetics, catalysts or proton donation.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "467f2a1779a4d9244423b1570a6ae8d23665cb470062ce39cc7e61187c650f41"
+    },
+    {
+      "questionId": "nsmq_chem_tf_014",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_organic",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns alkane saturation.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "32d9e210c0c2f1d63f75d026ef1df44c59b1b68922ef4f58debcde3c0b512413"
+    },
+    {
+      "questionId": "nsmq_chem_tf_015",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns acids, reversibility, kinetics, pH, energetics, catalysts or proton donation.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "79513815ebd72f15a30d75b468a4fd73b2470983464bb696363e2cf5632c9dfa"
+    },
+    {
+      "questionId": "nsmq_chem_tf_016",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_bonding",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns covalent, ionic or hydrogen bonding.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "369995f9933eb165be6b586b06a8f5bcafc7faa5ca1e5d1526740877cc88c26b"
+    },
+    {
+      "questionId": "nsmq_chem_tf_017",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_stoichiometry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns molar gas volume.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "6de0f4143150bf9c7c16327572d8fd4378a343301bbcd71585644a47fb685bb9"
+    },
+    {
+      "questionId": "nsmq_chem_tf_018",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_bonding",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns covalent, ionic or hydrogen bonding.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "f5a13fa3d1199b34b819298ae046bc92e78eb346fc9e5bd8467d4bf2bd757e08"
+    },
+    {
+      "questionId": "nsmq_chem_tf_019",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_electrochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns oxidation/reduction or electrolysis.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "2fa8a3fdfa68726a7ebc6d09a2df94235c13217ed4ace2895995128395565182"
+    },
+    {
+      "questionId": "nsmq_chem_tf_020",
+      "subjectId": "subj_nsmq_chemistry",
+      "roundType": "true_false",
+      "topicId": "topic_equilibrium",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns acids, reversibility, kinetics, pH, energetics, catalysts or proton donation.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "6cc61cb43fa6e8d517f53d23d93fffd676d1b212467b376452c76c5c31f115e9"
+    }
+  ]
+}

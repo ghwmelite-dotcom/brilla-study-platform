@@ -83,6 +83,7 @@ function makeRouteDb(
     subjectCount?: number | null;
     subjectRows?: Array<Record<string, unknown>>;
     questionRows?: Array<Record<string, unknown>>;
+    topicRows?: Array<Record<string, unknown>>;
     paperRow?: Record<string, unknown> | null;
     paperQuestionRows?: Array<Record<string, unknown>>;
   } = {},
@@ -92,8 +93,17 @@ function makeRouteDb(
     prepare: vi.fn((sql: string) => {
       const execute = {
         first: vi.fn(async () => {
-          if (sql.includes("SELECT role, status, is_active, session_version FROM users")) {
-            return { role: "student", status: "approved", is_active: 1, session_version: 0 };
+          if (
+            sql.includes(
+              "SELECT role, status, is_active, session_version FROM users",
+            )
+          ) {
+            return {
+              role: "student",
+              status: "approved",
+              is_active: 1,
+              session_version: 0,
+            };
           }
           if (sql.includes("SELECT role, subscription_tier_id")) {
             return {
@@ -103,11 +113,15 @@ function makeRouteDb(
               trial_expires_at: null,
             };
           }
+          if (sql.includes("WITH usage(total_requests)")) {
+            return { request_count: 1, total_requests: 1 };
+          }
           if (sql.includes("FROM rate_limits")) return null;
           if (sql.includes("SELECT question_count FROM daily_usage")) {
             return { question_count: 0 };
           }
-          if (sql.includes("FROM past_papers pp")) return options.paperRow ?? null;
+          if (sql.includes("FROM past_papers pp"))
+            return options.paperRow ?? null;
           if (
             sql.includes("FROM subjects s") &&
             sql.includes("AS question_count")
@@ -121,17 +135,20 @@ function makeRouteDb(
                   question_count: options.subjectCount ?? 0,
                 };
           }
-          if (sql.includes("SELECT q.*")) return options.questionRows?.[0] ?? null;
+          if (sql.includes("SELECT q.*"))
+            return options.questionRows?.[0] ?? null;
           return null;
         }),
         all: vi.fn(async () => ({
           results: sql.includes("q.past_paper_id = ?")
             ? (options.paperQuestionRows ?? [])
-            : sql.includes("FROM subjects s")
-              ? (options.subjectRows ?? [])
-              : sql.includes("FROM questions q")
-                ? (options.questionRows ?? [])
-                : (options.subjectRows ?? []),
+            : sql.includes("FROM topics t")
+              ? (options.topicRows ?? [])
+              : sql.includes("FROM subjects s")
+                ? (options.subjectRows ?? [])
+                : sql.includes("FROM questions q")
+                  ? (options.questionRows ?? [])
+                  : (options.subjectRows ?? []),
         })),
         run: vi.fn(async () => ({ success: true })),
       };
@@ -156,7 +173,13 @@ const routeEnv = (db: D1Database) => ({
 async function authenticatedRequest(url: string) {
   const now = Math.floor(Date.now() / 1000);
   const jwt = await sign(
-    { userId: "student-1", role: "student", sessionVersion: 0, iat: now, exp: now + 3600 },
+    {
+      userId: "student-1",
+      role: "student",
+      sessionVersion: 0,
+      iat: now,
+      exp: now + 3600,
+    },
     "subject-catalog-test-secret",
   );
   return new Request(url, { headers: { Authorization: `Bearer ${jwt}` } });
@@ -214,6 +237,77 @@ describe("public subject availability routes", () => {
     ).toBe(true);
   });
 
+  it("advertises only the 166 usable NSMQ Physics questions and excludes both quarantines", async () => {
+    const physics = makeRouteDb({
+      subjectRows: [
+        {
+          id: "subj_nsmq_physics",
+          name: "Physics",
+          slug: "physics",
+          exam_type_id: "exam_nsmq",
+          is_active: 1,
+          question_count: 166,
+          topic_count: 8,
+        },
+      ],
+      topicRows: [
+        { id: "topic-nsmq-physics-1", subject_id: "subj_nsmq_physics", question_count: 100 },
+        { id: "topic-nsmq-physics-2", subject_id: "subj_nsmq_physics", question_count: 66 },
+      ],
+      questionRows: [],
+    });
+
+    const catalogResponse = await worker.fetch(
+      new Request("http://test/api/subjects?exam_type=nsmq"),
+      routeEnv(physics.db),
+    );
+    const catalog = (await catalogResponse.json()) as {
+      data: Array<{ questionCount: number }>;
+    };
+    expect(catalog.data[0]?.questionCount).toBe(166);
+
+    const topicsResponse = await worker.fetch(
+      new Request("http://test/api/topics?subject=subj_nsmq_physics"),
+      routeEnv(physics.db),
+    );
+    const topics = (await topicsResponse.json()) as {
+      data: Array<{ question_count: number }>;
+    };
+    expect(
+      topics.data.reduce((sum, topic) => sum + Number(topic.question_count), 0),
+    ).toBe(catalog.data[0]?.questionCount);
+
+    for (const questionId of ["nsmq_phy_rid_001", "nsmq_phy_rid_003"]) {
+      const response = await worker.fetch(
+        await authenticatedRequest(`http://test/api/questions/${questionId}`),
+        routeEnv(physics.db),
+      );
+      expect(response.status).toBe(404);
+    }
+
+    const catalogueSql = physics.calls.find(({ sql }) =>
+      sql.includes("COUNT(*) AS question_count"),
+    )?.sql;
+    expect(catalogueSql).toContain("JOIN topics usable_topic");
+    expect(catalogueSql).toContain("usable_topic.subject_id = q.subject_id");
+
+    const topicSql = physics.calls.find(({ sql }) =>
+      sql.includes("COUNT(q.id) AS question_count"),
+    )?.sql;
+    expect(topicSql).toContain("q.subject_id = t.subject_id");
+
+    const quarantinedReads = physics.calls.filter(
+      ({ sql, args }) =>
+        sql.includes("WHERE q.id = ?") &&
+        (args.includes("nsmq_phy_rid_001") || args.includes("nsmq_phy_rid_003")),
+    );
+    expect(quarantinedReads).toHaveLength(2);
+    for (const { sql } of quarantinedReads) {
+      expect(sql).toContain("JOIN topics question_topic");
+      expect(sql).toContain("question_topic.subject_id = q.subject_id");
+    }
+  });
+
   it("returns active subject detail with slug-bound live counts and status metadata", async () => {
     const { db, calls } = makeRouteDb({ subjectCount: 20 });
     const response = await worker.fetch(
@@ -230,7 +324,9 @@ describe("public subject availability routes", () => {
       availabilityReason: "question_bank_meets_operational_floor",
       contentReviewStatus: "legacy_unreviewed",
     });
-    const detailCall = calls.find(({ sql }) => sql.includes("s.is_active = 1 AND s.slug = ?"));
+    const detailCall = calls.find(({ sql }) =>
+      sql.includes("s.is_active = 1 AND s.slug = ?"),
+    );
     expect(detailCall?.args).toEqual(["mathematics"]);
   });
 
@@ -247,7 +343,9 @@ describe("public subject availability routes", () => {
   it("rejects an empty bank before returning practice questions", async () => {
     const { db, calls } = makeRouteDb({ subjectCount: 0 });
     const response = await worker.fetch(
-      await authenticatedRequest("http://test/api/questions?subject=empty-subject"),
+      await authenticatedRequest(
+        "http://test/api/questions?subject=empty-subject",
+      ),
       routeEnv(db),
     );
     expect(response.status).toBe(409);
@@ -256,12 +354,21 @@ describe("public subject availability routes", () => {
     expect(
       calls.filter(({ sql }) => sql.includes("FROM questions q")),
     ).toHaveLength(0);
+    const availabilityCountSql = calls.find(({ sql }) =>
+      sql.includes("AS question_count"),
+    )?.sql;
+    expect(availabilityCountSql).toContain("COUNT(question_topic.id)");
+    expect(availabilityCountSql).toContain(
+      "question_topic.subject_id = q.subject_id",
+    );
   });
 
   it("returns 404 for an unknown or inactive subject", async () => {
     const { db } = makeRouteDb({ subjectCount: null });
     const response = await worker.fetch(
-      await authenticatedRequest("http://test/api/questions?subject=inactive-subject"),
+      await authenticatedRequest(
+        "http://test/api/questions?subject=inactive-subject",
+      ),
       routeEnv(db),
     );
     expect(response.status).toBe(404);
@@ -285,15 +392,24 @@ describe("public subject availability routes", () => {
       ],
     });
     const response = await worker.fetch(
-      await authenticatedRequest("http://test/api/questions?subject=limited-subject"),
+      await authenticatedRequest(
+        "http://test/api/questions?subject=limited-subject",
+      ),
       routeEnv(db),
     );
     expect(response.status).toBe(200);
-    const body = (await response.json()) as { data: Array<Record<string, unknown>> };
+    const body = (await response.json()) as {
+      data: Array<Record<string, unknown>>;
+    };
     expect(body.data).toHaveLength(1);
     expect(body.data[0]).not.toHaveProperty("correct_answer");
     expect(body.data[0]).not.toHaveProperty("explanation");
-    expect(body.data[0]).toMatchObject({ options: [{ id: "A", text: "3" }, { id: "B", text: "4" }] });
+    expect(body.data[0]).toMatchObject({
+      options: [
+        { id: "A", text: "3" },
+        { id: "B", text: "4" },
+      ],
+    });
     const questionRead = calls.find(({ sql }) => sql.includes("SELECT q.*"));
     expect(questionRead?.args[0]).toBe("subj_nsmq_math");
     expect(questionRead?.args).not.toContain("limited-subject");
@@ -315,25 +431,38 @@ describe("public subject availability routes", () => {
 
     const authenticated = makeRouteDb({
       subjectCount: 20,
-      paperRow: { id: "paper-1", subject_id: "subj_nsmq_math", subject_slug: "nsmq-mathematics" },
-      paperQuestionRows: [{
-        id: "paper-q-1",
-        options: '["3","4"]',
-        correct_answer: "B",
-        explanation: "2 + 2 = 4",
-      }],
+      paperRow: {
+        id: "paper-1",
+        subject_id: "subj_nsmq_math",
+        subject_slug: "nsmq-mathematics",
+      },
+      paperQuestionRows: [
+        {
+          id: "paper-q-1",
+          options: '["3","4"]',
+          correct_answer: "B",
+          explanation: "2 + 2 = 4",
+        },
+      ],
     });
     const response = await worker.fetch(
       await authenticatedRequest("http://test/api/papers/paper-1"),
       routeEnv(authenticated.db),
     );
     expect(response.status).toBe(200);
-    const body = (await response.json()) as { data: { questions: Array<Record<string, unknown>> } };
+    const body = (await response.json()) as {
+      data: { questions: Array<Record<string, unknown>> };
+    };
     expect(body.data.questions[0]).toEqual({
       id: "paper-q-1",
-      options: [{ id: "A", text: "3" }, { id: "B", text: "4" }],
+      options: [
+        { id: "A", text: "3" },
+        { id: "B", text: "4" },
+      ],
     });
-    expect(authenticated.calls.some(({ sql }) => sql.includes("s.is_active = 1"))).toBe(true);
+    expect(
+      authenticated.calls.some(({ sql }) => sql.includes("s.is_active = 1")),
+    ).toBe(true);
   });
 
   it("keeps the assessment question picker teacher/admin only", async () => {
@@ -343,7 +472,9 @@ describe("public subject availability routes", () => {
       routeEnv(db),
     );
     expect(response.status).toBe(403);
-    expect(calls.some(({ sql }) => sql.includes("LEFT JOIN topics t"))).toBe(false);
+    expect(calls.some(({ sql }) => sql.includes("LEFT JOIN topics t"))).toBe(
+      false,
+    );
   });
 
   it("filters subject detail, topic list/detail, and question detail through active subjects", async () => {
@@ -356,13 +487,30 @@ describe("public subject availability routes", () => {
     ];
 
     const responses = [];
-    for (const request of requests) responses.push(await worker.fetch(request, routeEnv(db)));
+    for (const request of requests)
+      responses.push(await worker.fetch(request, routeEnv(db)));
 
-    expect(responses.map((response) => response.status)).toEqual([404, 200, 404, 404]);
-    expect(calls.some(({ sql }) => sql.includes("s.is_active = 1 AND s.slug = ?"))).toBe(true);
-    expect(calls.some(({ sql }) => sql.includes("subject.is_active = 1"))).toBe(true);
-    expect(calls.some(({ sql }) => sql.includes("s.is_active = 1") && sql.includes("t.id = ?"))).toBe(true);
-    expect(calls.some(({ sql }) => sql.includes("s.is_active = 1") && sql.includes("q.id = ?"))).toBe(true);
+    expect(responses.map((response) => response.status)).toEqual([
+      404, 200, 404, 404,
+    ]);
+    expect(
+      calls.some(({ sql }) => sql.includes("s.is_active = 1 AND s.slug = ?")),
+    ).toBe(true);
+    expect(calls.some(({ sql }) => sql.includes("subject.is_active = 1"))).toBe(
+      true,
+    );
+    expect(
+      calls.some(
+        ({ sql }) =>
+          sql.includes("s.is_active = 1") && sql.includes("t.id = ?"),
+      ),
+    ).toBe(true);
+    expect(
+      calls.some(
+        ({ sql }) =>
+          sql.includes("s.is_active = 1") && sql.includes("q.id = ?"),
+      ),
+    ).toBe(true);
   });
 
   it("returns a controlled 500 when the catalogue database query fails", async () => {
@@ -372,10 +520,14 @@ describe("public subject availability routes", () => {
       }),
     } as unknown as D1Database;
 
-    const response = await worker.fetch(new Request("http://test/api/subjects"), routeEnv(db));
+    const response = await worker.fetch(
+      new Request("http://test/api/subjects"),
+      routeEnv(db),
+    );
     expect(response.status).toBe(500);
     expect(await response.json()).toMatchObject({
       success: false,
       error: "Failed to fetch subjects",
     });
-  });});
+  });
+});

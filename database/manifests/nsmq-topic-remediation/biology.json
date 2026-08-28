@@ -1,0 +1,893 @@
+{
+  "release": "nsmq-null-topic-remediation-audit-2026-08-26",
+  "status": "reviewed-audit-no-migrations",
+  "subjectId": "subj_nsmq_biology",
+  "subjectName": "Biology",
+  "sourceSubjectId": "subj_wassce_biology",
+  "sourceNullTopicCount": 86,
+  "mappedCount": 86,
+  "exceptionCount": 0,
+  "roundTotals": {
+    "problem_of_day": 20,
+    "riddles": 15,
+    "round_one": 30,
+    "true_false": 20,
+    "speed_race": 1
+  },
+  "mappedRoundTotals": {
+    "problem_of_day": 20,
+    "riddles": 15,
+    "round_one": 30,
+    "true_false": 20,
+    "speed_race": 1
+  },
+  "topicCounts": {
+    "topic_biochemistry": 10,
+    "topic_cells": 15,
+    "topic_ecology": 8,
+    "topic_genetics": 22,
+    "topic_physiology": 31
+  },
+  "mappings": [
+    {
+      "questionId": "nsmq_bio_pod_001",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns meiosis, inheritance, allele frequency, DNA/RNA or genetic crosses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "a36876084c4e7c4baeb451b2330d73130594e571f2f73906372197c5a16898f1"
+    },
+    {
+      "questionId": "nsmq_bio_pod_002",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns meiosis, inheritance, allele frequency, DNA/RNA or genetic crosses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "3bf6588e898cdf4ae4e395b8104b8cdc0a2f811876c5bee80f307a1d2f909a46"
+    },
+    {
+      "questionId": "nsmq_bio_pod_003",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns meiosis, inheritance, allele frequency, DNA/RNA or genetic crosses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "f70166699dfda626df85e12ced838163e0425f3e46028b3c112c52312d31c1c3"
+    },
+    {
+      "questionId": "nsmq_bio_pod_004",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns meiosis, inheritance, allele frequency, DNA/RNA or genetic crosses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "2e747ed45c4e1b6eaf9b7292bbd8c6bf5e65712430b83435c0cb618ba575bc1a"
+    },
+    {
+      "questionId": "nsmq_bio_pod_005",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The calculation explicitly concerns cardiac, plant-water, respiratory, transpiration or neural physiology.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "d8aae9247cf31b0d3e09109ef1bbc4a56e38df8d8c4a01cbb6dd7dd34a14165c"
+    },
+    {
+      "questionId": "nsmq_bio_pod_006",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns meiosis, inheritance, allele frequency, DNA/RNA or genetic crosses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "6aecbd1408373a74710c755cb6c1beba16968dffe11bb48022b2a93916d04cd1"
+    },
+    {
+      "questionId": "nsmq_bio_pod_007",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_biochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns aerobic respiration or photosynthesis chemistry.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "36a4e21f832a07df45103ddc360bc04bc04553d557181e2949ffd9fe70010aec"
+    },
+    {
+      "questionId": "nsmq_bio_pod_008",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns meiosis, inheritance, allele frequency, DNA/RNA or genetic crosses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "8b3c4bd23f6568d1ed5b16164b54ab3399cf4ef5b077a39be38457f73f822d0b"
+    },
+    {
+      "questionId": "nsmq_bio_pod_009",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_ecology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The calculation explicitly concerns trophic energy transfer or population growth.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "1fb0ba05603a921aa30e5f6e0d68c10fe7010d4bd70a0c06e57e4e9dc1fb73ac"
+    },
+    {
+      "questionId": "nsmq_bio_pod_010",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_cells",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The calculation explicitly concerns mitotic cell number or microscopy magnification.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "b0e058e76cc24c91707e3606b5d8f7589a616b7fd4ef044b80ab86606288ee3d"
+    },
+    {
+      "questionId": "nsmq_bio_pod_011",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns meiosis, inheritance, allele frequency, DNA/RNA or genetic crosses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "d219240476812d14b4a746970d6b4265c597c60dbe00081bf346d507c0598ef8"
+    },
+    {
+      "questionId": "nsmq_bio_pod_012",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The calculation explicitly concerns cardiac, plant-water, respiratory, transpiration or neural physiology.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "643086927ac8d2ed9bfb714088e8c402d557595bc706722d12b7a46e85101c4e"
+    },
+    {
+      "questionId": "nsmq_bio_pod_013",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns meiosis, inheritance, allele frequency, DNA/RNA or genetic crosses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "a7e6ed7d62a1b0a5d582634aaf092329928504e8c33a46c7b97d70927a04b2ca"
+    },
+    {
+      "questionId": "nsmq_bio_pod_014",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The calculation explicitly concerns cardiac, plant-water, respiratory, transpiration or neural physiology.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "70c35ca7b6cbe968f4fa21c4b352b2c82adedd2be1dc65bd38418b7d44bf5721"
+    },
+    {
+      "questionId": "nsmq_bio_pod_015",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns meiosis, inheritance, allele frequency, DNA/RNA or genetic crosses.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "16eb38f8205fc32e536d45a9de57c64992e069e0341f96b89d6ff7c0c398de4d"
+    },
+    {
+      "questionId": "nsmq_bio_pod_016",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The calculation explicitly concerns cardiac, plant-water, respiratory, transpiration or neural physiology.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "ca012e24a838e35366626280c0a0fc243390ca1ba5d52e125418fd5588c808ac"
+    },
+    {
+      "questionId": "nsmq_bio_pod_017",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_cells",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The calculation explicitly concerns mitotic cell number or microscopy magnification.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "b6d0e6fb4ceeb98b4d850f16bcdc60d3417d2e5e76d8fa60150b3b655a1b37a7"
+    },
+    {
+      "questionId": "nsmq_bio_pod_018",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_biochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns aerobic respiration or photosynthesis chemistry.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "102291171cd68df5555a7555f52a58b753a6b74025dbd4aca393cf17f3a88a9d"
+    },
+    {
+      "questionId": "nsmq_bio_pod_019",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_ecology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The calculation explicitly concerns trophic energy transfer or population growth.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "56caf8cd81e0749688a030ff61d821b295744f1338b6395cf72fcd52675ccc17"
+    },
+    {
+      "questionId": "nsmq_bio_pod_020",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "problem_of_day",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The calculation explicitly concerns cardiac, plant-water, respiratory, transpiration or neural physiology.",
+      "provenance": "database/migrations/archive/042_nsmq_problem_of_day.sql",
+      "contentFingerprint": "9d70b2e5e42de359f3bf180520c26c51ed8c12d218757d268eddd536b915df84"
+    },
+    {
+      "questionId": "nsmq_bio_rid_001",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly concern gametes, DNA, inherited traits or mRNA.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "3db3f2a8f9330111dc2b8d93266af7d595a3f20ac22b776d602646dcd6347c43"
+    },
+    {
+      "questionId": "nsmq_bio_rid_002",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_cells",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify an organelle, cell or acellular infectious agent in cell-biology context.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "5a69671e3d3b334ec1d31e8ee7bb422b7d8d98cf5fdb7e8d342d26d1d66374e0"
+    },
+    {
+      "questionId": "nsmq_bio_rid_003",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly concern gametes, DNA, inherited traits or mRNA.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "39a2fa36c8e7c6e417870e4966f3dff2abc1cd0e38460e74e054140e3c300958"
+    },
+    {
+      "questionId": "nsmq_bio_rid_004",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify a human organ, tissue, blood cell or hormone by physiological function.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "cff19f2084e40130f4a3af01381c22c38cdcfad51d7653fc722d51a7ae96de2f"
+    },
+    {
+      "questionId": "nsmq_bio_rid_005",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_cells",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify an organelle, cell or acellular infectious agent in cell-biology context.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "88cf4054d562b2bd7b5683ee271f48d53c02f85121fe768383cd4a2a7a54883e"
+    },
+    {
+      "questionId": "nsmq_bio_rid_006",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify a human organ, tissue, blood cell or hormone by physiological function.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "185fc5f02d489c214c9bb04031976ba5676421dfef3d5591648f98c5bfb9f431"
+    },
+    {
+      "questionId": "nsmq_bio_rid_007",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_biochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify the photosynthetic organelle and pigment.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "4d95e2e76f3acd9410380164eb821d18607f8f89ac56895bff2c8b398a85a228"
+    },
+    {
+      "questionId": "nsmq_bio_rid_008",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_ecology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The organism-level clues identify a fungus, fitting the broad ecology/diversity taxonomy.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "c04c9357bb157dd34cb6caf4362fd23de7c4f2210cd131181e5f9d5ad5506aa0"
+    },
+    {
+      "questionId": "nsmq_bio_rid_009",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify a human organ, tissue, blood cell or hormone by physiological function.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "83d17fdc5d88479a7d3d54efae0febc6f81a4b56ff3c74a8f4f68da28a641ec1"
+    },
+    {
+      "questionId": "nsmq_bio_rid_010",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly concern gametes, DNA, inherited traits or mRNA.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "598cee1c177e2d591d795b88fcde2517a15fd8ddeabf9ec1bab35dea791d499a"
+    },
+    {
+      "questionId": "nsmq_bio_rid_011",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly concern gametes, DNA, inherited traits or mRNA.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "2253000f15238d1d1b43011f1f250d19493d0c559828c31c592675c4e5348686"
+    },
+    {
+      "questionId": "nsmq_bio_rid_012",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify a human organ, tissue, blood cell or hormone by physiological function.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "15bb659f3b4eacd7d42dfe28f4e1d8993cc8d715ff5a5f7a50550599fff92836"
+    },
+    {
+      "questionId": "nsmq_bio_rid_013",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify a human organ, tissue, blood cell or hormone by physiological function.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "6305a2a86231484ac91c410ff45efe5091858d9677624fa61e4ca4e2b183d904"
+    },
+    {
+      "questionId": "nsmq_bio_rid_014",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify a human organ, tissue, blood cell or hormone by physiological function.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "1c9ab59bbd76df7e0738132beb99bb20711f0cd3c1f3b9161a9bb5073f696cfa"
+    },
+    {
+      "questionId": "nsmq_bio_rid_015",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "riddles",
+      "topicId": "topic_cells",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The clues explicitly identify an organelle, cell or acellular infectious agent in cell-biology context.",
+      "provenance": "database/migrations/archive/044_nsmq_riddles.sql",
+      "contentFingerprint": "96ef619e93e898d745d75d8d4a3c5ce7ed02a970d6a4e0492a24d090d1128b73"
+    },
+    {
+      "questionId": "nsmq_bio_r1_001",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_cells",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns cells, organelles, membranes or cellular structure.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "e8fe2fc81c60618cf34612e9ae671440c1509b4c26329b47237788eb4017018c"
+    },
+    {
+      "questionId": "nsmq_bio_r1_002",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_biochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns photosynthesis or glucose metabolism.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "f8c3a4ded1a4478072ad1b4861bee75d75be0e06891d74eaf8c3bb94c1d26d78"
+    },
+    {
+      "questionId": "nsmq_bio_r1_003",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns chromosomes, meiosis, DNA base pairing or inherited identity.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "e795293f6e23eb368f9db3721ce5c447f23f3e6fd0c29c2b66d396e8a7e69124"
+    },
+    {
+      "questionId": "nsmq_bio_r1_004",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_cells",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns cells, organelles, membranes or cellular structure.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "216c33e4a1a7fea446e60892d8d14dabde0495b3cc414dfff3bdff46a9c610cb"
+    },
+    {
+      "questionId": "nsmq_bio_r1_005",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns organ systems, nutrition, transport, hormones, plant water relations or neural control.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "4a31c9c1b6b8d775e1ebd36f3073d9f73988231eb6e54a4b95089f19dff01ced"
+    },
+    {
+      "questionId": "nsmq_bio_r1_006",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns organ systems, nutrition, transport, hormones, plant water relations or neural control.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "a23b86a8b76bbe96fc3bf2570a8a16e6742e3ad640663a099e9a5eba4d86583b"
+    },
+    {
+      "questionId": "nsmq_bio_r1_007",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns chromosomes, meiosis, DNA base pairing or inherited identity.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "4a24136417afb991ffb43ce166c8677469e95fbae8fdf0281ad242821083d93a"
+    },
+    {
+      "questionId": "nsmq_bio_r1_008",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns organ systems, nutrition, transport, hormones, plant water relations or neural control.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "17f0ebbb5b9b4f80d246894edd1801c593c8858e172074ab26584e4c30a68ae6"
+    },
+    {
+      "questionId": "nsmq_bio_r1_009",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns organ systems, nutrition, transport, hormones, plant water relations or neural control.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "880be3d94ec1c1baa177d333770bb484c458bb0cad405ed8f08bd262eec3e478"
+    },
+    {
+      "questionId": "nsmq_bio_r1_010",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_cells",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns cells, organelles, membranes or cellular structure.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "93635c9c08f8d886badd25e53e28ab3ee87663490034198332d975408b279794"
+    },
+    {
+      "questionId": "nsmq_bio_r1_011",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns organ systems, nutrition, transport, hormones, plant water relations or neural control.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "8ee3438c3621da52ec9985f566fb84db3b8752592eadd977e061c312e12a0a6f"
+    },
+    {
+      "questionId": "nsmq_bio_r1_012",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns organ systems, nutrition, transport, hormones, plant water relations or neural control.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "2b294059ca35413320a959b406323ceb11ef576d7dd33acbd1d177b34b7ebde2"
+    },
+    {
+      "questionId": "nsmq_bio_r1_013",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns organ systems, nutrition, transport, hormones, plant water relations or neural control.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "273520879a575df7f2604fe35edab5807dea6a1b0d7288f3aa040571efe1ddb6"
+    },
+    {
+      "questionId": "nsmq_bio_r1_014",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns chromosomes, meiosis, DNA base pairing or inherited identity.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "a7cabedf71c7065e83012ad04f731fe086f56be6a8dca86992aaa6b83f4d6b31"
+    },
+    {
+      "questionId": "nsmq_bio_r1_015",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns organ systems, nutrition, transport, hormones, plant water relations or neural control.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "b3bf668b34d41058ac4ffee94270f0cc6699cd52f091899a4548b1cfccc2f692"
+    },
+    {
+      "questionId": "nsmq_bio_r1_016",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_ecology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns trophic roles, biodiversity, decomposition or taxonomy.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "963f7ad6f7ba1f2c201febc334132e260f45058d83f56805db6b6d412cd51cd0"
+    },
+    {
+      "questionId": "nsmq_bio_r1_017",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns organ systems, nutrition, transport, hormones, plant water relations or neural control.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "ccfba7281d99a37b362bfadc5724b77c0cc49075cc3ccb31ed6dddbfc2131661"
+    },
+    {
+      "questionId": "nsmq_bio_r1_018",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns organ systems, nutrition, transport, hormones, plant water relations or neural control.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "986e311984555b8259677ed417532278e014e0f8bc28cd147360681a512561d4"
+    },
+    {
+      "questionId": "nsmq_bio_r1_019",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_cells",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns cells, organelles, membranes or cellular structure.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "97bc99d472a9dd2d1578a2aae8a7aba8b8fd5f85fe118faa5bd3b015f4624273"
+    },
+    {
+      "questionId": "nsmq_bio_r1_020",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns organ systems, nutrition, transport, hormones, plant water relations or neural control.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "fb6f6548c050f0f303f30c49feb89c1774cbdb335a988fdcf952f00139d2b375"
+    },
+    {
+      "questionId": "nsmq_bio_r1_021",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_biochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns photosynthesis or glucose metabolism.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "c7fc2dbc2a0f4820523d0a26f9397a0aab73c90dc9d825923583e2ff98dcf324"
+    },
+    {
+      "questionId": "nsmq_bio_r1_022",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_cells",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns cells, organelles, membranes or cellular structure.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "6a9becf73ff4cd709a1e8b9ff1bb6787c38565c3b0104330bbce2c58ba0c2673"
+    },
+    {
+      "questionId": "nsmq_bio_r1_023",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_ecology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns trophic roles, biodiversity, decomposition or taxonomy.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "d7f5cb657f23f9c2c69921d85fc9751717ec0cbe65319907fc22a64000a6bd84"
+    },
+    {
+      "questionId": "nsmq_bio_r1_024",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns organ systems, nutrition, transport, hormones, plant water relations or neural control.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "4f2215ee658d87c802dee259433b14161d212eeb72a7158dc01fd1ecdf596b55"
+    },
+    {
+      "questionId": "nsmq_bio_r1_025",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns organ systems, nutrition, transport, hormones, plant water relations or neural control.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "72e5ccaf1ca8c00d09e7f296ed2de0b047d6d4b06bcd9195a3b7ba94b7ecfb08"
+    },
+    {
+      "questionId": "nsmq_bio_r1_026",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns chromosomes, meiosis, DNA base pairing or inherited identity.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "7186a5dd05058a1c5f2e26f83ae913e49d5e0295155ca8d8dc4e92a2e1c759d8"
+    },
+    {
+      "questionId": "nsmq_bio_r1_027",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_ecology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns trophic roles, biodiversity, decomposition or taxonomy.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "8d806f15a32d521d738e8029e2d509df94f9a5271f43fd26eb5b11642f06ea02"
+    },
+    {
+      "questionId": "nsmq_bio_r1_028",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_biochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns photosynthesis or glucose metabolism.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "2fc90d0bbd32c6166f8aabe88e55ff2e9cdd2c9672e2c640695d7614a03015f9"
+    },
+    {
+      "questionId": "nsmq_bio_r1_029",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_ecology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns trophic roles, biodiversity, decomposition or taxonomy.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "df7ab09bdf13eab4a9e7884ca6b4619fecd4a293f25e401bcafcf877c7c69a79"
+    },
+    {
+      "questionId": "nsmq_bio_r1_030",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "round_one",
+      "topicId": "topic_cells",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The prompt explicitly concerns cells, organelles, membranes or cellular structure.",
+      "provenance": "database/migrations/archive/040_nsmq_round_one.sql",
+      "contentFingerprint": "6761fc588b2c65954aed8ae02162e1f0ccec715cf94a7a6962b94109088bd6aa"
+    },
+    {
+      "questionId": "q_speed_005",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "speed_race",
+      "topicId": "topic_cells",
+      "classificationSource": "production-inventory-plus-base-seed-explicit-topic",
+      "evidence": "The preserved pre-squash base seed explicitly binds this exact subject/round/content row to topic_cells; the production read-only inventory confirms the same ID is currently null-topic.",
+      "provenance": "database/seeds/seed_base.sql",
+      "contentFingerprint": "fa5fe6f8c10abf31d534c3556eb44e89318d5c8eef9b01da6fcd661f1a103e40"
+    },
+    {
+      "questionId": "nsmq_bio_tf_001",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_cells",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns cell nuclei or virus replication in cells.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "8e56a130aa6af086cde101b179046dac1ba85fbaec45f47c97b285469dfd8030"
+    },
+    {
+      "questionId": "nsmq_bio_tf_002",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns nucleic acids, meiosis, dominance, mutation or X-linked inheritance.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "b1e472f072ae4a8b5520f3b17d633ce10d282d8d7bcaf92769252079a749e192"
+    },
+    {
+      "questionId": "nsmq_bio_tf_003",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns circulation, hormones, plant transport, neural control or blood physiology.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "6067cea9fbaaf59e578b592af235307a5d2c02c651592acafaed0bf9a70792c7"
+    },
+    {
+      "questionId": "nsmq_bio_tf_004",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_biochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns photosynthesis, enzymes or respiration.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "2355c72b6dbb79c63e02e8478c7b3667fafe32db73d1ef2f015827975af68872"
+    },
+    {
+      "questionId": "nsmq_bio_tf_005",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_biochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns photosynthesis, enzymes or respiration.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "15880583d374ed12097424e4138304b7d410530ff1ad0506f130e634bbc89f2c"
+    },
+    {
+      "questionId": "nsmq_bio_tf_006",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_cells",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns cell nuclei or virus replication in cells.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "7b69d295adcccd167c7c1dbafc670fd03ac284666dc59e552ed02ef1b2f5833a"
+    },
+    {
+      "questionId": "nsmq_bio_tf_007",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns nucleic acids, meiosis, dominance, mutation or X-linked inheritance.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "e3e830923cb6b19c6e960735ba74514710756f264d3c16b39ee21f406f68c4f2"
+    },
+    {
+      "questionId": "nsmq_bio_tf_008",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns circulation, hormones, plant transport, neural control or blood physiology.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "449430b304a1301afa0dc897424634d394fb1322a86841f834ce32cd9bd45759"
+    },
+    {
+      "questionId": "nsmq_bio_tf_009",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_cells",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns cell nuclei or virus replication in cells.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "0cb51e2727cd2829fe78a2ff37423246575f010af7ed92fee0ca5cf7485a1252"
+    },
+    {
+      "questionId": "nsmq_bio_tf_010",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_biochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns photosynthesis, enzymes or respiration.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "c479733e8b189fd93156e6d7cd92d1b3dc2a2c12d319a9342be5149ebdd485e1"
+    },
+    {
+      "questionId": "nsmq_bio_tf_011",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns circulation, hormones, plant transport, neural control or blood physiology.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "650dc9a7eb42061167d8cb5f24a45ec43157d489258b264e1a9c256dc84a13ab"
+    },
+    {
+      "questionId": "nsmq_bio_tf_012",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns nucleic acids, meiosis, dominance, mutation or X-linked inheritance.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "3758b4f50544658484290bc5fb0e6cb57f41c9dee7dd312ed3038c091be22987"
+    },
+    {
+      "questionId": "nsmq_bio_tf_013",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns circulation, hormones, plant transport, neural control or blood physiology.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "cd61d262b1849a6bb01602917d30859b113f111d2ad67c46c99e0bc7f698a7a1"
+    },
+    {
+      "questionId": "nsmq_bio_tf_014",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_ecology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement concerns the ecological roles of bacteria.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "a439e6dd95e59e1475c6a04b7cd9ec7181ce16e7b567c654df4365730d516e67"
+    },
+    {
+      "questionId": "nsmq_bio_tf_015",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_biochemistry",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns photosynthesis, enzymes or respiration.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "7f784807cf864898fdc7eec1a8deb709d726c972e5be896ce09b789b5b569e5b"
+    },
+    {
+      "questionId": "nsmq_bio_tf_016",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns circulation, hormones, plant transport, neural control or blood physiology.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "28c9b7fbbfea3497ca1318cbcd04a47efa0f7a92ac32ca397318789f5a9276d7"
+    },
+    {
+      "questionId": "nsmq_bio_tf_017",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns circulation, hormones, plant transport, neural control or blood physiology.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "e8f0da3877d86c300af1beaede74ea1526aa38aceaca73562d04716b9f31b484"
+    },
+    {
+      "questionId": "nsmq_bio_tf_018",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns nucleic acids, meiosis, dominance, mutation or X-linked inheritance.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "d5ab9dfd557b4e55dd4f88108996e7762610444ca807d97f56789e50877b18b1"
+    },
+    {
+      "questionId": "nsmq_bio_tf_019",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_genetics",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns nucleic acids, meiosis, dominance, mutation or X-linked inheritance.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "f82540a8733d1f99bf06e813b38d1a9eba2d641140fbd180ac68053a07d971ff"
+    },
+    {
+      "questionId": "nsmq_bio_tf_020",
+      "subjectId": "subj_nsmq_biology",
+      "roundType": "true_false",
+      "topicId": "topic_physiology",
+      "classificationSource": "prompt-answer-explanation-human-review",
+      "evidence": "The statement explicitly concerns circulation, hormones, plant transport, neural control or blood physiology.",
+      "provenance": "database/migrations/archive/043_nsmq_true_false.sql",
+      "contentFingerprint": "1492841f6793bb5fff8538da3c082f29134a0f28eda1b995641278c400bd8e1e"
+    }
+  ]
+}

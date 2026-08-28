@@ -1,0 +1,82 @@
+{
+  "release": "cambridge-topic-remediation-2026-08-26",
+  "status": "reviewed-retained-exceptions",
+  "expectedExceptionCount": 5,
+  "exceptions": [
+    {
+      "questionId": "q_alevel_bio_028",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_biology",
+      "sourceFile": "database/migrations/archive/083_alevel_biology_questions.sql",
+      "sourceSection": "Ecology",
+      "reasonCode": "taxonomy-gap",
+      "missingConcept": "ecosystem energy transfer and nutrient cycles",
+      "reason": "The reviewed question assesses ecosystem energy transfer and nutrient cycles, but the current same-subject topic taxonomy has no matching topic. Assigning a broader topic would be a guess.",
+      "requiredTaxonomyAction": "Add and review a same-subject topic covering ecosystem energy transfer and nutrient cycles before mapping these rows.",
+      "reviewStatus": "reviewed-retained-exception",
+      "classification": "out-of-current-syllabus-general-biology",
+      "sourceDocument": "alevelBiology",
+      "rationale": "Trophic-level energy transfer is general ecology content but is not a named content point in the current 9700 topic overview; creating a broad Ecology topic would overstate current-syllabus alignment."
+    },
+    {
+      "questionId": "q_alevel_bio_029",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_biology",
+      "sourceFile": "database/migrations/archive/083_alevel_biology_questions.sql",
+      "sourceSection": "Ecology",
+      "reasonCode": "taxonomy-gap",
+      "missingConcept": "ecosystem energy transfer and nutrient cycles",
+      "reason": "The reviewed question assesses ecosystem energy transfer and nutrient cycles, but the current same-subject topic taxonomy has no matching topic. Assigning a broader topic would be a guess.",
+      "requiredTaxonomyAction": "Add and review a same-subject topic covering ecosystem energy transfer and nutrient cycles before mapping these rows.",
+      "reviewStatus": "reviewed-retained-exception",
+      "classification": "out-of-current-syllabus-general-biology",
+      "sourceDocument": "alevelBiology",
+      "rationale": "The nitrogen cycle is general ecology content but is not a named content point in the current 9700 topic overview; no bounded current-syllabus topic supports it."
+    },
+    {
+      "questionId": "q_alevel_fm_051",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "sourceFile": "database/migrations/archive/084_alevel_further_math_questions.sql",
+      "sourceSection": "Additional Questions",
+      "reasonCode": "taxonomy-gap",
+      "missingConcept": "Maclaurin series and advanced integration techniques",
+      "reason": "The reviewed question assesses Maclaurin series and advanced integration techniques, but the current same-subject topic taxonomy has no matching topic. Assigning a broader topic would be a guess.",
+      "requiredTaxonomyAction": "Add and review a same-subject topic covering Maclaurin series and advanced integration techniques before mapping these rows.",
+      "reviewStatus": "reviewed-retained-exception",
+      "classification": "out-of-current-syllabus-additional-pure",
+      "sourceDocument": "alevelFurtherMathematics",
+      "rationale": "Maclaurin or Taylor series are not listed in the current 9231 content sections. A generic Additional Pure topic would not be an official syllabus topic."
+    },
+    {
+      "questionId": "q_alevel_fm_052",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "sourceFile": "database/migrations/archive/084_alevel_further_math_questions.sql",
+      "sourceSection": "Additional Questions",
+      "reasonCode": "taxonomy-gap",
+      "missingConcept": "Maclaurin series and advanced integration techniques",
+      "reason": "The reviewed question assesses Maclaurin series and advanced integration techniques, but the current same-subject topic taxonomy has no matching topic. Assigning a broader topic would be a guess.",
+      "requiredTaxonomyAction": "Add and review a same-subject topic covering Maclaurin series and advanced integration techniques before mapping these rows.",
+      "reviewStatus": "reviewed-retained-exception",
+      "classification": "out-of-current-syllabus-additional-pure",
+      "sourceDocument": "alevelFurtherMathematics",
+      "rationale": "Maclaurin or Taylor series are not listed in the current 9231 content sections. A generic Additional Pure topic would not be an official syllabus topic."
+    },
+    {
+      "questionId": "q_alevel_fm_053",
+      "examFamily": "cambridge-a-level",
+      "subjectId": "subj_alevel_further_math",
+      "sourceFile": "database/migrations/archive/084_alevel_further_math_questions.sql",
+      "sourceSection": "Additional Questions",
+      "reasonCode": "taxonomy-gap",
+      "missingConcept": "Maclaurin series and advanced integration techniques",
+      "reason": "The reviewed question assesses Maclaurin series and advanced integration techniques, but the current same-subject topic taxonomy has no matching topic. Assigning a broader topic would be a guess.",
+      "requiredTaxonomyAction": "Add and review a same-subject topic covering Maclaurin series and advanced integration techniques before mapping these rows.",
+      "reviewStatus": "reviewed-retained-exception",
+      "classification": "out-of-current-syllabus-additional-pure",
+      "sourceDocument": "alevelFurtherMathematics",
+      "rationale": "Improper integration with an infinite limit is not specified in the current 9231 Integration section, so this row remains supplemental rather than being forced into the official topic."
+    }
+  ]
+}

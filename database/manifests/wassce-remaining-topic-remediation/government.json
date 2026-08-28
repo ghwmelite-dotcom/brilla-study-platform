@@ -1,0 +1,198 @@
+{
+  "release": "wassce-remaining-null-topic-audit-2026-08-26",
+  "subjectId": "subj_wassce_government",
+  "subjectName": "Government",
+  "expectedNullTopicCount": 110,
+  "mappedQuestionCount": 110,
+  "exceptionCount": 0,
+  "mappingGroups": [
+    {
+      "topicId": "topic_gov_intro",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed power, legitimacy, authority, ideology, sovereignty, rule-of-law and public-opinion stems.",
+      "questionIds": [
+        "q_gov_2023_001",
+        "q_gov_2023_002",
+        "q_gov_2023_003",
+        "q_gov_2023_004",
+        "q_gov_2023_005",
+        "q_gov_2023_006",
+        "q_gov_2023_007",
+        "q_gov_2024_001",
+        "q_gov_2024_005",
+        "q_gov_2024_010"
+      ]
+    },
+    {
+      "topicId": "topic_gov_constitution",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed constitution purpose, rigidity, sources and supremacy stems.",
+      "questionIds": [
+        "q_gov_2023_008",
+        "q_gov_2023_009",
+        "q_gov_2023_010",
+        "q_gov_2024_015"
+      ]
+    },
+    {
+      "topicId": "topic_gov_organs",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed legislature, executive, judiciary, civil service, decentralization and checks-and-balances stems.",
+      "questionIds": [
+        "q_gov_2023_012",
+        "q_gov_2023_013",
+        "q_gov_2023_014",
+        "q_gov_2023_015",
+        "q_gov_2024_002",
+        "q_gov_2024_003",
+        "q_gov_2024_008",
+        "q_gov_2024_016",
+        "q_gov_2024_017",
+        "q_gov_2024_018",
+        "q_gov_2024_019",
+        "q_gov_2024_020",
+        "q_gov_arms_001",
+        "q_gov_arms_002",
+        "q_gov_arms_003",
+        "q_gov_arms_004",
+        "q_gov_arms_005"
+      ]
+    },
+    {
+      "topicId": "topic_gov_systems",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed federal, presidential, parliamentary, unitary and constitutional-monarchy stems.",
+      "questionIds": [
+        "q_gov_2024_006",
+        "q_gov_2024_011",
+        "q_gov_2024_012",
+        "q_gov_2024_013",
+        "q_gov_2024_014"
+      ]
+    },
+    {
+      "topicId": "topic_gov_parties",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed party systems, coalition and party-purpose stems.",
+      "questionIds": [
+        "q_gov_2023_021",
+        "q_gov_2023_022",
+        "q_gov_2023_023",
+        "q_gov_2023_030",
+        "q_gov_2024_004",
+        "q_gov_2024_007",
+        "q_gov_2024_009"
+      ]
+    },
+    {
+      "topicId": "topic_gov_elections",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed electoral commission, suffrage, ballot, voting systems, referendum and apathy stems.",
+      "questionIds": [
+        "q_gov_2023_024",
+        "q_gov_2023_025",
+        "q_gov_2023_026",
+        "q_gov_2023_027",
+        "q_gov_2023_028",
+        "q_gov_2023_029",
+        "q_gov_2024_021",
+        "q_gov_2024_022",
+        "q_gov_2024_023",
+        "q_gov_2024_024",
+        "q_gov_2024_025",
+        "q_gov_2024_026",
+        "q_gov_2024_027",
+        "q_gov_2024_028",
+        "q_gov_2024_029",
+        "q_gov_2024_030"
+      ]
+    },
+    {
+      "topicId": "topic_gov_rights",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed citizenship, civil rights, Ombudsman and emergency-rights stems.",
+      "questionIds": [
+        "q_gov_2024_031",
+        "q_gov_2024_032",
+        "q_gov_2024_033",
+        "q_gov_2024_034",
+        "q_gov_2024_035",
+        "q_gov_2024_036",
+        "q_gov_2024_037",
+        "q_gov_2024_038",
+        "q_gov_2024_039",
+        "q_gov_2024_040"
+      ]
+    },
+    {
+      "topicId": "topic_gov_ghana",
+      "evidenceBasis": "reviewed-question-semantics-and-source-range",
+      "evidence": "Reviewed Ghanaian republic, party, constitution, independence, presidency, coup and local-government stems.",
+      "questionIds": [
+        "q_gov_2023_031",
+        "q_gov_2023_032",
+        "q_gov_2023_035",
+        "q_gov_2023_036",
+        "q_gov_2023_037",
+        "q_gov_2023_038",
+        "q_gov_2023_039",
+        "q_gov_2023_040",
+        "q_gov_2024_048",
+        "q_gov_2024_049",
+        "q_gov_2024_050",
+        "q_gov_local_001",
+        "q_gov_local_002",
+        "q_gov_local_003",
+        "q_gov_local_004",
+        "q_gov_local_005"
+      ]
+    },
+    {
+      "topicId": "topic_gov_public_admin",
+      "evidenceBasis": "official-curriculum-and-reviewed-question-semantics",
+      "evidence": "Official WAEC Government topic 10 covers public and civil service administration; reviewed rows assess civil service, local government, public corporations, red tape and decentralization.",
+      "questionIds": [
+        "q_gov_2023_011",
+        "q_gov_2023_016",
+        "q_gov_2023_017",
+        "q_gov_2023_018",
+        "q_gov_2023_019",
+        "q_gov_2023_020"
+      ]
+    },
+    {
+      "topicId": "topic_gov_west_africa_development",
+      "evidenceBasis": "official-curriculum-and-reviewed-question-semantics",
+      "evidence": "Official WASSCE Government materials assess West African political development; reviewed rows cover Nigerian independence, the Biafran War, colonialism, the Commonwealth and Pan-Africanism.",
+      "questionIds": [
+        "q_gov_2023_033",
+        "q_gov_2023_034",
+        "q_gov_2023_048",
+        "q_gov_2023_049",
+        "q_gov_2023_050"
+      ]
+    },
+    {
+      "topicId": "topic_gov_international",
+      "evidenceBasis": "official-curriculum-and-reviewed-question-semantics",
+      "evidence": "Official WAEC Government topics 17 and 18 cover foreign policy and international organizations; reviewed rows assess diplomacy, AU, ECOWAS, UN, WHO and non-alignment.",
+      "questionIds": [
+        "q_gov_2023_041",
+        "q_gov_2023_042",
+        "q_gov_2023_043",
+        "q_gov_2023_044",
+        "q_gov_2023_045",
+        "q_gov_2023_046",
+        "q_gov_2023_047",
+        "q_gov_2024_041",
+        "q_gov_2024_042",
+        "q_gov_2024_043",
+        "q_gov_2024_044",
+        "q_gov_2024_045",
+        "q_gov_2024_046",
+        "q_gov_2024_047"
+      ]
+    }
+  ],
+  "reviewedExceptions": []
+}

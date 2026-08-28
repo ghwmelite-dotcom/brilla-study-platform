@@ -1,0 +1,995 @@
+{
+  "release": "cambridge-topic-remediation-audit-2026-08-26",
+  "examFamily": "cambridge-a-level",
+  "examTypeId": "cambridge_a2",
+  "syllabusBoard": "Cambridge International",
+  "taxonomySource": "database/prod-patches/096_seed_topics_for_empty_subjects.sql",
+  "scopeRule": "Question identity is derived from the reviewed archive source files and canonical subject IDs. Legacy rows that omit questions.exam_type_id remain in-family through their subject identity.",
+  "mappingPolicy": "Map only when reviewed source section and assessed concept agree with one existing same-subject topic. Otherwise record a reviewed exception.",
+  "expectedNullTopicCohort": 230,
+  "mappedQuestionCount": 198,
+  "exceptionCount": 32,
+  "subjects": [
+    {
+      "subjectId": "subj_alevel_physics",
+      "subjectName": "Physics",
+      "syllabusCode": "9702",
+      "expectedQuestionCount": 40,
+      "sourceFiles": [
+        "database/migrations/archive/081_alevel_physics_questions.sql"
+      ],
+      "mappingGroups": [
+        {
+          "topicId": "topic_alevel_phys_mechanics",
+          "sourceFiles": [
+            "database/migrations/archive/081_alevel_physics_questions.sql"
+          ],
+          "sourceSections": [
+            "Mechanics"
+          ],
+          "evidence": "Reviewed projectile, equilibrium and circular-motion questions.",
+          "questionIds": [
+            "q_alevel_phy_001",
+            "q_alevel_phy_002",
+            "q_alevel_phy_005"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_phys_waves",
+          "sourceFiles": [
+            "database/migrations/archive/081_alevel_physics_questions.sql"
+          ],
+          "sourceSections": [
+            "Mechanics",
+            "Additional mechanics/oscillations"
+          ],
+          "evidence": "Reviewed SHM, resonance, damping, superposition, diffraction and coherence questions.",
+          "questionIds": [
+            "q_alevel_phy_003",
+            "q_alevel_phy_004",
+            "q_alevel_phy_031",
+            "q_alevel_phy_032",
+            "q_alevel_phy_033",
+            "q_alevel_phy_034",
+            "q_alevel_phy_035"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_phys_fields",
+          "sourceFiles": [
+            "database/migrations/archive/081_alevel_physics_questions.sql"
+          ],
+          "sourceSections": [
+            "Gravitational Fields",
+            "Electric Fields"
+          ],
+          "evidence": "Reviewed gravitational/electric field, potential and orbital questions.",
+          "questionIds": [
+            "q_alevel_phy_006",
+            "q_alevel_phy_007",
+            "q_alevel_phy_008",
+            "q_alevel_phy_009",
+            "q_alevel_phy_010"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_phys_em",
+          "sourceFiles": [
+            "database/migrations/archive/081_alevel_physics_questions.sql"
+          ],
+          "sourceSections": [
+            "Capacitance",
+            "Magnetic Fields"
+          ],
+          "evidence": "Reviewed capacitor, magnetic-force and electromagnetic-induction questions.",
+          "questionIds": [
+            "q_alevel_phy_011",
+            "q_alevel_phy_012",
+            "q_alevel_phy_013",
+            "q_alevel_phy_014",
+            "q_alevel_phy_015",
+            "q_alevel_phy_016"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_phys_quantum",
+          "sourceFiles": [
+            "database/migrations/archive/081_alevel_physics_questions.sql"
+          ],
+          "sourceSections": [
+            "Waves and Quantum",
+            "Nuclear Physics"
+          ],
+          "evidence": "Reviewed matter-wave, photoelectric, radioactivity and nuclear-energy questions.",
+          "questionIds": [
+            "q_alevel_phy_017",
+            "q_alevel_phy_018",
+            "q_alevel_phy_019",
+            "q_alevel_phy_020",
+            "q_alevel_phy_021",
+            "q_alevel_phy_022",
+            "q_alevel_phy_023",
+            "q_alevel_phy_024",
+            "q_alevel_phy_025"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_phys_thermal",
+          "sourceFiles": [
+            "database/migrations/archive/081_alevel_physics_questions.sql"
+          ],
+          "sourceSections": [
+            "Thermodynamics"
+          ],
+          "evidence": "Contiguous reviewed thermodynamics and ideal-gas source block.",
+          "questionIds": [
+            "q_alevel_phy_026",
+            "q_alevel_phy_027",
+            "q_alevel_phy_028"
+          ]
+        }
+      ],
+      "mappedQuestionCount": 33,
+      "exceptionCount": 7,
+      "topicCounts": {
+        "topic_alevel_phys_mechanics": 3,
+        "topic_alevel_phys_waves": 7,
+        "topic_alevel_phys_fields": 5,
+        "topic_alevel_phys_em": 6,
+        "topic_alevel_phys_quantum": 9,
+        "topic_alevel_phys_thermal": 3
+      },
+      "mappedQuestionIds": [
+        "q_alevel_phy_001",
+        "q_alevel_phy_002",
+        "q_alevel_phy_003",
+        "q_alevel_phy_004",
+        "q_alevel_phy_005",
+        "q_alevel_phy_006",
+        "q_alevel_phy_007",
+        "q_alevel_phy_008",
+        "q_alevel_phy_009",
+        "q_alevel_phy_010",
+        "q_alevel_phy_011",
+        "q_alevel_phy_012",
+        "q_alevel_phy_013",
+        "q_alevel_phy_014",
+        "q_alevel_phy_015",
+        "q_alevel_phy_016",
+        "q_alevel_phy_017",
+        "q_alevel_phy_018",
+        "q_alevel_phy_019",
+        "q_alevel_phy_020",
+        "q_alevel_phy_021",
+        "q_alevel_phy_022",
+        "q_alevel_phy_023",
+        "q_alevel_phy_024",
+        "q_alevel_phy_025",
+        "q_alevel_phy_026",
+        "q_alevel_phy_027",
+        "q_alevel_phy_028",
+        "q_alevel_phy_031",
+        "q_alevel_phy_032",
+        "q_alevel_phy_033",
+        "q_alevel_phy_034",
+        "q_alevel_phy_035"
+      ],
+      "exceptionQuestionIds": [
+        "q_alevel_phy_029",
+        "q_alevel_phy_030",
+        "q_alevel_phy_036",
+        "q_alevel_phy_037",
+        "q_alevel_phy_038",
+        "q_alevel_phy_039",
+        "q_alevel_phy_040"
+      ]
+    },
+    {
+      "subjectId": "subj_alevel_chemistry",
+      "subjectName": "Chemistry",
+      "syllabusCode": "9701",
+      "expectedQuestionCount": 40,
+      "sourceFiles": [
+        "database/migrations/archive/082_alevel_chemistry_questions.sql"
+      ],
+      "mappingGroups": [
+        {
+          "topicId": "topic_alevel_chem_atomic",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_chemistry_questions.sql"
+          ],
+          "sourceSections": [
+            "Atomic Structure",
+            "Bonding"
+          ],
+          "evidence": "Reviewed electron configuration, ionisation energy, molecular shape, Lewis-acid and hybridisation questions.",
+          "questionIds": [
+            "q_alevel_chem_001",
+            "q_alevel_chem_002",
+            "q_alevel_chem_003",
+            "q_alevel_chem_004",
+            "q_alevel_chem_005"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_chem_physical",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_chemistry_questions.sql"
+          ],
+          "sourceSections": [
+            "Energetics",
+            "Kinetics",
+            "Equilibria",
+            "Acids and Bases",
+            "Entropy"
+          ],
+          "evidence": "Reviewed enthalpy, kinetics, equilibrium, pH, buffer and spontaneity questions.",
+          "questionIds": [
+            "q_alevel_chem_006",
+            "q_alevel_chem_007",
+            "q_alevel_chem_008",
+            "q_alevel_chem_009",
+            "q_alevel_chem_010",
+            "q_alevel_chem_011",
+            "q_alevel_chem_012",
+            "q_alevel_chem_013",
+            "q_alevel_chem_014",
+            "q_alevel_chem_015",
+            "q_alevel_chem_016",
+            "q_alevel_chem_040"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_chem_redox",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_chemistry_questions.sql"
+          ],
+          "sourceSections": [
+            "Electrochemistry"
+          ],
+          "evidence": "Reviewed cell-potential and electrolysis questions.",
+          "questionIds": [
+            "q_alevel_chem_017",
+            "q_alevel_chem_018"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_chem_inorganic",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_chemistry_questions.sql"
+          ],
+          "sourceSections": [
+            "Transition Metals",
+            "Period 3",
+            "Group 17"
+          ],
+          "evidence": "Reviewed transition-metal, periodicity and halogen questions.",
+          "questionIds": [
+            "q_alevel_chem_019",
+            "q_alevel_chem_020",
+            "q_alevel_chem_021",
+            "q_alevel_chem_036",
+            "q_alevel_chem_037",
+            "q_alevel_chem_038",
+            "q_alevel_chem_039"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_chem_organic",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_chemistry_questions.sql"
+          ],
+          "sourceSections": [
+            "Organic Mechanisms",
+            "Carbonyl Compounds",
+            "Carboxylic Acids",
+            "Amines",
+            "Polymers"
+          ],
+          "evidence": "Reviewed organic mechanism, functional-group and polymer questions.",
+          "questionIds": [
+            "q_alevel_chem_022",
+            "q_alevel_chem_023",
+            "q_alevel_chem_024",
+            "q_alevel_chem_025",
+            "q_alevel_chem_026",
+            "q_alevel_chem_027",
+            "q_alevel_chem_028",
+            "q_alevel_chem_029",
+            "q_alevel_chem_030",
+            "q_alevel_chem_031",
+            "q_alevel_chem_032"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_chem_analysis",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_chemistry_questions.sql"
+          ],
+          "sourceSections": [
+            "Analytical Techniques"
+          ],
+          "evidence": "Contiguous reviewed mass-spectrometry, IR and NMR source block.",
+          "questionIds": [
+            "q_alevel_chem_033",
+            "q_alevel_chem_034",
+            "q_alevel_chem_035"
+          ]
+        }
+      ],
+      "mappedQuestionCount": 40,
+      "exceptionCount": 0,
+      "topicCounts": {
+        "topic_alevel_chem_atomic": 5,
+        "topic_alevel_chem_physical": 12,
+        "topic_alevel_chem_redox": 2,
+        "topic_alevel_chem_inorganic": 7,
+        "topic_alevel_chem_organic": 11,
+        "topic_alevel_chem_analysis": 3
+      },
+      "mappedQuestionIds": [
+        "q_alevel_chem_001",
+        "q_alevel_chem_002",
+        "q_alevel_chem_003",
+        "q_alevel_chem_004",
+        "q_alevel_chem_005",
+        "q_alevel_chem_006",
+        "q_alevel_chem_007",
+        "q_alevel_chem_008",
+        "q_alevel_chem_009",
+        "q_alevel_chem_010",
+        "q_alevel_chem_011",
+        "q_alevel_chem_012",
+        "q_alevel_chem_013",
+        "q_alevel_chem_014",
+        "q_alevel_chem_015",
+        "q_alevel_chem_016",
+        "q_alevel_chem_017",
+        "q_alevel_chem_018",
+        "q_alevel_chem_019",
+        "q_alevel_chem_020",
+        "q_alevel_chem_021",
+        "q_alevel_chem_022",
+        "q_alevel_chem_023",
+        "q_alevel_chem_024",
+        "q_alevel_chem_025",
+        "q_alevel_chem_026",
+        "q_alevel_chem_027",
+        "q_alevel_chem_028",
+        "q_alevel_chem_029",
+        "q_alevel_chem_030",
+        "q_alevel_chem_031",
+        "q_alevel_chem_032",
+        "q_alevel_chem_033",
+        "q_alevel_chem_034",
+        "q_alevel_chem_035",
+        "q_alevel_chem_036",
+        "q_alevel_chem_037",
+        "q_alevel_chem_038",
+        "q_alevel_chem_039",
+        "q_alevel_chem_040"
+      ],
+      "exceptionQuestionIds": []
+    },
+    {
+      "subjectId": "subj_alevel_biology",
+      "subjectName": "Biology",
+      "syllabusCode": "9700",
+      "expectedQuestionCount": 40,
+      "sourceFiles": [
+        "database/migrations/archive/083_alevel_biology_questions.sql"
+      ],
+      "mappingGroups": [
+        {
+          "topicId": "topic_alevel_bio_cells",
+          "sourceFiles": [
+            "database/migrations/archive/083_alevel_biology_questions.sql"
+          ],
+          "sourceSections": [
+            "Cell Structure and Ultrastructure",
+            "Biological Molecules",
+            "Cell Division"
+          ],
+          "evidence": "Reviewed organelle, microscopy, protein, enzyme and mitosis questions.",
+          "questionIds": [
+            "q_alevel_bio_001",
+            "q_alevel_bio_002",
+            "q_alevel_bio_003",
+            "q_alevel_bio_004",
+            "q_alevel_bio_005",
+            "q_alevel_bio_006",
+            "q_alevel_bio_007",
+            "q_alevel_bio_010"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_bio_membranes",
+          "sourceFiles": [
+            "database/migrations/archive/083_alevel_biology_questions.sql"
+          ],
+          "sourceSections": [
+            "Gas Exchange"
+          ],
+          "evidence": "Reviewed haemoglobin oxygen-transport and Bohr-effect questions.",
+          "questionIds": [
+            "q_alevel_bio_013",
+            "q_alevel_bio_014"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_bio_metabolism",
+          "sourceFiles": [
+            "database/migrations/archive/083_alevel_biology_questions.sql"
+          ],
+          "sourceSections": [
+            "Photosynthesis",
+            "Respiration"
+          ],
+          "evidence": "Reviewed light-dependent, Calvin-cycle, NAD and ATP-yield questions.",
+          "questionIds": [
+            "q_alevel_bio_033",
+            "q_alevel_bio_034",
+            "q_alevel_bio_035",
+            "q_alevel_bio_036"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_bio_genetics",
+          "sourceFiles": [
+            "database/migrations/archive/083_alevel_biology_questions.sql"
+          ],
+          "sourceSections": [
+            "Nucleic Acids",
+            "Cell Division",
+            "Genetics and Inheritance",
+            "Evolution"
+          ],
+          "evidence": "Reviewed DNA/RNA, meiosis, transcription, inheritance, selection, drift and speciation questions.",
+          "questionIds": [
+            "q_alevel_bio_008",
+            "q_alevel_bio_009",
+            "q_alevel_bio_011",
+            "q_alevel_bio_012",
+            "q_alevel_bio_015",
+            "q_alevel_bio_016",
+            "q_alevel_bio_017",
+            "q_alevel_bio_018",
+            "q_alevel_bio_030",
+            "q_alevel_bio_031",
+            "q_alevel_bio_032"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_bio_homeostasis",
+          "sourceFiles": [
+            "database/migrations/archive/083_alevel_biology_questions.sql"
+          ],
+          "sourceSections": [
+            "Homeostasis",
+            "Nervous System"
+          ],
+          "evidence": "Reviewed glucose/osmotic control, kidney and neuronal-control questions.",
+          "questionIds": [
+            "q_alevel_bio_019",
+            "q_alevel_bio_020",
+            "q_alevel_bio_021",
+            "q_alevel_bio_022",
+            "q_alevel_bio_023",
+            "q_alevel_bio_024"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_bio_biotech",
+          "sourceFiles": [
+            "database/migrations/archive/083_alevel_biology_questions.sql"
+          ],
+          "sourceSections": [
+            "Biotechnology"
+          ],
+          "evidence": "Contiguous reviewed PCR, electrophoresis, restriction-enzyme and CRISPR source block.",
+          "questionIds": [
+            "q_alevel_bio_037",
+            "q_alevel_bio_038",
+            "q_alevel_bio_039",
+            "q_alevel_bio_040"
+          ]
+        }
+      ],
+      "mappedQuestionCount": 35,
+      "exceptionCount": 5,
+      "topicCounts": {
+        "topic_alevel_bio_cells": 8,
+        "topic_alevel_bio_membranes": 2,
+        "topic_alevel_bio_metabolism": 4,
+        "topic_alevel_bio_genetics": 11,
+        "topic_alevel_bio_homeostasis": 6,
+        "topic_alevel_bio_biotech": 4
+      },
+      "mappedQuestionIds": [
+        "q_alevel_bio_001",
+        "q_alevel_bio_002",
+        "q_alevel_bio_003",
+        "q_alevel_bio_004",
+        "q_alevel_bio_005",
+        "q_alevel_bio_006",
+        "q_alevel_bio_007",
+        "q_alevel_bio_008",
+        "q_alevel_bio_009",
+        "q_alevel_bio_010",
+        "q_alevel_bio_011",
+        "q_alevel_bio_012",
+        "q_alevel_bio_013",
+        "q_alevel_bio_014",
+        "q_alevel_bio_015",
+        "q_alevel_bio_016",
+        "q_alevel_bio_017",
+        "q_alevel_bio_018",
+        "q_alevel_bio_019",
+        "q_alevel_bio_020",
+        "q_alevel_bio_021",
+        "q_alevel_bio_022",
+        "q_alevel_bio_023",
+        "q_alevel_bio_024",
+        "q_alevel_bio_030",
+        "q_alevel_bio_031",
+        "q_alevel_bio_032",
+        "q_alevel_bio_033",
+        "q_alevel_bio_034",
+        "q_alevel_bio_035",
+        "q_alevel_bio_036",
+        "q_alevel_bio_037",
+        "q_alevel_bio_038",
+        "q_alevel_bio_039",
+        "q_alevel_bio_040"
+      ],
+      "exceptionQuestionIds": [
+        "q_alevel_bio_025",
+        "q_alevel_bio_026",
+        "q_alevel_bio_027",
+        "q_alevel_bio_028",
+        "q_alevel_bio_029"
+      ]
+    },
+    {
+      "subjectId": "subj_alevel_math",
+      "subjectName": "Mathematics",
+      "syllabusCode": "9709",
+      "expectedQuestionCount": 55,
+      "sourceFiles": [
+        "database/migrations/archive/082_alevel_mathematics_questions.sql"
+      ],
+      "mappingGroups": [
+        {
+          "topicId": "topic_alevel_math_algebra",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_mathematics_questions.sql"
+          ],
+          "sourceSections": [
+            "Algebra & Functions",
+            "Further Algebra"
+          ],
+          "evidence": "Reviewed quadratics, polynomials, functions and partial-fraction questions.",
+          "questionIds": [
+            "q_alevel_math_001",
+            "q_alevel_math_002",
+            "q_alevel_math_003",
+            "q_alevel_math_004",
+            "q_alevel_math_005",
+            "q_alevel_math_006",
+            "q_alevel_math_007",
+            "q_alevel_math_008",
+            "q_alevel_math_027"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_math_coord",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_mathematics_questions.sql"
+          ],
+          "sourceSections": [
+            "Coordinate Geometry"
+          ],
+          "evidence": "Contiguous reviewed straight-line and circle source block.",
+          "questionIds": [
+            "q_alevel_math_009",
+            "q_alevel_math_010",
+            "q_alevel_math_011",
+            "q_alevel_math_012"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_math_sequences",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_mathematics_questions.sql"
+          ],
+          "sourceSections": [
+            "Further Algebra"
+          ],
+          "evidence": "Reviewed generalized binomial-expansion source question.",
+          "questionIds": [
+            "q_alevel_math_028"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_math_trig",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_mathematics_questions.sql"
+          ],
+          "sourceSections": [
+            "Trigonometry",
+            "Additional Pure Mathematics"
+          ],
+          "evidence": "Reviewed radians, identities, equations and trigonometric differentiation questions.",
+          "questionIds": [
+            "q_alevel_math_013",
+            "q_alevel_math_014",
+            "q_alevel_math_015",
+            "q_alevel_math_016",
+            "q_alevel_math_053"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_math_logs",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_mathematics_questions.sql"
+          ],
+          "sourceSections": [
+            "Further Algebra"
+          ],
+          "evidence": "Reviewed logarithm and exponential questions.",
+          "questionIds": [
+            "q_alevel_math_029",
+            "q_alevel_math_030"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_math_calculus",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_mathematics_questions.sql"
+          ],
+          "sourceSections": [
+            "Calculus (Differentiation)",
+            "Calculus (Integration)",
+            "Additional Pure Mathematics"
+          ],
+          "evidence": "Reviewed differentiation, integration and area questions.",
+          "questionIds": [
+            "q_alevel_math_017",
+            "q_alevel_math_018",
+            "q_alevel_math_019",
+            "q_alevel_math_020",
+            "q_alevel_math_021",
+            "q_alevel_math_022",
+            "q_alevel_math_023",
+            "q_alevel_math_024",
+            "q_alevel_math_025",
+            "q_alevel_math_026",
+            "q_alevel_math_054",
+            "q_alevel_math_055"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_math_vectors",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_mathematics_questions.sql"
+          ],
+          "sourceSections": [
+            "Vectors"
+          ],
+          "evidence": "Contiguous reviewed three-dimensional vector source block.",
+          "questionIds": [
+            "q_alevel_math_033",
+            "q_alevel_math_034",
+            "q_alevel_math_035",
+            "q_alevel_math_036"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_math_mechanics",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_mathematics_questions.sql"
+          ],
+          "sourceSections": [
+            "Mechanics - Kinematics",
+            "Mechanics - Forces and Newtons Laws"
+          ],
+          "evidence": "Reviewed kinematics, force, friction, connected-particle and equilibrium questions.",
+          "questionIds": [
+            "q_alevel_math_037",
+            "q_alevel_math_038",
+            "q_alevel_math_039",
+            "q_alevel_math_040",
+            "q_alevel_math_041",
+            "q_alevel_math_042",
+            "q_alevel_math_043",
+            "q_alevel_math_044"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_math_stats",
+          "sourceFiles": [
+            "database/migrations/archive/082_alevel_mathematics_questions.sql"
+          ],
+          "sourceSections": [
+            "Statistics - Probability",
+            "Statistics - Distributions"
+          ],
+          "evidence": "Reviewed probability, binomial, normal and Poisson-distribution questions.",
+          "questionIds": [
+            "q_alevel_math_045",
+            "q_alevel_math_046",
+            "q_alevel_math_047",
+            "q_alevel_math_048",
+            "q_alevel_math_049",
+            "q_alevel_math_050",
+            "q_alevel_math_051",
+            "q_alevel_math_052"
+          ]
+        }
+      ],
+      "mappedQuestionCount": 53,
+      "exceptionCount": 2,
+      "topicCounts": {
+        "topic_alevel_math_algebra": 9,
+        "topic_alevel_math_coord": 4,
+        "topic_alevel_math_sequences": 1,
+        "topic_alevel_math_trig": 5,
+        "topic_alevel_math_logs": 2,
+        "topic_alevel_math_calculus": 12,
+        "topic_alevel_math_vectors": 4,
+        "topic_alevel_math_mechanics": 8,
+        "topic_alevel_math_stats": 8
+      },
+      "mappedQuestionIds": [
+        "q_alevel_math_001",
+        "q_alevel_math_002",
+        "q_alevel_math_003",
+        "q_alevel_math_004",
+        "q_alevel_math_005",
+        "q_alevel_math_006",
+        "q_alevel_math_007",
+        "q_alevel_math_008",
+        "q_alevel_math_009",
+        "q_alevel_math_010",
+        "q_alevel_math_011",
+        "q_alevel_math_012",
+        "q_alevel_math_013",
+        "q_alevel_math_014",
+        "q_alevel_math_015",
+        "q_alevel_math_016",
+        "q_alevel_math_017",
+        "q_alevel_math_018",
+        "q_alevel_math_019",
+        "q_alevel_math_020",
+        "q_alevel_math_021",
+        "q_alevel_math_022",
+        "q_alevel_math_023",
+        "q_alevel_math_024",
+        "q_alevel_math_025",
+        "q_alevel_math_026",
+        "q_alevel_math_027",
+        "q_alevel_math_028",
+        "q_alevel_math_029",
+        "q_alevel_math_030",
+        "q_alevel_math_033",
+        "q_alevel_math_034",
+        "q_alevel_math_035",
+        "q_alevel_math_036",
+        "q_alevel_math_037",
+        "q_alevel_math_038",
+        "q_alevel_math_039",
+        "q_alevel_math_040",
+        "q_alevel_math_041",
+        "q_alevel_math_042",
+        "q_alevel_math_043",
+        "q_alevel_math_044",
+        "q_alevel_math_045",
+        "q_alevel_math_046",
+        "q_alevel_math_047",
+        "q_alevel_math_048",
+        "q_alevel_math_049",
+        "q_alevel_math_050",
+        "q_alevel_math_051",
+        "q_alevel_math_052",
+        "q_alevel_math_053",
+        "q_alevel_math_054",
+        "q_alevel_math_055"
+      ],
+      "exceptionQuestionIds": [
+        "q_alevel_math_031",
+        "q_alevel_math_032"
+      ]
+    },
+    {
+      "subjectId": "subj_alevel_further_math",
+      "subjectName": "Further Mathematics",
+      "syllabusCode": "9231",
+      "expectedQuestionCount": 55,
+      "sourceFiles": [
+        "database/migrations/archive/084_alevel_further_math_questions.sql"
+      ],
+      "mappingGroups": [
+        {
+          "topicId": "topic_alevel_fmath_complex",
+          "sourceFiles": [
+            "database/migrations/archive/084_alevel_further_math_questions.sql"
+          ],
+          "sourceSections": [
+            "Complex Numbers"
+          ],
+          "evidence": "Contiguous reviewed complex-number source block.",
+          "questionIds": [
+            "q_alevel_fm_001",
+            "q_alevel_fm_002",
+            "q_alevel_fm_003",
+            "q_alevel_fm_004",
+            "q_alevel_fm_005",
+            "q_alevel_fm_006",
+            "q_alevel_fm_007",
+            "q_alevel_fm_008"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_fmath_matrices",
+          "sourceFiles": [
+            "database/migrations/archive/084_alevel_further_math_questions.sql"
+          ],
+          "sourceSections": [
+            "Matrices"
+          ],
+          "evidence": "Contiguous reviewed matrices and linear-transformations source block.",
+          "questionIds": [
+            "q_alevel_fm_009",
+            "q_alevel_fm_010",
+            "q_alevel_fm_011",
+            "q_alevel_fm_012",
+            "q_alevel_fm_013",
+            "q_alevel_fm_014"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_fmath_polar",
+          "sourceFiles": [
+            "database/migrations/archive/084_alevel_further_math_questions.sql"
+          ],
+          "sourceSections": [
+            "Polar Coordinates",
+            "Hyperbolic Functions"
+          ],
+          "evidence": "Reviewed polar-coordinate and hyperbolic-function questions.",
+          "questionIds": [
+            "q_alevel_fm_015",
+            "q_alevel_fm_016",
+            "q_alevel_fm_017",
+            "q_alevel_fm_018",
+            "q_alevel_fm_019",
+            "q_alevel_fm_020",
+            "q_alevel_fm_021",
+            "q_alevel_fm_022"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_fmath_diffeq",
+          "sourceFiles": [
+            "database/migrations/archive/084_alevel_further_math_questions.sql"
+          ],
+          "sourceSections": [
+            "Differential Equations"
+          ],
+          "evidence": "Contiguous reviewed differential-equations source block.",
+          "questionIds": [
+            "q_alevel_fm_023",
+            "q_alevel_fm_024",
+            "q_alevel_fm_025",
+            "q_alevel_fm_026",
+            "q_alevel_fm_027"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_fmath_mechanics",
+          "sourceFiles": [
+            "database/migrations/archive/084_alevel_further_math_questions.sql"
+          ],
+          "sourceSections": [
+            "Circular Motion",
+            "Simple Harmonic Motion"
+          ],
+          "evidence": "Reviewed further circular-motion and SHM questions.",
+          "questionIds": [
+            "q_alevel_fm_028",
+            "q_alevel_fm_029",
+            "q_alevel_fm_030",
+            "q_alevel_fm_031",
+            "q_alevel_fm_032",
+            "q_alevel_fm_033"
+          ]
+        },
+        {
+          "topicId": "topic_alevel_fmath_stats",
+          "sourceFiles": [
+            "database/migrations/archive/084_alevel_further_math_questions.sql"
+          ],
+          "sourceSections": [
+            "Probability Distributions"
+          ],
+          "evidence": "Contiguous reviewed probability-distributions source block.",
+          "questionIds": [
+            "q_alevel_fm_034",
+            "q_alevel_fm_035",
+            "q_alevel_fm_036",
+            "q_alevel_fm_037"
+          ]
+        }
+      ],
+      "mappedQuestionCount": 37,
+      "exceptionCount": 18,
+      "topicCounts": {
+        "topic_alevel_fmath_complex": 8,
+        "topic_alevel_fmath_matrices": 6,
+        "topic_alevel_fmath_polar": 8,
+        "topic_alevel_fmath_diffeq": 5,
+        "topic_alevel_fmath_mechanics": 6,
+        "topic_alevel_fmath_stats": 4
+      },
+      "mappedQuestionIds": [
+        "q_alevel_fm_001",
+        "q_alevel_fm_002",
+        "q_alevel_fm_003",
+        "q_alevel_fm_004",
+        "q_alevel_fm_005",
+        "q_alevel_fm_006",
+        "q_alevel_fm_007",
+        "q_alevel_fm_008",
+        "q_alevel_fm_009",
+        "q_alevel_fm_010",
+        "q_alevel_fm_011",
+        "q_alevel_fm_012",
+        "q_alevel_fm_013",
+        "q_alevel_fm_014",
+        "q_alevel_fm_015",
+        "q_alevel_fm_016",
+        "q_alevel_fm_017",
+        "q_alevel_fm_018",
+        "q_alevel_fm_019",
+        "q_alevel_fm_020",
+        "q_alevel_fm_021",
+        "q_alevel_fm_022",
+        "q_alevel_fm_023",
+        "q_alevel_fm_024",
+        "q_alevel_fm_025",
+        "q_alevel_fm_026",
+        "q_alevel_fm_027",
+        "q_alevel_fm_028",
+        "q_alevel_fm_029",
+        "q_alevel_fm_030",
+        "q_alevel_fm_031",
+        "q_alevel_fm_032",
+        "q_alevel_fm_033",
+        "q_alevel_fm_034",
+        "q_alevel_fm_035",
+        "q_alevel_fm_036",
+        "q_alevel_fm_037"
+      ],
+      "exceptionQuestionIds": [
+        "q_alevel_fm_038",
+        "q_alevel_fm_039",
+        "q_alevel_fm_040",
+        "q_alevel_fm_041",
+        "q_alevel_fm_042",
+        "q_alevel_fm_043",
+        "q_alevel_fm_044",
+        "q_alevel_fm_045",
+        "q_alevel_fm_046",
+        "q_alevel_fm_047",
+        "q_alevel_fm_048",
+        "q_alevel_fm_049",
+        "q_alevel_fm_050",
+        "q_alevel_fm_051",
+        "q_alevel_fm_052",
+        "q_alevel_fm_053",
+        "q_alevel_fm_054",
+        "q_alevel_fm_055"
+      ]
+    }
+  ]
+}

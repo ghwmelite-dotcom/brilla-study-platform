@@ -22,6 +22,30 @@ const authHandler: MockHandler = {
   first: () => ({ role: 'student', status: 'approved', is_active: 1 }),
 };
 
+async function boundSessionId(questionIds: string[]): Promise<string> {
+  const payload = btoa(JSON.stringify({ sessionId: 'sess_1', questionIds }))
+    .split('+').join('-')
+    .split('/').join('_')
+    .replace(/=+$/u, '');
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(JWT_SECRET),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const signatureBytes = new Uint8Array(
+    await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payload)),
+  );
+  let binary = '';
+  for (const byte of signatureBytes) binary += String.fromCharCode(byte);
+  const signature = btoa(binary)
+    .split('+').join('-')
+    .split('/').join('_')
+    .replace(/=+$/u, '');
+  return `qps1.${payload}.${signature}`;
+}
+
 describe('XP awards use the real users.xp_points column', () => {
   it('POST /api/quickplay/submit awards XP via UPDATE users SET xp_points = xp_points + ?', async () => {
     const db = createMockD1([
@@ -36,7 +60,7 @@ describe('XP awards use the real users.xp_points column', () => {
         }),
       },
       {
-        match: /SELECT id, correct_answer, explanation FROM questions/,
+        match: /SELECT q.id, q.correct_answer, q.explanation/,
         all: () => ({ results: [{ id: 'q1', correct_answer: 'A', explanation: 'because' }] }),
       },
       {
@@ -60,7 +84,7 @@ describe('XP awards use the real users.xp_points column', () => {
         method: 'POST',
         headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sessionId: 'sess_1',
+          sessionId: await boundSessionId(['q1']),
           answers: [{ questionId: 'q1', answer: 'A' }],
           timeTaken: 15000,
         }),

@@ -313,7 +313,71 @@ describe('Counselor Brie route contracts', () => {
     const payload = JSON.parse(text) as { data: { sessionId: string; version: number; nextQuestion: { id: string } } };
     expect(payload.data).toMatchObject({ sessionId: 'gs_1', version: 3 });
     expect(payload.data.nextQuestion.id).toBe('q_1');
+    const questionLookup = db.calls.find((call) => /WHERE q\.id = \?/.test(call.sql));
+    expect(questionLookup?.sql).toMatch(
+      /JOIN topics t ON t\.id = q\.topic_id AND t\.subject_id = q\.subject_id/,
+    );
+    expect(questionLookup?.sql).toMatch(
+      /JOIN subjects s ON s\.id = q\.subject_id AND s\.is_active = 1/,
+    );
     expect(db.calls.some((call) => /INSERT INTO guidance_sessions/.test(call.sql))).toBe(false);
+  });
+
+  it('fails closed when an active assessment references either quarantined NSMQ riddle', async () => {
+    for (const quarantinedId of ['nsmq_phy_rid_001', 'nsmq_phy_rid_003']) {
+      const envelope = JSON.stringify({
+        asked: [], topicQueue: [], currentDifficulty: 'medium',
+        pendingQuestionId: quarantinedId, pendingOrdinal: 0,
+      });
+      const db = createMockD1([
+        authHandler,
+        subjectHandler,
+        {
+          match: /SELECT \* FROM guidance_sessions/,
+          first: () => ({
+            id: 'gs_quarantine', user_id: 'user_1', exam_type: 'wassce', subject_id: 'subject_1',
+            status: 'in_progress', version: 4, algorithm_version: 'brie-readiness-v1',
+            questions: envelope, readiness_score: null, completed_early: 0,
+            created_at: '2026-08-14T00:00:00Z', updated_at: '2026-08-14T00:00:00Z',
+            completed_at: null,
+          }),
+        },
+        { match: /WHERE q\.id = \?/, first: () => null },
+        {
+          match: /SELECT COUNT\(\*\) AS count, MAX\(qa\.created_at\) AS freshness/,
+          first: () => ({ count: 0, freshness: null }),
+        },
+        {
+          match: /COUNT\(DISTINCT t\.id\) AS total/,
+          first: () => ({ total: 0, covered: 0 }),
+        },
+        { match: /UPDATE guidance_sessions SET status = 'completed'/ },
+        {
+          match: /SELECT t\.id, COALESCE\(up\.mastery_level, 0\) AS mastery_level/,
+          all: () => ({ results: [] }),
+        },
+        { match: /INSERT INTO exam_readiness/ },
+      ]);
+
+      const response = await guidanceRequest(db, '/assessment/start', {
+        method: 'POST', body: JSON.stringify({ examType: 'wassce', subjectId: 'subject_1' }),
+      });
+
+      expect(response.status).toBe(200);
+      const text = await response.text();
+      expect(text).not.toContain(quarantinedId);
+      const payload = JSON.parse(text) as { data: { nextQuestion?: unknown; done?: unknown } };
+      expect(payload.data.nextQuestion).toBeUndefined();
+      expect(payload.data.done).toBeDefined();
+
+      const lookup = db.calls.find((call) => call.binds[0] === quarantinedId);
+      expect(lookup?.sql).toMatch(
+        /JOIN topics t ON t\.id = q\.topic_id AND t\.subject_id = q\.subject_id/,
+      );
+      expect(lookup?.sql).toMatch(
+        /JOIN subjects s ON s\.id = q\.subject_id AND s\.is_active = 1/,
+      );
+    }
   });
 
 

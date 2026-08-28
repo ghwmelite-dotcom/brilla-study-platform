@@ -1,0 +1,1510 @@
+{
+  "batchId": "bece-math-sets-beta-001",
+  "status": "approved_for_beta",
+  "examTypeId": "exam_bece",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment, Ghana",
+      "title": "Common Core Programme curricula for Junior High School",
+      "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-08-26T00:00:00Z",
+    "semanticDuplicateReview": {
+      "method": "human_cross_level_review_plus_normalized_and_token_overlap_gates",
+      "rewrittenPairs": [
+        {
+          "questionId": "q_bece_bdt_gap_b001_004",
+          "priorQuestionId": "q_was_building_b003_018"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_005",
+          "priorQuestionId": "q_was_building_b003_012"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_007",
+          "priorQuestionId": "q_was_building_b003_016"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_008",
+          "priorQuestionId": "q_was_building_b003_032"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_012",
+          "priorQuestionId": "q_was_building_b003_007"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_013",
+          "priorQuestionId": "q_was_building_b003_009"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_015",
+          "priorQuestionId": "q_was_elect_b001_037"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_017",
+          "priorQuestionId": "q_was_elect_b001_036"
+        },
+        {
+          "questionId": "q_bece_bdt_gap_b001_021",
+          "priorQuestionId": "q_was_elect_b001_001"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_007",
+          "priorQuestionId": "q_was_agric_b001_013"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_015",
+          "priorQuestionId": "q_was_agric_b001_014"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_019",
+          "priorQuestionId": "q_was_agric_b001_018"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_021",
+          "priorQuestionId": "q_was_agric_b001_017"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_034",
+          "priorQuestionId": "q_was_agric_b001_036"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_037",
+          "priorQuestionId": "q_was_agric_b001_004"
+        },
+        {
+          "questionId": "q_bece_science_agric_b001_039",
+          "priorQuestionId": "q_was_agric_b001_015"
+        }
+      ],
+      "unresolvedAllowedOverlaps": []
+    }
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep practice content aligned to Ghana’s published NaCCA Common Core Programme curricula; not official WAEC or NaCCA examination material.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true,
+    "rationaleAvailability": "manifest_only_runtime_question_schema_does_not_store_option_rationales"
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_bece_math",
+      "specificationCode": "NaCCA-CCP-MATH-SETS-2026",
+      "topics": [
+        {
+          "code": "MATH-SETS",
+          "title": "Sets",
+          "objective": "Represent, compare and combine finite sets using notation, descriptions and Venn diagrams."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_bece_math_sets_b001_001",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Which notation states that 5 is an element of set A?",
+          "options": [
+            {
+              "label": "A",
+              "text": "5 ∈ A",
+              "rationale": "This option is correct. The symbol ∈ means “is an element of,” so 5 ∈ A states that the object 5 belongs to the collection called set A."
+            },
+            {
+              "label": "B",
+              "text": "5 ⊂ A",
+              "rationale": "A learner choosing “5 ⊂ A” would be relying on the wrong criterion. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “5 ∈ A” is defensible because the symbol ∈ means “is an element of,” so 5 ∈ A states that the object 5 belongs to the collection called set A."
+            },
+            {
+              "label": "C",
+              "text": "5 ∉ A",
+              "rationale": "Treating “5 ∉ A” as correct overlooks the decisive condition. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “5 ∈ A” is defensible because the symbol ∈ means “is an element of,” so 5 ∈ A states that the object 5 belongs to the collection called set A."
+            },
+            {
+              "label": "D",
+              "text": "A ∈ 5",
+              "rationale": "A learner choosing “A ∈ 5” would be relying on the wrong criterion. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “5 ∈ A” is defensible because the symbol ∈ means “is an element of,” so 5 ∈ A states that the object 5 belongs to the collection called set A."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The symbol ∈ means “is an element of,” so 5 ∈ A states that the object 5 belongs to the collection called set A. Therefore the correct answer is A: 5 ∈ A.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_math_sets_b001_002",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "If B = {2, 4, 6, 8}, what is n(B)?",
+          "options": [
+            {
+              "label": "A",
+              "text": "2",
+              "rationale": "The proposed answer “2” cannot be reconciled with the stated conditions. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “4” is defensible because cardinality n(B) counts distinct elements. The listed elements are 2, 4, 6 and 8, so the set contains four elements."
+            },
+            {
+              "label": "B",
+              "text": "8",
+              "rationale": "Accepting “8” would bypass the reasoning the item requires. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “4” is defensible because cardinality n(B) counts distinct elements. The listed elements are 2, 4, 6 and 8, so the set contains four elements."
+            },
+            {
+              "label": "C",
+              "text": "20",
+              "rationale": "The option “20” describes a different outcome from the one supported by the evidence. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “4” is defensible because cardinality n(B) counts distinct elements. The listed elements are 2, 4, 6 and 8, so the set contains four elements."
+            },
+            {
+              "label": "D",
+              "text": "4",
+              "rationale": "This option is correct. Cardinality n(B) counts distinct elements. The listed elements are 2, 4, 6 and 8, so the set contains four elements."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Cardinality n(B) counts distinct elements. The listed elements are 2, 4, 6 and 8, so the set contains four elements. Therefore the correct answer is D: 4.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_math_sets_b001_003",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Which roster lists odd whole numbers below 10?",
+          "options": [
+            {
+              "label": "A",
+              "text": "{2, 4, 6, 8}",
+              "rationale": "The response “{2, 4, 6, 8}” points to the wrong property. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{1, 3, 5, 7, 9}” is defensible because odd whole numbers are not divisible by 2. Below 10 they are exactly 1, 3, 5, 7 and 9."
+            },
+            {
+              "label": "B",
+              "text": "{1, 3, 5, 7, 9}",
+              "rationale": "This option is correct. Odd whole numbers are not divisible by 2. Below 10 they are exactly 1, 3, 5, 7 and 9."
+            },
+            {
+              "label": "C",
+              "text": "{1, 2, 3, 4, 5}",
+              "rationale": "Using “{1, 2, 3, 4, 5}” would apply the concept in the wrong context. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{1, 3, 5, 7, 9}” is defensible because odd whole numbers are not divisible by 2. Below 10 they are exactly 1, 3, 5, 7 and 9."
+            },
+            {
+              "label": "D",
+              "text": "{3, 6, 9}",
+              "rationale": "Treating “{3, 6, 9}” as correct overlooks the decisive condition. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{1, 3, 5, 7, 9}” is defensible because odd whole numbers are not divisible by 2. Below 10 they are exactly 1, 3, 5, 7 and 9."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Odd whole numbers are not divisible by 2. Below 10 they are exactly 1, 3, 5, 7 and 9. Therefore the correct answer is B: {1, 3, 5, 7, 9}.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_math_sets_b001_004",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "What is the empty set?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A set containing zero",
+              "rationale": "That choice, “A set containing zero”, substitutes a distractor feature for the tested principle. It assigns the wrong cause, direction, or consequence to the process, reversing the practical relationship described. By contrast, “A set containing no elements” is defensible because the empty set has cardinality zero and is written ∅ or { }. The set {0} differs because it contains one element."
+            },
+            {
+              "label": "B",
+              "text": "A set containing no elements",
+              "rationale": "This option is correct. The empty set has cardinality zero and is written ∅ or { }. The set {0} differs because it contains one element."
+            },
+            {
+              "label": "C",
+              "text": "A set containing everything",
+              "rationale": "Treating “A set containing everything” as correct overlooks the decisive condition. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A set containing no elements” is defensible because the empty set has cardinality zero and is written ∅ or { }. The set {0} differs because it contains one element."
+            },
+            {
+              "label": "D",
+              "text": "A set with duplicate entries",
+              "rationale": "Here, “A set with duplicate entries” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A set containing no elements” is defensible because the empty set has cardinality zero and is written ∅ or { }. The set {0} differs because it contains one element."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The empty set has cardinality zero and is written ∅ or { }. The set {0} differs because it contains one element. Therefore the correct answer is B: A set containing no elements.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Define",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_math_sets_b001_005",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Given A = {1, 2} and B = {1, 2, 3}, which is true?",
+          "options": [
+            {
+              "label": "A",
+              "text": "B is a subset of A",
+              "rationale": "Using “B is a subset of A” would apply the concept in the wrong context. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “A is a proper subset of B” is defensible because every element of A occurs in B and B has the additional element 3, so A is a proper subset of B."
+            },
+            {
+              "label": "B",
+              "text": "A and B are disjoint",
+              "rationale": "The option “A and B are disjoint” describes a different outcome from the one supported by the evidence. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A is a proper subset of B” is defensible because every element of A occurs in B and B has the additional element 3, so A is a proper subset of B."
+            },
+            {
+              "label": "C",
+              "text": "A has more elements",
+              "rationale": "The proposed answer “A has more elements” cannot be reconciled with the stated conditions. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “A is a proper subset of B” is defensible because every element of A occurs in B and B has the additional element 3, so A is a proper subset of B."
+            },
+            {
+              "label": "D",
+              "text": "A is a proper subset of B",
+              "rationale": "This option is correct. Every element of A occurs in B and B has the additional element 3, so A is a proper subset of B."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Every element of A occurs in B and B has the additional element 3, so A is a proper subset of B. Therefore the correct answer is D: A is a proper subset of B.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_006",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "What is the intersection of P = {a, b, c} and Q = {b, c, d}?",
+          "options": [
+            {
+              "label": "A",
+              "text": "{b, c}",
+              "rationale": "This option is correct. Intersection contains elements common to both sets. Only b and c appear in both P and Q."
+            },
+            {
+              "label": "B",
+              "text": "{a, d}",
+              "rationale": "Choosing “{a, d}” follows a different rule from the one required here. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{b, c}” is defensible because intersection contains elements common to both sets. Only b and c appear in both P and Q."
+            },
+            {
+              "label": "C",
+              "text": "{a, b, c, d}",
+              "rationale": "The option “{a, b, c, d}” describes a different outcome from the one supported by the evidence. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{b, c}” is defensible because intersection contains elements common to both sets. Only b and c appear in both P and Q."
+            },
+            {
+              "label": "D",
+              "text": "{b, c, d}",
+              "rationale": "A learner choosing “{b, c, d}” would be relying on the wrong criterion. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{b, c}” is defensible because intersection contains elements common to both sets. Only b and c appear in both P and Q."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Intersection contains elements common to both sets. Only b and c appear in both P and Q. Therefore the correct answer is A: {b, c}.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_math_sets_b001_007",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "What is the union of P = {a, b, c} and Q = {b, c, d}?",
+          "options": [
+            {
+              "label": "A",
+              "text": "{b, c}",
+              "rationale": "A learner choosing “{b, c}” would be relying on the wrong criterion. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{a, b, c, d}” is defensible because union includes every distinct element appearing in either set, with repeated elements written only once."
+            },
+            {
+              "label": "B",
+              "text": "{a, d}",
+              "rationale": "That choice, “{a, d}”, substitutes a distractor feature for the tested principle. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{a, b, c, d}” is defensible because union includes every distinct element appearing in either set, with repeated elements written only once."
+            },
+            {
+              "label": "C",
+              "text": "{a, b, c, d}",
+              "rationale": "This option is correct. Union includes every distinct element appearing in either set, with repeated elements written only once."
+            },
+            {
+              "label": "D",
+              "text": "{a, b, c, b, c, d}",
+              "rationale": "Here, “{a, b, c, b, c, d}” represents the misconception rather than the valid conclusion. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{a, b, c, d}” is defensible because union includes every distinct element appearing in either set, with repeated elements written only once."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Union includes every distinct element appearing in either set, with repeated elements written only once. Therefore the correct answer is C: {a, b, c, d}.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_math_sets_b001_008",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Two sets have no common element. How are they described?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Equivalent fractions",
+              "rationale": "The response “Equivalent fractions” points to the wrong property. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Disjoint sets” is defensible because disjoint sets have an empty intersection, written A ∩ B = ∅, because no object belongs to both sets."
+            },
+            {
+              "label": "B",
+              "text": "Universal sets",
+              "rationale": "Here, “Universal sets” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Disjoint sets” is defensible because disjoint sets have an empty intersection, written A ∩ B = ∅, because no object belongs to both sets."
+            },
+            {
+              "label": "C",
+              "text": "Improper subsets",
+              "rationale": "Selecting “Improper subsets” misclassifies the idea being tested. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “Disjoint sets” is defensible because disjoint sets have an empty intersection, written A ∩ B = ∅, because no object belongs to both sets."
+            },
+            {
+              "label": "D",
+              "text": "Disjoint sets",
+              "rationale": "This option is correct. Disjoint sets have an empty intersection, written A ∩ B = ∅, because no object belongs to both sets."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Disjoint sets have an empty intersection, written A ∩ B = ∅, because no object belongs to both sets. Therefore the correct answer is D: Disjoint sets.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_math_sets_b001_009",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Let U = {1, 2, 3, 4, 5} and A = {2, 4}. What is A′?",
+          "options": [
+            {
+              "label": "A",
+              "text": "{2, 4}",
+              "rationale": "Here, “{2, 4}” represents the misconception rather than the valid conclusion. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{1, 3, 5}” is defensible because the complement contains elements of U not in A. Removing 2 and 4 leaves 1, 3 and 5."
+            },
+            {
+              "label": "B",
+              "text": "{1, 2, 3, 4, 5}",
+              "rationale": "The response “{1, 2, 3, 4, 5}” points to the wrong property. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{1, 3, 5}” is defensible because the complement contains elements of U not in A. Removing 2 and 4 leaves 1, 3 and 5."
+            },
+            {
+              "label": "C",
+              "text": "{1, 3, 5}",
+              "rationale": "This option is correct. The complement contains elements of U not in A. Removing 2 and 4 leaves 1, 3 and 5."
+            },
+            {
+              "label": "D",
+              "text": "{3, 5}",
+              "rationale": "The option “{3, 5}” describes a different outcome from the one supported by the evidence. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{1, 3, 5}” is defensible because the complement contains elements of U not in A. Removing 2 and 4 leaves 1, 3 and 5."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The complement contains elements of U not in A. Removing 2 and 4 leaves 1, 3 and 5. Therefore the correct answer is C: {1, 3, 5}.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_010",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "What role does a universal set play?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It contains one element",
+              "rationale": "Treating “It contains one element” as correct overlooks the decisive condition. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “It defines all elements considered in that context” is defensible because the universal set gives the complete domain, so complements and regions outside named subsets are interpreted relative to it."
+            },
+            {
+              "label": "B",
+              "text": "It defines all elements considered in that context",
+              "rationale": "This option is correct. The universal set gives the complete domain, so complements and regions outside named subsets are interpreted relative to it."
+            },
+            {
+              "label": "C",
+              "text": "It equals the empty set",
+              "rationale": "The proposed answer “It equals the empty set” cannot be reconciled with the stated conditions. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It defines all elements considered in that context” is defensible because the universal set gives the complete domain, so complements and regions outside named subsets are interpreted relative to it."
+            },
+            {
+              "label": "D",
+              "text": "It excludes named sets",
+              "rationale": "The claim “It excludes named sets” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It defines all elements considered in that context” is defensible because the universal set gives the complete domain, so complements and regions outside named subsets are interpreted relative to it."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The universal set gives the complete domain, so complements and regions outside named subsets are interpreted relative to it. Therefore the correct answer is B: It defines all elements considered in that context.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_011",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Which set-builder description represents exactly the natural numbers {2, 4, 6, 8, 10}?",
+          "options": [
+            {
+              "label": "A",
+              "text": "{x ∈ ℕ : x is even and 2 ≤ x ≤ 10}",
+              "rationale": "This option is correct. The listed values are precisely the even natural numbers from 2 through 10 inclusive, as the even-number condition states."
+            },
+            {
+              "label": "B",
+              "text": "{x ∈ ℕ : x is odd and x < 10}",
+              "rationale": "The proposed answer “{x ∈ ℕ : x is odd and x < 10}” cannot be reconciled with the stated conditions. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{x ∈ ℕ : x is even and 2 ≤ x ≤ 10}” is defensible because the listed values are precisely the even natural numbers from 2 through 10 inclusive, as the even-number condition states."
+            },
+            {
+              "label": "C",
+              "text": "{x ∈ ℕ : x is a multiple of 3 below 10}",
+              "rationale": "The response “{x ∈ ℕ : x is a multiple of 3 below 10}” points to the wrong property. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{x ∈ ℕ : x is even and 2 ≤ x ≤ 10}” is defensible because the listed values are precisely the even natural numbers from 2 through 10 inclusive, as the even-number condition states."
+            },
+            {
+              "label": "D",
+              "text": "{x ∈ ℕ : x is prime and x > 10}",
+              "rationale": "Choosing “{x ∈ ℕ : x is prime and x > 10}” follows a different rule from the one required here. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{x ∈ ℕ : x is even and 2 ≤ x ≤ 10}” is defensible because the listed values are precisely the even natural numbers from 2 through 10 inclusive, as the even-number condition states."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The listed values are precisely the even natural numbers from 2 through 10 inclusive, as the even-number condition states. Therefore the correct answer is A: {x ∈ ℕ : x is even and 2 ≤ x ≤ 10}.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Represent",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_012",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "If C = {red, blue, green}, which statement is false?",
+          "options": [
+            {
+              "label": "A",
+              "text": "yellow ∈ C",
+              "rationale": "This option is correct. The roster lists red, blue and green. Yellow is absent, so the claim that yellow belongs to C is false."
+            },
+            {
+              "label": "B",
+              "text": "red ∈ C",
+              "rationale": "The claim “red ∈ C” conflicts with the relationship described in the stem. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “yellow ∈ C” is defensible because the roster lists red, blue and green. Yellow is absent, so the claim that yellow belongs to C is false."
+            },
+            {
+              "label": "C",
+              "text": "blue ∈ C",
+              "rationale": "Selecting “blue ∈ C” misclassifies the idea being tested. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “yellow ∈ C” is defensible because the roster lists red, blue and green. Yellow is absent, so the claim that yellow belongs to C is false."
+            },
+            {
+              "label": "D",
+              "text": "green ∈ C",
+              "rationale": "The claim “green ∈ C” conflicts with the relationship described in the stem. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “yellow ∈ C” is defensible because the roster lists red, blue and green. Yellow is absent, so the claim that yellow belongs to C is false."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The roster lists red, blue and green. Yellow is absent, so the claim that yellow belongs to C is false. Therefore the correct answer is A: yellow ∈ C.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_math_sets_b001_013",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "If n(A)=18, n(B)=15 and n(A∩B)=7, find n(A∪B).",
+          "options": [
+            {
+              "label": "A",
+              "text": "33",
+              "rationale": "That choice, “33”, substitutes a distractor feature for the tested principle. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “26” is defensible because use n(A∪B)=n(A)+n(B)−n(A∩B). Thus 18+15−7=26 because overlap is not counted twice."
+            },
+            {
+              "label": "B",
+              "text": "40",
+              "rationale": "A learner choosing “40” would be relying on the wrong criterion. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “26” is defensible because use n(A∪B)=n(A)+n(B)−n(A∩B). Thus 18+15−7=26 because overlap is not counted twice."
+            },
+            {
+              "label": "C",
+              "text": "26",
+              "rationale": "This option is correct. Use n(A∪B)=n(A)+n(B)−n(A∩B). Thus 18+15−7=26 because overlap is not counted twice."
+            },
+            {
+              "label": "D",
+              "text": "10",
+              "rationale": "Here, “10” represents the misconception rather than the valid conclusion. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “26” is defensible because use n(A∪B)=n(A)+n(B)−n(A∩B). Thus 18+15−7=26 because overlap is not counted twice."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Use n(A∪B)=n(A)+n(B)−n(A∩B). Thus 18+15−7=26 because overlap is not counted twice. Therefore the correct answer is C: 26.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_014",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Twelve learners play football, nine play volleyball and four play both. How many play at least one?",
+          "options": [
+            {
+              "label": "A",
+              "text": "25",
+              "rationale": "Selecting “25” misclassifies the idea being tested. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “17” is defensible because subtract the overlap once because it appears in both totals: 12 + 9 − 4 = 17 learners."
+            },
+            {
+              "label": "B",
+              "text": "21",
+              "rationale": "Using “21” would apply the concept in the wrong context. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “17” is defensible because subtract the overlap once because it appears in both totals: 12 + 9 − 4 = 17 learners."
+            },
+            {
+              "label": "C",
+              "text": "8",
+              "rationale": "Using “8” would apply the concept in the wrong context. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “17” is defensible because subtract the overlap once because it appears in both totals: 12 + 9 − 4 = 17 learners."
+            },
+            {
+              "label": "D",
+              "text": "17",
+              "rationale": "This option is correct. Subtract the overlap once because it appears in both totals: 12 + 9 − 4 = 17 learners."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Subtract the overlap once because it appears in both totals: 12 + 9 − 4 = 17 learners. Therefore the correct answer is D: 17.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_015",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Where are elements belonging to both A and B placed in a Venn diagram?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Outside the universal rectangle",
+              "rationale": "Here, “Outside the universal rectangle” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The overlapping region” is defensible because the overlap represents intersection A ∩ B, so an element belonging to both sets must be placed there."
+            },
+            {
+              "label": "B",
+              "text": "The overlapping region",
+              "rationale": "This option is correct. The overlap represents intersection A ∩ B, so an element belonging to both sets must be placed there."
+            },
+            {
+              "label": "C",
+              "text": "The A-only region",
+              "rationale": "The option “The A-only region” describes a different outcome from the one supported by the evidence. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The overlapping region” is defensible because the overlap represents intersection A ∩ B, so an element belonging to both sets must be placed there."
+            },
+            {
+              "label": "D",
+              "text": "The B-only region",
+              "rationale": "Treating “The B-only region” as correct overlooks the decisive condition. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The overlapping region” is defensible because the overlap represents intersection A ∩ B, so an element belonging to both sets must be placed there."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The overlap represents intersection A ∩ B, so an element belonging to both sets must be placed there. Therefore the correct answer is B: The overlapping region.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_math_sets_b001_016",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "If A ⊆ B and x ∈ A, what must be true?",
+          "options": [
+            {
+              "label": "A",
+              "text": "x ∉ B",
+              "rationale": "The response “x ∉ B” points to the wrong property. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “x ∈ B” is defensible because a ⊆ B means every element of A is also an element of B, so x must belong to B."
+            },
+            {
+              "label": "B",
+              "text": "x ∈ B",
+              "rationale": "This option is correct. A ⊆ B means every element of A is also an element of B, so x must belong to B."
+            },
+            {
+              "label": "C",
+              "text": "B is empty",
+              "rationale": "The response “B is empty” points to the wrong property. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “x ∈ B” is defensible because a ⊆ B means every element of A is also an element of B, so x must belong to B."
+            },
+            {
+              "label": "D",
+              "text": "A and B are disjoint",
+              "rationale": "That choice, “A and B are disjoint”, substitutes a distractor feature for the tested principle. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “x ∈ B” is defensible because a ⊆ B means every element of A is also an element of B, so x must belong to B."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A ⊆ B means every element of A is also an element of B, so x must belong to B. Therefore the correct answer is B: x ∈ B.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Deduce",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_017",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "How many subsets does {p, q} have?",
+          "options": [
+            {
+              "label": "A",
+              "text": "4",
+              "rationale": "This option is correct. A set with n elements has 2ⁿ subsets. Here 2²=4: ∅, {p}, {q} and {p,q}."
+            },
+            {
+              "label": "B",
+              "text": "2",
+              "rationale": "Treating “2” as correct overlooks the decisive condition. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “4” is defensible because a set with n elements has 2ⁿ subsets. Here 2²=4: ∅, {p}, {q} and {p,q}."
+            },
+            {
+              "label": "C",
+              "text": "3",
+              "rationale": "Choosing “3” follows a different rule from the one required here. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “4” is defensible because a set with n elements has 2ⁿ subsets. Here 2²=4: ∅, {p}, {q} and {p,q}."
+            },
+            {
+              "label": "D",
+              "text": "8",
+              "rationale": "Choosing “8” follows a different rule from the one required here. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “4” is defensible because a set with n elements has 2ⁿ subsets. Here 2²=4: ∅, {p}, {q} and {p,q}."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A set with n elements has 2ⁿ subsets. Here 2²=4: ∅, {p}, {q} and {p,q}. Therefore the correct answer is A: 4.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_018",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Which set is a subset of every set?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The universal set",
+              "rationale": "Using “The universal set” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “The empty set” is defensible because the empty set has no member that can violate the subset condition, so it is a subset of every set."
+            },
+            {
+              "label": "B",
+              "text": "{0}",
+              "rationale": "The claim “{0}” conflicts with the relationship described in the stem. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “The empty set” is defensible because the empty set has no member that can violate the subset condition, so it is a subset of every set."
+            },
+            {
+              "label": "C",
+              "text": "The empty set",
+              "rationale": "This option is correct. The empty set has no member that can violate the subset condition, so it is a subset of every set."
+            },
+            {
+              "label": "D",
+              "text": "Every two-element set",
+              "rationale": "The response “Every two-element set” points to the wrong property. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “The empty set” is defensible because the empty set has no member that can violate the subset condition, so it is a subset of every set."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The empty set has no member that can violate the subset condition, so it is a subset of every set. Therefore the correct answer is C: The empty set.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_019",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "If M={1,2,3} and N={3,2,1}, how are they related?",
+          "options": [
+            {
+              "label": "A",
+              "text": "M is larger",
+              "rationale": "Accepting “M is larger” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “M = N” is defensible because order does not affect membership. Both rosters contain exactly the same distinct elements, so the sets are equal."
+            },
+            {
+              "label": "B",
+              "text": "They are disjoint",
+              "rationale": "A learner choosing “They are disjoint” would be relying on the wrong criterion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “M = N” is defensible because order does not affect membership. Both rosters contain exactly the same distinct elements, so the sets are equal."
+            },
+            {
+              "label": "C",
+              "text": "M is not a set",
+              "rationale": "A learner choosing “M is not a set” would be relying on the wrong criterion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “M = N” is defensible because order does not affect membership. Both rosters contain exactly the same distinct elements, so the sets are equal."
+            },
+            {
+              "label": "D",
+              "text": "M = N",
+              "rationale": "This option is correct. Order does not affect membership. Both rosters contain exactly the same distinct elements, so the sets are equal."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Order does not affect membership. Both rosters contain exactly the same distinct elements, so the sets are equal. Therefore the correct answer is D: M = N.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Compare",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_math_sets_b001_020",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "What does A \\ B represent?",
+          "options": [
+            {
+              "label": "A",
+              "text": "All elements in either set",
+              "rationale": "The option “All elements in either set” describes a different outcome from the one supported by the evidence. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “Elements in A that are not in B” is defensible because set difference starts with A and removes every element also belonging to B, leaving only A-only elements."
+            },
+            {
+              "label": "B",
+              "text": "Only common elements",
+              "rationale": "That choice, “Only common elements”, substitutes a distractor feature for the tested principle. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “Elements in A that are not in B” is defensible because set difference starts with A and removes every element also belonging to B, leaving only A-only elements."
+            },
+            {
+              "label": "C",
+              "text": "Elements in A that are not in B",
+              "rationale": "This option is correct. Set difference starts with A and removes every element also belonging to B, leaving only A-only elements."
+            },
+            {
+              "label": "D",
+              "text": "Elements outside both",
+              "rationale": "The proposed answer “Elements outside both” cannot be reconciled with the stated conditions. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “Elements in A that are not in B” is defensible because set difference starts with A and removes every element also belonging to B, leaving only A-only elements."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Set difference starts with A and removes every element also belonging to B, leaving only A-only elements. Therefore the correct answer is C: Elements in A that are not in B.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Interpret",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_021",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "If A={1,2,3,4} and B={3,4,5}, what is A \\ B?",
+          "options": [
+            {
+              "label": "A",
+              "text": "{3, 4}",
+              "rationale": "A learner choosing “{3, 4}” would be relying on the wrong criterion. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{1, 2}” is defensible because remove the common elements 3 and 4 from A. The remaining A-only elements are 1 and 2."
+            },
+            {
+              "label": "B",
+              "text": "{5}",
+              "rationale": "Selecting “{5}” misclassifies the idea being tested. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{1, 2}” is defensible because remove the common elements 3 and 4 from A. The remaining A-only elements are 1 and 2."
+            },
+            {
+              "label": "C",
+              "text": "{1, 2, 5}",
+              "rationale": "That choice, “{1, 2, 5}”, substitutes a distractor feature for the tested principle. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{1, 2}” is defensible because remove the common elements 3 and 4 from A. The remaining A-only elements are 1 and 2."
+            },
+            {
+              "label": "D",
+              "text": "{1, 2}",
+              "rationale": "This option is correct. Remove the common elements 3 and 4 from A. The remaining A-only elements are 1 and 2."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Remove the common elements 3 and 4 from A. The remaining A-only elements are 1 and 2. Therefore the correct answer is D: {1, 2}.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_022",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Among 30 learners, 18 like rice, 16 like yam and 8 like both. How many like neither?",
+          "options": [
+            {
+              "label": "A",
+              "text": "4",
+              "rationale": "This option is correct. The union is 18+16−8=26. Therefore 30−26=4 learners are outside both sets."
+            },
+            {
+              "label": "B",
+              "text": "26",
+              "rationale": "Selecting “26” misclassifies the idea being tested. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “4” is defensible because the union is 18+16−8=26. Therefore 30−26=4 learners are outside both sets."
+            },
+            {
+              "label": "C",
+              "text": "10",
+              "rationale": "Selecting “10” misclassifies the idea being tested. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “4” is defensible because the union is 18+16−8=26. Therefore 30−26=4 learners are outside both sets."
+            },
+            {
+              "label": "D",
+              "text": "12",
+              "rationale": "The option “12” describes a different outcome from the one supported by the evidence. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “4” is defensible because the union is 18+16−8=26. Therefore 30−26=4 learners are outside both sets."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The union is 18+16−8=26. Therefore 30−26=4 learners are outside both sets. Therefore the correct answer is A: 4.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_math_sets_b001_023",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Twenty study French, fourteen study ICT and six study both. How many study only French?",
+          "options": [
+            {
+              "label": "A",
+              "text": "20",
+              "rationale": "The claim “20” conflicts with the relationship described in the stem. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “14” is defensible because the French total includes the six in the overlap, so the French-only region is 20−6=14."
+            },
+            {
+              "label": "B",
+              "text": "14",
+              "rationale": "This option is correct. The French total includes the six in the overlap, so the French-only region is 20−6=14."
+            },
+            {
+              "label": "C",
+              "text": "8",
+              "rationale": "Selecting “8” misclassifies the idea being tested. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “14” is defensible because the French total includes the six in the overlap, so the French-only region is 20−6=14."
+            },
+            {
+              "label": "D",
+              "text": "26",
+              "rationale": "The proposed answer “26” cannot be reconciled with the stated conditions. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “14” is defensible because the French total includes the six in the overlap, so the French-only region is 20−6=14."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The French total includes the six in the overlap, so the French-only region is 20−6=14. Therefore the correct answer is B: 14.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_024",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "If n(U)=50 and n(A)=32, find n(A′).",
+          "options": [
+            {
+              "label": "A",
+              "text": "18",
+              "rationale": "This option is correct. A and its complement partition U, so n(A′)=n(U)−n(A)=50−32=18."
+            },
+            {
+              "label": "B",
+              "text": "82",
+              "rationale": "Selecting “82” misclassifies the idea being tested. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “18” is defensible because a and its complement partition U, so n(A′)=n(U)−n(A)=50−32=18."
+            },
+            {
+              "label": "C",
+              "text": "32",
+              "rationale": "The response “32” points to the wrong property. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “18” is defensible because a and its complement partition U, so n(A′)=n(U)−n(A)=50−32=18."
+            },
+            {
+              "label": "D",
+              "text": "2",
+              "rationale": "That choice, “2”, substitutes a distractor feature for the tested principle. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “18” is defensible because a and its complement partition U, so n(A′)=n(U)−n(A)=50−32=18."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A and its complement partition U, so n(A′)=n(U)−n(A)=50−32=18. Therefore the correct answer is A: 18.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_025",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Which set lists prime numbers below 10?",
+          "options": [
+            {
+              "label": "A",
+              "text": "{1, 2, 3, 5, 7}",
+              "rationale": "That choice, “{1, 2, 3, 5, 7}”, substitutes a distractor feature for the tested principle. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{2, 3, 5, 7}” is defensible because primes greater than 1 have exactly two positive factors. Below 10 these are 2, 3, 5 and 7."
+            },
+            {
+              "label": "B",
+              "text": "{2, 3, 5, 7}",
+              "rationale": "This option is correct. Primes greater than 1 have exactly two positive factors. Below 10 these are 2, 3, 5 and 7."
+            },
+            {
+              "label": "C",
+              "text": "{2, 4, 6, 8}",
+              "rationale": "That choice, “{2, 4, 6, 8}”, substitutes a distractor feature for the tested principle. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{2, 3, 5, 7}” is defensible because primes greater than 1 have exactly two positive factors. Below 10 these are 2, 3, 5 and 7."
+            },
+            {
+              "label": "D",
+              "text": "{3, 6, 9}",
+              "rationale": "The proposed answer “{3, 6, 9}” cannot be reconciled with the stated conditions. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{2, 3, 5, 7}” is defensible because primes greater than 1 have exactly two positive factors. Below 10 these are 2, 3, 5 and 7."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Primes greater than 1 have exactly two positive factors. Below 10 these are 2, 3, 5 and 7. Therefore the correct answer is B: {2, 3, 5, 7}.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_math_sets_b001_026",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "If disjoint A and B have 9 and 11 elements, find n(A∪B).",
+          "options": [
+            {
+              "label": "A",
+              "text": "2",
+              "rationale": "The proposed answer “2” cannot be reconciled with the stated conditions. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “20” is defensible because disjoint sets have zero overlap, so the union count is 9+11−0=20."
+            },
+            {
+              "label": "B",
+              "text": "99",
+              "rationale": "That choice, “99”, substitutes a distractor feature for the tested principle. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “20” is defensible because disjoint sets have zero overlap, so the union count is 9+11−0=20."
+            },
+            {
+              "label": "C",
+              "text": "11",
+              "rationale": "The option “11” describes a different outcome from the one supported by the evidence. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “20” is defensible because disjoint sets have zero overlap, so the union count is 9+11−0=20."
+            },
+            {
+              "label": "D",
+              "text": "20",
+              "rationale": "This option is correct. Disjoint sets have zero overlap, so the union count is 9+11−0=20."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Disjoint sets have zero overlap, so the union count is 9+11−0=20. Therefore the correct answer is D: 20.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_027",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "What does the region outside A but inside U represent?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A ∩ A",
+              "rationale": "The option “A ∩ A” describes a different outcome from the one supported by the evidence. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “A′” is defensible because every point inside U but outside circle A belongs to the complement of A, denoted A′ or Aᶜ."
+            },
+            {
+              "label": "B",
+              "text": "An empty universal set",
+              "rationale": "The claim “An empty universal set” conflicts with the relationship described in the stem. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A′” is defensible because every point inside U but outside circle A belongs to the complement of A, denoted A′ or Aᶜ."
+            },
+            {
+              "label": "C",
+              "text": "A′",
+              "rationale": "This option is correct. Every point inside U but outside circle A belongs to the complement of A, denoted A′ or Aᶜ."
+            },
+            {
+              "label": "D",
+              "text": "Only A’s boundary",
+              "rationale": "Here, “Only A’s boundary” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A′” is defensible because every point inside U but outside circle A belongs to the complement of A, denoted A′ or Aᶜ."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Every point inside U but outside circle A belongs to the complement of A, denoted A′ or Aᶜ. Therefore the correct answer is C: A′.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_math_sets_b001_028",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "If A is multiples of 4 and B is even numbers, which is correct?",
+          "options": [
+            {
+              "label": "A",
+              "text": "B ⊆ A",
+              "rationale": "Selecting “B ⊆ A” misclassifies the idea being tested. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “A ⊆ B” is defensible because every multiple of 4 is divisible by 2 and therefore even, although not every even number is a multiple of 4."
+            },
+            {
+              "label": "B",
+              "text": "A ∩ B = ∅",
+              "rationale": "Selecting “A ∩ B = ∅” misclassifies the idea being tested. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “A ⊆ B” is defensible because every multiple of 4 is divisible by 2 and therefore even, although not every even number is a multiple of 4."
+            },
+            {
+              "label": "C",
+              "text": "A = ∅",
+              "rationale": "Selecting “A = ∅” misclassifies the idea being tested. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “A ⊆ B” is defensible because every multiple of 4 is divisible by 2 and therefore even, although not every even number is a multiple of 4."
+            },
+            {
+              "label": "D",
+              "text": "A ⊆ B",
+              "rationale": "This option is correct. Every multiple of 4 is divisible by 2 and therefore even, although not every even number is a multiple of 4."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Every multiple of 4 is divisible by 2 and therefore even, although not every even number is a multiple of 4. Therefore the correct answer is D: A ⊆ B.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Deduce",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_math_sets_b001_029",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "A set contains the letters in LEVEL. How many distinct elements are there?",
+          "options": [
+            {
+              "label": "A",
+              "text": "3",
+              "rationale": "This option is correct. Repeated letters count once in a set. LEVEL contains the distinct letters L, E and V, giving cardinality 3."
+            },
+            {
+              "label": "B",
+              "text": "5",
+              "rationale": "Accepting “5” would bypass the reasoning the item requires. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “3” is defensible because repeated letters count once in a set. LEVEL contains the distinct letters L, E and V, giving cardinality 3."
+            },
+            {
+              "label": "C",
+              "text": "4",
+              "rationale": "The response “4” points to the wrong property. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “3” is defensible because repeated letters count once in a set. LEVEL contains the distinct letters L, E and V, giving cardinality 3."
+            },
+            {
+              "label": "D",
+              "text": "2",
+              "rationale": "The proposed answer “2” cannot be reconciled with the stated conditions. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “3” is defensible because repeated letters count once in a set. LEVEL contains the distinct letters L, E and V, giving cardinality 3."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Repeated letters count once in a set. LEVEL contains the distinct letters L, E and V, giving cardinality 3. Therefore the correct answer is A: 3.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_030",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Which pair is disjoint?",
+          "options": [
+            {
+              "label": "A",
+              "text": "{1,2} and {2,3}",
+              "rationale": "The claim “{1,2} and {2,3}” conflicts with the relationship described in the stem. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{1,3,5} and {2,4,6}” is defensible because odd numbers in the first set share no member with the even numbers in the second; every other pair overlaps."
+            },
+            {
+              "label": "B",
+              "text": "{1,3,5} and {2,4,6}",
+              "rationale": "This option is correct. Odd numbers in the first set share no member with the even numbers in the second; every other pair overlaps."
+            },
+            {
+              "label": "C",
+              "text": "{a,b} and {b,c}",
+              "rationale": "That choice, “{a,b} and {b,c}”, substitutes a distractor feature for the tested principle. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{1,3,5} and {2,4,6}” is defensible because odd numbers in the first set share no member with the even numbers in the second; every other pair overlaps."
+            },
+            {
+              "label": "D",
+              "text": "{4,8} and {2,4}",
+              "rationale": "A learner choosing “{4,8} and {2,4}” would be relying on the wrong criterion. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “{1,3,5} and {2,4,6}” is defensible because odd numbers in the first set share no member with the even numbers in the second; every other pair overlaps."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Odd numbers in the first set share no member with the even numbers in the second; every other pair overlaps. Therefore the correct answer is B: {1,3,5} and {2,4,6}.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Compare",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_031",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "If A ∩ B = A, what follows?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A and B are disjoint",
+              "rationale": "Selecting “A and B are disjoint” misclassifies the idea being tested. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A ⊆ B” is defensible because if intersection leaves all of A unchanged, every member of A must already belong to B."
+            },
+            {
+              "label": "B",
+              "text": "B is empty",
+              "rationale": "Here, “B is empty” represents the misconception rather than the valid conclusion. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A ⊆ B” is defensible because if intersection leaves all of A unchanged, every member of A must already belong to B."
+            },
+            {
+              "label": "C",
+              "text": "A ⊆ B",
+              "rationale": "This option is correct. If intersection leaves all of A unchanged, every member of A must already belong to B."
+            },
+            {
+              "label": "D",
+              "text": "A has no B elements",
+              "rationale": "The claim “A has no B elements” conflicts with the relationship described in the stem. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “A ⊆ B” is defensible because if intersection leaves all of A unchanged, every member of A must already belong to B."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "If intersection leaves all of A unchanged, every member of A must already belong to B. Therefore the correct answer is C: A ⊆ B.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Deduce",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_math_sets_b001_032",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "If A ∪ B = B, what follows?",
+          "options": [
+            {
+              "label": "A",
+              "text": "B ⊆ A only",
+              "rationale": "Here, “B ⊆ A only” represents the misconception rather than the valid conclusion. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “A ⊆ B” is defensible because adding A to B produces nothing new only when every member of A is already in B."
+            },
+            {
+              "label": "B",
+              "text": "A ⊆ B",
+              "rationale": "This option is correct. Adding A to B produces nothing new only when every member of A is already in B."
+            },
+            {
+              "label": "C",
+              "text": "A and B are disjoint",
+              "rationale": "The proposed answer “A and B are disjoint” cannot be reconciled with the stated conditions. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A ⊆ B” is defensible because adding A to B produces nothing new only when every member of A is already in B."
+            },
+            {
+              "label": "D",
+              "text": "B is empty",
+              "rationale": "Treating “B is empty” as correct overlooks the decisive condition. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “A ⊆ B” is defensible because adding A to B produces nothing new only when every member of A is already in B."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Adding A to B produces nothing new only when every member of A is already in B. Therefore the correct answer is B: A ⊆ B.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Deduce",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_math_sets_b001_033",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Eleven choose art only and five choose both art and music. How many choose art?",
+          "options": [
+            {
+              "label": "A",
+              "text": "11",
+              "rationale": "That choice, “11”, substitutes a distractor feature for the tested principle. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “16” is defensible because the art set contains the art-only region plus the overlap, so 11+5=16 learners choose art."
+            },
+            {
+              "label": "B",
+              "text": "23",
+              "rationale": "The claim “23” conflicts with the relationship described in the stem. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “16” is defensible because the art set contains the art-only region plus the overlap, so 11+5=16 learners choose art."
+            },
+            {
+              "label": "C",
+              "text": "16",
+              "rationale": "This option is correct. The art set contains the art-only region plus the overlap, so 11+5=16 learners choose art."
+            },
+            {
+              "label": "D",
+              "text": "18",
+              "rationale": "Here, “18” represents the misconception rather than the valid conclusion. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “16” is defensible because the art set contains the art-only region plus the overlap, so 11+5=16 learners choose art."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The art set contains the art-only region plus the overlap, so 11+5=16 learners choose art. Therefore the correct answer is C: 16.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_034",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "A Venn diagram has 6 in A only, 3 in both and 8 in B only. Find n(A∪B).",
+          "options": [
+            {
+              "label": "A",
+              "text": "17",
+              "rationale": "This option is correct. The union contains all three separate regions inside the circles, so 6+3+8=17."
+            },
+            {
+              "label": "B",
+              "text": "9",
+              "rationale": "Choosing “9” follows a different rule from the one required here. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “17” is defensible because the union contains all three separate regions inside the circles, so 6+3+8=17."
+            },
+            {
+              "label": "C",
+              "text": "11",
+              "rationale": "Choosing “11” follows a different rule from the one required here. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “17” is defensible because the union contains all three separate regions inside the circles, so 6+3+8=17."
+            },
+            {
+              "label": "D",
+              "text": "14",
+              "rationale": "A learner choosing “14” would be relying on the wrong criterion. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “17” is defensible because the union contains all three separate regions inside the circles, so 6+3+8=17."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The union contains all three separate regions inside the circles, so 6+3+8=17. Therefore the correct answer is A: 17.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_035",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "If U={1,2,3,4,5,6} and A={2,4,6}, which option belongs to A′?",
+          "options": [
+            {
+              "label": "A",
+              "text": "2",
+              "rationale": "The claim “2” conflicts with the relationship described in the stem. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “5” is defensible because the complement is {1,3,5}. Among the choices, only 5 lies outside A while remaining inside U."
+            },
+            {
+              "label": "B",
+              "text": "4",
+              "rationale": "Choosing “4” follows a different rule from the one required here. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “5” is defensible because the complement is {1,3,5}. Among the choices, only 5 lies outside A while remaining inside U."
+            },
+            {
+              "label": "C",
+              "text": "6",
+              "rationale": "Here, “6” represents the misconception rather than the valid conclusion. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “5” is defensible because the complement is {1,3,5}. Among the choices, only 5 lies outside A while remaining inside U."
+            },
+            {
+              "label": "D",
+              "text": "5",
+              "rationale": "This option is correct. The complement is {1,3,5}. Among the choices, only 5 lies outside A while remaining inside U."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The complement is {1,3,5}. Among the choices, only 5 lies outside A while remaining inside U. Therefore the correct answer is D: 5.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_036",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "What happens when an entry is repeated in roster notation?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Cardinality always rises",
+              "rationale": "That choice, “Cardinality always rises”, substitutes a distractor feature for the tested principle. It turns a limited principle into an absolute promise that the evidence cannot support. By contrast, “It does not create a new set element” is defensible because membership matters, not repetition. Thus {1,1,2} represents the same set as {1,2}."
+            },
+            {
+              "label": "B",
+              "text": "The set becomes empty",
+              "rationale": "Accepting “The set becomes empty” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It does not create a new set element” is defensible because membership matters, not repetition. Thus {1,1,2} represents the same set as {1,2}."
+            },
+            {
+              "label": "C",
+              "text": "It does not create a new set element",
+              "rationale": "This option is correct. Membership matters, not repetition. Thus {1,1,2} represents the same set as {1,2}."
+            },
+            {
+              "label": "D",
+              "text": "Letters become invalid",
+              "rationale": "The option “Letters become invalid” describes a different outcome from the one supported by the evidence. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “It does not create a new set element” is defensible because membership matters, not repetition. Thus {1,1,2} represents the same set as {1,2}."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Membership matters, not repetition. Thus {1,1,2} represents the same set as {1,2}. Therefore the correct answer is C: It does not create a new set element.",
+          "difficulty": "medium",
+          "marks": 1,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2"
+        },
+        {
+          "id": "q_bece_math_sets_b001_037",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "If n(A)=12, n(A∪B)=20 and n(A∩B)=5, find n(B).",
+          "options": [
+            {
+              "label": "A",
+              "text": "13",
+              "rationale": "This option is correct. Substitute into 20=12+n(B)−5. Rearranging gives n(B)=13."
+            },
+            {
+              "label": "B",
+              "text": "3",
+              "rationale": "Here, “3” represents the misconception rather than the valid conclusion. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “13” is defensible because substitute into 20=12+n(B)−5. Rearranging gives n(B)=13."
+            },
+            {
+              "label": "C",
+              "text": "17",
+              "rationale": "Here, “17” represents the misconception rather than the valid conclusion. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “13” is defensible because substitute into 20=12+n(B)−5. Rearranging gives n(B)=13."
+            },
+            {
+              "label": "D",
+              "text": "37",
+              "rationale": "The proposed answer “37” cannot be reconciled with the stated conditions. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “13” is defensible because substitute into 20=12+n(B)−5. Rearranging gives n(B)=13."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Substitute into 20=12+n(B)−5. Rearranging gives n(B)=13. Therefore the correct answer is A: 13.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_math_sets_b001_038",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "Of 35 people, 15 use bus only, 9 walk only and 6 do both. How many use neither?",
+          "options": [
+            {
+              "label": "A",
+              "text": "30",
+              "rationale": "Accepting “30” would bypass the reasoning the item requires. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “5” is defensible because the three inside regions total 15+9+6=30, leaving 35−30=5 outside both."
+            },
+            {
+              "label": "B",
+              "text": "11",
+              "rationale": "The response “11” points to the wrong property. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “5” is defensible because the three inside regions total 15+9+6=30, leaving 35−30=5 outside both."
+            },
+            {
+              "label": "C",
+              "text": "20",
+              "rationale": "The option “20” describes a different outcome from the one supported by the evidence. That value comes from the wrong count or operation rather than from the quantities and relationship given in the stem. By contrast, “5” is defensible because the three inside regions total 15+9+6=30, leaving 35−30=5 outside both."
+            },
+            {
+              "label": "D",
+              "text": "5",
+              "rationale": "This option is correct. The three inside regions total 15+9+6=30, leaving 35−30=5 outside both."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The three inside regions total 15+9+6=30, leaving 35−30=5 outside both. Therefore the correct answer is D: 5.",
+          "difficulty": "hard",
+          "marks": 1,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3"
+        },
+        {
+          "id": "q_bece_math_sets_b001_039",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "What is the intersection of any set A with the empty set?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A",
+              "rationale": "Using “A” would apply the concept in the wrong context. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “∅” is defensible because the empty set has no elements, so no element can be common to A and ∅; their intersection is empty."
+            },
+            {
+              "label": "B",
+              "text": "∅",
+              "rationale": "This option is correct. The empty set has no elements, so no element can be common to A and ∅; their intersection is empty."
+            },
+            {
+              "label": "C",
+              "text": "{0}",
+              "rationale": "Accepting “{0}” would bypass the reasoning the item requires. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “∅” is defensible because the empty set has no elements, so no element can be common to A and ∅; their intersection is empty."
+            },
+            {
+              "label": "D",
+              "text": "U",
+              "rationale": "Accepting “U” would bypass the reasoning the item requires. It substitutes a different property, process, or category and therefore does not account for the defining condition in the stem. By contrast, “∅” is defensible because the empty set has no elements, so no element can be common to A and ∅; their intersection is empty."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The empty set has no elements, so no element can be common to A and ∅; their intersection is empty. Therefore the correct answer is B: ∅.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO1"
+        },
+        {
+          "id": "q_bece_math_sets_b001_040",
+          "original": true,
+          "topicCode": "MATH-SETS",
+          "type": "multiple_choice",
+          "prompt": "What is the union of any set A with the empty set?",
+          "options": [
+            {
+              "label": "A",
+              "text": "∅",
+              "rationale": "Selecting “∅” misclassifies the idea being tested. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “A” is defensible because union collects members from either set. Since ∅ contributes none, the result contains exactly the members of A."
+            },
+            {
+              "label": "B",
+              "text": "A′",
+              "rationale": "Choosing “A′” follows a different rule from the one required here. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “A” is defensible because union collects members from either set. Since ∅ contributes none, the result contains exactly the members of A."
+            },
+            {
+              "label": "C",
+              "text": "A",
+              "rationale": "This option is correct. Union collects members from either set. Since ∅ contributes none, the result contains exactly the members of A."
+            },
+            {
+              "label": "D",
+              "text": "{A,∅}",
+              "rationale": "That choice, “{A,∅}”, substitutes a distractor feature for the tested principle. It misapplies set membership, notation, or counting, so its members or numerical result do not satisfy the stated relationship. By contrast, “A” is defensible because union collects members from either set. Since ∅ contributes none, the result contains exactly the members of A."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Union collects members from either set. Since ∅ contributes none, the result contains exactly the members of A. Therefore the correct answer is C: A.",
+          "difficulty": "easy",
+          "marks": 1,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO1"
+        }
+      ]
+    }
+  ]
+}
