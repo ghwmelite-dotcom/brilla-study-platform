@@ -156,7 +156,7 @@ function fixture() {
   return db;
 }
 
-function buildModel() {
+function buildFullModel() {
   assert(MAPPINGS.length === 45, 'Expected 45 mappings');
   assert(LEGACY_MATH_MAPPINGS.length === 40, 'Expected 40 legacy Mathematics mappings');
   assert(new Set(MAPPINGS.map((row) => row.questionId)).size === 45, 'Duplicate mapping IDs');
@@ -237,7 +237,7 @@ function buildModel() {
   }
 }
 
-function mappingTable() {
+function baseMappingTable() {
   const grouped = new Map();
   for (const row of MAPPINGS) {
     const entries = grouped.get(row.topicId) ?? [];
@@ -260,11 +260,12 @@ function topicTable() {
 const questionFp = () => fpSql('_qf281', 'FROM questions WHERE id IN(SELECT question_id FROM _m281)', 'id', STATE_FIELDS);
 const topicFp = () => fpSql('_tf281', 'FROM topics WHERE id IN(SELECT id FROM _t281)', 'id', TOPIC_FIELDS);
 const logFp = () => fpSql('_lf281', `FROM question_bank_remediation_log WHERE migration_id=${sql(MIGRATION_ID)}`, LOG_ORDER.join(','), LOG_FIELDS);
-const fingerprints = () => `${questionFp()}${topicFp()}${logFp()}`;
-const dropFingerprints = () => 'DROP TABLE _lf281;DROP TABLE _tf281;DROP TABLE _qf281;';
-const cleanup = () => `${dropFingerprints()}DROP TABLE _t281;DROP TABLE _m281;DROP TABLE _g281;`;
+const singularFp = () => fpSql('_sf281', 'FROM questions WHERE id IN(SELECT question_id FROM _s281)', 'id', STATE_FIELDS);
+const fingerprints = () => `${questionFp()}${singularFp()}${topicFp()}${logFp()}`;
+const dropFingerprints = () => 'DROP TABLE _lf281;DROP TABLE _tf281;DROP TABLE _sf281;DROP TABLE _qf281;';
+const cleanup = () => `${dropFingerprints()}DROP TABLE _t281;DROP TABLE _s281;DROP TABLE _m281;DROP TABLE _g281;`;
 
-function mappingIntegrity() {
+function obsoleteMappingIntegrity() {
   return `(SELECT COUNT(*) FROM _m281)=45 AND NOT EXISTS(` +
     `SELECT 1 FROM _m281 m LEFT JOIN questions q ON q.id=m.question_id ` +
     `LEFT JOIN topics t ON t.id=m.topic_id LEFT JOIN _t281 p ON p.id=m.topic_id ` +
@@ -274,7 +275,7 @@ function mappingIntegrity() {
     `SELECT 1 FROM _t281 p JOIN topics t ON t.subject_id=p.subject_id AND t.id<>p.id AND (t.name=p.name OR t.slug=p.slug))`;
 }
 
-function stateCondition(model, stage) {
+function obsoleteStateCondition(model, stage) {
   if (stage === 'source') {
     return `${fpEquals('_qf281', model.sourceFingerprint)} AND ${fpEquals('_lf281', [0, 0, 0, 0])} ` +
       `AND (SELECT COUNT(*) FROM topics WHERE id IN(SELECT id FROM _t281))=0`;
@@ -288,7 +289,7 @@ function insertTopics() {
     'SELECT id,subject_id,NULL,name,slug,description,NULL,NULL,display_order,created_at FROM _t281;';
 }
 
-function insertLogs() {
+function obsoleteInsertLogs() {
   const correctionRows = CORRECTIONS.flatMap((correction) => ['correct_answer', 'explanation'].map((field) =>
     `(${[MIGRATION_ID, 'question', correction.questionId, field, correction.old[field], correction.new[field]].map(sql).join(',')})`,
   ));
@@ -306,7 +307,45 @@ function applyCorrections(forward) {
   }).join('');
 }
 
-function migrationSql(model) {
+function buildModel() {
+  const m=buildFullModel(),db=fixture();
+  try {
+    const ids=Array.from({length:40},(_,i)=>`q_alevel_math_${pad(i+1)}`);
+    const singular=db.prepare(`SELECT ${STATE_FIELDS.join(',')} FROM questions WHERE id IN(${ids.map(()=>'?').join(',')}) ORDER BY id`).all(...ids);
+    const wanted=new Set(REASSESSED_EXCEPTION_MAPPINGS.map(x=>x.questionId));
+    const source=m.source.filter(x=>wanted.has(x.id)),target=m.target.filter(x=>wanted.has(x.id)),logs=m.logs.filter(x=>wanted.has(x.entity_id));
+    m.singularIds=ids;m.singularFingerprint=rowsFingerprint(singular,STATE_FIELDS);
+    m.production={source,target,logs,sourceFingerprint:rowsFingerprint(source,STATE_FIELDS),targetFingerprint:rowsFingerprint(target,STATE_FIELDS),logFingerprint:rowsFingerprint(logs,LOG_FIELDS)};
+    assert(JSON.stringify(m.production.sourceFingerprint)===JSON.stringify([5,1432,1920873078,1147809825]),'production source fingerprint drift');
+    assert(JSON.stringify(m.production.targetFingerprint)===JSON.stringify([5,1562,1891889133,1131942752]),'production target fingerprint drift');
+    assert(JSON.stringify(m.production.logFingerprint)===JSON.stringify([5,592,761733629,1545996926]),'production log fingerprint drift');
+    assert(JSON.stringify(m.singularFingerprint)===JSON.stringify([40,11250,560185981,2023523715]),'singular fingerprint drift');
+    return m;
+  } finally {db.close();}
+}
+
+function mappingTable() {
+  return baseMappingTable()+`CREATE TABLE _s281(question_id TEXT PRIMARY KEY);INSERT INTO _s281 VALUES${Array.from({length:40},(_,i)=>`(${sql(`q_alevel_math_${pad(i+1)}`)})`).join(',')};`;
+}
+
+function mappingIntegrity() {
+  return `((SELECT count(*) FROM questions q JOIN _m281 m ON m.question_id=q.id)=45 OR ((SELECT count(*) FROM questions q JOIN _m281 m ON m.question_id=q.id)=5 AND (SELECT count(*) FROM _m281 m LEFT JOIN questions q ON q.id=m.question_id WHERE q.id IS NULL)=40 AND NOT EXISTS(SELECT 1 FROM questions q JOIN _m281 m ON m.question_id=q.id WHERE m.question_id LIKE 'q_alevel_maths_%'))) AND ${fpEquals('_sf281',ACTIVE_MODEL.singularFingerprint)} AND NOT EXISTS(SELECT 1 FROM _m281 m JOIN questions q ON q.id=m.question_id LEFT JOIN topics t ON t.id=m.topic_id LEFT JOIN _t281 p ON p.id=m.topic_id WHERE q.subject_id<>m.subject_id OR coalesce(t.subject_id,p.subject_id)<>m.subject_id) AND NOT EXISTS(SELECT 1 FROM _t281 p LEFT JOIN subjects s ON s.id=p.subject_id WHERE s.id IS NULL OR s.is_active<>1 OR s.exam_type_id<>'cambridge_a2') AND NOT EXISTS(SELECT 1 FROM _t281 p JOIN topics t ON t.subject_id=p.subject_id AND t.id<>p.id AND (t.name=p.name OR t.slug=p.slug))`;
+}
+
+function stateCondition(model,stage) {
+  const q=stage==='source'?[model.sourceFingerprint,model.production.sourceFingerprint]:[model.targetFingerprint,model.production.targetFingerprint];
+  const l=stage==='source'?[[0,0,0,0]]:[model.logFingerprint,model.production.logFingerprint];
+  const base=`(${fpEquals('_qf281',q[0])} OR ${fpEquals('_qf281',q[1])}) AND (${l.map(x=>fpEquals('_lf281',x)).join(' OR ')}) AND ${fpEquals('_sf281',model.singularFingerprint)}`;
+  return stage==='source'?`${base} AND (SELECT count(*) FROM topics WHERE id IN(SELECT id FROM _t281))=0`:`${base} AND ${fpEquals('_tf281',model.topicFingerprint)} AND (SELECT count(*) FROM topics WHERE id IN(SELECT id FROM _t281))=2`;
+}
+
+function insertLogs() {
+  const c=CORRECTIONS.flatMap(x=>['correct_answer','explanation'].map(f=>`INSERT OR IGNORE INTO question_bank_remediation_log(migration_id,entity_type,entity_id,field_name,old_value,new_value) SELECT ${[MIGRATION_ID,'question',x.questionId,f,x.old[f],x.new[f]].map(sql).join(',')} WHERE EXISTS(SELECT 1 FROM questions WHERE id=${sql(x.questionId)});`)).join('');
+  return c+`INSERT OR IGNORE INTO question_bank_remediation_log(migration_id,entity_type,entity_id,field_name,old_value,new_value) SELECT ${sql(MIGRATION_ID)},'question',q.id,'topic_id',NULL,m.topic_id FROM questions q JOIN _m281 m ON m.question_id=q.id WHERE q.topic_id IS NULL;`;
+}
+
+let ACTIVE_MODEL;
+function migrationSql(model) { ACTIVE_MODEL=model;
   const before = `(${stateCondition(model, 'source')}) OR (${stateCondition(model, 'target')})`;
   return `-- Generated by scripts/generate-cambridge-legacy-topic-release.cjs.\nPRAGMA foreign_keys=ON;` +
     `${mappingTable()}${topicTable()}CREATE TABLE _g281(valid INTEGER CHECK(valid=1));${fingerprints()}` +
@@ -347,7 +386,7 @@ function flightSql(model, stage) {
     ` THEN 1 ELSE 0 END;${cleanup()}\n`;
 }
 
-function buildArtifacts() {
+function baseBuildArtifacts() {
   const model = buildModel();
   const manifest = {
     release: 'cambridge-legacy-topic-remediation-2026-08-26',
@@ -383,6 +422,20 @@ function buildArtifacts() {
       [POSTFLIGHT_FILE]: flightSql(model, 'target'),
     },
   };
+}
+
+function buildArtifacts() {
+  const out=baseBuildArtifacts(),m=out.model;
+  const manifest=JSON.parse(out.artifacts[MANIFEST_FILE]);
+  manifest.adaptiveModes={full45:{presentMappedQuestions:45,absentPluralQuestions:0,topicLogs:45,correctionLogs:4,sourceFingerprint:m.sourceFingerprint,targetFingerprint:m.targetFingerprint,logFingerprint:m.logFingerprint},historicalProduction5:{presentMappedQuestions:5,absentPluralQuestions:40,topicLogs:5,correctionLogs:0,sourceFingerprint:m.production.sourceFingerprint,targetFingerprint:m.production.targetFingerprint,logFingerprint:m.production.logFingerprint}};
+  manifest.protectedSingularMathematics={count:40,fingerprint:m.singularFingerprint,mutationAllowed:false};
+  manifest.fingerprints.historicalProduction5Source=m.production.sourceFingerprint;
+  manifest.fingerprints.historicalProduction5Target=m.production.targetFingerprint;
+  manifest.fingerprints.historicalProduction5Logs=m.production.logFingerprint;
+  manifest.fingerprints.protectedSingularMathematics=m.singularFingerprint;
+  manifest.catalogueDecision.reason='Every present reviewed row has a defensible topic; historical production never synthesizes the 40 absent plural-ID rows.';
+  manifest.catalogueDecision.invariant='Migration 281 mutates only the exact reviewed rows present in one guarded variant.';
+  out.artifacts[MANIFEST_FILE]=JSON.stringify(manifest,null,2)+'\n';return out;
 }
 
 function main() {
