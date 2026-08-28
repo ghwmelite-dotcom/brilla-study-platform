@@ -1,4 +1,3 @@
--- Bounded reviewed-scope population; retained through canonical release cleanup.
 PRAGMA foreign_keys=ON;
 INSERT INTO _npr_expected_m VALUES
   ('nsmq_chem_sr_016','subj_nsmq_chemistry','speed_race','topic_nsmq_chem_bonding','279_nsmq_legacy_null_topic_part_2'),
