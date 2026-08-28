@@ -1,9 +1,6 @@
--- Bounded reviewed-scope initialization; retained through canonical release cleanup.
 PRAGMA foreign_keys=ON;
-CREATE TABLE IF NOT EXISTS _npr_expected_m(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT NOT NULL,m TEXT NOT NULL);
-CREATE TABLE IF NOT EXISTS _npr_expected_q(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL);
-DELETE FROM _npr_expected_m;
-DELETE FROM _npr_expected_q;
+CREATE TABLE _npr_expected_m(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT NOT NULL,m TEXT NOT NULL);
+CREATE TABLE _npr_expected_q(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL);
 INSERT INTO _npr_expected_m VALUES
   ('nsmq_bio_sr_001','subj_nsmq_biology','speed_race','topic_nsmq_bio_physiology','278_nsmq_legacy_null_topic_part_1'),
   ('nsmq_bio_sr_002','subj_nsmq_biology','speed_race','topic_nsmq_bio_biochemistry','278_nsmq_legacy_null_topic_part_1'),
