@@ -304,11 +304,95 @@
       6281,
       1792803168,
       2128848288
+    ],
+    "historicalProduction5Source": [
+      5,
+      1432,
+      1920873078,
+      1147809825
+    ],
+    "historicalProduction5Target": [
+      5,
+      1562,
+      1891889133,
+      1131942752
+    ],
+    "historicalProduction5Logs": [
+      5,
+      592,
+      761733629,
+      1545996926
+    ],
+    "protectedSingularMathematics": [
+      40,
+      11250,
+      560185981,
+      2023523715
     ]
   },
   "catalogueDecision": {
     "filterRequired": false,
-    "reason": "Every reviewed row has a defensible topic after two narrow taxonomy additions and two deterministic answer corrections.",
-    "invariant": "For every Cambridge subject, raw question count equals the sum of topic question counts after migration 281."
+    "reason": "Every present reviewed row has a defensible topic; historical production never synthesizes the 40 absent plural-ID rows.",
+    "invariant": "Migration 281 mutates only the exact reviewed rows present in one guarded variant."
+  },
+  "adaptiveModes": {
+    "full45": {
+      "presentMappedQuestions": 45,
+      "absentPluralQuestions": 0,
+      "topicLogs": 45,
+      "correctionLogs": 4,
+      "sourceFingerprint": [
+        45,
+        10426,
+        1518901327,
+        1859246228
+      ],
+      "targetFingerprint": [
+        45,
+        11595,
+        1168531717,
+        231219804
+      ],
+      "logFingerprint": [
+        49,
+        6281,
+        1792803168,
+        2128848288
+      ]
+    },
+    "historicalProduction5": {
+      "presentMappedQuestions": 5,
+      "absentPluralQuestions": 40,
+      "topicLogs": 5,
+      "correctionLogs": 0,
+      "sourceFingerprint": [
+        5,
+        1432,
+        1920873078,
+        1147809825
+      ],
+      "targetFingerprint": [
+        5,
+        1562,
+        1891889133,
+        1131942752
+      ],
+      "logFingerprint": [
+        5,
+        592,
+        761733629,
+        1545996926
+      ]
+    }
+  },
+  "protectedSingularMathematics": {
+    "count": 40,
+    "fingerprint": [
+      40,
+      11250,
+      560185981,
+      2023523715
+    ],
+    "mutationAllowed": false
   }
 }
