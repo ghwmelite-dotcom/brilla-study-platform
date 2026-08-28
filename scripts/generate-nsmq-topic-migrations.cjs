@@ -16,6 +16,10 @@ const {
   RESOLVED_WITH_EXCEPTIONS,
   buildProposal,
 } = require("./generate-nsmq-topic-taxonomy-proposals.cjs");
+const {
+  buildTopicResolutions,
+  renderCanonicalTopicCase,
+} = require("./nsmq-topic-identity-resolver.cjs");
 
 const ROOT = path.join(__dirname, "..");
 const MANIFEST_DIR = path.join(
@@ -337,6 +341,7 @@ function buildPlan() {
       createdAt: TOPIC_CREATED_AT,
     })),
     contentCorrections: CONTENT_CORRECTIONS,
+    topicResolutions: buildTopicResolutions(planMappings, NEW_TOPICS),
     mappings: planMappings,
     reviewedExceptions: exceptions,
     proposalSummary: {
@@ -357,21 +362,36 @@ function valuesSql(rows) {
 
 const NEW_TOPIC_IDS_SQL = NEW_TOPICS.map((topic) => sql(topic.id)).join(",");
 
-function mappingTableSql(name, rows, withMigration = false) {
+function mappingTableSql(name, rows, withMigration = false, allowProposedAbsent = false) {
   const columns = withMigration
-    ? "q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT NOT NULL,m INTEGER NOT NULL"
-    : "q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT NOT NULL";
-  const values = rows.map((row) => [
+    ? "q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT,m INTEGER NOT NULL"
+    : "q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT";
+  const sourceColumns = withMigration ? "q,s,r,k,m" : "q,s,r,k";
+  const sourceValues = rows.map((row) => [
     row.questionId,
     row.subjectId,
     row.roundType,
     row.topicId,
     ...(withMigration ? [Number(row.migrationId.slice(0, 3))] : []),
   ]);
+  const fallback = allowProposedAbsent
+    ? `CASE WHEN source.k IN (${NEW_TOPIC_IDS_SQL}) AND source.s IS ${topicSubjectCase({ key: "source.k" })} THEN source.k END`
+    : "NULL";
   return `CREATE TABLE IF NOT EXISTS ${name}(${columns});
 DELETE FROM ${name};
-INSERT INTO ${name} VALUES
-  ${valuesSql(values)};`;
+WITH source(${sourceColumns}) AS (VALUES ${valuesSql(sourceValues)})
+INSERT INTO ${name}
+SELECT source.q,source.s,source.r,coalesce((
+  SELECT MIN(t.id) FROM topics t
+  JOIN subjects s ON s.id=t.subject_id
+  WHERE t.id IN (source.k,${renderCanonicalTopicCase("source.k", "source.s")}) AND t.subject_id=source.s
+    AND s.exam_type_id='exam_nsmq' AND s.is_active=1
+  HAVING COUNT(*)=1
+),${fallback})${withMigration ? ",source.m" : ""} FROM source;`;
+}
+
+function resolvedMappingSql(name, _resolutionName, rows, withMigration = false, allowProposedAbsent = false) {
+  return mappingTableSql(name, rows, withMigration, allowProposedAbsent);
 }
 
 function exceptionTableSql(name, rows) {
@@ -382,7 +402,8 @@ INSERT INTO ${name} VALUES
 }
 
 function topicSubjectCase(alias = "e") {
-  return `CASE ${alias}.t ${NEW_TOPICS.map((topic) => `WHEN ${sql(topic.id)} THEN ${sql(topic.subjectId)}`).join(" ")} END`;
+  const key = typeof alias === "string" ? `${alias}.t` : alias.key;
+  return `CASE ${key} ${NEW_TOPICS.map((topic) => `WHEN ${sql(topic.id)} THEN ${sql(topic.subjectId)}`).join(" ")} END`;
 }
 
 function topicExactPredicate() {
@@ -511,6 +532,7 @@ function renderMigration(part, parts) {
   const { migrationId, migrationNumber, rows } = part;
   const index = parts.indexOf(part);
   const table = `_migration_${migrationNumber}_expected`;
+  const resolutions = `_migration_${migrationNumber}_topic_candidates`;
   const guard = `_migration_${migrationNumber}_guard`;
   const includeCorrection = migrationNumber === 267;
   const sourceTopics = includeCorrection
@@ -519,15 +541,15 @@ function renderMigration(part, parts) {
   const finalTopics = topicExactPredicate();
   return `-- ${migrationNumber}: NSMQ null-topic remediation part ${index + 1}/4 (${rows.length} exact mappings).
 PRAGMA foreign_keys=ON;
-${mappingTableSql(table, rows)}
+${resolvedMappingSql(table, resolutions, rows, false, includeCorrection)}
 CREATE TABLE IF NOT EXISTS ${guard}(valid INTEGER NOT NULL CHECK(valid=1));
 DELETE FROM ${guard};
 INSERT INTO ${guard}(valid)
 SELECT CASE WHEN
   (SELECT COUNT(*) FROM ${table})=${rows.length}
   AND (SELECT COUNT(*) FROM questions q JOIN ${table} e ON e.q=q.id)=${rows.length}
+  AND NOT EXISTS (SELECT 1 FROM ${table} WHERE t IS NULL)
   AND NOT EXISTS (SELECT 1 FROM ${table} e LEFT JOIN subjects s ON s.id=e.s WHERE s.id IS NULL OR s.exam_type_id IS NOT 'exam_nsmq' OR s.is_active<>1)
-  AND ${topicOwnershipPredicate(table)}
   AND (${priorAppliedPredicate(parts, index)})
   AND (
     (${questionStatePredicate(table, rows.length, false, includeCorrection)}
@@ -553,6 +575,7 @@ function renderRollback(part, parts) {
   const { migrationId, migrationNumber, rows } = part;
   const index = parts.indexOf(part);
   const table = `_rollback_${migrationNumber}_expected`;
+  const resolutions = `_rollback_${migrationNumber}_topic_candidates`;
   const guard = `_rollback_${migrationNumber}_guard`;
   const includeCorrection = migrationNumber === 267;
   const sourceTopics = includeCorrection
@@ -560,13 +583,14 @@ function renderRollback(part, parts) {
     : topicExactPredicate();
   return `-- Rollback ${migrationNumber}: restore only exact ledger-backed NSMQ source values.
 PRAGMA foreign_keys=ON;
-${mappingTableSql(table, rows)}
+${resolvedMappingSql(table, resolutions, rows, false, includeCorrection)}
 CREATE TABLE IF NOT EXISTS ${guard}(valid INTEGER NOT NULL CHECK(valid=1));
 DELETE FROM ${guard};
 INSERT INTO ${guard}(valid)
 SELECT CASE WHEN
   (SELECT COUNT(*) FROM ${table})=${rows.length}
   AND (SELECT COUNT(*) FROM questions q JOIN ${table} e ON e.q=q.id WHERE q.subject_id IS e.s AND q.round_type IS e.r)=${rows.length}
+  AND NOT EXISTS (SELECT 1 FROM ${table} WHERE t IS NULL)
   AND ${topicOwnershipPredicate(table)}
   AND ${laterRolledBackPredicate(parts, index)}
   AND (
@@ -604,10 +628,11 @@ function aggregateLogPredicate(plan, table) {
 
 function renderPreflight(plan) {
   const table = "_nsmq_pre_expected";
+  const resolutions = "_nsmq_pre_topic_candidates";
   const exceptions = "_nsmq_pre_exceptions";
   return `-- Aggregate fail-closed preflight for NSMQ remediation 267-270.
 PRAGMA foreign_keys=ON;
-${mappingTableSql(table, plan.mappings, true)}
+${resolvedMappingSql(table, resolutions, plan.mappings, true, true)}
 ${exceptionTableSql(exceptions, plan.reviewedExceptions)}
 CREATE TABLE IF NOT EXISTS _nsmq_pre_guard(valid INTEGER NOT NULL CHECK(valid=1));
 DELETE FROM _nsmq_pre_guard;
@@ -615,6 +640,8 @@ INSERT INTO _nsmq_pre_guard(valid)
 SELECT CASE WHEN
   (SELECT COUNT(*) FROM ${table})=373
   AND (SELECT COUNT(*) FROM ${exceptions})=2
+  AND NOT EXISTS (SELECT 1 FROM ${table} WHERE t IS NULL)
+  AND NOT EXISTS (SELECT 1 FROM (SELECT s FROM ${table} UNION SELECT s FROM ${exceptions}) e LEFT JOIN subjects s ON s.id=e.s WHERE s.id IS NULL OR s.exam_type_id<>'exam_nsmq' OR s.is_active<>1)
   AND (SELECT COUNT(*) FROM questions q JOIN ${table} e ON e.q=q.id WHERE q.subject_id IS e.s AND q.round_type IS e.r AND q.topic_id IS NULL)=373
   AND (SELECT COUNT(*) FROM questions q JOIN ${exceptions} e ON e.q=q.id WHERE q.subject_id IS e.s AND q.round_type IS e.r AND q.topic_id IS NULL)=2
   AND ${correctionStatePredicate(false)}
@@ -634,16 +661,19 @@ DROP TABLE _nsmq_pre_guard;
 
 function renderPostflight(plan) {
   const table = "_nsmq_post_expected";
+  const resolutions = "_nsmq_post_topic_candidates";
   const exceptions = "_nsmq_post_exceptions";
   return `-- Aggregate fail-closed postflight for NSMQ remediation 267-270.
 PRAGMA foreign_keys=ON;
-${mappingTableSql(table, plan.mappings, true)}
+${resolvedMappingSql(table, resolutions, plan.mappings, true)}
 ${exceptionTableSql(exceptions, plan.reviewedExceptions)}
 CREATE TABLE IF NOT EXISTS _nsmq_post_guard(valid INTEGER NOT NULL CHECK(valid=1));
 DELETE FROM _nsmq_post_guard;
 INSERT INTO _nsmq_post_guard(valid)
 SELECT CASE WHEN
   (SELECT COUNT(*) FROM ${table})=373
+  AND NOT EXISTS (SELECT 1 FROM ${table} WHERE t IS NULL)
+  AND NOT EXISTS (SELECT 1 FROM (SELECT s FROM ${table} UNION SELECT s FROM ${exceptions}) e LEFT JOIN subjects s ON s.id=e.s WHERE s.id IS NULL OR s.exam_type_id<>'exam_nsmq' OR s.is_active<>1)
   AND (SELECT COUNT(*) FROM questions q JOIN ${table} e ON e.q=q.id WHERE q.subject_id IS e.s AND q.round_type IS e.r AND q.topic_id IS e.t)=373
   AND (SELECT COUNT(*) FROM questions q JOIN ${exceptions} e ON e.q=q.id WHERE q.subject_id IS e.s AND q.round_type IS e.r AND q.topic_id IS NULL)=2
   AND ${correctionStatePredicate(true)}

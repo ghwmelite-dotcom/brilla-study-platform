@@ -1,9 +1,8 @@
 -- Aggregate fail-closed postflight for legacy NSMQ remediation 278-280.
 PRAGMA foreign_keys=ON;
-CREATE TABLE IF NOT EXISTS _nsmq_legacy_post_expected(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT NOT NULL,m INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS _nsmq_legacy_post_expected(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,k TEXT NOT NULL,t TEXT,m INTEGER NOT NULL);
 DELETE FROM _nsmq_legacy_post_expected;
-INSERT INTO _nsmq_legacy_post_expected VALUES
-  ('nsmq_bio_sr_001','subj_nsmq_biology','speed_race','topic_physiology','278'),
+WITH source(q,s,r,k,m) AS (VALUES ('nsmq_bio_sr_001','subj_nsmq_biology','speed_race','topic_physiology','278'),
   ('nsmq_bio_sr_002','subj_nsmq_biology','speed_race','topic_biochemistry','278'),
   ('nsmq_bio_sr_003','subj_nsmq_biology','speed_race','topic_biochemistry','278'),
   ('nsmq_bio_sr_004','subj_nsmq_biology','speed_race','topic_physiology','278'),
@@ -270,7 +269,56 @@ INSERT INTO _nsmq_legacy_post_expected VALUES
   ('nsmq_phys_sr_072','subj_nsmq_physics','speed_race','topic_modern_physics','280'),
   ('nsmq_phys_sr_073','subj_nsmq_physics','speed_race','topic_modern_physics','280'),
   ('nsmq_phys_sr_074','subj_nsmq_physics','speed_race','topic_modern_physics','280'),
-  ('nsmq_phys_sr_075','subj_nsmq_physics','speed_race','topic_modern_physics','280');
+  ('nsmq_phys_sr_075','subj_nsmq_physics','speed_race','topic_modern_physics','280')),
+candidates(k,s,t,p) AS (VALUES ('topic_biochemistry','subj_nsmq_biology','topic_nsmq_bio_biochemistry','0'),
+  ('topic_biochemistry','subj_nsmq_biology','topic_biochemistry','1'),
+  ('topic_cells','subj_nsmq_biology','topic_nsmq_bio_cells','0'),
+  ('topic_cells','subj_nsmq_biology','topic_cells','1'),
+  ('topic_ecology','subj_nsmq_biology','topic_nsmq_bio_ecology','0'),
+  ('topic_ecology','subj_nsmq_biology','topic_ecology','1'),
+  ('topic_genetics','subj_nsmq_biology','topic_nsmq_bio_genetics','0'),
+  ('topic_genetics','subj_nsmq_biology','topic_genetics','1'),
+  ('topic_physiology','subj_nsmq_biology','topic_nsmq_bio_physiology','0'),
+  ('topic_physiology','subj_nsmq_biology','topic_physiology','1'),
+  ('topic_atomic','subj_nsmq_chemistry','topic_nsmq_chem_atomic','0'),
+  ('topic_atomic','subj_nsmq_chemistry','topic_atomic','1'),
+  ('topic_bonding','subj_nsmq_chemistry','topic_nsmq_chem_bonding','0'),
+  ('topic_bonding','subj_nsmq_chemistry','topic_bonding','1'),
+  ('topic_electrochemistry','subj_nsmq_chemistry','topic_nsmq_chem_electrochemistry','0'),
+  ('topic_electrochemistry','subj_nsmq_chemistry','topic_electrochemistry','1'),
+  ('topic_equilibrium','subj_nsmq_chemistry','topic_nsmq_chem_equilibrium','0'),
+  ('topic_equilibrium','subj_nsmq_chemistry','topic_equilibrium','1'),
+  ('topic_nsmq_chem_environmental','subj_nsmq_chemistry','topic_nsmq_chem_environmental','0'),
+  ('topic_organic','subj_nsmq_chemistry','topic_nsmq_chem_organic','0'),
+  ('topic_organic','subj_nsmq_chemistry','topic_organic','1'),
+  ('topic_stoichiometry','subj_nsmq_chemistry','topic_nsmq_chem_stoichiometry','0'),
+  ('topic_stoichiometry','subj_nsmq_chemistry','topic_stoichiometry','1'),
+  ('topic_algebra','subj_nsmq_math','topic_nsmq_math_algebra','0'),
+  ('topic_algebra','subj_nsmq_math','topic_algebra','1'),
+  ('topic_geometry','subj_nsmq_math','topic_nsmq_math_geometry','0'),
+  ('topic_geometry','subj_nsmq_math','topic_geometry','1'),
+  ('topic_statistics','subj_nsmq_math','topic_nsmq_math_statistics','0'),
+  ('topic_statistics','subj_nsmq_math','topic_statistics','1'),
+  ('topic_trigonometry','subj_nsmq_math','topic_nsmq_math_trigonometry','0'),
+  ('topic_trigonometry','subj_nsmq_math','topic_trigonometry','1'),
+  ('topic_electricity','subj_nsmq_physics','topic_nsmq_phys_electricity','0'),
+  ('topic_electricity','subj_nsmq_physics','topic_electricity','1'),
+  ('topic_mechanics','subj_nsmq_physics','topic_nsmq_phys_mechanics','0'),
+  ('topic_mechanics','subj_nsmq_physics','topic_mechanics','1'),
+  ('topic_modern_physics','subj_nsmq_physics','topic_nsmq_phys_modern_physics','0'),
+  ('topic_modern_physics','subj_nsmq_physics','topic_modern_physics','1'),
+  ('topic_thermodynamics','subj_nsmq_physics','topic_nsmq_phys_thermodynamics','0'),
+  ('topic_thermodynamics','subj_nsmq_physics','topic_thermodynamics','1'),
+  ('topic_waves','subj_nsmq_physics','topic_nsmq_phys_waves','0'),
+  ('topic_waves','subj_nsmq_physics','topic_waves','1'))
+INSERT INTO _nsmq_legacy_post_expected
+SELECT source.q,source.s,source.r,source.k,(
+  SELECT MIN(c.t) FROM candidates c
+  JOIN topics t ON t.id=c.t AND t.subject_id=c.s
+  JOIN subjects s ON s.id=t.subject_id
+  WHERE c.k=source.k AND c.s=source.s AND s.exam_type_id='exam_nsmq' AND s.is_active=1
+  HAVING COUNT(*)=1
+),source.m FROM source;
 CREATE TABLE IF NOT EXISTS _nsmq_legacy_post_quarantine(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,reason TEXT NOT NULL);
 DELETE FROM _nsmq_legacy_post_quarantine;
 INSERT INTO _nsmq_legacy_post_quarantine VALUES

@@ -110,6 +110,212 @@
       "evidence": "The complete finite digit search proves two solutions. The prompt is pluralized so the corrected answer is complete without adding or silently changing a constraint."
     }
   ],
+  "topicResolutions": [
+    {
+      "logicalTopicId": "topic_biochemistry",
+      "subjectId": "subj_nsmq_biology",
+      "candidateTopicIds": [
+        "topic_nsmq_bio_biochemistry",
+        "topic_biochemistry"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_cells",
+      "subjectId": "subj_nsmq_biology",
+      "candidateTopicIds": [
+        "topic_nsmq_bio_cells",
+        "topic_cells"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_ecology",
+      "subjectId": "subj_nsmq_biology",
+      "candidateTopicIds": [
+        "topic_nsmq_bio_ecology",
+        "topic_ecology"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_genetics",
+      "subjectId": "subj_nsmq_biology",
+      "candidateTopicIds": [
+        "topic_nsmq_bio_genetics",
+        "topic_genetics"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_physiology",
+      "subjectId": "subj_nsmq_biology",
+      "candidateTopicIds": [
+        "topic_nsmq_bio_physiology",
+        "topic_physiology"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_atomic",
+      "subjectId": "subj_nsmq_chemistry",
+      "candidateTopicIds": [
+        "topic_nsmq_chem_atomic",
+        "topic_atomic"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_bonding",
+      "subjectId": "subj_nsmq_chemistry",
+      "candidateTopicIds": [
+        "topic_nsmq_chem_bonding",
+        "topic_bonding"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_electrochemistry",
+      "subjectId": "subj_nsmq_chemistry",
+      "candidateTopicIds": [
+        "topic_nsmq_chem_electrochemistry",
+        "topic_electrochemistry"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_equilibrium",
+      "subjectId": "subj_nsmq_chemistry",
+      "candidateTopicIds": [
+        "topic_nsmq_chem_equilibrium",
+        "topic_equilibrium"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_nsmq_chem_environmental",
+      "subjectId": "subj_nsmq_chemistry",
+      "candidateTopicIds": [
+        "topic_nsmq_chem_environmental"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_organic",
+      "subjectId": "subj_nsmq_chemistry",
+      "candidateTopicIds": [
+        "topic_nsmq_chem_organic",
+        "topic_organic"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_stoichiometry",
+      "subjectId": "subj_nsmq_chemistry",
+      "candidateTopicIds": [
+        "topic_nsmq_chem_stoichiometry",
+        "topic_stoichiometry"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_algebra",
+      "subjectId": "subj_nsmq_math",
+      "candidateTopicIds": [
+        "topic_nsmq_math_algebra",
+        "topic_algebra"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_calculus",
+      "subjectId": "subj_nsmq_math",
+      "candidateTopicIds": [
+        "topic_nsmq_math_calculus",
+        "topic_calculus"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_geometry",
+      "subjectId": "subj_nsmq_math",
+      "candidateTopicIds": [
+        "topic_nsmq_math_geometry",
+        "topic_geometry"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_nsmq_math_general_reasoning",
+      "subjectId": "subj_nsmq_math",
+      "candidateTopicIds": [
+        "topic_nsmq_math_general_reasoning"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_nsmq_math_numeration",
+      "subjectId": "subj_nsmq_math",
+      "candidateTopicIds": [
+        "topic_nsmq_math_numeration"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_nsmq_math_sets",
+      "subjectId": "subj_nsmq_math",
+      "candidateTopicIds": [
+        "topic_nsmq_math_sets"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_quadratic",
+      "subjectId": "subj_nsmq_math",
+      "candidateTopicIds": [
+        "topic_nsmq_math_quadratic",
+        "topic_quadratic"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_statistics",
+      "subjectId": "subj_nsmq_math",
+      "candidateTopicIds": [
+        "topic_nsmq_math_statistics",
+        "topic_statistics"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_trigonometry",
+      "subjectId": "subj_nsmq_math",
+      "candidateTopicIds": [
+        "topic_nsmq_math_trigonometry",
+        "topic_trigonometry"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_electricity",
+      "subjectId": "subj_nsmq_physics",
+      "candidateTopicIds": [
+        "topic_nsmq_phys_electricity",
+        "topic_electricity"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_mechanics",
+      "subjectId": "subj_nsmq_physics",
+      "candidateTopicIds": [
+        "topic_nsmq_phys_mechanics",
+        "topic_mechanics"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_modern_physics",
+      "subjectId": "subj_nsmq_physics",
+      "candidateTopicIds": [
+        "topic_nsmq_phys_modern_physics",
+        "topic_modern_physics"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_thermodynamics",
+      "subjectId": "subj_nsmq_physics",
+      "candidateTopicIds": [
+        "topic_nsmq_phys_thermodynamics",
+        "topic_thermodynamics"
+      ]
+    },
+    {
+      "logicalTopicId": "topic_waves",
+      "subjectId": "subj_nsmq_physics",
+      "candidateTopicIds": [
+        "topic_nsmq_phys_waves",
+        "topic_waves"
+      ]
+    }
+  ],
   "mappings": [
     {
       "questionId": "nsmq_math_rid_012",

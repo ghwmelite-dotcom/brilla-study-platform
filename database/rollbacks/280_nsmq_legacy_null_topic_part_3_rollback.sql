@@ -1,9 +1,8 @@
 -- Rollback 280: restore exact ledger-backed legacy NSMQ topic values to NULL.
 PRAGMA foreign_keys=ON;
-CREATE TABLE IF NOT EXISTS _nsmq_legacy_rb_280_expected(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS _nsmq_legacy_rb_280_expected(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,k TEXT NOT NULL,t TEXT);
 DELETE FROM _nsmq_legacy_rb_280_expected;
-INSERT INTO _nsmq_legacy_rb_280_expected VALUES
-  ('nsmq_math_sr_037','subj_nsmq_math','speed_race','topic_geometry'),
+WITH source(q,s,r,k) AS (VALUES ('nsmq_math_sr_037','subj_nsmq_math','speed_race','topic_geometry'),
   ('nsmq_math_sr_038','subj_nsmq_math','speed_race','topic_geometry'),
   ('nsmq_math_sr_039','subj_nsmq_math','speed_race','topic_geometry'),
   ('nsmq_math_sr_040','subj_nsmq_math','speed_race','topic_geometry'),
@@ -90,7 +89,33 @@ INSERT INTO _nsmq_legacy_rb_280_expected VALUES
   ('nsmq_phys_sr_072','subj_nsmq_physics','speed_race','topic_modern_physics'),
   ('nsmq_phys_sr_073','subj_nsmq_physics','speed_race','topic_modern_physics'),
   ('nsmq_phys_sr_074','subj_nsmq_physics','speed_race','topic_modern_physics'),
-  ('nsmq_phys_sr_075','subj_nsmq_physics','speed_race','topic_modern_physics');
+  ('nsmq_phys_sr_075','subj_nsmq_physics','speed_race','topic_modern_physics')),
+candidates(k,s,t,p) AS (VALUES ('topic_algebra','subj_nsmq_math','topic_nsmq_math_algebra','0'),
+  ('topic_algebra','subj_nsmq_math','topic_algebra','1'),
+  ('topic_geometry','subj_nsmq_math','topic_nsmq_math_geometry','0'),
+  ('topic_geometry','subj_nsmq_math','topic_geometry','1'),
+  ('topic_statistics','subj_nsmq_math','topic_nsmq_math_statistics','0'),
+  ('topic_statistics','subj_nsmq_math','topic_statistics','1'),
+  ('topic_trigonometry','subj_nsmq_math','topic_nsmq_math_trigonometry','0'),
+  ('topic_trigonometry','subj_nsmq_math','topic_trigonometry','1'),
+  ('topic_electricity','subj_nsmq_physics','topic_nsmq_phys_electricity','0'),
+  ('topic_electricity','subj_nsmq_physics','topic_electricity','1'),
+  ('topic_mechanics','subj_nsmq_physics','topic_nsmq_phys_mechanics','0'),
+  ('topic_mechanics','subj_nsmq_physics','topic_mechanics','1'),
+  ('topic_modern_physics','subj_nsmq_physics','topic_nsmq_phys_modern_physics','0'),
+  ('topic_modern_physics','subj_nsmq_physics','topic_modern_physics','1'),
+  ('topic_thermodynamics','subj_nsmq_physics','topic_nsmq_phys_thermodynamics','0'),
+  ('topic_thermodynamics','subj_nsmq_physics','topic_thermodynamics','1'),
+  ('topic_waves','subj_nsmq_physics','topic_nsmq_phys_waves','0'),
+  ('topic_waves','subj_nsmq_physics','topic_waves','1'))
+INSERT INTO _nsmq_legacy_rb_280_expected
+SELECT source.q,source.s,source.r,source.k,(
+  SELECT MIN(c.t) FROM candidates c
+  JOIN topics t ON t.id=c.t AND t.subject_id=c.s
+  JOIN subjects s ON s.id=t.subject_id
+  WHERE c.k=source.k AND c.s=source.s AND s.exam_type_id='exam_nsmq' AND s.is_active=1
+  HAVING COUNT(*)=1
+) FROM source;
 CREATE TABLE IF NOT EXISTS _nsmq_legacy_rb_280_guard(valid INTEGER NOT NULL CHECK(valid=1));
 DELETE FROM _nsmq_legacy_rb_280_guard;
 INSERT INTO _nsmq_legacy_rb_280_guard(valid)

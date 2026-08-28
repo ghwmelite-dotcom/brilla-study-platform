@@ -1,9 +1,8 @@
 -- Rollback 267: restore only exact ledger-backed NSMQ source values.
 PRAGMA foreign_keys=ON;
-CREATE TABLE IF NOT EXISTS _rollback_267_expected(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS _rollback_267_expected(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT);
 DELETE FROM _rollback_267_expected;
-INSERT INTO _rollback_267_expected VALUES
-  ('nsmq_math_rid_012','subj_nsmq_math','riddles','topic_nsmq_math_general_reasoning'),
+WITH source(q,s,r,k) AS (VALUES ('nsmq_math_rid_012','subj_nsmq_math','riddles','topic_nsmq_math_general_reasoning'),
   ('nsmq_phy_rid_012','subj_nsmq_physics','riddles','topic_thermodynamics'),
   ('nsmq_bio_pod_001','subj_nsmq_biology','problem_of_day','topic_genetics'),
   ('nsmq_bio_pod_002','subj_nsmq_biology','problem_of_day','topic_genetics'),
@@ -102,13 +101,27 @@ INSERT INTO _rollback_267_expected VALUES
   ('nsmq_chem_pod_009','subj_nsmq_chemistry','problem_of_day','topic_electrochemistry'),
   ('nsmq_chem_pod_010','subj_nsmq_chemistry','problem_of_day','topic_stoichiometry'),
   ('nsmq_chem_pod_011','subj_nsmq_chemistry','problem_of_day','topic_stoichiometry'),
-  ('nsmq_chem_pod_012','subj_nsmq_chemistry','problem_of_day','topic_stoichiometry');
+  ('nsmq_chem_pod_012','subj_nsmq_chemistry','problem_of_day','topic_stoichiometry'))
+INSERT INTO _rollback_267_expected
+SELECT source.q,source.s,source.r,coalesce((
+  SELECT MIN(t.id) FROM topics t
+  JOIN subjects s ON s.id=t.subject_id
+  WHERE t.id IN (source.k,CASE source.s
+    WHEN 'subj_nsmq_math' THEN 'topic_nsmq_math_'||substr(source.k,7)
+    WHEN 'subj_nsmq_physics' THEN 'topic_nsmq_phys_'||substr(source.k,7)
+    WHEN 'subj_nsmq_chemistry' THEN 'topic_nsmq_chem_'||substr(source.k,7)
+    WHEN 'subj_nsmq_biology' THEN 'topic_nsmq_bio_'||substr(source.k,7)
+    ELSE source.k END) AND t.subject_id=source.s
+    AND s.exam_type_id='exam_nsmq' AND s.is_active=1
+  HAVING COUNT(*)=1
+),CASE WHEN source.k IN ('topic_nsmq_math_general_reasoning','topic_nsmq_math_numeration','topic_nsmq_math_sets','topic_nsmq_chem_environmental') AND source.s IS CASE source.k WHEN 'topic_nsmq_math_general_reasoning' THEN 'subj_nsmq_math' WHEN 'topic_nsmq_math_numeration' THEN 'subj_nsmq_math' WHEN 'topic_nsmq_math_sets' THEN 'subj_nsmq_math' WHEN 'topic_nsmq_chem_environmental' THEN 'subj_nsmq_chemistry' END THEN source.k END) FROM source;
 CREATE TABLE IF NOT EXISTS _rollback_267_guard(valid INTEGER NOT NULL CHECK(valid=1));
 DELETE FROM _rollback_267_guard;
 INSERT INTO _rollback_267_guard(valid)
 SELECT CASE WHEN
   (SELECT COUNT(*) FROM _rollback_267_expected)=100
   AND (SELECT COUNT(*) FROM questions q JOIN _rollback_267_expected e ON e.q=q.id WHERE q.subject_id IS e.s AND q.round_type IS e.r)=100
+  AND NOT EXISTS (SELECT 1 FROM _rollback_267_expected WHERE t IS NULL)
   AND NOT EXISTS (SELECT 1 FROM _rollback_267_expected e LEFT JOIN topics t ON t.id=e.t WHERE
     (e.t NOT IN ('topic_nsmq_math_general_reasoning','topic_nsmq_math_numeration','topic_nsmq_math_sets','topic_nsmq_chem_environmental') AND (t.id IS NULL OR t.subject_id IS NOT e.s))
     OR (e.t IN ('topic_nsmq_math_general_reasoning','topic_nsmq_math_numeration','topic_nsmq_math_sets','topic_nsmq_chem_environmental') AND e.s IS NOT CASE e.t WHEN 'topic_nsmq_math_general_reasoning' THEN 'subj_nsmq_math' WHEN 'topic_nsmq_math_numeration' THEN 'subj_nsmq_math' WHEN 'topic_nsmq_math_sets' THEN 'subj_nsmq_math' WHEN 'topic_nsmq_chem_environmental' THEN 'subj_nsmq_chemistry' END))

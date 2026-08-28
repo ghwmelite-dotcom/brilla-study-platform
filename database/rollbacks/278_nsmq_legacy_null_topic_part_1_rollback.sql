@@ -1,9 +1,8 @@
 -- Rollback 278: restore exact ledger-backed legacy NSMQ topic values to NULL.
 PRAGMA foreign_keys=ON;
-CREATE TABLE IF NOT EXISTS _nsmq_legacy_rb_278_expected(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,t TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS _nsmq_legacy_rb_278_expected(q TEXT PRIMARY KEY,s TEXT NOT NULL,r TEXT NOT NULL,k TEXT NOT NULL,t TEXT);
 DELETE FROM _nsmq_legacy_rb_278_expected;
-INSERT INTO _nsmq_legacy_rb_278_expected VALUES
-  ('nsmq_bio_sr_001','subj_nsmq_biology','speed_race','topic_physiology'),
+WITH source(q,s,r,k) AS (VALUES ('nsmq_bio_sr_001','subj_nsmq_biology','speed_race','topic_physiology'),
   ('nsmq_bio_sr_002','subj_nsmq_biology','speed_race','topic_biochemistry'),
   ('nsmq_bio_sr_003','subj_nsmq_biology','speed_race','topic_biochemistry'),
   ('nsmq_bio_sr_004','subj_nsmq_biology','speed_race','topic_physiology'),
@@ -92,7 +91,36 @@ INSERT INTO _nsmq_legacy_rb_278_expected VALUES
   ('nsmq_chem_sr_012','subj_nsmq_chemistry','speed_race','topic_organic'),
   ('nsmq_chem_sr_013','subj_nsmq_chemistry','speed_race','topic_equilibrium'),
   ('nsmq_chem_sr_014','subj_nsmq_chemistry','speed_race','topic_bonding'),
-  ('nsmq_chem_sr_015','subj_nsmq_chemistry','speed_race','topic_equilibrium');
+  ('nsmq_chem_sr_015','subj_nsmq_chemistry','speed_race','topic_equilibrium')),
+candidates(k,s,t,p) AS (VALUES ('topic_biochemistry','subj_nsmq_biology','topic_nsmq_bio_biochemistry','0'),
+  ('topic_biochemistry','subj_nsmq_biology','topic_biochemistry','1'),
+  ('topic_cells','subj_nsmq_biology','topic_nsmq_bio_cells','0'),
+  ('topic_cells','subj_nsmq_biology','topic_cells','1'),
+  ('topic_ecology','subj_nsmq_biology','topic_nsmq_bio_ecology','0'),
+  ('topic_ecology','subj_nsmq_biology','topic_ecology','1'),
+  ('topic_genetics','subj_nsmq_biology','topic_nsmq_bio_genetics','0'),
+  ('topic_genetics','subj_nsmq_biology','topic_genetics','1'),
+  ('topic_physiology','subj_nsmq_biology','topic_nsmq_bio_physiology','0'),
+  ('topic_physiology','subj_nsmq_biology','topic_physiology','1'),
+  ('topic_atomic','subj_nsmq_chemistry','topic_nsmq_chem_atomic','0'),
+  ('topic_atomic','subj_nsmq_chemistry','topic_atomic','1'),
+  ('topic_bonding','subj_nsmq_chemistry','topic_nsmq_chem_bonding','0'),
+  ('topic_bonding','subj_nsmq_chemistry','topic_bonding','1'),
+  ('topic_equilibrium','subj_nsmq_chemistry','topic_nsmq_chem_equilibrium','0'),
+  ('topic_equilibrium','subj_nsmq_chemistry','topic_equilibrium','1'),
+  ('topic_nsmq_chem_environmental','subj_nsmq_chemistry','topic_nsmq_chem_environmental','0'),
+  ('topic_organic','subj_nsmq_chemistry','topic_nsmq_chem_organic','0'),
+  ('topic_organic','subj_nsmq_chemistry','topic_organic','1'),
+  ('topic_stoichiometry','subj_nsmq_chemistry','topic_nsmq_chem_stoichiometry','0'),
+  ('topic_stoichiometry','subj_nsmq_chemistry','topic_stoichiometry','1'))
+INSERT INTO _nsmq_legacy_rb_278_expected
+SELECT source.q,source.s,source.r,source.k,(
+  SELECT MIN(c.t) FROM candidates c
+  JOIN topics t ON t.id=c.t AND t.subject_id=c.s
+  JOIN subjects s ON s.id=t.subject_id
+  WHERE c.k=source.k AND c.s=source.s AND s.exam_type_id='exam_nsmq' AND s.is_active=1
+  HAVING COUNT(*)=1
+) FROM source;
 CREATE TABLE IF NOT EXISTS _nsmq_legacy_rb_278_guard(valid INTEGER NOT NULL CHECK(valid=1));
 DELETE FROM _nsmq_legacy_rb_278_guard;
 INSERT INTO _nsmq_legacy_rb_278_guard(valid)
