@@ -6,6 +6,10 @@ const migrationSql = readFileSync(
   'database/migrations/358_referral_marketing_consent.sql',
   'utf8',
 );
+const dispatchMigrationSql = readFileSync(
+  'database/migrations/359_marketing_campaign_dispatches.sql',
+  'utf8',
+);
 
 let database: Database.Database | null = null;
 
@@ -100,5 +104,28 @@ describe('migration 358 referral marketing consent', () => {
     `);
     insert.run('suppression-1');
     expect(() => insert.run('suppression-2')).toThrow();
+  });
+
+  it('allows only one auditable dispatch reservation per campaign', () => {
+    const db = createDatabase();
+    db.exec(migrationSql);
+    db.exec(dispatchMigrationSql);
+    db.prepare(`
+      INSERT INTO users (id, email, name, role, email_verified)
+      VALUES ('admin-1', 'admin@example.com', 'Admin One', 'admin', 1)
+    `).run();
+    db.prepare(`
+      INSERT INTO marketing_campaigns (
+        id, name, subject, preview_text, message, pilot_percent, created_by
+      ) VALUES ('campaign-1', 'Pilot', 'Subject', 'Preview', 'Message', 10, 'admin-1')
+    `).run();
+
+    const reserve = db.prepare(`
+      INSERT INTO marketing_campaign_dispatches (
+        campaign_id, status, expected_recipient_count, requested_by
+      ) VALUES ('campaign-1', 'preparing', 1, 'admin-1')
+    `);
+    expect(() => reserve.run()).not.toThrow();
+    expect(() => reserve.run()).toThrow();
   });
 });
