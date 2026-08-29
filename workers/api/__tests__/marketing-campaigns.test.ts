@@ -30,7 +30,7 @@ function mockDb(role: 'student' | 'admin' = 'student') {
     bind: (..._params: unknown[]) => statement(sql),
     first: async () => {
       if (sql.includes('role, status, is_active, session_version FROM users')) return authRow;
-      if (sql.includes('SELECT id, name, email, role, email_verified')) return marketingUser;
+      if (sql.includes('SELECT id, name, email, email_verified')) return marketingUser;
       return null;
     },
     all: async () => ({ results: [] }),
@@ -76,8 +76,8 @@ function mockSendDb() {
             name: 'Admin One',
             email: 'admin@example.com',
             referral_code: 'REF-ONE',
-            consent_version: 'referral-rewards-2026-08-29',
-            eligibility_basis: 'adult_role',
+            consent_version: 'referral-rewards-explicit-opt-in-2026-08-29',
+            eligibility_basis: 'explicit_opt_in',
           }],
         };
       }
@@ -111,19 +111,44 @@ describe('referral marketing boundaries', () => {
     expect(response.status).toBe(401);
   });
 
-  it('rejects a student opt-in without adult attestation', async () => {
+  it('accepts an explicit student opt-in without inferring age from the student role', async () => {
     const response = await worker.fetch(
       new Request('http://x/api/marketing/preferences', {
         method: 'PUT',
         headers: await authHeader('student'),
-        body: JSON.stringify({ referralRewardsOptIn: true }),
+        body: JSON.stringify({
+          referralRewardsOptIn: true,
+          consentSource: 'student_onboarding',
+        }),
       }),
       { DB: mockDb('student'), JWT_SECRET },
     );
-    expect(response.status).toBe(409);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      success: true,
+      data: {
+        referralRewardsOptIn: true,
+        consentVersion: 'referral-rewards-explicit-opt-in-2026-08-29',
+      },
+    });
+  });
+
+  it('rejects an unrecognized consent source', async () => {
+    const response = await worker.fetch(
+      new Request('http://x/api/marketing/preferences', {
+        method: 'PUT',
+        headers: await authHeader('student'),
+        body: JSON.stringify({
+          referralRewardsOptIn: true,
+          consentSource: 'signup_terms',
+        }),
+      }),
+      { DB: mockDb('student'), JWT_SECRET },
+    );
+    expect(response.status).toBe(400);
     expect(await response.json()).toMatchObject({
       success: false,
-      error: expect.stringContaining('Adult confirmation'),
+      error: 'Invalid preference values',
     });
   });
 

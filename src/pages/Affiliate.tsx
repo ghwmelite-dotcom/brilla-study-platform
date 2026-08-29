@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useAffiliateStore } from '@/stores/affiliateStore';
 import { useAuthStore } from '@/stores/authStore';
-import { AffiliateGuide } from '@/components/affiliate';
+import { AffiliateGuide, ReferralEmailConsentCard } from '@/components/affiliate';
 
 type TabType = 'overview' | 'referrals' | 'leaderboard' | 'challenges' | 'earnings';
 
@@ -260,6 +260,10 @@ export default function Affiliate() {
             </button>
           </div>
         </div>
+
+        {user?.role === 'student' && (
+          <ReferralEmailConsentCard surface="affiliate_dashboard" className="mb-8" />
+        )}
 
         {/* Tier Progress */}
         {profile && (

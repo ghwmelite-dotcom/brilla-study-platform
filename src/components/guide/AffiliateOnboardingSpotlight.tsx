@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, Check, Copy, Medal, Sparkles, Users, WalletCards } from 'lucide-react';
 import type { AffiliateProfile } from '@/types';
+import { ReferralEmailConsentCard } from '@/components/affiliate/ReferralEmailConsentCard';
 
 interface AffiliateOnboardingSpotlightProps {
   profile: AffiliateProfile | null;
@@ -122,6 +123,8 @@ export function AffiliateOnboardingSpotlight({
         )}
         <p className="sr-only" aria-live="polite">{copied ? 'Referral link copied to clipboard.' : ''}</p>
       </div>
+
+      <ReferralEmailConsentCard surface="student_onboarding" />
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs leading-5 text-neutral-500">

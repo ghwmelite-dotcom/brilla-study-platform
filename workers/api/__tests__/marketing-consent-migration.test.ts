@@ -10,6 +10,10 @@ const dispatchMigrationSql = readFileSync(
   'database/migrations/359_marketing_campaign_dispatches.sql',
   'utf8',
 );
+const roleNeutralConsentMigrationSql = readFileSync(
+  'database/migrations/360_role_neutral_marketing_consent.sql',
+  'utf8',
+);
 
 let database: Database.Database | null = null;
 
@@ -127,5 +131,83 @@ describe('migration 358 referral marketing consent', () => {
     `);
     expect(() => reserve.run()).not.toThrow();
     expect(() => reserve.run()).toThrow();
+  });
+});
+
+describe('migration 360 role-neutral marketing consent', () => {
+  it('preserves active consent while replacing role-inferred eligibility with explicit opt-in', () => {
+    const db = createDatabase();
+    db.exec(migrationSql);
+    db.exec(dispatchMigrationSql);
+    db.exec(`
+      INSERT INTO users (id, email, name, role, email_verified)
+      VALUES
+        ('student-1', 'student@example.com', 'Student One', 'student', 1),
+        ('admin-1', 'admin@example.com', 'Admin One', 'admin', 1);
+      INSERT INTO affiliate_profiles (id, user_id, referral_code)
+      VALUES ('affiliate-1', 'student-1', 'SCOUT-1');
+      INSERT INTO marketing_email_preferences (
+        user_id, referral_rewards_opt_in, consent_version, consented_at,
+        consent_source, eligibility_basis, consent_actor_user_id
+      ) VALUES (
+        'student-1', 1, 'referral-rewards-2026-08-29', datetime('now'),
+        'settings', 'adult_self_attested', 'student-1'
+      );
+      INSERT INTO marketing_consent_events (
+        id, user_id, action, actor_user_id, source, consent_version, eligibility_basis
+      ) VALUES (
+        'event-1', 'student-1', 'opt_in', 'student-1', 'settings',
+        'referral-rewards-2026-08-29', 'adult_self_attested'
+      );
+      INSERT INTO marketing_campaigns (
+        id, name, subject, preview_text, message, pilot_percent, created_by
+      ) VALUES ('campaign-1', 'Pilot', 'Subject', 'Preview', 'Message', 10, 'admin-1');
+      INSERT INTO marketing_campaign_recipients (
+        campaign_id, user_id, referral_code, consent_version, eligibility_basis
+      ) VALUES (
+        'campaign-1', 'student-1', 'SCOUT-1',
+        'referral-rewards-2026-08-29', 'adult_self_attested'
+      );
+    `);
+
+    db.exec(roleNeutralConsentMigrationSql);
+
+    expect(db.prepare(`
+      SELECT eligibility_basis FROM marketing_email_preferences WHERE user_id = 'student-1'
+    `).get()).toEqual({ eligibility_basis: 'explicit_opt_in' });
+    expect(db.prepare(`
+      SELECT eligibility_basis FROM marketing_consent_events WHERE id = 'event-1'
+    `).get()).toEqual({ eligibility_basis: 'explicit_opt_in' });
+    expect(db.prepare(`
+      SELECT eligibility_basis FROM marketing_campaign_recipients
+      WHERE campaign_id = 'campaign-1' AND user_id = 'student-1'
+    `).get()).toEqual({ eligibility_basis: 'explicit_opt_in' });
+    expect(db.pragma('foreign_key_check')).toEqual([]);
+  });
+
+  it('accepts audited consent from each product surface without an age-derived basis', () => {
+    const db = createDatabase();
+    db.exec(migrationSql);
+    db.exec(roleNeutralConsentMigrationSql);
+    db.prepare(`
+      INSERT INTO users (id, email, name, role, email_verified)
+      VALUES ('student-1', 'student@example.com', 'Student One', 'student', 1)
+    `).run();
+
+    expect(() => db.prepare(`
+      INSERT INTO marketing_email_preferences (
+        user_id, referral_rewards_opt_in, consent_version, consented_at,
+        consent_source, eligibility_basis, consent_actor_user_id
+      ) VALUES (
+        'student-1', 1, 'referral-rewards-explicit-opt-in-2026-08-29', datetime('now'),
+        'student_onboarding', 'explicit_opt_in', 'student-1'
+      )
+    `).run()).not.toThrow();
+
+    expect(() => db.prepare(`
+      UPDATE marketing_email_preferences
+      SET eligibility_basis = 'adult_self_attested'
+      WHERE user_id = 'student-1'
+    `).run()).toThrow();
   });
 });

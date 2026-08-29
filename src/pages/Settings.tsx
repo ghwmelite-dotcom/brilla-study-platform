@@ -91,10 +91,8 @@ export default function Settings() {
   const [marketingPreference, setMarketingPreference] = useState({
     referralRewardsOptIn: false,
     emailVerified: false,
-    requiresAdultAttestation: user?.role === 'student',
     providerSyncStatus: 'not_synced',
   });
-  const [marketingAdultAttestation, setMarketingAdultAttestation] = useState(false);
   const [marketingLoading, setMarketingLoading] = useState(false);
   const [marketingSaving, setMarketingSaving] = useState(false);
   const [marketingError, setMarketingError] = useState<string | null>(null);
@@ -158,10 +156,8 @@ export default function Settings() {
         setMarketingPreference({
           referralRewardsOptIn: response.data.referralRewardsOptIn,
           emailVerified: response.data.emailVerified,
-          requiresAdultAttestation: response.data.requiresAdultAttestation,
           providerSyncStatus: response.data.providerSyncStatus,
         });
-        setMarketingAdultAttestation(response.data.eligibilityBasis === 'adult_self_attested');
       } catch (error) {
         setMarketingError(error instanceof Error ? error.message : 'Failed to load email choices');
       } finally {
@@ -183,9 +179,7 @@ export default function Settings() {
         providerSyncStatus: string;
       }>('/marketing/preferences', {
         referralRewardsOptIn: marketingPreference.referralRewardsOptIn,
-        adultAttestation: marketingPreference.requiresAdultAttestation
-          ? marketingAdultAttestation
-          : undefined,
+        consentSource: 'settings',
       });
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to save email choices');
@@ -1028,21 +1022,6 @@ export default function Settings() {
                       </p>
                     )}
 
-                    {marketingPreference.requiresAdultAttestation && marketingPreference.referralRewardsOptIn && (
-                      <label className="mt-4 flex items-start gap-3 rounded-xl border border-emerald-200 bg-white p-4">
-                        <input
-                          type="checkbox"
-                          checked={marketingAdultAttestation}
-                          onChange={(event) => setMarketingAdultAttestation(event.target.checked)}
-                          className="mt-0.5 h-5 w-5 rounded text-emerald-700 focus:ring-emerald-600"
-                        />
-                        <span className="text-sm leading-6 text-neutral-700">
-                          I confirm that I am 18 or older. Students under 18 should leave this off; a parent or guardian
-                          must manage any future marketing consent.
-                        </span>
-                      </label>
-                    )}
-
                     <p className="mt-4 text-xs leading-5 text-neutral-500">
                       You can withdraw consent here at any time. Brilla will keep essential account, security,
                       learning, and payment emails separate from this choice.
@@ -1070,8 +1049,7 @@ export default function Settings() {
                         onClick={handleMarketingPreferenceSave}
                         disabled={marketingLoading || marketingSaving ||
                           (marketingPreference.referralRewardsOptIn &&
-                            (!marketingPreference.emailVerified ||
-                              (marketingPreference.requiresAdultAttestation && !marketingAdultAttestation)))}
+                            !marketingPreference.emailVerified)}
                         className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {marketingSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}

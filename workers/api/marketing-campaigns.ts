@@ -3,7 +3,7 @@ import type { Context } from 'hono';
 import { requireAdmin, requireAuth, constantTimeEqual } from './auth-middleware';
 import { parseBoundedJsonBody } from './http';
 
-const CONSENT_VERSION = 'referral-rewards-2026-08-29';
+const CONSENT_VERSION = 'referral-rewards-explicit-opt-in-2026-08-29';
 const RESEND_API_BASE = 'https://api.resend.com';
 const RESEND_USER_AGENT = 'BrillaPrep-Worker/1.0 (+https://brillaprep.org)';
 const MAX_BODY_BYTES = 16_384;
@@ -31,7 +31,6 @@ interface MarketingUser {
   id: string;
   name: string;
   email: string;
-  role: string;
   email_verified: number;
   status: string;
   is_active: number;
@@ -156,7 +155,7 @@ function getUserId(c: MarketingContext): string {
 
 async function getMarketingUser(db: D1Database, userId: string): Promise<MarketingUser | null> {
   return db.prepare(`
-    SELECT id, name, email, role, email_verified, status, is_active, COALESCE(is_demo, 0) AS is_demo
+    SELECT id, name, email, email_verified, status, is_active, COALESCE(is_demo, 0) AS is_demo
     FROM users
     WHERE id = ?
   `).bind(userId).first<MarketingUser>();
@@ -368,7 +367,7 @@ async function getEligibleRecipients(db: D1Database): Promise<EligibleRecipient[
       AND mp.referral_rewards_opt_in = 1
       AND mp.unsubscribed_at IS NULL
       AND mp.consent_version IS NOT NULL
-      AND mp.eligibility_basis IN ('adult_self_attested', 'guardian_confirmed', 'adult_role')
+      AND mp.eligibility_basis IN ('explicit_opt_in', 'guardian_confirmed')
       AND ap.referral_code IS NOT NULL
       AND trim(ap.referral_code) <> ''
     ORDER BY u.id
@@ -518,10 +517,10 @@ marketingCampaignsApp.get('/preferences', async (c) => {
       referralRewardsOptIn: preference?.referral_rewards_opt_in === 1,
       consentVersion: preference?.consent_version || null,
       consentedAt: preference?.consented_at || null,
+      consentSource: preference?.consent_source || null,
       eligibilityBasis: preference?.eligibility_basis || 'unknown',
       providerSyncStatus: preference?.provider_sync_status || 'not_synced',
       emailVerified: user.email_verified === 1,
-      requiresAdultAttestation: user.role === 'student',
       consentCopyVersion: CONSENT_VERSION,
     },
   });
@@ -533,10 +532,14 @@ marketingCampaignsApp.put('/preferences', async (c) => {
     return c.json({ success: false, error: parsed.reason === 'too_large' ? 'Request is too large' : 'Invalid request body' }, parsed.reason === 'too_large' ? 413 : 400);
   }
   const optIn = parsed.body.referralRewardsOptIn;
-  const adultAttestation = parsed.body.adultAttestation;
-  if (typeof optIn !== 'boolean' || (adultAttestation !== undefined && typeof adultAttestation !== 'boolean')) {
+  const requestedSource = parsed.body.consentSource;
+  const allowedSources = new Set(['settings', 'student_onboarding', 'affiliate_dashboard']);
+  if (typeof optIn !== 'boolean' ||
+      (requestedSource !== undefined &&
+        (typeof requestedSource !== 'string' || !allowedSources.has(requestedSource)))) {
     return c.json({ success: false, error: 'Invalid preference values' }, 400);
   }
+  const consentSource = typeof requestedSource === 'string' ? requestedSource : 'settings';
 
   const user = await getMarketingUser(c.env.DB, getUserId(c));
   if (!user) return c.json({ success: false, error: 'User not found' }, 404);
@@ -550,9 +553,6 @@ marketingCampaignsApp.put('/preferences', async (c) => {
     if (user.is_demo === 1) {
       return c.json({ success: false, error: 'Demo accounts cannot join marketing lists' }, 409);
     }
-    if (user.role === 'student' && adultAttestation !== true) {
-      return c.json({ success: false, error: 'Adult confirmation is required. Students under 18 need a parent or guardian to manage marketing consent.' }, 409);
-    }
 
     const blockingSuppression = await c.env.DB.prepare(`
       SELECT reason FROM marketing_email_suppressions
@@ -563,7 +563,7 @@ marketingCampaignsApp.put('/preferences', async (c) => {
       return c.json({ success: false, error: 'This email address cannot currently receive marketing email' }, 409);
     }
 
-    const basis = user.role === 'student' ? 'adult_self_attested' : 'adult_role';
+    const basis = 'explicit_opt_in';
     await c.env.DB.batch([
       c.env.DB.prepare(`
         DELETE FROM marketing_email_suppressions
@@ -573,23 +573,23 @@ marketingCampaignsApp.put('/preferences', async (c) => {
         INSERT INTO marketing_email_preferences (
           user_id, referral_rewards_opt_in, consent_version, consented_at, consent_source,
           eligibility_basis, consent_actor_user_id, unsubscribed_at, provider_sync_status, updated_at
-        ) VALUES (?, 1, ?, ?, 'settings', ?, ?, NULL, 'pending', ?)
+        ) VALUES (?, 1, ?, ?, ?, ?, ?, NULL, 'pending', ?)
         ON CONFLICT(user_id) DO UPDATE SET
           referral_rewards_opt_in = 1,
           consent_version = excluded.consent_version,
           consented_at = excluded.consented_at,
-          consent_source = 'settings',
+          consent_source = excluded.consent_source,
           eligibility_basis = excluded.eligibility_basis,
           consent_actor_user_id = excluded.consent_actor_user_id,
           unsubscribed_at = NULL,
           provider_sync_status = 'pending',
           updated_at = excluded.updated_at
-      `).bind(user.id, CONSENT_VERSION, timestamp, basis, user.id, timestamp),
+      `).bind(user.id, CONSENT_VERSION, timestamp, consentSource, basis, user.id, timestamp),
       c.env.DB.prepare(`
         INSERT INTO marketing_consent_events (
           id, user_id, action, actor_user_id, source, consent_version, eligibility_basis
-        ) VALUES (?, ?, 'opt_in', ?, 'settings', ?, ?)
-      `).bind(crypto.randomUUID(), user.id, user.id, CONSENT_VERSION, basis),
+        ) VALUES (?, ?, 'opt_in', ?, ?, ?, ?)
+      `).bind(crypto.randomUUID(), user.id, user.id, consentSource, CONSENT_VERSION, basis),
     ]);
 
     const sync = await syncExplicitPreference(c.env, user, true);
@@ -627,18 +627,18 @@ marketingCampaignsApp.put('/preferences', async (c) => {
     `).bind(user.id, timestamp, timestamp),
     c.env.DB.prepare(`
       INSERT INTO marketing_email_suppressions (id, user_id, email_hash, reason, source)
-      VALUES (?, ?, ?, 'user_opt_out', 'settings')
+      VALUES (?, ?, ?, 'user_opt_out', ?)
       ON CONFLICT(email_hash) DO UPDATE SET
         user_id = excluded.user_id,
         reason = 'user_opt_out',
-        source = 'settings',
+        source = excluded.source,
         expires_at = NULL
-    `).bind(crypto.randomUUID(), user.id, emailHash),
+    `).bind(crypto.randomUUID(), user.id, emailHash, consentSource),
     c.env.DB.prepare(`
       INSERT INTO marketing_consent_events (
         id, user_id, action, actor_user_id, source, consent_version, eligibility_basis
-      ) VALUES (?, ?, 'opt_out', ?, 'settings', ?, 'unknown')
-    `).bind(crypto.randomUUID(), user.id, user.id, CONSENT_VERSION),
+      ) VALUES (?, ?, 'opt_out', ?, ?, ?, 'unknown')
+    `).bind(crypto.randomUUID(), user.id, user.id, consentSource, CONSENT_VERSION),
   ]);
 
   const sync = await syncExplicitPreference(c.env, user, false);
@@ -656,7 +656,7 @@ marketingCampaignsApp.use('/admin', requireAdmin);
 marketingCampaignsApp.use('/admin/*', requireAdmin);
 
 marketingCampaignsApp.get('/admin/overview', async (c) => {
-  const [activeVerified, consented, adultEligible, suppressed, campaigns, dispatches] = await Promise.all([
+  const [activeVerified, consented, eligibleRecipients, suppressed, campaigns, dispatches] = await Promise.all([
     c.env.DB.prepare(`
       SELECT COUNT(*) AS count FROM users
       WHERE status = 'approved' AND is_active = 1 AND COALESCE(is_demo, 0) = 0 AND email_verified = 1
@@ -690,7 +690,7 @@ marketingCampaignsApp.get('/admin/overview', async (c) => {
       audience: {
         activeVerified: activeVerified?.count || 0,
         explicitlyConsented: consented?.count || 0,
-        eligible: adultEligible.length,
+        eligible: eligibleRecipients.length,
         suppressed: suppressed?.count || 0,
       },
       provider: {
@@ -1041,7 +1041,7 @@ marketingCampaignsApp.post('/admin/campaigns/:id/send', async (c) => {
       AND mp.provider_sync_status = 'synced'
       AND mp.consent_version = mcr.consent_version
       AND mp.eligibility_basis = mcr.eligibility_basis
-      AND mp.eligibility_basis IN ('adult_self_attested', 'guardian_confirmed', 'adult_role')
+      AND mp.eligibility_basis IN ('explicit_opt_in', 'guardian_confirmed')
       AND ap.referral_code = mcr.referral_code
   `).bind(campaign.id).all<EligibleRecipient>();
 
