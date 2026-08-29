@@ -72,6 +72,7 @@ import {
   DAILY_QUESTION_LIMIT,
 } from './usage-limits';
 import { mapSubjectCatalogRow } from './subject-catalog';
+import { marketingCampaignsApp } from './marketing-campaigns';
 
 // Types for Cloudflare bindings
 export interface Env {
@@ -89,6 +90,8 @@ export interface Env {
   AI_CACHE_THRESHOLD?: string;
   AI: Ai;  // Cloudflare Workers AI binding
   RESEND_API_KEY?: string;
+  RESEND_WEBHOOK_SECRET?: string;
+  RESEND_REFERRAL_TOPIC_ID?: string;
   APP_URL?: string;
   FROM_EMAIL?: string;
   LIBRARY_BUCKET?: R2Bucket;
@@ -12171,6 +12174,10 @@ app.route('/api/telegram', telegramWebhookApp);
 
 // Mount OAuth routes (public with internal auth handling)
 app.route('/api/auth/oauth', oauthApp);
+
+// Consent-gated referral marketing preferences, provider webhooks, and
+// admin-only draft preparation. This router deliberately has no send endpoint.
+app.route('/api/marketing', marketingCampaignsApp);
 
 // Mount protected routes (must be after all protectedApp routes are defined)
 app.route('/api', protectedApp);

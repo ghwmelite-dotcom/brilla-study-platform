@@ -74,7 +74,7 @@ export default function PrivacyPolicy() {
     }
   };
 
-  const lastUpdated = new Date('2026-01-04').toLocaleDateString('en-US', {
+  const lastUpdated = new Date('2026-08-29').toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
     year: 'numeric'
@@ -310,6 +310,18 @@ export default function PrivacyPolicy() {
                       title="Legal Compliance"
                       description="Comply with legal obligations and enforce our terms of service."
                     />
+
+                  <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-5">
+                    <h3 className="font-semibold text-white">Optional referral and rewards marketing</h3>
+                    <p className="mt-2 text-sm leading-6 text-white/70">
+                      We send referral and rewards marketing emails only after a verified account holder gives
+                      explicit consent. Student accounts must also satisfy our adult or parent/guardian consent
+                      safeguards. Consent is recorded separately from essential account, security, learning, and
+                      payment communications. You may withdraw it at any time in Settings or through the
+                      unsubscribe link in each marketing email. We use Resend as our email delivery processor and
+                      retain suppression records so that withdrawn consent, complaints, and delivery failures are honoured.
+                    </p>
+                  </div>
                   </div>
                 </div>
               </section>
