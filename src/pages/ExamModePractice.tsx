@@ -344,10 +344,20 @@ export default function ExamModePractice() {
     }, 0);
 
     try {
+      const explicitSubjectId = subject !== "all" ? subject : null;
+      const loadedSubjectIds = new Set(
+        questions.map((question) => question.subjectId).filter(Boolean),
+      );
+      const sessionSubjectId =
+        explicitSubjectId ||
+        (topic && loadedSubjectIds.size === 1
+          ? Array.from(loadedSubjectIds)[0]
+          : null);
+
       // Save session to API
       const response = await api.post<{ id: string }>("/practice/sessions", {
         mode: mode === "speed" ? "speed_race" : "topic_drill",
-        subjectId: subject !== "all" ? subject : null,
+        subjectId: sessionSubjectId,
         topicId: topic || null,
         clientRequestId,
         attemptIds: results.map((result) => result.attemptId),

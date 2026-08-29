@@ -437,4 +437,31 @@ describe("ExamModePractice question transition", () => {
       ),
     );
   });
+
+  it("derives the subject for a topic-only drill before saving the session", async () => {
+    mocks.searchParams = "mode=drill&topic=soil-science&count=2";
+    mocks.apiPost.mockResolvedValueOnce({
+      success: true,
+      data: { id: "session-topic-only" },
+    });
+
+    const container = await renderPage();
+    await act(async () => findButton(container, "Submit").click());
+    expect(container.textContent).toContain("Submit Exam?");
+
+    await act(async () => {
+      findLastExactButton(container, "Submit").click();
+      await Promise.resolve();
+    });
+
+    await vi.waitFor(() =>
+      expect(mocks.apiPost).toHaveBeenCalledWith(
+        "/practice/sessions",
+        expect.objectContaining({
+          subjectId: "wassce-agricultural-science",
+          topicId: "soil-science",
+        }),
+      ),
+    );
+  });
 });
