@@ -5,6 +5,7 @@ import { parseBoundedJsonBody } from './http';
 
 const CONSENT_VERSION = 'referral-rewards-2026-08-29';
 const RESEND_API_BASE = 'https://api.resend.com';
+const RESEND_USER_AGENT = 'BrillaPrep-Worker/1.0 (+https://brillaprep.org)';
 const MAX_BODY_BYTES = 16_384;
 const WEBHOOK_TOLERANCE_SECONDS = 300;
 
@@ -148,6 +149,7 @@ async function resendRequest<T>(
     headers: {
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
       'Content-Type': 'application/json',
+      'User-Agent': RESEND_USER_AGENT,
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
@@ -193,14 +195,28 @@ async function syncExplicitPreference(
       method: 'PATCH',
       body: {
         unsubscribed: !optIn,
-        ...(optIn && env.RESEND_REFERRAL_TOPIC_ID ? {
-          topics: [{ id: env.RESEND_REFERRAL_TOPIC_ID, subscription: 'opt_in' }],
-        } : {}),
       },
     });
-    return updated.ok
-      ? { status: optIn ? 'synced' : 'suppressed', contactId: existing.data.id }
-      : { status: 'failed', contactId: existing.data.id };
+    if (!updated.ok) return { status: 'failed', contactId: existing.data.id };
+
+    if (env.RESEND_REFERRAL_TOPIC_ID) {
+      const topicsUpdated = await resendRequest<{ id: string }>(
+        env,
+        `/contacts/${encodeURIComponent(email)}/topics`,
+        {
+          method: 'PATCH',
+          body: {
+            topics: [{
+              id: env.RESEND_REFERRAL_TOPIC_ID,
+              subscription: optIn ? 'opt_in' : 'opt_out',
+            }],
+          },
+        },
+      );
+      if (!topicsUpdated.ok) return { status: 'failed', contactId: existing.data.id };
+    }
+
+    return { status: optIn ? 'synced' : 'suppressed', contactId: existing.data.id };
   }
 
   if (existing.status !== 404) return { status: 'failed', contactId: null };
