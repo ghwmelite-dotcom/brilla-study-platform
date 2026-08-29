@@ -22,6 +22,10 @@ function handleUnauthorized() {
   }
 }
 
+function hasBearerAuthorization(headers: Record<string, string>): boolean {
+  return typeof headers.Authorization === 'string' && headers.Authorization.startsWith('Bearer ');
+}
+
 class ApiClient {
   private baseUrl: string;
   private token: string | null = null;
@@ -64,9 +68,16 @@ class ApiClient {
         headers,
       });
 
-      if (response.status === 401) {
+      // A public or startup request can legitimately receive 401 while auth is
+      // still restoring. Only destroy the session when this request actually
+      // presented a bearer token that the server rejected.
+      if (response.status === 401 && hasBearerAuthorization(headers)) {
         handleUnauthorized();
         return { success: false, error: 'Your session has expired. Please sign in again.' };
+      }
+
+      if (response.status === 401) {
+        return { success: false, error: 'Authentication is required.' };
       }
 
       // Guard: non-JSON or empty bodies must not crash the caller
@@ -106,9 +117,13 @@ class ApiClient {
         body: formData,
       });
 
-      if (response.status === 401) {
+      if (response.status === 401 && hasBearerAuthorization(headers)) {
         handleUnauthorized();
         return { success: false, error: 'Your session has expired. Please sign in again.' };
+      }
+
+      if (response.status === 401) {
+        return { success: false, error: 'Authentication is required.' };
       }
 
       const text = await response.text();
@@ -146,9 +161,13 @@ class ApiClient {
         body: blob,
       });
 
-      if (response.status === 401) {
+      if (response.status === 401 && hasBearerAuthorization(headers)) {
         handleUnauthorized();
         return { success: false, error: 'Your session has expired. Please sign in again.' };
+      }
+
+      if (response.status === 401) {
+        return { success: false, error: 'Authentication is required.' };
       }
 
       const text = await response.text();
@@ -405,7 +424,7 @@ export async function fetchWithAuth(input: string, init: RequestInit = {}): Prom
     delete headers['Content-Type'];
   }
   const response = await fetch(input, { ...init, headers });
-  if (response.status === 401) {
+  if (response.status === 401 && hasBearerAuthorization(headers)) {
     handleUnauthorized();
   }
   return response;
