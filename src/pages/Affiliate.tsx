@@ -20,8 +20,17 @@ import {
 import { useAffiliateStore } from '@/stores/affiliateStore';
 import { useAuthStore } from '@/stores/authStore';
 import { AffiliateGuide, ReferralEmailConsentCard } from '@/components/affiliate';
+import { Modal } from '@/components/common/Modal';
 
 type TabType = 'overview' | 'referrals' | 'leaderboard' | 'challenges' | 'earnings';
+type MobileMoneyProvider = 'mtn' | 'vodafone' | 'airteltigo';
+
+function normalizeGhanaPhoneNumber(value: string): string {
+  const digits = value.replace(/\D/g, '');
+  return digits.startsWith('233') && digits.length === 12
+    ? `0${digits.slice(3)}`
+    : digits;
+}
 
 export default function Affiliate() {
   const navigate = useNavigate();
@@ -43,6 +52,7 @@ export default function Affiliate() {
     joinProgram,
     claimChallenge,
     copyReferralLink,
+    updateMobileMoneyDetails,
   } = useAffiliateStore();
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -50,6 +60,11 @@ export default function Affiliate() {
   const [leaderboardType, setLeaderboardType] = useState<'individual' | 'school'>('individual');
   const [isJoining, setIsJoining] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [showMobileMoneySetup, setShowMobileMoneySetup] = useState(false);
+  const [mobileMoneyProvider, setMobileMoneyProvider] = useState<MobileMoneyProvider>('mtn');
+  const [mobileMoneyNumber, setMobileMoneyNumber] = useState('');
+  const [mobileMoneyError, setMobileMoneyError] = useState<string | null>(null);
+  const [isSavingMobileMoney, setIsSavingMobileMoney] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -98,6 +113,41 @@ export default function Affiliate() {
 
   const handleClaimChallenge = async (challengeId: string) => {
     await claimChallenge(challengeId);
+  };
+
+  const openMobileMoneySetup = () => {
+    setMobileMoneyProvider(profile?.mobileMoneyProvider || 'mtn');
+    setMobileMoneyNumber(profile?.mobileMoneyNumber || '');
+    setMobileMoneyError(null);
+    setShowMobileMoneySetup(true);
+  };
+
+  const closeMobileMoneySetup = () => {
+    if (!isSavingMobileMoney) {
+      setShowMobileMoneySetup(false);
+    }
+  };
+
+  const handleMobileMoneySubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const normalizedNumber = normalizeGhanaPhoneNumber(mobileMoneyNumber);
+
+    if (!/^0[235][0-9]{8}$/.test(normalizedNumber)) {
+      setMobileMoneyError('Enter a valid 10-digit Ghana mobile number, for example 0241234567.');
+      return;
+    }
+
+    setMobileMoneyError(null);
+    setIsSavingMobileMoney(true);
+    const saved = await updateMobileMoneyDetails(normalizedNumber, mobileMoneyProvider);
+    setIsSavingMobileMoney(false);
+
+    if (saved) {
+      setShowMobileMoneySetup(false);
+      return;
+    }
+
+    setMobileMoneyError('We could not save your Mobile Money details. Please try again.');
   };
 
   // If not an affiliate, show join page
@@ -226,6 +276,89 @@ export default function Affiliate() {
         onClose={() => setShowGuide(false)}
         referralLink={profile?.referralLink}
       />
+
+      <Modal
+        isOpen={showMobileMoneySetup}
+        onClose={closeMobileMoneySetup}
+        title={profile?.mobileMoneyNumber ? 'Change Mobile Money account' : 'Set up Mobile Money'}
+        description="Add your Mobile Money details for future affiliate withdrawals."
+        size="sm"
+        closeOnOverlayClick={!isSavingMobileMoney}
+      >
+        <form id="mobile-money-form" className="space-y-4" onSubmit={handleMobileMoneySubmit}>
+          <div>
+            <label
+              htmlFor="mobile-money-provider"
+              className="mb-1.5 block text-sm font-medium text-neutral-800"
+            >
+              Network
+            </label>
+            <select
+              id="mobile-money-provider"
+              value={mobileMoneyProvider}
+              onChange={(event) => setMobileMoneyProvider(event.target.value as MobileMoneyProvider)}
+              disabled={isSavingMobileMoney}
+              className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-neutral-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <option value="mtn">MTN Mobile Money</option>
+              <option value="vodafone">Telecel Cash</option>
+              <option value="airteltigo">AT Money</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="mobile-money-number"
+              className="mb-1.5 block text-sm font-medium text-neutral-800"
+            >
+              Mobile Money number
+            </label>
+            <input
+              id="mobile-money-number"
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel"
+              value={mobileMoneyNumber}
+              onChange={(event) => setMobileMoneyNumber(event.target.value)}
+              disabled={isSavingMobileMoney}
+              aria-describedby="mobile-money-help mobile-money-error"
+              placeholder="0241234567"
+              className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60"
+            />
+            <p id="mobile-money-help" className="mt-1.5 text-xs text-neutral-500">
+              Use the Ghana number registered to the selected Mobile Money account.
+            </p>
+          </div>
+
+          {mobileMoneyError && (
+            <p
+              id="mobile-money-error"
+              role="alert"
+              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+            >
+              {mobileMoneyError}
+            </p>
+          )}
+
+          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              onClick={closeMobileMoneySetup}
+              disabled={isSavingMobileMoney}
+              className="min-h-11 rounded-lg border border-neutral-300 px-4 py-2 font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSavingMobileMoney}
+              className="min-h-11 rounded-lg bg-primary px-5 py-2 font-medium text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSavingMobileMoney ? 'Saving...' : 'Save Mobile Money'}
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       <div className="max-w-6xl mx-auto">
         {/* Header */}
@@ -793,7 +926,13 @@ export default function Affiliate() {
                             {profile.mobileMoneyProvider?.toUpperCase()} - {profile.mobileMoneyNumber}
                           </p>
                         </div>
-                        <button className="text-primary text-sm hover:underline">Change</button>
+                        <button
+                          type="button"
+                          onClick={openMobileMoneySetup}
+                          className="min-h-11 px-3 text-sm font-medium text-primary hover:underline"
+                        >
+                          Change
+                        </button>
                       </div>
 
                       <button
@@ -811,7 +950,11 @@ export default function Affiliate() {
                       <p className="text-neutral-600 mb-4">
                         Set up your Mobile Money account to withdraw earnings
                       </p>
-                      <button className="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-primary-dark transition-colors">
+                      <button
+                        type="button"
+                        onClick={openMobileMoneySetup}
+                        className="min-h-11 bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-primary-dark transition-colors"
+                      >
                         Set Up Mobile Money
                       </button>
                     </div>
