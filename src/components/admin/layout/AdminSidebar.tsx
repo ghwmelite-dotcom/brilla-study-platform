@@ -17,6 +17,7 @@ import {
   Zap,
   GraduationCap,
   Gift,
+  Mail,
   School,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -94,7 +95,7 @@ export function AdminSidebar() {
   const isUsersSection = location.pathname.startsWith('/admin/users') || location.pathname.startsWith('/admin/approvals') || location.pathname.startsWith('/admin/schools');
   const isContentSection = location.pathname.startsWith('/admin/content') || location.pathname.startsWith('/admin/moderation');
   const isSystemSection = location.pathname.startsWith('/admin/audit') || location.pathname.startsWith('/admin/settings');
-  const isRevenueSection = location.pathname.startsWith('/admin/subscriptions') || location.pathname.startsWith('/admin/affiliates');
+  const isRevenueSection = location.pathname.startsWith('/admin/subscriptions') || location.pathname.startsWith('/admin/affiliates') || location.pathname.startsWith('/admin/campaigns');
   const isTutoringSection = location.pathname.startsWith('/admin/tutoring') || location.pathname.startsWith('/admin/teacher-bonuses');
 
   return (
@@ -144,6 +145,7 @@ export function AdminSidebar() {
         <NavGroup label="Revenue" icon={<CreditCard className="w-4 h-4" />} defaultOpen={isRevenueSection}>
           <NavItem to="/admin/subscriptions" icon={<CreditCard className="w-4 h-4" />} label="Subscriptions" />
           <NavItem to="/admin/affiliates" icon={<Users className="w-4 h-4" />} label="Affiliates" />
+          <NavItem to="/admin/campaigns" icon={<Mail className="w-4 h-4" />} label="Email Campaigns" />
         </NavGroup>
 
         {/* Tutoring */}

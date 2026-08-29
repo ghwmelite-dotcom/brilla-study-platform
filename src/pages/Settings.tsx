@@ -88,6 +88,24 @@ export default function Settings() {
   const [notificationsSaving, setNotificationsSaving] = useState(false);
   const [notificationsSuccess, setNotificationsSuccess] = useState(false);
 
+  const [marketingPreference, setMarketingPreference] = useState({
+    referralRewardsOptIn: false,
+    emailVerified: false,
+    requiresAdultAttestation: user?.role === 'student',
+    providerSyncStatus: 'not_synced',
+  });
+  const [marketingAdultAttestation, setMarketingAdultAttestation] = useState(false);
+  const [marketingLoading, setMarketingLoading] = useState(false);
+  const [marketingSaving, setMarketingSaving] = useState(false);
+  const [marketingError, setMarketingError] = useState<string | null>(null);
+  const [marketingSuccess, setMarketingSuccess] = useState<string | null>(null);
+
+  type MarketingPreferenceResponse = typeof marketingPreference & {
+    consentVersion: string | null;
+    consentedAt: string | null;
+    eligibilityBasis: string;
+    consentCopyVersion: string;
+  };
   // Telegram connect state
   const [tg, setTg] = useState<{ linked: boolean; username: string | null; stale: boolean } | null>(null);
   const [tgConnecting, setTgConnecting] = useState(false);
@@ -126,6 +144,66 @@ export default function Settings() {
       loadTelegramStatus();
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== 'notifications') return;
+    const loadMarketingPreference = async () => {
+      setMarketingLoading(true);
+      setMarketingError(null);
+      try {
+        const response = await api.get<MarketingPreferenceResponse>('/marketing/preferences');
+        if (!response.success || !response.data) {
+          throw new Error(response.error || 'Failed to load email choices');
+        }
+        setMarketingPreference({
+          referralRewardsOptIn: response.data.referralRewardsOptIn,
+          emailVerified: response.data.emailVerified,
+          requiresAdultAttestation: response.data.requiresAdultAttestation,
+          providerSyncStatus: response.data.providerSyncStatus,
+        });
+        setMarketingAdultAttestation(response.data.eligibilityBasis === 'adult_self_attested');
+      } catch (error) {
+        setMarketingError(error instanceof Error ? error.message : 'Failed to load email choices');
+      } finally {
+        setMarketingLoading(false);
+      }
+    };
+    void loadMarketingPreference();
+  }, [activeTab]);
+
+
+
+  const handleMarketingPreferenceSave = async () => {
+    setMarketingSaving(true);
+    setMarketingError(null);
+    setMarketingSuccess(null);
+    try {
+      const response = await api.put<{
+        referralRewardsOptIn: boolean;
+        providerSyncStatus: string;
+      }>('/marketing/preferences', {
+        referralRewardsOptIn: marketingPreference.referralRewardsOptIn,
+        adultAttestation: marketingPreference.requiresAdultAttestation
+          ? marketingAdultAttestation
+          : undefined,
+      });
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to save email choices');
+      }
+      setMarketingPreference((current) => ({
+        ...current,
+        referralRewardsOptIn: response.data!.referralRewardsOptIn,
+        providerSyncStatus: response.data!.providerSyncStatus,
+      }));
+      setMarketingSuccess(response.data.referralRewardsOptIn
+        ? 'Referral and rewards email consent saved.'
+        : 'You will not receive referral and rewards marketing emails.');
+    } catch (error) {
+      setMarketingError(error instanceof Error ? error.message : 'Failed to save email choices');
+    } finally {
+      setMarketingSaving(false);
+    }
+  };
 
   const loadTelegramStatus = async () => {
     try {
@@ -914,6 +992,93 @@ export default function Settings() {
                       </p>
                     )}
                   </div>
+
+                  <section className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5" aria-labelledby="referral-email-heading">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h2 id="referral-email-heading" className="text-lg font-semibold text-neutral-900">
+                          Referral & rewards emails
+                        </h2>
+                        <p className="mt-1 text-sm leading-6 text-neutral-600">
+                          Get occasional ideas for inviting friends and updates about eligible Brilla referral rewards.
+                          This is optional and does not affect your account or learning access.
+                        </p>
+                      </div>
+                      {marketingLoading ? (
+                        <Loader2 className="mt-1 h-5 w-5 animate-spin text-emerald-700" aria-label="Loading email choice" />
+                      ) : (
+                        <input
+                          type="checkbox"
+                          checked={marketingPreference.referralRewardsOptIn}
+                          disabled={!marketingPreference.emailVerified || marketingSaving}
+                          onChange={(event) => setMarketingPreference((current) => ({
+                            ...current,
+                            referralRewardsOptIn: event.target.checked,
+                          }))}
+                          aria-label="Receive referral and rewards emails"
+                          className="mt-1 h-5 w-5 rounded text-emerald-700 focus:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                      )}
+                    </div>
+
+                    {!marketingPreference.emailVerified && (
+                      <p className="mt-3 flex items-center gap-2 text-sm text-amber-700">
+                        <AlertTriangle className="h-4 w-4" />
+                        Confirm your email address before opting in.
+                      </p>
+                    )}
+
+                    {marketingPreference.requiresAdultAttestation && marketingPreference.referralRewardsOptIn && (
+                      <label className="mt-4 flex items-start gap-3 rounded-xl border border-emerald-200 bg-white p-4">
+                        <input
+                          type="checkbox"
+                          checked={marketingAdultAttestation}
+                          onChange={(event) => setMarketingAdultAttestation(event.target.checked)}
+                          className="mt-0.5 h-5 w-5 rounded text-emerald-700 focus:ring-emerald-600"
+                        />
+                        <span className="text-sm leading-6 text-neutral-700">
+                          I confirm that I am 18 or older. Students under 18 should leave this off; a parent or guardian
+                          must manage any future marketing consent.
+                        </span>
+                      </label>
+                    )}
+
+                    <p className="mt-4 text-xs leading-5 text-neutral-500">
+                      You can withdraw consent here at any time. Brilla will keep essential account, security,
+                      learning, and payment emails separate from this choice.
+                    </p>
+
+                    {marketingError && (
+                      <p className="mt-3 flex items-center gap-2 text-sm text-red-700" role="alert">
+                        <AlertTriangle className="h-4 w-4" />
+                        {marketingError}
+                      </p>
+                    )}
+                    {marketingSuccess && (
+                      <p className="mt-3 flex items-center gap-2 text-sm text-emerald-700" role="status">
+                        <Check className="h-4 w-4" />
+                        {marketingSuccess}
+                      </p>
+                    )}
+
+                    <div className="mt-4 flex items-center justify-between gap-4">
+                      <span className="text-xs text-neutral-500">
+                        Delivery status: {marketingPreference.providerSyncStatus.replace(/_/g, ' ')}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleMarketingPreferenceSave}
+                        disabled={marketingLoading || marketingSaving ||
+                          (marketingPreference.referralRewardsOptIn &&
+                            (!marketingPreference.emailVerified ||
+                              (marketingPreference.requiresAdultAttestation && !marketingAdultAttestation)))}
+                        className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {marketingSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                        Save email choice
+                      </button>
+                    </div>
+                  </section>
 
                   <div>
                     <h2 className="text-lg font-semibold text-neutral-900 mb-1">Notification Preferences</h2>
