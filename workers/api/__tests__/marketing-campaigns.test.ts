@@ -82,4 +82,82 @@ describe('referral marketing boundaries', () => {
     );
     expect(response.status).toBe(404);
   });
+
+  it('creates an opted-in Resend contact with the required user agent and topic', async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.endsWith('/contacts/admin%40example.com')) {
+        return new Response(JSON.stringify({ message: 'Contact not found' }), { status: 404 });
+      }
+      return new Response(JSON.stringify({ object: 'contact', id: 'contact-1' }), { status: 200 });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const response = await worker.fetch(
+      new Request('http://x/api/marketing/preferences', {
+        method: 'PUT',
+        headers: await authHeader('admin'),
+        body: JSON.stringify({ referralRewardsOptIn: true }),
+      }),
+      {
+        DB: mockDb('admin'),
+        JWT_SECRET,
+        RESEND_API_KEY: 're_test',
+        RESEND_REFERRAL_TOPIC_ID: 'topic-1',
+      },
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      success: true,
+      data: { referralRewardsOptIn: true, providerSyncStatus: 'synced' },
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const createInit = fetchMock.mock.calls[1]?.[1] as RequestInit;
+    expect(new Headers(createInit.headers).get('User-Agent')).toContain('BrillaPrep-Worker');
+    expect(JSON.parse(String(createInit.body))).toMatchObject({
+      email: 'admin@example.com',
+      unsubscribed: false,
+      topics: [{ id: 'topic-1', subscription: 'opt_in' }],
+    });
+  });
+
+  it('updates an existing contact topic through the dedicated Resend topics endpoint', async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.endsWith('/contacts/admin%40example.com')) {
+        return new Response(JSON.stringify({
+          object: 'contact',
+          id: 'contact-1',
+          email: 'admin@example.com',
+          unsubscribed: false,
+        }), { status: 200 });
+      }
+      return new Response(JSON.stringify({ object: 'contact', id: 'contact-1' }), { status: 200 });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const response = await worker.fetch(
+      new Request('http://x/api/marketing/preferences', {
+        method: 'PUT',
+        headers: await authHeader('admin'),
+        body: JSON.stringify({ referralRewardsOptIn: true }),
+      }),
+      {
+        DB: mockDb('admin'),
+        JWT_SECRET,
+        RESEND_API_KEY: 're_test',
+        RESEND_REFERRAL_TOPIC_ID: 'topic-1',
+      },
+    );
+
+    expect(response.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(String(fetchMock.mock.calls[2]?.[0])).toBe(
+      'https://api.resend.com/contacts/admin%40example.com/topics',
+    );
+    expect(JSON.parse(String(fetchMock.mock.calls[2]?.[1]?.body))).toEqual({
+      topics: [{ id: 'topic-1', subscription: 'opt_in' }],
+    });
+  });
 });
