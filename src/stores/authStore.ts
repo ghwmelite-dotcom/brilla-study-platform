@@ -67,6 +67,7 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+  hasHydrated: boolean;
   isLoading: boolean;
   error: string | null;
 
@@ -80,6 +81,7 @@ interface AuthState {
   // Actions
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
+  setHasHydrated: (hasHydrated: boolean) => void;
   login: (email: string, password: string, turnstileToken?: string) => Promise<void>;
   register: (data: RegisterData) => Promise<{
     success: boolean;
@@ -197,6 +199,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
+      hasHydrated: false,
       isLoading: false,
       error: null,
       pendingUsers: [],
@@ -210,6 +213,8 @@ export const useAuthStore = create<AuthState>()(
         api.setToken(token);
         set({ token });
       },
+
+      setHasHydrated: (hasHydrated) => set({ hasHydrated }),
 
       login: async (email, password, turnstileToken?) => {
         set({ isLoading: true, error: null });
@@ -991,11 +996,15 @@ export const useAuthStore = create<AuthState>()(
         token: state.token,
         isAuthenticated: state.isAuthenticated,
       }),
-      onRehydrateStorage: () => (state) => {
-        // Restore token to API client after rehydration
-        if (state?.token) {
-          api.setToken(state.token);
-        }
+      onRehydrateStorage: (state) => {
+        return (rehydratedState) => {
+          const resolvedState = rehydratedState ?? state;
+
+          // Restore the token before any protected route or authenticated
+          // startup request is allowed to render.
+          api.setToken(resolvedState.token);
+          resolvedState.setHasHydrated(true);
+        };
       },
     }
   )

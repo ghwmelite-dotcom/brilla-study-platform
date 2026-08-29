@@ -251,6 +251,7 @@ function isPWA(): boolean {
 
 // Main App component
 function App() {
+  const hasAuthHydrated = useAuthStore((state) => state.hasHydrated);
   const [showSplash, setShowSplash] = useState(() => {
     // For PWA: Show splash on each launch (once per hour to avoid annoyance on quick re-opens)
     // For browser: Show once per session
@@ -285,6 +286,13 @@ function App() {
         duration={1800}
       />
     );
+  }
+
+  // Persisted auth is restored asynchronously by Zustand. Do not mount route
+  // guards or authenticated startup effects until that restoration completes;
+  // otherwise a hard refresh can briefly look logged out and erase the session.
+  if (!hasAuthHydrated) {
+    return <PageLoader />;
   }
 
   return (
