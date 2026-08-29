@@ -21,6 +21,14 @@ interface CampaignSummary {
   status: 'draft' | 'audience_ready' | 'provider_draft' | 'cancelled';
   audienceCount: number;
   providerDraftCreated: boolean;
+  dispatch: {
+    status: 'preparing' | 'queued' | 'sent' | 'failed';
+    expectedRecipientCount: number;
+    providerStatus: string | null;
+    failureCode: string | null;
+    requestedAt: string;
+    completedAt: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -39,7 +47,7 @@ interface CampaignOverview {
   };
   campaigns: CampaignSummary[];
   safety: {
-    sendEndpointAvailable: false;
+    sendEndpointAvailable: boolean;
     note: string;
   };
 }
@@ -146,13 +154,54 @@ export default function AdminCampaigns() {
     }
   };
 
+  const sendCampaign = async (campaign: CampaignSummary) => {
+    const confirmation = window.prompt(
+      `This will email ${campaign.audienceCount} explicitly consented recipient${campaign.audienceCount === 1 ? '' : 's'}. Type SEND ${campaign.id} to confirm.`,
+    );
+    if (confirmation === null) return;
+    setWorkingId(campaign.id);
+    setError(null);
+    setSuccess(null);
+    try {
+      const response = await api.post<{ status: string; recipientCount: number }>(
+        `/marketing/admin/campaigns/${campaign.id}/send`,
+        { confirmation },
+      );
+      if (!response.success || !response.data) throw new Error(response.error || 'Campaign dispatch failed');
+      setSuccess(`Campaign queued for ${response.data.recipientCount} consented recipient${response.data.recipientCount === 1 ? '' : 's'}.`);
+      await loadOverview();
+    } catch (sendError) {
+      setError(sendError instanceof Error ? sendError.message : 'Campaign dispatch failed');
+    } finally {
+      setWorkingId(null);
+    }
+  };
+
+  const refreshDispatch = async (campaign: CampaignSummary) => {
+    setWorkingId(campaign.id);
+    setError(null);
+    setSuccess(null);
+    try {
+      const response = await api.post<{ status: string; providerStatus: string; recipientCount: number }>(
+        `/marketing/admin/campaigns/${campaign.id}/refresh-dispatch`,
+      );
+      if (!response.success || !response.data) throw new Error(response.error || 'Could not refresh dispatch status');
+      setSuccess(`Provider status: ${response.data.providerStatus}.`);
+      await loadOverview();
+    } catch (refreshError) {
+      setError(refreshError instanceof Error ? refreshError.message : 'Could not refresh dispatch status');
+    } finally {
+      setWorkingId(null);
+    }
+  };
+
   return (
     <div className="space-y-6 text-admin-text">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Referral email campaigns</h1>
           <p className="mt-1 text-sm text-admin-text-muted">
-            Prepare consent-filtered Resend drafts. Sending and scheduling are deliberately unavailable here.
+            Prepare and dispatch consent-filtered Resend pilots with duplicate-send protection.
           </p>
         </div>
         <button
@@ -170,10 +219,11 @@ export default function AdminCampaigns() {
         <div className="flex items-start gap-3">
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
           <div>
-            <p className="font-semibold">No-send safety lock is active</p>
+            <p className="font-semibold">Consent and one-dispatch safety locks are active</p>
             <p className="mt-1 text-emerald-100/80">
               Existing users are opted out by default. Only verified, explicitly consented, adult-eligible,
               unsuppressed accounts with referral profiles can enter an audience snapshot.
+              Sending rechecks that snapshot and requires a typed campaign-specific confirmation.
             </p>
           </div>
         </div>
@@ -288,9 +338,22 @@ export default function AdminCampaigns() {
                       </button>
                     )}
                     {campaign.status === 'provider_draft' && (
-                      <span className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-300">
-                        <CheckCircle2 className="h-4 w-4" /> Draft only — not sent
-                      </span>
+                      campaign.dispatch ? (
+                        <>
+                          <span className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-300">
+                            <CheckCircle2 className="h-4 w-4" /> Dispatch: {campaign.dispatch.providerStatus || campaign.dispatch.status}
+                          </span>
+                          <button type="button" onClick={() => void refreshDispatch(campaign)} disabled={workingId === campaign.id} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-admin-border px-4 py-2 text-sm font-semibold hover:bg-admin-bg-tertiary disabled:opacity-50">
+                            {workingId === campaign.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                            Refresh provider status
+                          </button>
+                        </>
+                      ) : (
+                        <button type="button" onClick={() => void sendCampaign(campaign)} disabled={workingId === campaign.id || !overview.provider.apiConfigured || !overview.provider.webhookConfigured || !overview.provider.topicConfigured} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-slate-950 disabled:opacity-50">
+                          {workingId === campaign.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                          Send consented pilot
+                        </button>
+                      )
                     )}
                   </div>
                 </article>

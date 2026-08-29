@@ -64,6 +64,28 @@ interface CampaignRow {
   updated_at: string;
 }
 
+interface CampaignDispatchRow {
+  campaign_id: string;
+  status: 'preparing' | 'queued' | 'sent' | 'failed';
+  expected_recipient_count: number;
+  provider_send_id: string | null;
+  provider_status: string | null;
+  failure_code: string | null;
+  requested_at: string;
+  completed_at: string | null;
+  updated_at: string;
+}
+
+interface ResendBroadcast {
+  id: string;
+  segment_id: string;
+  subject: string;
+  status: 'draft' | 'scheduled' | 'queued' | 'sent';
+  topic_id: string | null;
+  scheduled_at: string | null;
+  sent_at: string | null;
+}
+
 interface EligibleRecipient {
   id: string;
   name: string;
@@ -77,6 +99,11 @@ interface ResendContact {
   id: string;
   email: string;
   unsubscribed: boolean;
+}
+
+interface ResendContactList {
+  data: ResendContact[];
+  has_more: boolean;
 }
 
 export const marketingCampaignsApp = new Hono<{
@@ -178,6 +205,32 @@ async function resendRequest<T>(
 
 async function getResendContact(env: MarketingEnv, email: string) {
   return resendRequest<ResendContact>(env, `/contacts/${encodeURIComponent(email)}`);
+}
+
+async function getResendBroadcast(env: MarketingEnv, broadcastId: string) {
+  return resendRequest<ResendBroadcast>(env, `/broadcasts/${encodeURIComponent(broadcastId)}`);
+}
+
+async function getResendSegmentContacts(
+  env: MarketingEnv,
+  segmentId: string,
+): Promise<{ ok: true; data: ResendContact[] } | { ok: false }> {
+  const contacts: ResendContact[] = [];
+  let after: string | null = null;
+  for (let page = 0; page < 50; page += 1) {
+    const cursor: string = after ? `&after=${encodeURIComponent(after)}` : '';
+    const response: Awaited<ReturnType<typeof resendRequest<ResendContactList>>> = await resendRequest<ResendContactList>(
+      env,
+      `/segments/${encodeURIComponent(segmentId)}/contacts?limit=100${cursor}`,
+    );
+    if (!response.ok) return { ok: false };
+    contacts.push(...response.data.data);
+    if (!response.data.has_more) return { ok: true, data: contacts };
+    const lastContact: ResendContact | undefined = response.data.data.at(-1);
+    if (!lastContact) return { ok: false };
+    after = lastContact.id;
+  }
+  return { ok: false };
 }
 
 async function syncExplicitPreference(
@@ -603,7 +656,7 @@ marketingCampaignsApp.use('/admin', requireAdmin);
 marketingCampaignsApp.use('/admin/*', requireAdmin);
 
 marketingCampaignsApp.get('/admin/overview', async (c) => {
-  const [activeVerified, consented, adultEligible, suppressed, campaigns] = await Promise.all([
+  const [activeVerified, consented, adultEligible, suppressed, campaigns, dispatches] = await Promise.all([
     c.env.DB.prepare(`
       SELECT COUNT(*) AS count FROM users
       WHERE status = 'approved' AND is_active = 1 AND COALESCE(is_demo, 0) = 0 AND email_verified = 1
@@ -622,7 +675,14 @@ marketingCampaignsApp.get('/admin/overview', async (c) => {
         audience_count, provider_segment_id, provider_broadcast_id, created_at, updated_at
       FROM marketing_campaigns ORDER BY created_at DESC LIMIT 25
     `).all<CampaignRow>(),
+    c.env.DB.prepare(`
+      SELECT campaign_id, status, expected_recipient_count, provider_send_id, provider_status,
+        failure_code, requested_at, completed_at, updated_at
+      FROM marketing_campaign_dispatches ORDER BY requested_at DESC LIMIT 25
+    `).all<CampaignDispatchRow>(),
   ]);
+
+  const dispatchByCampaign = new Map(dispatches.results.map((dispatch) => [dispatch.campaign_id, dispatch]));
 
   return c.json({
     success: true,
@@ -638,22 +698,33 @@ marketingCampaignsApp.get('/admin/overview', async (c) => {
         webhookConfigured: Boolean(c.env.RESEND_WEBHOOK_SECRET),
         topicConfigured: Boolean(c.env.RESEND_REFERRAL_TOPIC_ID),
       },
-      campaigns: campaigns.results.map((campaign) => ({
-        id: campaign.id,
-        name: campaign.name,
-        subject: campaign.subject,
-        previewText: campaign.preview_text,
-        message: campaign.message,
-        pilotPercent: campaign.pilot_percent,
-        status: campaign.status,
-        audienceCount: campaign.audience_count,
-        providerDraftCreated: Boolean(campaign.provider_broadcast_id),
-        createdAt: campaign.created_at,
-        updatedAt: campaign.updated_at,
-      })),
+      campaigns: campaigns.results.map((campaign) => {
+        const dispatch = dispatchByCampaign.get(campaign.id);
+        return {
+          id: campaign.id,
+          name: campaign.name,
+          subject: campaign.subject,
+          previewText: campaign.preview_text,
+          message: campaign.message,
+          pilotPercent: campaign.pilot_percent,
+          status: campaign.status,
+          audienceCount: campaign.audience_count,
+          providerDraftCreated: Boolean(campaign.provider_broadcast_id),
+          dispatch: dispatch ? {
+            status: dispatch.status,
+            expectedRecipientCount: dispatch.expected_recipient_count,
+            providerStatus: dispatch.provider_status,
+            failureCode: dispatch.failure_code,
+            requestedAt: dispatch.requested_at,
+            completedAt: dispatch.completed_at,
+          } : null,
+          createdAt: campaign.created_at,
+          updatedAt: campaign.updated_at,
+        };
+      }),
       safety: {
-        sendEndpointAvailable: false,
-        note: 'This workflow can only create provider drafts. It cannot send or schedule a broadcast.',
+        sendEndpointAvailable: true,
+        note: 'Sending requires a consent recheck, an immutable provider draft, and a typed campaign confirmation. Each campaign can be dispatched only once.',
       },
     },
   });
@@ -923,6 +994,174 @@ marketingCampaignsApp.post('/admin/campaigns/:id/provider-draft', async (c) => {
       failed,
       sendEndpointAvailable: false,
       message: 'Draft created in Resend. Nothing was sent or scheduled.',
+    },
+  });
+});
+
+marketingCampaignsApp.post('/admin/campaigns/:id/send', async (c) => {
+  const campaignId = c.req.param('id');
+  const parsed = await parseBoundedJsonBody(c, MAX_BODY_BYTES);
+  if (!parsed.ok) {
+    return c.json({ success: false, error: 'Invalid request body' }, parsed.reason === 'too_large' ? 413 : 400);
+  }
+
+  const campaign = await c.env.DB.prepare(`
+    SELECT id, name, subject, preview_text, message, pilot_percent, status,
+      audience_count, provider_segment_id, provider_broadcast_id, created_at, updated_at
+    FROM marketing_campaigns WHERE id = ?
+  `).bind(campaignId).first<CampaignRow>();
+  if (!campaign) return c.json({ success: false, error: 'Campaign not found' }, 404);
+
+  const expectedConfirmation = `SEND ${campaign.id}`;
+  if (parsed.body.confirmation !== expectedConfirmation) {
+    return c.json({ success: false, error: `Type ${expectedConfirmation} to confirm this one-time dispatch` }, 400);
+  }
+  if (campaign.status !== 'provider_draft' || !campaign.provider_segment_id || !campaign.provider_broadcast_id) {
+    return c.json({ success: false, error: 'An immutable provider draft is required before sending' }, 409);
+  }
+  if (!c.env.RESEND_API_KEY || !c.env.RESEND_REFERRAL_TOPIC_ID) {
+    return c.json({ success: false, error: 'Resend API and referral topic configuration are required' }, 503);
+  }
+
+  const recipients = await c.env.DB.prepare(`
+    SELECT u.id, u.name, lower(trim(u.email)) AS email, mcr.referral_code,
+      mcr.consent_version, mcr.eligibility_basis
+    FROM marketing_campaign_recipients mcr
+    JOIN users u ON u.id = mcr.user_id
+    JOIN marketing_email_preferences mp ON mp.user_id = u.id
+    JOIN affiliate_profiles ap ON ap.user_id = u.id
+    WHERE mcr.campaign_id = ?
+      AND mcr.status = 'provider_synced'
+      AND u.status = 'approved'
+      AND u.is_active = 1
+      AND COALESCE(u.is_demo, 0) = 0
+      AND u.email_verified = 1
+      AND mp.referral_rewards_opt_in = 1
+      AND mp.unsubscribed_at IS NULL
+      AND mp.provider_sync_status = 'synced'
+      AND mp.consent_version = mcr.consent_version
+      AND mp.eligibility_basis = mcr.eligibility_basis
+      AND mp.eligibility_basis IN ('adult_self_attested', 'guardian_confirmed', 'adult_role')
+      AND ap.referral_code = mcr.referral_code
+  `).bind(campaign.id).all<EligibleRecipient>();
+
+  let unsuppressedCount = 0;
+  for (const recipient of recipients.results) {
+    if (!isDeliverableEmail(recipient.email)) continue;
+    const emailHash = await sha256Hex(recipient.email);
+    const suppression = await c.env.DB.prepare(`
+      SELECT 1 AS suppressed FROM marketing_email_suppressions
+      WHERE email_hash = ? AND (expires_at IS NULL OR datetime(expires_at) > datetime('now'))
+    `).bind(emailHash).first<{ suppressed: number }>();
+    if (!suppression) unsuppressedCount += 1;
+  }
+
+  if (campaign.audience_count <= 0 || unsuppressedCount !== campaign.audience_count) {
+    return c.json({
+      success: false,
+      error: 'Audience consent or suppression state changed after the draft was built. Create a new campaign snapshot.',
+    }, 409);
+  }
+
+  const providerContacts = await getResendSegmentContacts(c.env, campaign.provider_segment_id);
+  if (!providerContacts.ok) {
+    return c.json({ success: false, error: 'Unable to verify the isolated provider segment' }, 502);
+  }
+  const expectedEmails = new Set(recipients.results.map((recipient) => normalizeEmail(recipient.email)));
+  const providerEmails = new Set(providerContacts.data.map((contact) => normalizeEmail(contact.email)));
+  if (providerContacts.data.some((contact) => contact.unsubscribed) ||
+      providerEmails.size !== expectedEmails.size ||
+      [...expectedEmails].some((email) => !providerEmails.has(email))) {
+    return c.json({ success: false, error: 'Provider segment membership no longer matches the consented audience snapshot' }, 409);
+  }
+
+  const providerDraft = await getResendBroadcast(c.env, campaign.provider_broadcast_id);
+  if (!providerDraft.ok) {
+    return c.json({ success: false, error: 'Unable to verify the provider draft' }, 502);
+  }
+  if (providerDraft.data.status !== 'draft' ||
+      providerDraft.data.segment_id !== campaign.provider_segment_id ||
+      providerDraft.data.topic_id !== c.env.RESEND_REFERRAL_TOPIC_ID ||
+      providerDraft.data.subject !== campaign.subject) {
+    return c.json({ success: false, error: 'Provider draft no longer matches the reviewed campaign snapshot' }, 409);
+  }
+
+  const timestamp = now();
+  const reserved = await c.env.DB.prepare(`
+    INSERT OR IGNORE INTO marketing_campaign_dispatches (
+      campaign_id, status, expected_recipient_count, requested_by, requested_at, updated_at
+    ) VALUES (?, 'preparing', ?, ?, ?, ?)
+  `).bind(campaign.id, campaign.audience_count, getUserId(c), timestamp, timestamp).run();
+  if ((reserved.meta.changes || 0) !== 1) {
+    return c.json({ success: false, error: 'This campaign already has a dispatch record and will not be sent again' }, 409);
+  }
+
+  const sent = await resendRequest<{ id: string }>(
+    c.env,
+    `/broadcasts/${encodeURIComponent(campaign.provider_broadcast_id)}/send`,
+    { method: 'POST', body: {} },
+  );
+  if (!sent.ok) {
+    await c.env.DB.prepare(`
+      UPDATE marketing_campaign_dispatches
+      SET status = 'failed', failure_code = ?, updated_at = ? WHERE campaign_id = ?
+    `).bind(`provider_${sent.status}`, now(), campaign.id).run();
+    return c.json({
+      success: false,
+      error: 'Provider dispatch failed. Automatic retry is disabled to prevent duplicate email.',
+    }, 502);
+  }
+
+  await c.env.DB.prepare(`
+    UPDATE marketing_campaign_dispatches
+    SET status = 'queued', provider_send_id = ?, provider_status = 'queued', updated_at = ?
+    WHERE campaign_id = ?
+  `).bind(sent.data.id, now(), campaign.id).run();
+
+  return c.json({
+    success: true,
+    data: {
+      status: 'queued',
+      recipientCount: campaign.audience_count,
+      duplicateSendProtected: true,
+    },
+  });
+});
+
+marketingCampaignsApp.post('/admin/campaigns/:id/refresh-dispatch', async (c) => {
+  const campaignId = c.req.param('id');
+  const campaign = await c.env.DB.prepare(`
+    SELECT id, name, subject, preview_text, message, pilot_percent, status,
+      audience_count, provider_segment_id, provider_broadcast_id, created_at, updated_at
+    FROM marketing_campaigns WHERE id = ?
+  `).bind(campaignId).first<CampaignRow>();
+  if (!campaign?.provider_broadcast_id) return c.json({ success: false, error: 'Provider draft not found' }, 404);
+
+  const dispatch = await c.env.DB.prepare(`
+    SELECT campaign_id, status, expected_recipient_count, provider_send_id, provider_status,
+      failure_code, requested_at, completed_at, updated_at
+    FROM marketing_campaign_dispatches WHERE campaign_id = ?
+  `).bind(campaign.id).first<CampaignDispatchRow>();
+  if (!dispatch) return c.json({ success: false, error: 'Campaign has not been dispatched' }, 409);
+
+  const provider = await getResendBroadcast(c.env, campaign.provider_broadcast_id);
+  if (!provider.ok) return c.json({ success: false, error: 'Unable to retrieve provider dispatch status' }, 502);
+
+  const terminal = provider.data.status === 'sent';
+  const localStatus = terminal ? 'sent' : dispatch.status === 'preparing' ? 'preparing' : 'queued';
+  const timestamp = now();
+  await c.env.DB.prepare(`
+    UPDATE marketing_campaign_dispatches SET status = ?, provider_status = ?,
+      completed_at = CASE WHEN ? = 1 THEN COALESCE(completed_at, ?) ELSE completed_at END,
+      updated_at = ? WHERE campaign_id = ?
+  `).bind(localStatus, provider.data.status, terminal ? 1 : 0, provider.data.sent_at || timestamp, timestamp, campaign.id).run();
+
+  return c.json({
+    success: true,
+    data: {
+      status: localStatus,
+      providerStatus: provider.data.status,
+      recipientCount: dispatch.expected_recipient_count,
     },
   });
 });
