@@ -32,6 +32,67 @@ describe('index.ts protectedApp auth', () => {
   });
 });
 
+describe('GET /api/auth/me session bootstrap', () => {
+  const SECRET = 'test-secret-that-is-long-enough';
+
+  it('returns the DB-fresh user for a valid session', async () => {
+    const token = await sign({
+      userId: 'admin_1',
+      email: 'admin@example.com',
+      role: 'admin',
+      sessionVersion: 2,
+      exp: Math.floor(Date.now() / 1000) + 3600,
+      iat: Math.floor(Date.now() / 1000),
+    }, SECRET);
+
+    const db = {
+      prepare: vi.fn((sql: string) => ({
+        bind: vi.fn(() => ({
+          first: vi.fn().mockResolvedValue(
+            sql.includes('SELECT role, status, is_active, session_version')
+              ? { role: 'admin', status: 'approved', is_active: 1, session_version: 2 }
+              : {
+                  id: 'admin_1',
+                  email: 'admin@example.com',
+                  name: 'Administrator',
+                  role: 'admin',
+                  status: 'approved',
+                  xp_points: 25,
+                  level: 2,
+                  streak_days: 3,
+                  ai_grading_credits: 10,
+                  email_verified: 1,
+                  is_active: 1,
+                  password_hash: 'hashed-password',
+                  created_at: '2026-08-01T00:00:00.000Z',
+                  updated_at: '2026-08-29T00:00:00.000Z',
+                },
+          ),
+        })),
+      })),
+    } as unknown as D1Database;
+
+    const res = await worker.fetch(
+      new Request('http://x/api/auth/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+      { DB: db, JWT_SECRET: SECRET },
+    );
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      success: true,
+      data: {
+        id: 'admin_1',
+        role: 'admin',
+        status: 'approved',
+        isActive: 1,
+        passwordSet: true,
+      },
+    });
+  });
+});
+
 // Regression for finding I-1: the per-route userAuth middleware on the
 // /admin/audit/* routes must not overwrite requireAuth's DB-fresh role with
 // the frozen JWT role. A demoted admin (token still claims role:'admin', but

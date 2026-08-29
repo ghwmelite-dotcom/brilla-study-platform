@@ -5814,6 +5814,61 @@ const userAuth: MiddlewareHandler<AppEnv> = async (c, next) => {
   await next();
 };
 
+// Return the DB-fresh user behind the verified bearer token. The frontend uses
+// this as the single authoritative bootstrap after a reload so duplicated or
+// stale browser persistence cannot manufacture a logout (or preserve a stale
+// role/status).
+protectedApp.get('/auth/me', userAuth, async (c) => {
+  const userId = c.get('userId');
+
+  try {
+    const user = await c.env.DB.prepare(`
+      SELECT id, email, name, role, status, house, year_group, school_level,
+             school_name, xp_points, level, streak_days, avatar_url,
+             primary_exam_type_id, subscription_tier_id,
+             subscription_expires_at, ai_grading_credits, email_verified,
+             is_active, password_hash, created_at, updated_at
+      FROM users
+      WHERE id = ?
+    `).bind(userId).first<Record<string, unknown>>();
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: c.get('userRole'),
+        status: user.status,
+        house: user.house,
+        yearGroup: user.year_group,
+        schoolLevel: user.school_level,
+        schoolName: user.school_name,
+        xpPoints: user.xp_points,
+        level: user.level,
+        streakDays: user.streak_days,
+        avatarUrl: user.avatar_url,
+        primaryExamTypeId: user.primary_exam_type_id,
+        subscriptionTierId: user.subscription_tier_id,
+        subscriptionExpiresAt: user.subscription_expires_at,
+        aiGradingCredits: user.ai_grading_credits,
+        emailVerified: user.email_verified,
+        isActive: user.is_active,
+        passwordSet: Boolean(user.password_hash),
+        createdAt: user.created_at,
+        updatedAt: user.updated_at,
+      },
+    });
+  } catch (error) {
+    console.error('Current user bootstrap error:', error);
+    return c.json({ success: false, error: 'Failed to restore session' }, 500);
+  }
+});
+
 // Update current user's profile
 protectedApp.put('/users/me', userAuth, async (c) => {
   const user = c.get('user') as UserPayload;
