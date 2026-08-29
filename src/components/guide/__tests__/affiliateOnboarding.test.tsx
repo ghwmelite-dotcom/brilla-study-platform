@@ -6,6 +6,23 @@ import { AffiliateOnboardingSpotlight } from '../AffiliateOnboardingSpotlight';
 import { getOnboardingStepsForRole } from '@/data/guides';
 import type { AffiliateProfile } from '@/types';
 
+vi.mock('@/lib/api', () => ({
+  api: {
+    get: vi.fn(async () => ({
+      success: true,
+      data: {
+        referralRewardsOptIn: false,
+        consentVersion: null,
+        consentedAt: null,
+        providerSyncStatus: 'not_synced',
+        emailVerified: true,
+        consentCopyVersion: 'referral-rewards-2026-08-29',
+      },
+    })),
+    put: vi.fn(),
+  },
+}));
+
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 const profile: AffiliateProfile = {
@@ -82,6 +99,7 @@ describe('affiliate onboarding', () => {
     expect(container.textContent).toContain('25% starting rate');
     expect(container.textContent).toContain('100 reward points');
     expect(container.textContent).toContain('AMA123XY');
+    expect(container.textContent).toContain('Keep referral opportunities within reach');
 
     const copyButton = container.querySelector<HTMLButtonElement>('button[aria-label="Copy referral link"]');
     expect(copyButton).toBeTruthy();

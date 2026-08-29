@@ -315,11 +315,12 @@ export default function PrivacyPolicy() {
                     <h3 className="font-semibold text-white">Optional referral and rewards marketing</h3>
                     <p className="mt-2 text-sm leading-6 text-white/70">
                       We send referral and rewards marketing emails only after a verified account holder gives
-                      explicit consent. Student accounts must also satisfy our adult or parent/guardian consent
-                      safeguards. Consent is recorded separately from essential account, security, learning, and
-                      payment communications. You may withdraw it at any time in Settings or through the
-                      unsubscribe link in each marketing email. We use Resend as our email delivery processor and
-                      retain suppression records so that withdrawn consent, complaints, and delivery failures are honoured.
+                      explicit, optional consent. We do not infer a person's age from their student role. Consent is
+                      recorded separately from essential account, security, learning, and payment communications,
+                      and any age-aware parent or guardian process is handled separately from this marketing choice.
+                      You may withdraw consent at any time in Settings or through the unsubscribe link in each
+                      marketing email. We use Resend as our email delivery processor and retain suppression records
+                      so that withdrawn consent, complaints, and delivery failures are honoured.
                     </p>
                   </div>
                   </div>
