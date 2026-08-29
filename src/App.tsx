@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Layout } from '@/components/layout';
 import { useAuthStore } from '@/stores/authStore';
 import { OnboardingModal, FeatureTour, OnboardingTrigger } from '@/components/guide';
@@ -252,6 +252,8 @@ function isPWA(): boolean {
 // Main App component
 function App() {
   const hasAuthHydrated = useAuthStore((state) => state.hasHydrated);
+  const hasRestoredSession = useAuthStore((state) => state.hasRestoredSession);
+  const restoreSession = useAuthStore((state) => state.restoreSession);
   const [showSplash, setShowSplash] = useState(() => {
     // For PWA: Show splash on each launch (once per hour to avoid annoyance on quick re-opens)
     // For browser: Show once per session
@@ -278,6 +280,12 @@ function App() {
     setShowSplash(false);
   };
 
+  useEffect(() => {
+    if (hasAuthHydrated && !hasRestoredSession) {
+      void restoreSession();
+    }
+  }, [hasAuthHydrated, hasRestoredSession, restoreSession]);
+
   // Show only splash screen until complete - prevents PageLoader from rendering behind it
   if (showSplash) {
     return (
@@ -291,7 +299,7 @@ function App() {
   // Persisted auth is restored asynchronously by Zustand. Do not mount route
   // guards or authenticated startup effects until that restoration completes;
   // otherwise a hard refresh can briefly look logged out and erase the session.
-  if (!hasAuthHydrated) {
+  if (!hasAuthHydrated || !hasRestoredSession) {
     return <PageLoader />;
   }
 

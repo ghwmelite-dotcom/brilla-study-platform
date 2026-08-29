@@ -68,6 +68,8 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   hasHydrated: boolean;
+  hasRestoredSession: boolean;
+  isRestoringSession: boolean;
   isLoading: boolean;
   error: string | null;
 
@@ -82,6 +84,7 @@ interface AuthState {
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   setHasHydrated: (hasHydrated: boolean) => void;
+  restoreSession: () => Promise<void>;
   login: (email: string, password: string, turnstileToken?: string) => Promise<void>;
   register: (data: RegisterData) => Promise<{
     success: boolean;
@@ -193,6 +196,59 @@ interface RegisterData {
   referralCode?: string;
 }
 
+interface SessionUserResponse {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  status: UserStatus;
+  house?: string | null;
+  yearGroup?: number | null;
+  schoolLevel?: SchoolLevel | null;
+  schoolName?: string | null;
+  xpPoints?: number | null;
+  level?: number | null;
+  streakDays?: number | null;
+  avatarUrl?: string | null;
+  primaryExamTypeId?: string | null;
+  subscriptionTierId?: string | null;
+  subscriptionExpiresAt?: string | null;
+  aiGradingCredits?: number | null;
+  emailVerified?: boolean | number;
+  isActive?: boolean | number;
+  passwordSet?: boolean | number;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+
+function mapSessionUser(apiUser: SessionUserResponse): ManagedUser {
+  const now = new Date().toISOString();
+  return {
+    id: apiUser.id,
+    email: apiUser.email,
+    name: apiUser.name,
+    role: apiUser.role,
+    status: apiUser.status,
+    house: apiUser.house || undefined,
+    yearGroup: apiUser.yearGroup || undefined,
+    schoolLevel: apiUser.schoolLevel || undefined,
+    schoolName: apiUser.schoolName || undefined,
+    xpPoints: apiUser.xpPoints || 0,
+    level: apiUser.level || 1,
+    streakDays: apiUser.streakDays || 0,
+    avatarUrl: apiUser.avatarUrl || undefined,
+    primaryExamTypeId: apiUser.primaryExamTypeId || undefined,
+    subscriptionTierId: apiUser.subscriptionTierId || undefined,
+    subscriptionExpiresAt: apiUser.subscriptionExpiresAt || undefined,
+    aiGradingCredits: apiUser.aiGradingCredits || 0,
+    emailVerified: apiUser.emailVerified === true || apiUser.emailVerified === 1,
+    isActive: apiUser.isActive === undefined || apiUser.isActive === true || apiUser.isActive === 1,
+    passwordSet: apiUser.passwordSet === true || apiUser.passwordSet === 1,
+    createdAt: apiUser.createdAt || now,
+    updatedAt: apiUser.updatedAt || now,
+  };
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -200,6 +256,8 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       isAuthenticated: false,
       hasHydrated: false,
+      hasRestoredSession: false,
+      isRestoringSession: false,
       isLoading: false,
       error: null,
       pendingUsers: [],
@@ -215,6 +273,58 @@ export const useAuthStore = create<AuthState>()(
       },
 
       setHasHydrated: (hasHydrated) => set({ hasHydrated }),
+
+      restoreSession: async () => {
+        if (get().hasRestoredSession || get().isRestoringSession) return;
+
+        // `brilla_token` predates the Zustand record and is still used by a
+        // few request helpers. Keep it as a recovery source so a valid server
+        // session cannot be lost merely because one browser record is absent
+        // or was written by an older bundle.
+        const token = get().token || api.getToken();
+        if (!token) {
+          set({ hasRestoredSession: true, isRestoringSession: false });
+          return;
+        }
+
+        api.setToken(token);
+        set({ token, isRestoringSession: true });
+
+        try {
+          const response = await api.get<SessionUserResponse>('/auth/me');
+          if (response.success && response.data) {
+            const user = mapSessionUser(response.data);
+            set({
+              user,
+              token,
+              isAuthenticated: user.status === 'approved' && user.isActive,
+              hasRestoredSession: true,
+              isRestoringSession: false,
+              error: null,
+            });
+            return;
+          }
+
+          // The API client clears both auth records only when the server
+          // explicitly rejects the bearer token. Network/5xx failures must not
+          // turn an otherwise valid cached session into a forced logout.
+          if (!api.getToken()) {
+            set({
+              user: null,
+              token: null,
+              isAuthenticated: false,
+              hasRestoredSession: true,
+              isRestoringSession: false,
+            });
+            return;
+          }
+
+          set({ hasRestoredSession: true, isRestoringSession: false });
+        } catch {
+          // Preserve the hydrated session during transient bootstrap failures.
+          set({ hasRestoredSession: true, isRestoringSession: false });
+        }
+      },
 
       login: async (email, password, turnstileToken?) => {
         set({ isLoading: true, error: null });
@@ -1001,8 +1111,15 @@ export const useAuthStore = create<AuthState>()(
           const resolvedState = rehydratedState ?? state;
 
           // Restore the token before any protected route or authenticated
-          // startup request is allowed to render.
-          api.setToken(resolvedState.token);
+          // startup request is allowed to render. The legacy token is a
+          // deliberate recovery source when the Zustand record is missing;
+          // never erase a valid token just because one of the two historical
+          // browser records failed to hydrate.
+          const token = api.getToken() || resolvedState.token;
+          api.setToken(token);
+          if (token !== resolvedState.token) {
+            resolvedState.setToken(token);
+          }
           resolvedState.setHasHydrated(true);
         };
       },
