@@ -77,28 +77,28 @@ export function EssayPracticePage() {
     try {
       const res = await api.get<Array<{
         id: string;
-        essay_question_id: string;
-        submitted_at: string;
-        score: number | null;
+        question_id: string;
+        question_text: string | null;
+        subject_name: string | null;
+        marks: number | null;
+        ai_score: number | null;
         grading_status: string;
-        essay_question?: {
-          question_text: string;
-          marks: number;
-          subject_id: string;
-        };
-      }>>('/essays/attempts?limit=20');
+        created_at: string;
+      }>>('/essays/history?limit=20');
       const response = res.success ? res.data : null;
 
       if (response && Array.isArray(response)) {
         const history: EssayAttempt[] = response.map(attempt => ({
           id: attempt.id,
-          questionId: attempt.essay_question_id,
-          questionText: attempt.essay_question?.question_text?.slice(0, 100) + '...' || 'Essay Question',
-          subject: attempt.essay_question?.subject_id?.replace('subj_', '').replace(/_/g, ' ') || 'General',
-          submittedAt: attempt.submitted_at,
-          score: attempt.score,
-          maxScore: attempt.essay_question?.marks || 20,
-          status: attempt.grading_status === 'graded' ? 'graded' : 'pending',
+          questionId: attempt.question_id,
+          questionText: attempt.question_text ? attempt.question_text.slice(0, 100) + '...' : 'Essay Question',
+          subject: attempt.subject_name || 'General',
+          submittedAt: attempt.created_at,
+          score: attempt.ai_score,
+          maxScore: attempt.marks || 20,
+          // essay_attempts.grading_status stores 'completed' for finished AI
+          // grading (prod CHECK); accept 'graded' too for forward compatibility.
+          status: attempt.grading_status === 'graded' || attempt.grading_status === 'completed' ? 'graded' : 'pending',
         }));
         setEssayHistory(history);
       }
