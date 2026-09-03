@@ -6096,7 +6096,7 @@ protectedApp.post('/essays/submit', async (c) => {
       answerText,
       wordCount,
       wantsAIGrading ? 'ai' : 'self',
-      wantsAIGrading ? 'pending' : 'graded',
+      wantsAIGrading ? 'pending' : 'completed',
       demoFlags.is_demo_data,
       demoFlags.expires_at
     ).run();
@@ -6114,7 +6114,7 @@ protectedApp.post('/essays/submit', async (c) => {
         attemptId,
         wordCount,
         gradingType: wantsAIGrading ? 'ai' : 'self',
-        gradingStatus: wantsAIGrading ? 'pending' : 'graded',
+        gradingStatus: wantsAIGrading ? 'pending' : 'completed',
       },
     });
   } catch {
@@ -6189,7 +6189,7 @@ protectedApp.post('/essays/:attemptId/grade', async (c) => {
     // Update attempt with grading results
     await c.env.DB.prepare(`
       UPDATE essay_attempts
-      SET grading_status = 'graded', ai_score = ?, ai_feedback = ?, final_score = ?, graded_at = datetime('now')
+      SET grading_status = 'completed', ai_score = ?, ai_feedback = ?, final_score = ?, ai_graded_at = datetime('now')
       WHERE id = ?
     `).bind(aiScore, JSON.stringify(aiFeedback), aiScore, attemptId).run();
 

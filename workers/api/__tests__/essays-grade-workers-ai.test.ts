@@ -201,3 +201,63 @@ describe('paper-sit essay convergence', () => {
     expect(insert!.binds[7]).toBe(12); // final_score
   });
 });
+
+describe('essay_attempts prod-schema compliance (CHECK regression)', () => {
+  // Prod's essay_attempts CHECK accepts only pending/grading/completed/failed
+  // and has ai_graded_at, not graded_at (verified via wrangler d1 execute
+  // --remote against sqlite_master). 'graded'/'graded_at' writes throw live.
+  it('grade endpoint persists completed status with ai_graded_at', async () => {
+    const { db, calls } = makeDb((sql) => {
+      if (sql.includes('FROM essay_attempts')) {
+        return {
+          id: 'ea_1', user_id: 'student_1', grading_type: 'ai', grading_status: 'pending',
+          answer_text: 'My essay', word_count: 120, marks: 20,
+          marking_scheme: null, marking_rubric: null, word_limit_min: null, word_limit_max: null,
+          question_text: 'Discuss photosynthesis.', subject_name: 'Integrated Science',
+        };
+      }
+      return STUDENT;
+    });
+    const aiRun = vi.fn(async () => ({ response: MARKING_JSON }));
+    const t = await token({ userId: 'student_1', role: 'student' });
+    const res = await worker.fetch(
+      new Request('http://x/api/essays/ea_1/grade', {
+        method: 'POST', headers: { Authorization: `Bearer ${t}` },
+      }),
+      { DB: db, JWT_SECRET, AI: { run: aiRun } as unknown as Ai },
+    );
+    expect(res.status).toBe(200);
+    const update = calls.find(
+      (c) => c.sql.includes('UPDATE essay_attempts') && c.sql.includes('ai_score = ?'),
+    );
+    expect(update).toBeDefined();
+    expect(update!.sql).toContain("grading_status = 'completed'");
+    expect(update!.sql).toContain('ai_graded_at');
+    expect(update!.sql).not.toMatch(/[^a-z_]graded_at/);
+  });
+
+  it('self-graded submit inserts completed, not the illegal graded status', async () => {
+    const { db, calls } = makeDb((sql) => {
+      if (sql.includes('FROM users u')) {
+        return { id: 'student_1', ai_grading_quota: 5, ai_grading_credits: 5 };
+      }
+      return STUDENT;
+    });
+    const t = await token({ userId: 'student_1', role: 'student' });
+    const res = await worker.fetch(
+      new Request('http://x/api/essays/submit', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questionId: 'q_1', answerText: 'My self graded essay.', gradingType: 'self' }),
+      }),
+      { DB: db, JWT_SECRET, AI: { run: vi.fn() } as unknown as Ai },
+    );
+    expect(res.status).toBe(200);
+    const insert = calls.find((c) => c.sql.includes('INSERT INTO essay_attempts'));
+    expect(insert).toBeDefined();
+    expect(insert!.args[5]).toBe('self'); // grading_type
+    expect(insert!.args[6]).toBe('completed'); // grading_status within prod CHECK
+    const body = await res.json() as any;
+    expect(body.data.gradingStatus).toBe('completed');
+  });
+});
