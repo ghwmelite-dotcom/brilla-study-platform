@@ -1,10 +1,25 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
-import { requireAuth } from './auth-middleware';
+import { requireAuth, constantTimeEqual } from './auth-middleware';
 import { parseLimit } from './http';
 import type { AuthPayload } from './auth-middleware';
 
 const MAX_RECORDING_BYTES = 100 * 1024 * 1024; // 100MB
+
+// Time-limited signed file URLs minted by the authorized metadata endpoints
+// (list/get). The frontend loads assets via <img>/<audio>/<video> src and
+// plain fetch(), which cannot send Authorization headers, so file serving
+// authorizes via these signatures (or is_public / a share token) instead.
+const SIGNED_FILE_URL_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+// Allowed upload content types per asset, matched on the base media type so
+// codec parameters (e.g. audio/webm;codecs=opus) are accepted.
+const ALLOWED_UPLOAD_CONTENT_TYPES: Record<string, string[]> = {
+  events: ['application/json'],
+  audio: ['audio/webm'],
+  webcam: ['video/webm'],
+  thumbnail: ['image/png'],
+};
 
 // Types for Cloudflare bindings
 interface Env {
@@ -44,9 +59,10 @@ interface WhiteboardRecording {
   updated_at: string;
 }
 
-// Generate unique ID
+// Generate unique ID. Object keys and share lookups derive from these IDs, so
+// they must be cryptographically random, not enumerable.
 function generateId(prefix: string): string {
-  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  return `${prefix}_${crypto.randomUUID()}`;
 }
 
 // Generate secure share token
@@ -55,11 +71,47 @@ function generateShareToken(): string {
   return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// HMAC-SHA256 signature over `<r2 path>.<expiry>` for signed file URLs.
+async function signFilePath(path: string, expiresAt: number, secret: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${path}.${expiresAt}`));
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Mint a time-limited signed variant of a stored asset URL
+// (/api/recordings/files/<r2 path>) for an authorized caller.
+async function signAssetUrl(url: string | null, secret: string): Promise<string | null> {
+  if (!url) return url;
+  const path = url.split('/files/')[1];
+  if (!path) return url;
+  const exp = Date.now() + SIGNED_FILE_URL_TTL_MS;
+  const sig = await signFilePath(path, exp, secret);
+  return `${url}?sig=${sig}&exp=${exp}`;
+}
+
+// Verify the sig/exp query params on a /files/ request against the R2 path.
+async function hasValidFileSignature(path: string, url: URL, secret: string): Promise<boolean> {
+  const sig = url.searchParams.get('sig');
+  const exp = url.searchParams.get('exp');
+  if (!sig || !exp || !/^\d+$/.test(exp)) return false;
+  const expiresAt = Number(exp);
+  if (expiresAt < Date.now()) return false;
+  return constantTimeEqual(sig, await signFilePath(path, expiresAt, secret));
+}
+
 // Recordings routes
 const recordingsApp = new Hono<{ Bindings: Env; Variables: AuthVars }>();
 
-// Auth middleware: public endpoints stay public, everything else requires a
-// verified JWT (sets userId/userRole on context).
+// Auth middleware: /public/ (share-token metadata) and /files/ (R2 serving)
+// run without requireAuth — the /files/ handler enforces its own
+// authorization (is_public, share token, or signed URL). Everything else
+// requires a verified JWT (sets userId/userRole on context).
 recordingsApp.use('*', async (c, next) => {
   const url = new URL(c.req.url);
   if (url.pathname.includes('/public/') || url.pathname.includes('/files/')) {
@@ -80,7 +132,7 @@ function isTeacherOrAdmin(c: Context): boolean {
 }
 
 // =============================================
-// FILE SERVING (PUBLIC)
+// FILE SERVING (AUTHORIZED VIA is_public / SHARE TOKEN / SIGNED URL)
 // =============================================
 
 // Serve recording files from R2 bucket
@@ -93,6 +145,53 @@ recordingsApp.get('/files/*', async (c) => {
       return c.json({ success: false, error: 'Storage not configured' }, 500);
     }
 
+    // Authorize before touching storage. Object keys are
+    // recordings/<recordingId>/<asset>; the recording row decides access.
+    const recordingId = path.match(/^recordings\/([^/]+)\/[^/]+$/)?.[1];
+    if (!recordingId) {
+      return c.json({ success: false, error: 'File not found' }, 404);
+    }
+
+    const recording = await c.env.DB.prepare(`
+      SELECT is_public, status FROM whiteboard_recordings WHERE id = ?
+    `).bind(recordingId).first() as { is_public: number; status: string } | null;
+
+    if (!recording || recording.status === 'deleted') {
+      return c.json({ success: false, error: 'File not found' }, 404);
+    }
+
+    let allowed = recording.is_public === 1;
+
+    // Share-token access: token must reference an active, unexpired share for
+    // this recording that has not exhausted its view limit.
+    if (!allowed) {
+      const shareToken = url.searchParams.get('share');
+      if (shareToken) {
+        const share = await c.env.DB.prepare(`
+          SELECT expires_at, max_views, current_views
+          FROM recording_shares
+          WHERE share_token = ? AND recording_id = ? AND is_active = 1
+        `).bind(shareToken, recordingId).first() as {
+          expires_at: string | null;
+          max_views: number | null;
+          current_views: number;
+        } | null;
+
+        allowed = !!share
+          && (!share.expires_at || new Date(share.expires_at) > new Date())
+          && (!share.max_views || share.current_views < share.max_views);
+      }
+    }
+
+    // Signed-URL access for callers authorized by the metadata endpoints.
+    if (!allowed) {
+      allowed = await hasValidFileSignature(path, url, c.env.JWT_SECRET);
+    }
+
+    if (!allowed) {
+      return c.json({ success: false, error: 'Access denied' }, 403);
+    }
+
     const object = await c.env.RECORDINGS_BUCKET.get(path);
 
     if (!object) {
@@ -101,8 +200,10 @@ recordingsApp.get('/files/*', async (c) => {
 
     const headers = new Headers();
     headers.set('Content-Type', object.httpMetadata?.contentType || 'application/octet-stream');
+    headers.set('X-Content-Type-Options', 'nosniff');
     headers.set('Cache-Control', 'public, max-age=31536000');
-    headers.set('Access-Control-Allow-Origin', '*');
+    // No Access-Control-Allow-Origin here: the global cors middleware scopes
+    // cross-origin access to the app origin.
 
     return new Response(object.body, { headers });
   } catch (error) {
@@ -156,6 +257,12 @@ recordingsApp.get('/public/:shareToken', async (c) => {
       SELECT name FROM users WHERE id = ?
     `).bind(share.teacher_id).first() as { name: string } | null;
 
+    // Asset URLs carry the share token so the gated /files/ route can
+    // authorize these unauthenticated loads (revocation/expiry/view limits
+    // are re-checked at serve time).
+    const withShareToken = (assetUrl: string | null) =>
+      assetUrl ? `${assetUrl}?share=${shareToken}` : assetUrl;
+
     return c.json({
       success: true,
       data: {
@@ -164,10 +271,10 @@ recordingsApp.get('/public/:shareToken', async (c) => {
         description: share.description,
         duration: share.duration,
         teacherName: teacher?.name || 'Unknown Teacher',
-        thumbnailUrl: share.thumbnail_url,
-        canvasEventsUrl: share.canvas_events_url,
-        audioUrl: share.audio_url,
-        webcamUrl: share.webcam_url,
+        thumbnailUrl: withShareToken(share.thumbnail_url),
+        canvasEventsUrl: withShareToken(share.canvas_events_url),
+        audioUrl: withShareToken(share.audio_url),
+        webcamUrl: withShareToken(share.webcam_url),
         canvasWidth: share.canvas_width,
         canvasHeight: share.canvas_height,
         initialCanvasJSON: share.initial_canvas_json,
@@ -238,17 +345,17 @@ recordingsApp.get('/', async (c) => {
     return c.json({
       success: true,
       data: {
-        recordings: recordings.results?.map((r: Record<string, unknown>) => ({
+        recordings: await Promise.all(recordings.results?.map(async (r: Record<string, unknown>) => ({
           id: r.id,
           title: r.title,
           description: r.description,
           duration: r.duration,
           teacherId: r.teacher_id,
           teacherName: r.teacher_name,
-          thumbnailUrl: r.thumbnail_url,
-          canvasEventsUrl: r.canvas_events_url,
-          audioUrl: r.audio_url,
-          webcamUrl: r.webcam_url,
+          thumbnailUrl: await signAssetUrl(r.thumbnail_url as string | null, c.env.JWT_SECRET),
+          canvasEventsUrl: await signAssetUrl(r.canvas_events_url as string | null, c.env.JWT_SECRET),
+          audioUrl: await signAssetUrl(r.audio_url as string | null, c.env.JWT_SECRET),
+          webcamUrl: await signAssetUrl(r.webcam_url as string | null, c.env.JWT_SECRET),
           canvasWidth: r.canvas_width,
           canvasHeight: r.canvas_height,
           subjectId: r.subject_id,
@@ -257,7 +364,7 @@ recordingsApp.get('/', async (c) => {
           viewCount: r.view_count,
           createdAt: r.created_at,
           updatedAt: r.updated_at,
-        })) || [],
+        })) || []),
         total: countResult?.total || 0,
         limit,
         offset,
@@ -317,10 +424,10 @@ recordingsApp.get('/:id', async (c) => {
         duration: recording.duration,
         teacherId: recording.teacher_id,
         teacherName: recording.teacher_name,
-        thumbnailUrl: recording.thumbnail_url,
-        canvasEventsUrl: recording.canvas_events_url,
-        audioUrl: recording.audio_url,
-        webcamUrl: recording.webcam_url,
+        thumbnailUrl: await signAssetUrl(recording.thumbnail_url, c.env.JWT_SECRET),
+        canvasEventsUrl: await signAssetUrl(recording.canvas_events_url, c.env.JWT_SECRET),
+        audioUrl: await signAssetUrl(recording.audio_url, c.env.JWT_SECRET),
+        webcamUrl: await signAssetUrl(recording.webcam_url, c.env.JWT_SECRET),
         canvasWidth: recording.canvas_width,
         canvasHeight: recording.canvas_height,
         initialCanvasJSON: recording.initial_canvas_json,
@@ -427,7 +534,7 @@ recordingsApp.post('/:id/upload-urls', async (c) => {
     }
 
     // Generate paths for each file type
-    const uploadInfo = files.map((file) => {
+    const uploadInfo = await Promise.all(files.map(async (file) => {
       let path: string;
       switch (file.type) {
         case 'events':
@@ -448,7 +555,7 @@ recordingsApp.post('/:id/upload-urls', async (c) => {
 
       // Build the upload URL (direct R2 URL via our API)
       const uploadUrl = `/api/recordings/upload/${recordingId}/${file.type}`;
-      const publicUrl = `/api/recordings/files/${path}`;
+      const publicUrl = await signAssetUrl(`/api/recordings/files/${path}`, c.env.JWT_SECRET);
 
       return {
         type: file.type,
@@ -456,7 +563,7 @@ recordingsApp.post('/:id/upload-urls', async (c) => {
         publicUrl,
         path,
       };
-    });
+    }));
 
     return c.json({
       success: true,
@@ -517,6 +624,13 @@ recordingsApp.put('/upload/:recordingId/:fileType', async (c) => {
         return c.json({ success: false, error: 'Invalid file type' }, 400);
     }
 
+    // Validate the client-declared content type against the per-asset
+    // whitelist before accepting the body.
+    const contentType = (c.req.header('Content-Type') || '').split(';')[0].trim().toLowerCase();
+    if (!ALLOWED_UPLOAD_CONTENT_TYPES[fileType].includes(contentType)) {
+      return c.json({ success: false, error: 'Unsupported content type for this file type' }, 415);
+    }
+
     // Get request body as ArrayBuffer (capped to MAX_RECORDING_BYTES)
     const declared = Number(c.req.header('Content-Length') || 0);
     if (declared > MAX_RECORDING_BYTES) {
@@ -526,7 +640,6 @@ recordingsApp.put('/upload/:recordingId/:fileType', async (c) => {
     if (body.byteLength > MAX_RECORDING_BYTES) {
       return c.json({ success: false, error: 'File exceeds 100MB limit' }, 413);
     }
-    const contentType = c.req.header('Content-Type') || 'application/octet-stream';
 
     // Upload to R2
     await c.env.RECORDINGS_BUCKET.put(path, body, {
@@ -558,7 +671,7 @@ recordingsApp.put('/upload/:recordingId/:fileType', async (c) => {
       success: true,
       data: {
         path,
-        url: publicUrl,
+        url: await signAssetUrl(publicUrl, c.env.JWT_SECRET),
       },
     });
   } catch (error) {
