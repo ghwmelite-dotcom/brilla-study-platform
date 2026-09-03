@@ -138,6 +138,23 @@ function makeHarness(opts: HarnessOptions) {
       match: /UPDATE paper_attempts/,
       run: () => ({ success: true, meta: { changes: 1 } }),
     },
+    // Task 10 analytics writes (best-effort at end of submit).
+    {
+      match: /SELECT paa\.question_id, paa\.user_answer, paa\.is_correct/,
+      all: () => ({ results: store.answers }),
+    },
+    {
+      match: /SELECT et\.slug AS exam_type_slug, pp\.exam_type_id/,
+      first: () => ({ exam_type_slug: 'wassce', exam_type_id: 'exam_wassce' }),
+    },
+    {
+      match: /INSERT INTO (question_attempts|user_progress|topic_mastery)|UPDATE user_progress/,
+      run: () => ({ success: true, meta: { changes: 1 } }),
+    },
+    {
+      match: /SELECT id FROM user_progress/,
+      first: () => null,
+    },
     {
       match: /paper_title/,
       first: () => ({

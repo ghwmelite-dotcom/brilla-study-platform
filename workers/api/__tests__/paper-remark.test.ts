@@ -142,6 +142,25 @@ function makeHarness(opts: HarnessOptions) {
         return { success: true, meta: { changes: 1 } };
       },
     },
+    // Task 10 analytics writes (best-effort at end of remark).
+    {
+      match: /SELECT paa\.question_id, paa\.user_answer, paa\.is_correct/,
+      all: (binds) => ({
+        results: store.answers.filter((a) => binds.length <= 1 || binds.slice(1).includes(a.question_id)),
+      }),
+    },
+    {
+      match: /SELECT et\.slug AS exam_type_slug, pp\.exam_type_id/,
+      first: () => ({ exam_type_slug: 'wassce', exam_type_id: 'exam_wassce' }),
+    },
+    {
+      match: /INSERT INTO (question_attempts|user_progress|topic_mastery)|UPDATE user_progress/,
+      run: () => ({ success: true, meta: { changes: 1 } }),
+    },
+    {
+      match: /SELECT id FROM user_progress/,
+      first: () => null,
+    },
   ];
 
   const db = createMockD1(handlers);

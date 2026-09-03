@@ -189,10 +189,25 @@ function createDb(): Database.Database {
       is_correct INTEGER,
       time_taken INTEGER,
       marks_earned INTEGER DEFAULT 0,
+      ai_score REAL,
+      ai_feedback TEXT,
+      marking_status TEXT,
       answered_at TEXT DEFAULT (datetime('now')),
       is_demo_data INTEGER DEFAULT 0,
       expires_at TEXT,
       UNIQUE(paper_attempt_id, question_id)
+    );
+    CREATE TABLE topic_mastery (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      topic_id TEXT NOT NULL,
+      exam_type TEXT NOT NULL,
+      mastery_level REAL DEFAULT 0,
+      practice_questions_attempted INTEGER DEFAULT 0,
+      practice_questions_correct INTEGER DEFAULT 0,
+      created_at TEXT,
+      updated_at TEXT,
+      UNIQUE(user_id, topic_id, exam_type)
     );
     CREATE TABLE rate_limits (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

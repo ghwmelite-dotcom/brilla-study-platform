@@ -5548,6 +5548,90 @@ async function finalizeAttemptMarking(
   return { status, pending, failed, totalScore, grade };
 }
 
+/**
+ * Best-effort per-topic analytics for a graded paper attempt. Runs the
+ * canonical question_attempts + user_progress pipeline (attempt-progress.ts)
+ * and increments topic_mastery counters. Failures are logged, never thrown.
+ */
+async function writePaperAnalytics(
+  env: Env,
+  attemptId: string,
+  userId: string,
+  questionIds?: string[],
+): Promise<void> {
+  if (questionIds && questionIds.length === 0) return;
+  try {
+    const filter = questionIds
+      ? ` AND paa.question_id IN (${questionIds.map(() => '?').join(',')})`
+      : '';
+    const { results: rows } = await env.DB.prepare(`
+      SELECT paa.question_id, paa.user_answer, paa.is_correct, paa.time_taken,
+             paa.marks_earned, paa.ai_score, paa.marking_status,
+             q.topic_id, q.marks, q.points, q.exam_type_id
+      FROM paper_attempt_answers paa
+      JOIN questions q ON q.id = paa.question_id
+      WHERE paa.paper_attempt_id = ?${filter}
+    `).bind(attemptId, ...(questionIds ?? [])).all<Record<string, unknown>>();
+
+    const attempt = await env.DB.prepare(`
+      SELECT et.slug AS exam_type_slug, pp.exam_type_id
+      FROM paper_attempts pa
+      JOIN past_papers pp ON pa.paper_id = pp.id
+      JOIN exam_types et ON et.id = pp.exam_type_id
+      WHERE pa.id = ?
+    `).bind(attemptId).first<{ exam_type_slug: string; exam_type_id: string }>();
+    if (!attempt) return;
+
+    const now = new Date().toISOString();
+    const statements: D1PreparedStatement[] = [];
+    for (const row of rows) {
+      if (!row.topic_id) continue;
+      const isTheory = row.marking_status !== null && row.marking_status !== undefined;
+      if (isTheory && row.marking_status !== 'graded') continue; // pending/failed: no outcome yet
+      const marks = Number(row.marks) || 0;
+      const isCorrect = isTheory
+        ? marks > 0 && (Number(row.ai_score) || 0) >= 0.5 * marks
+        : Number(row.is_correct) === 1;
+      const prepared = await prepareAttemptProgress(env.DB, {
+        userId,
+        questionId: String(row.question_id),
+        topicId: String(row.topic_id),
+        examTypeId: (row.exam_type_id as string) ?? null,
+        userAnswer: String(row.user_answer ?? ''),
+        isCorrect,
+        timeTaken: Number(row.time_taken) || 0,
+        points: Number(row.points) || 0,
+        now,
+      });
+      statements.push(...prepared.statements);
+      statements.push(env.DB.prepare(`
+        INSERT INTO topic_mastery (
+          id, user_id, topic_id, exam_type, mastery_level,
+          practice_questions_attempted, practice_questions_correct,
+          created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?)
+        ON CONFLICT(user_id, topic_id, exam_type) DO UPDATE SET
+          practice_questions_attempted = practice_questions_attempted + 1,
+          practice_questions_correct = practice_questions_correct + excluded.practice_questions_correct,
+          mastery_level = ROUND(100.0 * (practice_questions_correct + excluded.practice_questions_correct) / (practice_questions_attempted + 1), 1),
+          updated_at = excluded.updated_at
+      `).bind(
+        `tm_${crypto.randomUUID()}`,
+        userId,
+        String(row.topic_id),
+        attempt.exam_type_slug,
+        isCorrect ? 100 : 0,
+        isCorrect ? 1 : 0,
+        now,
+        now,
+      ));
+    }
+    if (statements.length > 0) await env.DB.batch(statements);
+  } catch (error) {
+    console.error(`Paper analytics write failed for attempt ${attemptId}:`, error);
+  }
+}
+
 // Submit paper attempt
 protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
   const attemptId = c.req.param('attemptId');
@@ -5562,9 +5646,11 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
 
   try {
     const attempt = await c.env.DB.prepare(`
-      SELECT pa.*, pp.total_marks, pp.specification_id, pp.paper_component_id, pp.session, pp.year
+      SELECT pa.*, pp.total_marks, pp.specification_id, pp.paper_component_id, pp.session, pp.year,
+             pp.exam_type_id, et.slug AS exam_type_slug
       FROM paper_attempts pa
       JOIN past_papers pp ON pa.paper_id = pp.id
+      JOIN exam_types et ON et.id = pp.exam_type_id
       WHERE pa.id = ? AND pa.user_id = ? AND pa.status = 'in_progress'
     `).bind(attemptId, userId).first<Record<string, unknown>>();
 
@@ -5694,6 +5780,8 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
 
     await c.env.DB.batch(gradeStatements);
 
+    await writePaperAnalytics(c.env, attemptId, userId);
+
     return c.json({
       success: true,
       data: {
@@ -5804,6 +5892,18 @@ protectedApp.post('/papers/attempts/:attemptId/remark', async (c) => {
 
     // Recompute totals + status from the full answer set.
     const final = await finalizeAttemptMarking(c.env.DB, attemptId, String(attempt.user_id));
+
+    // Analytics only for answers this call transitioned to 'graded' — answers
+    // graded at submit were already written, and graded answers are never
+    // re-marked, so no double-count path exists.
+    const gradedQuestionIds = outcomes
+      .filter((o) => o.kind === 'graded')
+      .map((o) => {
+        const row = toMark.find((a) => String(a.id) === o.answerId);
+        return row ? String(row.question_id) : null;
+      })
+      .filter((id): id is string => id !== null);
+    await writePaperAnalytics(c.env, attemptId, String(attempt.user_id), gradedQuestionIds);
 
     return c.json({
       success: true,
