@@ -3,6 +3,7 @@
 // src/lib/api.ts. Preserves the old throw/unwrap semantics via `call`.
 
 import { api, type ApiResponse } from './api';
+import type { WhiteboardRecording } from '@/types/whiteboard';
 
 export class ServiceError extends Error {
   status: number;
@@ -258,6 +259,28 @@ export interface RecordingData {
   viewCount: number;
   createdAt: string;
   updatedAt: string;
+}
+
+// Adapt a recordings API response (camelCase; asset URLs already HMAC-signed
+// with ?sig=&exp= at read time) to the player's WhiteboardRecording shape.
+export function toWhiteboardRecording(data: RecordingData): WhiteboardRecording {
+  return {
+    id: data.id,
+    title: data.title,
+    description: data.description || '',
+    duration: data.duration,
+    teacherId: data.teacherId,
+    teacherName: data.teacherName,
+    canvasEventsUrl: data.canvasEventsUrl || '',
+    audioUrl: data.audioUrl ?? undefined,
+    webcamUrl: data.webcamUrl ?? undefined,
+    thumbnailUrl: data.thumbnailUrl ?? undefined,
+    canvasWidth: data.canvasWidth,
+    canvasHeight: data.canvasHeight,
+    initialCanvasJSON: data.initialCanvasJSON,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+  };
 }
 
 export interface RecordingUploadInfo {

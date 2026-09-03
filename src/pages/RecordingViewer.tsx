@@ -13,50 +13,16 @@ import {
 } from 'lucide-react';
 import { RecordingPlayer } from '@/components/whiteboard';
 import type { WhiteboardRecording } from '@/types/whiteboard';
-import { api } from '@/lib/api';
+import { recordingsService, toWhiteboardRecording } from '@/lib/services';
 
 // Fetch recording from API
 async function fetchRecording(id: string): Promise<WhiteboardRecording | null> {
   try {
-    const res = await api.get<{
-      id: string;
-      title: string;
-      description?: string;
-      duration: number;
-      teacher_id: string;
-      teacher_name?: string;
-      canvas_events_url?: string;
-      audio_url?: string;
-      webcam_url?: string;
-      thumbnail_url?: string;
-      canvas_width: number;
-      canvas_height: number;
-      created_at: string;
-      updated_at: string;
-    }>(`/recordings/${id}`);
-    const response = res.success ? res.data : null;
-
-    if (!response || !response.id) {
+    const data = await recordingsService.get(id);
+    if (!data || !data.id) {
       return null;
     }
-
-    // Transform snake_case to camelCase
-    return {
-      id: response.id,
-      title: response.title,
-      description: response.description || '',
-      duration: response.duration,
-      teacherId: response.teacher_id,
-      teacherName: response.teacher_name,
-      canvasEventsUrl: response.canvas_events_url || '',
-      audioUrl: response.audio_url,
-      webcamUrl: response.webcam_url,
-      thumbnailUrl: response.thumbnail_url,
-      canvasWidth: response.canvas_width,
-      canvasHeight: response.canvas_height,
-      createdAt: response.created_at,
-      updatedAt: response.updated_at,
-    };
+    return toWhiteboardRecording(data);
   } catch (error) {
     console.error('Failed to fetch recording:', error);
     return null;
