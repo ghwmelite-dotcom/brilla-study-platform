@@ -5,7 +5,7 @@ import { sign } from 'hono/jwt';
 import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware';
 import { parseBoundedJsonBody, parseLimit, parseJsonBody } from './http';
 import type { JWTPayload } from 'hono/utils/jwt/types';
-import { getChatModel, getGenerationModel, getTtsModel, getVisionModel, unwrapAiText } from './ai-models';
+import { callTextModel, getChatModel, getGenerationModel, getMarkingModel, getTtsModel, getVisionModel, unwrapAiText } from './ai-models';
 import { formatUntrustedAiData, normalizeAiGradingFeedback, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
 import { libraryApp } from './library';
 import { counselorApp } from './counselor';
@@ -80,7 +80,6 @@ export interface Env {
   JWT_SECRET: string;
   SETUP_KEY?: string;
   ENVIRONMENT: string;
-  ANTHROPIC_API_KEY?: string;
   AI_PROVIDER?: string;
   AI_MODEL?: string;
   AI_MODEL_CHAT?: string;
@@ -827,36 +826,6 @@ async function sendSecurityAlertToAdmins(
   } catch (error) {
     console.error('Failed to send security alerts:', error);
   }
-}
-
-// Claude API helper
-async function callClaudeAPI(
-  apiKey: string,
-  model: string,
-  systemPrompt: string,
-  userMessage: string
-): Promise<string> {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: model,
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userMessage }],
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Claude API error: ${response.status}`);
-  }
-
-  const data = await response.json() as { content: Array<{ text: string }> };
-  return data.content[0]?.text || 'No response generated.';
 }
 
 // =============================================
@@ -5498,8 +5467,6 @@ protectedApp.post('/essays/submit', async (c) => {
 // AI grade essay (triggered after submission)
 protectedApp.post('/essays/:attemptId/grade', async (c) => {
   const attemptId = c.req.param('attemptId');
-  const apiKey = c.env.ANTHROPIC_API_KEY;
-  const model = getGenerationModel(c.env);
 
   try {
     // Get essay attempt with question details
@@ -5522,7 +5489,7 @@ protectedApp.post('/essays/:attemptId/grade', async (c) => {
       return c.json({ success: false, error: 'Forbidden' }, 403);
     }
 
-    if (!apiKey) {
+    if (!c.env.AI) {
       return c.json({ success: false, error: 'AI grading is temporarily unavailable' }, 503);
     }
 
@@ -5539,7 +5506,7 @@ protectedApp.post('/essays/:attemptId/grade', async (c) => {
     let aiScore: number;
 
     {
-      // Use Claude for grading
+      // Use Workers AI for grading
       const markingScheme = attempt.marking_scheme
         ? JSON.parse(attempt.marking_scheme as string)
         : null;
@@ -5569,7 +5536,12 @@ Return your assessment as a JSON object with this structure:
 
 Grade the essay using only the supplied data.`;
 
-      const response = await callClaudeAPI(apiKey, model, systemPrompt, userPrompt);
+      const response = await callTextModel(c.env, {
+        model: getMarkingModel(c.env),
+        system: systemPrompt,
+        user: userPrompt,
+        maxTokens: 1024,
+      });
 
       try {
         // Extract JSON from response
@@ -5641,9 +5613,6 @@ protectedApp.post('/ai/explain', async (c) => {
     }, 429);
   }
 
-  const apiKey = c.env.ANTHROPIC_API_KEY;
-  const model = getChatModel(c.env);
-
   try {
     const exam = getExamContext(context);
     const systemPrompt = `You are Brilla AI, a helpful tutor for ${exam.examDescription} preparation.
@@ -5664,12 +5633,16 @@ Please explain:
     let explanation: string;
     let provider: string;
 
-    if (apiKey) {
-      // Use Claude API
-      explanation = await callClaudeAPI(apiKey, model, systemPrompt, userPrompt);
-      provider = 'anthropic';
-    } else {
-      // Fallback to mock response
+    try {
+      explanation = await callTextModel(c.env, {
+        model: getChatModel(c.env),
+        system: systemPrompt,
+        user: userPrompt,
+        maxTokens: 1024,
+      });
+      provider = 'workers-ai';
+    } catch (modelError) {
+      console.error('AI explain model error:', modelError);
       explanation = generateMockExplanation(question, correctAnswer, isCorrect, userAnswer, context);
       provider = 'mock';
     }
@@ -5709,9 +5682,6 @@ protectedApp.post('/ai/chat', async (c) => {
     }, 429);
   }
 
-  const apiKey = c.env.ANTHROPIC_API_KEY;
-  const model = getChatModel(c.env);
-
   try {
     const exam = getExamContext(context);
     const displayName = userName || userPersonalization?.preferredName || userPersonalization?.name;
@@ -5749,12 +5719,16 @@ ${String(message || '').slice(0, 4000)}`;
     let response: string;
     let provider: string;
 
-    if (apiKey) {
-      // Use Claude API
-      response = await callClaudeAPI(apiKey, model, systemPrompt, userPrompt);
-      provider = 'anthropic';
-    } else {
-      // Fallback to mock response
+    try {
+      response = await callTextModel(c.env, {
+        model: getChatModel(c.env),
+        system: systemPrompt,
+        user: userPrompt,
+        maxTokens: 1024,
+      });
+      provider = 'workers-ai';
+    } catch (modelError) {
+      console.error('AI chat model error:', modelError);
       response = generateMockChatResponse(message, context, displayName);
       provider = 'mock';
     }
