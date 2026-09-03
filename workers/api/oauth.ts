@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import type { Context } from 'hono';
 import { sign } from 'hono/jwt';
 import { parseJsonBody } from './http';
 import { requireAuth, type AuthPayload } from './auth-middleware';
@@ -17,6 +18,7 @@ import {
   EMAIL_VERIFICATION_REWARD_XP,
   createEmailVerificationRewardStatement,
 } from './email-verification-reward';
+import { checkRateLimit, type RateLimitResult } from './rate-limit';
 
 // Types for Cloudflare bindings
 interface Env {
@@ -100,8 +102,15 @@ function generateState(): string {
   return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Decode JWT payload without verification (for ID token)
-function decodeJwtPayload(token: string): GoogleUserInfo | null {
+// ID token claims beyond the userinfo profile fields.
+interface GoogleIdTokenClaims extends GoogleUserInfo {
+  iss?: string;
+  aud?: string;
+  exp?: number;
+}
+
+// Decode JWT payload (claims are NOT trusted until verifyGoogleIdToken passes)
+function decodeJwtPayload(token: string): GoogleIdTokenClaims | null {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return null;
@@ -113,6 +122,57 @@ function decodeJwtPayload(token: string): GoogleUserInfo | null {
   } catch {
     return null;
   }
+}
+
+// Verify a Google ID token obtained from the server-to-server PKCE code
+// exchange. The project has no JWKS/signature-verifier dependency (and we
+// deliberately do not add one for this), so the signature and expiry check is
+// delegated to Google's tokeninfo endpoint — also server-to-server over TLS.
+// On top of that we assert the claims locally: aud must be our client ID,
+// iss must be Google, exp must be in the future, and the tokeninfo sub must
+// match the decoded sub. email_verified is taken from Google's response
+// (tokeninfo serializes it as the string "true"/"false").
+async function verifyGoogleIdToken(idToken: string, clientId: string): Promise<GoogleUserInfo | null> {
+  const claims = decodeJwtPayload(idToken);
+  if (!claims || !claims.email || !claims.sub) return null;
+  if (claims.aud !== clientId) return null;
+  if (claims.iss !== 'https://accounts.google.com' && claims.iss !== 'accounts.google.com') return null;
+  if (typeof claims.exp !== 'number' || claims.exp * 1000 <= Date.now()) return null;
+
+  try {
+    const res = await fetch(
+      `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`,
+    );
+    if (!res.ok) return null;
+    const info = await res.json() as {
+      aud?: string;
+      sub?: string;
+      email_verified?: string | boolean;
+    };
+    if (info.aud !== clientId) return null;
+    if (info.sub !== claims.sub) return null;
+    return {
+      ...claims,
+      email_verified: info.email_verified === true || info.email_verified === 'true',
+    };
+  } catch {
+    return null;
+  }
+}
+
+// Rate limit error response, mirroring rateLimitResponse in index.ts
+function rateLimitResponse(
+  c: Context<{ Bindings: Env; Variables: AuthVars }>,
+  result: RateLimitResult,
+) {
+  const retryAfter = result.retryAfter ?? 30;
+  c.header('Retry-After', String(retryAfter));
+  return c.json({
+    success: false,
+    error: 'Too many requests. Please try again later.',
+    code: 'RATE_LIMITED',
+    retryAfter,
+  }, 429);
 }
 
 // Generate JWT token
@@ -210,6 +270,14 @@ oauthApp.post('/google/init', async (c) => {
     }
   }
 
+  // Per-IP throttle on flow starts (each one writes an oauth_states row)
+  const rateLimit = await checkRateLimit(
+    c.env.DB,
+    c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown',
+    'oauth-google-init',
+  );
+  if (!rateLimit.allowed) return rateLimitResponse(c, rateLimit);
+
   // Generate PKCE parameters
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = await generateCodeChallenge(codeVerifier);
@@ -273,6 +341,14 @@ oauthApp.post('/google/callback', async (c) => {
     return c.json({ success: false, error: 'Missing code or state' }, 400);
   }
 
+  // Per-IP throttle BEFORE any DB work or the outbound Google token exchange
+  const rateLimit = await checkRateLimit(
+    c.env.DB,
+    c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown',
+    'oauth-google-callback',
+  );
+  if (!rateLimit.allowed) return rateLimitResponse(c, rateLimit);
+
   // Validate state and retrieve stored data (ISO comparison against bound JS ISO now)
   const storedState = await c.env.DB.prepare(`
     SELECT * FROM oauth_states WHERE state = ? AND expires_at > ?
@@ -310,8 +386,8 @@ oauthApp.post('/google/callback', async (c) => {
 
   const tokens: GoogleTokenResponse = await tokenResponse.json();
 
-  // Decode ID token to get user info
-  const googleUser = decodeJwtPayload(tokens.id_token);
+  // Verify the ID token (claims + Google tokeninfo signature check) to get user info
+  const googleUser = await verifyGoogleIdToken(tokens.id_token, c.env.GOOGLE_CLIENT_ID!);
   if (!googleUser || !googleUser.email) {
     return c.json({ success: false, error: 'Failed to get user info from Google' }, 400);
   }
@@ -369,7 +445,16 @@ oauthApp.post('/google/callback', async (c) => {
       `).bind(existingOAuth.id).run();
 
     } else if (existingUser) {
-      // User exists by email but Google not linked - auto-link
+      // User exists by email but Google not linked - auto-link.
+      // SECURITY: linking by email is an account-takeover vector unless Google
+      // has verified the mailbox ownership, so require email_verified.
+      if (googleUser.email_verified !== true) {
+        return c.json({
+          success: false,
+          error: 'Your Google email address is not verified. Please sign in with your password instead.',
+          code: 'EMAIL_NOT_VERIFIED',
+        }, 403);
+      }
       const oauthId = `oauth_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
       await c.env.DB.prepare(`
         INSERT INTO user_oauth_providers (id, user_id, provider, provider_user_id, provider_email, provider_name, provider_avatar_url)

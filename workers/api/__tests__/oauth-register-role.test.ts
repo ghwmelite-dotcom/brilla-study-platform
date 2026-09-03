@@ -6,9 +6,10 @@ import { oauthApp } from '../oauth';
 // registers as pending without receiving an authentication token.
 //
 // Approach: full callback test — global fetch is stubbed to fake Google's
-// token exchange (the ID token payload is decoded without signature
-// verification by the handler), and D1 is mocked with per-SQL routing so the
-// INSERT INTO users bind arguments can be captured and asserted.
+// token exchange and tokeninfo verification endpoints (the handler delegates
+// the ID token signature check to tokeninfo server-to-server), and D1 is
+// mocked with per-SQL routing so the INSERT INTO users bind arguments can be
+// captured and asserted.
 
 const JWT_SECRET = 'test-secret-that-is-long-enough';
 
@@ -22,6 +23,10 @@ const GOOGLE_USER = {
   email: 'new.user@example.com',
   email_verified: true,
   name: 'New User',
+  // Claims the handler now asserts before trusting the ID token.
+  aud: 'client-id',
+  iss: 'https://accounts.google.com',
+  exp: Math.floor(Date.now() / 1000) + 3600,
 };
 
 function makeStateRow(role: string | null, registrationData?: Record<string, unknown>) {
@@ -58,6 +63,10 @@ function makeDb(stateRow: unknown, captured: Captured, { affiliateRow = null }: 
     prepare: vi.fn((sql: string) => ({
       bind: vi.fn((...args: unknown[]) => ({
         first: vi.fn().mockImplementation(() => {
+          // D1-backed rate limiter (oauth-google-callback bucket): allow.
+          if (sql.includes('WITH usage(total_requests)')) {
+            return Promise.resolve({ request_count: 1, total_requests: 1 });
+          }
           if (sql.includes('FROM oauth_states')) return Promise.resolve(stateRow);
           if (sql.includes('FROM affiliate_profiles') && sql.includes('referral_code = ?')) {
             return Promise.resolve(
@@ -96,18 +105,34 @@ function makeEnv(stateRow: unknown, captured: Captured, opts: DbOptions & { regi
 function stubGoogleTokenExchange() {
   vi.stubGlobal(
     'fetch',
-    vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          access_token: 'access-token',
-          id_token: fakeIdToken(GOOGLE_USER),
-          expires_in: 3600,
-          token_type: 'Bearer',
-          scope: 'openid email profile',
-        }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } },
-      ),
-    ),
+    vi.fn().mockImplementation((url: string) => {
+      // tokeninfo: Google's server-to-server ID token verification endpoint
+      if (String(url).includes('tokeninfo')) {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              aud: 'client-id',
+              iss: 'https://accounts.google.com',
+              sub: GOOGLE_USER.sub,
+              email_verified: String(GOOGLE_USER.email_verified),
+            }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
+          ),
+        );
+      }
+      return Promise.resolve(
+        new Response(
+          JSON.stringify({
+            access_token: 'access-token',
+            id_token: fakeIdToken(GOOGLE_USER),
+            expires_in: 3600,
+            token_type: 'Bearer',
+            scope: 'openid email profile',
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        ),
+      );
+    }),
   );
 }
 

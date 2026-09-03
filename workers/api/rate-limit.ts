@@ -85,6 +85,18 @@ export const RATE_LIMITS: Record<string, RateLimitConfig> = {
     windowMs: 60 * 1000, // 60 new answer writes per user per minute
     failureMode: "closed",
   },
+  "public-read": {
+    maxRequests: 300,
+    windowMs: 60 * 1000, // 300 unauthenticated public reads per IP per minute
+  },
+  "oauth-google-init": {
+    maxRequests: 20,
+    windowMs: 60 * 1000, // 20 Google OAuth flow starts per IP per minute
+  },
+  "oauth-google-callback": {
+    maxRequests: 10,
+    windowMs: 60 * 1000, // 10 Google OAuth callbacks per IP per minute (each triggers an outbound token exchange)
+  },
 };
 
 export async function checkRateLimit(

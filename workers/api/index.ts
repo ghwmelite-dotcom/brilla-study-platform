@@ -410,7 +410,18 @@ function rateLimitResponse(c: Context<AppEnv>, result: RateLimitResult) {
   }, 429);
 }
 
-// Cloudflare Turnstile verification
+// Per-IP throttle for unauthenticated public read endpoints (leaderboard,
+// papers, houses, subjects, exam-types, public flashcards). Uses the shared
+// D1-backed limiter so the budget holds across Workers isolates; fail-open on
+// limiter errors, same as the question-read bucket.
+const publicReadRateLimit: MiddlewareHandler<AppEnv> = async (c, next) => {
+  const clientIp = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
+  const rateLimit = await checkRateLimit(c.env.DB, clientIp, 'public-read');
+  if (!rateLimit.allowed) return rateLimitResponse(c, rateLimit);
+  await next();
+};
+
+// Cloudflare Turnstile verification below; rate-limit helpers above.
 interface TurnstileVerifyResponse {
   success: boolean;
   'error-codes'?: string[];
@@ -932,6 +943,23 @@ app.route('/api/exam-boards', examBoardsApp);
 
 // Public routes (no auth required)
 const publicApp = new Hono<AppEnv>();
+
+// Unauthenticated read endpoints get a generous per-IP bucket so scraping
+// and refresh storms can't freely hammer D1 (registered before the routes
+// below so Hono runs it first; first-registered-wins). The trailing-*
+// pattern also matches the bare prefix in Hono, so registering both would
+// double-charge the bucket on every bare-path request.
+publicApp.use('/leaderboard/*', publicReadRateLimit);
+// /papers/:id (paper detail incl. answer material) is behind requireAuth
+// plus the per-user question-read bucket, so only the anonymous list and
+// years reads join the public-read bucket here. Exact patterns only -- a
+// '/papers/*' wildcard would also match (and double-charge) those routes.
+publicApp.use('/papers', publicReadRateLimit);
+publicApp.use('/papers/years', publicReadRateLimit);
+publicApp.use('/houses/*', publicReadRateLimit);
+publicApp.use('/subjects/*', publicReadRateLimit);
+publicApp.use('/exam-types/*', publicReadRateLimit);
+publicApp.use('/flashcards/public', publicReadRateLimit);
 
 // Protected routes with JWT authentication middleware
 const protectedApp = new Hono<AppEnv>();

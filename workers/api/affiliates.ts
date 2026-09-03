@@ -2,33 +2,13 @@ import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
 import { awardPoints } from './points';
+import { checkRateLimit } from './rate-limit';
 
 // Types for Cloudflare bindings
 interface Env {
   DB: D1Database;
   JWT_SECRET: string;
   APP_URL: string;
-}
-
-// Rate limiting store (in-memory for single worker, use KV/Durable Objects for distributed)
-const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
-
-// Check rate limit for an IP/key
-function checkRateLimit(key: string, maxRequests: number, windowMs: number): boolean {
-  const now = Date.now();
-  const record = rateLimitStore.get(key);
-
-  if (!record || now > record.resetAt) {
-    rateLimitStore.set(key, { count: 1, resetAt: now + windowMs });
-    return true;
-  }
-
-  if (record.count >= maxRequests) {
-    return false;
-  }
-
-  record.count++;
-  return true;
 }
 
 // Generate unique referral code
@@ -911,9 +891,15 @@ affiliatesApp.get('/validate-code/:code', async (c) => {
 
     const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
 
-    // SECURITY: in-memory rate limit, same pattern as /ref/:code click tracking
-    const rateLimitKey = `validate_${await hashIP(ip)}`;
-    if (!checkRateLimit(rateLimitKey, 30, 60000)) {
+    // SECURITY: D1-backed rate limit (shared across isolates), same pattern
+    // as /ref/:code click tracking
+    const validateLimit = await checkRateLimit(
+      c.env.DB,
+      `validate_${await hashIP(ip)}`,
+      'affiliate-validate-code',
+      { maxRequests: 30, windowMs: 60 * 1000 },
+    );
+    if (!validateLimit.allowed) {
       return c.json({ success: false, error: 'Too many requests' }, 429);
     }
 
@@ -949,9 +935,15 @@ affiliatesApp.get('/ref/:code', async (c) => {
 
     const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
 
-    // SECURITY: Rate limit click tracking (max 10 clicks per IP per minute)
-    const rateLimitKey = `click_${await hashIP(ip)}`;
-    if (!checkRateLimit(rateLimitKey, 10, 60000)) {
+    // SECURITY: D1-backed rate limit for click tracking (max 10 clicks per IP
+    // per minute); an in-memory Map would be per-isolate and ineffective.
+    const clickLimit = await checkRateLimit(
+      c.env.DB,
+      `click_${await hashIP(ip)}`,
+      'affiliate-ref-click',
+      { maxRequests: 10, windowMs: 60 * 1000 },
+    );
+    if (!clickLimit.allowed) {
       // Still redirect but don't track the click
       return c.redirect(`${c.env.APP_URL}/register?ref=${code}`);
     }

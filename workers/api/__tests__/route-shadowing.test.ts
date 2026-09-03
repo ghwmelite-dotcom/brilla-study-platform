@@ -18,7 +18,14 @@ function makeDb(userRow: unknown, allResults: Record<string, unknown>[] = []) {
   const db = {
     prepare: vi.fn((sql: string) => {
       const bound = {
-        first: vi.fn().mockResolvedValue(userRow),
+        // D1-backed public-read rate limiter: always allow one request.
+        first: vi.fn().mockImplementation(() =>
+          Promise.resolve(
+            sql.includes('WITH usage(total_requests)')
+              ? { request_count: 1, total_requests: 1 }
+              : userRow,
+          ),
+        ),
         all: vi.fn().mockResolvedValue({ results: allResults }),
         run: vi.fn().mockResolvedValue({ success: true }),
       };
