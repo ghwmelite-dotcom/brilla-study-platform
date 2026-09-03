@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Search, MessageSquare, Users } from 'lucide-react';
 import { useChatStore } from '@/stores/chatStore';
+import { api } from '@/lib/api';
 import { cn } from '@/utils';
 
 interface SearchUser {
   id: string;
   name: string;
-  house?: string;
-  level: number;
-  isOnline: boolean;
+  schoolLevel?: string;
   avatarUrl?: string;
+  existingDmId?: string | null;
 }
 
 export function ChatUserSearch() {
@@ -28,14 +28,13 @@ export function ChatUserSearch() {
 
       setIsSearching(true);
       try {
-        // TODO: Replace with API call
-        // const response = await fetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}`);
-        // const data = await response.json();
-        // setUsers(data.users);
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        setUsers([]);
+        const response = await api.get<SearchUser[]>(
+          `/chat/users/search?q=${encodeURIComponent(searchQuery)}`
+        );
+        setUsers(response.success && response.data ? response.data : []);
       } catch (error) {
         console.error('Failed to search users:', error);
+        setUsers([]);
       } finally {
         setIsSearching(false);
       }
@@ -46,8 +45,8 @@ export function ChatUserSearch() {
   }, [searchQuery]);
 
   // Check if DM already exists with user
-  const hasDMWith = (userId: string) => {
-    return rooms.some((room) => room.type === 'dm' && room.otherUser?.id === userId);
+  const hasDMWith = (user: SearchUser) => {
+    return !!user.existingDmId || rooms.some((room) => room.type === 'dm' && room.otherUser?.id === user.id);
   };
 
   const handleStartDM = async (user: SearchUser) => {
@@ -100,32 +99,22 @@ export function ChatUserSearch() {
           className="flex items-center gap-3 p-3 hover:bg-neutral-50 transition-colors"
         >
           {/* Avatar */}
-          <div className="relative">
-            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center overflow-hidden">
-              {user.avatarUrl ? (
-                <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-white font-semibold">
-                  {user.name.charAt(0).toUpperCase()}
-                </span>
-              )}
-            </div>
-            {/* Online indicator */}
-            <span
-              className={cn(
-                'absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white',
-                user.isOnline ? 'bg-green-500' : 'bg-neutral-400'
-              )}
-            />
+          <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center overflow-hidden">
+            {user.avatarUrl ? (
+              <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-white font-semibold">
+                {user.name.charAt(0).toUpperCase()}
+              </span>
+            )}
           </div>
 
           {/* User info */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h4 className="font-medium text-neutral-900 truncate">{user.name}</h4>
-              <span className="text-xs text-primary">Lv. {user.level}</span>
-            </div>
-            {user.house && <p className="text-xs text-neutral-500">{user.house}</p>}
+            <h4 className="font-medium text-neutral-900 truncate">{user.name}</h4>
+            {user.schoolLevel && (
+              <p className="text-xs text-neutral-500">{user.schoolLevel.toUpperCase()}</p>
+            )}
           </div>
 
           {/* Message button */}
@@ -134,13 +123,13 @@ export function ChatUserSearch() {
             disabled={isLoading}
             className={cn(
               'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
-              hasDMWith(user.id)
+              hasDMWith(user)
                 ? 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                 : 'bg-primary text-white hover:bg-primary-dark'
             )}
           >
             <MessageSquare className="w-4 h-4" />
-            {hasDMWith(user.id) ? 'Chat' : 'Message'}
+            {hasDMWith(user) ? 'Chat' : 'Message'}
           </button>
         </div>
       ))}

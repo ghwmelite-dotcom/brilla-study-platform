@@ -46,7 +46,6 @@ interface CounselorState {
   startConversation: (type: CounselorType, initialMessage?: string) => Promise<void>;
   loadConversation: (id: string) => Promise<void>;
   archiveConversation: (id: string) => Promise<void>;
-  deleteConversation: (id: string) => Promise<void>;
 
   // Actions - Messaging
   sendMessage: (message: string) => Promise<void>;
@@ -344,50 +343,71 @@ export const useCounselorStore = create<CounselorState>()(
         set({ isLoading: true, error: null });
 
         try {
-          // TODO: Replace with API call
-          const conversation = get().conversations.find(c => c.id === id);
-          if (conversation) {
+          const response = await api.get<{
+            id: string;
+            counselorType: CounselorType;
+            title?: string;
+            status: CounselorConversation['status'];
+            messageCount: number;
+            lastMessageAt?: string;
+            createdAt: string;
+            messages?: Array<Omit<CounselorMessage, 'conversationId'>>;
+          }>(`/counselor/conversations/${id}`);
+
+          if (response.success && response.data) {
+            const data = response.data;
+            const conversation: CounselorConversation = {
+              id: data.id,
+              userId: 'current_user',
+              counselorType: data.counselorType,
+              title: data.title,
+              status: data.status,
+              messageCount: data.messageCount,
+              lastMessageAt: data.lastMessageAt,
+              createdAt: data.createdAt,
+              updatedAt: data.lastMessageAt || data.createdAt,
+            };
+
             set({
               currentConversation: conversation,
-              messages: conversation.messages || [],
-              counselorType: conversation.counselorType,
+              messages: (data.messages || []).map(m => ({ ...m, conversationId: data.id })),
+              counselorType: data.counselorType,
               isLoading: false,
             });
+            return;
           }
         } catch {
+          console.error('Failed to load conversation from API');
+        }
+
+        // Fallback to the locally cached copy (offline/dev)
+        const conversation = get().conversations.find(c => c.id === id);
+        if (conversation) {
+          set({
+            currentConversation: conversation,
+            messages: conversation.messages || [],
+            counselorType: conversation.counselorType,
+            isLoading: false,
+          });
+        } else {
           set({ error: 'Failed to load conversation', isLoading: false });
         }
       },
 
       archiveConversation: async (id: string) => {
-        try {
-          // TODO: Replace with API call
-          set({
-            conversations: get().conversations.map(c =>
-              c.id === id ? { ...c, status: 'archived' as const } : c
-            ),
-          });
-
-          if (get().currentConversation?.id === id) {
-            set({ currentConversation: null, messages: [] });
-          }
-        } catch {
-          throw new Error('Failed to archive conversation');
+        // DELETE /counselor/conversations/:id archives server-side
+        // (the list endpoint excludes archived conversations).
+        const response = await api.delete(`/counselor/conversations/${id}`);
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to archive conversation');
         }
-      },
 
-      deleteConversation: async (id: string) => {
-        try {
-          // TODO: Replace with API call
-          set({
-            conversations: get().conversations.filter(c => c.id !== id),
-          });
+        set({
+          conversations: get().conversations.filter(c => c.id !== id),
+        });
 
-          if (get().currentConversation?.id === id) {
-            set({ currentConversation: null, messages: [] });
-          }
-        } catch {
-          throw new Error('Failed to delete conversation');
+        if (get().currentConversation?.id === id) {
+          set({ currentConversation: null, messages: [] });
         }
       },
 

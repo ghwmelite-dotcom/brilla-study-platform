@@ -12,37 +12,21 @@ import {
   ArrowRight,
   Star,
   Clock,
-  UserPlus,
   Loader2,
 } from 'lucide-react';
 import { useChatStore } from '@/stores/chatStore';
 import { useExamStore } from '@/stores/examStore';
+import { api } from '@/lib/api';
 import { cn } from '@/utils';
 import { ChatCreateRoom } from '@/components/chat';
 import type { GhanaExamTypeSlug, ExamTypeSlug } from '@/types';
 import { isGhanaExam } from '@/types';
-
-interface OnlineUser {
-  id: string;
-  name: string;
-  house?: string;
-  level: number;
-  avatarUrl?: string;
-}
 
 interface FeaturedRoom {
   id: string;
   name: string;
   members: number;
   isHot?: boolean;
-}
-
-interface RecentDiscussion {
-  room: string;
-  topic: string;
-  replies: number;
-  time: string;
-  author: string;
 }
 
 export function CommunityPage() {
@@ -52,95 +36,50 @@ export function CommunityPage() {
     openChat,
     setActiveRoom,
     setActiveTab,
-    startDM,
     isLoadingRooms,
     fetchRooms,
   } = useChatStore();
 
   const [showCreateRoom, setShowCreateRoom] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [featuredRooms, setFeaturedRooms] = useState<FeaturedRoom[]>([]);
-  const [recentDiscussions, setRecentDiscussions] = useState<RecentDiscussion[]>([]);
-  const [isLoadingOnline, setIsLoadingOnline] = useState(false);
   const [isLoadingFeatured, setIsLoadingFeatured] = useState(false);
-  const fetchOnlineUsersRef = useRef<() => void>(() => {});
   const fetchFeaturedRoomsRef = useRef<() => void>(() => {});
-  const fetchRecentDiscussionsRef = useRef<() => void>(() => {});
 
   // Fetch data on mount
   useEffect(() => {
     fetchRooms();
-    fetchOnlineUsersRef.current();
     fetchFeaturedRoomsRef.current();
-    fetchRecentDiscussionsRef.current();
   }, [currentExamType, fetchRooms]);
-
-  const fetchOnlineUsers = async () => {
-    setIsLoadingOnline(true);
-    try {
-      // TODO: Replace with API call in production
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      // Empty until real API is connected
-      setOnlineUsers([]);
-    } catch (error) {
-      console.error('Failed to fetch online users:', error);
-    } finally {
-      setIsLoadingOnline(false);
-    }
-  };
 
   const fetchFeaturedRooms = async () => {
     setIsLoadingFeatured(true);
     try {
-      // TODO: Replace with API call in production
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      // Real public rooms, ordered by membership (most active first)
+      const response = await api.get<Array<{ id: string; name: string; memberCount: number }>>(
+        '/chat/rooms/browse?type=public'
+      );
 
-      // Featured rooms based on exam type - members will be updated from real data
-      let demoFeatured: FeaturedRoom[] = [];
-
-      if (currentExamType === 'nsmq') {
-        demoFeatured = [
-          { id: 'room_nsmq_practice', name: 'NSMQ Speed Drills', members: 1 },
-        ];
-      } else if (currentExamType === 'bece') {
-        demoFeatured = [
-          { id: 'room_bece_maths', name: 'BECE Mathematics Study Group', members: 1 },
-          { id: 'room_bece_english', name: 'BECE English Language Help', members: 1 },
-          { id: 'room_bece_science', name: 'BECE Integrated Science', members: 1 },
-        ];
+      if (response.success && response.data) {
+        setFeaturedRooms(
+          response.data.slice(0, 3).map((room) => ({
+            id: room.id,
+            name: room.name,
+            members: room.memberCount,
+          }))
+        );
       } else {
-        // WASSCE (default)
-        demoFeatured = [
-          { id: 'room_wassce_physics', name: 'WASSCE Physics Study Group', members: 1 },
-          { id: 'room_wassce_maths', name: 'WASSCE Mathematics Help', members: 1 },
-          { id: 'room_chemistry_lab', name: 'Chemistry Lab Partners', members: 1 },
-        ];
+        setFeaturedRooms([]);
       }
-      setFeaturedRooms(demoFeatured);
     } catch (error) {
       console.error('Failed to fetch featured rooms:', error);
+      setFeaturedRooms([]);
     } finally {
       setIsLoadingFeatured(false);
     }
   };
 
-  const fetchRecentDiscussions = async () => {
-    try {
-      // TODO: Replace with API call in production
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      // Empty until real API is connected
-      setRecentDiscussions([]);
-    } catch (error) {
-      console.error('Failed to fetch recent discussions:', error);
-    }
-  };
-
-  fetchOnlineUsersRef.current = fetchOnlineUsers;
   fetchFeaturedRoomsRef.current = fetchFeaturedRooms;
-  fetchRecentDiscussionsRef.current = fetchRecentDiscussions;
 
   // Filter rooms based on current exam type
   const myRooms = rooms.filter(
@@ -160,11 +99,6 @@ export function CommunityPage() {
 
   const handleFindPeople = () => {
     setActiveTab('people');
-    openChat();
-  };
-
-  const handleStartDM = async (userId: string, userName: string) => {
-    await startDM(userId, userName);
     openChat();
   };
 
@@ -269,7 +203,7 @@ export function CommunityPage() {
                 <div className="flex items-center gap-3">
                   <TrendingUp className="w-5 h-5" />
                   <h2 className="font-semibold">
-                    Featured {currentExamType.toUpperCase()} Study Rooms
+                    Featured Study Rooms
                   </h2>
                 </div>
                 <button
@@ -289,7 +223,7 @@ export function CommunityPage() {
               <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
                 <BookOpen className="w-12 h-12 text-neutral-300 mb-3" />
                 <p className="text-neutral-500 text-sm">No featured rooms yet</p>
-                <p className="text-neutral-400 text-xs mt-1">Create the first study room for {currentExamType.toUpperCase()}</p>
+                <p className="text-neutral-400 text-xs mt-1">Create the first study room</p>
                 <button
                   onClick={() => setShowCreateRoom(true)}
                   className="mt-4 px-4 py-2 bg-primary text-white text-sm rounded-lg hover:bg-primary-dark transition-colors"
@@ -409,39 +343,12 @@ export function CommunityPage() {
               </div>
             </div>
 
-            {recentDiscussions.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-                <MessageSquare className="w-12 h-12 text-neutral-300 mb-3" />
-                <p className="text-neutral-500 text-sm">No recent discussions</p>
-                <p className="text-neutral-400 text-xs mt-1">Start a conversation in a study room</p>
-              </div>
-            ) : (
-              <div className="divide-y divide-neutral-100">
-                {recentDiscussions.map((discussion, i) => (
-                  <button
-                    key={i}
-                    onClick={handleBrowseRooms}
-                    className="w-full p-4 hover:bg-neutral-50 transition-colors text-left"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="font-medium text-neutral-900 truncate">
-                          {discussion.topic}
-                        </p>
-                        <p className="text-sm text-neutral-500 mt-1">
-                          in <span className="text-primary">{discussion.room}</span>
-                          {' • '}{discussion.replies} replies
-                          {' • '}{discussion.time}
-                        </p>
-                      </div>
-                      <span className="text-xs text-neutral-400 whitespace-nowrap">
-                        by {discussion.author}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
+            {/* No cross-room discussion feed endpoint exists yet; static empty state. */}
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+              <MessageSquare className="w-12 h-12 text-neutral-300 mb-3" />
+              <p className="text-neutral-500 text-sm">No recent discussions</p>
+              <p className="text-neutral-400 text-xs mt-1">Start a conversation in a study room</p>
+            </div>
           </div>
         </div>
 
@@ -461,68 +368,24 @@ export function CommunityPage() {
             </div>
           </div>
 
-          {/* Online Now */}
+          {/* Online Now — presence is not tracked server-side yet, so this is a
+              static entry point to Find Students rather than a fake live list. */}
           <div className="bg-white rounded-xl shadow-card overflow-hidden">
             <div className="px-4 py-3 border-b border-neutral-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                  <h3 className="font-semibold text-neutral-900">Online Now</h3>
-                </div>
-                <span className="text-xs text-neutral-500">{onlineUsers.length} students</span>
-              </div>
+              <h3 className="font-semibold text-neutral-900">Find Students</h3>
             </div>
 
-            {isLoadingOnline ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-5 h-5 text-neutral-400 animate-spin" />
-              </div>
-            ) : onlineUsers.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
-                <Users className="w-10 h-10 text-neutral-300 mb-2" />
-                <p className="text-neutral-500 text-sm">No students online</p>
-                <p className="text-neutral-400 text-xs mt-1">Check back later</p>
-              </div>
-            ) : (
-              <>
-                <div className="divide-y divide-neutral-100">
-                  {onlineUsers.slice(0, 5).map((u) => (
-                    <button
-                      key={u.id}
-                      onClick={() => handleStartDM(u.id, u.name)}
-                      className="w-full flex items-center gap-3 p-3 hover:bg-neutral-50 transition-colors text-left"
-                    >
-                      <div className="relative">
-                        <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center overflow-hidden">
-                          {u.avatarUrl ? (
-                            <img src={u.avatarUrl} alt={u.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <span className="text-white text-sm font-semibold">
-                              {u.name.charAt(0)}
-                            </span>
-                          )}
-                        </div>
-                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-neutral-900 text-sm truncate">{u.name}</p>
-                        <p className="text-xs text-neutral-500">{u.house} • Lv. {u.level}</p>
-                      </div>
-                      <UserPlus className="w-4 h-4 text-neutral-400" />
-                    </button>
-                  ))}
-                </div>
-
-                <div className="p-3 border-t border-neutral-100">
-                  <button
-                    onClick={handleFindPeople}
-                    className="w-full text-center text-sm text-primary font-medium hover:text-primary-dark"
-                  >
-                    View all students
-                  </button>
-                </div>
-              </>
-            )}
+            <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+              <Users className="w-10 h-10 text-neutral-300 mb-2" />
+              <p className="text-neutral-500 text-sm">Connect with other students</p>
+              <p className="text-neutral-400 text-xs mt-1">Search for students to start a conversation</p>
+              <button
+                onClick={handleFindPeople}
+                className="mt-4 px-4 py-2 bg-primary text-white text-sm rounded-lg hover:bg-primary-dark transition-colors"
+              >
+                Find Students
+              </button>
+            </div>
           </div>
 
           {/* Community Stats */}
@@ -535,10 +398,6 @@ export function CommunityPage() {
               <div className="flex justify-between">
                 <span className="text-white/80">Active Rooms</span>
                 <span className="font-semibold">{rooms.filter(r => r.type !== 'dm').length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/80">Online Students</span>
-                <span className="font-semibold">{onlineUsers.length}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-white/80">My Conversations</span>

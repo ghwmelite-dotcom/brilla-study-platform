@@ -245,7 +245,26 @@ export const useLibraryStore = create<LibraryState>()(
           const resource = get().selectedResource;
           if (!resource) return;
 
-          // TODO: Replace with API call
+          // Related = published resources in the same subject, excluding itself
+          const params = new URLSearchParams();
+          if (resource.subjectId) params.append('subjectId', resource.subjectId);
+          params.append('limit', '5');
+
+          const response = await api.get<{
+            resources: LibraryResource[];
+            pagination: { page: number; total: number; totalPages: number; hasMore: boolean };
+          }>(`/library/resources?${params}`);
+
+          if (response.success && response.data) {
+            set({
+              relatedResources: response.data.resources
+                .filter(r => r.id !== resourceId)
+                .slice(0, 4),
+            });
+            return;
+          }
+
+          // Fallback to demo data
           const related = DEMO_RESOURCES.filter(r =>
             r.id !== resourceId &&
             (r.subjectId === resource.subjectId || r.tags?.some(t => resource.tags?.includes(t)))
@@ -254,6 +273,7 @@ export const useLibraryStore = create<LibraryState>()(
           set({ relatedResources: related });
         } catch {
           console.error('Failed to load related resources');
+          set({ relatedResources: [] });
         }
       },
 
