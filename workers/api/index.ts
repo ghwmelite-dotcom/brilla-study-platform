@@ -87,6 +87,7 @@ export interface Env {
   AI_MODEL_GENERATION?: string;
   AI_MODEL_EMBEDDING?: string;
   AI_MODEL_TTS?: string;
+  AI_MODEL_MARKING?: string;
   AI_CACHE_THRESHOLD?: string;
   AI: Ai;  // Cloudflare Workers AI binding
   RESEND_API_KEY?: string;

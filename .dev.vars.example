@@ -9,6 +9,8 @@ PAYSTACK_SECRET_KEY=
 PAYSTACK_WEBHOOK_SECRET=
 TURNSTILE_SECRET=
 ANTHROPIC_API_KEY=
+# Optional Workers AI model override for exam/essay marking (defaults to @cf/openai/gpt-oss-120b)
+AI_MODEL_MARKING=
 # Telegram community bot (local dev placeholders — real token/secret go in .dev.vars)
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_WEBHOOK_SECRET=
