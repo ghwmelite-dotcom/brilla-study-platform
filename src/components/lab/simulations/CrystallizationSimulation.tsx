@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@/utils';
+import type { SimReportProps } from './types';
 
-interface CrystallizationSimulationProps {
-  onObservation?: (text: string) => void;
-}
+type CrystallizationSimulationProps = SimReportProps;
 
 type Stage = 'dissolving' | 'heating' | 'filtering' | 'evaporating' | 'cooling' | 'complete';
 
-export function CrystallizationSimulation({ onObservation }: CrystallizationSimulationProps) {
+export function CrystallizationSimulation({ onObservation, onAction }: CrystallizationSimulationProps) {
   const [stage, setStage] = useState<Stage>('dissolving');
   const [temperature, setTemperature] = useState(25);
   const [saturationLevel, setSaturationLevel] = useState(0);
@@ -31,6 +30,7 @@ export function CrystallizationSimulation({ onObservation }: CrystallizationSimu
         const target = Math.min((addedSolute / maxSolubility) * 100, 100);
         if (prev >= target) {
           setIsStirring(false);
+          onAction?.('observe', 'app_beaker_250');
           if (prev >= 100) {
             onObservation?.('Solution is saturated - excess solute remains undissolved');
           } else {
@@ -43,7 +43,7 @@ export function CrystallizationSimulation({ onObservation }: CrystallizationSimu
     }, 200);
 
     return () => clearInterval(interval);
-  }, [stage, isStirring, addedSolute, temperature, onObservation]);
+  }, [stage, isStirring, addedSolute, temperature, onObservation, onAction]);
 
   // Heating effect
   useEffect(() => {
@@ -70,6 +70,7 @@ export function CrystallizationSimulation({ onObservation }: CrystallizationSimu
         if (prev >= 70) {
           setIsHeating(false);
           onObservation?.('Evaporation complete - crystals beginning to form at edges');
+          onAction?.('observe', 'app_evaporating_dish');
           return 70;
         }
         // Steam visible
@@ -81,7 +82,7 @@ export function CrystallizationSimulation({ onObservation }: CrystallizationSimu
     }, 200);
 
     return () => clearInterval(interval);
-  }, [stage, isHeating, onObservation]);
+  }, [stage, isHeating, onObservation, onAction]);
 
   // Cooling effect
   useEffect(() => {
@@ -101,27 +102,32 @@ export function CrystallizationSimulation({ onObservation }: CrystallizationSimu
           // Determine crystal quality based on cooling rate
           setCrystalSize(prev => Math.min(prev + 5, 100));
           onObservation?.('Beautiful blue copper sulfate crystals have formed');
+          onAction?.('observe', 'app_evaporating_dish');
+          onAction?.('record', 'app_evaporating_dish');
           setStage('complete');
           return 100;
         }
         // Crystal formation observations
         if (prev === 30) {
           onObservation?.('Small crystal nuclei appearing in solution');
+          onAction?.('observe', 'app_evaporating_dish');
         }
         if (prev === 60) {
           onObservation?.('Crystals growing - characteristic blue color visible');
+          onAction?.('observe', 'app_evaporating_dish');
         }
         return prev + 1;
       });
     }, 150);
 
     return () => clearInterval(interval);
-  }, [stage, onObservation]);
+  }, [stage, onObservation, onAction]);
 
   const addSolute = () => {
     const amount = 5;
     setAddedSolute(prev => prev + amount);
     onObservation?.(`Added ${amount}g copper sulfate to water`);
+    onAction?.('pour', 'app_beaker_250');
   };
 
   const startStirring = () => {
@@ -131,6 +137,7 @@ export function CrystallizationSimulation({ onObservation }: CrystallizationSimu
 
   const startHeating = () => {
     setIsHeating(true);
+    onAction?.('heat', 'app_bunsen_burner');
     if (stage === 'dissolving') {
       onObservation?.('Heating to increase solubility');
     } else if (stage === 'evaporating') {
@@ -146,8 +153,11 @@ export function CrystallizationSimulation({ onObservation }: CrystallizationSimu
     if (saturationLevel >= 80) {
       setStage('filtering');
       onObservation?.('Filtering the hot saturated solution to remove impurities');
+      onAction?.('measure', 'app_thermometer', temperature);
       setTimeout(() => {
         onObservation?.('Filtration complete - clear blue solution obtained');
+        // Filtrate transferred to the evaporating dish for concentration.
+        onAction?.('pour', 'app_evaporating_dish');
         setStage('evaporating');
       }, 2000);
     } else {
@@ -160,6 +170,7 @@ export function CrystallizationSimulation({ onObservation }: CrystallizationSimu
       setStage('cooling');
       setCrystalQuality('excellent'); // Slow cooling = better crystals
       onObservation?.('Allowing solution to cool slowly for crystal formation');
+      onAction?.('measure', 'app_thermometer', temperature);
     }
   };
 

@@ -1,10 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/utils';
+import type { SimReportProps } from './types';
 
-interface ReactionRateSimulationProps {
-  onMeasurement?: (value: number, unit: string, label: string) => void;
-  onObservation?: (text: string) => void;
-}
+type ReactionRateSimulationProps = SimReportProps;
 
 interface Trial {
   concentration: number;
@@ -12,7 +10,7 @@ interface Trial {
   rate: number;
 }
 
-export function ReactionRateSimulation({ onMeasurement, onObservation }: ReactionRateSimulationProps) {
+export function ReactionRateSimulation({ onMeasurement, onObservation, onAction }: ReactionRateSimulationProps) {
   const [stage, setStage] = useState<'setup' | 'reacting' | 'results'>('setup');
   const [concentration, setConcentration] = useState(1.0); // mol/dm³
   const [marbleChips, setMarbleChips] = useState(5); // grams
@@ -60,11 +58,12 @@ export function ReactionRateSimulation({ onMeasurement, onObservation }: Reactio
       if (progress > 0.3 && showCrossVisible) {
         setShowCrossVisible(false);
         onObservation?.('Cross beneath flask becomes obscured by effervescence');
+        onAction?.('observe', 'app_conical_flask');
       }
     }, 100);
 
     return () => clearInterval(interval);
-  }, [isReacting, getReactionRate, maxGas, gasVolume, reactionTime, showCrossVisible, onObservation]);
+  }, [isReacting, getReactionRate, maxGas, gasVolume, reactionTime, showCrossVisible, onObservation, onAction]);
 
   // Bubble animation
   useEffect(() => {
@@ -96,6 +95,12 @@ export function ReactionRateSimulation({ onMeasurement, onObservation }: Reactio
     setStage('reacting');
     setShowCrossVisible(true);
     onObservation?.(`Starting reaction: ${concentration}M HCl with ${marbleChips}g marble chips`);
+    // Tile/flask placement and acid measurement are UI-static in this sim;
+    // starting the reaction is the honest observable setup signal.
+    onAction?.('drag', 'app_white_tile');
+    onAction?.('drag', 'app_conical_flask');
+    onAction?.('measure', 'app_measuring_cylinder');
+    onAction?.('pour', 'app_conical_flask');
   };
 
   const recordTrial = () => {
@@ -108,6 +113,8 @@ export function ReactionRateSimulation({ onMeasurement, onObservation }: Reactio
     setTrials(prev => [...prev, trial]);
     onMeasurement?.(rate, 'ml/s', `Rate at ${concentration}M`);
     onObservation?.(`Recorded: ${concentration}M → ${reactionTime.toFixed(1)}s, Rate: ${rate.toFixed(2)} ml/s`);
+    onAction?.('measure', 'app_stopwatch', reactionTime);
+    onAction?.('record', 'app_stopwatch');
     setStage('results');
   };
 

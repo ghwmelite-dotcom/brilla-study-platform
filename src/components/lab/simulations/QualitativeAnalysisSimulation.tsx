@@ -10,11 +10,9 @@ import {
   Sparkles
 } from 'lucide-react';
 import { cn } from '@/utils';
+import type { SimReportProps } from './types';
 
-interface QualitativeAnalysisSimulationProps {
-  onMeasurement?: (value: number, unit: string, label: string) => void;
-  onObservation?: (text: string) => void;
-}
+type QualitativeAnalysisSimulationProps = SimReportProps;
 
 // Salt database with properties
 const salts = [
@@ -92,7 +90,7 @@ const salts = [
 
 type TestType = 'flame' | 'naoh' | 'hcl' | 'agno3' | 'bacl2';
 
-export function QualitativeAnalysisSimulation({ onObservation }: QualitativeAnalysisSimulationProps) {
+export function QualitativeAnalysisSimulation({ onObservation, onAction }: QualitativeAnalysisSimulationProps) {
   const [currentSalt, setCurrentSalt] = useState(salts[Math.floor(Math.random() * salts.length)]);
   const [activeTest, setActiveTest] = useState<TestType | null>(null);
   const [completedTests, setCompletedTests] = useState<TestType[]>([]);
@@ -136,6 +134,15 @@ export function QualitativeAnalysisSimulation({ onObservation }: QualitativeAnal
         setCompletedTests(prev => [...prev, test]);
       }
       onObservation?.(`${test.toUpperCase()} test: ${result}`);
+      if (test === 'flame') {
+        onAction?.('heat', 'app_bunsen_burner');
+        onAction?.('observe', 'app_bunsen_burner');
+      } else {
+        // Reagent added to the sample tube, then the reaction observed.
+        onAction?.('pour', 'app_test_tube');
+        onAction?.('observe', 'app_test_tube');
+      }
+      onAction?.('record', 'app_test_tube');
     }, 1500);
   };
 

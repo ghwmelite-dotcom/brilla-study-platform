@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { cn } from '@/utils';
+import type { SimReportProps } from './types';
 
-interface GasTestsSimulationProps {
-  onObservation?: (text: string) => void;
-}
+type GasTestsSimulationProps = SimReportProps;
 
 interface GasInfo {
   name: string;
@@ -130,7 +129,7 @@ const gases: Record<string, GasInfo> = {
   },
 };
 
-export function GasTestsSimulation({ onObservation }: GasTestsSimulationProps) {
+export function GasTestsSimulation({ onObservation, onAction }: GasTestsSimulationProps) {
   const [selectedGas, setSelectedGas] = useState<string | null>(null);
   const [currentTest, setCurrentTest] = useState<number | null>(null);
   const [testInProgress, setTestInProgress] = useState(false);
@@ -144,11 +143,23 @@ export function GasTestsSimulation({ onObservation }: GasTestsSimulationProps) {
     setTestInProgress(true);
     setCurrentTest(testIndex);
     onObservation?.(`Testing for ${gas.name}: ${test.procedure}`);
+    // Test reagent/tool selection.
+    onAction?.('pour', 'app_test_tube');
+    if (test.name.toLowerCase().includes('splint')) {
+      onAction?.('drag', 'app_splint');
+    }
+    if (test.name.toLowerCase().includes('litmus')) {
+      onAction?.('drag', 'app_litmus_paper');
+    }
 
     setTimeout(() => {
       setTestResult(test.result);
       setCompletedTests(prev => new Set([...prev, `${gasKey}-${testIndex}`]));
       onObservation?.(`Result: ${test.result}`);
+      onAction?.('observe', 'app_test_tube');
+      onAction?.('observe', 'app_gas_jar');
+      onAction?.('record', 'app_test_tube');
+      onAction?.('record', 'app_gas_jar');
 
       setTimeout(() => {
         setTestInProgress(false);
@@ -184,6 +195,11 @@ export function GasTestsSimulation({ onObservation }: GasTestsSimulationProps) {
                     setCurrentTest(null);
                     setTestResult(null);
                     onObservation?.(`Selected ${g.name} (${g.formula})`);
+                    // Gas preparation: generating the gas and connecting the
+                    // delivery tube are UI-static here; selection is the
+                    // honest observable preparation signal.
+                    onAction?.('connect', 'app_delivery_tube');
+                    onAction?.('heat', 'app_bunsen_burner');
                   }}
                   disabled={testInProgress}
                   className={cn(

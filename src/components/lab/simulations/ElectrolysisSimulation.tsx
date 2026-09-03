@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@/utils';
+import type { SimReportProps } from './types';
 
-interface ElectrolysisSimulationProps {
-  onObservation?: (text: string) => void;
-}
+type ElectrolysisSimulationProps = SimReportProps;
 
-export function ElectrolysisSimulation({ onObservation }: ElectrolysisSimulationProps) {
+export function ElectrolysisSimulation({ onObservation, onAction }: ElectrolysisSimulationProps) {
   const [isRunning, setIsRunning] = useState(false);
   const [voltage, setVoltage] = useState(6);
   const [current, setCurrent] = useState(0);
@@ -40,20 +39,23 @@ export function ElectrolysisSimulation({ onObservation }: ElectrolysisSimulation
       // Add observations at certain points
       if (time === 5 && !observations.includes('bubbles_start')) {
         onObservation?.('Bubbles begin to form at both electrodes');
+        onAction?.('observe', 'app_electrolysis_cell');
         setObservations(prev => [...prev, 'bubbles_start']);
       }
       if (time === 15 && !observations.includes('yellow_green')) {
         onObservation?.('Yellowish-green gas collecting at anode (chlorine)');
+        onAction?.('observe', 'app_gas_jar');
         setObservations(prev => [...prev, 'yellow_green']);
       }
       if (time === 20 && !observations.includes('colorless')) {
         onObservation?.('Colorless gas collecting at cathode (hydrogen)');
+        onAction?.('observe', 'app_gas_jar');
         setObservations(prev => [...prev, 'colorless']);
       }
     }, 200);
 
     return () => clearInterval(interval);
-  }, [isRunning, voltage, time, observations, onObservation]);
+  }, [isRunning, voltage, time, observations, onObservation, onAction]);
 
   // Generate bubbles
   useEffect(() => {
@@ -93,6 +95,13 @@ export function ElectrolysisSimulation({ onObservation }: ElectrolysisSimulation
   const startElectrolysis = () => {
     setIsRunning(true);
     onObservation?.(`Starting electrolysis at ${voltage}V`);
+    // Cell, electrodes, and supply are pre-placed in this sim, so starting
+    // the run is the honest observable signal that the circuit is connected
+    // and the cell filled with brine.
+    onAction?.('connect', 'app_carbon_electrodes');
+    onAction?.('connect', 'app_dc_power_supply');
+    onAction?.('pour', 'app_electrolysis_cell');
+    onAction?.('adjust', 'app_dc_power_supply', voltage);
   };
 
   const stopElectrolysis = () => {
@@ -108,11 +117,14 @@ export function ElectrolysisSimulation({ onObservation }: ElectrolysisSimulation
         // Chlorine test - bleaches litmus
         setTestResult('Damp litmus paper is BLEACHED - confirms CHLORINE (Cl₂)');
         onObservation?.('Anode gas bleaches damp blue litmus paper - Chlorine confirmed');
+        onAction?.('drag', 'app_litmus_paper');
       } else {
         // Hydrogen test - squeaky pop
         setTestResult('SQUEAKY POP heard with burning splint - confirms HYDROGEN (H₂)');
         onObservation?.('Cathode gas gives a squeaky pop with burning splint - Hydrogen confirmed');
+        onAction?.('drag', 'app_splint');
       }
+      onAction?.('record', 'app_electrolysis_cell');
 
       setTimeout(() => {
         setTestingGas(null);
