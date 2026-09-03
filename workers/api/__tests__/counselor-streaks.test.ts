@@ -95,7 +95,8 @@ describe("counselor streak reads (phantom user_streaks regression)", () => {
     const db = makeStrictDb(recordedSql);
     const t = await token({ userId: "student_1", role: "student" });
 
-    // No ANTHROPIC_API_KEY → route falls back to a canned counselor reply.
+    // No AI binding → the model call throws and the route falls back to a
+    // canned counselor reply.
     const res = await counselorApp.fetch(
       new Request("http://x/chat", {
         method: "POST",
@@ -119,23 +120,12 @@ describe("counselor streak reads (phantom user_streaks regression)", () => {
     const db = makeStrictDb(recordedSql, { role: "teacher" });
     const t = await token({ userId: "teacher_1", role: "teacher" });
 
-    // generateReportWithClaude calls the Anthropic API via global fetch.
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          content: [
-            {
-              type: "text",
-              text:
-                '{"summary":"ok","academicPerformance":{},"wellbeingAssessment":{},' +
-                '"keyInsights":[],"recommendations":[],"goals":[],"concernLevel":"none"}',
-            },
-          ],
-        }),
-      }),
-    );
+    // generateReportWithModel calls Workers AI via the env.AI binding.
+    const aiRun = vi.fn().mockResolvedValue({
+      response:
+        '{"summary":"ok","academicPerformance":{},"wellbeingAssessment":{},' +
+        '"keyInsights":[],"recommendations":[],"goals":[],"concernLevel":"none"}',
+    });
 
     const res = await counselorApp.fetch(
       new Request("http://x/reports/generate", {
@@ -146,7 +136,7 @@ describe("counselor streak reads (phantom user_streaks regression)", () => {
         },
         body: JSON.stringify({ studentId: "student_1" }),
       }),
-      { DB: db, JWT_SECRET, ANTHROPIC_API_KEY: "test-key" },
+      { DB: db, JWT_SECRET, AI: { run: aiRun } },
     );
 
     expect(res.status).toBe(200);

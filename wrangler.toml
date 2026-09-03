@@ -36,7 +36,6 @@ TELEGRAM_PLATFORM_CHANNEL_ID = "@brillaprepchannel"
 # wrangler secret put PAYSTACK_WEBHOOK_SECRET  (from Paystack dashboard)
 #                                              REQUIRED: /payments/webhook returns 500 and processes nothing without it
 # wrangler secret put TURNSTILE_SECRET         (from Cloudflare Turnstile)
-# wrangler secret put ANTHROPIC_API_KEY        (from Anthropic console, optional AI fallback)
 # wrangler secret put TELEGRAM_BOT_TOKEN       (from @BotFather; read by workers/api/index.ts)
 # wrangler secret put TELEGRAM_WEBHOOK_SECRET  (shared secret for the Telegram webhook endpoint)
 

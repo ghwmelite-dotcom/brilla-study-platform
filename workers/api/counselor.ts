@@ -4,6 +4,7 @@ import { requireAuth } from './auth-middleware';
 import { checkRateLimit } from './rate-limit';
 import { parseCounselorReportContent } from './counselor-report-schema';
 import { formatUntrustedAiData, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
+import { callTextModel, getChatModel, getGenerationModel } from './ai-models';
 import {
   FAMILY_STAFF_ACCESS,
   PARENT_ADMIN_ACCESS,
@@ -19,7 +20,10 @@ import {
 interface Env {
   DB: D1Database;
   JWT_SECRET: string;
-  ANTHROPIC_API_KEY?: string;
+  AI: Ai;
+  AI_MODEL?: string;
+  AI_MODEL_CHAT?: string;
+  AI_MODEL_GENERATION?: string;
 }
 
 // Types
@@ -155,7 +159,7 @@ async function requireStudentCounselorAccess(
   await next();
 }
 
-// Call Claude API for counselor response
+// Call Workers AI for counselor response
 async function getCounselorResponse(
   env: Env,
   message: string,
@@ -163,16 +167,8 @@ async function getCounselorResponse(
   studentContext: StudentContext,
   counselorType: CounselorType
 ): Promise<{ content: string; sentiment: Sentiment; thinking?: string; resources?: SuggestedResource[] }> {
-  const apiKey = env.ANTHROPIC_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('ANTHROPIC_API_KEY not configured');
-  }
-
-  const systemPrompt = COUNSELOR_PROMPTS[counselorType];
-
   // Keep profile fields out of the privileged system prompt. They are data, not instructions.
-  const messages: Array<{ role: 'user' | 'assistant'; content: string }> = [
+  const historyMessages: Array<{ role: 'user' | 'assistant'; content: string }> = [
     { role: 'user', content: formatUntrustedAiData('Student profile', studentContext) },
     ...conversationHistory.map(msg => ({
       role: msg.role === 'counselor' ? 'assistant' as const : 'user' as const,
@@ -180,34 +176,14 @@ async function getCounselorResponse(
     })),
   ];
 
-  messages.push({ role: 'user', content: message });
-
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1024,
-        system: systemPrompt,
-        messages,
-      }),
+    const content = await callTextModel(env, {
+      model: getChatModel(env),
+      system: COUNSELOR_PROMPTS[counselorType],
+      user: message,
+      history: historyMessages,
+      maxTokens: 1024,
     });
-
-    if (!response.ok) {
-      console.error(`Claude API request failed with status ${response.status}`);
-      throw new Error(`Claude API error: ${response.status}`);
-    }
-
-    const data = await response.json() as {
-      content: Array<{ type: string; text?: string }>;
-    };
-
-    const content = data.content[0]?.type === 'text' ? data.content[0].text || '' : '';
 
     // Analyze sentiment based on content
     const sentiment = analyzeSentiment(message, content);
@@ -217,7 +193,7 @@ async function getCounselorResponse(
 
     return { content, sentiment, resources };
   } catch (error) {
-    console.error('Claude API request failed');
+    console.error('Counselor model request failed');
     throw error;
   }
 }
@@ -870,8 +846,8 @@ counselorApp.post('/reports/generate', async (c) => {
       FROM users u WHERE u.id = ?
     `).bind(studentId).first();
 
-    // Generate report content using Claude
-    const reportContent = await generateReportWithClaude(c.env, {
+    // Generate report content using Workers AI
+    const reportContent = await generateReportWithModel(c.env, {
       studentName: student.name as string,
       schoolLevel: student.school_level as string,
       yearGroup: student.year_group as number,
@@ -933,8 +909,8 @@ counselorApp.post('/reports/generate', async (c) => {
   }
 });
 
-// Helper function to generate report content with Claude
-async function generateReportWithClaude(
+// Helper function to generate report content with Workers AI
+async function generateReportWithModel(
   env: Env,
   data: {
     studentName: string;
@@ -947,12 +923,6 @@ async function generateReportWithClaude(
     streak: { current: number; longest: number };
   }
 ) {
-  const apiKey = env.ANTHROPIC_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('ANTHROPIC_API_KEY not configured. AI-generated reports require a valid API key.');
-  }
-
   const prompt = `${formatUntrustedAiData('Student report data', data)}
 
 Analyze the supplied data and return a JSON response with this structure:
@@ -981,31 +951,12 @@ Analyze the supplied data and return a JSON response with this structure:
 }`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2048,
-        system: `You generate evidence-grounded counselor reports for Brilla. Do not infer sensitive facts that are not present in the supplied data. ${UNTRUSTED_AI_DATA_INSTRUCTION}`,
-        messages: [{ role: 'user', content: prompt }],
-      }),
+    const content = await callTextModel(env, {
+      model: getGenerationModel(env),
+      system: `You generate evidence-grounded counselor reports for Brilla. Do not infer sensitive facts that are not present in the supplied data. ${UNTRUSTED_AI_DATA_INSTRUCTION}`,
+      user: prompt,
+      maxTokens: 2048,
     });
-
-    if (!response.ok) {
-      await response.text();
-      throw new Error(`Claude API error: ${response.status}`);
-    }
-
-    const result = await response.json() as {
-      content: Array<{ type: string; text?: string }>;
-    };
-
-    const content = result.content[0]?.type === 'text' ? result.content[0].text || '' : '';
 
     // Extract JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
