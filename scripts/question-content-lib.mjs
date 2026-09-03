@@ -1,6 +1,6 @@
 const VALID_STATUSES = new Set(['draft_automated_qa', 'approved_for_beta', 'approved_for_production']);
 const VALID_DIFFICULTIES = new Set(['easy', 'medium', 'hard']);
-const VALID_TYPES = new Set(['multiple_choice', 'short_answer', 'calculation']);
+const VALID_TYPES = new Set(['multiple_choice', 'short_answer', 'calculation', 'essay', 'structured']);
 const VALID_AOS = new Set(['AO1', 'AO2', 'AO3']);
 
 export function normalizeQuestionText(value) {
@@ -83,7 +83,10 @@ export function validateQuestionBatch(batch, { mode = 'draft' } = {}) {
     }
 
     if (!Array.isArray(subject?.questions) || subject.questions.length === 0) errors.push(`${subjectPath}.questions must contain at least one question`);
-    if (mode === 'production' && (subject?.questions?.length ?? 0) < 40) errors.push(`${subjectPath} needs at least 40 approved questions for production`);
+    const subjectQuestions = Array.isArray(subject?.questions) ? subject.questions : [];
+    const theoryOnly = subjectQuestions.length > 0
+      && subjectQuestions.every((q) => q?.type === 'essay' || q?.type === 'structured');
+    if (mode === 'production' && !theoryOnly && subjectQuestions.length < 40) errors.push(`${subjectPath} needs at least 40 approved questions for production`);
     const coveredTopics = new Set();
     const difficultyCounts = { easy: 0, medium: 0, hard: 0 };
     for (const [questionIndex, question] of (subject?.questions ?? []).entries()) {
@@ -100,15 +103,60 @@ export function validateQuestionBatch(batch, { mode = 'draft' } = {}) {
       if (!topicCodes.has(question?.topicCode)) errors.push(`${path}.topicCode is not declared`);
       coveredTopics.add(question?.topicCode);
       if (!VALID_TYPES.has(question?.type)) errors.push(`${path}.type is invalid`);
-      if (!VALID_DIFFICULTIES.has(question?.difficulty)) errors.push(`${path}.difficulty is invalid`);
-      else difficultyCounts[question.difficulty] += 1;
-      if (!VALID_AOS.has(question?.assessmentObjective)) errors.push(`${path}.assessmentObjective is invalid`);
-      if (!Number.isInteger(question?.marks) || question.marks < 1 || question.marks > 10) errors.push(`${path}.marks must be an integer from 1 to 10`);
+      const isTheory = question?.type === 'essay' || question?.type === 'structured';
+      if (!isTheory) {
+        if (!VALID_DIFFICULTIES.has(question?.difficulty)) errors.push(`${path}.difficulty is invalid`);
+        else difficultyCounts[question.difficulty] += 1;
+        if (!VALID_AOS.has(question?.assessmentObjective)) errors.push(`${path}.assessmentObjective is invalid`);
+        if (!Number.isInteger(question?.marks) || question.marks < 1 || question.marks > 10) errors.push(`${path}.marks must be an integer from 1 to 10`);
+      }
 
       const normalized = normalizeQuestionText(question?.prompt);
       const prior = seenQuestionText.get(normalized);
       if (prior) errors.push(`${path}.prompt duplicates ${prior}`);
       else if (normalized) seenQuestionText.set(normalized, path);
+
+      if (isTheory) {
+        if (!Number.isInteger(question.marks) || question.marks < 2) {
+          errors.push(`${path}: theory questions need marks >= 2`);
+        }
+        if (typeof question.contentLabel !== 'string'
+            || !/\b(?:not|non[- ]?)\s+official\s+(?:waec|west african examinations council)\b/i.test(question.contentLabel)) {
+          errors.push(`${path}: contentLabel must state the content is not official WAEC material`);
+        }
+        if (question.type === 'essay') {
+          const points = question.markingScheme?.points;
+          if (!Array.isArray(points) || points.length === 0) {
+            errors.push(`${path}: essay questions require markingScheme.points`);
+          } else {
+            const sum = points.reduce((s, p) => s + (typeof p?.marks === 'number' ? p.marks : NaN), 0);
+            if (!Number.isFinite(sum) || sum !== question.marks) {
+              errors.push(`${path}: markingScheme points (${sum}) must sum to marks (${question.marks})`);
+            }
+            for (const [i, p] of points.entries()) {
+              if (typeof p?.point !== 'string' || p.point.trim().length === 0) {
+                errors.push(`${path}: markingScheme.points[${i}] needs a point string`);
+              }
+            }
+          }
+        } else {
+          const parts = question.parts;
+          if (!Array.isArray(parts) || parts.length < 2) {
+            errors.push(`${path}: structured questions require at least 2 parts`);
+          } else {
+            const sum = parts.reduce((s, p) => s + (typeof p?.marks === 'number' ? p.marks : NaN), 0);
+            if (!Number.isFinite(sum) || sum !== question.marks) {
+              errors.push(`${path}: part marks (${sum}) must sum to marks (${question.marks})`);
+            }
+            for (const [i, p] of parts.entries()) {
+              if (typeof p?.label !== 'string' || typeof p?.text !== 'string' || typeof p?.correctAnswer !== 'string') {
+                errors.push(`${path}: parts[${i}] needs label, text, and correctAnswer strings`);
+              }
+            }
+          }
+        }
+        continue; // theory questions skip the options/correctAnswer MCQ checks below
+      }
 
       if (question?.type === 'multiple_choice') {
         if (!Array.isArray(question.options) || question.options.length !== 4) {
@@ -135,7 +183,7 @@ export function validateQuestionBatch(batch, { mode = 'draft' } = {}) {
     }
     const missingTopics = [...topicCodes].filter((code) => !coveredTopics.has(code));
     if (missingTopics.length) errors.push(`${subjectPath} has uncovered topics: ${missingTopics.join(', ')}`);
-    if ((subject?.questions?.length ?? 0) >= 6) {
+    if (!theoryOnly && (subject?.questions?.length ?? 0) >= 6) {
       for (const difficulty of VALID_DIFFICULTIES) if (difficultyCounts[difficulty] === 0) warnings.push(`${subjectPath} has no ${difficulty} questions`);
     }
   }

@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://brillaprep.org/schemas/question-batch.schema.json",
   "title": "BrillaPrep curriculum question batch",
+  "description": "Loose envelope for curriculum question batches; the authoritative rules live in scripts/question-content-lib.mjs. Question types: multiple_choice, short_answer, calculation (objective) plus essay and structured (theory). Theory questions carry marks >= 2, a per-question contentLabel stating the content is not official WAEC material, and either markingScheme.points (essay) or parts (structured) whose marks sum to the question marks.",
   "type": "object",
   "required": ["batchId", "status", "examTypeId", "subjects", "provenance", "review"],
   "properties": {
