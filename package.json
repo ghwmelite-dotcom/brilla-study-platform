@@ -17,7 +17,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "check:any-budget": "node scripts/check-any-budget.mjs",
-    "db:verify": "node scripts/verify-db.cjs && node scripts/verify-fresh-bootstrap.cjs",
+    "db:verify": "node scripts/verify-db.cjs && node scripts/verify-fresh-bootstrap.cjs && node scripts/verify-mock-configs.cjs",
     "db:schema": "wrangler d1 execute brilla-db --local --file=database/schema.sql",
     "db:seed": "wrangler d1 execute brilla-db --local --file=database/seed.sql",
     "db:seed:topics": "wrangler d1 execute brilla-db --local --file=database/prod-patches/094_seed_missing_subjects_topics.sql && wrangler d1 execute brilla-db --local --file=database/prod-patches/095_clone_topics_to_current_subjects.sql && wrangler d1 execute brilla-db --local --file=database/prod-patches/096_seed_topics_for_empty_subjects.sql",
