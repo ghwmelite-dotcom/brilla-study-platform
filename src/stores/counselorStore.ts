@@ -7,8 +7,6 @@ import type {
   CounselorType,
   StudentContext,
   WellbeingLog,
-  SuggestedResource,
-  Sentiment,
 } from '@/types';
 
 type ThinkingStage = 'idle' | 'thinking' | 'composing' | 'typing';
@@ -114,96 +112,6 @@ Your role is to:
 
 Be approachable, friendly, and encouraging. Help students feel heard and supported in their educational journey.`,
 };
-
-// Mock responses for development
-function generateMockResponse(message: string, type: CounselorType, studentName?: string): { content: string; sentiment: Sentiment; resources?: SuggestedResource[] } {
-  const greeting = studentName ? `${studentName}, ` : '';
-  const lowerMessage = message.toLowerCase();
-
-  if (type === 'academic') {
-    if (lowerMessage.includes('study') || lowerMessage.includes('tip')) {
-      return {
-        content: `${greeting}I'd love to help you study more effectively! Here are some strategies that work well for Ghanaian students:
-
-**1. Active Recall**
-Instead of just reading, test yourself frequently. Write questions from your notes and try to answer them without looking.
-
-**2. Past Papers Practice**
-For WASSCE and NSMQ, practicing past questions is essential. Time yourself to simulate exam conditions.
-
-**3. Group Study**
-Form study groups with classmates. Teaching others is one of the best ways to solidify your understanding.
-
-**4. Regular Breaks**
-Your brain needs rest to process information. Study for 45 minutes, then take a 10-minute break.
-
-Which of these would you like me to explain in more detail?`,
-        sentiment: 'positive',
-        resources: [
-          { type: 'article', title: 'Effective Study Techniques', description: 'Learn proven methods for better retention' },
-          { type: 'tip', title: 'Pomodoro Technique', description: '25-minute focused study sessions' },
-        ],
-      };
-    }
-  }
-
-  if (type === 'wellbeing') {
-    if (lowerMessage.includes('stress') || lowerMessage.includes('anxious') || lowerMessage.includes('worried')) {
-      return {
-        content: `${greeting}I hear that you're feeling stressed, and I want you to know that's completely normal, especially as a student. Let's work through this together.
-
-**First, take a deep breath with me:**
-Breathe in slowly for 4 counts... hold for 4... breathe out for 6. Repeat this a few times.
-
-**Remember:**
-- Feeling stressed shows you care about doing well
-- You don't have to be perfect
-- One step at a time is still progress
-
-Would you like to tell me more about what's causing your stress? Sometimes just talking about it helps.`,
-        sentiment: 'concerned',
-        resources: [
-          { type: 'exercise', title: 'Breathing Exercise', description: '5-minute calming technique' },
-          { type: 'article', title: 'Managing Exam Stress', description: 'Tips for staying calm during exams' },
-        ],
-      };
-    }
-  }
-
-  if (type === 'career') {
-    if (lowerMessage.includes('career') || lowerMessage.includes('job') || lowerMessage.includes('future')) {
-      return {
-        content: `${greeting}It's great that you're thinking about your future! Ghana has exciting opportunities in STEM fields.
-
-**Popular STEM Careers:**
-- **Engineering**: Civil, Electrical, Computer, Petroleum
-- **Medicine & Health**: Doctors, Pharmacists, Public Health
-- **Technology**: Software Development, Data Science, Cybersecurity
-- **Science**: Research, Environmental Science, Biotechnology
-
-**To explore further, ask yourself:**
-1. What subjects do you enjoy most?
-2. Do you prefer working with people, data, or things?
-3. What problems in Ghana would you like to help solve?
-
-Tell me more about your interests and I can suggest specific paths!`,
-        sentiment: 'positive',
-        resources: [
-          { type: 'article', title: 'STEM Careers in Ghana', description: 'Overview of opportunities' },
-          { type: 'video', title: 'Day in the Life: Engineer', description: 'See what engineers do daily' },
-        ],
-      };
-    }
-  }
-
-  // Default response
-  return {
-    content: `${greeting}Thank you for sharing that with me. I'm here to listen and help in any way I can.
-
-Could you tell me a bit more about what's on your mind? The more you share, the better I can support you.`,
-    sentiment: 'neutral',
-  };
-}
 
 // Demo data
 const DEMO_CONVERSATIONS: CounselorConversation[] = [];
@@ -413,7 +321,7 @@ export const useCounselorStore = create<CounselorState>()(
 
       // Messaging
       sendMessage: async (message: string) => {
-        const { currentConversation, counselorType, studentContext } = get();
+        const { currentConversation, counselorType } = get();
 
         if (!currentConversation) {
           // Start a new conversation first
@@ -473,63 +381,20 @@ export const useCounselorStore = create<CounselorState>()(
               },
             });
           } else {
-            // Fallback to mock response
-            await new Promise(resolve => setTimeout(resolve, 500));
-            const mockResponse = generateMockResponse(message, counselorType, studentContext?.name);
-
-            const counselorMessage: CounselorMessage = {
-              id: `msg_${Date.now() + 1}`,
-              conversationId: currentConversation.id,
-              role: 'counselor',
-              content: mockResponse.content,
-              sentiment: mockResponse.sentiment,
-              suggestedResources: mockResponse.resources,
-              createdAt: new Date().toISOString(),
-              isNew: true,
-            };
-
+            // No mock fallback: surface the failure instead of fabricating a
+            // counselor reply (same error-state pattern as loadConversation).
             set({
-              messages: [...get().messages, counselorMessage],
+              error: response.error || 'Failed to send message. Please try again.',
               isLoading: false,
               thinkingStage: 'idle',
             });
-
-            set({
-              currentConversation: {
-                ...currentConversation,
-                messageCount: (currentConversation.messageCount || 0) + 2,
-                lastMessageAt: new Date().toISOString(),
-              },
-            });
           }
         } catch {
-          // Fallback to mock on error
-          console.error('API error, using mock response');
-          const mockResponse = generateMockResponse(message, counselorType, studentContext?.name);
-
-          const counselorMessage: CounselorMessage = {
-            id: `msg_${Date.now() + 1}`,
-            conversationId: currentConversation.id,
-            role: 'counselor',
-            content: mockResponse.content,
-            sentiment: mockResponse.sentiment,
-            suggestedResources: mockResponse.resources,
-            createdAt: new Date().toISOString(),
-            isNew: true,
-          };
-
+          console.error('Failed to send message');
           set({
-            messages: [...get().messages, counselorMessage],
+            error: 'Failed to send message. Please try again.',
             isLoading: false,
             thinkingStage: 'idle',
-          });
-
-          set({
-            currentConversation: {
-              ...currentConversation,
-              messageCount: (currentConversation.messageCount || 0) + 2,
-              lastMessageAt: new Date().toISOString(),
-            },
           });
         }
       },

@@ -529,6 +529,17 @@ oauthApp.post('/google/callback', async (c) => {
       }, 409);
     }
 
+    // SECURITY: the account is created with email_verified=1 on the strength
+    // of Google's say-so, so require Google to actually report the mailbox as
+    // verified (same gate as the login auto-link path above).
+    if (googleUser.email_verified !== true) {
+      return c.json({
+        success: false,
+        error: 'Your Google email address is not verified. Please verify it with Google and try again.',
+        code: 'EMAIL_NOT_VERIFIED',
+      }, 403);
+    }
+
     if (role && !ALLOWED_SELF_SERVE_ROLES.includes(role)) {
       return c.json({ success: false, error: 'Invalid role' }, 400);
     }

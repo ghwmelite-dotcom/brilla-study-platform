@@ -57,23 +57,36 @@ function loginStateRow() {
   };
 }
 
-interface Captured {
-  runs: { sql: string; args: unknown[] }[];
+function registerStateRow() {
+  return {
+    ...loginStateRow(),
+    intent: 'register',
+    role: 'student',
+  };
 }
 
-function makeDb(captured: Captured) {
+interface Captured {
+  runs: { sql: string; args: unknown[] }[];
+  batches: { sql: string }[][];
+}
+
+function makeDb(captured: Captured, stateRow: Record<string, unknown> = loginStateRow()) {
   return {
     prepare: vi.fn((sql: string) => ({
       bind: vi.fn((...args: unknown[]) => ({
+        sql,
         first: vi.fn().mockImplementation(() => {
           // D1-backed rate limiter (oauth-google-callback bucket): allow.
           if (sql.includes('WITH usage(total_requests)')) {
             return Promise.resolve({ request_count: 1, total_requests: 1 });
           }
-          if (sql.includes('FROM oauth_states')) return Promise.resolve(loginStateRow());
-          // No existing Google link; the email account exists (auto-link path).
+          if (sql.includes('FROM oauth_states')) return Promise.resolve(stateRow);
+          // No existing Google link; on login intent the email account exists
+          // (auto-link path); on register intent there is no account yet.
           if (sql.includes('FROM user_oauth_providers')) return Promise.resolve(null);
-          if (sql.includes('FROM users WHERE email = ?')) return Promise.resolve(EXISTING_USER);
+          if (sql.includes('FROM users WHERE email = ?')) {
+            return Promise.resolve(stateRow.intent === 'login' ? EXISTING_USER : null);
+          }
           return Promise.resolve(null);
         }),
         run: vi.fn().mockImplementation(() => {
@@ -83,12 +96,16 @@ function makeDb(captured: Captured) {
         all: vi.fn().mockResolvedValue({ results: [] }),
       })),
     })),
+    batch: vi.fn((statements: { sql: string }[]) => {
+      captured.batches.push(statements);
+      return Promise.resolve(statements.map(() => ({ success: true, meta: { changes: 1 } })));
+    }),
   } as unknown as D1Database;
 }
 
-function makeEnv(captured: Captured) {
+function makeEnv(captured: Captured, stateRow?: Record<string, unknown>) {
   return {
-    DB: makeDb(captured),
+    DB: makeDb(captured, stateRow),
     JWT_SECRET,
     ENVIRONMENT: 'test',
     GOOGLE_CLIENT_ID: 'client-id',
@@ -159,7 +176,7 @@ afterEach(() => {
 describe('Google ID token claim verification', () => {
   it('rejects an ID token whose aud is not our client ID', async () => {
     stubGoogle({ ...VALID_CLAIMS, aud: 'attacker-client-id' });
-    const captured: Captured = { runs: [] };
+    const captured: Captured = { runs: [], batches: [] };
     const res = await oauthApp.fetch(callbackRequest(), makeEnv(captured));
     expect(res.status).toBe(400);
     expect(await res.json()).toMatchObject({
@@ -171,7 +188,7 @@ describe('Google ID token claim verification', () => {
 
   it('rejects an ID token with a non-Google issuer', async () => {
     stubGoogle({ ...VALID_CLAIMS, iss: 'https://evil.example.com' });
-    const captured: Captured = { runs: [] };
+    const captured: Captured = { runs: [], batches: [] };
     const res = await oauthApp.fetch(callbackRequest(), makeEnv(captured));
     expect(res.status).toBe(400);
     expect(await res.json()).toMatchObject({
@@ -182,7 +199,7 @@ describe('Google ID token claim verification', () => {
 
   it('rejects an expired ID token', async () => {
     stubGoogle({ ...VALID_CLAIMS, exp: Math.floor(Date.now() / 1000) - 60 });
-    const captured: Captured = { runs: [] };
+    const captured: Captured = { runs: [], batches: [] };
     const res = await oauthApp.fetch(callbackRequest(), makeEnv(captured));
     expect(res.status).toBe(400);
     expect(await res.json()).toMatchObject({
@@ -193,7 +210,7 @@ describe('Google ID token claim verification', () => {
 
   it('rejects when Google tokeninfo rejects the token signature', async () => {
     stubGoogle(VALID_CLAIMS, { ok: false });
-    const captured: Captured = { runs: [] };
+    const captured: Captured = { runs: [], batches: [] };
     const res = await oauthApp.fetch(callbackRequest(), makeEnv(captured));
     expect(res.status).toBe(400);
     expect(await res.json()).toMatchObject({
@@ -204,7 +221,7 @@ describe('Google ID token claim verification', () => {
 
   it('rejects when tokeninfo reports a different aud than the claims', async () => {
     stubGoogle(VALID_CLAIMS, { aud: 'attacker-client-id' });
-    const captured: Captured = { runs: [] };
+    const captured: Captured = { runs: [], batches: [] };
     const res = await oauthApp.fetch(callbackRequest(), makeEnv(captured));
     expect(res.status).toBe(400);
     expect(await res.json()).toMatchObject({
@@ -217,7 +234,7 @@ describe('Google ID token claim verification', () => {
 describe('login auto-link email_verified gate', () => {
   it('refuses to auto-link when Google reports email_verified=false', async () => {
     stubGoogle(VALID_CLAIMS, { emailVerified: false });
-    const captured: Captured = { runs: [] };
+    const captured: Captured = { runs: [], batches: [] };
     const res = await oauthApp.fetch(callbackRequest(), makeEnv(captured));
     expect(res.status).toBe(403);
     expect(await res.json()).toMatchObject({ success: false, code: 'EMAIL_NOT_VERIFIED' });
@@ -226,12 +243,38 @@ describe('login auto-link email_verified gate', () => {
 
   it('auto-links a verified Google email and issues a session', async () => {
     stubGoogle(VALID_CLAIMS);
-    const captured: Captured = { runs: [] };
+    const captured: Captured = { runs: [], batches: [] };
     const res = await oauthApp.fetch(callbackRequest(), makeEnv(captured));
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.accountLinked).toBe(true);
     expect(typeof body.data.token).toBe('string');
     expect(captured.runs.some((r) => r.sql.includes('INSERT INTO user_oauth_providers'))).toBe(true);
+  });
+});
+
+describe('register intent email_verified gate', () => {
+  it('rejects registration when Google reports email_verified=false', async () => {
+    stubGoogle(VALID_CLAIMS, { emailVerified: false });
+    const captured: Captured = { runs: [], batches: [] };
+    const res = await oauthApp.fetch(callbackRequest(), makeEnv(captured, registerStateRow()));
+    expect(res.status).toBe(403);
+    expect(await res.json()).toMatchObject({ success: false, code: 'EMAIL_NOT_VERIFIED' });
+    expect(captured.batches).toHaveLength(0);
+    expect(captured.runs.some((r) => r.sql.includes('INSERT INTO user_oauth_providers'))).toBe(false);
+  });
+
+  it('registers a new account when Google reports email_verified=true', async () => {
+    stubGoogle(VALID_CLAIMS);
+    const captured: Captured = { runs: [], batches: [] };
+    const res = await oauthApp.fetch(callbackRequest(), makeEnv(captured, registerStateRow()));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.data.isNewUser).toBe(true);
+    expect(body.data.accountLinked).toBe(false);
+    expect(typeof body.data.token).toBe('string');
+    const batchSql = captured.batches.flat().map((s) => s.sql);
+    expect(batchSql.some((sql) => sql.includes('INSERT INTO users'))).toBe(true);
+    expect(batchSql.some((sql) => sql.includes('INSERT INTO user_oauth_providers'))).toBe(true);
   });
 });
