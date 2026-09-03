@@ -23,6 +23,7 @@ import {
   generateUniqueReferralCode,
 } from './affiliates';
 import { recordingsApp } from './recordings';
+import { labApp } from './lab';
 import { whiteboardsApp } from './whiteboards';
 import { teacherBonusesRouter } from './teacher-bonuses';
 import { tutoringRouter } from './tutoring';
@@ -12201,6 +12202,9 @@ app.route('/api/affiliates', affiliatesApp);
 // Mount Recordings routes (whiteboard recordings)
 app.route('/api/recordings', recordingsApp);
 app.route('/api/whiteboards', whiteboardsApp);
+
+// Mount Virtual Lab routes (server-side sessions, event stream, grading)
+app.route('/api/lab', labApp);
 
 // Mount Teacher Bonuses routes
 app.route('/api/teacher-bonuses', teacherBonusesRouter);

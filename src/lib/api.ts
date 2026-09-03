@@ -1,5 +1,7 @@
 // API Client for Brilla Study Platform
 
+import type { GradingResult, LabEventInput, LabMode } from '../../shared/lab-grading';
+
 // In development, use relative /api path to go through Vite proxy
 // In production, use the configured VITE_API_URL
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
@@ -306,9 +308,58 @@ class ApiClient {
   async resendVerificationEmail(userId: string) {
     return this.post<{ message: string }>(`/admin/users/${userId}/resend-verification`);
   }
+
+  // =============================================
+  // VIRTUAL LAB ENDPOINTS
+  // =============================================
+
+  async startLabSession(experimentSlug: string, mode: LabMode) {
+    return this.post<{ sessionId: string; graded: 0 | 1; experimentSlug: string; mode: LabMode }>(
+      '/lab/sessions',
+      { experimentSlug, mode },
+    );
+  }
+
+  async appendLabEvents(sessionId: string, events: LabEventInput[]) {
+    return this.post<{ accepted: number; duplicates: number }>(
+      `/lab/sessions/${sessionId}/events`,
+      { events },
+    );
+  }
+
+  async submitLabSession(sessionId: string) {
+    return this.post<
+      | { graded: true; grading: GradingResult }
+      | { graded: false; reason: 'practice' }
+    >(`/lab/sessions/${sessionId}/submit`);
+  }
+
+  async getLabSessions(limit = 20) {
+    return this.get<{ sessions: LabSessionSummary[] }>(`/lab/sessions?limit=${limit}`);
+  }
+
+  async getLabSession(sessionId: string) {
+    return this.get<{ session: LabSessionSummary; events: unknown[]; grading: GradingResult | null }>(
+      `/lab/sessions/${sessionId}`,
+    );
+  }
 }
 
 // Types
+export interface LabSessionSummary {
+  id: string;
+  experiment_slug: string;
+  experimentName?: string;
+  mode: 'guided' | 'sandbox';
+  status: 'in_progress' | 'submitted' | 'graded';
+  graded: 0 | 1;
+  score: number | null;
+  max_score: number | null;
+  started_at: string;
+  submitted_at: string | null;
+  created_at: string;
+}
+
 export interface User {
   id: string;
   email: string;

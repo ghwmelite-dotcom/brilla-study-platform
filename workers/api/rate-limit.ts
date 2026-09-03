@@ -85,6 +85,25 @@ export const RATE_LIMITS: Record<string, RateLimitConfig> = {
     windowMs: 60 * 1000, // 60 new answer writes per user per minute
     failureMode: "closed",
   },
+  "lab-session-start": {
+    maxRequests: 20,
+    windowMs: 60 * 60 * 1000, // 20 new lab sessions per user per hour
+    failureMode: "closed",
+  },
+  "lab-events": {
+    maxRequests: 120,
+    windowMs: 60 * 1000, // event bursts during active sim use
+    failureMode: "closed",
+  },
+  "lab-submit": {
+    maxRequests: 10,
+    windowMs: 60 * 60 * 1000, // 10 submits per user per hour
+    failureMode: "closed",
+  },
+  "lab-read": {
+    maxRequests: 60,
+    windowMs: 60 * 1000, // history/detail reads
+  },
   "public-read": {
     maxRequests: 300,
     windowMs: 60 * 1000, // 300 unauthenticated public reads per IP per minute
