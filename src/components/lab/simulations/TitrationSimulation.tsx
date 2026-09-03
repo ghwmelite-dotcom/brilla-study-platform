@@ -9,13 +9,11 @@ import {
   Beaker
 } from 'lucide-react';
 import { cn } from '@/utils';
+import type { SimReportProps } from './types';
 
-interface TitrationSimulationProps {
-  onMeasurement?: (value: number, unit: string, label: string) => void;
-  onObservation?: (text: string) => void;
-}
+type TitrationSimulationProps = SimReportProps;
 
-export function TitrationSimulation({ onMeasurement, onObservation }: TitrationSimulationProps) {
+export function TitrationSimulation({ onMeasurement, onObservation, onAction }: TitrationSimulationProps) {
   // Burette state
   const [buretteVolume, setBuretteVolume] = useState(50); // ml remaining
   const [initialReading, setInitialReading] = useState(0);
@@ -92,6 +90,8 @@ export function TitrationSimulation({ onMeasurement, onObservation }: TitrationS
       setFlaskHCl(25);
       addCompletedAction('pipette');
       onObservation?.('Added 25ml HCl to conical flask using pipette');
+      onAction?.('measure', 'app_pipette', 25);
+      onAction?.('pour', 'app_conical_flask');
     }
   };
 
@@ -100,6 +100,12 @@ export function TitrationSimulation({ onMeasurement, onObservation }: TitrationS
       setHasIndicator(true);
       addCompletedAction('indicator');
       onObservation?.('Added 2-3 drops of methyl orange indicator - solution turned pink/red');
+      onAction?.('pour', 'app_conical_flask');
+      // Setup phase complete (tile + flask positioned for the titration);
+      // these are UI-static placements, so this transition is the honest
+      // signal the sim can actually observe.
+      onAction?.('drag', 'app_white_tile');
+      onAction?.('drag', 'app_conical_flask');
     }
   };
 
@@ -107,6 +113,8 @@ export function TitrationSimulation({ onMeasurement, onObservation }: TitrationS
     setInitialReading(50 - buretteVolume);
     addCompletedAction('initial_reading');
     onMeasurement?.(50 - buretteVolume, 'ml', 'Initial burette reading');
+    onAction?.('measure', 'app_burette');
+    onAction?.('record', 'app_burette');
   };
 
   const recordFinalReading = () => {
@@ -115,12 +123,17 @@ export function TitrationSimulation({ onMeasurement, onObservation }: TitrationS
     setTitreValues(prev => [...prev, titre]);
     addCompletedAction('final_reading');
     onMeasurement?.(finalReading, 'ml', `Final burette reading (Titration ${currentTitration})`);
-    onMeasurement?.(titre, 'ml', `Titre value ${currentTitration}`);
+    // Tag with the expectedResult condition so the grader aggregates titres
+    // into 'Average titre value'.
+    onMeasurement?.(titre, 'ml', `Titre value ${currentTitration}`, 'Average titre value');
+    onAction?.('measure', 'app_burette');
+    onAction?.('record', 'app_burette');
 
     // Check if at endpoint
     const percentNeutralized = naohAdded / equivalencePoint;
     if (percentNeutralized >= 0.98 && percentNeutralized <= 1.05) {
       onObservation?.(`Titration ${currentTitration}: End point reached - color changed from pink to yellow. Titre = ${titre.toFixed(1)} ml`);
+      onAction?.('observe', 'app_conical_flask');
     }
   };
 
@@ -132,6 +145,8 @@ export function TitrationSimulation({ onMeasurement, onObservation }: TitrationS
     setInitialReading(0);
     setCurrentTitration(prev => prev + 1);
     setCompletedActions([]);
+    // Refilling the burette with NaOH for the next titre.
+    onAction?.('pour', 'app_burette');
   };
 
   const addCompletedAction = (action: string) => {
