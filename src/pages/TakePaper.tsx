@@ -355,7 +355,10 @@ export default function TakePaper() {
     if (res.success) {
       navigate(`/past-papers/results/${attemptId}`);
     } else {
-      setError('Failed to submit paper');
+      const apiError = (res as { error?: string }).error;
+      setError(apiError === 'Time limit exceeded'
+        ? 'The time limit for this paper has passed. Your answers were not submitted.'
+        : 'Failed to submit paper');
     }
     setIsSubmitting(false);
   };

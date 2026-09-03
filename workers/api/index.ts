@@ -5708,6 +5708,17 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
     if (!attempt) {
       return c.json({ success: false, error: 'Attempt not found or already submitted' }, 404);
     }
+    // Server-side time authority: the client timer is UX only. 5-minute grace
+    // covers submission latency; TakePaper auto-submits at 0:00 so honest
+    // users never hit this.
+    const timeAllowedMinutes = Number(attempt.time_allowed) || 0;
+    if (timeAllowedMinutes > 0 && timeUsed > timeAllowedMinutes * 60 + 300) {
+      return c.json({
+        success: false,
+        error: 'Time limit exceeded',
+        code: 'time_limit_exceeded',
+      }, 400);
+    }
 
     const { results: answers } = await c.env.DB.prepare(`
       SELECT paa.*, q.correct_answer, q.marks, q.question_type, q.options,

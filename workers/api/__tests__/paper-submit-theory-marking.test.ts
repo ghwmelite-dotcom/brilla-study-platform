@@ -59,6 +59,7 @@ interface HarnessOptions {
   totalMarks: number;
   credits: { ai_grading_credits: number; ai_grading_quota: number } | null;
   resultsAttemptStatus?: string;
+  timeAllowed?: number | null;
 }
 
 function makeHarness(opts: HarnessOptions) {
@@ -85,6 +86,7 @@ function makeHarness(opts: HarnessOptions) {
       first: () => ({
         id: ATTEMPT_ID, user_id: USER_ID, paper_id: PAPER_ID,
         status: 'in_progress', total_marks: opts.totalMarks,
+        ...(opts.timeAllowed !== undefined ? { time_allowed: opts.timeAllowed } : {}),
       }),
     },
     {
@@ -189,13 +191,13 @@ function markingJson(score: number) {
   }) };
 }
 
-async function submit(db: MockD1, aiRun: ReturnType<typeof vi.fn>) {
+async function submit(db: MockD1, aiRun: ReturnType<typeof vi.fn>, timeUsed = 120) {
   const t = await authToken();
   return worker.fetch(
     new Request(`http://x/api/papers/attempts/${ATTEMPT_ID}/submit`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ timeUsed: 120 }),
+      body: JSON.stringify({ timeUsed }),
     }),
     { DB: db as unknown as D1Database, JWT_SECRET, AI: { run: aiRun } as unknown as Ai },
   );
@@ -375,5 +377,77 @@ describe('POST /papers/attempts/:attemptId/submit — theory marking fan-out', (
     expect(res.status).toBe(200);
     const body = await res.json() as any;
     expect(body.data.answers).toHaveLength(1);
+  });
+});
+
+describe('POST /papers/attempts/:attemptId/submit — time limit enforcement', () => {
+  // Attempt fixture: time_allowed = 90 (minutes) → bound = 5400 + 300 = 5700s.
+  const objectiveOnly = (): AnswerRow[] => [
+    objectiveAnswer('a_o1', 'q_o1', 'true', 'true', 2),
+    objectiveAnswer('a_o2', 'q_o2', 'false', 'true', 2),
+  ];
+
+  it('accepts timeUsed exactly at the bound (boundary inclusive)', async () => {
+    const { db } = makeHarness({
+      totalMarks: 4,
+      credits: null,
+      timeAllowed: 90,
+      answers: objectiveOnly(),
+    });
+
+    const res = await submit(db, vi.fn(), 5700);
+    expect(res.status).toBe(200);
+    const body = await res.json() as any;
+    expect(body.data.status).toBe('graded');
+  });
+
+  it('rejects timeUsed past the bound: 400 time_limit_exceeded, attempt stays in_progress', async () => {
+    const { db, calls } = makeHarness({
+      totalMarks: 4,
+      credits: null,
+      timeAllowed: 90,
+      answers: objectiveOnly(),
+    });
+
+    const res = await submit(db, vi.fn(), 5701);
+    expect(res.status).toBe(400);
+    const body = await res.json() as any;
+    expect(body.success).toBe(false);
+    expect(body.error).toBe('Time limit exceeded');
+    expect(body.code).toBe('time_limit_exceeded');
+    // No grade batch ran: neither the attempt status update nor answer grading.
+    expect(calls.find((c) => /UPDATE paper_attempts/.test(c.sql))).toBeUndefined();
+    expect(calls.find((c) => /SET is_correct = \?, marks_earned = \?/.test(c.sql))).toBeUndefined();
+  });
+
+  it('allows resubmission inside the bound after an over-time rejection', async () => {
+    const { db } = makeHarness({
+      totalMarks: 4,
+      credits: null,
+      timeAllowed: 90,
+      answers: objectiveOnly(),
+    });
+
+    const first = await submit(db, vi.fn(), 5701);
+    expect(first.status).toBe(400);
+
+    const second = await submit(db, vi.fn(), 5400);
+    expect(second.status).toBe(200);
+    const body = await second.json() as any;
+    expect(body.data.status).toBe('graded');
+  });
+
+  it('skips enforcement when time_allowed is NULL (24h sanity check still applies)', async () => {
+    const { db } = makeHarness({
+      totalMarks: 4,
+      credits: null,
+      timeAllowed: null,
+      answers: objectiveOnly(),
+    });
+
+    const res = await submit(db, vi.fn(), 5701);
+    expect(res.status).toBe(200);
+    const body = await res.json() as any;
+    expect(body.data.status).toBe('graded');
   });
 });
