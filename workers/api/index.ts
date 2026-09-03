@@ -5359,11 +5359,17 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
     }
 
     const { results: answers } = await c.env.DB.prepare(`
-      SELECT paa.*, q.correct_answer, q.marks, q.question_type, q.options
+      SELECT paa.*, q.correct_answer, q.marks, q.question_type, q.options,
+            q.question_text, q.topic_id, q.points, s.name AS subject_name,
+            eq.marking_scheme, eq.marking_rubric, eq.model_answer,
+            eq.required_points, eq.optional_points
       FROM paper_attempt_answers paa
       JOIN paper_attempts pa ON pa.id = paa.paper_attempt_id
       JOIN questions q ON q.id = paa.question_id AND q.past_paper_id = pa.paper_id
+      JOIN subjects s ON s.id = q.subject_id
+      LEFT JOIN essay_questions eq ON eq.question_id = q.id
       WHERE paa.paper_attempt_id = ?
+      ORDER BY q.section, q.question_number
     `).bind(attemptId).all<Record<string, unknown>>();
 
     let totalScore = 0;
@@ -5390,6 +5396,155 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
       `).bind(isCorrect ? 1 : 0, marksEarned, answerRow.id, attemptId));
     }
 
+    const THEORY_TYPES = new Set(['essay', 'structured', 'short_answer', 'calculation', 'direct_answer', 'comprehension']);
+    const MARKING_CONCURRENCY = 4;
+
+    const theoryAnswers = answers.filter((a) =>
+      THEORY_TYPES.has(String(a.question_type)) && String(a.user_answer ?? '').trim().length > 0);
+
+    let markingUnavailable = false;
+    let payable = 0;
+    if (theoryAnswers.length > 0) {
+      const user = await c.env.DB.prepare(`
+        SELECT u.ai_grading_credits, st.ai_grading_quota
+        FROM users u
+        LEFT JOIN subscription_tiers st ON u.subscription_tier_id = st.id
+        WHERE u.id = ?
+      `).bind(userId).first<{ ai_grading_credits: number | null; ai_grading_quota: number | null }>();
+      const quota = Number(user?.ai_grading_quota) || 0;
+      const credits = Number(user?.ai_grading_credits) || 0;
+
+      if (quota === 0) {
+        markingUnavailable = true; // tier has no AI grading — never fail the submit
+      } else if (quota === -1) {
+        payable = theoryAnswers.length; // unlimited tier: no deduction
+      } else {
+        payable = Math.min(theoryAnswers.length, credits);
+        if (payable > 0) {
+          const deduction = await c.env.DB.prepare(`
+            UPDATE users SET ai_grading_credits = ai_grading_credits - ?
+            WHERE id = ? AND ai_grading_credits >= ?
+          `).bind(payable, userId, payable).run();
+          if (deduction.meta.changes !== 1) {
+            // Concurrent spend won the race: mark nothing, leave all pending
+            // (retryable via /remark), never mark for free.
+            console.error(`Credit deduction raced for user ${userId}; leaving theory pending`);
+            payable = 0;
+          }
+        }
+      }
+    }
+
+    // Mark every theory answer with content as pending up front so the
+    // lifecycle is visible even when nothing is payable.
+    for (const a of theoryAnswers) {
+      gradeStatements.push(c.env.DB.prepare(`
+        UPDATE paper_attempt_answers SET marking_status = 'pending'
+        WHERE id = ? AND paper_attempt_id = ?
+      `).bind(a.id, attemptId));
+    }
+
+    // Structured parts for this paper's questions, one grouped query.
+    const structuredPartsByQuestion = new Map<string, StructuredPartInput[]>();
+    if (theoryAnswers.some((a) => String(a.question_type) === 'structured')) {
+      const { results: parts } = await c.env.DB.prepare(`
+        SELECT sqp.question_id, sqp.part_label, sqp.part_text, sqp.marks, sqp.correct_answer
+        FROM structured_question_parts sqp
+        JOIN paper_attempt_answers paa ON paa.question_id = sqp.question_id
+        WHERE paa.paper_attempt_id = ?
+        ORDER BY sqp.display_order
+      `).bind(attemptId).all<StructuredPartInput & { question_id: string }>();
+      for (const p of parts) {
+        const list = structuredPartsByQuestion.get(p.question_id) ?? [];
+        list.push({ part_label: p.part_label, part_text: p.part_text, marks: p.marks, correct_answer: p.correct_answer });
+        structuredPartsByQuestion.set(p.question_id, list);
+      }
+    }
+
+    const paidTheory = theoryAnswers.slice(0, payable); // question order preserved
+    type MarkingOutcome =
+      | { answerId: string; kind: 'graded'; marking: TheoryMarking }
+      | { answerId: string; kind: 'marking_failed' };
+
+    const parseJsonColumn = (v: unknown): unknown => {
+      if (typeof v !== 'string' || v.length === 0) return null;
+      try { return JSON.parse(v); } catch { return null; }
+    };
+
+    const markOne = async (a: Record<string, unknown>): Promise<MarkingOutcome> => {
+      try {
+        const marking = await withTimeout(
+          gradeTheoryAnswer(c.env, {
+            questionType: String(a.question_type),
+            questionText: String(a.question_text ?? ''),
+            marks: Number(a.marks) || 0,
+            subjectName: (a.subject_name as string) ?? null,
+            correctAnswer: (a.correct_answer as string) ?? null,
+            markingScheme: parseJsonColumn(a.marking_scheme),
+            markingRubric: (a.marking_rubric as string) ?? null,
+            modelAnswer: (a.model_answer as string) ?? null,
+            requiredPoints: parseJsonColumn(a.required_points),
+            optionalPoints: parseJsonColumn(a.optional_points),
+            structuredParts: structuredPartsByQuestion.get(String(a.question_id)) ?? [],
+          }, String(a.user_answer)),
+          THEORY_MARKING_TIMEOUT_MS,
+          `marking answer ${a.id}`,
+        );
+        return { answerId: String(a.id), kind: 'graded', marking };
+      } catch (error) {
+        console.error(`Theory marking failed for answer ${a.id}:`, error);
+        return { answerId: String(a.id), kind: 'marking_failed' };
+      }
+    };
+
+    // Bounded fan-out: chunks of MARKING_CONCURRENCY, never awaited past the
+    // response budget — stragglers finish via executionCtx and their answers
+    // remain 'pending' until they land.
+    const markAllPaid = async (): Promise<MarkingOutcome[]> => {
+      const outcomes: MarkingOutcome[] = [];
+      for (let i = 0; i < paidTheory.length; i += MARKING_CONCURRENCY) {
+        const settled = await Promise.allSettled(
+          paidTheory.slice(i, i + MARKING_CONCURRENCY).map(markOne),
+        );
+        for (const s of settled) {
+          if (s.status === 'fulfilled') outcomes.push(s.value);
+        }
+      }
+      return outcomes;
+    };
+
+    const outcomes = await markAllPaid();
+    let theoryScore = 0;
+    let gradedCount = 0;
+    let failedCount = 0;
+    for (const outcome of outcomes) {
+      if (outcome.kind === 'graded') {
+        theoryScore += outcome.marking.score;
+        gradedCount += 1;
+        gradeStatements.push(c.env.DB.prepare(`
+          UPDATE paper_attempt_answers
+          SET marking_status = 'graded', ai_score = ?, ai_feedback = ?, marks_earned = ?
+          WHERE id = ? AND paper_attempt_id = ?
+        `).bind(
+          outcome.marking.score, JSON.stringify(outcome.marking), outcome.marking.score,
+          outcome.answerId, attemptId,
+        ));
+      } else {
+        failedCount += 1;
+        gradeStatements.push(c.env.DB.prepare(`
+          UPDATE paper_attempt_answers SET marking_status = 'marking_failed'
+          WHERE id = ? AND paper_attempt_id = ?
+        `).bind(outcome.answerId, attemptId));
+      }
+    }
+
+    totalScore += theoryScore;
+    const pendingCount = theoryAnswers.length - gradedCount - failedCount;
+    const attemptStatus =
+      theoryAnswers.length === 0 || (gradedCount === theoryAnswers.length)
+        ? 'graded'
+        : 'partially_graded';
+
     const totalMarks = Number(attempt.total_marks) || 0;
     const percentageScore = totalMarks > 0
       ? Math.round((totalScore / totalMarks) * 100)
@@ -5397,10 +5552,10 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
 
     gradeStatements.push(c.env.DB.prepare(`
       UPDATE paper_attempts
-      SET status = 'graded', time_used = ?, total_score = ?, max_score = ?,
+      SET status = ?, time_used = ?, total_score = ?, max_score = ?,
           percentage = ?, submitted_at = datetime('now')
       WHERE id = ? AND user_id = ? AND status = 'in_progress'
-    `).bind(Math.round(timeUsed), totalScore, totalMarks, percentageScore, attemptId, userId));
+    `).bind(attemptStatus, Math.round(timeUsed), totalScore, totalMarks, percentageScore, attemptId, userId));
 
     await c.env.DB.batch(gradeStatements);
 
@@ -5411,7 +5566,14 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
         totalScore,
         totalMarks,
         percentageScore,
-        status: 'graded',
+        status: attemptStatus,
+        markingStatus: {
+          theoryTotal: theoryAnswers.length,
+          graded: gradedCount,
+          failed: failedCount,
+          pending: pendingCount,
+        },
+        ...(markingUnavailable ? { markingUnavailable: true } : {}),
       },
     });
   } catch (error) {
@@ -5454,7 +5616,7 @@ protectedApp.get('/papers/attempts/:attemptId/results', async (c) => {
       return c.json({ success: true, data: { attempt, answers } });
     }
 
-    if (!['submitted', 'graded'].includes(String(attempt.status))) {
+    if (!['submitted', 'graded', 'partially_graded'].includes(String(attempt.status))) {
       return c.json({
         success: false,
         error: 'Results are not available for this attempt',

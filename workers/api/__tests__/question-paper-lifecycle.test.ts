@@ -106,6 +106,14 @@ function createDb(): Database.Database {
       question_number INTEGER,
       section TEXT
     );
+    CREATE TABLE essay_questions (
+      question_id TEXT PRIMARY KEY,
+      marking_scheme TEXT,
+      marking_rubric TEXT,
+      model_answer TEXT,
+      required_points TEXT,
+      optional_points TEXT
+    );
     CREATE TABLE daily_usage (
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL,
