@@ -3410,7 +3410,7 @@ export const biologyExperiments: Experiment[] = [
     ],
     expectedResults: [
       { condition: 'Specimen clearly visible', value: 'Focused image', unit: '' },
-      { condition: 'Magnification at x400', value: 400, unit: 'x' },
+      { condition: 'Magnification at x400', value: 400, tolerance: 0, unit: 'x' },
     ],
     assessmentCriteria: [
       {
