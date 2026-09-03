@@ -432,10 +432,12 @@ export async function fetchWithAuth(input: string, init: RequestInit = {}): Prom
 
 export function getApiUrl(path?: string): string {
   if (path) {
+    // Strip only a leading /api prefix, not an occurrence deeper in the path
+    const normalizedPath = path.startsWith('/api') ? path.slice('/api'.length) : path;
     if (API_BASE_URL.startsWith('http')) {
-      return `${API_BASE_URL}${path.replace('/api', '')}`;
+      return `${API_BASE_URL}${normalizedPath}`;
     }
-    return `${window.location.origin}${API_BASE_URL}${path.replace('/api', '')}`;
+    return `${window.location.origin}${API_BASE_URL}${normalizedPath}`;
   }
   return API_BASE_URL;
 }

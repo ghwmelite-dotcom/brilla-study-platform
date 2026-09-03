@@ -709,7 +709,7 @@ function App() {
           <Route
             path="parent"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['parent']}>
                 <LazyPage><ParentDashboardPage /></LazyPage>
               </ProtectedRoute>
             }
@@ -717,7 +717,7 @@ function App() {
           <Route
             path="parent/notifications"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['parent']}>
                 <LazyPage><ParentNotificationsPage /></LazyPage>
               </ProtectedRoute>
             }
@@ -725,7 +725,7 @@ function App() {
           <Route
             path="parent/settings"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['parent']}>
                 <LazyPage><ParentSettingsPage /></LazyPage>
               </ProtectedRoute>
             }
@@ -733,7 +733,7 @@ function App() {
           <Route
             path="parent/reports"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['parent']}>
                 <LazyPage><ParentReportsPage /></LazyPage>
               </ProtectedRoute>
             }
@@ -741,7 +741,7 @@ function App() {
           <Route
             path="parent/reports/:reportId"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['parent']}>
                 <LazyPage><ParentReportsPage /></LazyPage>
               </ProtectedRoute>
             }
@@ -751,7 +751,7 @@ function App() {
           <Route
             path="teacher"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['teacher']}>
                 <LazyPage><TeacherDashboard /></LazyPage>
               </ProtectedRoute>
             }
@@ -759,7 +759,7 @@ function App() {
           <Route
             path="teacher/assessments"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['teacher']}>
                 <LazyPage><AssessmentList /></LazyPage>
               </ProtectedRoute>
             }
@@ -767,7 +767,7 @@ function App() {
           <Route
             path="teacher/assessments/new"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['teacher']}>
                 <LazyPage><AssessmentBuilder /></LazyPage>
               </ProtectedRoute>
             }
@@ -775,7 +775,7 @@ function App() {
           <Route
             path="teacher/assessments/:id/edit"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['teacher']}>
                 <LazyPage><AssessmentBuilder /></LazyPage>
               </ProtectedRoute>
             }
@@ -783,7 +783,7 @@ function App() {
           <Route
             path="teacher/grading"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['teacher']}>
                 <LazyPage><AssessmentGrading /></LazyPage>
               </ProtectedRoute>
             }
@@ -791,7 +791,7 @@ function App() {
           <Route
             path="teacher/classes"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['teacher']}>
                 <LazyPage><ClassManagement /></LazyPage>
               </ProtectedRoute>
             }
@@ -799,7 +799,7 @@ function App() {
           <Route
             path="teacher/whiteboard"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['teacher']}>
                 <LazyPage><WhiteboardList /></LazyPage>
               </ProtectedRoute>
             }
@@ -807,7 +807,7 @@ function App() {
           <Route
             path="teacher/whiteboard/new"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['teacher']}>
                 <LazyPage><WhiteboardEditor /></LazyPage>
               </ProtectedRoute>
             }
@@ -815,7 +815,7 @@ function App() {
           <Route
             path="teacher/whiteboard/:id/edit"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['teacher']}>
                 <LazyPage><WhiteboardEditor /></LazyPage>
               </ProtectedRoute>
             }
@@ -823,7 +823,7 @@ function App() {
           <Route
             path="teacher/whiteboard/recording/:id"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['teacher']}>
                 <LazyPage><RecordingViewer /></LazyPage>
               </ProtectedRoute>
             }
@@ -831,7 +831,7 @@ function App() {
           <Route
             path="teacher/directory-profile"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['teacher']}>
                 <LazyPage><TeacherDirectorySetup /></LazyPage>
               </ProtectedRoute>
             }
@@ -839,7 +839,7 @@ function App() {
           <Route
             path="teacher/tutoring"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['teacher']}>
                 <LazyPage><TeacherTutoringDashboard /></LazyPage>
               </ProtectedRoute>
             }
@@ -847,7 +847,7 @@ function App() {
           <Route
             path="teacher/bonus"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['teacher']}>
                 <LazyPage><TeacherBonusStatus /></LazyPage>
               </ProtectedRoute>
             }
