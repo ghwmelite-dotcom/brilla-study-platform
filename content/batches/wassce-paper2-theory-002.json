@@ -1,0 +1,910 @@
+{
+  "batchId": "wassce-paper2-theory-002",
+  "status": "approved_for_production",
+  "examTypeId": "exam_wassce",
+  "provenance": [
+    {
+      "publisher": "WAEC",
+      "title": "WASSCE Integrated Science syllabus",
+      "url": "https://waecgh.org/",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "WAEC",
+      "title": "WASSCE Social Studies syllabus",
+      "url": "https://waecgh.org/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-03T00:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science and Social Studies Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_wassce_int_science",
+      "specificationCode": "WASSCE-ISC-P2",
+      "release": {
+        "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+        "sourceUrl": "https://waecgh.org/",
+        "officialExamBoardContent": false,
+        "feedbackEnabled": true
+      },
+      "topics": [
+        {
+          "code": "SCI-ECO",
+          "title": "Ecosystems",
+          "objective": "Describe ecosystem components and construct food chains that show energy flow between organisms."
+        },
+        {
+          "code": "SCI-MAT",
+          "title": "Matter and mixtures",
+          "objective": "Select and justify physical separation techniques for the components of common mixtures."
+        },
+        {
+          "code": "SCI-ENR",
+          "title": "Electricity and energy",
+          "objective": "Analyse simple series circuits, relating current, resistance and lamp brightness quantitatively."
+        },
+        {
+          "code": "SCI-BIO",
+          "title": "Human digestion",
+          "objective": "Explain the stages of human digestion, naming the enzymes and organs responsible at each stage."
+        },
+        {
+          "code": "SCI-AGR",
+          "title": "Soil and crop production",
+          "objective": "Relate soil properties to crop growth and justify practices that conserve and improve soil fertility."
+        },
+        {
+          "code": "SCI-HLT",
+          "title": "Disease and health",
+          "objective": "Explain the transmission, symptoms and prevention of common communicable diseases in Ghana."
+        },
+        {
+          "code": "SCI-WST",
+          "title": "Waste management",
+          "objective": "Evaluate methods of managing solid waste, weighing the advantages and limitations of each method."
+        },
+        {
+          "code": "SCI-ENV",
+          "title": "Water and pollution",
+          "objective": "Analyse the causes and effects of water pollution and propose practical control measures."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_sci_2024_2_001",
+          "original": true,
+          "topicCode": "SCI-ECO",
+          "type": "structured",
+          "prompt": "A maize farm supports grasshoppers, lizards, hawks and earthworms alongside the maize plants.",
+          "marks": 12,
+          "section": "A",
+          "questionNumber": 1,
+          "isCompulsory": true,
+          "commandWord": "Explain",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "(a) An ecosystem is a community of living organisms interacting with one another and with their non-living (physical) environment as a functional unit. (b) Producer: maize plants. Consumers: grasshopper (primary), lizard and hawk (secondary). (c) Maize → grasshopper → lizard → hawk (any three-linked correct sequence earns full marks). (d) Lizards and hawks would lose a food source and decline, while maize yield would rise without the pest; the food chain would be disrupted.",
+          "markingScheme": null,
+          "modelAnswer": null,
+          "requiredPoints": null,
+          "optionalPoints": null,
+          "wordLimit": null,
+          "parts": [
+            {
+              "label": "a",
+              "text": "Define the term ecosystem.",
+              "marks": 3,
+              "correctAnswer": "An ecosystem is a community of living organisms interacting with one another and with their non-living (physical) environment as a functional unit."
+            },
+            {
+              "label": "b",
+              "text": "Identify the producer and two primary or secondary consumers in the farm community.",
+              "marks": 3,
+              "correctAnswer": "Producer: maize plants. Consumers: grasshopper (primary), lizard and hawk (secondary)."
+            },
+            {
+              "label": "c",
+              "text": "Construct a food chain using three of the organisms named above.",
+              "marks": 3,
+              "correctAnswer": "Maize → grasshopper → lizard → hawk (any three-linked correct sequence earns full marks)."
+            },
+            {
+              "label": "d",
+              "text": "State and explain one effect on the ecosystem if all the grasshoppers were removed.",
+              "marks": 3,
+              "correctAnswer": "Lizards and hawks would lose a food source and decline, while maize yield would rise without the pest; the food chain would be disrupted."
+            }
+          ]
+        },
+        {
+          "id": "q_sci_2024_2_002",
+          "original": true,
+          "topicCode": "SCI-MAT",
+          "type": "structured",
+          "prompt": "A mixture contains iron filings, sand and common salt.",
+          "marks": 12,
+          "section": "A",
+          "questionNumber": 2,
+          "isCompulsory": true,
+          "commandWord": "Describe",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "(a) Pass a magnet over or through the mixture; the iron filings are attracted to the magnet, leaving sand and salt behind. (b) Add water and stir to dissolve the salt, filter to remove the sand, then evaporate (or crystallise) the filtrate to obtain pure salt. (c) Dissolved salt particles are too small and pass through the pores of filter paper with the water; only insoluble solids are trapped. (d) Distillation: the water is evaporated and then condensed back to pure liquid, leaving the salt behind.",
+          "markingScheme": null,
+          "modelAnswer": null,
+          "requiredPoints": null,
+          "optionalPoints": null,
+          "wordLimit": null,
+          "parts": [
+            {
+              "label": "a",
+              "text": "Describe how the iron filings can be separated from the mixture.",
+              "marks": 3,
+              "correctAnswer": "Pass a magnet over or through the mixture; the iron filings are attracted to the magnet, leaving sand and salt behind."
+            },
+            {
+              "label": "b",
+              "text": "Outline the steps you would use to obtain pure salt from the remaining mixture.",
+              "marks": 3,
+              "correctAnswer": "Add water and stir to dissolve the salt, filter to remove the sand, then evaporate (or crystallise) the filtrate to obtain pure salt."
+            },
+            {
+              "label": "c",
+              "text": "Explain why filtration alone cannot separate the dissolved salt from the water.",
+              "marks": 3,
+              "correctAnswer": "Dissolved salt particles are too small and pass through the pores of filter paper with the water; only insoluble solids are trapped."
+            },
+            {
+              "label": "d",
+              "text": "Name the process you would use to recover pure water from the salt solution.",
+              "marks": 3,
+              "correctAnswer": "Distillation: the water is evaporated and then condensed back to pure liquid, leaving the salt behind."
+            }
+          ]
+        },
+        {
+          "id": "q_sci_2024_2_003",
+          "original": true,
+          "topicCode": "SCI-ENR",
+          "type": "structured",
+          "prompt": "A student connects a battery and two identical lamps in series to form a closed circuit.",
+          "marks": 12,
+          "section": "A",
+          "questionNumber": 3,
+          "isCompulsory": true,
+          "commandWord": "Explain",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "(a) Battery (supplies electrical energy), connecting wires (carry current), lamps (convert electrical energy to light), and a switch (opens or closes the circuit). (b) There is only one path for the charge to flow, so the same quantity of charge passes every point per second. (c) The lamps become dimmer because total resistance increases, so the current through each lamp decreases. (d) In series, resistances add: R = 4 + 4 + 4 = 12 Ω.",
+          "markingScheme": null,
+          "modelAnswer": null,
+          "requiredPoints": null,
+          "optionalPoints": null,
+          "wordLimit": null,
+          "parts": [
+            {
+              "label": "a",
+              "text": "List the components needed for the circuit and state the function of each.",
+              "marks": 3,
+              "correctAnswer": "Battery (supplies electrical energy), connecting wires (carry current), lamps (convert electrical energy to light), and a switch (opens or closes the circuit)."
+            },
+            {
+              "label": "b",
+              "text": "Explain why the current is the same at every point in a series circuit.",
+              "marks": 3,
+              "correctAnswer": "There is only one path for the charge to flow, so the same quantity of charge passes every point per second."
+            },
+            {
+              "label": "c",
+              "text": "State and explain what happens to the brightness of the lamps when a third identical lamp is added in series.",
+              "marks": 3,
+              "correctAnswer": "The lamps become dimmer because total resistance increases, so the current through each lamp decreases."
+            },
+            {
+              "label": "d",
+              "text": "If each lamp has a resistance of 4 Ω, calculate the total resistance when three lamps are connected in series.",
+              "marks": 3,
+              "correctAnswer": "In series, resistances add: R = 4 + 4 + 4 = 12 Ω."
+            }
+          ]
+        },
+        {
+          "id": "q_sci_2024_2_004",
+          "original": true,
+          "topicCode": "SCI-BIO",
+          "type": "structured",
+          "prompt": "A meal of kenkey and fried fish is eaten by a student.",
+          "marks": 12,
+          "section": "A",
+          "questionNumber": 4,
+          "isCompulsory": true,
+          "commandWord": "Explain",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "(a) Digestion is the breakdown of large, insoluble food molecules into smaller, soluble molecules that can be absorbed into the bloodstream. (b) Salivary amylase (ptyalin), which acts on starch, breaking it down to maltose. (c) Protein digestion begins in the stomach, where pepsin breaks proteins into peptides in the presence of hydrochloric acid. (d) Its inner wall is folded into millions of villi (with microvilli), giving a very large surface area, and each villus has a rich blood supply and thin walls for fast diffusion.",
+          "markingScheme": null,
+          "modelAnswer": null,
+          "requiredPoints": null,
+          "optionalPoints": null,
+          "wordLimit": null,
+          "parts": [
+            {
+              "label": "a",
+              "text": "Define digestion.",
+              "marks": 3,
+              "correctAnswer": "Digestion is the breakdown of large, insoluble food molecules into smaller, soluble molecules that can be absorbed into the bloodstream."
+            },
+            {
+              "label": "b",
+              "text": "Name the enzyme in saliva and the food substance it acts upon.",
+              "marks": 3,
+              "correctAnswer": "Salivary amylase (ptyalin), which acts on starch, breaking it down to maltose."
+            },
+            {
+              "label": "c",
+              "text": "State where the digestion of the protein in the fish begins and name the enzyme involved.",
+              "marks": 3,
+              "correctAnswer": "Protein digestion begins in the stomach, where pepsin breaks proteins into peptides in the presence of hydrochloric acid."
+            },
+            {
+              "label": "d",
+              "text": "Explain one way in which the small intestine is adapted for absorption of the digested food.",
+              "marks": 3,
+              "correctAnswer": "Its inner wall is folded into millions of villi (with microvilli), giving a very large surface area, and each villus has a rich blood supply and thin walls for fast diffusion."
+            }
+          ]
+        },
+        {
+          "id": "q_sci_2024_2_005",
+          "original": true,
+          "topicCode": "SCI-AGR",
+          "type": "structured",
+          "prompt": "A farmer wants to improve a patch of land before planting maize.",
+          "marks": 12,
+          "section": "A",
+          "questionNumber": 5,
+          "isCompulsory": true,
+          "commandWord": "Explain",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "(a) Mineral particles (anchor roots and supply nutrients) and humus/organic matter (holds moisture and releases nutrients); air and water in the pores support root respiration and nutrient uptake. (b) Loam balances sand, silt and clay with humus, so it drains well yet retains enough water and nutrients, and it is easily worked by roots and tools. (c) Compost adds humus, which improves soil structure and water retention and releases nitrogen, phosphorus and potassium slowly as it decomposes. (d) Contour ploughing (or terracing): ploughing across the slope slows run-off, reducing soil erosion and keeping nutrients in place.",
+          "markingScheme": null,
+          "modelAnswer": null,
+          "requiredPoints": null,
+          "optionalPoints": null,
+          "wordLimit": null,
+          "parts": [
+            {
+              "label": "a",
+              "text": "Name two components of soil and state the importance of each to plant growth.",
+              "marks": 3,
+              "correctAnswer": "Mineral particles (anchor roots and supply nutrients) and humus/organic matter (holds moisture and releases nutrients); air and water in the pores support root respiration and nutrient uptake."
+            },
+            {
+              "label": "b",
+              "text": "Explain why loamy soil is considered best for crop production.",
+              "marks": 3,
+              "correctAnswer": "Loam balances sand, silt and clay with humus, so it drains well yet retains enough water and nutrients, and it is easily worked by roots and tools."
+            },
+            {
+              "label": "c",
+              "text": "Describe how adding compost improves the soil.",
+              "marks": 3,
+              "correctAnswer": "Compost adds humus, which improves soil structure and water retention and releases nitrogen, phosphorus and potassium slowly as it decomposes."
+            },
+            {
+              "label": "d",
+              "text": "State one soil conservation practice the farmer can use on sloping land and explain how it works.",
+              "marks": 3,
+              "correctAnswer": "Contour ploughing (or terracing): ploughing across the slope slows run-off, reducing soil erosion and keeping nutrients in place."
+            }
+          ]
+        },
+        {
+          "id": "q_sci_2024_2_006",
+          "original": true,
+          "topicCode": "SCI-HLT",
+          "type": "structured",
+          "prompt": "Malaria remains a common illness in many Ghanaian communities.",
+          "marks": 12,
+          "section": "A",
+          "questionNumber": 6,
+          "isCompulsory": true,
+          "commandWord": "Explain",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "(a) Malaria is caused by Plasmodium parasites and transmitted by the female Anopheles mosquito. (b) Any two of: high fever with chills, headache, sweating, nausea/vomiting, body weakness. (c) Sleeping under insecticide-treated mosquito nets, and clearing stagnant water or spraying insecticides to kill mosquitoes and larvae. (d) Mosquitoes breed in stagnant water; removing it destroys breeding sites, so fewer adult mosquitoes emerge to transmit the parasite.",
+          "markingScheme": null,
+          "modelAnswer": null,
+          "requiredPoints": null,
+          "optionalPoints": null,
+          "wordLimit": null,
+          "parts": [
+            {
+              "label": "a",
+              "text": "Name the organism that causes malaria and the vector that transmits it.",
+              "marks": 3,
+              "correctAnswer": "Malaria is caused by Plasmodium parasites and transmitted by the female Anopheles mosquito."
+            },
+            {
+              "label": "b",
+              "text": "State two symptoms of malaria.",
+              "marks": 3,
+              "correctAnswer": "Any two of: high fever with chills, headache, sweating, nausea/vomiting, body weakness."
+            },
+            {
+              "label": "c",
+              "text": "Describe two measures used to prevent the spread of malaria.",
+              "marks": 3,
+              "correctAnswer": "Sleeping under insecticide-treated mosquito nets, and clearing stagnant water or spraying insecticides to kill mosquitoes and larvae."
+            },
+            {
+              "label": "d",
+              "text": "Explain why draining stagnant water helps to control malaria.",
+              "marks": 3,
+              "correctAnswer": "Mosquitoes breed in stagnant water; removing it destroys breeding sites, so fewer adult mosquitoes emerge to transmit the parasite."
+            }
+          ]
+        },
+        {
+          "id": "q_sci_2024_2_007",
+          "original": true,
+          "topicCode": "SCI-WST",
+          "type": "essay",
+          "prompt": "Your community is facing a waste disposal crisis. Discuss four proper methods of managing solid waste in your community, giving one advantage and one limitation of each method.",
+          "marks": 14,
+          "section": "B",
+          "questionNumber": 7,
+          "isCompulsory": true,
+          "commandWord": "Discuss",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "A strong answer discusses four of: sanitary landfilling (advantage: handles large mixed volumes cheaply; limitation: needs land and can pollute groundwater if unlined), composting of organic waste (advantage: produces manure and reduces refuse volume; limitation: only organic fraction and needs sorting), recycling and reuse (advantage: conserves raw materials and creates income; limitation: requires separation at source and markets for recyclables), and controlled incineration (advantage: greatly reduces volume and destroys pathogens; limitation: smoke and air pollution, high cost). Each method is described clearly, and one advantage and one limitation are explicitly tied to community conditions such as cost, land or labour.",
+          "markingScheme": {
+            "points": [
+              {
+                "point": "Identifies four appropriate solid-waste management methods",
+                "marks": 4
+              },
+              {
+                "point": "Explains a correct advantage of each method",
+                "marks": 5
+              },
+              {
+                "point": "Explains a correct limitation of each method",
+                "marks": 5
+              }
+            ]
+          },
+          "modelAnswer": "A strong answer discusses four of: sanitary landfilling (advantage: handles large mixed volumes cheaply; limitation: needs land and can pollute groundwater if unlined), composting of organic waste (advantage: produces manure and reduces refuse volume; limitation: only organic fraction and needs sorting), recycling and reuse (advantage: conserves raw materials and creates income; limitation: requires separation at source and markets for recyclables), and controlled incineration (advantage: greatly reduces volume and destroys pathogens; limitation: smoke and air pollution, high cost). Each method is described clearly, and one advantage and one limitation are explicitly tied to community conditions such as cost, land or labour.",
+          "requiredPoints": [
+            "Four distinct waste management methods correctly described",
+            "One advantage stated for each method",
+            "One limitation stated for each method"
+          ],
+          "optionalPoints": [
+            "Reference to community-level cost or labour constraints",
+            "A concluding recommendation of the most suitable mix of methods"
+          ],
+          "wordLimit": {
+            "min": 150,
+            "max": 400
+          },
+          "parts": null
+        },
+        {
+          "id": "q_sci_2024_2_008",
+          "original": true,
+          "topicCode": "SCI-ENV",
+          "type": "essay",
+          "prompt": "Discuss the causes and effects of water pollution in Ghanaian communities and suggest two measures that can be taken to control it.",
+          "marks": 14,
+          "section": "B",
+          "questionNumber": 8,
+          "isCompulsory": true,
+          "commandWord": "Discuss",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "A strong answer names causes such as dumping of refuse and sewage into streams, chemical fertiliser and pesticide run-off from farms, illegal mining (galamsey) washing mercury and silt into rivers, and oil or soapy water from washing at riverbanks. Effects include water-borne diseases such as cholera and typhoid, death of fish and other aquatic life as oxygen levels fall, siltation that raises the cost of treating pipe-borne water, and loss of fishing livelihoods. Control measures: enforcing by-laws and pollution penalties with regular monitoring of water bodies, and educating communities while providing proper refuse collection so waste is not dumped into rivers; buffer-zone tree planting along riverbanks is also creditable.",
+          "markingScheme": {
+            "points": [
+              {
+                "point": "Explains at least three causes of water pollution",
+                "marks": 4
+              },
+              {
+                "point": "Explains at least three effects on health, aquatic life or livelihoods",
+                "marks": 5
+              },
+              {
+                "point": "Suggests two workable control measures",
+                "marks": 5
+              }
+            ]
+          },
+          "modelAnswer": "A strong answer names causes such as dumping of refuse and sewage into streams, chemical fertiliser and pesticide run-off from farms, illegal mining (galamsey) washing mercury and silt into rivers, and oil or soapy water from washing at riverbanks. Effects include water-borne diseases such as cholera and typhoid, death of fish and other aquatic life as oxygen levels fall, siltation that raises the cost of treating pipe-borne water, and loss of fishing livelihoods. Control measures: enforcing by-laws and pollution penalties with regular monitoring of water bodies, and educating communities while providing proper refuse collection so waste is not dumped into rivers; buffer-zone tree planting along riverbanks is also creditable.",
+          "requiredPoints": [
+            "At least three distinct causes explained",
+            "At least three distinct effects explained",
+            "Two practical control measures suggested"
+          ],
+          "optionalPoints": [
+            "Named Ghanaian context such as galamsey-affected rivers",
+            "Links between cause, effect and chosen control measure"
+          ],
+          "wordLimit": {
+            "min": 150,
+            "max": 400
+          },
+          "parts": null
+        }
+      ]
+    },
+    {
+      "subjectId": "subj_wassce_social",
+      "specificationCode": "WASSCE-SST-P2",
+      "release": {
+        "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Social Studies Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+        "sourceUrl": "https://waecgh.org/",
+        "officialExamBoardContent": false,
+        "feedbackEnabled": true
+      },
+      "topics": [
+        {
+          "code": "SOC-GOV",
+          "title": "Governance and democracy",
+          "objective": "Explain how constitutional provisions and institutions promote democratic governance in Ghana."
+        },
+        {
+          "code": "SOC-CIV",
+          "title": "Elections and civic life",
+          "objective": "Analyse threats to peaceful elections and propose civic solutions that protect the democratic process."
+        },
+        {
+          "code": "SOC-MED",
+          "title": "Media and national development",
+          "objective": "Assess the roles the media play in education, accountability and national development."
+        },
+        {
+          "code": "SOC-MIG",
+          "title": "Population and migration",
+          "objective": "Evaluate the causes and consequences of rural-urban migration for sending and receiving communities."
+        },
+        {
+          "code": "SOC-CUL",
+          "title": "Culture and globalization",
+          "objective": "Explain how Ghanaian cultural values can be preserved amid globalizing influences."
+        },
+        {
+          "code": "SOC-EDU",
+          "title": "Adolescent health and education",
+          "objective": "Analyse the causes of teenage pregnancy and its consequences for girls' education and life chances."
+        },
+        {
+          "code": "SOC-ECO",
+          "title": "Agriculture and the economy",
+          "objective": "Explain the contribution of agriculture to employment, food security and industrial growth in Ghana."
+        },
+        {
+          "code": "SOC-ENV",
+          "title": "Environment and illegal mining",
+          "objective": "Evaluate the environmental and social effects of illegal mining and the measures available to control it."
+        },
+        {
+          "code": "SOC-EMP",
+          "title": "Work and unemployment",
+          "objective": "Propose and assess measures government can take to reduce unemployment among the youth."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_soc_2024_2_001",
+          "original": true,
+          "topicCode": "SOC-GOV",
+          "type": "essay",
+          "prompt": "Explain four ways by which the 1992 Constitution of Ghana promotes democracy in the country.",
+          "marks": 20,
+          "section": "A",
+          "questionNumber": 1,
+          "isCompulsory": true,
+          "commandWord": "Explain",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Social Studies Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "A strong answer explains four of: separation of powers among the Executive, Legislature and Judiciary so no arm dominates; the Bill of Rights (fundamental human rights in Chapter 5) protecting freedoms of speech, association and movement; provision for periodic, universal-suffrage elections through an independent Electoral Commission; an independent judiciary empowered to review and strike down unconstitutional acts; and recognition of a multi-party system allowing competition for power. Each point is developed to show the democratic principle it serves, with examples such as peaceful changes of government through elections.",
+          "markingScheme": {
+            "points": [
+              {
+                "point": "Identifies four relevant constitutional provisions or institutions",
+                "marks": 8
+              },
+              {
+                "point": "Explains accurately how each provision promotes democracy",
+                "marks": 8
+              },
+              {
+                "point": "Illustrates points with relevant Ghanaian examples or practice",
+                "marks": 4
+              }
+            ]
+          },
+          "modelAnswer": "A strong answer explains four of: separation of powers among the Executive, Legislature and Judiciary so no arm dominates; the Bill of Rights (fundamental human rights in Chapter 5) protecting freedoms of speech, association and movement; provision for periodic, universal-suffrage elections through an independent Electoral Commission; an independent judiciary empowered to review and strike down unconstitutional acts; and recognition of a multi-party system allowing competition for power. Each point is developed to show the democratic principle it serves, with examples such as peaceful changes of government through elections.",
+          "requiredPoints": [
+            "Four distinct constitutional provisions identified",
+            "Each linked clearly to a democratic principle",
+            "Ghanaian examples or practice cited"
+          ],
+          "optionalPoints": [
+            "Mention of checks and balances between arms of government",
+            "Reference to the independence of the Electoral Commission or judiciary"
+          ],
+          "wordLimit": {
+            "min": 200,
+            "max": 500
+          },
+          "parts": null
+        },
+        {
+          "id": "q_soc_2024_2_002",
+          "original": true,
+          "topicCode": "SOC-CIV",
+          "type": "essay",
+          "prompt": "Discuss four causes of electoral violence in Ghana and suggest two measures that can be taken to prevent it.",
+          "marks": 20,
+          "section": "A",
+          "questionNumber": 2,
+          "isCompulsory": false,
+          "commandWord": "Discuss",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Social Studies Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "Credible causes include: winner-takes-all politics, which raises the stakes of every election; mistrust of the Electoral Commission or security agencies by losing parties; the activities of party militias and vigilante groups; ethnic or religious campaigning that inflames divisions; and youth unemployment, which makes young people available for paid violence. Preventive measures: continuous voter and peace education by the NCCE, civil society and religious bodies, and firm, impartial enforcement of the law against vigilante groups together with dialogue platforms such as the National Peace Council bringing parties to sign peace pacts. Each cause must be tied to the mechanism by which it produces violence.",
+          "markingScheme": {
+            "points": [
+              {
+                "point": "Identifies four plausible causes of electoral violence",
+                "marks": 8
+              },
+              {
+                "point": "Explains how each cause produces violence",
+                "marks": 8
+              },
+              {
+                "point": "Suggests two workable preventive measures",
+                "marks": 4
+              }
+            ]
+          },
+          "modelAnswer": "Credible causes include: winner-takes-all politics, which raises the stakes of every election; mistrust of the Electoral Commission or security agencies by losing parties; the activities of party militias and vigilante groups; ethnic or religious campaigning that inflames divisions; and youth unemployment, which makes young people available for paid violence. Preventive measures: continuous voter and peace education by the NCCE, civil society and religious bodies, and firm, impartial enforcement of the law against vigilante groups together with dialogue platforms such as the National Peace Council bringing parties to sign peace pacts. Each cause must be tied to the mechanism by which it produces violence.",
+          "requiredPoints": [
+            "Four distinct causes explained with their mechanisms",
+            "Two concrete preventive measures",
+            "Balanced, non-partisan treatment"
+          ],
+          "optionalPoints": [
+            "Reference to peace pacts or the National Peace Council",
+            "Mention of the Vigilantism and Related Offences law"
+          ],
+          "wordLimit": {
+            "min": 200,
+            "max": 500
+          },
+          "parts": null
+        },
+        {
+          "id": "q_soc_2024_2_003",
+          "original": true,
+          "topicCode": "SOC-MED",
+          "type": "essay",
+          "prompt": "Explain four roles of the media in the national development of Ghana.",
+          "marks": 20,
+          "section": "A",
+          "questionNumber": 3,
+          "isCompulsory": false,
+          "commandWord": "Explain",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Social Studies Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "Four creditable roles: education and information dissemination — radio and television carry health campaigns, agricultural extension advice and civic education in local languages; watchdog over those in power — investigative reporting exposes corruption and prompts accountability; a platform for public discussion — phone-in programmes let citizens influence policy between elections; and promotion of culture and national unity — broadcasting festivals, languages and national events. The media also support economic activity through advertising and market information. Each role is developed with a Ghanaian example such as community radio or televised national events.",
+          "markingScheme": {
+            "points": [
+              {
+                "point": "Identifies four distinct developmental roles of the media",
+                "marks": 8
+              },
+              {
+                "point": "Explains how each role contributes to national development",
+                "marks": 8
+              },
+              {
+                "point": "Uses relevant examples of Ghanaian media practice",
+                "marks": 4
+              }
+            ]
+          },
+          "modelAnswer": "Four creditable roles: education and information dissemination — radio and television carry health campaigns, agricultural extension advice and civic education in local languages; watchdog over those in power — investigative reporting exposes corruption and prompts accountability; a platform for public discussion — phone-in programmes let citizens influence policy between elections; and promotion of culture and national unity — broadcasting festivals, languages and national events. The media also support economic activity through advertising and market information. Each role is developed with a Ghanaian example such as community radio or televised national events.",
+          "requiredPoints": [
+            "Four distinct roles identified",
+            "Developmental impact of each role explained",
+            "Ghanaian examples included"
+          ],
+          "optionalPoints": [
+            "Acknowledgement of limits such as sensationalism or misinformation",
+            "Mention of local-language broadcasting"
+          ],
+          "wordLimit": {
+            "min": 200,
+            "max": 500
+          },
+          "parts": null
+        },
+        {
+          "id": "q_soc_2024_2_004",
+          "original": true,
+          "topicCode": "SOC-MIG",
+          "type": "essay",
+          "prompt": "Discuss four negative effects of rural-urban migration on the rural communities the migrants leave behind.",
+          "marks": 20,
+          "section": "B",
+          "questionNumber": 4,
+          "isCompulsory": false,
+          "commandWord": "Discuss",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Social Studies Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "A strong answer keeps the focus on the sending community: loss of energetic young labour, which lowers farm output and leaves agriculture to the aged; depopulation, which makes schools and clinics lose enrolment and staff and can lead to their closure; breakdown of extended-family care, leaving children and the elderly without support; and slower local development as the most educated and enterprising residents leave. Some answers add that traditional festivals and communal labour decline. Each effect is explained through its mechanism rather than merely listed, with examples drawn from farming and community life.",
+          "markingScheme": {
+            "points": [
+              {
+                "point": "Identifies four negative effects on the sending rural community",
+                "marks": 8
+              },
+              {
+                "point": "Explains the mechanism by which each effect harms the community",
+                "marks": 8
+              },
+              {
+                "point": "Grounds the discussion in Ghanaian rural realities",
+                "marks": 4
+              }
+            ]
+          },
+          "modelAnswer": "A strong answer keeps the focus on the sending community: loss of energetic young labour, which lowers farm output and leaves agriculture to the aged; depopulation, which makes schools and clinics lose enrolment and staff and can lead to their closure; breakdown of extended-family care, leaving children and the elderly without support; and slower local development as the most educated and enterprising residents leave. Some answers add that traditional festivals and communal labour decline. Each effect is explained through its mechanism rather than merely listed, with examples drawn from farming and community life.",
+          "requiredPoints": [
+            "Four effects specific to the rural sending community",
+            "Mechanisms explained, not just listed",
+            "Ghanaian rural context evident"
+          ],
+          "optionalPoints": [
+            "Distinction from effects on the receiving urban area",
+            "Acknowledgement of possible benefits such as remittances, handled briefly"
+          ],
+          "wordLimit": {
+            "min": 200,
+            "max": 500
+          },
+          "parts": null
+        },
+        {
+          "id": "q_soc_2024_2_005",
+          "original": true,
+          "topicCode": "SOC-CUL",
+          "type": "essay",
+          "prompt": "Explain four ways by which Ghanaian cultural values can be preserved in the face of globalization.",
+          "marks": 20,
+          "section": "B",
+          "questionNumber": 5,
+          "isCompulsory": false,
+          "commandWord": "Explain",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Social Studies Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "Creditable strategies: teaching Ghanaian languages, history and cultural studies in schools so children internalize them early; deliberate family transmission — parents speaking mother tongues at home and involving children in festivals, naming ceremonies and storytelling; documentation and promotion through museums, cultural centres and media; and state support for festivals, traditional authorities and creative arts that keep crafts, music and dance economically viable. Each way should name the value it protects — respect for elders, communal solidarity, hospitality — and acknowledge the globalizing pressure it answers, such as foreign media content or urban lifestyles.",
+          "markingScheme": {
+            "points": [
+              {
+                "point": "Identifies four practical preservation strategies",
+                "marks": 8
+              },
+              {
+                "point": "Explains how each strategy protects a cultural value",
+                "marks": 8
+              },
+              {
+                "point": "Shows awareness of the pressures globalization creates",
+                "marks": 4
+              }
+            ]
+          },
+          "modelAnswer": "Creditable strategies: teaching Ghanaian languages, history and cultural studies in schools so children internalize them early; deliberate family transmission — parents speaking mother tongues at home and involving children in festivals, naming ceremonies and storytelling; documentation and promotion through museums, cultural centres and media; and state support for festivals, traditional authorities and creative arts that keep crafts, music and dance economically viable. Each way should name the value it protects — respect for elders, communal solidarity, hospitality — and acknowledge the globalizing pressure it answers, such as foreign media content or urban lifestyles.",
+          "requiredPoints": [
+            "Four distinct preservation strategies",
+            "Each tied to a specific cultural value",
+            "Globalization pressure acknowledged"
+          ],
+          "optionalPoints": [
+            "Role of schools, family, state and media distinguished",
+            "Mention of documentation or digital archiving"
+          ],
+          "wordLimit": {
+            "min": 200,
+            "max": 500
+          },
+          "parts": null
+        },
+        {
+          "id": "q_soc_2024_2_006",
+          "original": true,
+          "topicCode": "SOC-EDU",
+          "type": "essay",
+          "prompt": "Discuss four causes of teenage pregnancy in Ghana and explain two effects it has on the girl's education.",
+          "marks": 20,
+          "section": "B",
+          "questionNumber": 6,
+          "isCompulsory": false,
+          "commandWord": "Discuss",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Social Studies Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "Creditable causes: poverty, which pushes girls into transactional relationships for basic needs; inadequate sexuality education at home and school; peer pressure and exposure to explicit media; and broken homes or weak parental supervision. Educational effects: many girls drop out or are withdrawn, cutting short their schooling and qualifications; even where re-entry is possible, pregnancy and childcare interrupt learning, lower performance and narrow future career options. The best answers treat the subject sensitively, avoid blame, and show how the causes interact with economic circumstances.",
+          "markingScheme": {
+            "points": [
+              {
+                "point": "Identifies four plausible causes",
+                "marks": 8
+              },
+              {
+                "point": "Explains how each cause operates",
+                "marks": 8
+              },
+              {
+                "point": "Explains two educational effects on the girl",
+                "marks": 4
+              }
+            ]
+          },
+          "modelAnswer": "Creditable causes: poverty, which pushes girls into transactional relationships for basic needs; inadequate sexuality education at home and school; peer pressure and exposure to explicit media; and broken homes or weak parental supervision. Educational effects: many girls drop out or are withdrawn, cutting short their schooling and qualifications; even where re-entry is possible, pregnancy and childcare interrupt learning, lower performance and narrow future career options. The best answers treat the subject sensitively, avoid blame, and show how the causes interact with economic circumstances.",
+          "requiredPoints": [
+            "Four distinct causes with explanations",
+            "Two clear educational effects",
+            "Sensitive, non-judgemental tone"
+          ],
+          "optionalPoints": [
+            "Mention of school re-entry policies",
+            "Link between poverty and transactional relationships"
+          ],
+          "wordLimit": {
+            "min": 200,
+            "max": 500
+          },
+          "parts": null
+        },
+        {
+          "id": "q_soc_2024_2_007",
+          "original": true,
+          "topicCode": "SOC-ECO",
+          "type": "essay",
+          "prompt": "Explain four contributions of agriculture to the economic development of Ghana.",
+          "marks": 20,
+          "section": "C",
+          "questionNumber": 7,
+          "isCompulsory": false,
+          "commandWord": "Explain",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Social Studies Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "Four creditable contributions: employment — agriculture engages a large share of the labour force in farming, processing and trading; food supply — it feeds the population and keeps urban food prices stable; foreign exchange — cocoa, cashew and other exports earn foreign currency; and raw materials — agro-processing industries depend on farm produce, while farm incomes create demand for manufactured goods. Government also earns revenue through taxes and export levies on the sector. Each contribution is traced through its economic channel with examples such as cocoa exports or the link between farming and agro-processing factories.",
+          "markingScheme": {
+            "points": [
+              {
+                "point": "Identifies four distinct economic contributions of agriculture",
+                "marks": 8
+              },
+              {
+                "point": "Explains the channel through which each contribution works",
+                "marks": 8
+              },
+              {
+                "point": "Supports points with Ghanaian examples such as cocoa",
+                "marks": 4
+              }
+            ]
+          },
+          "modelAnswer": "Four creditable contributions: employment — agriculture engages a large share of the labour force in farming, processing and trading; food supply — it feeds the population and keeps urban food prices stable; foreign exchange — cocoa, cashew and other exports earn foreign currency; and raw materials — agro-processing industries depend on farm produce, while farm incomes create demand for manufactured goods. Government also earns revenue through taxes and export levies on the sector. Each contribution is traced through its economic channel with examples such as cocoa exports or the link between farming and agro-processing factories.",
+          "requiredPoints": [
+            "Four distinct contributions identified",
+            "Economic channel of each explained",
+            "Ghanaian examples such as cocoa cited"
+          ],
+          "optionalPoints": [
+            "Mention of linkage to agro-processing industry",
+            "Reference to export earnings or government revenue"
+          ],
+          "wordLimit": {
+            "min": 200,
+            "max": 500
+          },
+          "parts": null
+        },
+        {
+          "id": "q_soc_2024_2_008",
+          "original": true,
+          "topicCode": "SOC-ENV",
+          "type": "essay",
+          "prompt": "Discuss four effects of illegal mining (galamsey) on the environment in Ghana and suggest two measures to control the practice.",
+          "marks": 20,
+          "section": "C",
+          "questionNumber": 8,
+          "isCompulsory": false,
+          "commandWord": "Discuss",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Social Studies Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "Environmental effects: pollution and siltation of rivers such as the Pra and Ankobra, making water unusable and costly to treat; destruction of forest cover and cocoa farms as land is excavated; mercury and chemical contamination of soil and water, poisoning fish and entering food chains; and abandoned pits that breed mosquitoes and cause deadly accidents. Control measures: strict, impartial enforcement of mining laws with prosecution of financiers, not only labourers; provision of regulated small-scale mining zones with training in safer methods; and sustained public education plus reclamation of mined-out land with tree planting. Each effect is tied to its environmental mechanism.",
+          "markingScheme": {
+            "points": [
+              {
+                "point": "Identifies four environmental effects of illegal mining",
+                "marks": 8
+              },
+              {
+                "point": "Explains how each effect damages the environment",
+                "marks": 8
+              },
+              {
+                "point": "Suggests two workable control measures",
+                "marks": 4
+              }
+            ]
+          },
+          "modelAnswer": "Environmental effects: pollution and siltation of rivers such as the Pra and Ankobra, making water unusable and costly to treat; destruction of forest cover and cocoa farms as land is excavated; mercury and chemical contamination of soil and water, poisoning fish and entering food chains; and abandoned pits that breed mosquitoes and cause deadly accidents. Control measures: strict, impartial enforcement of mining laws with prosecution of financiers, not only labourers; provision of regulated small-scale mining zones with training in safer methods; and sustained public education plus reclamation of mined-out land with tree planting. Each effect is tied to its environmental mechanism.",
+          "requiredPoints": [
+            "Four distinct environmental effects explained",
+            "Two control measures suggested",
+            "Ghanaian rivers or mining areas referenced"
+          ],
+          "optionalPoints": [
+            "Mention of mercury contamination of food chains",
+            "Land reclamation as a remedial measure"
+          ],
+          "wordLimit": {
+            "min": 200,
+            "max": 500
+          },
+          "parts": null
+        },
+        {
+          "id": "q_soc_2024_2_009",
+          "original": true,
+          "topicCode": "SOC-EMP",
+          "type": "essay",
+          "prompt": "Explain four measures the government of Ghana can take to reduce unemployment among the youth.",
+          "marks": 20,
+          "section": "C",
+          "questionNumber": 9,
+          "isCompulsory": false,
+          "commandWord": "Explain",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Social Studies Paper 2 theory practice; not official WAEC examination material. Use the enabled feedback channel to report corrections.",
+          "workedSolution": "Creditable measures: expanding technical and vocational education so young people gain employable, practical skills; supporting entrepreneurship through start-up credit, training and business incubation; promoting agriculture as a business with inputs, credit and ready markets to draw youth into agribusiness; and attracting investment into industry and services through tax incentives and infrastructure, creating formal jobs. Public employment programmes and digitization of the economy are also creditable. Each measure is explained in terms of how it creates or sustains employment for young people rather than merely named.",
+          "markingScheme": {
+            "points": [
+              {
+                "point": "Identifies four plausible government measures",
+                "marks": 8
+              },
+              {
+                "point": "Explains how each measure creates or sustains jobs",
+                "marks": 8
+              },
+              {
+                "point": "Relates measures to the situation of Ghanaian youth",
+                "marks": 4
+              }
+            ]
+          },
+          "modelAnswer": "Creditable measures: expanding technical and vocational education so young people gain employable, practical skills; supporting entrepreneurship through start-up credit, training and business incubation; promoting agriculture as a business with inputs, credit and ready markets to draw youth into agribusiness; and attracting investment into industry and services through tax incentives and infrastructure, creating formal jobs. Public employment programmes and digitization of the economy are also creditable. Each measure is explained in terms of how it creates or sustains employment for young people rather than merely named.",
+          "requiredPoints": [
+            "Four distinct government measures",
+            "Job-creation mechanism of each explained",
+            "Youth focus maintained throughout"
+          ],
+          "optionalPoints": [
+            "Reference to TVET expansion or entrepreneurship support",
+            "Agribusiness promotion as youth employment"
+          ],
+          "wordLimit": {
+            "min": 200,
+            "max": 500
+          },
+          "parts": null
+        }
+      ]
+    }
+  ]
+}

@@ -48,6 +48,37 @@ const MIGRATIONS: MigrationSpec[] = [
       { id: 'q_math_2024_2_010', type: 'structured', marks: 15 },
     ],
   },
+  {
+    number: 365,
+    slug: 'science',
+    paperId: 'pp_wassce_sci_2024_2',
+    questions: [
+      { id: 'q_sci_2024_2_001', type: 'structured', marks: 12 },
+      { id: 'q_sci_2024_2_002', type: 'structured', marks: 12 },
+      { id: 'q_sci_2024_2_003', type: 'structured', marks: 12 },
+      { id: 'q_sci_2024_2_004', type: 'structured', marks: 12 },
+      { id: 'q_sci_2024_2_005', type: 'structured', marks: 12 },
+      { id: 'q_sci_2024_2_006', type: 'structured', marks: 12 },
+      { id: 'q_sci_2024_2_007', type: 'essay', marks: 14 },
+      { id: 'q_sci_2024_2_008', type: 'essay', marks: 14 },
+    ],
+  },
+  {
+    number: 366,
+    slug: 'social',
+    paperId: 'pp_wassce_soc_2024_2',
+    questions: [
+      { id: 'q_soc_2024_2_001', type: 'essay', marks: 20 },
+      { id: 'q_soc_2024_2_002', type: 'essay', marks: 20 },
+      { id: 'q_soc_2024_2_003', type: 'essay', marks: 20 },
+      { id: 'q_soc_2024_2_004', type: 'essay', marks: 20 },
+      { id: 'q_soc_2024_2_005', type: 'essay', marks: 20 },
+      { id: 'q_soc_2024_2_006', type: 'essay', marks: 20 },
+      { id: 'q_soc_2024_2_007', type: 'essay', marks: 20 },
+      { id: 'q_soc_2024_2_008', type: 'essay', marks: 20 },
+      { id: 'q_soc_2024_2_009', type: 'essay', marks: 20 },
+    ],
+  },
 ];
 
 const migrationSql = (spec: MigrationSpec) => readFileSync(
