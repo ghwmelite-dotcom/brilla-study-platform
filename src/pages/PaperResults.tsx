@@ -16,6 +16,15 @@ import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/lib/api';
 import { cn } from '@/utils';
 
+interface TheoryFeedback {
+  score: number;
+  maxScore: number;
+  perPoint: Array<{ point: string; awarded: number; maxMarks: number; comment: string }>;
+  feedback: string;
+  strengths: string[];
+  improvements: string[];
+}
+
 interface AnswerResult {
   id: string;
   question_text: string;
@@ -26,6 +35,9 @@ interface AnswerResult {
   marks: number;
   marks_earned: number;
   explanation?: string;
+  marking_status?: 'pending' | 'graded' | 'marking_failed' | null;
+  ai_score?: number | null;
+  ai_feedback?: string | null;
 }
 
 interface AttemptResult {
@@ -41,6 +53,7 @@ interface AttemptResult {
   status: string;
   started_at: string;
   submitted_at: string;
+  grade?: string | null;
 }
 
 export default function PaperResults() {
@@ -52,6 +65,7 @@ export default function PaperResults() {
   const [answers, setAnswers] = useState<AnswerResult[]>([]);
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
+  const [isRemarking, setIsRemarking] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -176,6 +190,11 @@ export default function PaperResults() {
               <p className={cn('text-4xl font-bold', getGradeColor(attempt.percentage_score))}>
                 {attempt.percentage_score}%
               </p>
+              {attempt.grade && (
+                <p className={cn('text-lg font-semibold mt-1', getGradeColor(attempt.percentage_score))}>
+                  Grade {attempt.grade}
+                </p>
+              )}
               <p className="text-sm text-neutral-600">Score</p>
             </div>
           </div>
@@ -233,6 +252,39 @@ export default function PaperResults() {
             </div>
           </div>
         </div>
+
+        {/* Partially graded banner + retry */}
+        {attempt.status === 'partially_graded' && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600" />
+              <p className="text-sm text-amber-800">
+                Some answers are still awaiting AI marking. Retry marking to complete your result.
+              </p>
+            </div>
+            <button
+              onClick={async () => {
+                setIsRemarking(true);
+                try {
+                  await api.post(`/papers/attempts/${attemptId}/remark`, {});
+                  const response = await api.get<{ attempt: AttemptResult; answers: AnswerResult[] }>(
+                    `/papers/attempts/${attemptId}/results?userId=${user?.id}`,
+                  );
+                  if (response.success && response.data) {
+                    setAttempt(response.data.attempt);
+                    setAnswers(response.data.answers || []);
+                  }
+                } finally {
+                  setIsRemarking(false);
+                }
+              }}
+              disabled={isRemarking}
+              className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-50 text-sm font-medium"
+            >
+              {isRemarking ? 'Marking…' : 'Retry marking'}
+            </button>
+          </div>
+        )}
 
         {/* Question Review */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -318,6 +370,43 @@ export default function PaperResults() {
                           {answer.explanation}
                         </p>
                       </div>
+                    )}
+
+                    {answer.marking_status === 'graded' && answer.ai_feedback && (() => {
+                      try {
+                        const feedback = JSON.parse(answer.ai_feedback) as TheoryFeedback;
+                        return (
+                          <div className="space-y-2">
+                            <p className="text-xs font-medium text-neutral-500">
+                              AI marking ({feedback.score}/{feedback.maxScore}) — advisory, not an official WAEC result
+                            </p>
+                            <p className="text-sm p-2 rounded bg-indigo-50 text-indigo-900">{feedback.feedback}</p>
+                            {feedback.perPoint.map((p, i) => (
+                              <div key={i} className="flex items-start justify-between text-sm p-2 rounded bg-neutral-50">
+                                <span className="text-neutral-700">{p.point} — {p.comment}</span>
+                                <span className="text-neutral-500 flex-shrink-0 ml-3">{p.awarded}/{p.maxMarks}</span>
+                              </div>
+                            ))}
+                            {feedback.improvements.length > 0 && (
+                              <p className="text-sm text-neutral-600">
+                                To improve: {feedback.improvements.join('; ')}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      } catch {
+                        return null;
+                      }
+                    })()}
+                    {answer.marking_status === 'pending' && (
+                      <p className="text-sm p-2 rounded bg-neutral-100 text-neutral-500 italic">
+                        Awaiting AI marking — retry marking below to complete this answer.
+                      </p>
+                    )}
+                    {answer.marking_status === 'marking_failed' && (
+                      <p className="text-sm p-2 rounded bg-red-50 text-red-700">
+                        Marking failed for this answer. Retry marking — retries of failed markings are free.
+                      </p>
                     )}
                   </div>
                 )}
