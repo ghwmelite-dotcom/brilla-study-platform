@@ -2,8 +2,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import * as fabric from 'fabric';
 import { Eraser, Trash2, Undo2 } from 'lucide-react';
 
-// Local cn — the '@/utils' barrel re-exports pdfExtractor (react-pdf), which
-// crashes under jsdom; this component must stay import-clean for tests.
+// Local cn so this component stays import-clean for jsdom tests. (The '@/utils'
+// barrel used to re-export pdfExtractor/react-pdf, which crashed under jsdom;
+// that re-export has since been removed, but the local helper is kept to avoid
+// the dependency.)
 function cn(...classes: (string | boolean | undefined | null)[]): string {
   return classes.filter(Boolean).join(' ');
 }

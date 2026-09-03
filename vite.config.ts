@@ -26,6 +26,8 @@ export default defineConfig({
           'vendor-pdf': ['react-pdf', 'pdfjs-dist'],
           // KaTeX for math rendering
           'vendor-math': ['katex'],
+          // Framer Motion for splash/animations (splash shows at startup)
+          'vendor-motion': ['framer-motion'],
         },
       },
     },

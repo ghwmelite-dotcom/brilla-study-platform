@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 
-// The '@/utils' barrel re-exports pdfExtractor, which pulls in pdfjs-dist and
-// crashes under the node test environment (DOMMatrix undefined). The fallback
-// helper under test does not use the barrel, so stub it out.
+// Stub the '@/utils' barrel so the helper under test stays isolated from it.
+// (The barrel no longer re-exports pdfExtractor — that eager pdfjs-dist chain
+// was removed — so the stub is now just lightweight isolation.)
 vi.mock('@/utils', () => ({
   hasLatex: () => false,
   extractLatex: () => [],

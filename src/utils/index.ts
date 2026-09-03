@@ -1,6 +1,9 @@
 export * from './scoring';
 export * from './formatters';
-export * from './pdfExtractor';
+// pdfExtractor is intentionally NOT re-exported here: it imports
+// react-pdf/pdfjs-dist with top-level side effects, which would force the
+// vendor-pdf chunk into the eager entry graph. Import it via dynamic import
+// (see stores/aiTutorStore.ts) instead.
 
 /**
  * Classnames utility for conditional classes

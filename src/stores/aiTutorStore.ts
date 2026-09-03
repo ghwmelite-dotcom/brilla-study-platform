@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { getApiUrl, getAuthHeaders, fetchWithAuth } from '@/lib/api';
-import { extractTextFromPDF, isPDFFile } from '../utils/pdfExtractor';
 
 export interface FileAttachment {
   id: string;
@@ -445,6 +444,8 @@ export const useAiTutorStore = create<AiTutorState>()(
             let pdfContent: string | undefined;
 
             if (files && files.length > 0) {
+              // Lazy-load the PDF extractor so react-pdf/pdfjs-dist stay out of the entry chunk
+              const { extractTextFromPDF, isPDFFile } = await import('../utils/pdfExtractor');
               for (const file of files) {
                 // Handle PDF files - extract text content or render for OCR
                 if (isPDFFile(file)) {
