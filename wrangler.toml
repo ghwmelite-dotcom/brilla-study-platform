@@ -22,6 +22,9 @@ TELEGRAM_COMMUNITY_URL = "https://t.me/brillaprepchannel"
 TELEGRAM_PLATFORM_CHANNEL_ID = "@brillaprepchannel"
 
 # IMPORTANT: Set these secrets using wrangler:
+#   Production: wrangler secret put <NAME>
+#   Staging:    wrangler secret put <NAME> --env staging
+#   (secrets are per-environment; staging does NOT inherit production secrets)
 # wrangler secret put JWT_SECRET               (generate a secure random string)
 # wrangler secret put SETUP_KEY                (one-shot /auth/setup key; endpoint is disabled until set)
 # wrangler secret put RESEND_API_KEY           (your Resend API key for emails)
@@ -34,6 +37,8 @@ TELEGRAM_PLATFORM_CHANNEL_ID = "@brillaprepchannel"
 #                                              REQUIRED: /payments/webhook returns 500 and processes nothing without it
 # wrangler secret put TURNSTILE_SECRET         (from Cloudflare Turnstile)
 # wrangler secret put ANTHROPIC_API_KEY        (from Anthropic console, optional AI fallback)
+# wrangler secret put TELEGRAM_BOT_TOKEN       (from @BotFather; read by workers/api/index.ts)
+# wrangler secret put TELEGRAM_WEBHOOK_SECRET  (shared secret for the Telegram webhook endpoint)
 
 [observability]
 enabled = true
@@ -73,6 +78,12 @@ local_protocol = "http"
 crons = ["0 */6 * * *"]
 
 # Local development environment (wrangler dev --env dev)
+#
+# IMPORTANT: env.dev must NEVER bind production resources (the top-level
+# D1/R2/Vectorize bindings above). Remote bindings below deliberately mirror
+# the isolated staging pool (brilla-db-staging, *-staging R2 buckets,
+# brilla-answers-staging) so a stray `wrangler dev --remote --env dev` or
+# `wrangler deploy --env dev` can only touch staging data, never prod.
 [env.dev.vars]
 ENVIRONMENT = "development"
 AI_PROVIDER = "workers-ai"
@@ -91,23 +102,25 @@ NOTIFICATION_EMAILS = "brillaprepgh@gmail.com"
 [env.dev.ai]
 binding = "AI"
 
+# Staging-isolated bindings — see the env.dev warning above. These IDs and
+# bucket names intentionally match [env.staging], NOT the production top level.
 [[env.dev.d1_databases]]
 binding = "DB"
-database_name = "brilla-db"
-database_id = "aa806d65-d3dd-4cf9-9cac-e3ddd252f937"
+database_name = "brilla-db-staging"
+database_id = "1faeca41-2233-4a0b-a273-0d3aadba9c96"
 migrations_dir = "database/migrations"
 
 [[env.dev.r2_buckets]]
 binding = "LIBRARY_BUCKET"
-bucket_name = "brilla-library"
+bucket_name = "brilla-library-staging"
 
 [[env.dev.r2_buckets]]
 binding = "RECORDINGS_BUCKET"
-bucket_name = "brilla-recordings"
+bucket_name = "brilla-recordings-staging"
 
 [[env.dev.vectorize]]
 binding = "ANSWERS_INDEX"
-index_name = "brilla-answers"
+index_name = "brilla-answers-staging"
 
 # Isolated remote staging environment. Never point these bindings at
 # production resources.
