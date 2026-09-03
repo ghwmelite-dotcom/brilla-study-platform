@@ -5334,6 +5334,159 @@ Mark the student answer using only the supplied data.`;
   return normalizeTheoryMarking(parsed, question.marks);
 }
 
+const MARKING_CONCURRENCY = 4;
+
+type MarkingOutcome =
+  | { answerId: string; kind: 'graded'; marking: TheoryMarking }
+  | { answerId: string; kind: 'marking_failed' };
+
+function parseJsonColumn(v: unknown): unknown {
+  if (typeof v !== 'string' || v.length === 0) return null;
+  try { return JSON.parse(v); } catch { return null; }
+}
+
+/** Structured parts for the given answer rows, one grouped query. */
+async function loadStructuredParts(
+  db: D1Database,
+  attemptId: string,
+): Promise<Map<string, StructuredPartInput[]>> {
+  const byQuestion = new Map<string, StructuredPartInput[]>();
+  const { results: parts } = await db.prepare(`
+    SELECT sqp.question_id, sqp.part_label, sqp.part_text, sqp.marks, sqp.correct_answer
+    FROM structured_question_parts sqp
+    JOIN paper_attempt_answers paa ON paa.question_id = sqp.question_id
+    WHERE paa.paper_attempt_id = ?
+    ORDER BY sqp.display_order
+  `).bind(attemptId).all<StructuredPartInput & { question_id: string }>();
+  for (const p of parts) {
+    const list = byQuestion.get(p.question_id) ?? [];
+    list.push({
+      part_label: p.part_label, part_text: p.part_text,
+      marks: p.marks, correct_answer: p.correct_answer,
+    });
+    byQuestion.set(p.question_id, list);
+  }
+  return byQuestion;
+}
+
+/**
+ * Mark theory answer rows in bounded parallel (4 at a time, per-call
+ * timeout). Each outcome maps to a paper_attempt_answers update; failures
+ * are 'marking_failed', never a fabricated score.
+ */
+async function markTheoryAnswers(
+  env: Env,
+  db: D1Database,
+  answers: Record<string, unknown>[],
+  attemptId: string,
+): Promise<{ outcomes: MarkingOutcome[]; statements: D1PreparedStatement[] }> {
+  if (answers.length === 0) return { outcomes: [], statements: [] };
+  // Only pay the parts query when a structured question is present.
+  const partsByQuestion = answers.some((a) => String(a.question_type) === 'structured')
+    ? await loadStructuredParts(db, attemptId)
+    : new Map<string, StructuredPartInput[]>();
+
+  const markOne = async (a: Record<string, unknown>): Promise<MarkingOutcome> => {
+    try {
+      const marking = await withTimeout(
+        gradeTheoryAnswer(env, {
+          questionType: String(a.question_type),
+          questionText: String(a.question_text ?? ''),
+          marks: Number(a.marks) || 0,
+          subjectName: (a.subject_name as string) ?? null,
+          correctAnswer: (a.correct_answer as string) ?? null,
+          markingScheme: parseJsonColumn(a.marking_scheme),
+          markingRubric: (a.marking_rubric as string) ?? null,
+          modelAnswer: (a.model_answer as string) ?? null,
+          requiredPoints: parseJsonColumn(a.required_points),
+          optionalPoints: parseJsonColumn(a.optional_points),
+          structuredParts: partsByQuestion.get(String(a.question_id)) ?? [],
+        }, String(a.user_answer)),
+        THEORY_MARKING_TIMEOUT_MS,
+        `marking answer ${a.id}`,
+      );
+      return { answerId: String(a.id), kind: 'graded', marking };
+    } catch (error) {
+      console.error(`Theory marking failed for answer ${a.id}:`, error);
+      return { answerId: String(a.id), kind: 'marking_failed' };
+    }
+  };
+
+  const outcomes: MarkingOutcome[] = [];
+  for (let i = 0; i < answers.length; i += MARKING_CONCURRENCY) {
+    const settled = await Promise.allSettled(
+      answers.slice(i, i + MARKING_CONCURRENCY).map(markOne),
+    );
+    for (const s of settled) {
+      if (s.status === 'fulfilled') outcomes.push(s.value);
+    }
+  }
+
+  const statements: D1PreparedStatement[] = outcomes.map((outcome) =>
+    outcome.kind === 'graded'
+      ? db.prepare(`
+          UPDATE paper_attempt_answers
+          SET marking_status = 'graded', ai_score = ?, ai_feedback = ?, marks_earned = ?
+          WHERE id = ? AND paper_attempt_id = ?
+        `).bind(
+          outcome.marking.score, JSON.stringify(outcome.marking), outcome.marking.score,
+          outcome.answerId, attemptId,
+        )
+      : db.prepare(`
+          UPDATE paper_attempt_answers SET marking_status = 'marking_failed'
+          WHERE id = ? AND paper_attempt_id = ?
+        `).bind(outcome.answerId, attemptId),
+  );
+
+  return { outcomes, statements };
+}
+
+/**
+ * Recompute an attempt's totals and status from its current answer rows.
+ * Totals = objective marks_earned + theory ai_score for 'graded' answers.
+ * (Task 9 extends this helper to also compute and write paper_attempts.grade.)
+ */
+async function finalizeAttemptMarking(
+  db: D1Database,
+  attemptId: string,
+  userId: string,
+): Promise<{ status: 'graded' | 'partially_graded'; pending: number; failed: number; totalScore: number }> {
+  const { results: rows } = await db.prepare(`
+    SELECT paa.marks_earned, paa.ai_score, paa.marking_status, q.question_type
+    FROM paper_attempt_answers paa
+    JOIN questions q ON q.id = paa.question_id
+    WHERE paa.paper_attempt_id = ?
+  `).bind(attemptId).all<Record<string, unknown>>();
+
+  let totalScore = 0;
+  let pending = 0;
+  let failed = 0;
+  for (const row of rows) {
+    const status = row.marking_status as string | null;
+    if (status === 'pending') pending += 1;
+    else if (status === 'marking_failed') failed += 1;
+    else if (status === 'graded') totalScore += Number(row.ai_score) || 0;
+    else totalScore += Number(row.marks_earned) || 0; // objective / unmarked
+  }
+
+  const attempt = await db.prepare(`
+    SELECT pp.total_marks FROM paper_attempts pa
+    JOIN past_papers pp ON pa.paper_id = pp.id
+    WHERE pa.id = ?
+  `).bind(attemptId).first<{ total_marks: number | null }>();
+  const totalMarks = Number(attempt?.total_marks) || 0;
+  const percentage = totalMarks > 0 ? Math.round((totalScore / totalMarks) * 100) : 0;
+  const status = pending === 0 && failed === 0 ? 'graded' : 'partially_graded';
+
+  await db.prepare(`
+    UPDATE paper_attempts
+    SET status = ?, total_score = ?, max_score = ?, percentage = ?
+    WHERE id = ? AND user_id = ?
+  `).bind(status, totalScore, totalMarks, percentage, attemptId, userId).run();
+
+  return { status, pending, failed, totalScore };
+}
+
 // Submit paper attempt
 protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
   const attemptId = c.req.param('attemptId');
@@ -5397,7 +5550,6 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
     }
 
     const THEORY_TYPES = new Set(['essay', 'structured', 'short_answer', 'calculation', 'direct_answer', 'comprehension']);
-    const MARKING_CONCURRENCY = 4;
 
     const theoryAnswers = answers.filter((a) =>
       THEORY_TYPES.has(String(a.question_type)) && String(a.user_answer ?? '').trim().length > 0);
@@ -5444,100 +5596,16 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
       `).bind(a.id, attemptId));
     }
 
-    // Structured parts for this paper's questions, one grouped query.
-    const structuredPartsByQuestion = new Map<string, StructuredPartInput[]>();
-    if (theoryAnswers.some((a) => String(a.question_type) === 'structured')) {
-      const { results: parts } = await c.env.DB.prepare(`
-        SELECT sqp.question_id, sqp.part_label, sqp.part_text, sqp.marks, sqp.correct_answer
-        FROM structured_question_parts sqp
-        JOIN paper_attempt_answers paa ON paa.question_id = sqp.question_id
-        WHERE paa.paper_attempt_id = ?
-        ORDER BY sqp.display_order
-      `).bind(attemptId).all<StructuredPartInput & { question_id: string }>();
-      for (const p of parts) {
-        const list = structuredPartsByQuestion.get(p.question_id) ?? [];
-        list.push({ part_label: p.part_label, part_text: p.part_text, marks: p.marks, correct_answer: p.correct_answer });
-        structuredPartsByQuestion.set(p.question_id, list);
-      }
-    }
-
     const paidTheory = theoryAnswers.slice(0, payable); // question order preserved
-    type MarkingOutcome =
-      | { answerId: string; kind: 'graded'; marking: TheoryMarking }
-      | { answerId: string; kind: 'marking_failed' };
 
-    const parseJsonColumn = (v: unknown): unknown => {
-      if (typeof v !== 'string' || v.length === 0) return null;
-      try { return JSON.parse(v); } catch { return null; }
-    };
-
-    const markOne = async (a: Record<string, unknown>): Promise<MarkingOutcome> => {
-      try {
-        const marking = await withTimeout(
-          gradeTheoryAnswer(c.env, {
-            questionType: String(a.question_type),
-            questionText: String(a.question_text ?? ''),
-            marks: Number(a.marks) || 0,
-            subjectName: (a.subject_name as string) ?? null,
-            correctAnswer: (a.correct_answer as string) ?? null,
-            markingScheme: parseJsonColumn(a.marking_scheme),
-            markingRubric: (a.marking_rubric as string) ?? null,
-            modelAnswer: (a.model_answer as string) ?? null,
-            requiredPoints: parseJsonColumn(a.required_points),
-            optionalPoints: parseJsonColumn(a.optional_points),
-            structuredParts: structuredPartsByQuestion.get(String(a.question_id)) ?? [],
-          }, String(a.user_answer)),
-          THEORY_MARKING_TIMEOUT_MS,
-          `marking answer ${a.id}`,
-        );
-        return { answerId: String(a.id), kind: 'graded', marking };
-      } catch (error) {
-        console.error(`Theory marking failed for answer ${a.id}:`, error);
-        return { answerId: String(a.id), kind: 'marking_failed' };
-      }
-    };
-
-    // Bounded fan-out: chunks of MARKING_CONCURRENCY, never awaited past the
-    // response budget — stragglers finish via executionCtx and their answers
-    // remain 'pending' until they land.
-    const markAllPaid = async (): Promise<MarkingOutcome[]> => {
-      const outcomes: MarkingOutcome[] = [];
-      for (let i = 0; i < paidTheory.length; i += MARKING_CONCURRENCY) {
-        const settled = await Promise.allSettled(
-          paidTheory.slice(i, i + MARKING_CONCURRENCY).map(markOne),
-        );
-        for (const s of settled) {
-          if (s.status === 'fulfilled') outcomes.push(s.value);
-        }
-      }
-      return outcomes;
-    };
-
-    const outcomes = await markAllPaid();
-    let theoryScore = 0;
-    let gradedCount = 0;
-    let failedCount = 0;
-    for (const outcome of outcomes) {
-      if (outcome.kind === 'graded') {
-        theoryScore += outcome.marking.score;
-        gradedCount += 1;
-        gradeStatements.push(c.env.DB.prepare(`
-          UPDATE paper_attempt_answers
-          SET marking_status = 'graded', ai_score = ?, ai_feedback = ?, marks_earned = ?
-          WHERE id = ? AND paper_attempt_id = ?
-        `).bind(
-          outcome.marking.score, JSON.stringify(outcome.marking), outcome.marking.score,
-          outcome.answerId, attemptId,
-        ));
-      } else {
-        failedCount += 1;
-        gradeStatements.push(c.env.DB.prepare(`
-          UPDATE paper_attempt_answers SET marking_status = 'marking_failed'
-          WHERE id = ? AND paper_attempt_id = ?
-        `).bind(outcome.answerId, attemptId));
-      }
-    }
-
+    const { outcomes, statements: markingStatements } =
+      await markTheoryAnswers(c.env, c.env.DB, paidTheory, attemptId);
+    gradeStatements.push(...markingStatements);
+    const gradedCount = outcomes.filter((o) => o.kind === 'graded').length;
+    const failedCount = outcomes.filter((o) => o.kind === 'marking_failed').length;
+    const theoryScore = outcomes.reduce(
+      (sum, o) => sum + (o.kind === 'graded' ? o.marking.score : 0), 0,
+    );
     totalScore += theoryScore;
     const pendingCount = theoryAnswers.length - gradedCount - failedCount;
     const attemptStatus =
@@ -5579,6 +5647,109 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
   } catch (error) {
     console.error('Submit paper attempt error:', error);
     return c.json({ success: false, error: 'Failed to submit paper' }, 500);
+  }
+});
+
+// Retry marking for failed/unpaid theory answers
+protectedApp.post('/papers/attempts/:attemptId/remark', async (c) => {
+  const attemptId = c.req.param('attemptId');
+  const userId = getUserId(c)!;
+
+  try {
+    const attempt = await c.env.DB.prepare(`
+      SELECT pa.*, pp.total_marks
+      FROM paper_attempts pa
+      JOIN past_papers pp ON pa.paper_id = pp.id
+      WHERE pa.id = ? AND pa.status IN ('graded', 'partially_graded')
+    `).bind(attemptId).first<Record<string, unknown>>();
+
+    if (!attempt) {
+      return c.json({ success: false, error: 'Attempt not found or not yet submitted' }, 404);
+    }
+
+    // IDOR guard: only the attempt's owner (or an admin) may trigger remarking
+    // (same pattern as the essay grader).
+    if (attempt.user_id !== userId && getUserRole(c) !== 'admin') {
+      return c.json({ success: false, error: 'Forbidden' }, 403);
+    }
+
+    const { results: retryable } = await c.env.DB.prepare(`
+      SELECT paa.*, q.question_type, q.question_text, q.marks, q.correct_answer,
+             q.topic_id, q.points, s.name AS subject_name,
+             eq.marking_scheme, eq.marking_rubric, eq.model_answer,
+             eq.required_points, eq.optional_points
+      FROM paper_attempt_answers paa
+      JOIN paper_attempts pa ON pa.id = paa.paper_attempt_id
+      JOIN questions q ON q.id = paa.question_id AND q.past_paper_id = pa.paper_id
+      JOIN subjects s ON s.id = q.subject_id
+      LEFT JOIN essay_questions eq ON eq.question_id = q.id
+      WHERE paa.paper_attempt_id = ? AND paa.marking_status IN ('marking_failed', 'pending')
+      ORDER BY q.section, q.question_number
+    `).bind(attemptId).all<Record<string, unknown>>();
+
+    // Idempotent: nothing retryable → return current state.
+    if (retryable.length === 0) {
+      return c.json({
+        success: true,
+        data: { attemptId, status: attempt.status, remarked: 0, failed: 0, remaining: 0 },
+      });
+    }
+
+    const failedAnswers = retryable.filter((a) => a.marking_status === 'marking_failed');
+    const pendingAnswers = retryable.filter((a) => a.marking_status === 'pending');
+
+    // Failed re-marks are free (paid at submit); pending need credits.
+    let paidPending: Record<string, unknown>[] = [];
+    if (pendingAnswers.length > 0) {
+      const user = await c.env.DB.prepare(`
+        SELECT u.ai_grading_credits, st.ai_grading_quota
+        FROM users u
+        LEFT JOIN subscription_tiers st ON u.subscription_tier_id = st.id
+        WHERE u.id = ?
+      `).bind(attempt.user_id).first<{ ai_grading_credits: number | null; ai_grading_quota: number | null }>();
+      const quota = Number(user?.ai_grading_quota) || 0;
+      const credits = Number(user?.ai_grading_credits) || 0;
+      const payable = quota === -1 ? pendingAnswers.length
+        : quota > 0 ? Math.min(pendingAnswers.length, credits)
+        : 0;
+      if (payable > 0 && quota !== -1) {
+        const deduction = await c.env.DB.prepare(`
+          UPDATE users SET ai_grading_credits = ai_grading_credits - ?
+          WHERE id = ? AND ai_grading_credits >= ?
+        `).bind(payable, attempt.user_id, payable).run();
+        if (deduction.meta.changes === 1) {
+          paidPending = pendingAnswers.slice(0, payable);
+        } // raced deduction → mark none; they stay pending
+      } else if (quota === -1) {
+        paidPending = pendingAnswers;
+      }
+    }
+
+    const toMark = [...failedAnswers, ...paidPending];
+
+    // Shared fan-out — one marker, two entry points (submit and remark).
+    const { outcomes, statements } = await markTheoryAnswers(c.env, c.env.DB, toMark, attemptId);
+    await c.env.DB.batch(statements);
+
+    const remarked = outcomes.filter((o) => o.kind === 'graded').length;
+    const failed = outcomes.filter((o) => o.kind === 'marking_failed').length;
+
+    // Recompute totals + status from the full answer set.
+    const final = await finalizeAttemptMarking(c.env.DB, attemptId, String(attempt.user_id));
+
+    return c.json({
+      success: true,
+      data: {
+        attemptId,
+        status: final.status,
+        remarked,
+        failed,
+        remaining: final.pending + final.failed,
+      },
+    });
+  } catch (error) {
+    console.error('Remark paper attempt error:', error);
+    return c.json({ success: false, error: 'Failed to remark paper' }, 500);
   }
 });
 
