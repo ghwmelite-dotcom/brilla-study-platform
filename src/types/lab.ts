@@ -2,9 +2,6 @@
 
 // Domain types shared with the server-side grader live in shared/lab-grading.ts.
 // Re-exported here so existing `@/types` imports keep working.
-// NOTE: the shared GradingResult is intentionally NOT re-exported yet — the
-// legacy GradingResult below still backs labStore's scoring stub and the
-// LabWorkspace results screen until those are reworked (plan tasks 6 and 10).
 export type {
   LabMode,
   SimulationType,
@@ -29,6 +26,7 @@ export type {
   StepEvidence,
   StepScore,
   CriterionScore,
+  GradingResult,
 } from '../../shared/lab-grading';
 import type { Apparatus, LabMode } from '../../shared/lab-grading';
 
@@ -144,20 +142,9 @@ export interface LabFeedback {
   suggestedExperiments?: string[];
 }
 
-// LEGACY client-side grading shape — still consumed by labStore's scoring
-// stub and the LabWorkspace results screen. The server-side GradingResult
-// (criteriaScores + stepScores) lives in shared/lab-grading.ts; this legacy
-// interface is deleted when those two consumers are reworked.
-export interface GradingResult {
-  totalScore: number;
-  maxScore: number;
-  percentageScore: number;
-  criteriaScores: CriteriaScore[];
-  procedureAccuracy: number;
-  measurementAccuracy: number;
-  feedback: LabFeedback;
-}
-
+// LEGACY attempt record — kept for historical data. The live grading shape is
+// the server-side GradingResult (criteriaScores + stepScores) re-exported at
+// the top of this file from shared/lab-grading.ts.
 export interface LabAttempt {
   id: string;
   oduserId: string;

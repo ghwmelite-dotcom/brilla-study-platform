@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { api } from '@/lib/api';
 import type {
   Experiment,
   LabSession,
@@ -10,9 +11,10 @@ import type {
   Position,
   Measurement,
   Observation,
-  PerformedAction,
   CanvasState,
   GradingResult,
+  LabEventInput,
+  LabActionType,
 } from '@/types';
 
 // Clear old cached data on load
@@ -38,6 +40,20 @@ const getCurrentUser = () => {
     return authState?.state?.user || null;
   } catch {
     return null;
+  }
+};
+
+const FLUSH_BATCH_SIZE = 20;
+const FLUSH_INTERVAL_MS = 15_000;
+const RETRY_DELAYS_MS = [15_000, 30_000, 60_000];
+
+let flushTimer: ReturnType<typeof setInterval> | null = null;
+let retryCount = 0;
+
+const stopFlushTimer = () => {
+  if (flushTimer) {
+    clearInterval(flushTimer);
+    flushTimer = null;
   }
 };
 
@@ -75,12 +91,18 @@ interface LabState {
   // Results
   lastAttemptResult: GradingResult | null;
 
+  // Server sync
+  serverSessionId: string | null;
+  eventQueue: LabEventInput[];
+  syncStatus: 'idle' | 'syncing' | 'retry_scheduled';
+  submitPending: boolean;
+
   // Loading states
   isLoading: boolean;
   error: string | null;
 
   // Actions
-  startSession: (experiment: Experiment, mode: LabMode) => void;
+  startSession: (experiment: Experiment, mode: LabMode) => Promise<void>;
   endSession: () => void;
   pauseSession: () => void;
   resumeSession: () => void;
@@ -96,12 +118,17 @@ interface LabState {
   adjustApparatus: (instanceId: string, value: number) => void;
 
   // Measurement actions
-  recordMeasurement: (apparatusId: string, value: number, unit: string) => void;
+  recordMeasurement: (value: number, unit: string, label: string, condition?: string, apparatusId?: string) => void;
   deleteMeasurement: (measurementId: string) => void;
   updateMeasurement: (measurementId: string, value: number) => void;
 
+  // Event queue
+  enqueueEvent: (eventType: LabEventInput['eventType'], payload: LabEventInput['payload']) => void;
+  flushEventQueue: () => Promise<void>;
+
   // Observation actions
   addObservation: (text: string) => void;
+  recordObservation: (text: string) => void;
   updateObservation: (id: string, text: string) => void;
   deleteObservation: (id: string) => void;
 
@@ -110,7 +137,7 @@ interface LabState {
   completeStep: () => void;
   nextStep: () => void;
   previousStep: () => void;
-  recordAction: (action: PerformedAction) => void;
+  recordAction: (actionType: LabActionType, targetApparatus: string, value?: number) => void;
 
   // Timer
   incrementTimer: () => void;
@@ -128,6 +155,7 @@ interface LabState {
   // Session management
   saveSession: () => void;
   submitExperiment: () => Promise<GradingResult>;
+  finishPractice: () => Promise<void>;
 
   // Utility
   clearError: () => void;
@@ -160,6 +188,10 @@ const initialState = {
   isDataTableOpen: false,
   showHints: false,
   lastAttemptResult: null,
+  serverSessionId: null,
+  eventQueue: [],
+  syncStatus: 'idle' as const,
+  submitPending: false,
   isLoading: false,
   error: null,
 };
@@ -170,7 +202,7 @@ export const useLabStore = create<LabState>()(
       ...initialState,
 
       // Session Actions
-      startSession: (experiment, mode) => {
+      startSession: async (experiment, mode) => {
         const user = getCurrentUser();
         const userId = user?.id || 'anonymous';
 
@@ -207,11 +239,31 @@ export const useLabStore = create<LabState>()(
           isTimerRunning: true,
           isProcedurePanelOpen: true,
           lastAttemptResult: null,
+          serverSessionId: null,
+          eventQueue: [],
+          submitPending: false,
+          error: null,
         });
+
+        // Start the periodic flush for this session.
+        stopFlushTimer();
+        retryCount = 0;
+        flushTimer = setInterval(() => {
+          void get().flushEventQueue();
+        }, FLUSH_INTERVAL_MS);
+
+        const res = await api.startLabSession(experiment.slug, mode);
+        if (!res.success || !res.data) {
+          stopFlushTimer();
+          set({ ...initialState, error: res.code ?? res.error ?? 'Failed to start lab session' });
+          return;
+        }
+        set({ serverSessionId: res.data.sessionId });
       },
 
       endSession: () => {
         const { currentSession } = get();
+        stopFlushTimer();
         if (currentSession) {
           set({
             currentSession: { ...currentSession, status: 'abandoned' },
@@ -306,20 +358,20 @@ export const useLabStore = create<LabState>()(
       },
 
       // Measurement Actions
-      recordMeasurement: (apparatusId, value, unit) => {
+      recordMeasurement: (value, unit, label, condition, apparatusId) => {
         const { currentStepIndex } = get();
         const measurement: Measurement = {
           id: `meas_${Date.now()}`,
-          apparatusId,
+          apparatusId: apparatusId ?? 'app_generic',
           value,
           unit,
           timestamp: new Date().toISOString(),
           stepNumber: currentStepIndex + 1,
         };
-
-        set((state) => ({
-          measurements: [...state.measurements, measurement],
-        }));
+        set((state) => ({ measurements: [...state.measurements, measurement] }));
+        get().enqueueEvent('measurement', {
+          value, unit, label, condition, apparatusId, stepNumber: currentStepIndex + 1,
+        });
       },
 
       deleteMeasurement: (measurementId) => {
@@ -336,6 +388,47 @@ export const useLabStore = create<LabState>()(
         }));
       },
 
+      // Event Queue
+      enqueueEvent: (eventType, payload) => {
+        const event: LabEventInput = {
+          clientEventId: crypto.randomUUID(),
+          eventType,
+          payload,
+        };
+        set((state) => ({ eventQueue: [...state.eventQueue, event] }));
+        if (get().eventQueue.length >= FLUSH_BATCH_SIZE) {
+          void get().flushEventQueue();
+        }
+      },
+
+      flushEventQueue: async () => {
+        const { eventQueue, serverSessionId, syncStatus } = get();
+        if (!serverSessionId || eventQueue.length === 0 || syncStatus === 'syncing') return;
+
+        const batch = eventQueue.slice(0, 200);
+        set({ syncStatus: 'syncing' });
+        try {
+          const res = await api.appendLabEvents(serverSessionId, batch);
+          if (!res.success) throw new Error(res.error ?? 'flush failed');
+          // Only drop events the server accepted or explicitly deduped.
+          const acknowledged = (res.data?.accepted ?? 0) + (res.data?.duplicates ?? 0);
+          set((state) => ({
+            eventQueue: state.eventQueue.slice(acknowledged),
+            syncStatus: 'idle',
+          }));
+          retryCount = 0;
+        } catch {
+          // Offline resilience: the queue persists in localStorage and retries
+          // with backoff; server-side idempotency makes re-sends safe.
+          retryCount = Math.min(retryCount + 1, RETRY_DELAYS_MS.length);
+          set({ syncStatus: 'retry_scheduled' });
+          setTimeout(() => {
+            set({ syncStatus: 'idle' });
+            void get().flushEventQueue();
+          }, RETRY_DELAYS_MS[retryCount - 1]);
+        }
+      },
+
       // Observation Actions
       addObservation: (text) => {
         const { currentStepIndex } = get();
@@ -349,6 +442,11 @@ export const useLabStore = create<LabState>()(
         set((state) => ({
           observations: [...state.observations, observation],
         }));
+        get().enqueueEvent('observation', { text, stepNumber: currentStepIndex + 1 });
+      },
+
+      recordObservation: (text) => {
+        get().addObservation(text); // keeps the observations panel working
       },
 
       updateObservation: (id, text) => {
@@ -400,6 +498,7 @@ export const useLabStore = create<LabState>()(
         } else {
           set({ stepCompletionStatus: newStatus });
         }
+        get().enqueueEvent('step_complete', { stepNumber: currentStepIndex + 1 });
       },
 
       nextStep: () => {
@@ -418,25 +517,21 @@ export const useLabStore = create<LabState>()(
         }
       },
 
-      recordAction: (action) => {
+      recordAction: (actionType, targetApparatus, value) => {
         const { currentSession, currentStepIndex } = get();
-        if (!currentSession) return;
-
-        const updatedProgress = [...currentSession.stepProgress];
-        updatedProgress[currentStepIndex] = {
-          ...updatedProgress[currentStepIndex],
-          actionsPerformed: [
-            ...updatedProgress[currentStepIndex].actionsPerformed,
-            action,
-          ],
-        };
-
-        set({
-          currentSession: {
-            ...currentSession,
-            stepProgress: updatedProgress,
-          },
-        });
+        const stepNumber = currentStepIndex + 1;
+        if (currentSession) {
+          const updatedProgress = [...currentSession.stepProgress];
+          updatedProgress[currentStepIndex] = {
+            ...updatedProgress[currentStepIndex],
+            actionsPerformed: [
+              ...updatedProgress[currentStepIndex].actionsPerformed,
+              { actionType, apparatusId: targetApparatus, value, timestamp: new Date().toISOString(), isCorrect: true },
+            ],
+          };
+          set({ currentSession: { ...currentSession, stepProgress: updatedProgress } });
+        }
+        get().enqueueEvent('action', { actionType, targetApparatus, value, stepNumber });
       },
 
       // Timer
@@ -497,71 +592,45 @@ export const useLabStore = create<LabState>()(
       },
 
       submitExperiment: async () => {
-        const { currentSession, currentExperiment, measurements, stepCompletionStatus, timeSpent } =
-          get();
+        const { currentSession, currentExperiment, serverSessionId } = get();
 
         if (!currentSession || !currentExperiment) {
           throw new Error('No active session');
         }
+        if (currentExperiment.simulationType === 'phet') {
+          throw new Error('Practice sessions are not graded — use finishPractice()');
+        }
 
-        set({ isLoading: true });
+        set({ isLoading: true, submitPending: false });
 
         try {
-          // Calculate grading result
-          // TODO: Replace with API call when backend is ready
-          const completedSteps = stepCompletionStatus.filter(Boolean).length;
-          const totalSteps = currentExperiment.procedure.length;
-          const procedureAccuracy = Math.round((completedSteps / totalSteps) * 100);
+          // Best-effort flush so the grader sees all recorded evidence.
+          await get().flushEventQueue();
 
-          // Calculate measurement accuracy (simplified)
-          const measurementAccuracy = measurements.length > 0 ? 70 : 0; // Placeholder
+          if (!serverSessionId) throw new Error('Session has not synced to the server yet');
+          const res = await api.submitLabSession(serverSessionId);
+          if (!res.success || !res.data || res.data.graded !== true) {
+            throw new Error(res.error ?? 'Grading is pending');
+          }
 
-          // Calculate total score
-          const maxScore = currentExperiment.procedure.reduce((sum, step) => sum + step.maxMarks, 0);
-          const totalScore = Math.round((procedureAccuracy / 100) * maxScore);
-          const percentageScore = Math.round((totalScore / maxScore) * 100);
-
-          const result: GradingResult = {
-            totalScore,
-            maxScore,
-            percentageScore,
-            criteriaScores: currentExperiment.assessmentCriteria.map((criterion) => ({
-              criterionId: criterion.id,
-              criterionName: criterion.name,
-              score: Math.round((procedureAccuracy / 100) * criterion.maxMarks),
-              maxScore: criterion.maxMarks,
-              feedback: procedureAccuracy >= 70 ? 'Good work!' : 'Needs improvement',
-            })),
-            procedureAccuracy,
-            measurementAccuracy,
-            feedback: {
-              overall:
-                percentageScore >= 70
-                  ? 'Excellent work! You demonstrated strong practical skills.'
-                  : percentageScore >= 50
-                    ? 'Good effort! With more practice, you can improve further.'
-                    : 'More practice needed. Review the procedure and try again.',
-              strengths: procedureAccuracy >= 70 ? ['Procedure execution'] : [],
-              improvements: procedureAccuracy < 70 ? ['Procedure accuracy'] : [],
-            },
-          };
-
-          // Update session as completed
+          const result = res.data.grading;
+          stopFlushTimer();
           set({
             currentSession: {
               ...currentSession,
               status: 'completed',
               completedAt: new Date().toISOString(),
-              timeSpent,
             },
             lastAttemptResult: result,
             isTimerRunning: false,
             isLoading: false,
           });
-
           return result;
         } catch (error) {
+          // Honest degradation: no locally-fabricated score. The student is
+          // told grading is pending; the result appears in history on sync.
           set({
+            submitPending: true,
             error: error instanceof Error ? error.message : 'Failed to submit experiment',
             isLoading: false,
           });
@@ -569,10 +638,28 @@ export const useLabStore = create<LabState>()(
         }
       },
 
+      finishPractice: async () => {
+        const { currentSession, currentExperiment, serverSessionId } = get();
+        if (!currentSession || !currentExperiment) return;
+        if (currentExperiment.simulationType !== 'phet') return;
+
+        if (serverSessionId) {
+          await api.submitLabSession(serverSessionId).catch(() => undefined);
+        }
+        stopFlushTimer();
+        set({
+          currentSession: { ...currentSession, status: 'completed', completedAt: new Date().toISOString() },
+          isTimerRunning: false,
+        });
+      },
+
       // Utility
       clearError: () => set({ error: null }),
 
-      reset: () => set(initialState),
+      reset: () => {
+        stopFlushTimer();
+        set(initialState);
+      },
     }),
     {
       name: 'brilla-lab',
@@ -588,6 +675,8 @@ export const useLabStore = create<LabState>()(
         currentStepIndex: state.currentStepIndex,
         stepCompletionStatus: state.stepCompletionStatus,
         timeSpent: state.timeSpent,
+        serverSessionId: state.serverSessionId,
+        eventQueue: state.eventQueue,
       }),
     }
   )

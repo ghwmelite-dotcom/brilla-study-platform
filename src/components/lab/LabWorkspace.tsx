@@ -295,38 +295,22 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
               </div>
             </div>
 
-            {/* Feedback */}
+            {/* Feedback — per-criterion, from the server grading breakdown */}
             <div className={cn(
               "backdrop-blur-sm rounded-2xl p-6 border mb-8",
               isDark ? "bg-white/5 border-white/10" : "bg-white/80 border-slate-200 shadow-lg"
             )}>
-              <p className={cn("mb-4", isDark ? "text-white/80" : "text-slate-700")}>{results.feedback.overall}</p>
-              {results.feedback.strengths.length > 0 && (
-                <div className="mb-3">
-                  <span className="text-xs font-medium text-emerald-500 uppercase">Strengths:</span>
-                  <ul className={cn("text-sm mt-1", isDark ? "text-white/70" : "text-slate-600")}>
-                    {results.feedback.strengths.map((s, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                        {s}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {results.feedback.improvements.length > 0 && (
-                <div>
-                  <span className="text-xs font-medium text-amber-500 uppercase">Areas to improve:</span>
-                  <ul className={cn("text-sm mt-1", isDark ? "text-white/70" : "text-slate-600")}>
-                    {results.feedback.improvements.map((s, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                        {s}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              <h3 className={cn("font-semibold mb-4", isDark ? "text-white" : "text-slate-900")}>Feedback</h3>
+              <ul className={cn("space-y-2 text-sm", isDark ? "text-white/70" : "text-slate-600")}>
+                {results.criteriaScores.map((criteria) => (
+                  <li key={criteria.criterionId} className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                    <span>
+                      <span className="font-medium">{criteria.criterionName}:</span> {criteria.feedback}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             {/* Actions */}
