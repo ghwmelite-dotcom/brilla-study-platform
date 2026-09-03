@@ -6,7 +6,7 @@ import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware'
 import { parseBoundedJsonBody, parseLimit, parseJsonBody } from './http';
 import type { JWTPayload } from 'hono/utils/jwt/types';
 import { callTextModel, getChatModel, getGenerationModel, getMarkingModel, getTtsModel, getVisionModel, unwrapAiText } from './ai-models';
-import { extractJsonObject, formatUntrustedAiData, normalizeAiGradingFeedback, normalizeTheoryMarking, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
+import { extractJsonObject, formatUntrustedAiData, normalizeTheoryMarking, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
 import type { TheoryMarking } from './ai-safety';
 import { libraryApp } from './library';
 import { counselorApp } from './counselor';
@@ -5267,6 +5267,7 @@ export interface TheoryQuestionContext {
   requiredPoints: unknown;
   optionalPoints: unknown;
   structuredParts: StructuredPartInput[];
+  wordLimits?: { min: number | null; max: number | null } | null;
 }
 
 export function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
@@ -5313,6 +5314,7 @@ Return ONLY a JSON object with this structure:
     optionalPoints: question.optionalPoints,
     structuredParts: question.structuredParts,
     expectedAnswer: question.correctAnswer,
+    ...(question.wordLimits ? { wordLimits: question.wordLimits } : {}),
   })}
 
 ${formatUntrustedAiData('Student answer', studentAnswer)}
@@ -5332,6 +5334,25 @@ Mark the student answer using only the supplied data.`;
     throw new Error('Theory marking output contained no JSON object');
   }
   return normalizeTheoryMarking(parsed, question.marks);
+}
+
+/** Adapt the theory-marking contract to the legacy essay feedback shape
+    (overallScore/overallFeedback/criteriaScores/strengths/areasForImprovement/
+    suggestions) that essay_attempts consumers and EssayFeedback UI read. */
+export function theoryMarkingToEssayFeedback(marking: TheoryMarking): Record<string, unknown> {
+  return {
+    overallScore: marking.score,
+    overallFeedback: marking.feedback,
+    criteriaScores: marking.perPoint.map((p) => ({
+      criterionName: p.point,
+      score: p.awarded,
+      maxScore: p.maxMarks,
+      feedback: p.comment,
+    })),
+    strengths: marking.strengths,
+    areasForImprovement: marking.improvements,
+    suggestions: marking.improvements,
+  };
 }
 
 const MARKING_CONCURRENCY = 4;
@@ -5379,8 +5400,10 @@ async function markTheoryAnswers(
   db: D1Database,
   answers: Record<string, unknown>[],
   attemptId: string,
+  userId: string,
 ): Promise<{ outcomes: MarkingOutcome[]; statements: D1PreparedStatement[] }> {
   if (answers.length === 0) return { outcomes: [], statements: [] };
+  const demoFlags = getDemoDataFlags(userId);
   // Only pay the parts query when a structured question is present.
   const partsByQuestion = answers.some((a) => String(a.question_type) === 'structured')
     ? await loadStructuredParts(db, attemptId)
@@ -5422,21 +5445,49 @@ async function markTheoryAnswers(
     }
   }
 
-  const statements: D1PreparedStatement[] = outcomes.map((outcome) =>
-    outcome.kind === 'graded'
-      ? db.prepare(`
-          UPDATE paper_attempt_answers
-          SET marking_status = 'graded', ai_score = ?, ai_feedback = ?, marks_earned = ?
-          WHERE id = ? AND paper_attempt_id = ?
+  const statements: D1PreparedStatement[] = [];
+  for (const outcome of outcomes) {
+    const a = answers.find((row) => String(row.id) === outcome.answerId);
+    if (outcome.kind === 'graded') {
+      statements.push(db.prepare(`
+        UPDATE paper_attempt_answers
+        SET marking_status = 'graded', ai_score = ?, ai_feedback = ?, marks_earned = ?
+        WHERE id = ? AND paper_attempt_id = ?
+      `).bind(
+        outcome.marking.score, JSON.stringify(outcome.marking), outcome.marking.score,
+        outcome.answerId, attemptId,
+      ));
+      // Paper-sit essays also land in the essay pipeline so they surface in
+      // essay history; paper_attempt_id links them back to this attempt.
+      // grading_status 'completed': prod's essay_attempts CHECK accepts only
+      // pending/grading/completed/failed (verified against sqlite_master).
+      if (a && String(a.question_type) === 'essay') {
+        statements.push(db.prepare(`
+          INSERT INTO essay_attempts (
+            id, user_id, question_id, paper_attempt_id, answer_text,
+            grading_type, grading_status, ai_score, ai_feedback, final_score,
+            ai_graded_at, is_demo_data, expires_at
+          ) VALUES (?, ?, ?, ?, ?, 'ai', 'completed', ?, ?, ?, datetime('now'), ?, ?)
         `).bind(
-          outcome.marking.score, JSON.stringify(outcome.marking), outcome.marking.score,
-          outcome.answerId, attemptId,
-        )
-      : db.prepare(`
-          UPDATE paper_attempt_answers SET marking_status = 'marking_failed'
-          WHERE id = ? AND paper_attempt_id = ?
-        `).bind(outcome.answerId, attemptId),
-  );
+          `ea_${crypto.randomUUID()}`,
+          userId,
+          String(a.question_id),
+          attemptId,
+          String(a.user_answer),
+          outcome.marking.score,
+          JSON.stringify(theoryMarkingToEssayFeedback(outcome.marking)),
+          outcome.marking.score,
+          demoFlags.is_demo_data,
+          demoFlags.expires_at,
+        ));
+      }
+    } else {
+      statements.push(db.prepare(`
+        UPDATE paper_attempt_answers SET marking_status = 'marking_failed'
+        WHERE id = ? AND paper_attempt_id = ?
+      `).bind(outcome.answerId, attemptId));
+    }
+  }
 
   return { outcomes, statements };
 }
@@ -5746,7 +5797,7 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
     const paidTheory = theoryAnswers.slice(0, payable); // question order preserved
 
     const { outcomes, statements: markingStatements } =
-      await markTheoryAnswers(c.env, c.env.DB, paidTheory, attemptId);
+      await markTheoryAnswers(c.env, c.env.DB, paidTheory, attemptId, userId);
     gradeStatements.push(...markingStatements);
     const gradedCount = outcomes.filter((o) => o.kind === 'graded').length;
     const failedCount = outcomes.filter((o) => o.kind === 'marking_failed').length;
@@ -5884,7 +5935,7 @@ protectedApp.post('/papers/attempts/:attemptId/remark', async (c) => {
     const toMark = [...failedAnswers, ...paidPending];
 
     // Shared fan-out — one marker, two entry points (submit and remark).
-    const { outcomes, statements } = await markTheoryAnswers(c.env, c.env.DB, toMark, attemptId);
+    const { outcomes, statements } = await markTheoryAnswers(c.env, c.env.DB, toMark, attemptId, String(attempt.user_id));
     await c.env.DB.batch(statements);
 
     const remarked = outcomes.filter((o) => o.kind === 'graded').length;
@@ -6098,60 +6149,31 @@ protectedApp.post('/essays/:attemptId/grade', async (c) => {
       return c.json({ success: false, error: 'Essay grading is already in progress' }, 409);
     }
 
-    let aiFeedback: Record<string, unknown>;
-    let aiScore: number;
-
-    {
-      // Use Workers AI for grading
-      const markingScheme = attempt.marking_scheme
-        ? JSON.parse(attempt.marking_scheme as string)
-        : null;
-
-      const systemPrompt = `You are an experienced WAEC examiner. Grade fairly and constructively. Provide specific feedback grounded in the student's work.
-${UNTRUSTED_AI_DATA_INSTRUCTION}
-
-Return your assessment as a JSON object with this structure:
-{
-  "overallScore": number,
-  "overallFeedback": "string",
-  "criteriaScores": [{"criterionName": "string", "score": number, "maxScore": number, "feedback": "string"}],
-  "strengths": ["string"],
-  "areasForImprovement": ["string"],
-  "suggestions": ["string"]
-}`;
-
-      const userPrompt = `${formatUntrustedAiData('Essay grading inputs', {
-        subject: attempt.subject_name,
-        totalMarks: attempt.marks,
-        markingScheme,
-        wordLimits: { min: attempt.word_limit_min, max: attempt.word_limit_max },
-        question: attempt.question_text,
-        answer: attempt.answer_text,
-        wordCount: attempt.word_count,
-      })}
-
-Grade the essay using only the supplied data.`;
-
-      const response = await callTextModel(c.env, {
-        model: getMarkingModel(c.env),
-        system: systemPrompt,
-        user: userPrompt,
-        maxTokens: 1024,
-      });
-
-      try {
-        // Extract JSON from response
-        const jsonMatch = response.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          aiFeedback = normalizeAiGradingFeedback(JSON.parse(jsonMatch[0]), attempt.marks);
-          aiScore = aiFeedback.overallScore as number;
-        } else {
-          throw new Error('No JSON in response');
-        }
-      } catch {
-        throw new Error('Invalid AI grading response');
-      }
-    }
+    // Shared theory marker; the adapter preserves the legacy feedback shape
+    // that essay_attempts consumers and the EssayFeedback UI read.
+    const marking = await withTimeout(
+      gradeTheoryAnswer(c.env, {
+        questionType: 'essay',
+        questionText: String(attempt.question_text ?? ''),
+        marks: Number(attempt.marks) || 0,
+        subjectName: (attempt.subject_name as string) ?? null,
+        correctAnswer: null,
+        markingScheme: attempt.marking_scheme ? JSON.parse(attempt.marking_scheme as string) : null,
+        markingRubric: (attempt.marking_rubric as string) ?? null,
+        modelAnswer: null,
+        requiredPoints: null,
+        optionalPoints: null,
+        structuredParts: [],
+        wordLimits: {
+          min: (attempt.word_limit_min as number) ?? null,
+          max: (attempt.word_limit_max as number) ?? null,
+        },
+      }, String(attempt.answer_text)),
+      THEORY_MARKING_TIMEOUT_MS,
+      `essay grading ${attemptId}`,
+    );
+    const aiFeedback = theoryMarkingToEssayFeedback(marking);
+    const aiScore = marking.score;
 
     // Update attempt with grading results
     await c.env.DB.prepare(`

@@ -154,7 +154,7 @@ function makeHarness(opts: HarnessOptions) {
       first: () => ({ exam_type_slug: 'wassce', exam_type_id: 'exam_wassce' }),
     },
     {
-      match: /INSERT INTO (question_attempts|user_progress|topic_mastery)|UPDATE user_progress/,
+      match: /INSERT INTO (question_attempts|user_progress|topic_mastery|essay_attempts)|UPDATE user_progress/,
       run: () => ({ success: true, meta: { changes: 1 } }),
     },
     {
