@@ -86,6 +86,9 @@ function createDb(): Database.Database {
       title TEXT NOT NULL,
       total_marks INTEGER,
       time_allowed INTEGER,
+      specification_id TEXT,
+      paper_component_id TEXT,
+      session TEXT,
       is_premium INTEGER DEFAULT 0
     );
     CREATE TABLE questions (
@@ -166,7 +169,7 @@ function createDb(): Database.Database {
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL,
       paper_id TEXT NOT NULL,
-      status TEXT DEFAULT 'in_progress' CHECK (status IN ('in_progress', 'submitted', 'graded', 'abandoned')),
+      status TEXT DEFAULT 'in_progress' CHECK (status IN ('in_progress', 'submitted', 'graded', 'partially_graded', 'abandoned')),
       started_at TEXT DEFAULT (datetime('now')),
       time_allowed INTEGER,
       time_used INTEGER,
@@ -174,6 +177,7 @@ function createDb(): Database.Database {
       total_score INTEGER,
       max_score INTEGER,
       percentage REAL,
+      grade TEXT,
       is_demo_data INTEGER DEFAULT 0,
       expires_at TEXT
     );

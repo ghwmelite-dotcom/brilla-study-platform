@@ -213,6 +213,14 @@ describe('POST /papers/attempts/:attemptId/submit — theory marking fan-out', (
     expect(deduct!.binds[0]).toBe(2);
     expect(deduct!.binds[2]).toBe(2); // atomic ai_grading_credits >= ? guard
     expect(aiRun).toHaveBeenCalledTimes(2);
+
+    // Task 9: submit response carries the computed grade (WAEC fallback for
+    // 66% — no grade_boundaries rows in this fixture) and the attempt UPDATE
+    // persists it.
+    expect(body.data.grade).toBe('B3');
+    const attemptUpdate = calls.find((c) => /UPDATE paper_attempts/.test(c.sql));
+    expect(attemptUpdate).toBeDefined();
+    expect(attemptUpdate!.binds).toContain('B3');
   });
 
   it('marks only what credits cover: all-theory paper with 1 of 2 payable', async () => {

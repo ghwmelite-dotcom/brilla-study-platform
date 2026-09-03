@@ -5441,6 +5441,54 @@ async function markTheoryAnswers(
   return { outcomes, statements };
 }
 
+const WAEC_GRADE_BANDS: ReadonlyArray<readonly [string, number]> = [
+  ['A1', 75], ['B2', 70], ['B3', 65], ['C4', 60], ['C5', 55],
+  ['C6', 50], ['D7', 45], ['E8', 40], ['F9', 0],
+];
+
+/** Deterministic WAEC percentage-band fallback when no boundary row exists. */
+export function waecGradeForPercentage(percentage: number): string {
+  const pct = Number.isFinite(percentage) ? percentage : 0;
+  for (const [grade, threshold] of WAEC_GRADE_BANDS) {
+    if (pct >= threshold) return grade;
+  }
+  return 'F9';
+}
+
+/**
+ * Grade for an attempt: grade_boundaries rows (highest threshold ≤ the
+ * attempt percentage wins; below the lowest threshold → lowest listed grade)
+ * when the paper's specification/session/year match, else WAEC bands.
+ */
+export async function computeAttemptGrade(
+  db: D1Database,
+  paper: {
+    specification_id: string | null;
+    paper_component_id: string | null;
+    session: string | null;
+    year: number | null;
+  },
+  percentage: number,
+): Promise<string> {
+  if (paper.specification_id && paper.session && paper.year) {
+    const { results } = await db.prepare(`
+      SELECT grade, percentage FROM grade_boundaries
+      WHERE specification_id = ? AND session = ? AND year = ?
+        AND (paper_component_id = ? OR (paper_component_id IS NULL AND ? IS NULL))
+        AND percentage IS NOT NULL
+      ORDER BY percentage DESC
+    `).bind(
+      paper.specification_id, paper.session, paper.year,
+      paper.paper_component_id, paper.paper_component_id,
+    ).all<{ grade: string; percentage: number }>();
+    for (const row of results) {
+      if (percentage >= Number(row.percentage)) return String(row.grade);
+    }
+    if (results.length > 0) return String(results[results.length - 1].grade);
+  }
+  return waecGradeForPercentage(percentage);
+}
+
 /**
  * Recompute an attempt's totals and status from its current answer rows.
  * Totals = objective marks_earned + theory ai_score for 'graded' answers.
@@ -5450,7 +5498,7 @@ async function finalizeAttemptMarking(
   db: D1Database,
   attemptId: string,
   userId: string,
-): Promise<{ status: 'graded' | 'partially_graded'; pending: number; failed: number; totalScore: number }> {
+): Promise<{ status: 'graded' | 'partially_graded'; pending: number; failed: number; totalScore: number; grade: string }> {
   const { results: rows } = await db.prepare(`
     SELECT paa.marks_earned, paa.ai_score, paa.marking_status, q.question_type
     FROM paper_attempt_answers paa
@@ -5470,21 +5518,34 @@ async function finalizeAttemptMarking(
   }
 
   const attempt = await db.prepare(`
-    SELECT pp.total_marks FROM paper_attempts pa
+    SELECT pp.total_marks, pp.specification_id, pp.paper_component_id, pp.session, pp.year
+    FROM paper_attempts pa
     JOIN past_papers pp ON pa.paper_id = pp.id
     WHERE pa.id = ?
-  `).bind(attemptId).first<{ total_marks: number | null }>();
+  `).bind(attemptId).first<{
+    total_marks: number | null;
+    specification_id: string | null;
+    paper_component_id: string | null;
+    session: string | null;
+    year: number | null;
+  }>();
   const totalMarks = Number(attempt?.total_marks) || 0;
   const percentage = totalMarks > 0 ? Math.round((totalScore / totalMarks) * 100) : 0;
   const status = pending === 0 && failed === 0 ? 'graded' : 'partially_graded';
+  const grade = await computeAttemptGrade(db, {
+    specification_id: attempt?.specification_id ?? null,
+    paper_component_id: attempt?.paper_component_id ?? null,
+    session: attempt?.session ?? null,
+    year: attempt?.year ?? null,
+  }, percentage);
 
   await db.prepare(`
     UPDATE paper_attempts
-    SET status = ?, total_score = ?, max_score = ?, percentage = ?
+    SET status = ?, total_score = ?, max_score = ?, percentage = ?, grade = ?
     WHERE id = ? AND user_id = ?
-  `).bind(status, totalScore, totalMarks, percentage, attemptId, userId).run();
+  `).bind(status, totalScore, totalMarks, percentage, grade, attemptId, userId).run();
 
-  return { status, pending, failed, totalScore };
+  return { status, pending, failed, totalScore, grade };
 }
 
 // Submit paper attempt
@@ -5501,7 +5562,7 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
 
   try {
     const attempt = await c.env.DB.prepare(`
-      SELECT pa.*, pp.total_marks
+      SELECT pa.*, pp.total_marks, pp.specification_id, pp.paper_component_id, pp.session, pp.year
       FROM paper_attempts pa
       JOIN past_papers pp ON pa.paper_id = pp.id
       WHERE pa.id = ? AND pa.user_id = ? AND pa.status = 'in_progress'
@@ -5617,13 +5678,19 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
     const percentageScore = totalMarks > 0
       ? Math.round((totalScore / totalMarks) * 100)
       : 0;
+    const grade = await computeAttemptGrade(c.env.DB, {
+      specification_id: (attempt.specification_id as string) ?? null,
+      paper_component_id: (attempt.paper_component_id as string) ?? null,
+      session: (attempt.session as string) ?? null,
+      year: attempt.year === null || attempt.year === undefined ? null : Number(attempt.year),
+    }, percentageScore);
 
     gradeStatements.push(c.env.DB.prepare(`
       UPDATE paper_attempts
       SET status = ?, time_used = ?, total_score = ?, max_score = ?,
-          percentage = ?, submitted_at = datetime('now')
+          percentage = ?, grade = ?, submitted_at = datetime('now')
       WHERE id = ? AND user_id = ? AND status = 'in_progress'
-    `).bind(attemptStatus, Math.round(timeUsed), totalScore, totalMarks, percentageScore, attemptId, userId));
+    `).bind(attemptStatus, Math.round(timeUsed), totalScore, totalMarks, percentageScore, grade, attemptId, userId));
 
     await c.env.DB.batch(gradeStatements);
 
@@ -5635,6 +5702,7 @@ protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
         totalMarks,
         percentageScore,
         status: attemptStatus,
+        grade,
         markingStatus: {
           theoryTotal: theoryAnswers.length,
           graded: gradedCount,
@@ -5742,6 +5810,7 @@ protectedApp.post('/papers/attempts/:attemptId/remark', async (c) => {
       data: {
         attemptId,
         status: final.status,
+        grade: final.grade,
         remarked,
         failed,
         remaining: final.pending + final.failed,

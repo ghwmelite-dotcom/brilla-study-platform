@@ -128,8 +128,11 @@ function makeHarness(opts: HarnessOptions) {
       all: () => ({ results: store.answers }),
     },
     {
-      match: /SELECT pp\.total_marks FROM paper_attempts/,
-      first: () => ({ total_marks: opts.totalMarks ?? 40 }),
+      match: /SELECT pp\.total_marks, pp\.specification_id/,
+      first: () => ({
+        total_marks: opts.totalMarks ?? 40,
+        specification_id: null, paper_component_id: null, session: null, year: 2024,
+      }),
     },
     {
       match: /UPDATE paper_attempts\s+SET status = \?, total_score = \?/,
@@ -210,6 +213,9 @@ describe('POST /papers/attempts/:attemptId/remark', () => {
     expect(finalize).toBeDefined();
     expect(finalize!.binds[0]).toBe('graded');
     expect(finalize!.binds[1]).toBe(15); // 2 objective + 13 re-marked
+    // Task 9: remark's recompute also writes the grade (15/40 = 38% → F9).
+    expect(finalize!.binds[4]).toBe('F9');
+    expect(body.data.grade).toBe('F9');
   });
 
   it('marks a pending answer after an atomic 1-credit deduction', async () => {
