@@ -18,7 +18,10 @@ import type {
 } from '@/types';
 
 // Clear old cached data on load
-const STORE_VERSION = 1;
+// v2: sessions live server-side; v1 localStorage-only sessions were never real
+// records and are deliberately NOT migrated — the version check below wipes
+// them so stale in-progress state can't sync into the new API.
+const STORE_VERSION = 2;
 if (typeof window !== 'undefined') {
   try {
     const stored = localStorage.getItem('brilla-lab');
