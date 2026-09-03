@@ -1,58 +1,46 @@
 // Virtual Lab Type Definitions
 
+// Domain types shared with the server-side grader live in shared/lab-grading.ts.
+// Re-exported here so existing `@/types` imports keep working.
+// NOTE: the shared GradingResult is intentionally NOT re-exported yet — the
+// legacy GradingResult below still backs labStore's scoring stub and the
+// LabWorkspace results screen until those are reworked (plan tasks 6 and 10).
+export type {
+  LabMode,
+  SimulationType,
+  ApparatusCategory,
+  InteractionPoint,
+  ApparatusProperties,
+  Apparatus,
+  Material,
+  LabActionType,
+  RequiredAction,
+  ProcedureStep,
+  ExpectedResult,
+  AssessmentCriterion,
+  Experiment,
+  LabEventType,
+  MeasurementEventPayload,
+  ActionEventPayload,
+  ObservationEventPayload,
+  StepCompleteEventPayload,
+  LabEventPayload,
+  LabEventInput,
+  StepEvidence,
+  StepScore,
+  CriterionScore,
+} from '../../shared/lab-grading';
+import type { Apparatus, LabMode } from '../../shared/lab-grading';
+
 // =============================================
 // CORE TYPES
 // =============================================
-
-export type LabMode = 'guided' | 'sandbox';
-export type SimulationType = 'custom' | 'phet';
-export type ApparatusCategory =
-  | 'measurement'
-  | 'container'
-  | 'heating'
-  | 'optical'
-  | 'electrical'
-  | 'biological'
-  | 'support'
-  | 'chemical';
 
 export type LabSessionStatus = 'not_started' | 'in_progress' | 'completed' | 'abandoned';
 
 // =============================================
 // APPARATUS TYPES
 // =============================================
-
-export interface InteractionPoint {
-  id: string;
-  name: string;
-  type: 'input' | 'output' | 'connect' | 'measure' | 'adjust';
-  position: { x: number; y: number };
-  acceptsFrom?: string[]; // Apparatus IDs that can connect
-}
-
-export interface ApparatusProperties {
-  isDraggable: boolean;
-  isConnectable: boolean;
-  hasReading?: boolean;
-  readingType?: 'numeric' | 'visual' | 'color';
-  readingUnit?: string;
-  minValue?: number;
-  maxValue?: number;
-  precision?: number;
-  defaultValue?: number;
-}
-
-export interface Apparatus {
-  id: string;
-  name: string;
-  description: string;
-  category: ApparatusCategory;
-  iconUrl?: string;
-  spriteUrl?: string;
-  interactionPoints: InteractionPoint[];
-  properties: ApparatusProperties;
-  subjectId: string;
-}
 
 export interface ApparatusInstance {
   instanceId: string;
@@ -80,75 +68,9 @@ export interface Position {
 // =============================================
 // EXPERIMENT TYPES
 // =============================================
-
-export interface Material {
-  name: string;
-  quantity: string;
-  concentration?: string;
-}
-
-export interface RequiredAction {
-  actionType: 'drag' | 'connect' | 'adjust' | 'measure' | 'record' | 'observe' | 'pour' | 'heat';
-  targetApparatus: string;
-  targetValue?: number;
-  tolerance?: number;
-  description: string;
-}
-
-export interface ProcedureStep {
-  stepNumber: number;
-  instruction: string;
-  hint?: string;
-  requiredActions: RequiredAction[];
-  expectedOutcome?: string;
-  imageUrl?: string;
-  videoUrl?: string;
-  isCheckpoint: boolean;
-  maxMarks: number;
-}
-
-export interface ExpectedResult {
-  condition: string;
-  value: string | number;
-  tolerance?: number;
-  unit?: string;
-}
-
-export interface AssessmentCriterion {
-  id: string;
-  name: string;
-  description: string;
-  maxMarks: number;
-  rubric: {
-    marks: number;
-    description: string;
-  }[];
-}
-
-export interface Experiment {
-  id: string;
-  subjectId: string;
-  topicId: string;
-  name: string;
-  slug: string;
-  description: string;
-  objectives: string[];
-  difficulty: 'easy' | 'medium' | 'hard';
-  estimatedTime: number; // minutes
-  simulationType: SimulationType;
-  phetSimUrl?: string;
-  apparatus: string[]; // Apparatus IDs
-  materials: Material[];
-  safetyNotes: string[];
-  procedure: ProcedureStep[];
-  expectedResults: ExpectedResult[];
-  assessmentCriteria: AssessmentCriterion[];
-  examTypeId: string;
-  paperTypeId: string;
-  waecPastYears?: number[];
-  isActive: boolean;
-  isPremium?: boolean;
-}
+// (Material, RequiredAction, ProcedureStep, ExpectedResult,
+//  AssessmentCriterion, and Experiment moved to shared/lab-grading.ts
+//  and are re-exported at the top of this file.)
 
 // =============================================
 // LAB SESSION TYPES
@@ -222,6 +144,10 @@ export interface LabFeedback {
   suggestedExperiments?: string[];
 }
 
+// LEGACY client-side grading shape — still consumed by labStore's scoring
+// stub and the LabWorkspace results screen. The server-side GradingResult
+// (criteriaScores + stepScores) lives in shared/lab-grading.ts; this legacy
+// interface is deleted when those two consumers are reworked.
 export interface GradingResult {
   totalScore: number;
   maxScore: number;

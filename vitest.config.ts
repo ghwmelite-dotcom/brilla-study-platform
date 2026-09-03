@@ -9,7 +9,7 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['src/**/*.test.{ts,tsx}', 'workers/**/*.test.ts'],
+    include: ['src/**/*.test.{ts,tsx}', 'workers/**/*.test.ts', 'shared/**/*.test.ts'],
     // Canvas/Fabric suites are CPU-heavy. Bounding concurrency prevents
     // resource contention from turning deterministic 5s tests into flakes.
     maxWorkers: 4,
