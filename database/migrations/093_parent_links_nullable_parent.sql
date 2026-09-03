@@ -33,4 +33,14 @@ CREATE INDEX idx_parent_links_student ON parent_student_links(student_id);
 CREATE INDEX idx_parent_links_code ON parent_student_links(invite_code);
 CREATE INDEX idx_parent_links_status ON parent_student_links(status);
 
+-- Fresh-environment parity: the canonical schema.sql creates
+-- idx_parent_links_access (folded from 095_counselor_authorization.sql) before
+-- this rebuild runs, so the DROP above discards it — and 095 is recorded as
+-- applied on fresh databases (database/record_folded_migrations.sql), so it
+-- never recreates the index there. Recreate it here. IF NOT EXISTS makes this
+-- a no-op wherever the index already exists, and this file is already recorded
+-- in d1_migrations on existing databases, so this edit never re-runs there.
+CREATE INDEX IF NOT EXISTS idx_parent_links_access
+ON parent_student_links(parent_id, student_id, status, student_opted_out);
+
 PRAGMA foreign_keys = ON;

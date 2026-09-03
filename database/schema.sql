@@ -1,9 +1,14 @@
 -- ============================================================================
 -- BRILLA STUDY PLATFORM — CANONICAL DATABASE SCHEMA
 -- ============================================================================
--- GENERATED FILE — DO NOT EDIT BY HAND.
+-- GENERATED BASELINE — DO NOT REPLACE BLINDLY.
 -- Regenerate with: node scripts/build-canonical-schema.cjs > database/schema.sql.new
 -- (see .superpowers/sdd/2026-08-03-fix-05-database-reckoning/task-2-brief.md)
+-- NOTE: regeneration reproduces ONLY the generator's baseline. This committed
+-- file additionally carries hand-merged folds of live post-squash migrations
+-- (marked in place with "-- Source: migrations/..." comments; see the fold list
+-- below) that the generator does not reproduce. Diff and re-apply those folds
+-- before ever replacing this file with regenerated output.
 --
 -- Squash of the legacy database/schema.sql plus all migrations below, with
 -- last-definition-wins collision resolution, ALTER TABLE ADD COLUMN folding,
@@ -124,6 +129,16 @@
 --   database/migrations/seed_chat_rooms.sql
 --   database/migrations/090_growth_loop.sql
 --   database/migrations/091_telegram_community.sql
+--
+-- Hand-merged folds: this file additionally contains DDL from the live
+-- post-squash migrations 092, 094, 095, 096, 097, 098, 099, 100, 101, 103,
+-- 113, 276, 277, 282 and 358, merged by hand and marked in place with
+-- "-- Source: migrations/..." / "-- added by migrations/..." comments.
+-- scripts/build-canonical-schema.cjs does NOT reproduce these folds — its
+-- output is the generator baseline only, so diff before ever replacing this
+-- file with regenerated output. The non-idempotent folds (090, 091, 092, 095,
+-- 096, 097, 099, 276, 277, 282) are recorded as applied on fresh databases via
+-- database/record_folded_migrations.sql (see scripts/verify-fresh-bootstrap.cjs).
 --
 -- PRAGMA foreign_keys = ON;  -- enforced by db:verify and D1; a schema file
 -- cannot set PRAGMAs on D1, so this is documented here as a comment.
@@ -579,7 +594,12 @@ CREATE TABLE IF NOT EXISTS users (
     -- added by migrations/022_add_selected_tier_preference.sql
     selected_tier_id TEXT REFERENCES subscription_tiers(id),
     -- added by migrations/090_growth_loop.sql
-    school_id TEXT REFERENCES schools(id)
+    school_id TEXT REFERENCES schools(id),
+    -- added by migrations/092_users_parent_role.sql (its users_new rebuild shape;
+    -- the original squash dropped these three columns even though 092 ran on prod)
+    longest_streak INTEGER DEFAULT 0,
+    rejected_by TEXT,
+    rejected_at TEXT
 );
 
 -- Source: schema.sql
@@ -4464,6 +4484,107 @@ CREATE TABLE IF NOT EXISTS tutor_feedback (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Source: migrations/358_referral_marketing_consent.sql
+-- Folded so the canonical schema matches the live chain through 358. 358 is
+-- fully idempotent (IF NOT EXISTS throughout), so it is NOT listed in
+-- database/record_folded_migrations.sql: on fresh databases `migrations apply`
+-- re-applies it as a harmless no-op (same as folded 094/098/100/101/103/113).
+CREATE TABLE IF NOT EXISTS marketing_email_preferences (
+  user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  referral_rewards_opt_in INTEGER NOT NULL DEFAULT 0 CHECK (referral_rewards_opt_in IN (0, 1)),
+  consent_version TEXT,
+  consented_at TEXT,
+  consent_source TEXT CHECK (consent_source IS NULL OR consent_source IN ('settings', 'guardian_confirmation')),
+  eligibility_basis TEXT NOT NULL DEFAULT 'unknown'
+    CHECK (eligibility_basis IN ('unknown', 'adult_self_attested', 'guardian_confirmed', 'adult_role')),
+  consent_actor_user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  unsubscribed_at TEXT,
+  provider_contact_id TEXT,
+  provider_sync_status TEXT NOT NULL DEFAULT 'not_synced'
+    CHECK (provider_sync_status IN ('not_synced', 'pending', 'synced', 'suppressed', 'failed')),
+  provider_synced_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  CHECK (
+    referral_rewards_opt_in = 0 OR (
+      consent_version IS NOT NULL AND
+      consented_at IS NOT NULL AND
+      consent_source IS NOT NULL AND
+      eligibility_basis IN ('adult_self_attested', 'guardian_confirmed', 'adult_role') AND
+      unsubscribed_at IS NULL
+    )
+  )
+);
+
+-- Source: migrations/358_referral_marketing_consent.sql
+CREATE TABLE IF NOT EXISTS marketing_consent_events (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  topic TEXT NOT NULL DEFAULT 'referral_rewards' CHECK (topic = 'referral_rewards'),
+  action TEXT NOT NULL CHECK (action IN ('opt_in', 'opt_out', 'provider_unsubscribe', 'guardian_confirmed')),
+  actor_user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  source TEXT NOT NULL CHECK (source IN ('settings', 'guardian_confirmation', 'resend_webhook')),
+  consent_version TEXT,
+  eligibility_basis TEXT CHECK (
+    eligibility_basis IS NULL OR eligibility_basis IN ('unknown', 'adult_self_attested', 'guardian_confirmed', 'adult_role')
+  ),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Source: migrations/358_referral_marketing_consent.sql
+CREATE TABLE IF NOT EXISTS marketing_email_suppressions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+  email_hash TEXT NOT NULL,
+  reason TEXT NOT NULL CHECK (reason IN ('user_opt_out', 'provider_unsubscribe', 'hard_bounce', 'complaint', 'admin')),
+  source TEXT NOT NULL CHECK (source IN ('settings', 'resend_webhook', 'admin')),
+  expires_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(email_hash)
+);
+
+-- Source: migrations/358_referral_marketing_consent.sql
+CREATE TABLE IF NOT EXISTS marketing_campaigns (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  template_key TEXT NOT NULL DEFAULT 'referral_rewards_v1' CHECK (template_key = 'referral_rewards_v1'),
+  subject TEXT NOT NULL,
+  preview_text TEXT NOT NULL,
+  message TEXT NOT NULL,
+  pilot_percent INTEGER NOT NULL DEFAULT 10 CHECK (pilot_percent BETWEEN 1 AND 10),
+  status TEXT NOT NULL DEFAULT 'draft'
+    CHECK (status IN ('draft', 'audience_ready', 'provider_draft', 'cancelled')),
+  audience_count INTEGER NOT NULL DEFAULT 0 CHECK (audience_count >= 0),
+  provider_segment_id TEXT,
+  provider_broadcast_id TEXT,
+  created_by TEXT NOT NULL REFERENCES users(id),
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Source: migrations/358_referral_marketing_consent.sql
+CREATE TABLE IF NOT EXISTS marketing_campaign_recipients (
+  campaign_id TEXT NOT NULL REFERENCES marketing_campaigns(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  referral_code TEXT NOT NULL,
+  consent_version TEXT NOT NULL,
+  eligibility_basis TEXT NOT NULL
+    CHECK (eligibility_basis IN ('adult_self_attested', 'guardian_confirmed', 'adult_role')),
+  status TEXT NOT NULL DEFAULT 'planned'
+    CHECK (status IN ('planned', 'provider_synced', 'provider_suppressed', 'provider_failed')),
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (campaign_id, user_id)
+);
+
+-- Source: migrations/358_referral_marketing_consent.sql
+CREATE TABLE IF NOT EXISTS marketing_webhook_events (
+  svix_id TEXT PRIMARY KEY,
+  event_type TEXT NOT NULL,
+  event_created_at TEXT,
+  processed_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 
 -- =============================================
 -- INDEXES
@@ -5019,3 +5140,11 @@ CREATE INDEX IF NOT EXISTS idx_assessment_attempt_answers_demo ON assessment_att
 CREATE INDEX IF NOT EXISTS idx_tutor_feedback_message ON tutor_feedback(message_id);
 CREATE INDEX IF NOT EXISTS idx_tutor_feedback_user ON tutor_feedback(user_id);
 CREATE INDEX IF NOT EXISTS idx_tutor_feedback_demo ON tutor_feedback(is_demo_data, expires_at);
+
+-- Source: migrations/358_referral_marketing_consent.sql
+CREATE INDEX IF NOT EXISTS idx_marketing_consent_events_user_created
+  ON marketing_consent_events(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_marketing_suppressions_user
+  ON marketing_email_suppressions(user_id);
+CREATE INDEX IF NOT EXISTS idx_marketing_campaign_recipients_status
+  ON marketing_campaign_recipients(campaign_id, status);

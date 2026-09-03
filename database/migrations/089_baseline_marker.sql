@@ -17,7 +17,7 @@
 --   2. wrangler d1 execute brilla-db --local --file=database/seed.sql
 --   3. wrangler d1 execute brilla-db --local --file=database/seeds/seed_chat_rooms.sql
 --   4. wrangler d1 migrations apply brilla-db --local   (records 088, 088a, 089)
---   Note: `db:migrate` (schema.sql) is for FRESH databases only — it is not
+--   Note: `db:schema` (schema.sql) is for FRESH databases only — it is not
 --   idempotent against an existing populated database. Existing/production
 --   databases follow the runbook in
 --   docs/superpowers/plans/2026-08-03-fix-05-database-reckoning.md.

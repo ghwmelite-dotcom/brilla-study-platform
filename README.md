@@ -135,24 +135,40 @@ The migration chain 001-087 was squashed on 2026-08-11 into a canonical
 `database/schema.sql` + `database/seed.sql`. The old files are preserved
 untouched in `database/migrations/archive/` (outside `migrations_dir`, so
 wrangler ignores them); `database/migrations/` now holds the maintained
-post-squash chain from `088` through `098`.
+post-squash chain from `088` through `360`.
+
+`schema.sql` also folds in the DDL of ten post-squash migrations (090, 091,
+092, 095, 096, 097, 099, 276, 277, 282 — each marked in place). Those files
+are not idempotent, so on a fresh database they can never run again; the
+bootstrap records them as applied in wrangler's `d1_migrations` bookkeeping
+table (`npm run db:baseline:fresh`) before `migrations apply` continues with
+the rest of the chain.
 
 Fresh environment — single bootstrap path:
 
 ```bash
 wrangler d1 create brilla-db
-npm run db:migrate    # schema.sql — FRESH databases only, not idempotent
-npm run db:seed       # seed.sql — idempotent, safe to re-run
+npm run db:schema          # schema.sql — FRESH databases only, not idempotent
+npm run db:seed            # seed.sql — idempotent, safe to re-run
 wrangler d1 execute brilla-db --local --file=database/seeds/seed_chat_rooms.sql
-npm run db:baseline   # wrangler d1 migrations apply → records the current post-squash chain
-npm run db:verify     # gate — must be green
+npm run db:seed:topics     # topic seeds required by the guarded topic-mapping migrations (225+)
+npm run db:baseline:fresh  # record folded migrations in d1_migrations — FRESH databases only
+npm run db:baseline        # wrangler d1 migrations apply → applies 088…360 minus the folded ten
+npm run db:verify          # gate — must be green
 ```
+
+For a remote environment (e.g. staging), run the same files in the same order
+with `wrangler d1 execute brilla-db-staging --env staging --remote --file=...`
+and `wrangler d1 migrations apply brilla-db-staging --env staging --remote`.
 
 `npm run db:verify` is the database gate (node:sqlite, zero deps): it applies
 schema + seed with `foreign_keys=ON` and checks MCQ answer format, letter-answer
-ranges, first-letter collisions, FK resolution, and duplicate subjects. Run it
-before committing anything under `database/`. No CI workflow exists yet
-(`.github/workflows` is absent) — when one is added, `db:verify` belongs in it.
+ranges, first-letter collisions, FK resolution, and duplicate subjects, then
+simulates the full fresh-environment bootstrap above — baseline record plus a
+replay of all ~270 live migrations — so the bootstrap path cannot regress
+silently. Run it before committing anything under `database/`. CI runs it on
+every PR and push to `main` via `.github/workflows/ci.yml` (step "Verify
+database schema and migrations", alongside tests, typecheck, lint, and build).
 
 Windows notes:
 

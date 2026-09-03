@@ -26,6 +26,14 @@
  *   6. Output: header banner, tables in dependency-safe topological order
  *      (REFERENCES graph, parents before children), then all indexes.
  *
+ * IMPORTANT — this generator's output is the BASELINE ONLY. The committed
+ * database/schema.sql additionally carries hand-merged folds of live
+ * post-squash migrations (092, 094-099, 100, 101, 103, 113, 276, 277, 282,
+ * 358 — marked in place with "-- Source: migrations/..." comments) that this
+ * generator does not reproduce. Regeneration is therefore NOT byte-identical
+ * to the committed file; diff and re-apply the hand-merged folds before ever
+ * replacing database/schema.sql with regenerated output.
+ *
  * Usage: node scripts/build-canonical-schema.cjs > database/schema.sql.new
  * Diagnostics (collision log, merges, parity check) go to stderr.
  */
@@ -49,7 +57,9 @@ const SCRATCH_RE = /(_backup|_v2|_old|_tmp)$/i;
 // when the canonical squash was first generated, so their banner lines are
 // part of the committed schema.sql. Neither contributes DDL (088 is
 // data-only UPDATEs; seed_chat_rooms.sql is INSERT-only and now lives in
-// database/seeds/). Kept so regeneration stays byte-identical.
+// database/seeds/). Kept so the emitted banner stays close to the committed
+// header — regeneration is NOT byte-identical regardless (the committed file
+// carries hand-merged folds this generator does not reproduce; see header).
 const BANNER_TRAILING_FILES = ['088_normalize_datetime_to_iso.sql', 'seed_chat_rooms.sql'];
 
 // ---------------------------------------------------------------------------
@@ -817,9 +827,15 @@ if (migrationUniqueCount !== 178) {
 const banner = `-- ============================================================================
 -- BRILLA STUDY PLATFORM — CANONICAL DATABASE SCHEMA
 -- ============================================================================
--- GENERATED FILE — DO NOT EDIT BY HAND.
+-- GENERATED BASELINE — DO NOT REPLACE BLINDLY.
 -- Regenerate with: node scripts/build-canonical-schema.cjs > database/schema.sql.new
 -- (see .superpowers/sdd/2026-08-03-fix-05-database-reckoning/task-2-brief.md)
+-- NOTE: regeneration reproduces ONLY this generator's baseline. The committed
+-- database/schema.sql additionally carries hand-merged folds of live
+-- post-squash migrations (092, 094-099, 100, 101, 103, 113, 276, 277, 282,
+-- 358 — marked in place with "-- Source: migrations/..." comments) that this
+-- generator does not reproduce. Diff and re-apply those folds before ever
+-- replacing the committed file with regenerated output.
 --
 -- Squash of the legacy database/schema.sql plus all migrations below, with
 -- last-definition-wins collision resolution, ALTER TABLE ADD COLUMN folding,

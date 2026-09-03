@@ -1187,21 +1187,31 @@ post-squash chain:
 
 **Fresh-environment bootstrap (single path):**
 
+`schema.sql` folds in the DDL of ten non-idempotent post-squash migrations
+(090, 091, 092, 095, 096, 097, 099, 276, 277, 282), so a fresh database records
+them as applied in wrangler's `d1_migrations` bookkeeping before
+`migrations apply` continues with the rest of the chain (`088` through `360`).
+
 ```bash
 wrangler d1 create brilla-db
-npm run db:migrate    # schema.sql — FRESH databases only, not idempotent
-npm run db:seed       # seed.sql — idempotent, safe to re-run
+npm run db:schema          # schema.sql — FRESH databases only, not idempotent
+npm run db:seed            # seed.sql — idempotent, safe to re-run
 wrangler d1 execute brilla-db --local --file=database/seeds/seed_chat_rooms.sql
-npm run db:baseline   # wrangler d1 migrations apply → records 088, 088a, 089
-npm run db:verify     # gate — must be green
+npm run db:seed:topics     # topic seeds required by the guarded topic-mapping migrations (225+)
+npm run db:baseline:fresh  # record folded migrations in d1_migrations — FRESH databases only
+npm run db:baseline        # wrangler d1 migrations apply → applies 088…360 minus the folded ten
+npm run db:verify          # gate — must be green
 ```
 
 `npm run db:verify` is the database gate (node:sqlite, zero deps): schema + seed
 apply clean with `foreign_keys=ON`; 0 numeric MCQ answers; all letter answers in
 range; 0 first-letter collisions; every FK reference resolves; no duplicate
-subjects. Run it before committing any change under `database/`. No CI workflow
-exists yet (`.github/workflows` is absent); when one is added, `db:verify`
-belongs in it.
+subjects. It also simulates the full fresh-environment bootstrap above (baseline
+record + replay of all ~270 live migrations) via
+`scripts/verify-fresh-bootstrap.cjs`. Run it before committing any change under
+`database/`. CI runs it on every PR and push to `main` via
+`.github/workflows/ci.yml` (step "Verify database schema and migrations",
+alongside tests, typecheck, lint, and build).
 
 **Windows notes:**
 

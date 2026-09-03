@@ -1,12 +1,12 @@
 /**
  * DB Verify Gate for Brilla Prep
  * Applies database/schema.sql + database/seed.sql + data-dependent migrations
- * 100 and 101 to an in-memory SQLite DB (node:sqlite, zero deps), then runs
+ * 100-103 to an in-memory SQLite DB (node:sqlite, zero deps), then runs
  * integrity checks over the final result.
  *
- * Exit 0 = all checks pass. Exit 1 = any failure (this IS the expected state
- * until the database reckoning tasks land — the failing baseline is the proof
- * the gate works).
+ * Exit 0 = all checks pass. Exit 1 = any failure. The gate is green on main;
+ * `npm run db:verify` also runs scripts/verify-fresh-bootstrap.cjs, which
+ * proves the fresh-environment provisioning path end to end.
  *
  * Checks:
  *   1. schema.sql applies cleanly
