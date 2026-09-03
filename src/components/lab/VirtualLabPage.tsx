@@ -273,12 +273,16 @@ export function VirtualLabPage() {
               <Card
                 hoverable
                 className="p-4 cursor-pointer border-2 border-transparent hover:border-primary"
-                onClick={() => {
-                  if (experimentForModal) {
-                    startSession(experimentForModal, 'guided');
+                onClick={async () => {
+                  if (!experimentForModal) return;
+                  await startSession(experimentForModal, 'guided');
+                  if (useLabStore.getState().error === 'LAB_PREMIUM_REQUIRED') {
                     setShowModeSelection(false);
-                    navigate(`/virtual-lab/${experimentForModal.slug}`);
+                    navigate('/pricing');
+                    return;
                   }
+                  setShowModeSelection(false);
+                  navigate(`/virtual-lab/${experimentForModal.slug}`);
                 }}
               >
                 <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-3">
@@ -301,12 +305,16 @@ export function VirtualLabPage() {
               <Card
                 hoverable
                 className="p-4 cursor-pointer border-2 border-transparent hover:border-primary"
-                onClick={() => {
-                  if (experimentForModal) {
-                    startSession(experimentForModal, 'sandbox');
+                onClick={async () => {
+                  if (!experimentForModal) return;
+                  await startSession(experimentForModal, 'sandbox');
+                  if (useLabStore.getState().error === 'LAB_PREMIUM_REQUIRED') {
                     setShowModeSelection(false);
-                    navigate(`/virtual-lab/${experimentForModal.slug}`);
+                    navigate('/pricing');
+                    return;
                   }
+                  setShowModeSelection(false);
+                  navigate(`/virtual-lab/${experimentForModal.slug}`);
                 }}
               >
                 <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-3">

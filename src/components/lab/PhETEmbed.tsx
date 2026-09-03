@@ -48,6 +48,9 @@ export function PhETEmbed({ simUrl, title, guidanceNotes }: PhETEmbedProps) {
         <div className="flex items-center gap-2 min-w-0">
           <span className="font-medium text-neutral-900 truncate text-sm">{title}</span>
           <span className="text-xs text-neutral-500 hidden sm:inline">PhET Simulation</span>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">
+            Practice mode — ungraded
+          </span>
         </div>
         <div className="flex items-center gap-1 shrink-0">
           {guidanceNotes && guidanceNotes.length > 0 && (

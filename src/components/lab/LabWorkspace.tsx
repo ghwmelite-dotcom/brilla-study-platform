@@ -46,6 +46,7 @@ import {
 import { useLabStore } from '@/stores/labStore';
 import { useThemeStore } from '@/stores/themeStore';
 import { useUIStore } from '@/stores/uiStore';
+import { Badge } from '@/components/common';
 import { buildSimReporters } from './simulations/reporting';
 import { cn } from '@/utils';
 import type { GradingResult } from '@/types';
@@ -69,6 +70,7 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
     observations,
     lastAttemptResult,
     isLoading,
+    submitPending,
     // Actions
     goToStep,
     completeStep,
@@ -84,6 +86,7 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
     recordAction,
     recordObservation,
     submitExperiment,
+    finishPractice,
   } = useLabStore();
 
   // Store-backed sim reporting callbacks, built once per render.
@@ -100,6 +103,7 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
   const [showDataPanel, setShowDataPanel] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showMobileProcedure, setShowMobileProcedure] = useState(false);
+  const [practiceComplete, setPracticeComplete] = useState(false);
 
   // Toggle theme for distraction-free mode
   const toggleLocalTheme = () => {
@@ -178,6 +182,9 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
   const completedSteps = stepCompletionStatus.filter(Boolean).length;
   const totalSteps = currentExperiment.procedure.length;
   const progressPercent = Math.round((completedSteps / totalSteps) * 100);
+  // PhET embeds can't emit structured evidence — they run as ungraded
+  // practice sessions.
+  const isPractice = currentExperiment.simulationType === 'phet';
 
   // Format time
   const formatTime = (seconds: number) => {
@@ -194,8 +201,17 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
       setShowResults(true);
       setShowSubmitConfirm(false);
     } catch (error) {
+      // submitExperiment already set the store's submitPending flag; the
+      // pending card below is the honest UI for a failed submit.
       console.error('Failed to submit:', error);
+      setShowSubmitConfirm(false);
     }
+  };
+
+  // Handle practice-mode completion (PhET — ungraded)
+  const handleFinishPractice = async () => {
+    await finishPractice();
+    setPracticeComplete(true);
   };
 
   // Handle add observation
@@ -284,19 +300,22 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
               <h3 className={cn("font-semibold mb-4", isDark ? "text-white" : "text-slate-900")}>Performance Breakdown</h3>
               <div className="space-y-3">
                 {results.criteriaScores.map((criteria) => (
-                  <div key={criteria.criterionId} className="flex items-center justify-between">
-                    <span className={cn("text-sm", isDark ? "text-white/70" : "text-slate-600")}>{criteria.criterionName}</span>
-                    <div className="flex items-center gap-3">
-                      <div className={cn("w-24 h-2 rounded-full overflow-hidden", isDark ? "bg-white/10" : "bg-slate-200")}>
-                        <div
-                          className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"
-                          style={{ width: `${(criteria.score / criteria.maxScore) * 100}%` }}
-                        />
+                  <div key={criteria.criterionId}>
+                    <div className="flex items-center justify-between">
+                      <span className={cn("text-sm", isDark ? "text-white/70" : "text-slate-600")}>{criteria.criterionName}</span>
+                      <div className="flex items-center gap-3">
+                        <div className={cn("w-24 h-2 rounded-full overflow-hidden", isDark ? "bg-white/10" : "bg-slate-200")}>
+                          <div
+                            className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"
+                            style={{ width: `${(criteria.score / criteria.maxScore) * 100}%` }}
+                          />
+                        </div>
+                        <span className={cn("text-sm font-medium w-12 text-right", isDark ? "text-white" : "text-slate-900")}>
+                          {criteria.score}/{criteria.maxScore}
+                        </span>
                       </div>
-                      <span className={cn("text-sm font-medium w-12 text-right", isDark ? "text-white" : "text-slate-900")}>
-                        {criteria.score}/{criteria.maxScore}
-                      </span>
                     </div>
+                    <p className={cn("text-xs mt-0.5", isDark ? "text-white/40" : "text-slate-400")}>{criteria.feedback}</p>
                   </div>
                 ))}
               </div>
@@ -304,7 +323,7 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
 
             {/* Feedback — per-criterion, from the server grading breakdown */}
             <div className={cn(
-              "backdrop-blur-sm rounded-2xl p-6 border mb-8",
+              "backdrop-blur-sm rounded-2xl p-6 border mb-6",
               isDark ? "bg-white/5 border-white/10" : "bg-white/80 border-slate-200 shadow-lg"
             )}>
               <h3 className={cn("font-semibold mb-4", isDark ? "text-white" : "text-slate-900")}>Feedback</h3>
@@ -318,6 +337,34 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
                   </li>
                 ))}
               </ul>
+            </div>
+
+            {/* Step Evidence */}
+            <div className={cn(
+              "backdrop-blur-sm rounded-2xl p-6 border mb-6",
+              isDark ? "bg-white/5 border-white/10" : "bg-white/80 border-slate-200 shadow-lg"
+            )}>
+              <h3 className={cn("font-semibold mb-4", isDark ? "text-white" : "text-slate-900")}>Step Evidence</h3>
+              <div className="space-y-2">
+                {results.stepScores.map((step) => (
+                  <div key={step.stepNumber} className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <span className={cn("text-sm", isDark ? "text-white/70" : "text-slate-600")}>
+                        Step {step.stepNumber}
+                      </span>
+                      <p className={cn("text-xs", isDark ? "text-white/40" : "text-slate-400")}>{step.feedback}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {step.evidence === 'self_report_only' && (
+                        <Badge variant="warning">Self-reported</Badge>
+                      )}
+                      <span className={cn("text-sm font-medium", isDark ? "text-white" : "text-slate-900")}>
+                        {step.marksEarned}/{step.maxMarks}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Actions */}
@@ -344,6 +391,69 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
               </button>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Pending grading state — the submit failed (offline/server unreachable),
+  // so no score is fabricated; the result lands in lab history on sync.
+  if (submitPending && !results) {
+    return (
+      <div className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center p-4 transition-colors duration-300",
+        isDark
+          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+          : "bg-gradient-to-br from-slate-100 via-white to-slate-100"
+      )}>
+        <div className={cn(
+          "w-full max-w-md backdrop-blur-sm rounded-2xl p-8 border text-center",
+          isDark ? "bg-white/5 border-white/10" : "bg-white/80 border-slate-200 shadow-lg"
+        )}>
+          <Clock className={cn("w-12 h-12 mx-auto mb-4", isDark ? "text-amber-400" : "text-amber-500")} />
+          <h2 className={cn("text-2xl font-bold mb-2", isDark ? "text-white" : "text-slate-900")}>
+            Grading Pending
+          </h2>
+          <p className={cn("mb-6", isDark ? "text-white/60" : "text-slate-500")}>
+            Grading is pending — your result will appear in your lab history once the connection is restored.
+          </p>
+          <button
+            onClick={onExit}
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-medium hover:from-purple-700 hover:to-indigo-700 transition-colors"
+          >
+            Exit Lab
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Practice-mode completion (PhET — ungraded, no score)
+  if (practiceComplete) {
+    return (
+      <div className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center p-4 transition-colors duration-300",
+        isDark
+          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+          : "bg-gradient-to-br from-slate-100 via-white to-slate-100"
+      )}>
+        <div className={cn(
+          "w-full max-w-md backdrop-blur-sm rounded-2xl p-8 border text-center",
+          isDark ? "bg-white/5 border-white/10" : "bg-white/80 border-slate-200 shadow-lg"
+        )}>
+          <CheckCircle className={cn("w-12 h-12 mx-auto mb-4", isDark ? "text-emerald-400" : "text-emerald-500")} />
+          <h2 className={cn("text-2xl font-bold mb-2", isDark ? "text-white" : "text-slate-900")}>
+            Practice Complete
+          </h2>
+          <p className={cn("mb-6", isDark ? "text-white/60" : "text-slate-500")}>
+            Practice sessions are not graded. Try a custom lab when you're ready for a scored attempt.
+          </p>
+          <button
+            onClick={onExit}
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-medium hover:from-purple-700 hover:to-indigo-700 transition-colors"
+          >
+            Exit Lab
+          </button>
         </div>
       </div>
     );
@@ -400,6 +510,9 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
               )}>
                 {mode === 'guided' ? 'Guided' : 'Sandbox'}
               </span>
+              {isPractice && (
+                <Badge variant="secondary" size="sm">Practice mode — ungraded</Badge>
+              )}
               <span className={isDark ? "text-white/50" : "text-slate-500"}>Step {currentStepIndex + 1} of {totalSteps}</span>
             </div>
           </div>
@@ -469,13 +582,13 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
             {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
           </button>
 
-          {/* Submit */}
+          {/* Submit / Finish practice */}
           <button
-            onClick={() => setShowSubmitConfirm(true)}
-            disabled={completedSteps < totalSteps && mode === 'guided'}
+            onClick={isPractice ? handleFinishPractice : () => setShowSubmitConfirm(true)}
+            disabled={!isPractice && completedSteps < totalSteps && mode === 'guided'}
             className={cn(
               'flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all',
-              completedSteps >= totalSteps || mode === 'sandbox'
+              isPractice || completedSteps >= totalSteps || mode === 'sandbox'
                 ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700'
                 : isDark
                   ? 'bg-white/5 text-white/30 cursor-not-allowed'
@@ -483,7 +596,7 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
             )}
           >
             <Send className="w-4 h-4" />
-            <span className="hidden sm:inline">Submit</span>
+            <span className="hidden sm:inline">{isPractice ? 'Finish practice' : 'Submit'}</span>
           </button>
         </div>
       </div>

@@ -1,5 +1,6 @@
-import { Clock, FlaskConical, Beaker, Microscope, Star, Play, BookOpen } from 'lucide-react';
+import { Clock, FlaskConical, Beaker, Microscope, Star, Play, BookOpen, Lock } from 'lucide-react';
 import { Card, Badge, Button } from '@/components/common';
+import { useUsageStore } from '@/stores/usageStore';
 import { cn } from '@/utils';
 import type { Experiment } from '@/types';
 
@@ -42,6 +43,11 @@ export function ExperimentCard({ experiment, onStart, className }: ExperimentCar
   const iconColor = subjectColors[experiment.subjectId] || 'bg-gray-500';
   const bgColor = subjectBgColors[experiment.subjectId] || 'bg-gray-50';
 
+  // Premium lock: same signal as Practice.tsx
+  const { dailyUsage } = useUsageStore();
+  const isPremiumUser = dailyUsage?.isUnlimited || dailyUsage?.isPremium || false;
+  const isLocked = experiment.isPremium && !isPremiumUser;
+
   // Get subject name from ID
   const getSubjectName = (subjectId: string) => {
     const mapping: Record<string, string> = {
@@ -56,7 +62,15 @@ export function ExperimentCard({ experiment, onStart, className }: ExperimentCar
   const totalMarks = experiment.procedure.reduce((sum, step) => sum + step.maxMarks, 0);
 
   return (
-    <Card hoverable className={cn('overflow-hidden', className)}>
+    <Card hoverable className={cn('overflow-hidden relative', className)}>
+      {/* Premium lock overlay */}
+      {isLocked && (
+        <div className="absolute top-3 right-3 z-10">
+          <Badge variant="warning" size="sm" icon={<Lock className="w-3 h-3" />}>
+            Premium
+          </Badge>
+        </div>
+      )}
       {/* Header with Subject Icon */}
       <div className={cn('p-4 flex items-start gap-4', bgColor)}>
         <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center text-white shrink-0', iconColor)}>
@@ -140,9 +154,9 @@ export function ExperimentCard({ experiment, onStart, className }: ExperimentCar
         <Button
           className="w-full"
           onClick={() => onStart(experiment)}
-          rightIcon={<Play className="w-4 h-4" />}
+          rightIcon={isLocked ? <Lock className="w-4 h-4" /> : <Play className="w-4 h-4" />}
         >
-          Start Experiment
+          {isLocked ? 'Unlock with Premium' : 'Start Experiment'}
         </Button>
       </div>
     </Card>

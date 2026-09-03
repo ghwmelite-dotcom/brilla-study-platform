@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { ExperimentCard } from './ExperimentCard';
+import { useUsageStore } from '@/stores/usageStore';
 import type { Experiment } from '@/types';
 
 interface ExperimentListProps {
@@ -7,6 +9,12 @@ interface ExperimentListProps {
 }
 
 export function ExperimentList({ experiments, onStartExperiment }: ExperimentListProps) {
+  // Fetch usage once for the list so premium locks render correctly.
+  const { fetchDailyUsage } = useUsageStore();
+  useEffect(() => {
+    fetchDailyUsage();
+  }, [fetchDailyUsage]);
+
   if (experiments.length === 0) {
     return (
       <div className="text-center py-12">
