@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@/utils';
+import type { SimReportProps } from './types';
 
-interface EnzymeSimulationProps {
-  onMeasurement?: (value: number, unit: string, label: string) => void;
-  onObservation?: (text: string) => void;
-}
+type EnzymeSimulationProps = SimReportProps;
 
 interface TrialData {
   temperature: number;
@@ -12,7 +10,7 @@ interface TrialData {
   rate: number;
 }
 
-export function EnzymeSimulation({ onMeasurement, onObservation }: EnzymeSimulationProps) {
+export function EnzymeSimulation({ onMeasurement, onObservation, onAction }: EnzymeSimulationProps) {
   const [temperature, setTemperature] = useState(37);
   const [stage, setStage] = useState<'setup' | 'incubating' | 'testing' | 'results'>('setup');
   const [incubationTime, setIncubationTime] = useState(0);
@@ -40,6 +38,7 @@ export function EnzymeSimulation({ onMeasurement, onObservation }: EnzymeSimulat
       setIncubationTime(prev => {
         if (prev >= 100) {
           onObservation?.(`Enzyme and starch equilibrated at ${temperature}°C`);
+          onAction?.('measure', 'app_thermometer', temperature);
           setStage('testing');
           return 100;
         }
@@ -48,7 +47,7 @@ export function EnzymeSimulation({ onMeasurement, onObservation }: EnzymeSimulat
     }, 100);
 
     return () => clearInterval(interval);
-  }, [stage, temperature, onObservation]);
+  }, [stage, temperature, onObservation, onAction]);
 
   // Reaction effect
   useEffect(() => {
@@ -94,12 +93,18 @@ export function EnzymeSimulation({ onMeasurement, onObservation }: EnzymeSimulat
     setStage('incubating');
     setIncubationTime(0);
     onObservation?.(`Incubating enzyme (amylase) and starch at ${temperature}°C`);
+    // Tubes placed in the water bath and the bath set to the selected
+    // temperature.
+    onAction?.('drag', 'app_water_bath');
+    onAction?.('adjust', 'app_water_bath', temperature);
   };
 
   const startReaction = () => {
     setIsReacting(true);
     setReactionTime(0);
     onObservation?.('Mixing enzyme with starch - reaction begins');
+    onAction?.('pour', 'app_petri_dish');
+    onAction?.('pour', 'app_test_tube');
   };
 
   const testWithIodine = () => {
@@ -114,7 +119,10 @@ export function EnzymeSimulation({ onMeasurement, onObservation }: EnzymeSimulat
     };
     setTrials(prev => [...prev, trial]);
     onMeasurement?.(time, 's', `Time at ${temperature}°C`);
+    onAction?.('measure', 'app_stopwatch', time);
+    onAction?.('record', 'app_stopwatch');
 
+    onAction?.('observe', 'app_test_tube');
     if (starchRemaining <= 0) {
       onObservation?.('Iodine remains brown - NO starch present (fully digested)');
     } else if (starchRemaining < 50) {

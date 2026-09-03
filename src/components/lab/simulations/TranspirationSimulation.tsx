@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@/utils';
+import type { SimReportProps } from './types';
 
-interface TranspirationSimulationProps {
-  onMeasurement?: (value: number, unit: string, label: string) => void;
-  onObservation?: (text: string) => void;
-}
+type TranspirationSimulationProps = SimReportProps;
 
 interface TrialData {
   condition: string;
@@ -23,7 +21,7 @@ const CONDITION_RATES: Record<Condition, { rate: number; label: string; descript
 };
 
 
-export function TranspirationSimulation({ onMeasurement, onObservation }: TranspirationSimulationProps) {
+export function TranspirationSimulation({ onMeasurement, onObservation, onAction }: TranspirationSimulationProps) {
   const [condition, setCondition] = useState<Condition>('normal');
   const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(0);
@@ -45,6 +43,7 @@ export function TranspirationSimulation({ onMeasurement, onObservation }: Transp
         if (newPos >= 100) {
           setIsRunning(false);
           onObservation?.(`Bubble moved 100mm in ${time + 1}s under ${CONDITION_RATES[condition].label} conditions`);
+          onAction?.('observe', 'app_potometer');
           return 100;
         }
         return newPos;
@@ -52,13 +51,17 @@ export function TranspirationSimulation({ onMeasurement, onObservation }: Transp
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isRunning, condition, time, onObservation]);
+  }, [isRunning, condition, time, onObservation, onAction]);
 
   const startMeasurement = () => {
     setIsRunning(true);
     setTime(0);
     setBubblePosition(0);
     onObservation?.(`Starting measurement under ${CONDITION_RATES[condition].label} conditions`);
+    // Potometer setup: shoot cut under water, connected, and filled.
+    onAction?.('drag', 'app_scalpel');
+    onAction?.('connect', 'app_potometer');
+    onAction?.('pour', 'app_potometer');
   };
 
   const stopAndRecord = () => {
@@ -74,12 +77,17 @@ export function TranspirationSimulation({ onMeasurement, onObservation }: Transp
     setTrials(prev => [...prev, trial]);
     onMeasurement?.(rate, 'mm/min', `Rate (${CONDITION_RATES[condition].label})`);
     onObservation?.(`Recorded: ${bubblePosition.toFixed(1)}mm in ${time}s = ${rate.toFixed(2)} mm/min`);
+    onAction?.('measure', 'app_stopwatch', time);
+    onAction?.('measure', 'app_meter_rule', bubblePosition);
+    onAction?.('record', 'app_stopwatch');
   };
 
   const resetBubble = () => {
     setBubblePosition(0);
     setTime(0);
     onObservation?.('Air bubble repositioned to start');
+    onAction?.('drag', 'app_potometer');
+    onAction?.('adjust', 'app_potometer');
   };
 
   return (

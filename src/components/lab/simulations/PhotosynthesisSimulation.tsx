@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@/utils';
+import type { SimReportProps } from './types';
 
-interface PhotosynthesisSimulationProps {
-  onObservation?: (text: string) => void;
-}
+type PhotosynthesisSimulationProps = SimReportProps;
 
 type LeafCondition = 'normal' | 'covered' | 'variegated';
 type Stage = 'setup' | 'destarch' | 'light_exposure' | 'decolorize' | 'test' | 'results';
@@ -14,7 +13,7 @@ interface LeafResult {
   explanation: string;
 }
 
-export function PhotosynthesisSimulation({ onObservation }: PhotosynthesisSimulationProps) {
+export function PhotosynthesisSimulation({ onObservation, onAction }: PhotosynthesisSimulationProps) {
   const [stage, setStage] = useState<Stage>('setup');
   const [selectedLeaf, setSelectedLeaf] = useState<LeafCondition>('normal');
   const [destarchTime, setDestarchTime] = useState(0);
@@ -80,6 +79,7 @@ export function PhotosynthesisSimulation({ onObservation }: PhotosynthesisSimula
             onObservation?.('Leaf softened in boiling water - cell membranes disrupted');
           } else {
             onObservation?.('Chlorophyll removed - leaf is now pale/white');
+            onAction?.('observe', 'app_test_tube');
           }
           return 100;
         }
@@ -88,11 +88,12 @@ export function PhotosynthesisSimulation({ onObservation }: PhotosynthesisSimula
     }, 100);
 
     return () => clearInterval(interval);
-  }, [isBoiling, boilingStage, onObservation]);
+  }, [isBoiling, boilingStage, onObservation, onAction]);
 
   const startDestarch = () => {
     setStage('destarch');
     onObservation?.('Placing plant in dark cupboard for de-starching (simulated 48 hours)');
+    onAction?.('record', 'app_forceps');
   };
 
   const boilInWater = () => {
@@ -100,6 +101,9 @@ export function PhotosynthesisSimulation({ onObservation }: PhotosynthesisSimula
     setBoilingProgress(0);
     setIsBoiling(true);
     onObservation?.('Boiling leaf in water to kill cells and stop reactions');
+    onAction?.('drag', 'app_beaker_250');
+    onAction?.('pour', 'app_beaker_250');
+    onAction?.('heat', 'app_bunsen_burner');
   };
 
   const boilInEthanol = () => {
@@ -111,6 +115,8 @@ export function PhotosynthesisSimulation({ onObservation }: PhotosynthesisSimula
     setBoilingProgress(0);
     setIsBoiling(true);
     onObservation?.('Boiling in ethanol to remove chlorophyll (using water bath for safety)');
+    onAction?.('drag', 'app_test_tube');
+    onAction?.('heat', 'app_bunsen_burner');
   };
 
   const applyIodine = () => {
@@ -121,6 +127,8 @@ export function PhotosynthesisSimulation({ onObservation }: PhotosynthesisSimula
     setIodineApplied(true);
     setStage('test');
     onObservation?.('Applying iodine solution to test for starch');
+    // Leaf placed on the petri dish and iodine added.
+    onAction?.('pour', 'app_petri_dish');
 
     // Generate results after a delay
     setTimeout(() => {
@@ -145,6 +153,8 @@ export function PhotosynthesisSimulation({ onObservation }: PhotosynthesisSimula
       const result = leafResults.find(r => r.condition === selectedLeaf)!;
       setResults([result]);
       onObservation?.(result.explanation);
+      onAction?.('observe', 'app_petri_dish');
+      onAction?.('record', 'app_petri_dish');
       setStage('results');
     }, 2000);
   };
@@ -219,7 +229,12 @@ export function PhotosynthesisSimulation({ onObservation }: PhotosynthesisSimula
                 ].map((leaf) => (
                   <button
                     key={leaf.key}
-                    onClick={() => setSelectedLeaf(leaf.key as LeafCondition)}
+                    onClick={() => {
+                      setSelectedLeaf(leaf.key as LeafCondition);
+                      // Leaf handling with forceps onto the petri dish.
+                      onAction?.('drag', 'app_petri_dish');
+                      onAction?.('drag', 'app_forceps');
+                    }}
                     className={cn(
                       'w-full p-3 rounded-lg text-left transition-all border',
                       selectedLeaf === leaf.key

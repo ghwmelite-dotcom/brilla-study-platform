@@ -15,11 +15,9 @@ import {
   FlaskConical
 } from 'lucide-react';
 import { cn } from '@/utils';
+import type { SimReportProps } from './types';
 
-interface OsmosisSimulationProps {
-  onMeasurement?: (value: number, unit: string, label: string) => void;
-  onObservation?: (text: string) => void;
-}
+type OsmosisSimulationProps = SimReportProps;
 
 // Sucrose concentrations for the experiment
 const concentrations = [
@@ -41,7 +39,7 @@ interface PotatoStrip {
 
 type ExperimentPhase = 'setup' | 'weighing' | 'soaking' | 'results' | 'plasmolysis';
 
-export function OsmosisSimulation({ onMeasurement, onObservation }: OsmosisSimulationProps) {
+export function OsmosisSimulation({ onMeasurement, onObservation, onAction }: OsmosisSimulationProps) {
   // Experiment phase
   const [phase, setPhase] = useState<ExperimentPhase>('setup');
 
@@ -127,6 +125,7 @@ export function OsmosisSimulation({ onMeasurement, onObservation }: OsmosisSimul
           setIsTimerRunning(false);
           setPhase('results');
           onObservation?.('30 minutes complete! Remove strips and weigh final masses.');
+          onAction?.('observe', 'app_petri_dish');
         }
 
         return Math.min(newTime, targetTime);
@@ -134,7 +133,7 @@ export function OsmosisSimulation({ onMeasurement, onObservation }: OsmosisSimul
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isTimerRunning, calculateMassChange, onObservation, targetTime]);
+  }, [isTimerRunning, calculateMassChange, onObservation, onAction, targetTime]);
 
   // Plasmolysis animation
   useEffect(() => {
@@ -156,6 +155,7 @@ export function OsmosisSimulation({ onMeasurement, onObservation }: OsmosisSimul
     ));
 
     const allPlaced = strips.every((s, i) => i === stripId || s.inSolution !== null);
+    onAction?.('drag', 'app_petri_dish');
     if (allPlaced || strips.filter(s => s.inSolution !== null).length === 5) {
       onObservation?.(`Placed all potato strips in their solutions. Start the timer!`);
       setPhase('soaking');
@@ -171,12 +171,16 @@ export function OsmosisSimulation({ onMeasurement, onObservation }: OsmosisSimul
     if (isFinal) {
       setWeighedFinal(prev => new Set([...prev, stripId]));
       onMeasurement?.(strip.currentMass, 'g', `Strip ${stripId + 1} final mass (${concentrations[strip.inSolution!]?.label})`);
+      onAction?.('measure', 'app_balance', strip.currentMass);
+      onAction?.('record', 'app_balance');
 
       const percentChange = ((strip.currentMass - strip.initialMass) / strip.initialMass) * 100;
       onObservation?.(`Strip ${stripId + 1}: Initial ${strip.initialMass.toFixed(2)}g → Final ${strip.currentMass.toFixed(2)}g (${percentChange > 0 ? '+' : ''}${percentChange.toFixed(1)}%)`);
     } else {
       setWeighedInitial(prev => new Set([...prev, stripId]));
       onMeasurement?.(strip.initialMass, 'g', `Strip ${stripId + 1} initial mass`);
+      onAction?.('measure', 'app_balance', strip.initialMass);
+      onAction?.('record', 'app_balance');
       onObservation?.(`Weighed strip ${stripId + 1}: ${strip.initialMass.toFixed(2)}g`);
 
       if (weighedInitial.size === 5) {
@@ -222,6 +226,7 @@ export function OsmosisSimulation({ onMeasurement, onObservation }: OsmosisSimul
   const startExperiment = () => {
     setPhase('weighing');
     onObservation?.('Cut 6 potato strips of equal size. Now weigh each strip.');
+    onAction?.('drag', 'app_scalpel');
   };
 
   // Render potato strip
@@ -782,6 +787,10 @@ export function OsmosisSimulation({ onMeasurement, onObservation }: OsmosisSimul
                       setSelectedCellView('normal');
                       setPlasmolysisProgress(0);
                       onObservation?.('Viewing onion cells in distilled water - cells are turgid');
+                      // Slide prep for the plasmolysis viewing.
+                      onAction?.('drag', 'app_cover_slip');
+                      onAction?.('pour', 'app_cover_slip');
+                      onAction?.('observe', 'app_microscope');
                     }}
                   >
                     <Droplets className="w-3 h-3 mr-2" />
@@ -795,6 +804,7 @@ export function OsmosisSimulation({ onMeasurement, onObservation }: OsmosisSimul
                       setSelectedCellView('salt');
                       setPlasmolysisProgress(0);
                       onObservation?.('Adding concentrated salt solution - watch for plasmolysis!');
+                      onAction?.('observe', 'app_microscope');
                     }}
                   >
                     <FlaskConical className="w-3 h-3 mr-2" />
@@ -823,6 +833,7 @@ export function OsmosisSimulation({ onMeasurement, onObservation }: OsmosisSimul
                         onClick={() => {
                           onObservation?.('Plasmolysis complete! Cell membrane has pulled away from cell wall due to water loss.');
                           onMeasurement?.(100, '%', 'Plasmolysis completion');
+                          onAction?.('record', 'app_microscope');
                         }}
                       >
                         <CheckCircle2 className="w-3 h-3 mr-1" />

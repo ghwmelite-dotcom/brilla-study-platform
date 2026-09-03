@@ -9,11 +9,9 @@ import {
   Microscope
 } from 'lucide-react';
 import { cn } from '@/utils';
+import type { SimReportProps } from './types';
 
-interface MicroscopeSimulationProps {
-  onMeasurement?: (value: number, unit: string, label: string) => void;
-  onObservation?: (text: string) => void;
-}
+type MicroscopeSimulationProps = SimReportProps;
 
 // Specimen types with cell images
 const specimens = [
@@ -53,7 +51,7 @@ const specimens = [
 
 type ObjectivePower = 4 | 10 | 40;
 
-export function MicroscopeSimulation({ onMeasurement, onObservation }: MicroscopeSimulationProps) {
+export function MicroscopeSimulation({ onMeasurement, onObservation, onAction }: MicroscopeSimulationProps) {
   const [currentSpecimen] = useState(specimens[Math.floor(Math.random() * specimens.length)]);
   const [objectivePower, setObjectivePower] = useState<ObjectivePower>(4);
   const [eyepiecePower] = useState(10);
@@ -92,12 +90,15 @@ export function MicroscopeSimulation({ onMeasurement, onObservation }: Microscop
     setHasSlide(true);
     addCompletedStep('slide');
     onObservation?.(`Placed ${currentSpecimen.name} slide on the stage`);
+    onAction?.('drag', 'app_microscope');
+    onAction?.('drag', 'app_slide');
   };
 
   const turnOnLight = () => {
     setIsLightOn(true);
     addCompletedStep('light');
     onObservation?.('Adjusted illumination - specimen is now visible');
+    onAction?.('adjust', 'app_microscope');
   };
 
   const changeObjective = (power: ObjectivePower) => {
@@ -107,12 +108,16 @@ export function MicroscopeSimulation({ onMeasurement, onObservation }: Microscop
     setFineFocus(50);
     addCompletedStep(`objective_${power}`);
     onObservation?.(`Changed to ${power}x objective lens`);
+    onAction?.('adjust', 'app_microscope', power);
   };
 
   const recordMagnification = () => {
     addCompletedStep('magnification');
-    onMeasurement?.(totalMagnification, 'x', 'Total Magnification');
+    // Tag with the expectedResult condition so the grader checks the
+    // reported total magnification against 'Magnification at x400'.
+    onMeasurement?.(totalMagnification, 'x', 'Total Magnification', 'Magnification at x400');
     onObservation?.(`Total magnification: ${eyepiecePower}x (eyepiece) × ${objectivePower}x (objective) = ${totalMagnification}x`);
+    onAction?.('record', 'app_microscope');
   };
 
   const resetSimulation = () => {

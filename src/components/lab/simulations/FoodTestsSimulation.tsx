@@ -10,11 +10,9 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { cn } from '@/utils';
+import type { SimReportProps } from './types';
 
-interface FoodTestsSimulationProps {
-  onMeasurement?: (value: number, unit: string, label: string) => void;
-  onObservation?: (text: string) => void;
-}
+type FoodTestsSimulationProps = SimReportProps;
 
 // Food samples with their nutrient content
 const foodSamples = [
@@ -92,7 +90,7 @@ interface TestResult {
   description: string;
 }
 
-export function FoodTestsSimulation({ onObservation }: FoodTestsSimulationProps) {
+export function FoodTestsSimulation({ onObservation, onAction }: FoodTestsSimulationProps) {
   const [selectedFood, setSelectedFood] = useState(foodSamples[0]);
   const [activeTest, setActiveTest] = useState<TestType | null>(null);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
@@ -138,6 +136,9 @@ export function FoodTestsSimulation({ onObservation }: FoodTestsSimulationProps)
     setActiveTest(test);
     setIsAnimating(true);
 
+    // Reagent added to the sample tube.
+    onAction?.('pour', 'app_test_tube');
+
     // For Benedict's test, need heating
     if (test === 'reducing_sugar') {
       setIsHeating(true);
@@ -166,6 +167,8 @@ export function FoodTestsSimulation({ onObservation }: FoodTestsSimulationProps)
       });
 
       onObservation?.(`${test.replace('_', ' ').toUpperCase()} test on ${selectedFood.name}: ${result.description}`);
+      onAction?.('observe', 'app_test_tube');
+      onAction?.('record', 'app_test_tube');
 
       setIsAnimating(false);
       setIsHeating(false);
@@ -190,6 +193,9 @@ export function FoodTestsSimulation({ onObservation }: FoodTestsSimulationProps)
     setSelectedFood(food);
     resetSimulation();
     onObservation?.(`Selected food sample: ${food.name}`);
+    // Sample preparation: a fresh tube is taken and the sample added.
+    onAction?.('drag', 'app_test_tube');
+    onAction?.('pour', 'app_test_tube');
   };
 
   return (

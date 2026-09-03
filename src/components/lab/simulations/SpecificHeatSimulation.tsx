@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/utils';
+import type { SimReportProps } from './types';
 
-interface SpecificHeatSimulationProps {
-  onMeasurement?: (value: number, unit: string, label: string) => void;
-  onObservation?: (text: string) => void;
-}
+type SpecificHeatSimulationProps = SimReportProps;
 
 interface DataPoint {
   massWater: number;
@@ -15,7 +13,7 @@ interface DataPoint {
   specificHeat: number;
 }
 
-export function SpecificHeatSimulation({ onMeasurement, onObservation }: SpecificHeatSimulationProps) {
+export function SpecificHeatSimulation({ onMeasurement, onObservation, onAction }: SpecificHeatSimulationProps) {
   const [stage, setStage] = useState<'setup' | 'heating' | 'mixing' | 'results'>('setup');
   const [selectedMetal, setSelectedMetal] = useState<'aluminum' | 'copper' | 'iron'>('aluminum');
   const [massWater, setMassWater] = useState(100);
@@ -33,6 +31,8 @@ export function SpecificHeatSimulation({ onMeasurement, onObservation }: Specifi
   const calculateFinalTempRef = useRef<() => number>(() => 25);
   const onObservationRef = useRef(onObservation);
   onObservationRef.current = onObservation;
+  const onActionRef = useRef(onAction);
+  onActionRef.current = onAction;
   // Metal properties (specific heat in J/g°C)
   const metals = {
     aluminum: { name: 'Aluminum', color: '#C0C0C0', actualSHC: 0.897, maxTemp: 100 },
@@ -52,6 +52,7 @@ export function SpecificHeatSimulation({ onMeasurement, onObservation }: Specifi
         if (newTemp >= currentMetal.maxTemp) {
           setIsHeating(false);
           onObservationRef.current?.(`Metal heated to ${newTemp}°C - ready for transfer`);
+          onActionRef.current?.('observe', 'app_thermometer');
         }
         return newTemp;
       });
@@ -73,6 +74,8 @@ export function SpecificHeatSimulation({ onMeasurement, onObservation }: Specifi
         if (Math.abs(diff) < 0.1) {
           setIsMixing(false);
           onObservationRef.current?.(`Thermal equilibrium reached at ${targetTemp.toFixed(1)}°C`);
+          onActionRef.current?.('measure', 'app_thermometer', targetTemp);
+          onActionRef.current?.('observe', 'app_thermometer');
           return targetTemp;
         }
         return prev + diff * 0.1;
@@ -109,6 +112,11 @@ export function SpecificHeatSimulation({ onMeasurement, onObservation }: Specifi
     setIsHeating(true);
     setStage('heating');
     onObservationRef.current?.('Heating metal in boiling water bath...');
+    // Metal weighed and water measured out before heating begins.
+    onAction?.('measure', 'app_balance', massMetal);
+    onAction?.('record', 'app_balance');
+    onAction?.('adjust', 'app_beaker_250', massWater);
+    onAction?.('heat', 'app_bunsen_burner');
   };
 
   const transferMetal = () => {
@@ -120,6 +128,9 @@ export function SpecificHeatSimulation({ onMeasurement, onObservation }: Specifi
     setFinalTemp(tempWater);
     setIsMixing(true);
     onObservationRef.current?.(`Transferring ${currentMetal.name} (${tempMetal}°C) to calorimeter water (${tempWater}°C)`);
+    onAction?.('measure', 'app_thermometer', tempMetal);
+    onAction?.('drag', 'app_calorimeter');
+    onAction?.('pour', 'app_calorimeter');
   };
 
   const recordResult = () => {
@@ -133,8 +144,16 @@ export function SpecificHeatSimulation({ onMeasurement, onObservation }: Specifi
       specificHeat: calculatedSHC,
     };
     setDataPoints(prev => [...prev, newPoint]);
-    onMeasurement?.(calculatedSHC, 'J/g°C', `Specific heat of ${currentMetal.name}`);
+    // Tag with the matching expectedResult condition so the grader checks
+    // against the metal's accepted SHC (iron has no expectedResult).
+    const condition = selectedMetal === 'copper'
+      ? 'Specific heat capacity of copper'
+      : selectedMetal === 'aluminum'
+        ? 'Specific heat capacity of aluminum'
+        : undefined;
+    onMeasurement?.(calculatedSHC, 'J/g°C', `Specific heat of ${currentMetal.name}`, condition);
     onObservationRef.current?.(`Calculated specific heat: ${calculatedSHC.toFixed(3)} J/g°C (Actual: ${currentMetal.actualSHC} J/g°C)`);
+    onAction?.('record', 'app_thermometer');
     setStage('results');
   };
 

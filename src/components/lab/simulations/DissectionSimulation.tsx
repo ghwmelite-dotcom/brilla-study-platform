@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { cn } from '@/utils';
+import type { SimReportProps } from './types';
 
-interface DissectionSimulationProps {
-  onObservation?: (text: string) => void;
-}
+type DissectionSimulationProps = SimReportProps;
 
 interface Organ {
   id: string;
@@ -16,7 +15,7 @@ interface Organ {
   identified: boolean;
 }
 
-export function DissectionSimulation({ onObservation }: DissectionSimulationProps) {
+export function DissectionSimulation({ onObservation, onAction }: DissectionSimulationProps) {
   const [stage, setStage] = useState<'external' | 'incision' | 'internal' | 'identify'>('external');
   const [selectedOrgan, setSelectedOrgan] = useState<string | null>(null);
   const [identifiedOrgans, setIdentifiedOrgans] = useState<Set<string>>(new Set());
@@ -127,6 +126,7 @@ export function DissectionSimulation({ onObservation }: DissectionSimulationProp
           setTimeout(() => {
             setStage('internal');
             onObservation?.('Body cavity exposed - internal organs visible');
+            onAction?.('observe', 'app_dissecting_board');
           }, 500);
           return 100;
         }
@@ -143,6 +143,8 @@ export function DissectionSimulation({ onObservation }: DissectionSimulationProp
       setIdentifiedOrgans(prev => new Set([...prev, organId]));
       setSelectedOrgan(organId);
       onObservation?.(`Identified: ${organ.name} - ${organ.function}`);
+      onAction?.('observe', 'app_dissecting_board');
+      onAction?.('record', 'app_dissecting_board');
     }
   };
 
@@ -177,6 +179,11 @@ export function DissectionSimulation({ onObservation }: DissectionSimulationProp
                     if (s.key === 'incision' && stage === 'external') {
                       setStage('incision');
                       onObservation?.('Preparing to make ventral incision');
+                      // Specimen pinned to the board and tools selected.
+                      onAction?.('drag', 'app_dissecting_board');
+                      onAction?.('drag', 'app_dissecting_pins');
+                      onAction?.('drag', 'app_forceps');
+                      onAction?.('drag', 'app_scissors');
                     } else if (s.key === 'identify' && stage === 'internal') {
                       setStage('identify');
                       onObservation?.('Click on organs to identify them');
