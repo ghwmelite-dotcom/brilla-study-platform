@@ -6,7 +6,8 @@ import { requireAuth, requireAdmin, constantTimeEqual } from './auth-middleware'
 import { parseBoundedJsonBody, parseLimit, parseJsonBody } from './http';
 import type { JWTPayload } from 'hono/utils/jwt/types';
 import { callTextModel, getChatModel, getGenerationModel, getMarkingModel, getTtsModel, getVisionModel, unwrapAiText } from './ai-models';
-import { formatUntrustedAiData, normalizeAiGradingFeedback, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
+import { extractJsonObject, formatUntrustedAiData, normalizeAiGradingFeedback, normalizeTheoryMarking, UNTRUSTED_AI_DATA_INSTRUCTION } from './ai-safety';
+import type { TheoryMarking } from './ai-safety';
 import { libraryApp } from './library';
 import { counselorApp } from './counselor';
 import { notificationsApp, createNotification } from './notifications';
@@ -5240,6 +5241,98 @@ protectedApp.put('/papers/attempts/:attemptId/answer', async (c) => {
     return c.json({ success: false, error: 'Failed to save answer' }, 500);
   }
 });
+
+// =============================================
+// THEORY MARKING (shared marker for paper submits, /remark, and essays)
+// =============================================
+
+export const THEORY_MARKING_TIMEOUT_MS = 25_000;
+
+export interface StructuredPartInput {
+  part_label: string;
+  part_text: string;
+  marks: number;
+  correct_answer: string;
+}
+
+export interface TheoryQuestionContext {
+  questionType: string;
+  questionText: string;
+  marks: number;
+  subjectName: string | null;
+  correctAnswer: string | null;
+  markingScheme: unknown;
+  markingRubric: string | null;
+  modelAnswer: string | null;
+  requiredPoints: unknown;
+  optionalPoints: unknown;
+  structuredParts: StructuredPartInput[];
+}
+
+export function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)),
+  ]);
+}
+
+/**
+ * Mark one theory answer against its marking scheme (or generic WAEC
+ * criteria when no scheme exists). Every content field — scheme, model
+ * answer, and the student answer — is untrusted data, never instructions.
+ * Unparseable model output throws: a marking failure, not a guessed score.
+ */
+export async function gradeTheoryAnswer(
+  env: Env,
+  question: TheoryQuestionContext,
+  studentAnswer: string,
+): Promise<TheoryMarking> {
+  const systemPrompt = `You are an experienced WAEC examiner marking a ${question.questionType} answer. Award marks strictly against the supplied marking points when they exist, otherwise against standard WAEC expectations for the question's mark allocation. Be fair, specific, and constructive.
+${UNTRUSTED_AI_DATA_INSTRUCTION}
+
+Return ONLY a JSON object with this structure:
+{
+  "score": number,
+  "maxScore": number,
+  "perPoint": [{"point": "string", "awarded": number, "maxMarks": number, "comment": "string"}],
+  "feedback": "string",
+  "strengths": ["string"],
+  "improvements": ["string"]
+}`;
+
+  const userPrompt = `${formatUntrustedAiData('Marking inputs', {
+    subject: question.subjectName,
+    questionType: question.questionType,
+    totalMarks: question.marks,
+    question: question.questionText,
+    markingScheme: question.markingScheme,
+    markingRubric: question.markingRubric,
+    modelAnswer: question.modelAnswer,
+    requiredPoints: question.requiredPoints,
+    optionalPoints: question.optionalPoints,
+    structuredParts: question.structuredParts,
+    expectedAnswer: question.correctAnswer,
+  })}
+
+${formatUntrustedAiData('Student answer', studentAnswer)}
+
+Mark the student answer using only the supplied data.`;
+
+  const response = await callTextModel(env, {
+    model: getMarkingModel(env),
+    system: systemPrompt,
+    user: userPrompt,
+    maxTokens: 2048,
+    temperature: 0.2,
+  });
+
+  const parsed = extractJsonObject(response);
+  if (parsed === null) {
+    throw new Error('Theory marking output contained no JSON object');
+  }
+  return normalizeTheoryMarking(parsed, question.marks);
+}
 
 // Submit paper attempt
 protectedApp.post('/papers/attempts/:attemptId/submit', async (c) => {
