@@ -1215,8 +1215,10 @@ alongside tests, typecheck, lint, and build).
 
 **Windows notes:**
 
-- `npm run db:backup` embeds `$(date ...)` — Git Bash / POSIX shells only; it
-  does not expand in cmd.exe or PowerShell.
+- `npm run db:backup` / `npm run db:backup:staging` export the remote
+  production / staging D1 (`wrangler d1 export --remote`) and embed
+  `$(date ...)` — Git Bash / POSIX shells only; it does not expand in cmd.exe
+  or PowerShell.
 - `wrangler d1 execute --local --file=database/seed.sql` can crash workerd on
   Windows (miniflare `kj HashIndex` internal error on the 4,545-row file). The
   SQL is valid — `db:verify` proves it. Workaround: load the seed locally via

@@ -22,9 +22,11 @@
 -- listed here still fails to apply on the schema.sql baseline — i.e. it is
 -- genuinely folded — and (b) every migration NOT listed here applies cleanly.
 --
--- Idempotent folds (094, 098, 100, 101, 103, 113, 358) are deliberately NOT
--- listed: their files apply cleanly as no-ops on fresh databases and are
--- recorded by wrangler itself when `migrations apply` runs them.
+-- Idempotent folds (094, 098, 100, 101, 103, 113, 358, 359, 360) are
+-- deliberately NOT listed: their files apply cleanly on fresh databases
+-- (358/359 are IF NOT EXISTS no-ops; 360's table rebuild succeeds because its
+-- _v2 scratch tables do not exist in schema.sql and the folded tables are
+-- empty) and are recorded by wrangler itself when `migrations apply` runs them.
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS d1_migrations(
 	id         INTEGER PRIMARY KEY AUTOINCREMENT,

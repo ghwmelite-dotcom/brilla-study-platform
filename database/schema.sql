@@ -4485,18 +4485,25 @@ CREATE TABLE IF NOT EXISTS tutor_feedback (
 );
 
 -- Source: migrations/358_referral_marketing_consent.sql
--- Folded so the canonical schema matches the live chain through 358. 358 is
+-- (post-360 shape: 360_role_neutral_marketing_consent.sql rebuilds this table,
+-- replacing role-inferred eligibility with explicit opt-in)
+-- Folded so the canonical schema matches the live chain through 360. 358 is
 -- fully idempotent (IF NOT EXISTS throughout), so it is NOT listed in
 -- database/record_folded_migrations.sql: on fresh databases `migrations apply`
 -- re-applies it as a harmless no-op (same as folded 094/098/100/101/103/113).
+-- 360's rebuild also applies cleanly on this baseline (its _v2 scratch tables
+-- do not exist here, the tables it drops are empty, and the indexes it
+-- recreates are dropped along with them), so 360 is not listed either.
 CREATE TABLE IF NOT EXISTS marketing_email_preferences (
   user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
   referral_rewards_opt_in INTEGER NOT NULL DEFAULT 0 CHECK (referral_rewards_opt_in IN (0, 1)),
   consent_version TEXT,
   consented_at TEXT,
-  consent_source TEXT CHECK (consent_source IS NULL OR consent_source IN ('settings', 'guardian_confirmation')),
+  consent_source TEXT CHECK (
+    consent_source IS NULL OR consent_source IN ('settings', 'student_onboarding', 'affiliate_dashboard', 'guardian_confirmation')
+  ),
   eligibility_basis TEXT NOT NULL DEFAULT 'unknown'
-    CHECK (eligibility_basis IN ('unknown', 'adult_self_attested', 'guardian_confirmed', 'adult_role')),
+    CHECK (eligibility_basis IN ('unknown', 'explicit_opt_in', 'guardian_confirmed')),
   consent_actor_user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
   unsubscribed_at TEXT,
   provider_contact_id TEXT,
@@ -4510,34 +4517,40 @@ CREATE TABLE IF NOT EXISTS marketing_email_preferences (
       consent_version IS NOT NULL AND
       consented_at IS NOT NULL AND
       consent_source IS NOT NULL AND
-      eligibility_basis IN ('adult_self_attested', 'guardian_confirmed', 'adult_role') AND
+      eligibility_basis IN ('explicit_opt_in', 'guardian_confirmed') AND
       unsubscribed_at IS NULL
     )
   )
 );
 
 -- Source: migrations/358_referral_marketing_consent.sql
+-- (post-360 shape: rebuilt by 360_role_neutral_marketing_consent.sql)
 CREATE TABLE IF NOT EXISTS marketing_consent_events (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   topic TEXT NOT NULL DEFAULT 'referral_rewards' CHECK (topic = 'referral_rewards'),
   action TEXT NOT NULL CHECK (action IN ('opt_in', 'opt_out', 'provider_unsubscribe', 'guardian_confirmed')),
   actor_user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
-  source TEXT NOT NULL CHECK (source IN ('settings', 'guardian_confirmation', 'resend_webhook')),
+  source TEXT NOT NULL CHECK (
+    source IN ('settings', 'student_onboarding', 'affiliate_dashboard', 'guardian_confirmation', 'resend_webhook')
+  ),
   consent_version TEXT,
   eligibility_basis TEXT CHECK (
-    eligibility_basis IS NULL OR eligibility_basis IN ('unknown', 'adult_self_attested', 'guardian_confirmed', 'adult_role')
+    eligibility_basis IS NULL OR eligibility_basis IN ('unknown', 'explicit_opt_in', 'guardian_confirmed')
   ),
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 -- Source: migrations/358_referral_marketing_consent.sql
+-- (post-360 shape: rebuilt by 360_role_neutral_marketing_consent.sql)
 CREATE TABLE IF NOT EXISTS marketing_email_suppressions (
   id TEXT PRIMARY KEY,
   user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
   email_hash TEXT NOT NULL,
   reason TEXT NOT NULL CHECK (reason IN ('user_opt_out', 'provider_unsubscribe', 'hard_bounce', 'complaint', 'admin')),
-  source TEXT NOT NULL CHECK (source IN ('settings', 'resend_webhook', 'admin')),
+  source TEXT NOT NULL CHECK (
+    source IN ('settings', 'student_onboarding', 'affiliate_dashboard', 'resend_webhook', 'admin')
+  ),
   expires_at TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE(email_hash)
@@ -4563,13 +4576,14 @@ CREATE TABLE IF NOT EXISTS marketing_campaigns (
 );
 
 -- Source: migrations/358_referral_marketing_consent.sql
+-- (post-360 shape: rebuilt by 360_role_neutral_marketing_consent.sql)
 CREATE TABLE IF NOT EXISTS marketing_campaign_recipients (
   campaign_id TEXT NOT NULL REFERENCES marketing_campaigns(id) ON DELETE CASCADE,
   user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   referral_code TEXT NOT NULL,
   consent_version TEXT NOT NULL,
   eligibility_basis TEXT NOT NULL
-    CHECK (eligibility_basis IN ('adult_self_attested', 'guardian_confirmed', 'adult_role')),
+    CHECK (eligibility_basis IN ('explicit_opt_in', 'guardian_confirmed')),
   status TEXT NOT NULL DEFAULT 'planned'
     CHECK (status IN ('planned', 'provider_synced', 'provider_suppressed', 'provider_failed')),
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -4583,6 +4597,24 @@ CREATE TABLE IF NOT EXISTS marketing_webhook_events (
   event_type TEXT NOT NULL,
   event_created_at TEXT,
   processed_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Source: migrations/359_marketing_campaign_dispatches.sql
+-- Folded so the canonical schema matches the live chain through 360. 359 is
+-- fully idempotent (IF NOT EXISTS throughout), so like 358 it is NOT listed in
+-- database/record_folded_migrations.sql: on fresh databases `migrations apply`
+-- re-applies it as a harmless no-op.
+CREATE TABLE IF NOT EXISTS marketing_campaign_dispatches (
+  campaign_id TEXT PRIMARY KEY REFERENCES marketing_campaigns(id) ON DELETE RESTRICT,
+  status TEXT NOT NULL CHECK (status IN ('preparing', 'queued', 'sent', 'failed')),
+  expected_recipient_count INTEGER NOT NULL CHECK (expected_recipient_count > 0),
+  provider_send_id TEXT,
+  provider_status TEXT,
+  failure_code TEXT,
+  requested_by TEXT NOT NULL REFERENCES users(id),
+  requested_at TEXT NOT NULL DEFAULT (datetime('now')),
+  completed_at TEXT,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 
@@ -5142,9 +5174,15 @@ CREATE INDEX IF NOT EXISTS idx_tutor_feedback_user ON tutor_feedback(user_id);
 CREATE INDEX IF NOT EXISTS idx_tutor_feedback_demo ON tutor_feedback(is_demo_data, expires_at);
 
 -- Source: migrations/358_referral_marketing_consent.sql
+-- (360_role_neutral_marketing_consent.sql recreates these same indexes after
+-- rebuilding their tables; the definitions are unchanged)
 CREATE INDEX IF NOT EXISTS idx_marketing_consent_events_user_created
   ON marketing_consent_events(user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_marketing_suppressions_user
   ON marketing_email_suppressions(user_id);
 CREATE INDEX IF NOT EXISTS idx_marketing_campaign_recipients_status
   ON marketing_campaign_recipients(campaign_id, status);
+
+-- Source: migrations/359_marketing_campaign_dispatches.sql
+CREATE INDEX IF NOT EXISTS idx_marketing_campaign_dispatches_status
+  ON marketing_campaign_dispatches(status, requested_at DESC);

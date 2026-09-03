@@ -23,7 +23,8 @@
     "db:seed:topics": "wrangler d1 execute brilla-db --local --file=database/prod-patches/094_seed_missing_subjects_topics.sql && wrangler d1 execute brilla-db --local --file=database/prod-patches/095_clone_topics_to_current_subjects.sql && wrangler d1 execute brilla-db --local --file=database/prod-patches/096_seed_topics_for_empty_subjects.sql",
     "db:baseline:fresh": "wrangler d1 execute brilla-db --local --file=database/record_folded_migrations.sql",
     "db:baseline": "wrangler d1 migrations apply brilla-db",
-    "db:backup": "wrangler d1 export brilla-db --output=backups/brilla-db-$(date +%Y%m%d-%H%M%S).sql",
+    "db:backup": "wrangler d1 export brilla-db --remote --output=backups/brilla-db-$(date +%Y%m%d-%H%M%S).sql",
+    "db:backup:staging": "wrangler d1 export brilla-db-staging --env staging --remote --output=backups/brilla-db-staging-$(date +%Y%m%d-%H%M%S).sql",
     "test:watch": "vitest"
   },
   "dependencies": {
