@@ -74,3 +74,74 @@ export function normalizeAiGradingFeedback(
     suggestions: stringArray(input.suggestions),
   };
 }
+
+export interface TheoryMarkingPoint {
+  point: string;
+  awarded: number;
+  maxMarks: number;
+  comment: string;
+}
+
+export interface TheoryMarking {
+  score: number;
+  maxScore: number;
+  perPoint: TheoryMarkingPoint[];
+  feedback: string;
+  strengths: string[];
+  improvements: string[];
+}
+
+/**
+ * Extract the first JSON object from model output (handles fenced or
+ * prose-wrapped JSON). Returns null when none parses — callers treat that
+ * as a marking failure, never a guessed score.
+ */
+export function extractJsonObject(text: string): unknown | null {
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+  try {
+    return JSON.parse(match[0]);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Normalize the theory-marking output contract. Strict on the score (must
+ * clamp into [0, maxScore] with a valid positive maxScore), tolerant of
+ * missing optional arrays. All strings are length-bounded before storage.
+ */
+export function normalizeTheoryMarking(value: unknown, maxScore: unknown): TheoryMarking {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error('Invalid theory marking output');
+  }
+  const input = value as Record<string, unknown>;
+  const max = typeof maxScore === 'number' ? maxScore : Number(maxScore);
+  if (!Number.isFinite(max) || max <= 0) {
+    throw new Error('Invalid theory marking maxScore');
+  }
+
+  const perPointInput = Array.isArray(input.perPoint) ? input.perPoint.slice(0, 30) : [];
+  const perPoint: TheoryMarkingPoint[] = perPointInput.map((item) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      throw new Error('Invalid theory marking point');
+    }
+    const p = item as Record<string, unknown>;
+    const pointMax = normalizeAiScore(p.maxMarks, max);
+    return {
+      point: String(p.point ?? '').slice(0, 500),
+      awarded: normalizeAiScore(p.awarded, pointMax),
+      maxMarks: pointMax,
+      comment: String(p.comment ?? '').slice(0, 1_000),
+    };
+  });
+
+  return {
+    score: normalizeAiScore(input.score, max),
+    maxScore: max,
+    perPoint,
+    feedback: String(input.feedback ?? '').slice(0, 8_000),
+    strengths: Array.isArray(input.strengths) ? stringArray(input.strengths) : [],
+    improvements: Array.isArray(input.improvements) ? stringArray(input.improvements) : [],
+  };
+}
