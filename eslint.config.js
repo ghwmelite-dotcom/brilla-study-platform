@@ -43,8 +43,10 @@ export default tseslint.config(
     },
     rules: {
       // Ratchet: workers/ has a large pre-existing violation backlog.
-      // Phase 0 only measures it; later phases re-enable rules as counts drop.
-      '@typescript-eslint/no-explicit-any': 'off',
+      // Phase 1: editors surface violations as warnings; CI enforces a hard
+      // budget via scripts/check-any-budget.mjs (see scripts/any-baseline.json).
+      // Later phases re-enable rules as counts drop.
+      '@typescript-eslint/no-explicit-any': 'warn',
     },
   }
 );

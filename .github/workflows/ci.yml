@@ -31,8 +31,11 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
 
-      - name: Run tests
-        run: npm test -- --reporter=dot
+      # Tests run once, with coverage, so the ~7min suite is not doubled.
+      # Coverage thresholds in vitest.config.ts act as a ratchet: CI fails if
+      # coverage drops below the recorded baseline.
+      - name: Run tests with coverage
+        run: npm run test:coverage -- --reporter=dot
 
       - name: Type-check Worker API
         run: npm run typecheck:api
@@ -42,6 +45,12 @@ jobs:
 
       - name: Lint production source
         run: npm run lint -- --quiet
+
+      # Hard budget for no-explicit-any in workers/ (lint --quiet only warns).
+      # Local `npm run lint` stays fast and non-breaking; CI enforces the
+      # baseline in scripts/any-baseline.json.
+      - name: Enforce workers/ no-explicit-any budget
+        run: npm run check:any-budget
 
       - name: Build production bundle
         run: npm run build

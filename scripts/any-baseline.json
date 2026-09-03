@@ -1,0 +1,5 @@
+{
+  "count": 249,
+  "scope": "workers/**/*.ts excluding *.test.ts",
+  "note": "Hard budget for @typescript-eslint/no-explicit-any, enforced by scripts/check-any-budget.mjs in CI. Lower this as violations are fixed; raising it requires an explicit, reviewed edit. Measured 2026-08-27 (279 total incl. 30 in test files)."
+}
