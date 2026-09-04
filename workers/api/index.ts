@@ -5953,7 +5953,10 @@ protectedApp.post('/papers/attempts/:attemptId/remark', async (c) => {
 
     // Shared fan-out — one marker, two entry points (submit and remark).
     const { outcomes, statements } = await markTheoryAnswers(c.env, c.env.DB, toMark, attemptId, String(attempt.user_id));
-    await c.env.DB.batch(statements);
+    // Nothing payable and nothing failed → nothing to persist; D1 rejects an
+    // empty batch ("No SQL statements detected"), so skip it and report the
+    // honest remainder instead of erroring.
+    if (statements.length > 0) await c.env.DB.batch(statements);
 
     const remarked = outcomes.filter((o) => o.kind === 'graded').length;
     const failed = outcomes.filter((o) => o.kind === 'marking_failed').length;

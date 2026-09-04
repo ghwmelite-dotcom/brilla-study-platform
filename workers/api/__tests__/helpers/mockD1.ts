@@ -45,6 +45,9 @@ export function createMockD1(handlers: MockHandler[]): MockD1 {
     // D1 batches are atomic in prod; sequential execution is sufficient for
     // unit tests because no handler in these tests interleaves between stmts.
     async batch(stmts) {
+      // Real D1 rejects an empty batch ("D1_ERROR: No SQL statements detected.");
+      // Mirroring that here keeps callers honest about guarding empty statement lists.
+      if (stmts.length === 0) throw new Error('D1_ERROR: No SQL statements detected.');
       const out = [];
       for (const s of stmts) out.push(await s.run());
       return out;
