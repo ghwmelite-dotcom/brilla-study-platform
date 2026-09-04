@@ -268,8 +268,12 @@ function isSubmittedAnswerCorrect(
   }
 
   const options = transformQuestionOptions(questionOptions, null);
+  // The paper UI submits the option TEXT as the answer while practice clients
+  // submit the option letter — resolve the selection by either.
+  const normalizedUserAnswer = userAnswer.trim().toLowerCase();
   const selected = options?.find(
-    (option) => option.id.toLowerCase() === userAnswer.trim().toLowerCase(),
+    (option) => option.id.toLowerCase() === normalizedUserAnswer
+      || option.text.trim().toLowerCase() === normalizedUserAnswer,
   );
   if (!selected) return fallback.userNormalized === fallback.correctNormalized;
 

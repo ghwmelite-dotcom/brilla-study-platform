@@ -332,6 +332,37 @@ describe('POST /papers/attempts/:attemptId/submit — theory marking fan-out', (
     expect(calls.find((c) => /ai_grading_credits, st\.ai_grading_quota/.test(c.sql))).toBeUndefined();
   });
 
+  // Regression: ISSUE-002 — the paper UI stores the option TEXT as user_answer
+  // while the question bank stores the option LETTER as correct_answer, so every
+  // multiple-choice answer scored 0 regardless of the student's choice.
+  // Found by /qa on 2026-09-04 against staging (pp_wassce_math_2024_1, 0/50).
+  // Report: .gstack/qa-reports/qa-report-whiteboard-staging-2026-09-04.md
+  it('grades multiple-choice answers submitted as option text against letter correct_answer', async () => {
+    const mcOptions = JSON.stringify([
+      { id: 'A', text: '11/12' }, { id: 'B', text: '5/6' },
+      { id: 'C', text: '7/12' }, { id: 'D', text: '3/4' },
+    ]);
+    const mc = (id: string, qid: string, userText: string): AnswerRow => ({
+      id, paper_attempt_id: ATTEMPT_ID, question_id: qid, user_answer: userText,
+      correct_answer: 'A', marks: 1, question_type: 'multiple_choice', options: mcOptions,
+      question_text: 'Simplify: 3/4 + 2/3 - 1/2', topic_id: null, points: 3,
+      subject_name: 'Core Mathematics', marking_scheme: null, marking_rubric: null,
+      model_answer: null, required_points: null, optional_points: null,
+    });
+    const { db, store } = makeHarness({
+      totalMarks: 2,
+      credits: null,
+      answers: [mc('a_m1', 'q_m1', '11/12'), mc('a_m2', 'q_m2', '5/6')],
+    });
+
+    const res = await submit(db, vi.fn());
+    expect(res.status).toBe(200);
+    const body = await res.json() as any;
+    expect(body.data.totalScore).toBe(1);
+    expect(store.answers.find((a) => a.id === 'a_m1')!.is_correct).toBe(1);
+    expect(store.answers.find((a) => a.id === 'a_m2')!.is_correct).toBe(0);
+  });
+
   it('unanswered theory questions are not marked and cost no credits', async () => {
     const { db, calls, store } = makeHarness({
       totalMarks: 60,
