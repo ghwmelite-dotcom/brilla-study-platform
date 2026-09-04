@@ -21,7 +21,7 @@ function buildDb() {
         id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         paper_id TEXT NOT NULL REFERENCES past_papers(id) ON DELETE CASCADE,
-        status TEXT DEFAULT 'in_progress' CHECK (status IN ('in_progress', 'submitted', 'graded', 'abandoned')),
+        status TEXT DEFAULT 'in_progress' CHECK (status IN ('in_progress', 'submitted', 'graded', 'completed', 'abandoned')),
         started_at TEXT DEFAULT (datetime('now')),
         time_allowed INTEGER,
         time_used INTEGER,
@@ -57,6 +57,10 @@ function buildDb() {
     INSERT INTO questions (id) VALUES ('q_2');
     INSERT INTO paper_attempts (id, user_id, paper_id, status, time_allowed)
       VALUES ('pa_1', 'user_1', 'paper_1', 'graded', 90);
+    -- Prod carries legacy 'completed' rows (pre-marking submit path); the
+    -- rebuild must map them to 'graded' or the new CHECK rejects the copy.
+    INSERT INTO paper_attempts (id, user_id, paper_id, status)
+      VALUES ('pa_legacy', 'user_1', 'paper_1', 'completed');
     INSERT INTO paper_attempt_answers (id, paper_attempt_id, question_id, user_answer, marks_earned)
       VALUES ('paa_1', 'pa_1', 'q_1', 'A', 1);
   `);
@@ -93,6 +97,10 @@ describe('migration 361 mock real marking', () => {
       // Rows preserved through the rebuild.
       expect(db.prepare('SELECT status, time_allowed FROM paper_attempts WHERE id = ?').get('pa_1'))
         .toEqual({ status: 'graded', time_allowed: 90 });
+
+      // Legacy 'completed' rows map to 'graded' during the copy.
+      expect(db.prepare('SELECT status FROM paper_attempts WHERE id = ?').get('pa_legacy'))
+        .toEqual({ status: 'graded' });
 
       // Indexes recreated by the rebuild.
       const indexNames = db.prepare(

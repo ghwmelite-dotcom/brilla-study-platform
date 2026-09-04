@@ -36,7 +36,11 @@ INSERT INTO paper_attempts_m361 (
     is_demo_data, expires_at
 )
 SELECT
-    id, user_id, paper_id, status, started_at, time_allowed, time_used,
+    id, user_id, paper_id,
+    -- Legacy 'completed' (20 rows in prod, written by the pre-marking submit
+    -- path) maps to 'graded'; the relaxed CHECK rejects it otherwise.
+    CASE WHEN status = 'completed' THEN 'graded' ELSE status END,
+    started_at, time_allowed, time_used,
     submitted_at, total_score, max_score, percentage, grade, created_at,
     is_demo_data, expires_at
 FROM paper_attempts;
