@@ -104,7 +104,7 @@ export function ExamModeSwitcher() {
   const [isOpen, setIsOpen] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { currentExamType, setExamType, isLoading } = useExamStore();
+  const { currentExamType, hasChosenExamType, setExamType, chooseExamType, isLoading } = useExamStore();
   const { preferences, setActiveExamType, primaryExamTypeId } = useExamPreferencesStore();
   // Accounts without preference rows (older accounts, seeded users) still
   // carry users.primary_exam_type_id on the auth profile — use it as the
@@ -124,16 +124,17 @@ export function ExamModeSwitcher() {
     ? userExamSlugs
     : defaultExamTypes;
 
-  // Initialize exam type from user's primary preference on first load
+  // Initialize exam type from the user's primary on first load — but never
+  // override a mode the user picked themselves in a previous session.
   useEffect(() => {
-    if (!hasInitialized && effectivePrimaryExamTypeId) {
+    if (!hasInitialized && !hasChosenExamType && effectivePrimaryExamTypeId) {
       const primarySlug = EXAM_ID_TO_SLUG[effectivePrimaryExamTypeId];
       if (primarySlug && primarySlug !== currentExamType) {
         setExamType(primarySlug);
       }
       setHasInitialized(true);
     }
-  }, [effectivePrimaryExamTypeId, currentExamType, setExamType, hasInitialized]);
+  }, [effectivePrimaryExamTypeId, hasChosenExamType, currentExamType, setExamType, hasInitialized]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -151,7 +152,7 @@ export function ExamModeSwitcher() {
 
   const handleSelect = async (examType: ExamTypeSlug) => {
     if (examType !== currentExamType) {
-      await setExamType(examType);
+      await chooseExamType(examType);
       // Also update the preferences store active exam type
       const examTypeId = Object.entries(EXAM_ID_TO_SLUG).find(([_, slug]) => slug === examType)?.[0];
       if (examTypeId) {

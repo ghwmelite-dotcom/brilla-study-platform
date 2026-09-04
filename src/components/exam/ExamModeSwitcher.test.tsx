@@ -6,15 +6,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 const setExamType = vi.fn();
-let examState: { currentExamType: string; isLoading: boolean };
+const chooseExamType = vi.fn();
+let examState: { currentExamType: string; hasChosenExamType: boolean; isLoading: boolean };
 let preferencesState: { preferences: unknown[]; primaryExamTypeId: string | null };
 let authUser: { primaryExamTypeId?: string } | null;
 
 vi.mock('@/stores/examStore', () => ({
   useExamStore: () => ({
     currentExamType: examState.currentExamType,
+    hasChosenExamType: examState.hasChosenExamType,
     isLoading: examState.isLoading,
     setExamType,
+    chooseExamType,
   }),
 }));
 vi.mock('@/stores/examPreferencesStore', () => ({
@@ -46,7 +49,8 @@ async function render() {
 
 beforeEach(() => {
   setExamType.mockClear();
-  examState = { currentExamType: 'nsmq', isLoading: false };
+  chooseExamType.mockClear();
+  examState = { currentExamType: 'nsmq', hasChosenExamType: false, isLoading: false };
   preferencesState = { preferences: [], primaryExamTypeId: null };
   authUser = null;
 });
@@ -87,5 +91,30 @@ describe('ExamModeSwitcher primary exam type initialization', () => {
     authUser = { primaryExamTypeId: 'exam_wassce' };
     await render();
     expect(setExamType).not.toHaveBeenCalled();
+  });
+
+  it('never overrides an exam mode the user explicitly chose in a previous session', async () => {
+    examState = { currentExamType: 'nsmq', hasChosenExamType: true, isLoading: false };
+    authUser = { primaryExamTypeId: 'exam_wassce' };
+    await render();
+    expect(setExamType).not.toHaveBeenCalled();
+  });
+
+  it('marks a manual selection as an explicit choice via chooseExamType', async () => {
+    authUser = { primaryExamTypeId: 'exam_wassce' };
+    const container = await render();
+    // Open the dropdown and pick WASSCE.
+    const toggle = container.querySelector('button');
+    await act(async () => {
+      toggle?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    const options = [...container.querySelectorAll('button')].filter((b) =>
+      b.textContent?.includes('WASSCE'),
+    );
+    expect(options.length).toBeGreaterThan(0);
+    await act(async () => {
+      options[0].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    expect(chooseExamType).toHaveBeenCalledWith('wassce');
   });
 });

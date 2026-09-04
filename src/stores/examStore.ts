@@ -30,6 +30,10 @@ export interface ApiSubject {
 
 interface ExamState {
   currentExamType: ExamTypeSlug;
+  // True once the user picks an exam mode themselves; the profile-primary
+  // sync only applies while this is false, so a deliberate choice sticks
+  // across sessions instead of being reset on every app load.
+  hasChosenExamType: boolean;
   examTypes: ExamType[];
   subjects: Subject[];
   categories: SubjectCategory[];
@@ -38,6 +42,7 @@ interface ExamState {
   isLoadingSubjects: boolean;
   error: string | null;
   setExamType: (examType: ExamTypeSlug) => void;
+  chooseExamType: (examType: ExamTypeSlug) => void;
   initializeExamData: () => void;
   fetchSubjects: (examType?: ExamTypeSlug) => Promise<void>;
   fetchCategories: (examType: ExamTypeSlug) => void;
@@ -98,6 +103,7 @@ export const useExamStore = create<ExamState>()(
   persist(
     (set, get) => ({
       currentExamType: 'nsmq',
+      hasChosenExamType: false,
       examTypes: localExamTypes,
       subjects: [],
       categories: [],
@@ -118,6 +124,11 @@ export const useExamStore = create<ExamState>()(
           error: null,
         });
         void get().fetchSubjects(examType);
+      },
+
+      chooseExamType: (examType) => {
+        set({ hasChosenExamType: true });
+        get().setExamType(examType);
       },
 
       initializeExamData: () => {
@@ -197,7 +208,10 @@ export const useExamStore = create<ExamState>()(
     }),
     {
       name: 'brilla-exam',
-      partialize: (state) => ({ currentExamType: state.currentExamType }),
+      partialize: (state) => ({
+        currentExamType: state.currentExamType,
+        hasChosenExamType: state.hasChosenExamType,
+      }),
     },
   ),
 );

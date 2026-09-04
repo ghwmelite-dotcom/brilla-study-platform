@@ -121,3 +121,20 @@ describe('examStore live subject catalogue', () => {
     expect(state.subjects.every((subject) => subject.availabilityStatus === 'unknown')).toBe(true);
   });
 });
+
+describe('examStore explicit choice flag', () => {
+  it('chooseExamType marks the choice as user-made and persists it; setExamType does not', () => {
+    useExamStore.setState({ hasChosenExamType: false });
+
+    useExamStore.getState().setExamType('bece');
+    expect(useExamStore.getState().hasChosenExamType).toBe(false);
+
+    useExamStore.getState().chooseExamType('wassce');
+    const state = useExamStore.getState();
+    expect(state.hasChosenExamType).toBe(true);
+    expect(state.currentExamType).toBe('wassce');
+
+    const persisted = JSON.parse(localStorage.getItem('brilla-exam') || '{}');
+    expect(persisted.state?.hasChosenExamType).toBe(true);
+  });
+});
