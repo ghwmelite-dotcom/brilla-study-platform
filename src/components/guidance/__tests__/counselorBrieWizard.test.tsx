@@ -121,18 +121,20 @@ describe('CounselorBrieWizard', () => {
 });
 
 describe('CounselorBrieTrigger policy', () => {
-  it('launches only for an authenticated student when enabled and outside cooldown', () => {
+  it('launches only for an authenticated student when enabled, on a dashboard route, and outside cooldown', () => {
     const baseline = {
       enabled: true,
       isAuthenticated: true,
       role: 'student',
       wizardOpen: false,
       coolingDown: false,
+      pathname: '/dashboard',
     };
     expect(shouldAutoLaunchBrie(baseline)).toBe(true);
     expect(shouldAutoLaunchBrie({ ...baseline, role: 'teacher' })).toBe(false);
     expect(shouldAutoLaunchBrie({ ...baseline, enabled: false })).toBe(false);
     expect(shouldAutoLaunchBrie({ ...baseline, coolingDown: true })).toBe(false);
     expect(shouldAutoLaunchBrie({ ...baseline, wizardOpen: true })).toBe(false);
+    expect(shouldAutoLaunchBrie({ ...baseline, pathname: '/settings' })).toBe(false);
   });
 });
