@@ -51,7 +51,8 @@ interface MockExamConfig {
 }
 
 // Mock exam configurations per exam type
-// Each exam ID maps to an actual paper ID in the database for Paper 1 (objectives)
+// Each paper entry maps to an actual paper ID in the database; core WASSCE
+// subjects carry both Paper 1 (objectives) and Paper 2 (theory, AI-marked).
 const mockExamConfigs: Record<GhanaExamTypeSlug, MockExamConfig> = {
   wassce: {
     title: 'WASSCE Mock Exams',
@@ -63,6 +64,7 @@ const mockExamConfigs: Record<GhanaExamTypeSlug, MockExamConfig> = {
         subject: 'Core Mathematics',
         papers: [
           { type: 'Paper 1', questions: 50, duration: 90, marks: 50, format: 'Objectives', paperId: 'pp_wassce_math_2024_1' },
+          { type: 'Paper 2', questions: 10, duration: 150, marks: 115, format: 'Theory', paperId: 'pp_wassce_math_2024_2' },
         ],
         difficulty: 'Standard',
         color: '#8B5CF6',
@@ -73,6 +75,7 @@ const mockExamConfigs: Record<GhanaExamTypeSlug, MockExamConfig> = {
         subject: 'English Language',
         papers: [
           { type: 'Paper 1', questions: 80, duration: 60, marks: 80, format: 'Objectives', paperId: 'pp_wassce_eng_2024_1' },
+          { type: 'Paper 2', questions: 8, duration: 120, marks: 300, format: 'Theory', paperId: 'pp_wassce_eng_2024_2' },
         ],
         difficulty: 'Standard',
         color: '#3B82F6',
@@ -83,6 +86,7 @@ const mockExamConfigs: Record<GhanaExamTypeSlug, MockExamConfig> = {
         subject: 'Integrated Science',
         papers: [
           { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives', paperId: 'pp_wassce_sci_2024_1' },
+          { type: 'Paper 2', questions: 8, duration: 105, marks: 100, format: 'Theory', paperId: 'pp_wassce_sci_2024_2' },
         ],
         difficulty: 'Standard',
         color: '#10B981',
@@ -93,6 +97,7 @@ const mockExamConfigs: Record<GhanaExamTypeSlug, MockExamConfig> = {
         subject: 'Social Studies',
         papers: [
           { type: 'Paper 1', questions: 50, duration: 60, marks: 50, format: 'Objectives', paperId: 'pp_wassce_soc_2024_1' },
+          { type: 'Paper 2', questions: 9, duration: 120, marks: 180, format: 'Theory', paperId: 'pp_wassce_soc_2024_2' },
         ],
         difficulty: 'Standard',
         color: '#F59E0B',
