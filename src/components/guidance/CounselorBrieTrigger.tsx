@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useExamStore } from '@/stores/examStore';
 import { useGuidanceStore } from '@/stores/guidanceStore';
@@ -18,6 +19,7 @@ export function CounselorBrieTrigger() {
   const { isAuthenticated, user } = useAuthStore();
   const currentExamType = useExamStore((state) => state.currentExamType);
   const { wizardOpen, fetchGoals, startAssessment, openWizard } = useGuidanceStore();
+  const { pathname } = useLocation();
   const attemptedKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -28,6 +30,7 @@ export function CounselorBrieTrigger() {
       role: student.role,
       wizardOpen,
       coolingDown: false,
+      pathname,
     })) {
       return;
     }
@@ -50,6 +53,7 @@ export function CounselorBrieTrigger() {
         role: student.role,
         wizardOpen: false,
         coolingDown: isBrieDismissalCoolingDown(student.id, examType, subjectId),
+        pathname,
       })) {
         return;
       }
@@ -69,7 +73,7 @@ export function CounselorBrieTrigger() {
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [currentExamType, fetchGoals, isAuthenticated, openWizard, startAssessment, user, wizardOpen]);
+  }, [currentExamType, fetchGoals, isAuthenticated, openWizard, pathname, startAssessment, user, wizardOpen]);
 
   return null;
 }
