@@ -44,4 +44,9 @@ INSERT OR IGNORE INTO d1_migrations (name) VALUES
   ('099_payment_reconciliation.sql'),
   ('276_practice_session_integrity.sql'),
   ('277_answer_attempt_integrity.sql'),
-  ('282_battle_demo_data_integrity.sql');
+  ('282_battle_demo_data_integrity.sql'),
+  -- 367 is a prod-drift remediation, not a fold: schema.sql already has the
+  -- canonical paper_attempt_answers columns, so its legacy-column INSERT
+  -- cannot parse on a fresh baseline. Prod applied it for real; staging
+  -- recorded it without running (already canonical).
+  ('367_paper_attempt_answers_column_rename.sql');
