@@ -23,14 +23,19 @@ import {
   Link,
   Unlink,
   Send,
+  GraduationCap,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { useExamStore } from '@/stores/examStore';
+import { useExamPreferencesStore } from '@/stores/examPreferencesStore';
+import { ExamTypeSelector } from '@/components/auth/ExamTypeSelector';
+import { EXAM_ID_TO_SLUG } from '@/data/examData';
 import { api, fetchWithAuth } from '@/lib/api';
 import { cn } from '@/utils';
 import { Turnstile } from '@/components/common/Turnstile';
 import { useTurnstile } from '@/hooks/useTurnstile';
 
-type SettingsTab = 'profile' | 'password' | 'notifications' | 'appearance';
+type SettingsTab = 'profile' | 'exams' | 'password' | 'notifications' | 'appearance';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -47,6 +52,31 @@ export default function Settings() {
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
+
+  // Exam preferences state (students and teachers only). Initialized lazily
+  // from the persisted store so the selector never mounts with an empty
+  // selection (its own default-fill effect would otherwise mark the form dirty).
+  const {
+    preferences: examPreferences,
+    primaryExamTypeId: savedPrimaryExamTypeId,
+    isLoading: examPrefsLoading,
+    setPreferences: saveExamPreferences,
+    setActiveExamType: setActiveExamPreference,
+  } = useExamPreferencesStore();
+  const [examSelected, setExamSelected] = useState<string[]>(() =>
+    useExamPreferencesStore.getState().preferences.map((p) => p.examTypeId),
+  );
+  const [examPrimary, setExamPrimary] = useState(() => {
+    const state = useExamPreferencesStore.getState();
+    return state.primaryExamTypeId
+      || state.preferences.find((p) => p.isPrimary)?.examTypeId
+      || state.preferences[0]?.examTypeId
+      || '';
+  });
+  const [examDirty, setExamDirty] = useState(false);
+  const [examSaving, setExamSaving] = useState(false);
+  const [examSuccess, setExamSuccess] = useState(false);
+  const [examError, setExamError] = useState<string | null>(null);
 
   // Avatar state
   const [avatarUploading, setAvatarUploading] = useState(false);
@@ -135,6 +165,19 @@ export default function Settings() {
       loadConnectedAccountsRef.current();
     }
   }, [activeTab]);
+
+  // Sync the exam form from saved preferences when the tab opens or the
+  // store refreshes — but never clobber edits the user hasn't saved yet.
+  useEffect(() => {
+    if (activeTab !== 'exams' || examDirty) return;
+    setExamSelected(examPreferences.map((p) => p.examTypeId));
+    setExamPrimary(
+      savedPrimaryExamTypeId
+      || examPreferences.find((p) => p.isPrimary)?.examTypeId
+      || examPreferences[0]?.examTypeId
+      || '',
+    );
+  }, [activeTab, examPreferences, savedPrimaryExamTypeId, examDirty]);
 
   // Load Telegram link status when notifications tab is active
   useEffect(() => {
@@ -278,10 +321,41 @@ export default function Settings() {
 
   const tabs = [
     { id: 'profile' as const, label: 'Profile', icon: User },
+    // Exam preferences only exist for students and teachers
+    ...((user?.role === 'student' || user?.role === 'teacher')
+      ? [{ id: 'exams' as const, label: 'Exam Mode', icon: GraduationCap }]
+      : []),
     { id: 'password' as const, label: 'Password', icon: Lock },
     { id: 'notifications' as const, label: 'Notifications', icon: Bell },
     { id: 'appearance' as const, label: 'Appearance', icon: Palette },
   ];
+
+  const handleExamPreferencesSave = async () => {
+    setExamSaving(true);
+    setExamError(null);
+    setExamSuccess(false);
+
+    try {
+      await saveExamPreferences(examSelected, examPrimary);
+
+      // Hand exam mode back to the profile: clear the sticky manual choice so
+      // the new primary wins on every device, and apply it here immediately.
+      const primarySlug = EXAM_ID_TO_SLUG[examPrimary];
+      if (primarySlug) {
+        useExamStore.getState().applyProfileExamType(primarySlug);
+        setActiveExamPreference(examPrimary);
+      }
+      updateProfile({ primaryExamTypeId: examPrimary });
+
+      setExamDirty(false);
+      setExamSuccess(true);
+      setTimeout(() => setExamSuccess(false), 3000);
+    } catch (error) {
+      setExamError(error instanceof Error ? error.message : 'Failed to update exam preferences');
+    } finally {
+      setExamSaving(false);
+    }
+  };
 
   const handleProfileSave = async () => {
     setProfileSaving(true);
@@ -490,6 +564,17 @@ export default function Settings() {
     navigate('/login');
     return null;
   }
+
+  // ExamTypeSelector buckets: runtime school_level is 'jhs' | 'shs' | null;
+  // O/A-level students store NULL by design (see schema.sql) and map to the
+  // international bucket. Teachers bypass this via isTeacher.
+  const rawSchoolLevel = user.schoolLevel as string | undefined;
+  const examSelectorLevel: 'jhs' | 'shs' | 'international' =
+    rawSchoolLevel === 'jhs' || rawSchoolLevel === 'jss'
+      ? 'jhs'
+      : rawSchoolLevel === 'shs'
+        ? 'shs'
+        : 'international';
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -700,6 +785,69 @@ export default function Settings() {
                         <Save className="w-4 h-4" />
                       )}
                       Save Changes
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Exam Mode Tab */}
+              {activeTab === 'exams' && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-lg font-semibold text-neutral-900 mb-1">Exam Mode</h2>
+                    <p className="text-sm text-neutral-500">
+                      Choose the exams you're preparing for and set your primary exam
+                    </p>
+                  </div>
+
+                  {examError && (
+                    <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      {examError}
+                    </div>
+                  )}
+
+                  {examSuccess && (
+                    <div className="p-3 bg-green-50 text-green-700 rounded-lg text-sm flex items-center gap-2">
+                      <Check className="w-4 h-4" />
+                      Exam preferences updated! Your dashboard now follows your primary exam.
+                    </div>
+                  )}
+
+                  {examPrefsLoading ? (
+                    <div className="flex items-center justify-center py-6">
+                      <Loader2 className="w-6 h-6 animate-spin text-neutral-400" />
+                    </div>
+                  ) : (
+                    <ExamTypeSelector
+                      schoolLevel={examSelectorLevel}
+                      selectedExamTypes={examSelected}
+                      primaryExamType={examPrimary}
+                      onChange={(examTypeIds, primaryId) => {
+                        setExamDirty(true);
+                        setExamSelected(examTypeIds);
+                        setExamPrimary(primaryId);
+                      }}
+                      isTeacher={user.role === 'teacher'}
+                    />
+                  )}
+
+                  <p className="text-xs text-neutral-400">
+                    Saving replaces a manual exam-mode pick: your primary exam becomes the default on every device.
+                  </p>
+
+                  <div className="flex justify-end pt-4 border-t border-neutral-200">
+                    <button
+                      onClick={handleExamPreferencesSave}
+                      disabled={examSaving || examSelected.length === 0 || !examPrimary || !examDirty}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50"
+                    >
+                      {examSaving ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Save className="w-4 h-4" />
+                      )}
+                      Save Exam Preferences
                     </button>
                   </div>
                 </div>

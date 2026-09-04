@@ -43,6 +43,7 @@ interface ExamState {
   error: string | null;
   setExamType: (examType: ExamTypeSlug) => void;
   chooseExamType: (examType: ExamTypeSlug) => void;
+  applyProfileExamType: (examType: ExamTypeSlug) => void;
   initializeExamData: () => void;
   fetchSubjects: (examType?: ExamTypeSlug) => Promise<void>;
   fetchCategories: (examType: ExamTypeSlug) => void;
@@ -128,6 +129,14 @@ export const useExamStore = create<ExamState>()(
 
       chooseExamType: (examType) => {
         set({ hasChosenExamType: true });
+        get().setExamType(examType);
+      },
+
+      // Used when the profile primary is deliberately changed (e.g. Settings):
+      // clears the sticky manual choice so profile sync owns exam mode again,
+      // and applies the new primary to the current session immediately.
+      applyProfileExamType: (examType) => {
+        set({ hasChosenExamType: false });
         get().setExamType(examType);
       },
 

@@ -1,7 +1,7 @@
 // Exam-specific data for NSMQ, WASSCE, and BECE
 // This provides local data for navigation and subject display
 
-import type { ExamType, Subject, SubjectCategory, PaperType } from '@/types';
+import type { ExamType, ExamTypeSlug, Subject, SubjectCategory, PaperType } from '@/types';
 
 // =============================================
 // EXAM TYPES
@@ -65,6 +65,20 @@ export const examTypes: ExamType[] = [
     color: '#7C3AED',
   },
 ];
+
+// Map exam type IDs to slugs — includes Edexcel/AS variants that have no
+// local examData entries yet (placeholder modes in the switcher).
+export const EXAM_ID_TO_SLUG: Record<string, ExamTypeSlug> = {
+  'exam_bece': 'bece',
+  'exam_wassce': 'wassce',
+  'exam_nsmq': 'nsmq',
+  'igcse': 'igcse',
+  'cambridge_a2': 'cambridge-a-level',
+  'cambridge_as': 'cambridge-as',
+  'edexcel_igcse': 'edexcel-igcse',
+  'edexcel_as': 'edexcel-as',
+  'edexcel_a2': 'edexcel-a-level',
+};
 
 // =============================================
 // SUBJECT CATEGORIES

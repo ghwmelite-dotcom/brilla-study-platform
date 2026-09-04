@@ -137,4 +137,19 @@ describe('examStore explicit choice flag', () => {
     const persisted = JSON.parse(localStorage.getItem('brilla-exam') || '{}');
     expect(persisted.state?.hasChosenExamType).toBe(true);
   });
+
+  it('applyProfileExamType clears the sticky choice and switches to the profile primary', async () => {
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: [apiSubject] });
+    useExamStore.setState({ hasChosenExamType: true, currentExamType: 'nsmq' });
+
+    useExamStore.getState().applyProfileExamType('wassce');
+
+    const state = useExamStore.getState();
+    expect(state.hasChosenExamType).toBe(false);
+    expect(state.currentExamType).toBe('wassce');
+
+    const persisted = JSON.parse(localStorage.getItem('brilla-exam') || '{}');
+    expect(persisted.state?.hasChosenExamType).toBe(false);
+    expect(persisted.state?.currentExamType).toBe('wassce');
+  });
 });

@@ -3,6 +3,7 @@ import { ChevronDown, Trophy, GraduationCap, BookOpen, Check, Globe, Award } fro
 import { useExamStore } from '@/stores/examStore';
 import { useExamPreferencesStore } from '@/stores/examPreferencesStore';
 import { useAuthStore } from '@/stores/authStore';
+import { EXAM_ID_TO_SLUG } from '@/data/examData';
 import type { ExamTypeSlug } from '@/types';
 
 // Exam config interface
@@ -80,19 +81,6 @@ const EXAM_CONFIG: Record<ExamTypeSlug, ExamConfigItem> = {
     color: 'text-teal-600',
     bgColor: 'bg-teal-50',
   },
-};
-
-// Map exam type IDs to slugs
-const EXAM_ID_TO_SLUG: Record<string, ExamTypeSlug> = {
-  'exam_bece': 'bece',
-  'exam_wassce': 'wassce',
-  'exam_nsmq': 'nsmq',
-  'igcse': 'igcse',
-  'cambridge_a2': 'cambridge-a-level',
-  'cambridge_as': 'cambridge-as',
-  'edexcel_igcse': 'edexcel-igcse',
-  'edexcel_as': 'edexcel-as',
-  'edexcel_a2': 'edexcel-a-level',
 };
 
 // Get config for an exam type with fallback
