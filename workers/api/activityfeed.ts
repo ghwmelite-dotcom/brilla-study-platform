@@ -13,6 +13,18 @@ interface UserPayload {
   role: string;
 }
 
+interface ActivityRow {
+  id: string;
+  user_id: string;
+  user_name: string;
+  user_avatar: string | null;
+  activity_type: string;
+  title: string;
+  description: string | null;
+  metadata: string | null;
+  created_at: string;
+}
+
 const activityFeedApp = new Hono<{ Bindings: Env; Variables: { user: UserPayload } }>();
 
 // All activity feed routes require a verified JWT (sets user on context).
@@ -51,7 +63,7 @@ activityFeedApp.get('/', async (c) => {
         )
       )
     `;
-    const params: any[] = [user.userId, user.userId, user.userId];
+    const params: (string | number)[] = [user.userId, user.userId, user.userId];
 
     if (type) {
       query += ` AND af.activity_type = ?`;
@@ -61,12 +73,12 @@ activityFeedApp.get('/', async (c) => {
     query += ` ORDER BY af.created_at DESC LIMIT ? OFFSET ?`;
     params.push(limit, offset);
 
-    const activities = await c.env.DB.prepare(query).bind(...params).all();
+    const activities = await c.env.DB.prepare(query).bind(...params).all<ActivityRow>();
 
     return c.json({
       success: true,
       data: {
-        activities: activities.results.map((a: any) => ({
+        activities: activities.results.map((a) => ({
           id: a.id,
           userId: a.user_id,
           userName: a.user_name,
@@ -107,12 +119,12 @@ activityFeedApp.get('/friends', async (c) => {
         )
       ORDER BY af.created_at DESC
       LIMIT ?
-    `).bind(user.userId, user.userId, user.userId, limit).all();
+    `).bind(user.userId, user.userId, user.userId, limit).all<ActivityRow>();
 
     return c.json({
       success: true,
       data: {
-        activities: activities.results.map((a: any) => ({
+        activities: activities.results.map((a) => ({
           id: a.id,
           userId: a.user_id,
           userName: a.user_name,
@@ -168,12 +180,12 @@ activityFeedApp.get('/user/:userId', async (c) => {
 
     query += ` ORDER BY af.created_at DESC LIMIT ?`;
 
-    const activities = await c.env.DB.prepare(query).bind(targetUserId, limit).all();
+    const activities = await c.env.DB.prepare(query).bind(targetUserId, limit).all<ActivityRow>();
 
     return c.json({
       success: true,
       data: {
-        activities: activities.results.map((a: any) => ({
+        activities: activities.results.map((a) => ({
           id: a.id,
           userId: a.user_id,
           userName: a.user_name,
