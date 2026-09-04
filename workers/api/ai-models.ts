@@ -66,11 +66,21 @@ export function getCacheThreshold(env: ModelEnv): number {
  * returns `{ response: string }`, but returns `response` as ALREADY-PARSED JSON
  * (object/array) when the model output is bare valid JSON — observed live with
  * `@cf/meta/llama-3.3-70b-instruct-fp8-fast` (whiteboard Phase B verification).
- * Any caller that string-processes the result (`.match`, `.trim`, …) MUST go
- * through this; a raw cast throws `TypeError` on parsed-JSON responses and the
- * surrounding catch then silently serves fallback content.
+ * OpenAI-format models (`@cf/openai/gpt-oss-*`) instead return a chat-completions
+ * envelope `{ choices: [{ message: { content: string } }] }` — observed live on
+ * staging with gpt-oss-120b marking. Any caller that string-processes the result
+ * (`.match`, `.trim`, …) MUST go through this; a raw cast throws `TypeError` on
+ * parsed-JSON responses and the surrounding catch then silently serves fallback
+ * content.
  */
 export function unwrapAiText(result: unknown): string {
+  if (typeof result === 'object' && result !== null) {
+    const choices = (result as { choices?: unknown }).choices;
+    if (Array.isArray(choices) && choices.length > 0) {
+      const content = (choices[0] as { message?: { content?: unknown } })?.message?.content;
+      if (typeof content === 'string') return content;
+    }
+  }
   const raw =
     typeof result === 'object' && result !== null && 'response' in result
       ? (result as { response: unknown }).response

@@ -77,6 +77,20 @@ describe('callTextModel', () => {
     });
   });
 
+  it('unwraps the OpenAI chat-completions envelope (gpt-oss models)', async () => {
+    const AI = makeAi({
+      choices: [{ finish_reason: 'stop', index: 0, message: { role: 'assistant', content: '{"score":3,"maxScore":8}' } }],
+    });
+    const text = await callTextModel({ AI } as any, { model: '@cf/openai/gpt-oss-120b', system: 's', user: 'u' });
+    expect(text).toBe('{"score":3,"maxScore":8}');
+  });
+
+  it('falls through the envelope when message content is not a string', async () => {
+    const AI = makeAi({ choices: [{ message: { content: null } }] });
+    const text = await callTextModel({ AI } as any, { model: 'm', system: 's', user: 'u' });
+    expect(text).toBe('{"choices":[{"message":{"content":null}}]}');
+  });
+
   it('inserts history between system and user messages', async () => {
     const AI = makeAi({ response: 'ok' });
     await callTextModel({ AI } as any, {

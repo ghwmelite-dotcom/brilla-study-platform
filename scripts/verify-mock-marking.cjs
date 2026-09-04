@@ -8,6 +8,8 @@
  * Requires BRILLA_E2E_STUDENT_EMAIL / BRILLA_E2E_STUDENT_PASSWORD env vars
  * (see scripts/qa-credentials.cjs) and a local Chrome for the login step
  * (same convention as verify-paper-submit.cjs / verify-paper-resume.cjs).
+ * Alternatively set BRILLA_E2E_TOKEN to a valid student JWT to skip the
+ * browser login entirely (useful when Turnstile blocks headless login).
  *
  * Probe sequence (all against a real theory paper from migration 363+):
  *   1. Baseline GET /progress (question_attempts count).
@@ -39,7 +41,8 @@ const API = `${target.apiOrigin}/api`;
 const PAGES = target.pagesOrigin;
 const THEORY_PAPER = 'pp_wassce_math_2024_2';
 
-const [qaEmail, qaPassword] = getQaCredentials('student');
+const directToken = process.env.BRILLA_E2E_TOKEN?.trim();
+const [qaEmail, qaPassword] = directToken ? [null, null] : getQaCredentials('student');
 
 const failures = [];
 function check(name, condition, detail = '') {
@@ -54,6 +57,8 @@ const THEORY_ANSWERS = [
 ];
 
 (async () => {
+  let token = directToken;
+  if (!token) {
   const browser = await puppeteer.launch({
     executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
     headless: false,
@@ -82,9 +87,12 @@ const THEORY_ANSWERS = [
     form?.requestSubmit ? form.requestSubmit() : form?.querySelector('button[type="submit"]')?.click();
   });
   await page.waitForFunction(() => !!localStorage.getItem('brilla_token'), { timeout: 30000 });
-  const token = await page.evaluate(() => localStorage.getItem('brilla_token'));
+  token = await page.evaluate(() => localStorage.getItem('brilla_token'));
   await browser.close();
   console.log(`logged in via ${PAGES} (env=${envArg})\n`);
+  } else {
+    console.log('using BRILLA_E2E_TOKEN (browser login skipped)\n');
+  }
 
   const call = async (method, p, body) => {
     const res = await fetch(API + p, {

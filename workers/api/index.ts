@@ -5331,9 +5331,15 @@ Mark the student answer using only the supplied data.`;
 
   const parsed = extractJsonObject(response);
   if (parsed === null) {
+    console.error('Theory marking returned no JSON object; raw excerpt:', response.slice(0, 500));
     throw new Error('Theory marking output contained no JSON object');
   }
-  return normalizeTheoryMarking(parsed, question.marks);
+  try {
+    return normalizeTheoryMarking(parsed, question.marks);
+  } catch (error) {
+    console.error('Theory marking failed normalization; raw excerpt:', response.slice(0, 500));
+    throw error;
+  }
 }
 
 /** Adapt the theory-marking contract to the legacy essay feedback shape
