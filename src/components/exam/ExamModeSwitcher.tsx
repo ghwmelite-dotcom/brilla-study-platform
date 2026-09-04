@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ChevronDown, Trophy, GraduationCap, BookOpen, Check, Globe, Award } from 'lucide-react';
 import { useExamStore } from '@/stores/examStore';
 import { useExamPreferencesStore } from '@/stores/examPreferencesStore';
+import { useAuthStore } from '@/stores/authStore';
 import type { ExamTypeSlug } from '@/types';
 
 // Exam config interface
@@ -105,6 +106,11 @@ export function ExamModeSwitcher() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { currentExamType, setExamType, isLoading } = useExamStore();
   const { preferences, setActiveExamType, primaryExamTypeId } = useExamPreferencesStore();
+  // Accounts without preference rows (older accounts, seeded users) still
+  // carry users.primary_exam_type_id on the auth profile — use it as the
+  // fallback so they don't land on the NSMQ default.
+  const authPrimaryExamTypeId = useAuthStore((s) => s.user?.primaryExamTypeId);
+  const effectivePrimaryExamTypeId = primaryExamTypeId || authPrimaryExamTypeId || null;
 
   // Get user's available exam type slugs from preferences
   const userExamSlugs = preferences
@@ -120,14 +126,14 @@ export function ExamModeSwitcher() {
 
   // Initialize exam type from user's primary preference on first load
   useEffect(() => {
-    if (!hasInitialized && primaryExamTypeId && preferences.length > 0) {
-      const primarySlug = EXAM_ID_TO_SLUG[primaryExamTypeId];
+    if (!hasInitialized && effectivePrimaryExamTypeId) {
+      const primarySlug = EXAM_ID_TO_SLUG[effectivePrimaryExamTypeId];
       if (primarySlug && primarySlug !== currentExamType) {
         setExamType(primarySlug);
       }
       setHasInitialized(true);
     }
-  }, [primaryExamTypeId, preferences, currentExamType, setExamType, hasInitialized]);
+  }, [effectivePrimaryExamTypeId, currentExamType, setExamType, hasInitialized]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

@@ -374,6 +374,7 @@ export interface User {
   level: number;
   streakDays: number;
   aiGradingCredits?: number;
+  primaryExamTypeId?: string | null;
 }
 
 export interface ManagedUser extends User {

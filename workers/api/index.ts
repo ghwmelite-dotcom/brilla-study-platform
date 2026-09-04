@@ -1561,6 +1561,7 @@ publicApp.post('/auth/login', async (c) => {
       level: result.level,
       streakDays: result.streak_days,
       aiGradingCredits: result.ai_grading_credits,
+      primaryExamTypeId: result.primary_exam_type_id,
     };
 
     return c.json({ success: true, data: { user, token } });

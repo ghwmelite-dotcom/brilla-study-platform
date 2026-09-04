@@ -350,6 +350,7 @@ export const useAuthStore = create<AuthState>()(
               level: apiUser.level || 1,
               streakDays: apiUser.streakDays || 0,
               aiGradingCredits: apiUser.aiGradingCredits || 0,
+              primaryExamTypeId: apiUser.primaryExamTypeId || undefined,
               emailVerified: true,
               isActive: true,
               passwordSet: true,
