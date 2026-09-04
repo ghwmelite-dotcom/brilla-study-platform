@@ -25,3 +25,8 @@ DELETE FROM questions WHERE id IN (
   'q_soc_2024_2_009'
 );
 DELETE FROM past_papers WHERE id = 'pp_wassce_soc_2024_2';
+DELETE FROM topics WHERE id IN (
+  'topic_wassce_p2_soc_gov', 'topic_wassce_p2_soc_civ', 'topic_wassce_p2_soc_med',
+  'topic_wassce_p2_soc_mig', 'topic_wassce_p2_soc_cul', 'topic_wassce_p2_soc_edu',
+  'topic_wassce_p2_soc_eco', 'topic_wassce_p2_soc_env', 'topic_wassce_p2_soc_emp'
+);

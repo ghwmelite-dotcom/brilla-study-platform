@@ -25,3 +25,9 @@ DELETE FROM questions WHERE id IN (
   'q_math_2024_2_009', 'q_math_2024_2_010'
 );
 DELETE FROM past_papers WHERE id = 'pp_wassce_math_2024_2';
+DELETE FROM topics WHERE id IN (
+  'topic_wassce_p2_math_num', 'topic_wassce_p2_math_alg', 'topic_wassce_p2_math_geo',
+  'topic_wassce_p2_math_sta', 'topic_wassce_p2_math_men', 'topic_wassce_p2_math_rat',
+  'topic_wassce_p2_math_qdr', 'topic_wassce_p2_math_trg', 'topic_wassce_p2_math_prb',
+  'topic_wassce_p2_math_ine'
+);

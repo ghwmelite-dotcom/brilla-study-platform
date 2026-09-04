@@ -21,3 +21,8 @@ DELETE FROM questions WHERE id IN (
   'q_sci_2024_2_005', 'q_sci_2024_2_006', 'q_sci_2024_2_007', 'q_sci_2024_2_008'
 );
 DELETE FROM past_papers WHERE id = 'pp_wassce_sci_2024_2';
+DELETE FROM topics WHERE id IN (
+  'topic_wassce_p2_sci_eco', 'topic_wassce_p2_sci_mat', 'topic_wassce_p2_sci_enr',
+  'topic_wassce_p2_sci_bio', 'topic_wassce_p2_sci_agr', 'topic_wassce_p2_sci_hlt',
+  'topic_wassce_p2_sci_wst', 'topic_wassce_p2_sci_env'
+);

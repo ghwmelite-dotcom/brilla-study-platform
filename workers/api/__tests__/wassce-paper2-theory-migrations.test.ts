@@ -93,6 +93,14 @@ const rollbackSql = (spec: MigrationSpec) => readFileSync(
 function buildDb() {
   const db = new Database(':memory:');
   db.exec(`
+    CREATE TABLE topics (
+      id TEXT PRIMARY KEY,
+      subject_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      slug TEXT NOT NULL,
+      description TEXT,
+      display_order INTEGER
+    );
     CREATE TABLE past_papers (
       id TEXT PRIMARY KEY,
       exam_type_id TEXT NOT NULL,

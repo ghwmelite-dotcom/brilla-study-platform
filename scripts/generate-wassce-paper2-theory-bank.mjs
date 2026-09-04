@@ -132,7 +132,7 @@ const questionFields = [
 
 function questionValues(paper, question) {
   return {
-    topic_id: null, subject_id: paper.subjectId, exam_type_id: 'exam_wassce',
+    topic_id: topicId(paper, question.topicCode), subject_id: paper.subjectId, exam_type_id: 'exam_wassce',
     paper_type_id: 'paper_wassce_2', past_paper_id: paper.paperId, question_text: question.prompt,
     question_type: question.type, round_type: null, options: null,
     correct_answer: correctAnswer(question), explanation: workedSolution(question), difficulty: 'medium',
@@ -166,6 +166,11 @@ const releaseMatch = (alias, paper) => [
 
 const essayQuestionId = (question) => 'eq_' + question.id;
 const partId = (question, part) => 'sqp_' + question.id + '_' + part.label;
+// Deterministic per-paper topic ids, same precedent as the MCQ bank
+// generators (topic_was_*). The paper endpoint INNER JOINs topics, so a NULL
+// topic_id would make the question invisible to students.
+const topicId = (paper, code) => 'topic_wassce_p2_' + paper.key + '_' + code.split('-').at(-1).toLowerCase();
+const topicSlug = (paper, code) => 'wassce-p2-' + paper.key + '-' + code.split('-').at(-1).toLowerCase();
 
 function essayValues(question) {
   return {
@@ -216,6 +221,10 @@ function emitMigration(paper) {
   const pv = paperValues(paper);
   lines.push('INSERT OR IGNORE INTO past_papers (id, ' + Object.keys(pv).filter((key) => key !== 'id').join(', ') + ') VALUES (' + sql(pv.id) + ', ' + Object.keys(pv).filter((key) => key !== 'id').map((key) => sql(pv[key])).join(', ') + ');');
 
+  for (const [index, topic] of paper.topics.entries()) {
+    lines.push('INSERT OR IGNORE INTO topics (id, subject_id, name, slug, description, display_order) VALUES (' + sql(topicId(paper, topic.code)) + ', ' + sql(paper.subjectId) + ', ' + sql(topic.title) + ', ' + sql(topicSlug(paper, topic.code)) + ', ' + sql(topic.objective) + ', ' + (index + 1) + ');');
+  }
+
   for (const question of paper.questions) {
     const values = questionValues(paper, question);
     lines.push('INSERT OR IGNORE INTO questions (id, ' + questionFields.join(', ') + ') VALUES (' + sql(question.id) + ', ' + questionFields.map((field) => sql(values[field])).join(', ') + ');');
@@ -242,6 +251,8 @@ function emitMigration(paper) {
     'EXISTS (SELECT 1 FROM past_papers p WHERE p.id = ' + sql(paper.paperId) + ' AND ' + paperMatch + ')',
     '(SELECT COUNT(*) FROM questions WHERE id IN (' + ids.map(sql).join(', ') + ')) = ' + ids.length,
     '(SELECT COUNT(*) FROM question_content_releases r WHERE r.question_id IN (' + ids.map(sql).join(', ') + ') AND ' + releaseMatch('r', paper) + ') = ' + ids.length,
+    '(SELECT COUNT(*) FROM topics WHERE id IN (' + paper.topics.map((topic) => sql(topicId(paper, topic.code))).join(', ') + ')) = ' + paper.topics.length,
+    '(SELECT COUNT(*) FROM questions q JOIN topics t ON t.id = q.topic_id AND t.subject_id = q.subject_id WHERE q.id IN (' + ids.map(sql).join(', ') + ')) = ' + ids.length,
   ];
   if (essayQuestions.length) {
     postChecks.push('(SELECT COUNT(*) FROM essay_questions WHERE question_id IN (' + essayQuestions.map((question) => sql(question.id)).join(', ') + ')) = ' + essayQuestions.length);

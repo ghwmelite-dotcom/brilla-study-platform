@@ -21,3 +21,6 @@ DELETE FROM questions WHERE id IN (
   'q_eng_2024_2_005', 'q_eng_2024_2_006', 'q_eng_2024_2_007', 'q_eng_2024_2_008'
 );
 DELETE FROM past_papers WHERE id = 'pp_wassce_eng_2024_2';
+DELETE FROM topics WHERE id IN (
+  'topic_wassce_p2_eng_ess', 'topic_wassce_p2_eng_cmp', 'topic_wassce_p2_eng_sum'
+);
