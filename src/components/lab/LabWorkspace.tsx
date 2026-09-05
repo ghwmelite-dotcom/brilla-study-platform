@@ -608,11 +608,11 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
         </div>
       </div>
 
-      {/* Main Content. No min-h-0 here: when the step card + sim + nav bar
-          exceed a short viewport, this row must keep its natural height so the
-          root's overflow-y-auto can scroll; when content fits, flex-1 behaves
-          exactly as before. */}
-      <div className="relative z-10 flex flex-1 overflow-hidden">
+      {/* Main Content. No min-h-0 and no overflow clipping down this chain
+          (row -> column): on short screens the step card + sim + nav bar keep
+          their natural height and the root's overflow-y-auto scrolls; when
+          content fits the viewport, flex-1 behaves exactly as before. */}
+      <div className="relative z-10 flex flex-1">
         {/* Left Panel - Procedure Guide */}
         <div className={cn(
           'backdrop-blur-xl border-r overflow-y-auto transition-all shrink-0 hidden md:flex flex-col',
@@ -691,7 +691,7 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
         </div>
 
         {/* Main Lab Area */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <div className="flex-1 flex flex-col min-w-0">
           {/* Current Step Instruction */}
           <div className={cn(
             "mx-3 mt-3 p-4 backdrop-blur-xl rounded-xl border shrink-0",
