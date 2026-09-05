@@ -56,6 +56,7 @@ export function VirtualLabPage() {
   // Mode selection for starting
   const [selectedExperiment, setSelectedExperiment] = useState<Experiment | null>(null);
   const [showModeSelection, setShowModeSelection] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
 
   // If there's an experiment slug in the URL, load that experiment
   const urlExperiment = experimentSlug ? getExperimentBySlug(experimentSlug) : null;
@@ -100,7 +101,29 @@ export function VirtualLabPage() {
   // Handle experiment start
   const handleStartExperiment = (experiment: Experiment) => {
     setSelectedExperiment(experiment);
+    setStartError(null);
     setShowModeSelection(true);
+  };
+
+  // Start a session in the chosen mode. Server-side failures (rate limits,
+  // network, premium gate) previously left the modal open with no feedback —
+  // surface the store error so the student knows what happened.
+  const handleModeSelect = async (mode: 'guided' | 'sandbox') => {
+    if (!experimentForModal) return;
+    setStartError(null);
+    await startSession(experimentForModal, mode);
+    const error = useLabStore.getState().error;
+    if (error === 'LAB_PREMIUM_REQUIRED') {
+      setShowModeSelection(false);
+      navigate('/pricing');
+      return;
+    }
+    if (error) {
+      setStartError(error);
+      return;
+    }
+    setShowModeSelection(false);
+    navigate(`/virtual-lab/${experimentForModal.slug}`);
   };
 
   // Handle session end
@@ -256,6 +279,7 @@ export function VirtualLabPage() {
                 onClick={() => {
                   setShowModeSelection(false);
                   setSelectedExperiment(null);
+                  setStartError(null);
                   navigate('/virtual-lab');
                 }}
               >
@@ -268,22 +292,20 @@ export function VirtualLabPage() {
               <strong>{experimentForModal.name}</strong>
             </p>
 
+            {startError && (
+              <div role="alert" className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+                {startError === 'Too many requests. Please slow down.'
+                  ? 'You\'ve started a lot of lab sessions in the last hour. Give it a few minutes and try again.'
+                  : startError}
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Guided Mode */}
               <Card
                 hoverable
                 className="p-4 cursor-pointer border-2 border-transparent hover:border-primary"
-                onClick={async () => {
-                  if (!experimentForModal) return;
-                  await startSession(experimentForModal, 'guided');
-                  if (useLabStore.getState().error === 'LAB_PREMIUM_REQUIRED') {
-                    setShowModeSelection(false);
-                    navigate('/pricing');
-                    return;
-                  }
-                  setShowModeSelection(false);
-                  navigate(`/virtual-lab/${experimentForModal.slug}`);
-                }}
+                onClick={() => void handleModeSelect('guided')}
               >
                 <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-3">
                   <FlaskConical className="w-6 h-6 text-blue-600" />
@@ -305,17 +327,7 @@ export function VirtualLabPage() {
               <Card
                 hoverable
                 className="p-4 cursor-pointer border-2 border-transparent hover:border-primary"
-                onClick={async () => {
-                  if (!experimentForModal) return;
-                  await startSession(experimentForModal, 'sandbox');
-                  if (useLabStore.getState().error === 'LAB_PREMIUM_REQUIRED') {
-                    setShowModeSelection(false);
-                    navigate('/pricing');
-                    return;
-                  }
-                  setShowModeSelection(false);
-                  navigate(`/virtual-lab/${experimentForModal.slug}`);
-                }}
+                onClick={() => void handleModeSelect('sandbox')}
               >
                 <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-3">
                   <Beaker className="w-6 h-6 text-green-600" />
