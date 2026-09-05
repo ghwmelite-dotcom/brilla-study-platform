@@ -48,6 +48,7 @@ import { useThemeStore } from '@/stores/themeStore';
 import { useUIStore } from '@/stores/uiStore';
 import { Badge } from '@/components/common';
 import { buildSimReporters } from './simulations/reporting';
+import { getStepGuidance } from '../../../shared/lab-guidance';
 import { cn } from '@/utils';
 import type { GradingResult } from '@/types';
 
@@ -179,6 +180,8 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
   }
 
   const currentStep = currentExperiment.procedure[currentStepIndex];
+  // Authored plain-language help: inline step fields win, corpus fills the rest.
+  const stepGuidance = getStepGuidance(currentExperiment, currentStep.stepNumber);
   const completedSteps = stepCompletionStatus.filter(Boolean).length;
   const totalSteps = currentExperiment.procedure.length;
   const progressPercent = Math.round((completedSteps / totalSteps) * 100);
@@ -706,13 +709,24 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
                   )}
                 </div>
                 <p className={isDark ? "text-white" : "text-slate-900"}>{currentStep.instruction}</p>
-                {showHints && currentStep.hint && (
+                {stepGuidance?.why && (
+                  <details className={cn(
+                    "mt-2 rounded-lg border text-sm",
+                    isDark ? "border-white/10 text-white/70" : "border-slate-200 text-slate-600"
+                  )}>
+                    <summary className="cursor-pointer select-none px-3 py-2 font-medium">
+                      Why this step?
+                    </summary>
+                    <p className="px-3 pb-3">{stepGuidance.why}</p>
+                  </details>
+                )}
+                {showHints && stepGuidance?.hint && (
                   <div className={cn(
                     "mt-3 p-3 rounded-lg border flex items-start gap-2",
                     isDark ? "bg-amber-500/10 border-amber-500/20" : "bg-amber-50 border-amber-200"
                   )}>
                     <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                    <p className={cn("text-sm", isDark ? "text-amber-200" : "text-amber-800")}>{currentStep.hint}</p>
+                    <p className={cn("text-sm", isDark ? "text-amber-200" : "text-amber-800")}>{stepGuidance.hint}</p>
                   </div>
                 )}
               </div>

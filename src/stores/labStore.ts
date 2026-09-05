@@ -189,7 +189,9 @@ const initialState = {
   isTimerRunning: false,
   isProcedurePanelOpen: true,
   isDataTableOpen: false,
-  showHints: false,
+  // Hints on by default: help should not require discovering a toggle. Every
+  // procedure step carries authored guidance (shared/lab-guidance.ts).
+  showHints: true,
   lastAttemptResult: null,
   serverSessionId: null,
   eventQueue: [],

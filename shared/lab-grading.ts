@@ -70,6 +70,7 @@ export interface ProcedureStep {
   stepNumber: number;
   instruction: string;
   hint?: string;
+  why?: string;
   requiredActions: RequiredAction[];
   expectedOutcome?: string;
   imageUrl?: string;
