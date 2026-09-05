@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Maximize2, Minimize2, ExternalLink, HelpCircle, ChevronRight } from 'lucide-react';
+import { Maximize2, Minimize2, ExternalLink, HelpCircle, ChevronRight, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/common';
 import { cn } from '@/utils';
 
@@ -9,10 +9,24 @@ interface PhETEmbedProps {
   guidanceNotes?: string[];
 }
 
+const LOAD_TIMEOUT_MS = 20000;
+
 export function PhETEmbed({ simUrl, title, guidanceNotes }: PhETEmbedProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showGuidance, setShowGuidance] = useState(false); // Start collapsed
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadTimedOut, setLoadTimedOut] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Without a loading state, a failed or slow PhET load (e.g. an upstream 429)
+  // leaves students staring at an empty black box with no way to recover.
+  useEffect(() => {
+    setIsLoading(true);
+    setLoadTimedOut(false);
+    const timer = window.setTimeout(() => setLoadTimedOut(true), LOAD_TIMEOUT_MS);
+    return () => window.clearTimeout(timer);
+  }, [reloadKey, simUrl]);
 
   const handleFullscreen = () => {
     if (!isFullscreen && containerRef.current) {
@@ -94,12 +108,40 @@ export function PhETEmbed({ simUrl, title, guidanceNotes }: PhETEmbedProps) {
         {/* Simulation Iframe */}
         <div className="flex-1 relative bg-neutral-900">
           <iframe
+            key={reloadKey}
             src={simUrl}
             title={title}
             className="absolute inset-0 w-full h-full"
             allowFullScreen
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            onLoad={() => {
+              setIsLoading(false);
+              setLoadTimedOut(false);
+            }}
           />
+          {isLoading && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-neutral-900 text-neutral-300">
+              <Loader2 className="w-8 h-8 animate-spin" />
+              <p className="text-sm">Loading simulation…</p>
+              {loadTimedOut && (
+                <div className="flex flex-col items-center gap-2 px-4 text-center">
+                  <p className="text-xs text-neutral-400">
+                    This is taking longer than usual — check your connection, or open the simulation directly.
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button size="sm" onClick={() => setReloadKey((key) => key + 1)}>
+                      <RefreshCw className="w-4 h-4 mr-1" />
+                      Retry
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => window.open(simUrl, '_blank')}>
+                      <ExternalLink className="w-4 h-4 mr-1" />
+                      Open in new tab
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Guidance Panel */}
