@@ -608,8 +608,11 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 flex flex-1 min-h-0 overflow-hidden">
+      {/* Main Content. No min-h-0 here: when the step card + sim + nav bar
+          exceed a short viewport, this row must keep its natural height so the
+          root's overflow-y-auto can scroll; when content fits, flex-1 behaves
+          exactly as before. */}
+      <div className="relative z-10 flex flex-1 overflow-hidden">
         {/* Left Panel - Procedure Guide */}
         <div className={cn(
           'backdrop-blur-xl border-r overflow-y-auto transition-all shrink-0 hidden md:flex flex-col',
