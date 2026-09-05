@@ -465,7 +465,10 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
 
   return (
     <div className={cn(
-      "fixed inset-0 z-50 flex flex-col overflow-hidden transition-colors duration-300",
+      // Scroll-when-needed: identical to overflow-hidden when content fits the
+      // viewport, but short screens can scroll to reach the step controls
+      // instead of them being clipped off-screen.
+      "fixed inset-0 z-50 flex flex-col overflow-y-auto overflow-x-hidden transition-colors duration-300",
       isDark
         ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
         : "bg-gradient-to-br from-slate-100 via-white to-slate-100"
