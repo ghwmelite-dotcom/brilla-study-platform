@@ -13,6 +13,7 @@ import {
   ChevronUp,
   ChevronDown,
   Lightbulb,
+  HelpCircle,
   FlaskConical,
   ClipboardList,
   Table,
@@ -710,15 +711,16 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
                 </div>
                 <p className={isDark ? "text-white" : "text-slate-900"}>{currentStep.instruction}</p>
                 {stepGuidance?.why && (
-                  <details className={cn(
-                    "mt-2 rounded-lg border text-sm",
-                    isDark ? "border-white/10 text-white/70" : "border-slate-200 text-slate-600"
+                  <div className={cn(
+                    "mt-2 rounded-lg border p-3 text-sm",
+                    isDark ? "bg-blue-500/10 border-blue-500/20 text-blue-200" : "bg-blue-50 border-blue-200 text-blue-900"
                   )}>
-                    <summary className="cursor-pointer select-none px-3 py-2 font-medium">
+                    <p className={cn("flex items-center gap-1.5 font-medium mb-1", isDark ? "text-blue-300" : "text-blue-700")}>
+                      <HelpCircle className="w-4 h-4" />
                       Why this step?
-                    </summary>
-                    <p className="px-3 pb-3">{stepGuidance.why}</p>
-                  </details>
+                    </p>
+                    <p>{stepGuidance.why}</p>
+                  </div>
                 )}
                 {showHints && stepGuidance?.hint && (
                   <div className={cn(
@@ -732,7 +734,7 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
               </div>
               <button
                 className={cn(
-                  'p-2 rounded-lg transition-colors',
+                  'flex items-center gap-1.5 px-2 py-2 rounded-lg transition-colors',
                   showHints
                     ? 'bg-amber-500/20 text-amber-500'
                     : isDark ? 'text-white/50 hover:bg-white/10' : 'text-slate-400 hover:bg-slate-100'
@@ -741,6 +743,7 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
                 title="Toggle hints"
               >
                 <Lightbulb className="w-5 h-5" />
+                <span className="hidden sm:inline text-sm font-medium">Hints</span>
               </button>
             </div>
           </div>
