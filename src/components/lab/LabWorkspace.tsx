@@ -816,7 +816,11 @@ export function LabWorkspace({ onExit }: LabWorkspaceProps) {
 
           {/* Step Navigation + Data Toggle */}
           <div className={cn(
-            "flex items-center justify-between px-3 py-3 backdrop-blur-xl border-t shrink-0",
+            "flex items-center justify-between px-4 pt-4 backdrop-blur-xl border-t shrink-0",
+            // Generous bottom padding + safe-area inset: the workspace root is
+            // a fixed, non-scrolling shell, so without this the Next/Done
+            // controls sit flush against the browser's bottom edge.
+            "pb-[max(1.25rem,env(safe-area-inset-bottom))]",
             isDark ? "bg-black/20 border-white/10" : "bg-white/70 border-slate-200"
           )}>
             <button
