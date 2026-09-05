@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { cn } from '@/utils';
 import type { SimReportProps } from './types';
+import { simRootBackground } from './simTheme';
 
 type DissectionSimulationProps = SimReportProps;
 
@@ -151,7 +152,7 @@ export function DissectionSimulation({ onObservation, onAction }: DissectionSimu
   const currentOrgan = selectedOrgan ? organs.find(o => o.id === selectedOrgan) : null;
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-slate-900 via-rose-900/20 to-slate-900 text-white p-4 overflow-auto">
+    <div className="h-full flex flex-col bg-slate-900 text-white p-4 overflow-auto" style={simRootBackground('rgba(136, 19, 55, 0.2)')}>
       {/* Header */}
       <div className="text-center mb-4">
         <h2 className="text-xl font-bold bg-gradient-to-r from-rose-400 to-pink-400 bg-clip-text text-transparent">

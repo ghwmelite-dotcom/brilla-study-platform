@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@/utils';
 import type { SimReportProps } from './types';
+import { simRootBackground } from './simTheme';
 
 type EnzymeSimulationProps = SimReportProps;
 
@@ -150,7 +151,7 @@ export function EnzymeSimulation({ onMeasurement, onObservation, onAction }: Enz
   };
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-slate-900 via-amber-900/20 to-slate-900 text-white p-4 overflow-auto">
+    <div className="h-full flex flex-col bg-slate-900 text-white p-4 overflow-auto" style={simRootBackground('rgba(120, 53, 15, 0.2)')}>
       {/* Header */}
       <div className="text-center mb-4">
         <h2 className="text-xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">

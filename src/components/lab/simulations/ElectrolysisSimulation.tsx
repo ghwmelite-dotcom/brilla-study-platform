@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@/utils';
 import type { SimReportProps } from './types';
+import { simRootBackground } from './simTheme';
 
 type ElectrolysisSimulationProps = SimReportProps;
 
@@ -145,7 +146,7 @@ export function ElectrolysisSimulation({ onObservation, onAction }: Electrolysis
   };
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-slate-900 via-indigo-900/30 to-slate-900 text-white p-4 overflow-auto">
+    <div className="h-full flex flex-col bg-slate-900 text-white p-4 overflow-auto" style={simRootBackground('rgba(49, 46, 129, 0.3)')}>
       {/* Header */}
       <div className="text-center mb-4">
         <h2 className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-green-400 bg-clip-text text-transparent">

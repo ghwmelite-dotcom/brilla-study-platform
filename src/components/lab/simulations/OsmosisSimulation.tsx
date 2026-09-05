@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/utils';
 import type { SimReportProps } from './types';
+import { simRootBackground } from './simTheme';
 
 type OsmosisSimulationProps = SimReportProps;
 
@@ -402,7 +403,7 @@ export function OsmosisSimulation({ onMeasurement, onObservation, onAction }: Os
   };
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-b from-slate-800 to-slate-900">
+    <div className="h-full flex flex-col bg-slate-900" style={simRootBackground(null, 'to bottom')}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2 bg-slate-700 border-b border-slate-600">
         <div className="flex items-center gap-3">

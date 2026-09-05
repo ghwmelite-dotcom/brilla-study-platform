@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@/utils';
 import type { SimReportProps } from './types';
+import { simRootBackground } from './simTheme';
 
 type TranspirationSimulationProps = SimReportProps;
 
@@ -91,7 +92,7 @@ export function TranspirationSimulation({ onMeasurement, onObservation, onAction
   };
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-slate-900 via-teal-900/20 to-slate-900 text-white p-4 overflow-auto">
+    <div className="h-full flex flex-col bg-slate-900 text-white p-4 overflow-auto" style={simRootBackground('rgba(19, 78, 74, 0.2)')}>
       {/* Header */}
       <div className="text-center mb-4">
         <h2 className="text-xl font-bold bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">
