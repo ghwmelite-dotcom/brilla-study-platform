@@ -54,6 +54,7 @@ import {
   Maximize,
   Headset,
   Layers,
+  FlaskConical,
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { AuthModal } from '@/components/auth';
@@ -120,6 +121,30 @@ function useInView(threshold = 0.1) {
   }, [threshold]);
 
   return { ref, inView };
+}
+
+// Count-up hook: animates 0 -> target with ease-out cubic once active flips true
+function useCountUp(target: number, active: boolean, duration = 1600) {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (!active) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setValue(target);
+      return;
+    }
+    let raf = 0;
+    const start = performance.now();
+    const step = (now: number) => {
+      const p = Math.min((now - start) / duration, 1);
+      setValue(Math.round(target * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [active, target, duration]);
+
+  return value;
 }
 
 // Mouse parallax hook with throttling for performance
@@ -284,6 +309,12 @@ function TypewriterText({ texts }: { texts: string[] }) {
   });
 
   useEffect(() => {
+    // Respect reduced-motion: show the first word statically, no cycling.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setDisplayText(texts[0]);
+      return;
+    }
+
     const tick = () => {
       const state = stateRef.current;
       const currentWord = texts[state.wordIndex];
@@ -342,17 +373,21 @@ function TypewriterText({ texts }: { texts: string[] }) {
     <>
       {displayText}
       <span
-        className="animate-blink"
-        style={{ color: '#FFD700', WebkitTextFillColor: '#FFD700' }}
-      >
-        |
-      </span>
+        aria-hidden="true"
+        className="animate-blink inline-block w-[0.08em] h-[0.85em] ml-1.5 rounded-full align-[-0.06em] bg-gradient-to-b from-yellow-300 via-amber-400 to-orange-400 shadow-[0_0_12px_rgba(255,215,0,0.6)]"
+      />
     </>
   );
 }
 
 // Stat item component
 function StatItem({ stat, index, inView }: { stat: typeof stats[0]; index: number; inView: boolean }) {
+  // Numeric stats count up when scrolled into view; non-numeric ones render as-is
+  const match = stat.text.match(/^([\d,]+)(.*)$/);
+  const target = match ? parseInt(match[1].replace(/,/g, ''), 10) : null;
+  const suffix = match ? match[2] : '';
+  const counted = useCountUp(target ?? 0, inView);
+
   return (
     <div
       className={cn(
@@ -366,8 +401,8 @@ function StatItem({ stat, index, inView }: { stat: typeof stats[0]; index: numbe
         <div className="inline-flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 mb-3 sm:mb-4 group-hover:scale-110 transition-transform">
           <stat.icon className="w-5 h-5 sm:w-7 sm:h-7 text-secondary" />
         </div>
-        <div className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-1 leading-tight">
-          {stat.text}
+        <div className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-1 leading-tight tabular-nums">
+          {target === null ? stat.text : `${counted.toLocaleString()}${suffix}`}
         </div>
         <div className="text-white/70 text-xs sm:text-sm leading-tight">{stat.label}</div>
       </div>
@@ -797,6 +832,24 @@ const features = [
     description: 'Detailed insights into your progress with performance predictions.',
     gradient: 'from-rose-500 to-orange-500',
   },
+  {
+    icon: FlaskConical,
+    title: 'Virtual Science Lab',
+    description: 'Run guided AI-graded experiments — titrations, osmosis, circuits and more.',
+    gradient: 'from-teal-500 to-emerald-500',
+  },
+  {
+    icon: FileText,
+    title: 'Realistic Mock Exams',
+    description: 'Full exam conditions with Paper 1 & Paper 2, timed and AI-marked.',
+    gradient: 'from-sky-500 to-blue-600',
+  },
+  {
+    icon: UsersRound,
+    title: 'Tutoring Marketplace',
+    description: 'Book verified tutors for video calls, live chat, and whiteboard sessions.',
+    gradient: 'from-violet-500 to-fuchsia-500',
+  },
 ];
 
 const platformCapabilities = [
@@ -837,6 +890,59 @@ const platformCapabilities = [
     ],
   },
 ];
+
+// Audience tabs: what the platform offers each role (drives the animated
+// role switcher in the "Built for Everyone" section)
+const audienceTabs = [
+  {
+    id: 'students',
+    label: 'Students',
+    icon: GraduationCap,
+    gradient: 'from-secondary to-orange-500',
+    tagline: 'Everything you need to master your exams — in one place.',
+    cta: 'Start Learning Free',
+    features: [
+      { icon: Brain, text: 'AI Revision Classroom — chat, whiteboard, voice & focus modes' },
+      { icon: FlaskConical, text: 'Virtual Science Lab with AI-graded experiments' },
+      { icon: FileText, text: 'Realistic mock exams — full Paper 1 & Paper 2' },
+      { icon: Swords, text: '1v1 & team battles plus full NSMQ simulation' },
+      { icon: Layers, text: 'Smart flashcards that adapt to your memory' },
+      { icon: TrendingUp, text: 'Predicted grades and progress analytics' },
+    ],
+  },
+  {
+    id: 'teachers',
+    label: 'Teachers',
+    icon: PenTool,
+    gradient: 'from-blue-500 to-indigo-500',
+    tagline: 'Powerful classroom tools — and a marketplace that pays you.',
+    cta: 'Join as Teacher',
+    features: [
+      { icon: Users, text: 'Class management with per-student progress tracking' },
+      { icon: PenTool, text: 'Assessment builder with AI-assisted grading' },
+      { icon: Library, text: 'Upload and share materials in the E-Library' },
+      { icon: Wallet, text: 'Earn 85% of fees tutoring on the marketplace' },
+      { icon: BarChart3, text: 'Class analytics and performance insights' },
+      { icon: Presentation, text: 'School dashboard for your whole department' },
+    ],
+  },
+  {
+    id: 'parents',
+    label: 'Parents',
+    icon: Shield,
+    gradient: 'from-emerald-500 to-green-500',
+    tagline: 'Stay connected to your child\'s learning journey.',
+    cta: 'Create Parent Account',
+    features: [
+      { icon: TrendingUp, text: 'Real-time progress monitoring dashboard' },
+      { icon: FileText, text: 'Weekly performance reports in your inbox' },
+      { icon: Clock, text: 'Study time and streak insights' },
+      { icon: Target, text: 'Predicted grades ahead of exam season' },
+      { icon: MessageCircle, text: 'Notifications on milestones and activity' },
+      { icon: Heart, text: 'AI counselor wellbeing check-ins' },
+    ],
+  },
+] as const;
 
 const testimonials = [
   {
@@ -927,6 +1033,34 @@ export function LandingPage() {
     };
   }, []);
 
+  // Audience role switcher with auto-rotation (pauses briefly on manual pick)
+  const [activeAudience, setActiveAudience] = useState(0);
+  const [audiencePaused, setAudiencePaused] = useState(false);
+  const audienceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (audiencePaused) return;
+    const interval = setInterval(() => {
+      setActiveAudience(prev => (prev + 1) % audienceTabs.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [audiencePaused]);
+
+  const handleAudienceChange = (index: number) => {
+    setActiveAudience(index);
+    setAudiencePaused(true);
+    if (audienceTimeoutRef.current) clearTimeout(audienceTimeoutRef.current);
+    audienceTimeoutRef.current = setTimeout(() => setAudiencePaused(false), 12000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (audienceTimeoutRef.current) clearTimeout(audienceTimeoutRef.current);
+    };
+  }, []);
+
+  const activeTab = audienceTabs[activeAudience];
+
   const handleOpenAuth = (mode: 'login' | 'register') => {
     setAuthMode(mode);
     setShowAuthModal(true);
@@ -967,6 +1101,22 @@ export function LandingPage() {
       duration: Math.random() * (durationRange.max - durationRange.min) + durationRange.min,
     }));
   }, []);
+
+  // Heatmap intensities + confetti layout are memoized so re-renders (preview
+  // cycling, scroll state, auth modal) don't visibly reshuffle them.
+  const heatmapCells = useMemo(() =>
+    Array.from({ length: 84 }, () => Math.random()),
+  []);
+
+  const confetti = useMemo(() =>
+    Array.from({ length: 20 }, (_, i) => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      color: ['#10B981', '#06B6D4', '#8B5CF6', '#F59E0B'][i % 4],
+      delay: `${Math.random() * 5}s`,
+      duration: `${5 + Math.random() * 5}s`,
+    })),
+  []);
 
   return (
     <div className="min-h-screen bg-slate-950 overflow-x-hidden">
@@ -1045,6 +1195,12 @@ export function LandingPage() {
         .glass-hover:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
         .text-gradient { background: linear-gradient(135deg, #FFD700, #FFA500, #FF6B35); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .glow-text { text-shadow: 0 0 40px rgba(255, 215, 0, 0.5), 0 0 80px rgba(255, 165, 0, 0.3); }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-float, .animate-float-slow, .animate-float-particle, .animate-morph,
+          .animate-gradient, .animate-pulse-glow, .animate-slide-up, .animate-scale-in,
+          .animate-blink, .animate-shimmer, .animate-spin-slow, .animate-border-dance,
+          .animate-fade-in { animation: none !important; }
+        }
       `}</style>
 
       {/* Header */}
@@ -1156,8 +1312,14 @@ export function LandingPage() {
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-8 leading-[1.1]">
             Master Your
             <br />
-            <span className="text-gradient glow-text">
-              <TypewriterText texts={['NSMQ', 'WASSCE', 'BECE', 'IGCSE', 'A-Level']} />
+            {/* Fixed-width box sized by the longest word: the typed text
+                overlays it absolutely, so the heading never reflows or
+                collides with the line below while typing/deleting. */}
+            <span className="relative inline-block glow-text">
+              <span className="invisible text-gradient" aria-hidden="true">WASSCE</span>
+              <span className="absolute inset-0 text-gradient">
+                <TypewriterText texts={['NSMQ', 'WASSCE', 'BECE', 'IGCSE', 'A-Level']} />
+              </span>
             </span>
             <br />
             <span className="text-white">with </span>
@@ -1366,7 +1528,7 @@ export function LandingPage() {
                 {/* Chat Mode Preview */}
                 {aiPreviewMode === 'chat' && (
                   <>
-                    <div className="p-3 sm:p-4 space-y-3 min-h-[280px] sm:min-h-[320px] bg-slate-900/80">
+                    <div className="p-3 sm:p-4 space-y-3 min-h-[320px] sm:min-h-[380px] bg-slate-900/80 animate-fade-in">
                       {/* AI Message 1 */}
                       <div className="flex gap-2">
                         <div className="w-7 h-7 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
@@ -1426,7 +1588,7 @@ export function LandingPage() {
                 {/* Whiteboard Mode Preview */}
                 {aiPreviewMode === 'whiteboard' && (
                   <>
-                    <div className="relative min-h-[320px] sm:min-h-[380px] bg-slate-900/90">
+                    <div className="relative min-h-[320px] sm:min-h-[380px] bg-slate-900/90 animate-fade-in">
                       {/* Whiteboard Canvas Area */}
                       <div className="absolute inset-0 bg-gradient-to-br from-slate-800/50 to-slate-900/50">
                         {/* Grid pattern */}
@@ -1546,7 +1708,7 @@ export function LandingPage() {
                 {/* Voice Mode Preview */}
                 {aiPreviewMode === 'voice' && (
                   <>
-                    <div className="relative min-h-[320px] sm:min-h-[380px] bg-slate-900/90 flex flex-col items-center justify-center">
+                    <div className="relative min-h-[320px] sm:min-h-[380px] bg-slate-900/90 flex flex-col items-center justify-center animate-fade-in">
                       {/* Ambient background */}
                       <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/50 via-slate-900 to-violet-950/50" />
 
@@ -1562,14 +1724,15 @@ export function LandingPage() {
                           </div>
                         </div>
 
-                        {/* Voice visualization - fewer bars on mobile */}
+                        {/* Voice visualization - deterministic heights so the
+                            equalizer doesn't reshuffle on every re-render */}
                         <div className="flex items-end gap-0.5 sm:gap-1 mt-4 sm:mt-6 h-6 sm:h-8">
-                          {[...Array(8)].map((_, i) => (
+                          {[10, 20, 28, 14, 24, 9, 18, 12].map((h, i) => (
                             <div
                               key={i}
                               className="w-1 sm:w-1.5 bg-gradient-to-t from-cyan-500 to-violet-400 rounded-full animate-pulse"
                               style={{
-                                height: `${Math.random() * 20 + 6}px`,
+                                height: `${h}px`,
                                 animationDelay: `${i * 100}ms`,
                                 animationDuration: '0.5s'
                               }}
@@ -1615,7 +1778,7 @@ export function LandingPage() {
                 {/* Focus Mode Preview */}
                 {aiPreviewMode === 'focus' && (
                   <>
-                    <div className="relative min-h-[320px] sm:min-h-[380px] bg-slate-950">
+                    <div className="relative min-h-[320px] sm:min-h-[380px] bg-slate-950 animate-fade-in">
                       {/* Immersive dark background */}
                       <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-violet-950/20 to-slate-950" />
 
@@ -2970,80 +3133,56 @@ export function LandingPage() {
             </h2>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {/* Students */}
-            <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 text-center hover:bg-white/10 transition-all">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-secondary to-orange-500 flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                <GraduationCap className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" />
-              </div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-2 sm:mb-4">Students</h3>
-              <p className="text-white/60 text-sm sm:text-base mb-4 sm:mb-6">
-                Practice with AI tutoring, compete in battles, and access the E-Library.
-              </p>
-              <ul className="text-left space-y-1.5 sm:space-y-2 text-white/70 text-sm sm:text-base">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
-                  <span>Unlimited practice questions</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
-                  <span>AI tutor & counselor access</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
-                  <span>Competition & leaderboards</span>
-                </li>
-              </ul>
+          {/* Role switcher tabs with sliding indicator */}
+          <div className="flex justify-center mb-10 sm:mb-14">
+            <div className="relative glass rounded-full p-1.5 inline-flex w-full max-w-md">
+              <div
+                className="absolute top-1.5 bottom-1.5 left-1.5 w-[calc((100%-0.75rem)/3)] rounded-full bg-gradient-to-r from-secondary to-orange-500 transition-transform duration-500 ease-out"
+                style={{ transform: `translateX(${activeAudience * 100}%)` }}
+              />
+              {audienceTabs.map((tab, i) => (
+                <button
+                  key={tab.id}
+                  onClick={() => handleAudienceChange(i)}
+                  className={cn(
+                    'relative z-10 flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-colors duration-300',
+                    i === activeAudience ? 'text-slate-900' : 'text-white/70 hover:text-white'
+                  )}
+                >
+                  <tab.icon className="w-4 h-4" />
+                  <span>{tab.label}</span>
+                </button>
+              ))}
             </div>
+          </div>
 
-            {/* Teachers */}
-            <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 text-center hover:bg-white/10 transition-all">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                <PenTool className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" />
-              </div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-2 sm:mb-4">Teachers</h3>
-              <p className="text-white/60 text-sm sm:text-base mb-4 sm:mb-6">
-                Manage classes, create assessments, and monitor student performance.
-              </p>
-              <ul className="text-left space-y-1.5 sm:space-y-2 text-white/70 text-sm sm:text-base">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
-                  <span>Class management tools</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
-                  <span>Assessment builder</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
-                  <span>E-Library uploads</span>
-                </li>
-              </ul>
+          {/* Active role panel — remounts per role for a clean fade/slide-in */}
+          <div key={activeTab.id} className="animate-fade-in">
+            <p className="text-center text-lg sm:text-xl text-white/70 mb-8 sm:mb-10 max-w-2xl mx-auto">
+              {activeTab.tagline}
+            </p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {activeTab.features.map((feature, i) => (
+                <div
+                  key={feature.text}
+                  className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all animate-slide-up"
+                  style={{ animationDelay: `${i * 0.08}s` }}
+                >
+                  <div className={cn('w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br flex items-center justify-center mb-4', activeTab.gradient)}>
+                    <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  </div>
+                  <p className="text-white/80 text-sm sm:text-base leading-relaxed">{feature.text}</p>
+                </div>
+              ))}
             </div>
-
-            {/* Parents */}
-            <div className="glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 text-center hover:bg-white/10 transition-all sm:col-span-2 lg:col-span-1">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                <Shield className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" />
-              </div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-2 sm:mb-4">Parents</h3>
-              <p className="text-white/60 text-sm sm:text-base mb-4 sm:mb-6">
-                Monitor your child's progress and stay connected with their learning.
-              </p>
-              <ul className="text-left space-y-1.5 sm:space-y-2 text-white/70 text-sm sm:text-base sm:max-w-xs sm:mx-auto lg:max-w-none">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
-                  <span>Progress monitoring</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
-                  <span>Weekly reports</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
-                  <span>Study time insights</span>
-                </li>
-              </ul>
+            <div className="text-center mt-10 sm:mt-12">
+              <button onClick={() => handleOpenAuth('register')} className="group relative inline-flex">
+                <div className="absolute inset-0 bg-gradient-to-r from-secondary via-yellow-400 to-orange-400 rounded-full blur-xl opacity-40 group-hover:opacity-70 transition-all" />
+                <div className="relative flex items-center gap-2.5 px-7 py-3.5 bg-gradient-to-r from-secondary via-yellow-400 to-orange-400 rounded-full font-semibold text-slate-900 shadow-2xl shadow-secondary/25 hover:scale-105 transition-all">
+                  <span>{activeTab.cta}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </button>
             </div>
           </div>
         </div>
@@ -3172,22 +3311,19 @@ export function LandingPage() {
                           <span className="text-white/50 text-xs">Last 12 weeks</span>
                         </div>
                         <div className="grid grid-cols-12 gap-1">
-                          {[...Array(84)].map((_, i) => {
-                            const intensity = Math.random();
-                            return (
-                              <div
-                                key={i}
-                                className={cn(
-                                  "aspect-square rounded-sm",
-                                  intensity > 0.8 ? "bg-teal-400" :
-                                  intensity > 0.6 ? "bg-teal-500/70" :
-                                  intensity > 0.4 ? "bg-teal-600/50" :
-                                  intensity > 0.2 ? "bg-teal-700/30" :
-                                  "bg-white/5"
-                                )}
-                              />
-                            );
-                          })}
+                          {heatmapCells.map((intensity, i) => (
+                            <div
+                              key={i}
+                              className={cn(
+                                "aspect-square rounded-sm",
+                                intensity > 0.8 ? "bg-teal-400" :
+                                intensity > 0.6 ? "bg-teal-500/70" :
+                                intensity > 0.4 ? "bg-teal-600/50" :
+                                intensity > 0.2 ? "bg-teal-700/30" :
+                                "bg-white/5"
+                              )}
+                            />
+                          ))}
                         </div>
                         <div className="flex items-center justify-end gap-2 mt-3 text-xs text-white/50">
                           <span>Less</span>
@@ -3715,17 +3851,17 @@ export function LandingPage() {
 
         {/* Animated confetti-like particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(20)].map((_, i) => (
+          {confetti.map((c, i) => (
             <div
               key={i}
               className="absolute w-2 h-2 rounded-full animate-float"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                backgroundColor: ['#10B981', '#06B6D4', '#8B5CF6', '#F59E0B'][i % 4],
+                left: c.left,
+                top: c.top,
+                backgroundColor: c.color,
                 opacity: 0.3,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${5 + Math.random() * 5}s`,
+                animationDelay: c.delay,
+                animationDuration: c.duration,
               }}
             />
           ))}

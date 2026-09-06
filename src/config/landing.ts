@@ -62,10 +62,10 @@ export function formatCommissionRate(rate: number, bonus?: boolean): string {
 // Animation timing constants
 export const ANIMATION_CONFIG = {
   typewriter: {
-    typingSpeed: { min: 180, max: 260 }, // ms per character
-    deletingSpeed: 100, // ms per character
-    pauseAfterWord: 3000, // ms
-    pauseBeforeNextWord: 600, // ms
+    typingSpeed: { min: 70, max: 130 }, // ms per character
+    deletingSpeed: 45, // ms per character
+    pauseAfterWord: 2200, // ms
+    pauseBeforeNextWord: 400, // ms
   },
   parallax: {
     throttleMs: 16, // ~60fps
