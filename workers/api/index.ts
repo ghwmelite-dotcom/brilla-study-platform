@@ -3507,10 +3507,239 @@ publicApp.get('/houses/:id/members', async (c) => {
 // BATTLE ENDPOINTS
 // =====================
 
+// Speed bonus for correct battle answers: <=5s +2, <=10s +1, else +0.
+// Incorrect answers always score 0 regardless of speed.
+function battleAnswerPoints(isCorrect: boolean, basePoints: number, timeTaken: number): number {
+  if (!isCorrect) return 0;
+  const speedBonus = timeTaken <= 5 ? 2 : timeTaken <= 10 ? 1 : 0;
+  return basePoints + speedBonus;
+}
+
+const BATTLE_BOT_ID = 'bot_battler';
+const BATTLE_BOT_CORRECTNESS: Record<string, number> = {
+  easy: 0.6,
+  medium: 0.7,
+  hard: 0.8,
+  expert: 0.85,
+};
+
+// Stable 32-bit hash so bot behavior is deterministic per battle across requests.
+function battleBotHash(input: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < input.length; i++) {
+    h ^= input.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+// The bot answers question i after (i+1) cumulative delays of 12-25s each,
+// measured from battle start.
+function battleBotDelaySeconds(battleId: string, questionIndex: number): number {
+  return 12 + (battleBotHash(`${battleId}:delay:${questionIndex}`) % 14);
+}
+
+function battleBotAnswersCorrectly(battleId: string, difficulty: string, questionIndex: number): boolean {
+  const probability = BATTLE_BOT_CORRECTNESS[difficulty] ?? BATTLE_BOT_CORRECTNESS.medium;
+  const roll = battleBotHash(`${battleId}:roll:${questionIndex}`) % 100;
+  return roll < probability * 100;
+}
+
+// The bot submits exactly what a player would: the correct answer text when
+// it "knows" it, otherwise a deliberately wrong option/value.
+function battleBotAnswer(
+  question: Record<string, unknown>,
+  isCorrect: boolean,
+  questionIndex: number,
+): string {
+  const correctAnswer = String(question.correct_answer ?? '');
+  if (isCorrect) return correctAnswer;
+  const options = Array.isArray(question.options)
+    ? (question.options as Array<{ id: string; text: string; isCorrect?: boolean }>)
+    : null;
+  if (options && options.length > 0) {
+    const wrong = options.filter((option) => option.isCorrect !== true);
+    if (wrong.length > 0) {
+      const pick = wrong[battleBotHash(`${question.id ?? questionIndex}:wrong`) % wrong.length];
+      return pick.text;
+    }
+  }
+  return `__bot_wrong_${questionIndex}`;
+}
+
+// Waiting battles carry a join-window expiry (set at creation). Lazily
+// transition stale waiting battles to 'cancelled' wherever battles are
+// listed, read, or joined — no cron needed.
+async function expireStaleWaitingBattles(db: D1Database): Promise<void> {
+  await db.prepare(`
+    UPDATE battles SET status = 'cancelled', completed_at = datetime('now')
+    WHERE status = 'waiting' AND expires_at IS NOT NULL AND expires_at <= ?
+  `).bind(new Date().toISOString()).run();
+}
+
+// Completes a battle once both participants answered every question, then
+// awards battle_win XP (and win_battles quest progress) to a human winner.
+async function finalizeBattleIfComplete(
+  db: D1Database,
+  battleId: string,
+  totalQuestions: number,
+): Promise<boolean> {
+  const { results: answerCounts } = await db.prepare(`
+    SELECT user_id, COUNT(*) as count FROM battle_answers WHERE battle_id = ? GROUP BY user_id
+  `).bind(battleId).all();
+
+  const bothComplete = answerCounts.length === 2 &&
+    answerCounts.every((ac: Record<string, unknown>) => (ac.count as number) >= totalQuestions);
+  if (!bothComplete) return false;
+
+  const battle = await db.prepare(`
+    SELECT challenger_score, opponent_score, challenger_id, opponent_id FROM battles WHERE id = ?
+  `).bind(battleId).first<{ challenger_score: number; opponent_score: number; challenger_id: string; opponent_id: string }>();
+  if (!battle) return false;
+
+  const winnerId = battle.challenger_score > battle.opponent_score
+    ? battle.challenger_id
+    : battle.opponent_score > battle.challenger_score
+      ? battle.opponent_id
+      : null; // Tie
+
+  // The status guard makes completion idempotent: a concurrent GET (bot
+  // materialization) and answer submission can both reach this point, but
+  // only the first transition awards XP.
+  const completion = await db.prepare(`
+    UPDATE battles SET status = 'completed', winner_id = ?, completed_at = datetime('now')
+    WHERE id = ? AND status = 'active'
+  `).bind(winnerId, battleId).run();
+  if (completion.meta.changes === 0) return true;
+
+  if (winnerId && winnerId !== BATTLE_BOT_ID) {
+    const winnerScore = winnerId === battle.challenger_id ? battle.challenger_score : battle.opponent_score;
+    const demoFlags = getDemoDataFlags(winnerId);
+    await awardPoints(db, {
+      userId: winnerId,
+      points: 50 + winnerScore,
+      source: 'battle_win',
+      sourceRef: battleId,
+      isDemoData: demoFlags.is_demo_data,
+      expiresAt: demoFlags.expires_at,
+    });
+
+    // Quest progress: win_battles templates (daily_battle / weekly_battles_5),
+    // same two-statement pattern as POST /quests/progress.
+    await db.prepare(`
+      UPDATE user_quests
+      SET progress = MIN(progress + 1, target)
+      WHERE user_id = ? AND status = 'active'
+        AND quest_template_id IN (
+          SELECT id FROM quest_templates WHERE requirement_type = 'win_battles'
+        )
+    `).bind(winnerId).run();
+    await db.prepare(`
+      UPDATE user_quests
+      SET status = 'completed', completed_at = datetime('now')
+      WHERE user_id = ? AND status = 'active' AND progress >= target
+    `).bind(winnerId).run();
+  }
+
+  return true;
+}
+
+// Lazily materialize due bot answers for vs-bot battles (no cron): the
+// schedule derives deterministically from the battle id, so it is stable
+// across requests and inserts are idempotent.
+async function materializeDueBotAnswers(db: D1Database, battle: Record<string, unknown>): Promise<void> {
+  let questions: Record<string, unknown>[];
+  try {
+    const parsed: unknown = JSON.parse(battle.questions as string);
+    questions = Array.isArray(parsed) ? parsed as Record<string, unknown>[] : [];
+  } catch {
+    return;
+  }
+
+  const rawStart = String(battle.started_at || battle.created_at || '');
+  const startMs = Date.parse(rawStart.includes('T') ? rawStart : `${rawStart.replace(' ', 'T')}Z`);
+  if (Number.isNaN(startMs)) return;
+
+  const battleId = battle.id as string;
+  const difficulty = String(battle.difficulty || 'medium');
+  const nowMs = Date.now();
+  let elapsedSeconds = 0;
+
+  for (let i = 0; i < questions.length; i++) {
+    const delay = battleBotDelaySeconds(battleId, i);
+    elapsedSeconds += delay;
+    if (startMs + elapsedSeconds * 1000 > nowMs) break;
+
+    const existing = await db.prepare(`
+      SELECT id FROM battle_answers WHERE battle_id = ? AND user_id = ? AND question_index = ?
+    `).bind(battleId, BATTLE_BOT_ID, i).first();
+    if (existing) continue;
+
+    const question = questions[i];
+    const isCorrect = battleBotAnswersCorrectly(battleId, difficulty, i);
+    const answer = battleBotAnswer(question, isCorrect, i);
+    const pointsEarned = battleAnswerPoints(isCorrect, (question.points as number) || 3, delay);
+
+    await db.prepare(`
+      INSERT INTO battle_answers (id, battle_id, user_id, question_index, answer, is_correct, time_taken, points_earned, is_demo_data, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      `ba_bot_${battleId}_${i}`,
+      battleId,
+      BATTLE_BOT_ID,
+      i,
+      answer,
+      isCorrect ? 1 : 0,
+      delay,
+      pointsEarned,
+      battle.is_demo_data ?? 0,
+      battle.expires_at ?? null,
+    ).run();
+
+    await db.prepare(`
+      UPDATE battles SET opponent_score = opponent_score + ? WHERE id = ?
+    `).bind(pointsEarned, battleId).run();
+  }
+
+  await finalizeBattleIfComplete(db, battleId, questions.length);
+}
+
+// Shared opponent-join logic for POST /battles/:id/join and
+// POST /battles/join-by-code: activates a waiting battle and clears the
+// waiting-room expiry (demo battles keep their 24h cleanup expiry).
+async function joinBattleAsOpponent(
+  db: D1Database,
+  battle: Record<string, unknown>,
+  userId: string,
+): Promise<Record<string, unknown>> {
+  await db.prepare(`
+    UPDATE battles SET
+      opponent_id = ?,
+      status = 'active',
+      started_at = datetime('now'),
+      expires_at = CASE WHEN is_demo_data = 1 THEN expires_at ELSE NULL END
+    WHERE id = ?
+  `).bind(userId, battle.id).run();
+
+  const opponent = await db.prepare(`
+    SELECT name, avatar_url FROM users WHERE id = ?
+  `).bind(userId).first();
+
+  return {
+    battleId: battle.id,
+    opponentId: userId,
+    opponentName: opponent?.name,
+    opponentAvatar: opponent?.avatar_url,
+    status: 'active',
+    startedAt: new Date().toISOString(),
+  };
+}
+
 // Get available battles to join
 publicApp.get('/battles/available', async (c) => {
   const now = new Date().toISOString();
   try {
+    await expireStaleWaitingBattles(c.env.DB);
     const { results } = await c.env.DB.prepare(`
       SELECT b.*,
         u.name as challenger_name, u.avatar_url as challenger_avatar,
@@ -3549,6 +3778,21 @@ publicApp.get('/battles/:id', async (c) => {
   const now = new Date().toISOString();
 
   try {
+    await expireStaleWaitingBattles(c.env.DB);
+
+    // Bot battles: materialize any due bot answers (and possibly complete the
+    // battle) before reading scores below.
+    const botBattle = await c.env.DB.prepare(`
+      SELECT * FROM battles WHERE id = ? AND opponent_id = ? AND status = 'active'
+    `).bind(id, BATTLE_BOT_ID).first();
+    if (botBattle) {
+      await materializeDueBotAnswers(c.env.DB, botBattle);
+    }
+
+    // Only waiting battles are hidden once their join window lapses (they are
+    // cancelled by expireStaleWaitingBattles above and returned as such, so
+    // deep links can render an expired state). Active/completed battles stay
+    // readable past the original waiting-room expiry.
     const battle = await c.env.DB.prepare(`
       SELECT b.*,
         c.name as challenger_name, c.avatar_url as challenger_avatar,
@@ -3559,7 +3803,7 @@ publicApp.get('/battles/:id', async (c) => {
       LEFT JOIN users o ON b.opponent_id = o.id
       LEFT JOIN subjects s ON b.subject_id = s.id
       WHERE b.id = ?
-        AND (b.expires_at IS NULL OR b.expires_at > ?)
+        AND (b.status != 'waiting' OR b.expires_at IS NULL OR b.expires_at > ?)
     `).bind(id, now).first();
 
     if (!battle) {
@@ -3729,6 +3973,49 @@ app.get('/api/battles/history', requireAuth, async (c) => {
     return c.json({ success: true, data: formattedResults });
   } catch {
     return c.json({ success: false, error: 'Failed to fetch battle history' }, 500);
+  }
+});
+
+// Join a waiting battle by its shareable 8-char code (battle id suffix).
+// Registered on `app` BEFORE the publicApp mount, same pattern as
+// /battles/history above: publicApp's `/battles/:id` param route is
+// registered earlier than protectedApp's routes and would otherwise shadow
+// a protectedApp copy (Hono: first-registered matching route wins).
+app.post('/api/battles/join-by-code', requireAuth, async (c) => {
+  const userId = getUserId(c)!;
+
+  let code = '';
+  try {
+    const body = await c.req.json<{ code?: unknown }>();
+    code = String(body?.code ?? '').trim();
+  } catch {
+    return c.json({ success: false, error: 'A battle code is required' }, 400);
+  }
+  if (!/^[A-Za-z0-9]{4,8}$/.test(code)) {
+    return c.json({ success: false, error: 'A battle code is required' }, 400);
+  }
+
+  try {
+    await expireStaleWaitingBattles(c.env.DB);
+
+    const battle = await c.env.DB.prepare(`
+      SELECT * FROM battles
+      WHERE UPPER(SUBSTR(id, -8)) = UPPER(?) AND status = 'waiting'
+        AND (expires_at IS NULL OR expires_at > ?)
+    `).bind(code, new Date().toISOString()).first();
+
+    if (!battle) {
+      return c.json({ success: false, error: 'No waiting battle with that code' }, 404);
+    }
+
+    if (battle.challenger_id === userId) {
+      return c.json({ success: false, error: 'Cannot join your own battle' }, 400);
+    }
+
+    const data = await joinBattleAsOpponent(c.env.DB, battle, userId);
+    return c.json({ success: true, data });
+  } catch {
+    return c.json({ success: false, error: 'Failed to join battle' }, 500);
   }
 });
 
@@ -4807,9 +5094,10 @@ protectedApp.put('/users/:id/house', async (c) => {
 // BATTLE PROTECTED ENDPOINTS
 // =====================
 
-// Create a new battle (challenge)
+// Create a new battle (challenge). With vsBot: true the battle starts
+// immediately against the deterministic practice bot instead of waiting.
 protectedApp.post('/battles', async (c) => {
-  const { subjectId, difficulty, questionCount } = await c.req.json();
+  const { subjectId, difficulty, questionCount, vsBot } = await c.req.json();
   const userId = getUserId(c)!;
 
   try {
@@ -4845,6 +5133,60 @@ protectedApp.post('/battles', async (c) => {
 
     const battleId = `battle_${Date.now()}`;
     const demoFlags = getDemoDataFlags(userId);
+    // Waiting battles get a 30-minute join window (demo battles keep their
+    // 24h cleanup expiry); vs-bot battles start active so they never expire.
+    const waitingExpiresAt = demoFlags.expires_at
+      ?? new Date(Date.now() + 30 * 60 * 1000).toISOString();
+
+    if (vsBot) {
+      // battles.opponent_id REFERENCES users(id): the practice bot needs a
+      // real user row. Migration 368 / seed.sql create it; this guard keeps
+      // the route self-sufficient on databases missing the migration.
+      await c.env.DB.prepare(`
+        INSERT OR IGNORE INTO users (id, email, name, role, status, email_verified, is_active)
+        VALUES (?, ?, ?, 'student', 'approved', 1, 1)
+      `).bind(BATTLE_BOT_ID, 'bot@brillaprep.org', 'Brilla Bot').run();
+
+      await c.env.DB.prepare(`
+        INSERT INTO battles (id, challenger_id, opponent_id, subject_id, difficulty, question_count, questions, status, is_demo_data, expires_at, started_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, datetime('now'))
+      `).bind(
+        battleId,
+        userId,
+        BATTLE_BOT_ID,
+        subjectId || null,
+        difficulty || 'medium',
+        questionCount || 10,
+        JSON.stringify(parsedQuestions),
+        demoFlags.is_demo_data,
+        demoFlags.expires_at
+      ).run();
+
+      const challenger = await c.env.DB.prepare(`
+        SELECT name, avatar_url FROM users WHERE id = ?
+      `).bind(userId).first();
+
+      return c.json({
+        success: true,
+        data: {
+          id: battleId,
+          challengerId: userId,
+          challengerName: challenger?.name,
+          challengerAvatar: challenger?.avatar_url,
+          opponentId: BATTLE_BOT_ID,
+          opponentName: 'Brilla Bot',
+          subjectId,
+          difficulty: difficulty || 'medium',
+          questionCount: questionCount || 10,
+          status: 'active',
+          challengerScore: 0,
+          opponentScore: 0,
+          currentQuestion: 0,
+          createdAt: new Date().toISOString(),
+        },
+      });
+    }
+
     await c.env.DB.prepare(`
       INSERT INTO battles (id, challenger_id, subject_id, difficulty, question_count, questions, status, is_demo_data, expires_at)
       VALUES (?, ?, ?, ?, ?, ?, 'waiting', ?, ?)
@@ -4856,7 +5198,7 @@ protectedApp.post('/battles', async (c) => {
       questionCount || 10,
       JSON.stringify(parsedQuestions),
       demoFlags.is_demo_data,
-      demoFlags.expires_at
+      waitingExpiresAt
     ).run();
 
     // Get challenger info
@@ -4893,6 +5235,8 @@ protectedApp.post('/battles/:id/join', async (c) => {
 
   const now = new Date().toISOString();
   try {
+    await expireStaleWaitingBattles(c.env.DB);
+
     // Check if battle exists and is waiting
     const battle = await c.env.DB.prepare(`
       SELECT * FROM battles WHERE id = ? AND status = 'waiting'
@@ -4908,31 +5252,8 @@ protectedApp.post('/battles/:id/join', async (c) => {
       return c.json({ success: false, error: 'Cannot join your own battle' }, 400);
     }
 
-    // Update battle with opponent and start
-    await c.env.DB.prepare(`
-      UPDATE battles SET
-        opponent_id = ?,
-        status = 'active',
-        started_at = datetime('now')
-      WHERE id = ?
-    `).bind(userId, battleId).run();
-
-    // Get opponent info
-    const opponent = await c.env.DB.prepare(`
-      SELECT name, avatar_url FROM users WHERE id = ?
-    `).bind(userId).first();
-
-    return c.json({
-      success: true,
-      data: {
-        battleId,
-        opponentId: userId,
-        opponentName: opponent?.name,
-        opponentAvatar: opponent?.avatar_url,
-        status: 'active',
-        startedAt: new Date().toISOString(),
-      },
-    });
+    const data = await joinBattleAsOpponent(c.env.DB, battle, userId);
+    return c.json({ success: true, data });
   } catch {
     return c.json({ success: false, error: 'Failed to join battle' }, 500);
   }
@@ -4984,7 +5305,7 @@ protectedApp.post('/battles/:id/answer', async (c) => {
       question.correct_answer
     );
     const isCorrect = userNormalized === correctNormalized;
-    const pointsEarned = isCorrect ? (question.points || 3) : 0;
+    const pointsEarned = battleAnswerPoints(isCorrect, question.points || 3, timeTaken || 0);
 
     // Record answer with demo data flags
     const answerId = `ba_${Date.now()}_${userId}`;
@@ -5000,37 +5321,22 @@ protectedApp.post('/battles/:id/answer', async (c) => {
       UPDATE battles SET ${scoreField} = ${scoreField} + ? WHERE id = ?
     `).bind(pointsEarned, battleId).run();
 
-    // Check if battle is complete (both answered all questions)
-    const { results: answerCounts } = await c.env.DB.prepare(`
-      SELECT user_id, COUNT(*) as count FROM battle_answers WHERE battle_id = ? GROUP BY user_id
-    `).bind(battleId).all();
+    // Check if battle is complete (both answered all questions); on
+    // completion this also updates status/winner and awards battle_win XP.
+    const bothComplete = await finalizeBattleIfComplete(c.env.DB, battleId, questions.length);
 
-    const totalQuestions = questions.length;
-    const bothComplete = answerCounts.length === 2 &&
-      answerCounts.every((ac: Record<string, unknown>) => (ac.count as number) >= totalQuestions);
-
-    if (bothComplete) {
-      // Get final scores
-      const updatedBattle = await c.env.DB.prepare(`
-        SELECT challenger_score, opponent_score, challenger_id, opponent_id FROM battles WHERE id = ?
-      `).bind(battleId).first<{ challenger_score: number; opponent_score: number; challenger_id: string; opponent_id: string }>();
-
-      const winnerId = updatedBattle!.challenger_score > updatedBattle!.opponent_score
-        ? updatedBattle!.challenger_id
-        : updatedBattle!.opponent_score > updatedBattle!.challenger_score
-          ? updatedBattle!.opponent_id
-          : null; // Tie
-
-      await c.env.DB.prepare(`
-        UPDATE battles SET status = 'completed', winner_id = ?, completed_at = datetime('now') WHERE id = ?
-      `).bind(winnerId, battleId).run();
-    }
+    // The player already answered, so revealing the correct option for THIS
+    // question is safe (GET /battles/:id keeps stripping isCorrect).
+    const correctOption = Array.isArray(question.options)
+      ? (question.options as Array<{ id: string; isCorrect?: boolean }>).find((option) => option.isCorrect === true)
+      : undefined;
 
     return c.json({
       success: true,
       data: {
         isCorrect,
         correctAnswer: question.correct_answer,
+        correctOptionId: correctOption?.id ?? null,
         explanation: question.explanation,
         pointsEarned,
         battleComplete: bothComplete,

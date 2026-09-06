@@ -335,6 +335,12 @@ INSERT INTO "users" (id, email, password_hash, name, role, status, email_verifie
 ('admin_1', 'admin@brillaprep.org', NULL, 'System Admin', 'admin', 'approved', 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, 0, NULL, NULL, NULL, 'tier_free', NULL, 100, '2026-08-04T00:00:00.000Z', '2026-08-04T00:00:00.000Z', 0, NULL, 0, NULL, 1, NULL, NULL, NULL, 0, 0, NULL, NULL)
 ON CONFLICT(id) DO NOTHING;
 
+-- Practice-battle bot opponent (mirrors migrations/368_battle_bot_user.sql).
+-- Minimal column set; all other columns default.
+INSERT INTO "users" (id, email, name, role, status, email_verified, is_active) VALUES
+('bot_battler', 'bot@brillaprep.org', 'Brilla Bot', 'student', 'approved', 1, 1)
+ON CONFLICT(id) DO NOTHING;
+
 -- =============================================
 -- QUEST_TEMPLATES (14 rows)
 -- =============================================

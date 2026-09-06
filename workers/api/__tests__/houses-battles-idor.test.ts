@@ -68,7 +68,11 @@ describe('houses/battles IDOR fixes', () => {
     expect(insert!.args).not.toContain('victim_1');
     expect(insert!.sql).toContain('is_demo_data, expires_at');
     expect(insert!.args[6]).toBe(0);
-    expect(insert!.args[7]).toBeNull();
+    // Waiting battles get a 30-minute join-window expiry (demo users keep 24h).
+    expect(typeof insert!.args[7]).toBe('string');
+    const expiresMs = Date.parse(insert!.args[7] as string) - Date.now();
+    expect(expiresMs).toBeGreaterThan(25 * 60 * 1000);
+    expect(expiresMs).toBeLessThanOrEqual(30 * 60 * 1000);
 
     const body = (await res.json()) as { data: { challengerId: string } };
     expect(body.data.challengerId).toBe('attacker_1');

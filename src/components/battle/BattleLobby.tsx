@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Swords, Users, RefreshCw, Zap } from 'lucide-react';
+import { Swords, Users, RefreshCw, Zap, Bot, KeyRound } from 'lucide-react';
 import { useBattleStore } from '@/stores/battleStore';
 import { useAuthStore } from '@/stores/authStore';
 import { usePolling } from '@/hooks/usePolling';
@@ -18,13 +18,18 @@ export function BattleLobby({ onBattleStart }: BattleLobbyProps) {
     fetchAvailableBattles,
     createBattle,
     joinBattle,
+    joinByCode,
   } = useBattleStore();
 
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [botMode, setBotMode] = useState(false);
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('medium');
   const [questionCount, setQuestionCount] = useState(10);
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState<string | null>(null);
+  const [joinCode, setJoinCode] = useState('');
+  const [isJoiningByCode, setIsJoiningByCode] = useState(false);
+  const [codeError, setCodeError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAvailableBattles();
@@ -41,12 +46,29 @@ export function BattleLobby({ onBattleStart }: BattleLobbyProps) {
       const battle = await createBattle(user.id, {
         difficulty: selectedDifficulty,
         questionCount,
+        vsBot: botMode,
       });
       onBattleStart(battle);
     } catch (err) {
       console.error('Failed to create battle:', err);
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  const handleJoinByCode = async () => {
+    const code = joinCode.trim();
+    if (!code) return;
+
+    setIsJoiningByCode(true);
+    setCodeError(null);
+    try {
+      const battle = await joinByCode(code);
+      onBattleStart({ ...battle, status: 'active' });
+    } catch (err) {
+      setCodeError(err instanceof Error ? err.message : 'No waiting battle with that code');
+    } finally {
+      setIsJoiningByCode(false);
     }
   };
 
@@ -95,7 +117,7 @@ export function BattleLobby({ onBattleStart }: BattleLobbyProps) {
       </div>
 
       {/* Quick actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Quick match */}
         <button
           onClick={handleQuickMatch}
@@ -108,18 +130,69 @@ export function BattleLobby({ onBattleStart }: BattleLobbyProps) {
 
         {/* Create battle */}
         <button
-          onClick={() => setShowCreateForm(!showCreateForm)}
+          onClick={() => {
+            setBotMode(false);
+            setShowCreateForm(!showCreateForm || botMode);
+          }}
           className="flex items-center justify-center gap-3 p-6 bg-white border-2 border-neutral-200 rounded-xl font-semibold hover:border-primary transition-all"
         >
           <Users className="w-6 h-6" />
           Create Battle
         </button>
+
+        {/* Practice vs bot */}
+        <button
+          onClick={() => {
+            setBotMode(true);
+            setShowCreateForm(!showCreateForm || !botMode);
+          }}
+          className="flex items-center justify-center gap-3 p-6 bg-white border-2 border-neutral-200 rounded-xl font-semibold hover:border-primary transition-all"
+        >
+          <Bot className="w-6 h-6" />
+          Practice vs Bot
+        </button>
+      </div>
+
+      {/* Join with code */}
+      <div className="bg-white rounded-xl shadow-card p-6">
+        <div className="flex items-center gap-2 mb-3">
+          <KeyRound className="w-5 h-5 text-neutral-500" />
+          <h3 className="text-lg font-semibold text-neutral-900">Have a battle code?</h3>
+        </div>
+        <div className="flex gap-3">
+          <input
+            type="text"
+            value={joinCode}
+            onChange={(e) => {
+              setJoinCode(e.target.value.toUpperCase());
+              setCodeError(null);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleJoinByCode();
+            }}
+            placeholder="e.g. A1B2C3D4"
+            maxLength={8}
+            className="flex-1 px-4 py-3 border-2 border-neutral-200 rounded-lg font-mono uppercase tracking-widest focus:border-primary focus:outline-none"
+          />
+          <button
+            onClick={handleJoinByCode}
+            disabled={!joinCode.trim() || isJoiningByCode}
+            className="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark transition-colors disabled:opacity-50"
+          >
+            {isJoiningByCode ? 'Joining...' : 'Join'}
+          </button>
+        </div>
+        {codeError && (
+          <p className="mt-2 text-sm text-red-600">{codeError}</p>
+        )}
       </div>
 
       {/* Create battle form */}
       {showCreateForm && (
         <div className="bg-white rounded-xl shadow-card p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-neutral-900">Create New Battle</h3>
+          <h3 className="text-lg font-semibold text-neutral-900">
+            {botMode ? 'Practice vs Bot' : 'Create New Battle'}
+          </h3>
 
           {/* Difficulty selection */}
           <div>
@@ -175,8 +248,17 @@ export function BattleLobby({ onBattleStart }: BattleLobbyProps) {
             disabled={isCreating}
             className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark transition-colors disabled:opacity-50"
           >
-            {isCreating ? 'Creating...' : 'Create Battle & Wait for Opponent'}
+            {isCreating
+              ? 'Creating...'
+              : botMode
+              ? 'Start Bot Battle'
+              : 'Create Battle & Wait for Opponent'}
           </button>
+          {botMode && (
+            <p className="text-sm text-neutral-500 text-center">
+              The bot answers on its own schedule — the battle starts immediately.
+            </p>
+          )}
         </div>
       )}
 

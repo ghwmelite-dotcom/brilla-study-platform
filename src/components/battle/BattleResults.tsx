@@ -21,11 +21,12 @@ export function BattleResults({ battle, onRematch, onExit }: BattleResultsProps)
   const isTie = !battle.winnerId && battle.challengerScore === battle.opponentScore;
   const isLoser = !isWinner && !isTie;
 
-  // Calculate XP earned
-  const baseXP = myScore * 10;
+  // XP actually persisted server-side on completion: the winner earns
+  // battle_win XP = 50 victory bonus + their battle score. No participation
+  // XP source exists in the points ledger, so losers/ties earn nothing.
+  const scoreXP = isWinner ? myScore : 0;
   const winBonus = isWinner ? 50 : 0;
-  const participationBonus = 20;
-  const totalXP = baseXP + winBonus + participationBonus;
+  const totalXP = scoreXP + winBonus;
 
   return (
     <div className="max-w-lg mx-auto">
@@ -97,26 +98,26 @@ export function BattleResults({ battle, onRematch, onExit }: BattleResultsProps)
         {/* XP earned */}
         <div className="p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg">
           <h3 className="text-sm font-medium text-neutral-600 mb-3">Rewards Earned</h3>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-neutral-600">Base XP ({myScore} correct x 10)</span>
-              <span className="font-medium text-neutral-900">+{baseXP} XP</span>
-            </div>
-            {isWinner && (
+          {isWinner ? (
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-neutral-600">Battle Score XP</span>
+                <span className="font-medium text-neutral-900">+{scoreXP} XP</span>
+              </div>
               <div className="flex justify-between text-sm">
                 <span className="text-neutral-600">Victory Bonus</span>
                 <span className="font-medium text-yellow-600">+{winBonus} XP</span>
               </div>
-            )}
-            <div className="flex justify-between text-sm">
-              <span className="text-neutral-600">Participation</span>
-              <span className="font-medium text-neutral-900">+{participationBonus} XP</span>
+              <div className="pt-2 border-t border-neutral-200 flex justify-between">
+                <span className="font-medium text-neutral-900">Total</span>
+                <span className="font-bold text-primary">+{totalXP} XP</span>
+              </div>
             </div>
-            <div className="pt-2 border-t border-neutral-200 flex justify-between">
-              <span className="font-medium text-neutral-900">Total</span>
-              <span className="font-bold text-primary">+{totalXP} XP</span>
-            </div>
-          </div>
+          ) : (
+            <p className="text-sm text-neutral-600">
+              No XP this time — win a battle to earn XP.
+            </p>
+          )}
         </div>
 
         {/* Stats summary */}

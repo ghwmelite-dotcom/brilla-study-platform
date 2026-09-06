@@ -7,7 +7,7 @@
 export const DEMO_EMAIL_PATTERNS = ['@brillaprep.org'];
 
 // Excluded emails (real accounts that use demo email domain)
-export const EXCLUDED_DEMO_EMAILS = ['admin@brillaprep.org'];
+export const EXCLUDED_DEMO_EMAILS = ['admin@brillaprep.org', 'bot@brillaprep.org'];
 
 // Demo user IDs (explicit list of demo user IDs)
 // Note: admin_prod_001 is NOT a demo account - it's the main admin

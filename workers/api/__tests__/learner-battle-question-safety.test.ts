@@ -121,8 +121,10 @@ describe("public battle question safety", () => {
       "nsmq_phy_rid_001",
     );
     const battleSql = calls.find((sql) => sql.includes("WHERE b.id = ?"));
+    // Waiting battles past their join window are hidden (and lazily
+    // cancelled); active/completed battles stay readable.
     expect(battleSql).toContain(
-      "(b.expires_at IS NULL OR b.expires_at > ?)",
+      "(b.status != 'waiting' OR b.expires_at IS NULL OR b.expires_at > ?)",
     );
 
     const eligibilitySql = calls.find((sql) =>

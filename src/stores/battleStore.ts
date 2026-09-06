@@ -20,11 +20,12 @@ interface BattleState {
 
   // Actions
   fetchAvailableBattles: () => Promise<void>;
-  fetchBattle: (battleId: string) => Promise<void>;
+  fetchBattle: (battleId: string) => Promise<Battle | null>;
   fetchBattleHistory: (userId: string) => Promise<void>;
-  createBattle: (userId: string, options: { subjectId?: string; difficulty?: Difficulty; questionCount?: number }) => Promise<Battle>;
+  createBattle: (userId: string, options: { subjectId?: string; difficulty?: Difficulty; questionCount?: number; vsBot?: boolean }) => Promise<Battle>;
   joinBattle: (battleId: string, userId: string) => Promise<void>;
-  submitAnswer: (battleId: string, userId: string, answer: string, questionIndex: number, timeTaken: number) => Promise<{ isCorrect: boolean; correctAnswer: string; explanation?: string; pointsEarned: number; battleComplete: boolean }>;
+  joinByCode: (code: string) => Promise<Battle>;
+  submitAnswer: (battleId: string, userId: string, answer: string, questionIndex: number, timeTaken: number) => Promise<{ isCorrect: boolean; correctAnswer: string; correctOptionId: string | null; explanation?: string; pointsEarned: number; battleComplete: boolean }>;
   cancelBattle: (battleId: string, userId: string) => Promise<void>;
   startPolling: (battleId: string) => void;
   stopPolling: () => void;
@@ -121,11 +122,13 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         currentQuestion,
         isLoading: false,
       });
+      return battle;
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to fetch battle',
         isLoading: false,
       });
+      return null;
     }
   },
 
@@ -180,7 +183,9 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         challengerId: data.challengerId as string,
         challengerName: data.challengerName as string,
         challengerAvatar: data.challengerAvatar as string | undefined,
-        status: 'waiting',
+        opponentId: data.opponentId as string | undefined,
+        opponentName: data.opponentName as string | undefined,
+        status: (data.status as Battle['status']) || 'waiting',
         difficulty: data.difficulty as Difficulty,
         questionCount: data.questionCount as number,
         challengerScore: 0,
@@ -221,9 +226,33 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     }
   },
 
+  joinByCode: async (code) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await api.post<{ battleId: string }>('/battles/join-by-code', { code });
+
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'No waiting battle with that code');
+      }
+
+      const battle = await get().fetchBattle(response.data.battleId);
+      if (!battle) {
+        throw new Error(get().error || 'Failed to load battle');
+      }
+      set({ isLoading: false });
+      return battle;
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to join battle',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
   submitAnswer: async (battleId, userId, answer, questionIndex, timeTaken) => {
     try {
-      const response = await api.post<{ isCorrect: boolean; correctAnswer: string; explanation?: string; pointsEarned: number; battleComplete: boolean }>(`/battles/${battleId}/answer`, { userId, answer, questionIndex, timeTaken });
+      const response = await api.post<{ isCorrect: boolean; correctAnswer: string; correctOptionId: string | null; explanation?: string; pointsEarned: number; battleComplete: boolean }>(`/battles/${battleId}/answer`, { userId, answer, questionIndex, timeTaken });
 
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to submit answer');

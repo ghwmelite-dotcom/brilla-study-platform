@@ -14,49 +14,60 @@ export function BattlePage() {
 
   const [phase, setPhase] = useState<BattlePhase>('lobby');
   const [battle, setBattle] = useState<Battle | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  // If battleId is in URL, load that battle
+  // If battleId is in URL, load that battle. fetchBattle returns the fetched
+  // battle — using the return value avoids the stale-closure read of
+  // currentBattle (null on first load) that stranded deep links on the spinner.
   useEffect(() => {
-    if (battleId) {
-      fetchBattle(battleId).then(() => {
-        setBattle(currentBattle);
-        if (currentBattle?.status === 'waiting') {
-          setPhase('waiting');
-        } else if (currentBattle?.status === 'active') {
-          setPhase('battle');
-        } else if (currentBattle?.status === 'completed') {
-          setPhase('results');
-        }
-      });
-    }
+    if (!battleId) return;
+    let cancelled = false;
+
+    fetchBattle(battleId).then((loaded) => {
+      if (cancelled) return;
+      if (!loaded) {
+        setLoadError(useBattleStore.getState().error || 'Battle not found');
+        return;
+      }
+      setBattle(loaded);
+      if (loaded.status === 'waiting') {
+        setPhase('waiting');
+      } else if (loaded.status === 'active') {
+        setPhase('battle');
+      } else if (loaded.status === 'completed') {
+        setPhase('results');
+      }
+      // 'cancelled' battles render the expired state below.
+    });
 
     return () => {
+      cancelled = true;
       stopPolling();
     };
-  }, [battleId, fetchBattle, currentBattle, stopPolling]);
+  }, [battleId, fetchBattle, stopPolling]);
 
-  // Poll for opponent when waiting
+  // Poll for opponent when waiting (single poller: the store's)
   useEffect(() => {
-    if (phase === 'waiting' && battle) {
-      startPolling(battle.id);
+    if (phase !== 'waiting' || !battle || battle.status !== 'waiting') return;
+    startPolling(battle.id);
+    return () => stopPolling();
+  }, [phase, battle, startPolling, stopPolling]);
 
-      const checkInterval = setInterval(async () => {
-        await fetchBattle(battle.id);
-        if (currentBattle?.status === 'active') {
-          setPhase('battle');
-          setBattle(currentBattle);
-          stopPolling();
-        }
-      }, 2000);
-
-      return () => {
-        clearInterval(checkInterval);
-        stopPolling();
-      };
+  // React to polled store updates while waiting for an opponent
+  useEffect(() => {
+    if (phase !== 'waiting' || !battle || !currentBattle || currentBattle.id !== battle.id) return;
+    if (currentBattle.status === 'active') {
+      setBattle(currentBattle);
+      setPhase('battle');
+      stopPolling();
+    } else if (currentBattle.status === 'cancelled') {
+      setBattle(currentBattle);
+      stopPolling();
     }
-  }, [phase, battle, startPolling, stopPolling, fetchBattle, currentBattle]);
+  }, [currentBattle, phase, battle, stopPolling]);
 
   const handleBattleStart = (newBattle: Battle) => {
+    setLoadError(null);
     setBattle(newBattle);
     if (newBattle.status === 'waiting') {
       setPhase('waiting');
@@ -75,6 +86,7 @@ export function BattlePage() {
   const handleRematch = () => {
     resetBattle();
     setBattle(null);
+    setLoadError(null);
     setPhase('lobby');
     navigate('/battle');
   };
@@ -85,6 +97,49 @@ export function BattlePage() {
   };
 
   // Render based on phase
+  // Expired / cancelled battle: the waiting room lapsed with no opponent.
+  // Checked before the lobby render: a cancelled deep link keeps phase 'lobby'.
+  if (battle?.status === 'cancelled') {
+    return (
+      <div className="max-w-lg mx-auto">
+        <div className="bg-white rounded-xl shadow-card p-8 text-center">
+          <h2 className="text-2xl font-display font-bold text-neutral-900 mb-2">
+            Battle Expired
+          </h2>
+          <p className="text-neutral-500 mb-6">
+            This battle expired — no opponent joined in time.
+          </p>
+          <button
+            onClick={handleRematch}
+            className="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors"
+          >
+            Return to Lobby
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Deep-link load failure (unknown id, expired demo data, etc.)
+  if (loadError) {
+    return (
+      <div className="max-w-lg mx-auto">
+        <div className="bg-white rounded-xl shadow-card p-8 text-center">
+          <h2 className="text-2xl font-display font-bold text-neutral-900 mb-2">
+            Battle Unavailable
+          </h2>
+          <p className="text-neutral-500 mb-6">{loadError}</p>
+          <button
+            onClick={handleRematch}
+            className="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors"
+          >
+            Return to Lobby
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (phase === 'lobby') {
     return <BattleLobby onBattleStart={handleBattleStart} />;
   }

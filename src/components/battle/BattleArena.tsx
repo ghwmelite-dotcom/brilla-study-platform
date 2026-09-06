@@ -14,6 +14,7 @@ interface BattleArenaProps {
 export function BattleArena({ battle, onComplete }: BattleArenaProps) {
   const { user } = useAuthStore();
   const {
+    currentBattle,
     currentQuestion,
     currentQuestionIndex,
     myScore,
@@ -31,9 +32,14 @@ export function BattleArena({ battle, onComplete }: BattleArenaProps) {
   const [lastResult, setLastResult] = useState<{
     isCorrect: boolean;
     correctAnswer: string;
+    correctOptionId: string | null;
     explanation?: string;
   } | null>(null);
   const [answerStartTime] = useState(Date.now());
+
+  // The store poller keeps currentBattle fresh; fall back to the prop until
+  // the first poll for this battle lands.
+  const liveBattle = currentBattle?.id === battle.id ? currentBattle : battle;
 
   // Timer for each question
   const { time, start, reset: resetTimer } = useTimer({
@@ -45,11 +51,22 @@ export function BattleArena({ battle, onComplete }: BattleArenaProps) {
     },
   });
 
-  // Start polling for opponent's status
+  // Start polling for opponent's status (single poller: the store's — no
+  // component-local interval, which used to double the request rate)
   useEffect(() => {
     startPolling(battle.id);
+    fetchBattle(battle.id);
     return () => stopPolling();
-  }, [battle.id, startPolling, stopPolling]);
+  }, [battle.id, startPolling, stopPolling, fetchBattle]);
+
+  // The opponent can finish while we're idle between questions; the poller
+  // picks that up via the store. Guarded by showResult so our own final
+  // answer still gets its 2s reveal (handled in handleSubmit).
+  useEffect(() => {
+    if (liveBattle.status === 'completed' && !showResult) {
+      onComplete(liveBattle);
+    }
+  }, [liveBattle, showResult, onComplete]);
 
   // Start timer when question changes
   useEffect(() => {
@@ -58,16 +75,6 @@ export function BattleArena({ battle, onComplete }: BattleArenaProps) {
       start();
     }
   }, [currentQuestion, start, resetTimer]);
-
-  // Check if battle is complete
-  useEffect(() => {
-    fetchBattle(battle.id);
-    const checkInterval = setInterval(async () => {
-      await fetchBattle(battle.id);
-    }, 2000);
-
-    return () => clearInterval(checkInterval);
-  }, [battle.id, fetchBattle]);
 
   const handleSubmit = useCallback(async (answer: string) => {
     if (!user || !currentQuestion || isSubmitting) return;
@@ -87,15 +94,16 @@ export function BattleArena({ battle, onComplete }: BattleArenaProps) {
       setLastResult({
         isCorrect: result.isCorrect,
         correctAnswer: result.correctAnswer,
+        correctOptionId: result.correctOptionId,
         explanation: result.explanation,
       });
       setShowResult(true);
 
       if (result.battleComplete) {
-        // Wait a moment then show results
+        // Wait a moment then show results (with freshly fetched final scores)
         setTimeout(() => {
-          fetchBattle(battle.id).then(() => {
-            onComplete(battle);
+          fetchBattle(battle.id).then((finalBattle) => {
+            onComplete(finalBattle ?? battle);
           });
         }, 2000);
       } else {
@@ -124,8 +132,14 @@ export function BattleArena({ battle, onComplete }: BattleArenaProps) {
   };
 
   const isChallenger = user?.id === battle.challengerId;
-  const displayMyScore = isChallenger ? myScore || battle.challengerScore : myScore || battle.opponentScore;
-  const displayOpponentScore = isChallenger ? opponentScore || battle.opponentScore : opponentScore || battle.challengerScore;
+  // Role-aware score selection with ?? 0: the old `myScore || battle.xScore`
+  // pattern misattributed scores whenever the real score was 0. The store's
+  // myScore is an optimistic pre-poll value, so take the max with the
+  // server-authoritative score from liveBattle.
+  const myServerScore = (isChallenger ? liveBattle.challengerScore : liveBattle.opponentScore) ?? 0;
+  const opponentServerScore = (isChallenger ? liveBattle.opponentScore : liveBattle.challengerScore) ?? 0;
+  const displayMyScore = Math.max(myScore, myServerScore);
+  const displayOpponentScore = Math.max(opponentScore, opponentServerScore);
   const myName = isChallenger ? battle.challengerName : battle.opponentName;
   const opponentName = isChallenger ? battle.opponentName : battle.challengerName;
 
@@ -197,8 +211,9 @@ export function BattleArena({ battle, onComplete }: BattleArenaProps) {
           <div className="space-y-3">
             {currentQuestion.options.map((option, index) => {
               const isSelected = selectedAnswer === option.text;
-              // Use option.isCorrect from API (pre-computed) for correct answer highlighting
-              const isCorrectAnswer = showResult && (option as { isCorrect?: boolean }).isCorrect === true;
+              // The answer response reveals the correct option id post-answer
+              // (GET battle keeps isCorrect stripped for anti-cheat).
+              const isCorrectAnswer = showResult && lastResult?.correctOptionId != null && option.id === lastResult.correctOptionId;
               const isWrongAnswer = showResult && isSelected && !lastResult?.isCorrect;
 
               return (
