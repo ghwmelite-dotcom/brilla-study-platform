@@ -17,9 +17,11 @@ interface FlashcardProps {
   cards: FlashcardItem[];
   title?: string;
   onComplete?: (results: { known: number; unknown: number }) => void;
+  // SM-2 rating (1-5) per card, posted to /flashcards/:id/review by the caller.
+  onRateCard?: (cardId: string, rating: number) => void;
 }
 
-export function Flashcard({ cards, title, onComplete }: FlashcardProps) {
+export function Flashcard({ cards, title, onComplete, onRateCard }: FlashcardProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [knownCards, setKnownCards] = useState<Set<string>>(new Set());
@@ -37,11 +39,13 @@ export function Flashcard({ cards, title, onComplete }: FlashcardProps) {
   };
 
   const handleKnow = () => {
+    onRateCard?.(currentCard.id, 4);
     setKnownCards((prev) => new Set([...prev, currentCard.id]));
     goToNext();
   };
 
   const handleDontKnow = () => {
+    onRateCard?.(currentCard.id, 2);
     setUnknownCards((prev) => new Set([...prev, currentCard.id]));
     goToNext();
   };

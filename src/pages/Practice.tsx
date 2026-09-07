@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Card, Button, Badge, Select } from '@/components/common';
 import { TopicDrill, SpeedRace, Flashcard } from '@/components/practice';
+import { MyDecks } from '@/components/flashcards';
 import { DailyUsageIndicator, LimitReachedModal } from '@/components/subscription';
 import { useExamStore } from '@/stores/examStore';
 import { useUsageStore } from '@/stores/usageStore';
@@ -470,6 +471,21 @@ export function PracticePage() {
     setActiveMode(null);
   };
 
+  // Study a user-owned deck from the My Decks manager.
+  const handleStudyDeck = (deckName: string, cards: Array<{ id: string; front: string; back: string; category: string }>) => {
+    setFlashcards(cards);
+    setFlashcardDeckName(deckName);
+    setFlashcardError(null);
+    setActiveMode('flashcard');
+    setIsSessionActive(true);
+  };
+
+  // Record an SM-2 review for a flashcard (fire-and-forget; failures only
+  // mean the card stays due sooner, never a broken session).
+  const handleRateCard = (cardId: string, rating: number) => {
+    api.post(`/flashcards/${cardId}/review`, { rating }).catch(() => undefined);
+  };
+
   // Active practice session
   if (isSessionActive && activeMode) {
     switch (activeMode) {
@@ -617,6 +633,7 @@ export function PracticePage() {
             <Flashcard
               cards={flashcards}
               title={flashcardDeckName}
+              onRateCard={handleRateCard}
             />
           </div>
         );
@@ -750,6 +767,11 @@ export function PracticePage() {
             </Button>
           </div>
         </Card>
+      )}
+
+      {/* My Flashcard Decks — shown when the flashcard mode is selected */}
+      {activeMode === 'flashcard' && (
+        <MyDecks onStudyDeck={handleStudyDeck} />
       )}
 
       {/* Quick Start Cards */}
