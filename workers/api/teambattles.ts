@@ -335,7 +335,9 @@ teamBattlesApp.post('/join-by-code', async (c) => {
     const user = c.get('user');
     const body = await c.req.json().catch(() => ({}));
     const code = String((body as { code?: unknown })?.code ?? '').trim();
-    if (!/^[A-Za-z0-9]{4,8}$/.test(code)) {
+    // Team-battle ids look like tb_<timestamp>_<rand>, so the last-8 code can
+    // legitimately contain an underscore — allow it (SQL matches verbatim).
+    if (!/^[A-Za-z0-9_]{4,8}$/.test(code)) {
       return c.json({ success: false, error: 'A battle code is required' }, 400);
     }
 

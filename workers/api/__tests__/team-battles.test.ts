@@ -503,6 +503,30 @@ describe('POST /api/team-battles/:id/leave', () => {
 });
 
 describe('POST /api/team-battles/join-by-code', () => {
+  it('accepts codes containing underscores (tb_<ts>_<rand> id suffixes)', async () => {
+    const db = createMockD1([
+      authHandler(),
+      { match: /UPDATE team_battles SET status = 'cancelled'/, run: () => ({ success: true, meta: { changes: 0 } }) },
+      { match: /UPPER\(SUBSTR\(id, -8\)\)/, first: () => battleRow({ status: 'waiting' }) },
+      {
+        match: /GROUP BY team_number/,
+        all: () => ({ results: [{ team_number: 1, count: 1 }] }),
+      },
+      { match: /FROM team_battle_members WHERE battle_id = \? AND user_id = \?/, first: () => null },
+      {
+        match: /COUNT\(\*\) as count FROM team_battle_members WHERE battle_id = \? AND team_number = \?/,
+        first: () => ({ count: 0 }),
+      },
+      catchAll(),
+    ]);
+    const t = await token('joiner_1');
+    const res = await worker.fetch(
+      post('http://x/api/team-battles/join-by-code', { code: '_2IWSTJY' }, t),
+      env(db),
+    );
+    expect(res.status).toBe(200);
+  });
+
   it('joins the smaller team by shareable code', async () => {
     const db = createMockD1([
       authHandler(),
