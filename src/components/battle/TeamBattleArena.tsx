@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check, Clock, Crown, Loader2, Trophy, X } from 'lucide-react';
 import { cn } from '@/utils';
+import { useAuthStore } from '@/stores/authStore';
 import {
   getTeamColors,
   useTeamBattleStore,
@@ -287,6 +288,12 @@ export function TeamBattleResults({ data, userId, onPlayAgain, onExit }: TeamBat
   const myTeamNumber = team1.some((m) => m.userId === userId) ? 1 : 2;
   const isDraw = battle.winnerTeam === null;
   const isWinner = battle.winnerTeam === myTeamNumber;
+
+  // Refresh the profile so the topbar XP reflects the battle award immediately
+  const restoreSession = useAuthStore((s) => s.restoreSession);
+  useEffect(() => {
+    restoreSession();
+  }, [restoreSession]);
 
   return (
     <div className="max-w-lg mx-auto space-y-6">
