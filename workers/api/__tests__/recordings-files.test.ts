@@ -237,7 +237,9 @@ describe('signed file URLs', () => {
 
   it('rejects a tampered signature', async () => {
     const signedPath = await mintSignedUrl();
-    const tampered = signedPath.replace(/sig=[0-9a-f]{2}/, 'sig=ff');
+    // Flip to a hex pair guaranteed to differ from the original — replacing
+    // with a fixed 'ff' is a no-op 1/256 of the time (CI flake).
+    const tampered = signedPath.replace(/sig=([0-9a-f]{2})/, (_m, p) => `sig=${p === 'ff' ? 'fe' : 'ff'}`);
 
     const res = await recordingsApp.request(tampered, {}, env(signedUrlDb(), bucket()));
     expect(res.status).toBe(403);
