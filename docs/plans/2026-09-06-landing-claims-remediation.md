@@ -47,7 +47,7 @@ migration if the landing prices are the intended ones. Owner decision: which pri
 | "AI-powered score prediction", "B2 with 72% confidence" mock copy | "Grade estimate based on your accuracy" |
 | "Smart Practice — adaptive questions" | "Mastery tracking with smart recommendations" |
 | Tutoring "Video Calls with screen sharing" | "Video via Zoom/Meet link" |
-| Parents "Weekly performance reports in your inbox" | "AI counselor reports in your dashboard" until Tier 1.2 ships |
+| Parents "Weekly performance reports in your inbox" | "AI counselor reports in your dashboard" until Tier 1.2 ships (then: "weekly progress updates on Telegram") |
 | Teachers "School dashboard for your whole department" | "Class dashboard" |
 | "50+ Subjects Covered" | Recount prod (Aug dump: 44 with questions of 73 rows) and state the real number |
 | Testimonials (invented quotes naming real schools: Presec, Wesley Girls, Mfantsipim) | Remove until real ones are collected |
@@ -64,13 +64,23 @@ UI: `studyGroupStore.ts` already targets `/api/study-groups/*` — align it to t
 Acceptance: create group → invite 2 users → post message → all members see it (2s poll); group list per user.
 Tests: route tests + membership caps; store contract test.
 
-### 1.2 Weekly parent email reports (M)
-Cron entry (existing scheduled handler) weekly Mon 06:00 UTC: for each parent with linked active students,
-generate summary (questions attempted, accuracy, streak, study time, weakest topic) from existing progress
-queries; send via the existing email infra (`marketing-campaigns.ts` has send plumbing); log to
-`parent_notifications`. Unsubscribe/preference toggle in ParentSettings.
-Acceptance: cron fires in staging, email lands, in-app copy + landing copy flip to "weekly email reports".
-Tests: summary-builder unit tests; cron dry-run test.
+### 1.2 Weekly parent progress digest via Telegram (M) — revised 2026-09-06
+Parent updates go through the **BrillaPrep Telegram bot**, not email. The integration is already
+production-grade: `workers/api/telegram.ts` (webhook link flow with idempotent token consume,
+`telegram_links` table, `notifyUser` DMs rate-limited 3/day, connect-points award with rollback).
+Parents link Telegram in Settings → Notifications.
+
+Build: weekly cron (Monday 06:00 UTC, existing scheduled handler): for each parent with linked active
+students AND a non-stale `telegram_links` row, build a per-child summary (questions attempted,
+accuracy, streak, study time, weakest topic) from the existing parent-progress queries and send via
+`notifyUser`. Also write an in-app `parent_notifications` entry regardless of Telegram linkage.
+Opt-out: unlink (already supported) + a digest toggle in ParentSettings if a settings store exists.
+Note the 3 DM/day budget: digest is weekly, but it shares the budget with race alerts — schedule
+digests at a low-traffic hour and log skips. Only after this ships may the landing say
+"weekly progress updates on Telegram"; until then the copy stays "AI counselor reports in your dashboard".
+Acceptance: cron dry-run in staging sends a real digest to a linked test parent; in-app notification
+written for unlinked parents.
+Tests: summary-builder unit tests; cron fan-out test (notifyUser mocked); skip-when-over-budget test.
 
 ### 1.3 Custom flashcard decks (S–M)
 `flashcard_decks.user_id` column exists unused. Add POST/PUT/DELETE `/flashcards/decks[/:id]` + card CRUD
