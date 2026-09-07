@@ -336,9 +336,9 @@ INSERT INTO "users" (id, email, password_hash, name, role, status, email_verifie
 ON CONFLICT(id) DO NOTHING;
 
 -- Practice-battle bot opponent (mirrors migrations/368_battle_bot_user.sql).
--- Minimal column set; all other columns default.
-INSERT INTO "users" (id, email, name, role, status, email_verified, is_active) VALUES
-('bot_battler', 'bot@brillaprep.org', 'Brilla Bot', 'student', 'approved', 1, 1)
+-- password_hash is a non-decodable marker: the bot can never log in.
+INSERT INTO "users" (id, email, password_hash, name, role, status, email_verified, is_active) VALUES
+('bot_battler', 'bot@brillaprep.org', 'BOT_ACCOUNT_NO_LOGIN', 'Brilla Bot', 'student', 'approved', 1, 1)
 ON CONFLICT(id) DO NOTHING;
 
 -- =============================================

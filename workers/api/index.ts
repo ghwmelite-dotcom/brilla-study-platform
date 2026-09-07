@@ -5143,8 +5143,8 @@ protectedApp.post('/battles', async (c) => {
       // real user row. Migration 368 / seed.sql create it; this guard keeps
       // the route self-sufficient on databases missing the migration.
       await c.env.DB.prepare(`
-        INSERT OR IGNORE INTO users (id, email, name, role, status, email_verified, is_active)
-        VALUES (?, ?, ?, 'student', 'approved', 1, 1)
+        INSERT OR IGNORE INTO users (id, email, password_hash, name, role, status, email_verified, is_active)
+        VALUES (?, ?, 'BOT_ACCOUNT_NO_LOGIN', ?, 'student', 'approved', 1, 1)
       `).bind(BATTLE_BOT_ID, 'bot@brillaprep.org', 'Brilla Bot').run();
 
       await c.env.DB.prepare(`
