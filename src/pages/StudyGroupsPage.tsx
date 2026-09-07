@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
   Users,
@@ -12,6 +12,7 @@ import {
 import { useStudyGroupStore } from '@/stores/studyGroupStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useToastStore } from '@/stores/toastStore';
+import StudyGroupDetailPage from '@/pages/StudyGroupDetailPage';
 import type { StudyGroup } from '@/types';
 import { cn } from '@/utils';
 
@@ -98,6 +99,7 @@ function GroupCard({ group, isOwner, onView, onJoin }: GroupCardProps) {
 }
 
 export default function StudyGroupsPage() {
+  const { groupId } = useParams<{ groupId?: string }>();
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const {
@@ -132,7 +134,7 @@ export default function StudyGroupsPage() {
     if (success) {
       toast.showSuccess('Joined Group!', 'Welcome to the study group');
     } else {
-      toast.showError('Failed', 'Could not join group');
+      toast.showError('Failed', useStudyGroupStore.getState().error || 'Could not join group');
     }
   };
 
@@ -151,13 +153,19 @@ export default function StudyGroupsPage() {
       setNewGroupName('');
       setNewGroupDescription('');
     } else {
-      toast.showError('Failed', 'Could not create group');
+      toast.showError('Failed', useStudyGroupStore.getState().error || 'Could not create group');
     }
   };
 
   const availablePublicGroups = publicGroups.filter(
     (pg) => !myGroups.some((mg) => mg.id === pg.id)
   );
+
+  // The /study-groups/:groupId route renders this component too (App.tsx);
+  // delegate to the detail view when a group id is present.
+  if (groupId) {
+    return <StudyGroupDetailPage />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
