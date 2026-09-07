@@ -214,6 +214,8 @@ describe('POST /api/battles/:id/answer', () => {
   function makeAnswerDb(opts: {
     answerCounts?: { user_id: string; count: number }[];
     scores?: { challenger_score: number; opponent_score: number; challenger_id: string; opponent_id: string };
+    streakSolo?: { winner_id: string | null; completed_at: string }[];
+    streakTeam?: { winner_team: number | null; completed_at: string; team_number: number }[];
   } = {}) {
     return createMockD1([
       authHandler(),
@@ -227,6 +229,8 @@ describe('POST /api/battles/:id/answer', () => {
         first: () => opts.scores ?? null,
       },
       { match: /UPDATE battles SET status = 'completed'/, run: () => ({ success: true, meta: { changes: 1 } }) },
+      { match: /SELECT winner_id, completed_at FROM battles/, all: () => ({ results: opts.streakSolo ?? [] }) },
+      { match: /SELECT tb\.winner_team, tb\.completed_at, tbm\.team_number/, all: () => ({ results: opts.streakTeam ?? [] }) },
       { match: /SELECT house FROM users/, first: () => ({ house: null }) },
       catchAll(),
     ]);
@@ -290,6 +294,9 @@ describe('POST /api/battles/:id/answer', () => {
         { user_id: 'user_b', count: 2 },
       ],
       scores: { challenger_score: 10, opponent_score: 6, challenger_id: 'user_a', opponent_id: 'user_b' },
+      // The just-completed battle is part of the history (completion UPDATE
+      // runs before the streak read), so an empty prior record is streak 1.
+      streakSolo: [{ winner_id: 'user_a', completed_at: '2026-09-06 12:00:00' }],
     });
     const t = await token('user_a');
     const res = await worker.fetch(
@@ -305,20 +312,169 @@ describe('POST /api/battles/:id/answer', () => {
     const completion = db.calls.find((c) => c.sql.includes("UPDATE battles SET status = 'completed'"));
     expect(completion!.binds[0]).toBe('user_a'); // winner
 
+    // battle_win award + first-win streak bonus (+10), both to the winner only
     const xpUpdates = db.calls.filter((c) => c.sql.includes('UPDATE users SET xp_points'));
-    expect(xpUpdates).toHaveLength(1);
-    expect(xpUpdates[0].binds[1]).toBe('user_a');
-    expect(xpUpdates[0].binds[0]).toBe(60); // 50 victory bonus + 10 battle score
+    expect(xpUpdates).toHaveLength(2);
+    expect(xpUpdates[0].binds).toEqual([60, 'user_a']); // 50 victory bonus + 10 battle score
+    expect(xpUpdates[1].binds).toEqual([10, 'user_a']); // win streak x1
 
     const ledger = db.calls.filter((c) => c.sql.includes('INSERT INTO points_ledger'));
-    expect(ledger).toHaveLength(1);
+    expect(ledger).toHaveLength(2);
     expect(ledger[0].binds).toContain('battle_win');
-    expect(ledger[0].binds).toContain('user_a');
+    expect(ledger[1].binds).toContain('battle_win_streak');
+    expect(ledger.every((c) => c.binds.includes('user_a'))).toBe(true);
 
     // win_battles quest progress for the winner (same pattern as /quests/progress)
     const questProgress = db.calls.filter((c) => c.sql.includes('UPDATE user_quests'));
     expect(questProgress.length).toBeGreaterThan(0);
     expect(questProgress.every((c) => c.binds[0] === 'user_a' || c.binds.includes('user_a'))).toBe(true);
+  });
+
+  it('win streak increments across consecutive wins', async () => {
+    // History (most recent first, including the battle just won): 3 straight wins.
+    const db = makeAnswerDb({
+      answerCounts: [
+        { user_id: 'user_a', count: 2 },
+        { user_id: 'user_b', count: 2 },
+      ],
+      scores: { challenger_score: 10, opponent_score: 6, challenger_id: 'user_a', opponent_id: 'user_b' },
+      streakSolo: [
+        { winner_id: 'user_a', completed_at: '2026-09-06 12:00:00' },
+        { winner_id: 'user_a', completed_at: '2026-09-06 11:00:00' },
+        { winner_id: 'user_a', completed_at: '2026-09-06 10:00:00' },
+        { winner_id: 'user_b', completed_at: '2026-09-06 09:00:00' }, // loss breaks the run
+      ],
+    });
+    const t = await token('user_a');
+    const res = await worker.fetch(
+      authedPost('http://x/api/battles/battle_active_1/answer', {
+        questionIndex: 1, answer: 'B', timeTaken: 7,
+      }, t),
+      env(db),
+    );
+    expect(res.status).toBe(200);
+
+    const xpUpdates = db.calls.filter((c) => c.sql.includes('UPDATE users SET xp_points'));
+    expect(xpUpdates.map((c) => c.binds[0])).toEqual([60, 30]); // streak x3 -> +30
+    const streakLedger = db.calls.filter(
+      (c) => c.sql.includes('INSERT INTO points_ledger') && c.binds.includes('battle_win_streak'),
+    );
+    expect(streakLedger).toHaveLength(1);
+  });
+
+  it('win streak resets after a loss and counts team-battle wins too', async () => {
+    const db = makeAnswerDb({
+      answerCounts: [
+        { user_id: 'user_a', count: 2 },
+        { user_id: 'user_b', count: 2 },
+      ],
+      scores: { challenger_score: 10, opponent_score: 6, challenger_id: 'user_a', opponent_id: 'user_b' },
+      streakSolo: [
+        { winner_id: 'user_a', completed_at: '2026-09-06 12:00:00' },
+        { winner_id: 'user_b', completed_at: '2026-09-06 09:00:00' }, // most recent PRIOR solo was a loss
+      ],
+      streakTeam: [
+        { winner_team: 1, completed_at: '2026-09-06 11:00:00', team_number: 1 }, // team win in between
+      ],
+    });
+    const t = await token('user_a');
+    const res = await worker.fetch(
+      authedPost('http://x/api/battles/battle_active_1/answer', {
+        questionIndex: 1, answer: 'B', timeTaken: 7,
+      }, t),
+      env(db),
+    );
+    expect(res.status).toBe(200);
+
+    // Merged timeline: win (this battle, 12:00), team win (11:00), solo loss (09:00) -> streak 2.
+    const xpUpdates = db.calls.filter((c) => c.sql.includes('UPDATE users SET xp_points'));
+    expect(xpUpdates.map((c) => c.binds[0])).toEqual([60, 20]);
+  });
+
+  it('win-streak bonus caps at +50', async () => {
+    const db = makeAnswerDb({
+      answerCounts: [
+        { user_id: 'user_a', count: 2 },
+        { user_id: 'user_b', count: 2 },
+      ],
+      scores: { challenger_score: 10, opponent_score: 6, challenger_id: 'user_a', opponent_id: 'user_b' },
+      streakSolo: Array.from({ length: 8 }, (_, i) => ({
+        winner_id: 'user_a',
+        completed_at: `2026-09-06 ${String(12 - i).padStart(2, '0')}:00:00`,
+      })),
+    });
+    const t = await token('user_a');
+    const res = await worker.fetch(
+      authedPost('http://x/api/battles/battle_active_1/answer', {
+        questionIndex: 1, answer: 'B', timeTaken: 7,
+      }, t),
+      env(db),
+    );
+    expect(res.status).toBe(200);
+
+    const xpUpdates = db.calls.filter((c) => c.sql.includes('UPDATE users SET xp_points'));
+    expect(xpUpdates.map((c) => c.binds[0])).toEqual([60, 50]); // streak 8 -> capped +50
+  });
+});
+
+describe('win-streak surfacing on completed battles', () => {
+  it('GET /battles/:id includes winner_streak and winner_streak_bonus', async () => {
+    const completedBattle = {
+      id: 'battle_done_1',
+      status: 'completed',
+      challenger_id: 'user_a',
+      opponent_id: 'user_b',
+      winner_id: 'user_a',
+      questions: JSON.stringify([]),
+      expires_at: null,
+    };
+    const db = createMockD1([
+      { match: /UPDATE battles SET status = 'cancelled'/, run: () => ({ success: true, meta: { changes: 0 } }) },
+      { match: /FROM battles WHERE id = \? AND opponent_id = \?/, first: () => null },
+      { match: /FROM battles b/, first: () => completedBattle },
+      { match: /FROM questions q/, all: () => ({ results: [] }) },
+      {
+        match: /SELECT winner_id, completed_at FROM battles/,
+        all: () => ({
+          results: [
+            { winner_id: 'user_a', completed_at: '2026-09-06 12:00:00' },
+            { winner_id: 'user_a', completed_at: '2026-09-06 11:00:00' },
+            { winner_id: 'user_b', completed_at: '2026-09-06 10:00:00' },
+          ],
+        }),
+      },
+      { match: /SELECT tb\.winner_team/, all: () => ({ results: [] }) },
+      catchAll(),
+    ]);
+    const res = await worker.fetch(new Request('http://x/api/battles/battle_done_1'), env(db));
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { data: Record<string, unknown> };
+    expect(body.data.winner_streak).toBe(2);
+    expect(body.data.winner_streak_bonus).toBe(20);
+  });
+
+  it('omits streak fields while the battle is not completed', async () => {
+    const activeBattle = {
+      id: 'battle_live_1',
+      status: 'active',
+      challenger_id: 'user_a',
+      opponent_id: 'user_b',
+      winner_id: null,
+      questions: JSON.stringify([]),
+      expires_at: null,
+    };
+    const db = createMockD1([
+      { match: /UPDATE battles SET status = 'cancelled'/, run: () => ({ success: true, meta: { changes: 0 } }) },
+      { match: /FROM battles WHERE id = \? AND opponent_id = \?/, first: () => null },
+      { match: /FROM battles b/, first: () => activeBattle },
+      { match: /FROM questions q/, all: () => ({ results: [] }) },
+      catchAll(),
+    ]);
+    const res = await worker.fetch(new Request('http://x/api/battles/battle_live_1'), env(db));
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { data: Record<string, unknown> };
+    expect(body.data).not.toHaveProperty('winner_streak');
+    expect(db.calls.some((c) => c.sql.includes('SELECT winner_id, completed_at FROM battles'))).toBe(false);
   });
 });
 
@@ -403,6 +559,17 @@ describe('practice bot battles', () => {
         first: () => opts.scores ?? { challenger_score: 4, opponent_score: 11, challenger_id: 'user_h', opponent_id: 'bot_battler' },
       },
       { match: /UPDATE battles SET status = 'completed'/, run: () => ({ success: true, meta: { changes: 1 } }) },
+      // Win-streak history: the just-completed battle counts (completion
+      // UPDATE runs before the streak read), so the human winner is streak 1.
+      {
+        match: /SELECT winner_id, completed_at FROM battles/,
+        all: (binds) => ({
+          results: binds[0] === 'user_h'
+            ? [{ winner_id: 'user_h', completed_at: '2026-09-06 12:00:00' }]
+            : [],
+        }),
+      },
+      { match: /SELECT tb\.winner_team/, all: () => ({ results: [] }) },
       { match: /FROM battles b/, first: () => ({ ...botBattleRow, questions: JSON.stringify([]) }) },
       { match: /FROM questions q/, all: () => ({ results: [] }) },
       { match: /SELECT house FROM users/, first: () => ({ house: null }) },
@@ -442,9 +609,9 @@ describe('practice bot battles', () => {
     expect(res.status).toBe(200);
 
     const xpUpdates = db.calls.filter((c) => c.sql.includes('UPDATE users SET xp_points'));
-    expect(xpUpdates).toHaveLength(1);
-    expect(xpUpdates[0].binds[1]).toBe('user_h');
-    expect(xpUpdates[0].binds[0]).toBe(61); // 50 + 11
+    expect(xpUpdates).toHaveLength(2);
+    expect(xpUpdates[0].binds).toEqual([61, 'user_h']); // 50 + 11 battle_win
+    expect(xpUpdates[1].binds).toEqual([10, 'user_h']); // win streak x1
     expect(xpUpdates.every((c) => !c.binds.includes('bot_battler'))).toBe(true);
   });
 

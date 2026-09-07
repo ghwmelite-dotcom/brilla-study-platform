@@ -34,6 +34,8 @@ import { guidanceApp } from './guidance';
 import { activityFeedApp } from './activityfeed';
 import { eventsApp } from './events';
 import { teamBattlesApp } from './teambattles';
+import { studyGroupsApp } from './study-groups';
+import { flashcardDecksApp } from './flashcard-decks';
 import { cosmeticsApp } from './cosmetics';
 import { rewardsApp } from './rewards';
 import { engagementApp } from './engagement';
@@ -47,6 +49,7 @@ import { studyRoomsApp } from './study-rooms';
 import tutorClassroomApp from './tutor-classroom';
 import { cleanupExpiredDemoData } from './demoUtils';
 import { awardPoints } from './points';
+import { battleWinStreakBonus, computeBattleWinStreak } from './battle-streak';
 import {
   getSelfRegistrationStatus,
   IMMEDIATE_STUDENT_REGISTRATION_MESSAGE,
@@ -3504,6 +3507,65 @@ publicApp.get('/houses/:id/members', async (c) => {
 });
 
 // =====================
+// PUBLIC PLATFORM STATS (landing page)
+// =====================
+
+// Real COUNT(*)s for the landing/community stats rows (spec 1.5 — replaces
+// hardcoded marketing numbers). Cached in-module for 5 minutes (per Workers
+// isolate) so landing traffic doesn't hammer D1.
+interface PublicStatsPayload {
+  students: number;
+  questions: number;
+  subjectsWithQuestions: number;
+  chatRooms: number;
+  studyGroups: number;
+  pastPapers: number;
+}
+
+let publicStatsCache: { data: PublicStatsPayload; at: number } | null = null;
+const PUBLIC_STATS_TTL_MS = 5 * 60 * 1000;
+
+export function resetPublicStatsCacheForTests(): void {
+  publicStatsCache = null;
+}
+
+async function publicStatsCount(db: D1Database, sql: string): Promise<number> {
+  const row = await db.prepare(sql).bind().first<{ c: number }>();
+  return Number(row?.c ?? 0);
+}
+
+publicApp.use('/public/stats', publicReadRateLimit);
+publicApp.get('/public/stats', async (c) => {
+  if (publicStatsCache && Date.now() - publicStatsCache.at < PUBLIC_STATS_TTL_MS) {
+    return c.json({ success: true, data: publicStatsCache.data });
+  }
+
+  try {
+    const [students, questions, subjectsWithQuestions, chatRooms, pastPapers] = await Promise.all([
+      publicStatsCount(c.env.DB, "SELECT COUNT(*) as c FROM users WHERE role = 'student' AND status = 'approved' AND is_demo = 0"),
+      publicStatsCount(c.env.DB, 'SELECT COUNT(*) as c FROM questions'),
+      publicStatsCount(c.env.DB, 'SELECT COUNT(DISTINCT subject_id) as c FROM questions'),
+      publicStatsCount(c.env.DB, 'SELECT COUNT(*) as c FROM chat_rooms'),
+      publicStatsCount(c.env.DB, 'SELECT COUNT(*) as c FROM past_papers'),
+    ]);
+
+    // study_groups may not exist on older databases — degrade to 0.
+    let studyGroups = 0;
+    try {
+      studyGroups = await publicStatsCount(c.env.DB, 'SELECT COUNT(*) as c FROM study_groups');
+    } catch {
+      studyGroups = 0;
+    }
+
+    const data: PublicStatsPayload = { students, questions, subjectsWithQuestions, chatRooms, studyGroups, pastPapers };
+    publicStatsCache = { data, at: Date.now() };
+    return c.json({ success: true, data });
+  } catch {
+    return c.json({ success: false, error: 'Failed to fetch stats' }, 500);
+  }
+});
+
+// =====================
 // BATTLE ENDPOINTS
 // =====================
 
@@ -3623,6 +3685,22 @@ async function finalizeBattleIfComplete(
       isDemoData: demoFlags.is_demo_data,
       expiresAt: demoFlags.expires_at,
     });
+
+    // Win-streak bonus: +10 per consecutive win across both battle modes,
+    // capped at +50 (spec 1.4a). Runs after the completion UPDATE above, so
+    // the just-won battle is part of the streak.
+    const streak = await computeBattleWinStreak(db, winnerId);
+    const streakBonus = battleWinStreakBonus(streak);
+    if (streakBonus > 0) {
+      await awardPoints(db, {
+        userId: winnerId,
+        points: streakBonus,
+        source: 'battle_win_streak',
+        sourceRef: battleId,
+        isDemoData: demoFlags.is_demo_data,
+        expiresAt: demoFlags.expires_at,
+      });
+    }
 
     // Quest progress: win_battles templates (daily_battle / weekly_battles_5),
     // same two-statement pattern as POST /quests/progress.
@@ -3844,12 +3922,20 @@ publicApp.get('/battles/:id', async (c) => {
 
     const safeBattle = { ...battle };
     delete safeBattle.questions;
-    const data = {
+    const data: Record<string, unknown> = {
       ...safeBattle,
       questions: storedQuestions
         .filter((question) => eligibleQuestionIds.has(String(question.id)))
         .map((question) => sanitizeQuestionForStudent(question)),
     };
+
+    // Completed battles surface the winner's current win streak (and the
+    // streak bonus that was awarded) so the results UI can show it.
+    if (battle.status === 'completed' && battle.winner_id && battle.winner_id !== BATTLE_BOT_ID) {
+      const winnerStreak = await computeBattleWinStreak(c.env.DB, battle.winner_id as string);
+      data.winner_streak = winnerStreak;
+      data.winner_streak_bonus = battleWinStreakBonus(winnerStreak);
+    }
 
     return c.json({ success: true, data });
   } catch {
@@ -4870,14 +4956,16 @@ protectedApp.get('/flashcards/decks', async (c) => {
   }
 });
 
-// Get single deck with cards
+// Get single deck with cards (owner or public only — anything else is an IDOR
+// on private decks; the flashcard-decks router enforces the same rule)
 protectedApp.get('/flashcards/decks/:id', async (c) => {
   const deckId = c.req.param('id');
+  const userId = getUserId(c);
 
   try {
     const deck = await c.env.DB.prepare(`
-      SELECT * FROM flashcard_decks WHERE id = ?
-    `).bind(deckId).first();
+      SELECT * FROM flashcard_decks WHERE id = ? AND (is_public = 1 OR user_id = ?)
+    `).bind(deckId, userId).first();
 
     if (!deck) {
       return c.json({ success: false, error: 'Deck not found' }, 404);
@@ -13167,6 +13255,8 @@ app.route('/api/activity', activityFeedApp);
 app.route('/api/events', eventsApp);
 app.route('/api/guidance', guidanceApp);
 app.route('/api/team-battles', teamBattlesApp);
+app.route('/api/study-groups', studyGroupsApp);
+app.route('/api/flashcard-decks', flashcardDecksApp);
 app.route('/api/cosmetics', cosmeticsApp);
 app.route('/api/rewards', rewardsApp);
 app.route('/api/engagement', engagementApp);

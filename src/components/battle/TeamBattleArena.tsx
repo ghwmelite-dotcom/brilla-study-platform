@@ -316,6 +316,11 @@ export function TeamBattleResults({ data, userId, onPlayAgain, onExit }: TeamBat
             ? `Team ${battle.winnerTeam} takes it! +${battle.xpReward} XP for every winning member.`
             : `Team ${battle.winnerTeam} wins. Better luck next time!`}
         </p>
+        {isWinner && battle.myWinStreak != null && battle.myWinStreak > 0 && battle.myWinStreakBonus != null && battle.myWinStreakBonus > 0 && (
+          <p className="mt-2 font-semibold text-white/95">
+            Win streak ×{battle.myWinStreak} (+{battle.myWinStreakBonus} XP)
+          </p>
+        )}
       </div>
 
       <div className="bg-white rounded-xl shadow-card p-6 space-y-4">

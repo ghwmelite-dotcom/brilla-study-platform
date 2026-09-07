@@ -58,6 +58,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { AuthModal } from '@/components/auth';
+import { communityStatsText, heroStatsText, usePublicStats } from '@/lib/publicStats';
 import {
   SITE_CONFIG,
   TRIAL_CONFIG,
@@ -985,6 +986,18 @@ export function LandingPage() {
   const testimonialsRef = useInView(0.2);
   const ctaRef = useInView(0.3);
 
+  // Real platform counts (GET /api/public/stats); static strings remain as
+  // the fallback while/ if the fetch fails.
+  const publicStats = usePublicStats();
+  const heroCounts = heroStatsText(publicStats);
+  const communityCounts = communityStatsText(publicStats);
+  const displayStats = [
+    { ...stats[0], text: heroCounts.questions },
+    stats[1],
+    { ...stats[2], text: heroCounts.subjects },
+    stats[3],
+  ];
+
   // Auth modal state
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
@@ -1386,7 +1399,7 @@ export function LandingPage() {
 
         <div className="relative max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-            {stats.map((stat, index) => (
+            {displayStats.map((stat, index) => (
               <StatItem
                 key={stat.label}
                 stat={stat}
@@ -3618,8 +3631,7 @@ export function LandingPage() {
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/50">12 friends online</span>
+                  <div className="flex items-center justify-end text-sm">
                     <button className="text-violet-400 hover:text-violet-300 font-medium">Find Friends</button>
                   </div>
                 </div>
@@ -3702,10 +3714,6 @@ export function LandingPage() {
                     <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/10">
                       <div className="w-6 h-6 rounded bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-xs">📚</div>
                       <span className="text-white text-sm font-medium">General Maths</span>
-                      <span className="text-emerald-400 text-xs ml-auto flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        142 online
-                      </span>
                     </div>
                     <div className="space-y-2 text-sm">
                       <div className="flex items-start gap-2">
@@ -3761,20 +3769,20 @@ export function LandingPage() {
           <div className="glass rounded-2xl p-6 sm:p-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
               <div className="text-center">
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent mb-1">10K+</div>
-                <div className="text-white/60 text-xs sm:text-sm">Active Students</div>
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent mb-1">{communityCounts.students}</div>
+                <div className="text-white/60 text-xs sm:text-sm">Students learning</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-1">500+</div>
-                <div className="text-white/60 text-xs sm:text-sm">Study Groups</div>
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-1">{communityCounts.studyGroups}</div>
+                <div className="text-white/60 text-xs sm:text-sm">Study groups</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent mb-1">50+</div>
-                <div className="text-white/60 text-xs sm:text-sm">Subject Chats</div>
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent mb-1">{communityCounts.chatRooms}</div>
+                <div className="text-white/60 text-xs sm:text-sm">Chat rooms</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent mb-1">Safe</div>
-                <div className="text-white/60 text-xs sm:text-sm">Moderated 24/7</div>
+                <div className="text-white/60 text-xs sm:text-sm">Moderated community</div>
               </div>
             </div>
           </div>

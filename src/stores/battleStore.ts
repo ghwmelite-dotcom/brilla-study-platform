@@ -110,6 +110,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         opponentScore: data.opponent_score as number,
         currentQuestion: data.current_question as number,
         winnerId: data.winner_id as string | undefined,
+        winnerStreak: data.winner_streak as number | undefined,
+        winnerStreakBonus: data.winner_streak_bonus as number | undefined,
         createdAt: data.created_at as string,
         startedAt: data.started_at as string | undefined,
         completedAt: data.completed_at as string | undefined,

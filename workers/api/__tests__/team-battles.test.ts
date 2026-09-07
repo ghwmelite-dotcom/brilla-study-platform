@@ -283,6 +283,9 @@ describe('lazy completion + XP', () => {
     battle: Record<string, unknown>;
     times?: { team_number: number; total_time: number }[];
     winners?: { user_id: string }[];
+    // Per-user battle history for the win-streak computation (binds[0] = userId)
+    streakSolo?: (userId: string) => { winner_id: string | null; completed_at: string }[];
+    streakTeam?: (userId: string) => { winner_team: number | null; completed_at: string; team_number: number }[];
   }) {
     return createMockD1([
       authHandler(),
@@ -293,6 +296,15 @@ describe('lazy completion + XP', () => {
       {
         match: /SELECT user_id FROM team_battle_members WHERE battle_id = \? AND team_number = \?/,
         all: () => ({ results: opts.winners ?? [] }),
+      },
+      // Win-streak history reads (shared helper, per-user via binds)
+      {
+        match: /SELECT winner_id, completed_at FROM battles/,
+        all: (binds) => ({ results: opts.streakSolo ? opts.streakSolo(binds[0] as string) : [] }),
+      },
+      {
+        match: /SELECT tb\.winner_team, tb\.completed_at, tbm\.team_number/,
+        all: (binds) => ({ results: opts.streakTeam ? opts.streakTeam(binds[0] as string) : [] }),
       },
       // GET's battle read (alias tb)
       { match: /FROM team_battles tb/, first: () => opts.battle },
@@ -313,6 +325,19 @@ describe('lazy completion + XP', () => {
     const db = makeGetDb({
       battle: endedRow({ team1_score: 12, team2_score: 6 }),
       winners: [{ user_id: 'w1' }, { user_id: 'w2' }],
+      // The just-completed battle is a TEAM battle win for both. w1 extends a
+      // run to 3 (two prior wins), w2's prior result was a loss.
+      streakTeam: (userId) =>
+        userId === 'w1'
+          ? [
+              { winner_team: 1, completed_at: '2026-09-06 12:00:00', team_number: 1 },
+              { winner_team: 1, completed_at: '2026-09-06 11:00:00', team_number: 1 },
+            ]
+          : [{ winner_team: 1, completed_at: '2026-09-06 12:00:00', team_number: 1 }],
+      streakSolo: (userId) =>
+        userId === 'w1'
+          ? [{ winner_id: 'w1', completed_at: '2026-09-06 10:00:00' }]
+          : [{ winner_id: 'someone_else', completed_at: '2026-09-06 11:00:00' }],
     });
     const t = await token('w1');
     const res = await worker.fetch(get('http://x/api/team-battles/tb_1', t), env(db));
@@ -321,13 +346,22 @@ describe('lazy completion + XP', () => {
     const completion = db.calls.find((c) => c.sql.includes("UPDATE team_battles SET status = 'completed'"));
     expect(completion!.binds[0]).toBe(1);
 
+    // Each winning member: xp_reward battle_win + their own streak bonus
+    // (w1: +30 for streak x3; w2: +10 for streak x1 after the loss).
     const xp = db.calls.filter((c) => c.sql.includes('UPDATE users SET xp_points'));
-    expect(xp.map((c) => c.binds[1]).sort()).toEqual(['w1', 'w2']);
-    expect(xp.every((c) => c.binds[0] === 200)).toBe(true); // xp_reward per winning member
+    const byUser = new Map<string, number[]>();
+    for (const call of xp) {
+      const userId = call.binds[1] as string;
+      byUser.set(userId, [...(byUser.get(userId) ?? []), call.binds[0] as number]);
+    }
+    expect([...byUser.keys()].sort()).toEqual(['w1', 'w2']);
+    expect(byUser.get('w1')).toEqual([200, 30]);
+    expect(byUser.get('w2')).toEqual([200, 10]);
 
     const ledger = db.calls.filter((c) => c.sql.includes('INSERT INTO points_ledger'));
-    expect(ledger).toHaveLength(2);
-    expect(ledger.every((c) => c.binds.includes('battle_win'))).toBe(true);
+    expect(ledger).toHaveLength(4);
+    expect(ledger.filter((c) => c.binds.includes('battle_win'))).toHaveLength(2);
+    expect(ledger.filter((c) => c.binds.includes('battle_win_streak'))).toHaveLength(2);
   });
 
   it('breaks score ties on lower aggregate time_taken', async () => {
@@ -431,6 +465,84 @@ describe('GET /api/team-battles/:battleId', () => {
     // Progress counts without answer content
     expect(body.data.team1[0]).toMatchObject({ userId: 'u1', answeredCount: 1, isCaptain: true });
     expect(JSON.stringify(body.data)).not.toContain('correct_answer');
+  });
+
+  it('surfaces the viewer\'s win streak on a completed battle they won', async () => {
+    const completedBattle = battleRow({
+      status: 'completed',
+      winner_team: 1,
+      team1_score: 12,
+      team2_score: 6,
+      completed_at: '2026-09-06 12:00:00',
+    });
+    const db = createMockD1([
+      authHandler(),
+      { match: /UPDATE team_battles SET status = 'cancelled'/, run: () => ({ success: true, meta: { changes: 0 } }) },
+      { match: /SELECT \* FROM team_battles WHERE id = \?/, first: () => completedBattle },
+      // Streak handlers must precede the aliased battle read: the streak
+      // query also contains "FROM team_battles tb".
+      {
+        match: /SELECT winner_id, completed_at FROM battles/,
+        all: () => ({ results: [] }),
+      },
+      {
+        match: /SELECT tb\.winner_team, tb\.completed_at, tbm\.team_number/,
+        all: () => ({
+          results: [
+            { winner_team: 1, completed_at: '2026-09-06 12:00:00', team_number: 1 },
+            { winner_team: 1, completed_at: '2026-09-05 12:00:00', team_number: 1 },
+            { winner_team: 2, completed_at: '2026-09-04 12:00:00', team_number: 1 },
+          ],
+        }),
+      },
+      { match: /FROM team_battles tb/, first: () => completedBattle },
+      {
+        match: /answered_count/,
+        all: () => ({
+          results: [
+            { user_id: 'u1', name: 'Ama', avatar_url: null, is_captain: 1, team_number: 1, score: 12, correct_answers: 2, answered_count: 2 },
+            { user_id: 'u2', name: 'Kofi', avatar_url: null, is_captain: 0, team_number: 2, score: 6, correct_answers: 1, answered_count: 2 },
+          ],
+        }),
+      },
+      catchAll(),
+    ]);
+    const t = await token('u1');
+    const res = await worker.fetch(get('http://x/api/team-battles/tb_1', t), env(db));
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { data: { battle: Record<string, unknown> } };
+    expect(body.data.battle.myWinStreak).toBe(2);
+    expect(body.data.battle.myWinStreakBonus).toBe(20);
+  });
+
+  it('does not surface a streak to members of the losing team', async () => {
+    const completedBattle = battleRow({
+      status: 'completed',
+      winner_team: 1,
+      completed_at: '2026-09-06 12:00:00',
+    });
+    const db = createMockD1([
+      authHandler(),
+      { match: /UPDATE team_battles SET status = 'cancelled'/, run: () => ({ success: true, meta: { changes: 0 } }) },
+      { match: /SELECT \* FROM team_battles WHERE id = \?/, first: () => completedBattle },
+      { match: /FROM team_battles tb/, first: () => completedBattle },
+      {
+        match: /answered_count/,
+        all: () => ({
+          results: [
+            { user_id: 'u1', name: 'Ama', avatar_url: null, is_captain: 1, team_number: 1, score: 12, correct_answers: 2, answered_count: 2 },
+            { user_id: 'u2', name: 'Kofi', avatar_url: null, is_captain: 0, team_number: 2, score: 6, correct_answers: 1, answered_count: 2 },
+          ],
+        }),
+      },
+      catchAll(),
+    ]);
+    const t = await token('u2'); // team 2 — the losers
+    const res = await worker.fetch(get('http://x/api/team-battles/tb_1', t), env(db));
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { data: { battle: Record<string, unknown> } };
+    expect(body.data.battle.myWinStreak).toBeNull();
+    expect(body.data.battle.myWinStreakBonus).toBeNull();
   });
 });
 

@@ -723,6 +723,8 @@ export interface Battle {
   opponentScore: number;
   currentQuestion: number;
   winnerId?: string;
+  winnerStreak?: number;
+  winnerStreakBonus?: number;
   createdAt: string;
   startedAt?: string;
   completedAt?: string;

@@ -22,11 +22,14 @@ export function BattleResults({ battle, onRematch, onExit }: BattleResultsProps)
   const isLoser = !isWinner && !isTie;
 
   // XP actually persisted server-side on completion: the winner earns
-  // battle_win XP = 50 victory bonus + their battle score. No participation
-  // XP source exists in the points ledger, so losers/ties earn nothing.
+  // battle_win XP = 50 victory bonus + their battle score, plus a win-streak
+  // bonus (min(streak, 5) x 10) served back as winnerStreak/winnerStreakBonus.
+  // No participation XP source exists in the points ledger, so losers/ties
+  // earn nothing.
   const scoreXP = isWinner ? myScore : 0;
   const winBonus = isWinner ? 50 : 0;
-  const totalXP = scoreXP + winBonus;
+  const streakBonus = isWinner && battle.winnerStreak ? (battle.winnerStreakBonus ?? 0) : 0;
+  const totalXP = scoreXP + winBonus + streakBonus;
 
   return (
     <div className="max-w-lg mx-auto">
@@ -108,6 +111,12 @@ export function BattleResults({ battle, onRematch, onExit }: BattleResultsProps)
                 <span className="text-neutral-600">Victory Bonus</span>
                 <span className="font-medium text-yellow-600">+{winBonus} XP</span>
               </div>
+              {streakBonus > 0 && battle.winnerStreak && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-neutral-600">Win streak ×{battle.winnerStreak}</span>
+                  <span className="font-medium text-orange-600">+{streakBonus} XP</span>
+                </div>
+              )}
               <div className="pt-2 border-t border-neutral-200 flex justify-between">
                 <span className="font-medium text-neutral-900">Total</span>
                 <span className="font-bold text-primary">+{totalXP} XP</span>

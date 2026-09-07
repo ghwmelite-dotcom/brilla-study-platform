@@ -36,6 +36,8 @@ export interface TeamBattleInfo {
   team2Score: number;
   winnerTeam: number | null;
   xpReward: number;
+  myWinStreak?: number | null;
+  myWinStreakBonus?: number | null;
   currentQuestion: number;
   roundEndsAt: string | null;
   startedAt?: string;

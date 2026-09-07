@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { requireAuth } from './auth-middleware';
 import { parseLimit } from './http';
 import { awardPoints } from './points';
+import { battleWinStreakBonus, computeBattleWinStreak } from './battle-streak';
 import { getDemoDataFlags } from './demoUtils';
 
 interface Env {
@@ -178,6 +179,22 @@ async function finalizeTeamBattleIfComplete(db: D1Database, battleId: string): P
         isDemoData: demoFlags.is_demo_data,
         expiresAt: demoFlags.expires_at,
       });
+
+      // Win-streak bonus per winning member (spec 1.4a): +10 per consecutive
+      // win across both battle modes, capped at +50. Awarded after the
+      // completion UPDATE, so this battle counts toward the streak.
+      const streak = await computeBattleWinStreak(db, userId);
+      const streakBonus = battleWinStreakBonus(streak);
+      if (streakBonus > 0) {
+        await awardPoints(db, {
+          userId,
+          points: streakBonus,
+          source: 'battle_win_streak',
+          sourceRef: battleId,
+          isDemoData: demoFlags.is_demo_data,
+          expiresAt: demoFlags.expires_at,
+        });
+      }
     }
   }
 
@@ -584,6 +601,18 @@ teamBattlesApp.get('/:battleId', async (c) => {
 
     const round = deriveTeamBattleRound(battle as unknown as TeamBattleRow, Date.now());
 
+    // Completed battles surface the VIEWER's win streak when they were on the
+    // winning team, so the results UI can show the streak bonus awarded.
+    let myWinStreak: number | null = null;
+    let myWinStreakBonus: number | null = null;
+    if (battle.status === 'completed' && battle.winner_team !== null) {
+      const viewer = [...team1, ...team2].find((m) => m.userId === c.get('user').userId);
+      if (viewer && viewer.teamNumber === battle.winner_team) {
+        myWinStreak = await computeBattleWinStreak(c.env.DB, viewer.userId);
+        myWinStreakBonus = battleWinStreakBonus(myWinStreak);
+      }
+    }
+
     // Serve the current question (sanitized) while its round is open.
     let question: Record<string, unknown> | null = null;
     if (battle.status === 'active' && !round.ended) {
@@ -620,6 +649,8 @@ teamBattlesApp.get('/:battleId', async (c) => {
           startedAt: battle.started_at,
           completedAt: battle.completed_at,
           createdAt: battle.created_at,
+          myWinStreak,
+          myWinStreakBonus,
           question,
         },
         team1,

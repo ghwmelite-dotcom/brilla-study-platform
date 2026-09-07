@@ -1,7 +1,7 @@
 import type { D1Database } from '@cloudflare/workers-types';
 
 export type PointSource =
-  | 'question_correct' | 'battle_win' | 'streak_day' | 'quest_claim'
+  | 'question_correct' | 'battle_win' | 'battle_win_streak' | 'streak_day' | 'quest_claim'
   | 'tutor_session' | 'essay_graded'
   | 'referral_signup' | 'referral_paid_conversion' | 'house_contribution'
   | 'notification_subscribe';
@@ -11,6 +11,7 @@ export type PointSource =
 export const SOURCE_WEIGHTS: Record<PointSource, number> = {
   question_correct: 0.2,
   battle_win: 1,
+  battle_win_streak: 1,
   streak_day: 1,
   quest_claim: 0.5,
   tutor_session: 1,
@@ -31,6 +32,7 @@ export const DAILY_SOURCE_CAPS: Partial<Record<PointSource, number>> = {
 const HOUSE_SOURCE_MAP: Partial<Record<PointSource, string>> = {
   question_correct: 'practice',
   battle_win: 'battle',
+  battle_win_streak: 'battle',
   quest_claim: 'achievement',
   streak_day: 'achievement',
   essay_graded: 'achievement',
