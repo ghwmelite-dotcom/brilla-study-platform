@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Zap, Crown, Star, ArrowRight, Clock, Gift, Sparkles } from 'lucide-react';
+import { Check, Zap, Crown, Star, ArrowRight, Clock, Gift, Sparkles, Building2 } from 'lucide-react';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { useAuthStore } from '@/stores/authStore';
 import type { SubscriptionPlan } from '@/types';
@@ -294,6 +294,27 @@ export default function Pricing() {
                 </div>
               );
             })}
+        </div>
+
+        {/* Schools & Institutions — B2B, sales-led (no self-serve checkout
+            until the school dashboard ships; see landing-claims spec B-1) */}
+        <div className="mt-12 bg-neutral-900 rounded-2xl p-8 text-white flex flex-col md:flex-row items-center gap-6 md:gap-10">
+          <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center flex-shrink-0">
+            <Building2 className="w-7 h-7 text-secondary" />
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <h2 className="text-xl font-bold mb-2">For Schools & Institutions</h2>
+            <p className="text-white/70 text-sm max-w-2xl">
+              Bulk student seats, class management for your teachers, assessment tools, and priority
+              onboarding support — priced per school. Tell us about your school and we'll tailor a plan.
+            </p>
+          </div>
+          <a
+            href="mailto:admissions@brillaprep.org?subject=School%20plan%20enquiry"
+            className="flex-shrink-0 bg-secondary text-neutral-900 px-6 py-3 rounded-xl font-semibold hover:bg-yellow-400 transition-colors"
+          >
+            Talk to Us
+          </a>
         </div>
 
         {/* FAQ or Additional Info */}

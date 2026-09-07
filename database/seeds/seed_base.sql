@@ -75,11 +75,13 @@ INSERT INTO paper_types (id, exam_type_id, name, slug, description, question_for
 -- =============================================
 -- SUBSCRIPTION TIERS
 -- =============================================
-INSERT INTO subscription_tiers (id, name, slug, description, price_monthly, price_yearly, ai_grading_quota, features) VALUES
-('tier_free', 'Free', 'free', 'Access to questions and model answers', 0, 0, 0, '["unlimited_questions", "model_answers", "basic_analytics", "leaderboards"]'),
-('tier_basic', 'Basic', 'basic', 'AI grading for essays with detailed feedback', 15, 120, 30, '["ai_grading", "detailed_feedback", "progress_tracking", "past_papers"]'),
-('tier_premium', 'Premium', 'premium', 'Unlimited AI grading and advanced features', 35, 300, -1, '["unlimited_ai_grading", "advanced_analytics", "study_plans", "teacher_review", "priority_support"]'),
-('tier_school', 'School', 'school', 'For schools and institutions', 500, 4500, -1, '["all_premium_features", "admin_dashboard", "student_management", "bulk_reports", "custom_branding"]');
+INSERT INTO subscription_tiers (id, name, slug, description, price_monthly, price_yearly, currency, ai_grading_quota, features, user_type, is_active, daily_question_limit) VALUES
+-- Mirrors prod (verified 2026-09-06): students 50/mo or 480/yr, teachers 75/mo or 720/yr.
+('tier_free', 'Free', 'free', 'Basic access to practice questions', 0, 0, 'GHS', 0, '["unlimited_questions", "model_answers", "basic_analytics", "community_access"]', 'student', 1, -1),
+('tier_student_monthly', 'Student Monthly', 'student-monthly', 'Full access for students - monthly billing', 50, NULL, 'GHS', 50, '["unlimited_questions", "ai_grading", "detailed_feedback", "progress_tracking", "past_papers", "advanced_analytics", "priority_support"]', 'student', 1, -1),
+('tier_student_yearly', 'Student Yearly', 'student-yearly', 'Full access for students - yearly billing (save 20%)', NULL, 480, 'GHS', -1, '["unlimited_questions", "ai_grading", "detailed_feedback", "progress_tracking", "past_papers", "advanced_analytics", "priority_support", "yearly_bonus_content"]', 'student', 1, -1),
+('tier_teacher_monthly', 'Teacher Monthly', 'teacher-monthly', 'Full access for teachers - monthly billing', 75, NULL, 'GHS', -1, '["unlimited_questions", "ai_grading", "detailed_feedback", "class_management", "assessment_builder", "student_analytics", "bulk_grading", "priority_support"]', 'teacher', 1, -1),
+('tier_teacher_yearly', 'Teacher Yearly', 'teacher-yearly', 'Full access for teachers - yearly billing (save 20%)', NULL, 720, 'GHS', -1, '["unlimited_questions", "ai_grading", "detailed_feedback", "class_management", "assessment_builder", "student_analytics", "bulk_grading", "priority_support", "yearly_bonus_content"]', 'teacher', 1, -1);
 
 -- =============================================
 -- NSMQ SUBJECTS
