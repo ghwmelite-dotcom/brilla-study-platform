@@ -27,6 +27,7 @@ const CompetitionPage = lazyWithRetry(() => import('@/pages/Competition').then(m
 const HouseCupPage = lazyWithRetry(() => import('@/pages/HouseCup').then(m => ({ default: m.HouseCupPage })));
 const AnalyticsPage = lazyWithRetry(() => import('@/pages/Analytics').then(m => ({ default: m.AnalyticsPage })));
 const BattlePage = lazyWithRetry(() => import('@/pages/Battle').then(m => ({ default: m.BattlePage })));
+const TeamBattlePage = lazyWithRetry(() => import('@/pages/TeamBattle').then(m => ({ default: m.TeamBattlePage })));
 const PastPapersPage = lazyWithRetry(() => import('@/pages/PastPapers').then(m => ({ default: m.PastPapers })));
 const TakePaper = lazyWithRetry(() => import('@/pages/TakePaper'));
 const PaperResults = lazyWithRetry(() => import('@/pages/PaperResults'));
@@ -515,6 +516,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <LazyPage><BattlePage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="team-battle"
+            element={
+              <ProtectedRoute>
+                <LazyPage><TeamBattlePage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="team-battle/:id"
+            element={
+              <ProtectedRoute>
+                <LazyPage><TeamBattlePage /></LazyPage>
               </ProtectedRoute>
             }
           />

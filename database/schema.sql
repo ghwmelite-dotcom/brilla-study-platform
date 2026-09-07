@@ -3447,6 +3447,21 @@ CREATE TABLE IF NOT EXISTS team_battle_invites (
     UNIQUE(battle_id, invitee_id)
 );
 
+-- Source: migrations/369_team_battle_answers.sql
+CREATE TABLE IF NOT EXISTS team_battle_answers (
+    id TEXT PRIMARY KEY,
+    battle_id TEXT NOT NULL REFERENCES team_battles(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    question_id TEXT NOT NULL,
+    question_index INTEGER NOT NULL,
+    answer TEXT,
+    is_correct INTEGER,
+    time_taken INTEGER,
+    points_earned INTEGER DEFAULT 0,
+    answered_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(battle_id, user_id, question_index)
+);
+
 -- Source: migrations/072_o_a_level_system.sql
 CREATE TABLE IF NOT EXISTS topic_syllabus_mapping (
     id TEXT PRIMARY KEY,
@@ -5022,6 +5037,7 @@ CREATE INDEX IF NOT EXISTS idx_tutoring_sessions_request ON tutoring_sessions(re
 CREATE INDEX IF NOT EXISTS idx_flashcards_deck ON flashcards(deck_id);
 CREATE INDEX IF NOT EXISTS idx_team_battle_members ON team_battle_members(battle_id, team_number);
 CREATE INDEX IF NOT EXISTS idx_team_battle_invites_user ON team_battle_invites(invitee_id, status);
+CREATE INDEX IF NOT EXISTS idx_team_battle_answers_battle ON team_battle_answers(battle_id);
 CREATE INDEX IF NOT EXISTS idx_topic_syllabus_map_topic ON topic_syllabus_mapping(topic_id);
 CREATE INDEX IF NOT EXISTS idx_topic_syllabus_map_syllabus ON topic_syllabus_mapping(syllabus_topic_id);
 CREATE INDEX IF NOT EXISTS idx_grade_boundaries_spec ON grade_boundaries(specification_id);

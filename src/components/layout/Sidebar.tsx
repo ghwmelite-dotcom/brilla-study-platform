@@ -83,6 +83,7 @@ const mainNavItems = [
 const examSpecificItems: Record<GhanaExamTypeSlug, { path: string; label: string; icon: typeof Trophy; auth?: boolean }[]> = {
   nsmq: [
     { path: '/battle', label: '1v1 Battle', icon: Swords, auth: true },
+    { path: '/team-battle', label: 'Team Battle (3v3)', icon: Users, auth: true },
     { path: '/competition', label: 'Competition Sim', icon: Trophy },
     { path: '/practice?mode=speed', label: 'Speed Quiz', icon: Zap },
   ],

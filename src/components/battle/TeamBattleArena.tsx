@@ -1,460 +1,368 @@
-import { useCallback, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Clock,
-  Check,
-  X,
-  Trophy,
-  Crown,
-  Star,
-  Zap,
-} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Check, Clock, Crown, Loader2, Trophy, X } from 'lucide-react';
 import { cn } from '@/utils';
-import { Button, Card } from '@/components/common';
 import {
-  useTeamBattleStore,
-  type TeamBattle,
-  type BattleTeam,
   getTeamColors,
+  useTeamBattleStore,
+  type TeamBattleData,
+  type TeamBattleMember,
 } from '@/stores/teamBattleStore';
-import type { Question } from '@/types';
 
 interface TeamBattleArenaProps {
-  battle: TeamBattle;
-  question: Question;
-  onComplete?: (winnerId: string) => void; // Will be used when battle ends
-  className?: string;
+  data: TeamBattleData;
+  userId: string;
+  onComplete: (data: TeamBattleData) => void;
 }
 
-// Note: onComplete will be called when the battle ends
+// Synchronized-round arena. The countdown ticks against the SERVER-returned
+// round_ends_at — never local Date.now() alone — so client clock drift only
+// affects display, not acceptance (the server re-validates the window).
+export function TeamBattleArena({ data, userId, onComplete }: TeamBattleArenaProps) {
+  const { battle, team1, team2 } = data;
+  const { submitAnswer } = useTeamBattleStore();
 
-export function TeamBattleArena({
-  battle,
-  question,
-  onComplete: _onComplete, // Reserved for future use
-  className,
-}: TeamBattleArenaProps) {
-  const {
-    myTeamId,
-    selectedAnswer,
-    isAnswerLocked,
-    timeRemaining,
-    setSelectedAnswer,
-    updateTimeRemaining,
-    submitTeamAnswer,
-  } = useTeamBattleStore();
+  const [selectedAnswer, setSelectedAnswer] = useState<string>('');
+  const [textAnswer, setTextAnswer] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [answeredQuestionId, setAnsweredQuestionId] = useState<string | null>(null);
+  const [lastResult, setLastResult] = useState<{ correct: boolean; points: number; correctAnswer: string } | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState<number>(() => secondsUntil(battle.roundEndsAt));
+  const completedRef = useRef(false);
 
-  const [showResult, setShowResult] = useState(false);
-  const [lastResult, setLastResult] = useState<{
-    isCorrect: boolean;
-    correctAnswer: string;
-    pointsEarned: number;
-  } | null>(null);
+  const question = battle.question ?? null;
+  const roundClosed = !battle.roundEndsAt || secondsLeft <= 0;
+  const alreadyAnswered = question ? answeredQuestionId === question.id : false;
 
-  // Timer countdown
+  // Reset per-round local state when the served question changes
   useEffect(() => {
-    if (isAnswerLocked || timeRemaining <= 0) return;
+    setSelectedAnswer('');
+    setTextAnswer('');
+    setLastResult(null);
+    setSubmitError(null);
+  }, [question?.id]);
 
-    const timer = setInterval(() => {
-      updateTimeRemaining(timeRemaining - 1);
-    }, 1000);
-
+  // Countdown against the server round clock
+  useEffect(() => {
+    const tick = () => setSecondsLeft(secondsUntil(battle.roundEndsAt));
+    tick();
+    const timer = setInterval(tick, 500);
     return () => clearInterval(timer);
-  }, [timeRemaining, isAnswerLocked, updateTimeRemaining]);
+  }, [battle.roundEndsAt]);
 
-  const handleSubmit = useCallback(async () => {
-    if (!selectedAnswer) return;
-
-    const result = await submitTeamAnswer(selectedAnswer);
-    setLastResult(result);
-    setShowResult(true);
-
-    setTimeout(() => {
-      setShowResult(false);
-    }, 2000);
-  }, [selectedAnswer, submitTeamAnswer]);
-
-  // Auto-submit on timer end
+  // The poller keeps the store fresh; surface completion once.
   useEffect(() => {
-    if (timeRemaining === 0 && !isAnswerLocked && selectedAnswer) {
-      void handleSubmit();
+    if (battle.status === 'completed' && !completedRef.current) {
+      completedRef.current = true;
+      onComplete(data);
     }
-  }, [handleSubmit, isAnswerLocked, selectedAnswer, timeRemaining]);
+  }, [battle.status, data, onComplete]);
 
-  // Team info for potential future use (e.g., showing team-specific UI)
-  // const myTeam = myTeamId === battle.team1.id ? battle.team1 : battle.team2;
-  // const opponentTeam = myTeamId === battle.team1.id ? battle.team2 : battle.team1;
+  const handleSubmit = async (value: string) => {
+    if (!question || !value.trim() || isSubmitting || alreadyAnswered || roundClosed) return;
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      const result = await submitAnswer(question.id, value.trim());
+      setLastResult({ correct: result.correct, points: result.points, correctAnswer: result.correctAnswer });
+      setAnsweredQuestionId(question.id);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to submit answer';
+      // A duplicate means we already answered this round (e.g. after reconnect)
+      if (message.toLowerCase().includes('already answered')) {
+        setAnsweredQuestionId(question.id);
+      } else {
+        setSubmitError(message);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className="max-w-3xl mx-auto space-y-6">
       {/* Scoreboard */}
-      <TeamScoreboard
-        team1={battle.team1}
-        team2={battle.team2}
-        myTeamId={myTeamId || ''}
-        currentQuestion={battle.currentQuestionIndex + 1}
-        totalQuestions={battle.questionCount}
-      />
+      <div className="bg-white rounded-xl shadow-card p-4">
+        <div className="grid grid-cols-3 items-center gap-4">
+          <TeamScore team={team1} teamIndex={1} score={battle.team1Score} isMine={team1.some((m) => m.userId === userId)} totalQuestions={battle.totalQuestions} />
+          <div className="text-center">
+            <p className="text-xs text-neutral-400 uppercase">Round</p>
+            <p className="text-lg font-bold text-neutral-900">
+              {Math.min(battle.currentQuestion + 1, battle.totalQuestions)} / {battle.totalQuestions}
+            </p>
+          </div>
+          <TeamScore team={team2} teamIndex={2} score={battle.team2Score} isMine={team2.some((m) => m.userId === userId)} totalQuestions={battle.totalQuestions} alignRight />
+        </div>
+      </div>
 
-      {/* Timer */}
+      {/* Round countdown */}
       <div className="flex justify-center">
-        <motion.div
-          animate={{
-            scale: timeRemaining <= 5 ? [1, 1.1, 1] : 1,
-          }}
-          transition={{ duration: 0.5, repeat: timeRemaining <= 5 ? Infinity : 0 }}
-          className={cn(
-            'flex items-center gap-2 px-6 py-3 rounded-full font-bold text-xl',
-            timeRemaining <= 5
-              ? 'bg-red-100 text-red-600'
-              : timeRemaining <= 10
-              ? 'bg-amber-100 text-amber-600'
-              : 'bg-neutral-100 text-neutral-700'
-          )}
-        >
-          <Clock className="w-6 h-6" />
-          <span>{timeRemaining}s</span>
-        </motion.div>
+        <div className={cn(
+          'flex items-center gap-2 px-6 py-3 rounded-full font-bold text-lg',
+          roundClosed
+            ? 'bg-neutral-200 text-neutral-500'
+            : secondsLeft <= 5
+            ? 'bg-red-100 text-red-600 animate-pulse'
+            : 'bg-neutral-100 text-neutral-700',
+        )}>
+          <Clock className="w-5 h-5" />
+          {roundClosed ? 'Round closed' : `${secondsLeft}s`}
+        </div>
       </div>
 
-      {/* Question */}
-      <Card className="p-6">
-        <div className="text-center mb-6">
-          <span className="text-sm text-neutral-500">
-            Question {battle.currentQuestionIndex + 1} of {battle.questionCount}
-          </span>
-          <h2 className="text-xl font-semibold text-neutral-900 mt-2">
-            {question.questionText}
-          </h2>
-        </div>
+      {/* Question card */}
+      <div className="bg-white rounded-xl shadow-card p-6">
+        {roundClosed ? (
+          <div className="text-center py-8">
+            <Loader2 className="w-8 h-8 mx-auto mb-3 animate-spin text-primary" />
+            <p className="text-neutral-500">
+              Round closed — {battle.currentQuestion + 1 >= battle.totalQuestions ? 'finishing battle...' : 'next question loading...'}
+            </p>
+          </div>
+        ) : !question ? (
+          <div className="text-center py-8">
+            <Loader2 className="w-8 h-8 mx-auto mb-3 animate-spin text-primary" />
+            <p className="text-neutral-500">Loading question...</p>
+          </div>
+        ) : (
+          <>
+            <p className="text-lg font-medium text-neutral-900 mb-6">{question.questionText}</p>
 
-        {/* Answer Options */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {question.options?.map((option, index) => {
-            const optionLetter = String.fromCharCode(65 + index); // A, B, C, D
-            const isSelected = selectedAnswer === option.text;
-            const isCorrect = showResult && option.text === lastResult?.correctAnswer;
-            const isWrong = showResult && isSelected && !lastResult?.isCorrect;
+            {question.options && question.options.length > 0 ? (
+              <div className="space-y-3">
+                {question.options.map((option) => {
+                  const isSelected = selectedAnswer === option.id;
+                  const showReveal = alreadyAnswered && lastResult;
+                  // correct_answer may be a letter ("B"), letter-prefixed
+                  // ("B. 3"), or a value ("True") — match all three shapes.
+                  const ca = (lastResult?.correctAnswer ?? '').trim();
+                  const isCorrectOption = !!showReveal && (
+                    option.id === ca.toUpperCase() ||
+                    ca.toUpperCase().startsWith(`${option.id}.`) ||
+                    option.text.trim().toLowerCase() === ca.toLowerCase()
+                  );
+                  const isWrongPick = showReveal && isSelected && !lastResult.correct;
 
-            return (
-              <motion.button
-                key={option.id || index}
-                whileHover={!isAnswerLocked ? { scale: 1.02 } : undefined}
-                whileTap={!isAnswerLocked ? { scale: 0.98 } : undefined}
-                onClick={() => !isAnswerLocked && setSelectedAnswer(option.text)}
-                disabled={isAnswerLocked}
-                className={cn(
-                  'p-4 rounded-xl border-2 text-left transition-all',
-                  isCorrect && 'bg-emerald-50 border-emerald-500',
-                  isWrong && 'bg-red-50 border-red-500',
-                  !showResult && isSelected && 'bg-primary-50 border-primary',
-                  !showResult && !isSelected && 'bg-white border-neutral-200 hover:border-neutral-300',
-                  isAnswerLocked && 'cursor-not-allowed opacity-75'
-                )}
+                  return (
+                    <button
+                      key={option.id}
+                      onClick={() => setSelectedAnswer(option.id)}
+                      disabled={alreadyAnswered || isSubmitting}
+                      className={cn(
+                        'w-full p-4 text-left rounded-lg border-2 transition-all disabled:cursor-default',
+                        isCorrectOption
+                          ? 'bg-green-50 border-green-500 text-green-800'
+                          : isWrongPick
+                          ? 'bg-red-50 border-red-500 text-red-800'
+                          : isSelected
+                          ? 'bg-primary/10 border-primary text-primary'
+                          : 'bg-white border-neutral-200 hover:border-neutral-300',
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center font-medium">
+                          {option.id}
+                        </span>
+                        <span className="flex-1">{option.text}</span>
+                        {isCorrectOption && <Check className="w-5 h-5 text-green-500" />}
+                        {isWrongPick && <X className="w-5 h-5 text-red-500" />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <input
+                type="text"
+                value={textAnswer}
+                onChange={(e) => setTextAnswer(e.target.value)}
+                disabled={alreadyAnswered || isSubmitting}
+                placeholder="Type your answer..."
+                className="w-full px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-primary focus:outline-none disabled:opacity-60"
+              />
+            )}
+
+            {submitError && (
+              <p className="mt-3 text-sm text-red-600">{submitError}</p>
+            )}
+
+            {!alreadyAnswered ? (
+              <button
+                onClick={() => handleSubmit(question.options?.length ? selectedAnswer : textAnswer)}
+                disabled={isSubmitting || !(question.options?.length ? selectedAnswer : textAnswer.trim())}
+                className="w-full mt-4 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark transition-colors disabled:opacity-50"
               >
-                <div className="flex items-start gap-3">
-                  <div
-                    className={cn(
-                      'w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0',
-                      isCorrect && 'bg-emerald-500 text-white',
-                      isWrong && 'bg-red-500 text-white',
-                      !showResult && isSelected && 'bg-primary text-white',
-                      !showResult && !isSelected && 'bg-neutral-100 text-neutral-600'
+                {isSubmitting ? 'Locking in...' : 'Lock In Answer'}
+              </button>
+            ) : (
+              <div className={cn(
+                'mt-4 p-4 rounded-lg text-center',
+                lastResult
+                  ? lastResult.correct
+                    ? 'bg-green-50 border border-green-200'
+                    : 'bg-red-50 border border-red-200'
+                  : 'bg-neutral-50',
+              )}>
+                {lastResult ? (
+                  <>
+                    <p className={cn('font-semibold', lastResult.correct ? 'text-green-700' : 'text-red-700')}>
+                      {lastResult.correct ? `Correct! +${lastResult.points} pts` : 'Incorrect'}
+                    </p>
+                    {!lastResult.correct && (
+                      <p className="text-sm text-neutral-700 mt-1">
+                        Correct answer: <strong>{lastResult.correctAnswer}</strong>
+                      </p>
                     )}
-                  >
-                    {isCorrect && <Check className="w-4 h-4" />}
-                    {isWrong && <X className="w-4 h-4" />}
-                    {!showResult && optionLetter}
-                  </div>
-                  <span className="font-medium text-neutral-700">{option.text}</span>
-                </div>
-              </motion.button>
-            );
-          })}
-        </div>
-
-        {/* Submit Button */}
-        {!isAnswerLocked && (
-          <div className="mt-6 text-center">
-            <Button
-              size="lg"
-              onClick={handleSubmit}
-              disabled={!selectedAnswer}
-            >
-              <Zap className="w-5 h-5 mr-2" />
-              Lock In Answer
-            </Button>
-          </div>
-        )}
-      </Card>
-
-      {/* Result Overlay */}
-      <AnimatePresence>
-        {showResult && lastResult && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-          >
-            <div
-              className={cn(
-                'p-8 rounded-2xl text-center',
-                lastResult.isCorrect ? 'bg-emerald-500' : 'bg-red-500'
-              )}
-            >
-              <div className="w-20 h-20 mx-auto rounded-full bg-white/20 flex items-center justify-center mb-4">
-                {lastResult.isCorrect ? (
-                  <Check className="w-10 h-10 text-white" />
+                  </>
                 ) : (
-                  <X className="w-10 h-10 text-white" />
+                  <p className="text-neutral-600">Answer locked in — waiting for the round to close.</p>
                 )}
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">
-                {lastResult.isCorrect ? 'Correct!' : 'Wrong!'}
-              </h3>
-              {lastResult.pointsEarned > 0 && (
-                <p className="text-white/80">+{lastResult.pointsEarned} points</p>
-              )}
-            </div>
-          </motion.div>
+            )}
+          </>
         )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }
 
-// Team Scoreboard
-interface TeamScoreboardProps {
-  team1: BattleTeam;
-  team2: BattleTeam;
-  myTeamId: string;
-  currentQuestion: number;
-  totalQuestions: number;
+function secondsUntil(roundEndsAt: string | null): number {
+  if (!roundEndsAt) return 0;
+  return Math.max(0, Math.ceil((Date.parse(roundEndsAt) - Date.now()) / 1000));
 }
 
-export function TeamScoreboard({
-  team1,
-  team2,
-  myTeamId,
-  currentQuestion,
+function TeamScore({
+  team,
+  teamIndex,
+  score,
+  isMine,
   totalQuestions,
-}: TeamScoreboardProps) {
-  const team1Colors = getTeamColors(1);
-  const team2Colors = getTeamColors(2);
-
+  alignRight,
+}: {
+  team: TeamBattleMember[];
+  teamIndex: 1 | 2;
+  score: number;
+  isMine: boolean;
+  totalQuestions: number;
+  alignRight?: boolean;
+}) {
+  const colors = getTeamColors(teamIndex);
   return (
-    <div className="relative">
-      <div className="grid grid-cols-3 gap-4 items-center">
-        {/* Team 1 */}
-        <div
-          className={cn(
-            'p-4 rounded-xl',
-            team1.id === myTeamId ? 'ring-2 ring-primary' : '',
-            team1Colors.bgLight,
-            team1Colors.border,
-            'border'
-          )}
-        >
-          <div className="flex items-center gap-3">
-            <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center', team1Colors.bg)}>
-              <Trophy className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <p className={cn('font-bold text-lg', team1Colors.text)}>
-                {team1.name || 'Team 1'}
-              </p>
-              <div className="flex -space-x-2">
-                {team1.members.slice(0, 3).map((m) => (
-                  <div
-                    key={m.id}
-                    className={cn(
-                      'w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold text-white',
-                      team1Colors.bg
-                    )}
-                    title={m.name}
-                  >
-                    {m.name[0]}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="mt-3 text-center">
-            <span className={cn('text-4xl font-bold', team1Colors.text)}>
-              {team1.totalScore}
-            </span>
-          </div>
-        </div>
-
-        {/* Center - Question Counter */}
-        <div className="text-center">
-          <div className="inline-flex flex-col items-center">
-            <div className="w-16 h-16 rounded-full bg-neutral-900 flex items-center justify-center text-white font-bold text-xl">
-              VS
-            </div>
-            <div className="mt-2 px-4 py-1 rounded-full bg-neutral-100 text-sm font-medium">
-              Q{currentQuestion}/{totalQuestions}
-            </div>
-          </div>
-        </div>
-
-        {/* Team 2 */}
-        <div
-          className={cn(
-            'p-4 rounded-xl',
-            team2.id === myTeamId ? 'ring-2 ring-primary' : '',
-            team2Colors.bgLight,
-            team2Colors.border,
-            'border'
-          )}
-        >
-          <div className="flex items-center gap-3 justify-end">
-            <div className="text-right">
-              <p className={cn('font-bold text-lg', team2Colors.text)}>
-                {team2.name || 'Team 2'}
-              </p>
-              <div className="flex -space-x-2 justify-end">
-                {team2.members.slice(0, 3).map((m) => (
-                  <div
-                    key={m.id}
-                    className={cn(
-                      'w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold text-white',
-                      team2Colors.bg
-                    )}
-                    title={m.name}
-                  >
-                    {m.name[0]}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center', team2Colors.bg)}>
-              <Trophy className="w-6 h-6 text-white" />
-            </div>
-          </div>
-          <div className="mt-3 text-center">
-            <span className={cn('text-4xl font-bold', team2Colors.text)}>
-              {team2.totalScore}
-            </span>
-          </div>
-        </div>
+    <div className={cn('p-3 rounded-lg border', colors.bgLight, colors.border, isMine && 'ring-2 ring-primary')}>
+      <div className={cn('flex items-center gap-2', alignRight && 'justify-end')}>
+        <p className={cn('font-bold', colors.text)}>Team {teamIndex}</p>
+        {isMine && <span className="text-xs text-neutral-500">(You)</span>}
       </div>
-    </div>
-  );
-}
-
-// Battle Results
-interface TeamBattleResultsProps {
-  battle: TeamBattle;
-  onPlayAgain?: () => void;
-  onExit?: () => void;
-}
-
-export function TeamBattleResults({
-  battle,
-  onPlayAgain,
-  onExit,
-}: TeamBattleResultsProps) {
-  const { myTeamId } = useTeamBattleStore();
-  const isWinner = battle.winnerId === myTeamId;
-  const winningTeam = battle.winnerId === battle.team1.id ? battle.team1 : battle.team2;
-  const losingTeam = battle.winnerId === battle.team1.id ? battle.team2 : battle.team1;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="text-center space-y-8"
-    >
-      {/* Result Header */}
-      <div>
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', delay: 0.2 }}
-          className={cn(
-            'w-32 h-32 mx-auto rounded-full flex items-center justify-center',
-            isWinner ? 'bg-amber-100' : 'bg-neutral-100'
-          )}
-        >
-          {isWinner ? (
-            <Crown className="w-16 h-16 text-amber-500" />
-          ) : (
-            <Star className="w-16 h-16 text-neutral-400" />
-          )}
-        </motion.div>
-
-        <motion.h2
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className={cn(
-            'text-3xl font-bold mt-6',
-            isWinner ? 'text-amber-600' : 'text-neutral-600'
-          )}
-        >
-          {isWinner ? 'Victory!' : 'Defeat'}
-        </motion.h2>
-        <p className="text-neutral-500 mt-2">
-          {isWinner
-            ? 'Your team dominated the competition!'
-            : 'Better luck next time!'}
-        </p>
-      </div>
-
-      {/* Final Scores */}
-      <div className="grid grid-cols-2 gap-6 max-w-md mx-auto">
-        <Card className={cn('p-6', isWinner && 'ring-2 ring-amber-400')}>
-          <p className="text-sm text-neutral-500 mb-2">{winningTeam.name || 'Winners'}</p>
-          <p className="text-4xl font-bold text-amber-600">{winningTeam.totalScore}</p>
-          {isWinner && (
-            <div className="mt-2 text-xs text-amber-600 font-medium">Your Team</div>
-          )}
-        </Card>
-
-        <Card className="p-6">
-          <p className="text-sm text-neutral-500 mb-2">{losingTeam.name || 'Opponents'}</p>
-          <p className="text-4xl font-bold text-neutral-600">{losingTeam.totalScore}</p>
-          {!isWinner && (
-            <div className="mt-2 text-xs text-neutral-500 font-medium">Your Team</div>
-          )}
-        </Card>
-      </div>
-
-      {/* Team MVP */}
-      <Card className="p-6 max-w-md mx-auto">
-        <h4 className="text-sm font-medium text-neutral-500 mb-4">Team MVP</h4>
-        {/* Show top performer from winning team */}
-        {winningTeam.members.sort((a, b) => b.score - a.score).slice(0, 1).map((mvp) => (
-          <div key={mvp.id} className="flex items-center gap-4">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold text-xl">
-                {mvp.name.split(' ').map(n => n[0]).join('')}
-              </div>
-              <div className="absolute -top-1 -right-1">
-                <Crown className="w-6 h-6 text-amber-500" />
-              </div>
-            </div>
-            <div className="text-left">
-              <p className="font-bold text-neutral-900">{mvp.name}</p>
-              <p className="text-neutral-500">
-                {mvp.correctAnswers}/{mvp.questionsAnswered} correct • {mvp.score} pts
-              </p>
+      <p className={cn('text-3xl font-bold my-1', colors.text, alignRight && 'text-right')}>{score}</p>
+      {/* Per-member progress dots: answered rounds out of total */}
+      <div className={cn('space-y-1', alignRight && 'flex flex-col items-end')}>
+        {team.map((member) => (
+          <div key={member.userId} className="flex items-center gap-1" title={`${member.name}: ${member.answeredCount}/${totalQuestions} answered`}>
+            <span className="text-xs text-neutral-500 w-16 truncate">{member.name}</span>
+            <div className="flex gap-0.5">
+              {Array.from({ length: totalQuestions }).map((_, i) => (
+                <span
+                  key={i}
+                  className={cn('w-1.5 h-1.5 rounded-full', i < member.answeredCount ? colors.bg : 'bg-neutral-200')}
+                />
+              ))}
             </div>
           </div>
         ))}
-      </Card>
-
-      {/* Actions */}
-      <div className="flex gap-4 justify-center">
-        <Button variant="outline" onClick={onExit}>
-          Exit
-        </Button>
-        <Button onClick={onPlayAgain}>
-          Play Again
-        </Button>
       </div>
-    </motion.div>
+    </div>
+  );
+}
+
+// Results
+interface TeamBattleResultsProps {
+  data: TeamBattleData;
+  userId: string;
+  onPlayAgain: () => void;
+  onExit: () => void;
+}
+
+export function TeamBattleResults({ data, userId, onPlayAgain, onExit }: TeamBattleResultsProps) {
+  const { battle, team1, team2 } = data;
+  const myTeamNumber = team1.some((m) => m.userId === userId) ? 1 : 2;
+  const isDraw = battle.winnerTeam === null;
+  const isWinner = battle.winnerTeam === myTeamNumber;
+
+  return (
+    <div className="max-w-lg mx-auto space-y-6">
+      <div className={cn(
+        'text-center p-8 rounded-xl text-white',
+        isDraw
+          ? 'bg-gradient-to-br from-neutral-400 to-neutral-500'
+          : isWinner
+          ? 'bg-gradient-to-br from-yellow-400 to-yellow-500'
+          : 'bg-gradient-to-br from-neutral-600 to-neutral-700',
+      )}>
+        <Trophy className="w-16 h-16 mx-auto mb-4" />
+        <h1 className="text-3xl font-display font-bold mb-2">
+          {isDraw ? "It's a Draw!" : isWinner ? 'Victory!' : 'Defeat'}
+        </h1>
+        <p className="opacity-90">
+          {isDraw
+            ? 'Dead even on score and time.'
+            : isWinner
+            ? `Team ${battle.winnerTeam} takes it! +${battle.xpReward} XP for every winning member.`
+            : `Team ${battle.winnerTeam} wins. Better luck next time!`}
+        </p>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-card p-6 space-y-4">
+        <div className="flex items-center justify-between text-center">
+          <div className="flex-1">
+            <p className="text-sm text-neutral-500">Team 1{myTeamNumber === 1 ? ' (You)' : ''}</p>
+            <p className="text-3xl font-bold text-blue-600">{battle.team1Score}</p>
+          </div>
+          <span className="text-2xl font-bold text-neutral-300 px-4">VS</span>
+          <div className="flex-1">
+            <p className="text-sm text-neutral-500">Team 2{myTeamNumber === 2 ? ' (You)' : ''}</p>
+            <p className="text-3xl font-bold text-red-600">{battle.team2Score}</p>
+          </div>
+        </div>
+
+        {/* Per-member scoreboard */}
+        {[1, 2].map((teamIndex) => {
+          const members = (teamIndex === 1 ? team1 : team2);
+          const colors = getTeamColors(teamIndex as 1 | 2);
+          return (
+            <div key={teamIndex}>
+              <p className={cn('text-sm font-semibold mb-2', colors.text)}>Team {teamIndex}</p>
+              <div className="space-y-1">
+                {[...members].sort((a, b) => b.score - a.score).map((member) => (
+                  <div key={member.userId} className="flex items-center justify-between p-2 rounded-lg bg-neutral-50">
+                    <span className="flex items-center gap-2 text-sm font-medium text-neutral-800">
+                      {member.isCaptain && <Crown className="w-4 h-4 text-amber-500" />}
+                      {member.name}{member.userId === userId && ' (You)'}
+                    </span>
+                    <span className="text-sm text-neutral-600">
+                      {member.correctAnswers} correct · <strong>{member.score} pts</strong>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+
+        <div className="flex gap-3 pt-2">
+          <button
+            onClick={onPlayAgain}
+            className="flex-1 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+          >
+            Play Again
+          </button>
+          <button
+            onClick={onExit}
+            className="flex-1 py-3 border-2 border-neutral-200 text-neutral-700 rounded-lg font-semibold hover:bg-neutral-50 transition-colors"
+          >
+            Exit
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,445 +1,264 @@
 import { create } from 'zustand';
 import { api } from '@/lib/api';
-import type { Question, Difficulty } from '@/types';
+import { createPoller, type Poller } from '@/utils/polling';
 
-export interface TeamMember {
-  id: string;
+// Contract mirrors workers/api/teambattles.ts exactly. No mock fallbacks:
+// API errors surface as `error` for the UI to render honestly.
+
+export interface TeamBattleMember {
+  userId: string;
   name: string;
-  avatar?: string;
-  level: number;
-  isReady: boolean;
-  isOnline: boolean;
+  avatarUrl?: string;
+  isCaptain: boolean;
+  teamNumber: 1 | 2;
   score: number;
-  questionsAnswered: number;
   correctAnswers: number;
+  answeredCount: number;
 }
 
-export interface BattleTeam {
+export interface TeamBattleQuestion {
   id: string;
-  name?: string;
-  members: TeamMember[];
-  totalScore: number;
-  captain?: string;
+  questionText: string;
+  questionType?: string;
+  options: { id: string; text: string }[] | null;
 }
 
-export type TeamBattleStatus = 'forming' | 'waiting' | 'matched' | 'active' | 'completed';
+export type TeamBattleStatus = 'waiting' | 'ready' | 'active' | 'completed' | 'cancelled';
 
-export interface TeamBattle {
+export interface TeamBattleInfo {
   id: string;
-  team1: BattleTeam;
-  team2: BattleTeam;
   status: TeamBattleStatus;
-  subjectId?: string;
   subjectName?: string;
-  difficulty: Difficulty;
-  questionCount: number;
-  currentQuestionIndex: number;
-  questions?: Question[];
-  timePerQuestion: number; // seconds
+  topicName?: string;
+  totalQuestions: number;
+  timePerQuestion: number;
   team1Score: number;
   team2Score: number;
-  winnerId?: string;
-  createdAt: string;
+  winnerTeam: number | null;
+  xpReward: number;
+  currentQuestion: number;
+  roundEndsAt: string | null;
   startedAt?: string;
   completedAt?: string;
+  createdAt: string;
+  question?: TeamBattleQuestion | null;
 }
 
-export interface TeamBattleInvite {
+export interface TeamBattleData {
+  battle: TeamBattleInfo;
+  team1: TeamBattleMember[];
+  team2: TeamBattleMember[];
+}
+
+export interface AvailableTeamBattle {
   id: string;
-  battleId: string;
-  teamId: string;
-  fromUserId: string;
-  fromUserName: string;
-  toUserId: string;
-  status: 'pending' | 'accepted' | 'declined' | 'expired';
-  expiresAt: string;
+  subjectId?: string;
+  subjectName?: string;
+  topicId?: string;
+  topicName?: string;
+  status: TeamBattleStatus;
+  team1Count: number;
+  team2Count: number;
+  totalQuestions: number;
+  timePerQuestion: number;
+  xpReward?: number;
   createdAt: string;
 }
 
+export interface TeamAnswerResult {
+  correct: boolean;
+  points: number;
+  correctAnswer: string;
+  questionIndex: number;
+  timeTaken: number;
+}
+
+let poller: Poller | null = null;
+let polledBattleId: string | null = null;
+
 interface TeamBattleState {
-  // Current battle
-  currentTeamBattle: TeamBattle | null;
-  myTeam: BattleTeam | null;
-  myTeamId: string | null;
-
-  // Lobbies & Matchmaking
-  availableTeamBattles: TeamBattle[];
-  pendingInvites: TeamBattleInvite[];
-  sentInvites: TeamBattleInvite[];
-
-  // Game state
-  currentQuestion: Question | null;
-  timeRemaining: number;
-  isAnswerLocked: boolean;
-  selectedAnswer: string | null;
-
-  // Loading states
+  current: TeamBattleData | null;
+  availableBattles: AvailableTeamBattle[];
   isLoading: boolean;
   error: string | null;
 
-  // Actions
-  createTeamBattle: (options: {
-    members: string[];
-    subjectId?: string;
-    difficulty?: Difficulty;
-  }) => Promise<TeamBattle>;
-  joinTeamBattle: (battleId: string, teamId: string) => Promise<void>;
-  inviteToTeam: (battleId: string, userId: string) => Promise<void>;
-  acceptInvite: (inviteId: string) => Promise<void>;
-  declineInvite: (inviteId: string) => Promise<void>;
-  leaveTeamBattle: (battleId: string) => Promise<void>;
-  toggleReady: () => Promise<void>;
-  submitTeamAnswer: (answer: string) => Promise<{
-    isCorrect: boolean;
-    correctAnswer: string;
-    pointsEarned: number;
-  }>;
-  fetchAvailableTeamBattles: () => Promise<void>;
-  fetchPendingInvites: () => Promise<void>;
-
-  // Local state
-  setSelectedAnswer: (answer: string | null) => void;
-  updateTimeRemaining: (time: number) => void;
-  resetTeamBattle: () => void;
+  fetchAvailableBattles: () => Promise<void>;
+  fetchBattle: (battleId: string) => Promise<TeamBattleData | null>;
+  createBattle: (options: { subjectId?: string; topicId?: string; totalQuestions?: number; timePerQuestion?: number }) => Promise<string>;
+  joinBattle: (battleId: string, teamNumber: 1 | 2) => Promise<void>;
+  joinByCode: (code: string) => Promise<TeamBattleData>;
+  startBattle: (battleId: string) => Promise<void>;
+  leaveBattle: (battleId: string) => Promise<void>;
+  submitAnswer: (questionId: string, answer: string) => Promise<TeamAnswerResult>;
+  startPolling: (battleId: string) => void;
+  stopPolling: () => void;
+  reset: () => void;
   clearError: () => void;
 }
 
-// Mock team names
-const teamNames = [
-  'Alpha Warriors',
-  'Brain Storm',
-  'Quiz Masters',
-  'Knowledge Knights',
-  'Wisdom Wizards',
-  'Study Squad',
-  'The Scholars',
-  'Mind Ninjas',
-];
-
-// Generate mock battle data
-function generateMockTeamBattle(): TeamBattle {
-  const mockUsers = [
-    { id: 'u1', name: 'Kwame Asante', level: 15 },
-    { id: 'u2', name: 'Ama Mensah', level: 22 },
-    { id: 'u3', name: 'Kofi Owusu', level: 18 },
-    { id: 'u4', name: 'Akosua Boateng', level: 12 },
-    { id: 'u5', name: 'Yaw Adjei', level: 25 },
-    { id: 'u6', name: 'Efua Darko', level: 20 },
-  ];
-
-  const team1Members = mockUsers.slice(0, 3).map(u => ({
-    ...u,
-    isReady: Math.random() > 0.3,
-    isOnline: true,
-    score: 0,
-    questionsAnswered: 0,
-    correctAnswers: 0,
-  }));
-
-  const team2Members = mockUsers.slice(3).map(u => ({
-    ...u,
-    isReady: Math.random() > 0.3,
-    isOnline: true,
-    score: 0,
-    questionsAnswered: 0,
-    correctAnswers: 0,
-  }));
-
-  return {
-    id: `team_battle_${Date.now()}`,
-    team1: {
-      id: 'team1',
-      name: teamNames[Math.floor(Math.random() * teamNames.length)],
-      members: team1Members,
-      totalScore: 0,
-      captain: team1Members[0].id,
-    },
-    team2: {
-      id: 'team2',
-      name: teamNames[Math.floor(Math.random() * teamNames.length)],
-      members: team2Members,
-      totalScore: 0,
-      captain: team2Members[0].id,
-    },
-    status: 'waiting',
-    subjectId: 'mathematics',
-    subjectName: 'Mathematics',
-    difficulty: 'medium',
-    questionCount: 10,
-    currentQuestionIndex: 0,
-    timePerQuestion: 30,
-    team1Score: 0,
-    team2Score: 0,
-    createdAt: new Date().toISOString(),
-  };
-}
-
-function generateMockTeamBattles(count: number): TeamBattle[] {
-  return Array.from({ length: count }, generateMockTeamBattle);
-}
-
-export const useTeamBattleStore = create<TeamBattleState>((set, get) => ({
-  currentTeamBattle: null,
-  myTeam: null,
-  myTeamId: null,
-  availableTeamBattles: [],
-  pendingInvites: [],
-  sentInvites: [],
-  currentQuestion: null,
-  timeRemaining: 30,
-  isAnswerLocked: false,
-  selectedAnswer: null,
+export const useTeamBattleStore = create<TeamBattleState>()((set, get) => ({
+  current: null,
+  availableBattles: [],
   isLoading: false,
   error: null,
 
-  createTeamBattle: async (options) => {
+  fetchAvailableBattles: async () => {
     set({ isLoading: true, error: null });
-
     try {
-      const response = await api.post<TeamBattle>('/team-battles', options);
-
-      if (response.success && response.data) {
-        set({
-          currentTeamBattle: response.data,
-          myTeam: response.data.team1,
-          myTeamId: response.data.team1.id,
-          isLoading: false,
-        });
-        return response.data;
+      const response = await api.get<{ battles: AvailableTeamBattle[] }>('/team-battles/available');
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to fetch team battles');
       }
-
-      // Mock for demo
-      const mockBattle = generateMockTeamBattle();
-      mockBattle.status = 'forming';
+      set({ availableBattles: response.data.battles, isLoading: false });
+    } catch (error) {
       set({
-        currentTeamBattle: mockBattle,
-        myTeam: mockBattle.team1,
-        myTeamId: mockBattle.team1.id,
+        error: error instanceof Error ? error.message : 'Failed to fetch team battles',
         isLoading: false,
       });
-      return mockBattle;
-    } catch {
-      const mockBattle = generateMockTeamBattle();
-      mockBattle.status = 'forming';
-      set({
-        currentTeamBattle: mockBattle,
-        myTeam: mockBattle.team1,
-        myTeamId: mockBattle.team1.id,
-        isLoading: false,
-      });
-      return mockBattle;
     }
   },
 
-  joinTeamBattle: async (battleId, teamId) => {
-    set({ isLoading: true, error: null });
-
+  fetchBattle: async (battleId) => {
     try {
-      const response = await api.post(`/team-battles/${battleId}/join`, { teamId });
-
-      if (response.success) {
-        // Fetch updated battle
-        await get().fetchAvailableTeamBattles();
+      const response = await api.get<TeamBattleData>(`/team-battles/${battleId}`);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to fetch team battle');
       }
+      set({ current: response.data, error: null });
+      return response.data;
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Failed to fetch team battle' });
+      return null;
+    }
+  },
+
+  createBattle: async (options) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await api.post<{ battleId: string }>('/team-battles/create', options);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to create team battle');
+      }
+      await get().fetchBattle(response.data.battleId);
       set({ isLoading: false });
+      return response.data.battleId;
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to create team battle',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  joinBattle: async (battleId, teamNumber) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await api.post(`/team-battles/${battleId}/join`, { teamNumber });
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to join team battle');
+      }
+      const data = await get().fetchBattle(battleId);
+      set({ isLoading: false });
+      if (!data) throw new Error(get().error || 'Failed to load team battle');
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to join team battle',
         isLoading: false,
       });
+      throw error;
     }
   },
 
-  inviteToTeam: async (battleId, userId) => {
-    try {
-      const response = await api.post(`/team-battles/${battleId}/invite`, { userId });
-
-      if (response.success) {
-        // Update sent invites
-        const invite: TeamBattleInvite = {
-          id: `invite_${Date.now()}`,
-          battleId,
-          teamId: get().myTeamId || '',
-          fromUserId: 'current_user',
-          fromUserName: 'You',
-          toUserId: userId,
-          status: 'pending',
-          expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
-          createdAt: new Date().toISOString(),
-        };
-
-        set((state) => ({
-          sentInvites: [...state.sentInvites, invite],
-        }));
-      }
-    } catch (error) {
-      console.error('Failed to send invite:', error);
-    }
-  },
-
-  acceptInvite: async (inviteId) => {
-    try {
-      const response = await api.post(`/team-battles/invites/${inviteId}/accept`);
-
-      if (response.success) {
-        set((state) => ({
-          pendingInvites: state.pendingInvites.filter(i => i.id !== inviteId),
-        }));
-      }
-    } catch (error) {
-      console.error('Failed to accept invite:', error);
-    }
-  },
-
-  declineInvite: async (inviteId) => {
-    try {
-      await api.post(`/team-battles/invites/${inviteId}/decline`);
-      set((state) => ({
-        pendingInvites: state.pendingInvites.filter(i => i.id !== inviteId),
-      }));
-    } catch (error) {
-      console.error('Failed to decline invite:', error);
-    }
-  },
-
-  leaveTeamBattle: async (battleId) => {
-    try {
-      await api.post(`/team-battles/${battleId}/leave`);
-      set({
-        currentTeamBattle: null,
-        myTeam: null,
-        myTeamId: null,
-      });
-    } catch {
-      set({
-        currentTeamBattle: null,
-        myTeam: null,
-        myTeamId: null,
-      });
-    }
-  },
-
-  toggleReady: async () => {
-    const { currentTeamBattle, myTeamId } = get();
-    if (!currentTeamBattle || !myTeamId) return;
-
-    try {
-      await api.post(`/team-battles/${currentTeamBattle.id}/ready`);
-
-      // Update local state
-      const teamKey = myTeamId === currentTeamBattle.team1.id ? 'team1' : 'team2';
-      set((state) => {
-        if (!state.currentTeamBattle) return state;
-
-        const updatedTeam = {
-          ...state.currentTeamBattle[teamKey],
-          members: state.currentTeamBattle[teamKey].members.map((m) =>
-            m.id === 'current_user' ? { ...m, isReady: !m.isReady } : m
-          ),
-        };
-
-        return {
-          currentTeamBattle: {
-            ...state.currentTeamBattle,
-            [teamKey]: updatedTeam,
-          },
-        };
-      });
-    } catch (error) {
-      console.error('Failed to toggle ready:', error);
-    }
-  },
-
-  submitTeamAnswer: async (answer) => {
-    const { currentTeamBattle, currentQuestion } = get();
-    if (!currentTeamBattle || !currentQuestion) {
-      throw new Error('No active battle or question');
-    }
-
-    set({ isAnswerLocked: true, selectedAnswer: answer });
-
-    try {
-      const response = await api.post<{
-        isCorrect: boolean;
-        correctAnswer: string;
-        pointsEarned: number;
-      }>(`/team-battles/${currentTeamBattle.id}/answer`, {
-        questionIndex: currentTeamBattle.currentQuestionIndex,
-        answer,
-      });
-
-      if (response.success && response.data) {
-        return response.data;
-      }
-
-      // Mock response
-      const isCorrect = answer === currentQuestion.correctAnswer;
-      return {
-        isCorrect,
-        correctAnswer: currentQuestion.correctAnswer || '',
-        pointsEarned: isCorrect ? 10 : 0,
-      };
-    } catch {
-      const isCorrect = answer === currentQuestion?.correctAnswer;
-      return {
-        isCorrect,
-        correctAnswer: currentQuestion?.correctAnswer || '',
-        pointsEarned: isCorrect ? 10 : 0,
-      };
-    }
-  },
-
-  fetchAvailableTeamBattles: async () => {
+  joinByCode: async (code) => {
     set({ isLoading: true, error: null });
-
     try {
-      const response = await api.get<{ battles: TeamBattle[] }>('/team-battles/available');
-
-      if (response.success && response.data) {
-        set({
-          availableTeamBattles: response.data.battles,
-          isLoading: false,
-        });
-      } else {
-        // Mock data
-        set({
-          availableTeamBattles: generateMockTeamBattles(3),
-          isLoading: false,
-        });
+      const response = await api.post<{ battleId: string; teamNumber: 1 | 2 }>(
+        '/team-battles/join-by-code',
+        { code },
+      );
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'No waiting team battle with that code');
       }
-    } catch {
+      const data = await get().fetchBattle(response.data.battleId);
+      set({ isLoading: false });
+      if (!data) throw new Error(get().error || 'Failed to load team battle');
+      return data;
+    } catch (error) {
       set({
-        availableTeamBattles: generateMockTeamBattles(3),
+        error: error instanceof Error ? error.message : 'Failed to join team battle',
         isLoading: false,
       });
+      throw error;
     }
   },
 
-  fetchPendingInvites: async () => {
+  startBattle: async (battleId) => {
+    set({ error: null });
     try {
-      const response = await api.get<{ invites: TeamBattleInvite[] }>('/team-battles/invites');
+      const response = await api.post(`/team-battles/${battleId}/start`);
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to start battle');
+      }
+      await get().fetchBattle(battleId);
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Failed to start battle' });
+      throw error;
+    }
+  },
 
-      if (response.success && response.data) {
-        set({ pendingInvites: response.data.invites });
+  leaveBattle: async (battleId) => {
+    try {
+      const response = await api.post(`/team-battles/${battleId}/leave`);
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to leave battle');
       }
     } catch (error) {
-      console.error('Failed to fetch invites:', error);
+      set({ error: error instanceof Error ? error.message : 'Failed to leave battle' });
+      throw error;
+    } finally {
+      get().stopPolling();
+      set({ current: null });
     }
   },
 
-  setSelectedAnswer: (answer) => set({ selectedAnswer: answer }),
-  updateTimeRemaining: (time) => set({ timeRemaining: time }),
+  submitAnswer: async (questionId, answer) => {
+    const battleId = get().current?.battle.id;
+    if (!battleId) throw new Error('No active team battle');
 
-  resetTeamBattle: () => set({
-    currentTeamBattle: null,
-    myTeam: null,
-    myTeamId: null,
-    currentQuestion: null,
-    timeRemaining: 30,
-    isAnswerLocked: false,
-    selectedAnswer: null,
-    error: null,
-  }),
+    const response = await api.post<TeamAnswerResult>(`/team-battles/${battleId}/answer`, {
+      questionId,
+      answer,
+    });
+    if (!response.success || !response.data) {
+      throw new Error(response.error || 'Failed to submit answer');
+    }
+    return response.data;
+  },
+
+  // Single 2s poller while a battle is open (same pattern as the 1v1 store;
+  // Phase A removed the doubled component-local interval).
+  startPolling: (battleId) => {
+    polledBattleId = battleId;
+    if (!poller) {
+      poller = createPoller(async () => {
+        if (polledBattleId) {
+          await get().fetchBattle(polledBattleId);
+        }
+      }, 2000);
+    }
+    poller.start(); // idempotent
+  },
+
+  stopPolling: () => {
+    poller?.stop();
+    polledBattleId = null;
+  },
+
+  reset: () => {
+    get().stopPolling();
+    set({ current: null, error: null });
+  },
 
   clearError: () => set({ error: null }),
 }));

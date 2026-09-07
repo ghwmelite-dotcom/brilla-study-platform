@@ -43,7 +43,15 @@ export type { ActivityItem, ActivityType } from './activityFeedStore';
 export { useEventStore } from './eventStore';
 export type { SeasonalEvent, Tournament, EventQuest, EventReward, EventTheme } from './eventStore';
 export { useTeamBattleStore, getTeamColors } from './teamBattleStore';
-export type { TeamBattle, BattleTeam, TeamMember, TeamBattleStatus, TeamBattleInvite } from './teamBattleStore';
+export type {
+  TeamBattleData,
+  TeamBattleInfo,
+  TeamBattleMember,
+  TeamBattleQuestion,
+  TeamBattleStatus,
+  AvailableTeamBattle,
+  TeamAnswerResult,
+} from './teamBattleStore';
 export { useCosmeticsStore, getCosmeticById, getCosmeticsByType, getCosmeticsByRarity, rarityConfig } from './cosmeticsStore';
 export type { Cosmetic, CosmeticSlot, CosmeticRarity, UnlockMethod, EquippedCosmetics } from './cosmeticsStore';
 export { useRewardStore, applyMultiplier, chestConfig } from './rewardStore';
