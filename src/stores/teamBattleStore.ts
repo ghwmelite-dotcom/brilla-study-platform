@@ -75,14 +75,37 @@ export interface TeamAnswerResult {
   timeTaken: number;
 }
 
+// Spec 1.4c team chat. Contract mirrors the chat endpoints in
+// workers/api/teambattles.ts.
+export interface TeamBattleChatMessage {
+  id: string;
+  senderId: string;
+  senderName: string | null;
+  avatarUrl?: string | null;
+  content: string;
+  createdAt: string;
+}
+
 let poller: Poller | null = null;
 let polledBattleId: string | null = null;
+
+// Incremental-chat cursor lives outside zustand (like the poller): it is
+// transport state, not render state. Reset on battle switch / leave / reset.
+let chatBattleId: string | null = null;
+let chatSince: string | null = null;
+
+function clearChatCursor() {
+  chatBattleId = null;
+  chatSince = null;
+}
 
 interface TeamBattleState {
   current: TeamBattleData | null;
   availableBattles: AvailableTeamBattle[];
   isLoading: boolean;
   error: string | null;
+  chatMessages: TeamBattleChatMessage[];
+  chatError: string | null;
 
   fetchAvailableBattles: () => Promise<void>;
   fetchBattle: (battleId: string) => Promise<TeamBattleData | null>;
@@ -92,6 +115,8 @@ interface TeamBattleState {
   startBattle: (battleId: string) => Promise<void>;
   leaveBattle: (battleId: string) => Promise<void>;
   submitAnswer: (questionId: string, answer: string) => Promise<TeamAnswerResult>;
+  fetchChat: (battleId: string) => Promise<void>;
+  sendChatMessage: (message: string) => Promise<void>;
   startPolling: (battleId: string) => void;
   stopPolling: () => void;
   reset: () => void;
@@ -103,6 +128,8 @@ export const useTeamBattleStore = create<TeamBattleState>()((set, get) => ({
   availableBattles: [],
   isLoading: false,
   error: null,
+  chatMessages: [],
+  chatError: null,
 
   fetchAvailableBattles: async () => {
     set({ isLoading: true, error: null });
@@ -220,7 +247,8 @@ export const useTeamBattleStore = create<TeamBattleState>()((set, get) => ({
       throw error;
     } finally {
       get().stopPolling();
-      set({ current: null });
+      clearChatCursor();
+      set({ current: null, chatMessages: [], chatError: null });
     }
   },
 
@@ -238,14 +266,70 @@ export const useTeamBattleStore = create<TeamBattleState>()((set, get) => ({
     return response.data;
   },
 
+  // Incremental sync: after the first full page, polls pass the last seen
+  // createdAt as `since` (server compares >=, so we dedupe by id here).
+  fetchChat: async (battleId) => {
+    if (chatBattleId !== battleId) {
+      chatBattleId = battleId;
+      chatSince = null;
+      set({ chatMessages: [], chatError: null });
+    }
+    try {
+      const url = chatSince
+        ? `/team-battles/${battleId}/chat?since=${encodeURIComponent(chatSince)}`
+        : `/team-battles/${battleId}/chat`;
+      const response = await api.get<{ messages: TeamBattleChatMessage[] }>(url);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to load team chat');
+      }
+      const incoming = response.data.messages;
+      if (incoming.length > 0) {
+        set((state) => {
+          const seen = new Set(state.chatMessages.map((m) => m.id));
+          const merged = [...state.chatMessages, ...incoming.filter((m) => !seen.has(m.id))];
+          return { chatMessages: merged.slice(-100), chatError: null };
+        });
+        chatSince = incoming[incoming.length - 1].createdAt;
+      } else {
+        set({ chatError: null });
+      }
+    } catch (error) {
+      // Chat failure must not break battle polling — surface it in the panel only.
+      set({ chatError: error instanceof Error ? error.message : 'Failed to load team chat' });
+    }
+  },
+
+  sendChatMessage: async (message) => {
+    const battleId = get().current?.battle.id;
+    if (!battleId) throw new Error('No active team battle');
+
+    const response = await api.post<{ message: TeamBattleChatMessage }>(
+      `/team-battles/${battleId}/chat`,
+      { message },
+    );
+    if (!response.success || !response.data) {
+      throw new Error(response.error || 'Failed to send message');
+    }
+    const created = response.data.message;
+    set((state) =>
+      state.chatMessages.some((m) => m.id === created.id)
+        ? { chatError: null }
+        : { chatMessages: [...state.chatMessages, created].slice(-100), chatError: null },
+    );
+    chatBattleId = battleId;
+    chatSince = created.createdAt;
+  },
+
   // Single 2s poller while a battle is open (same pattern as the 1v1 store;
-  // Phase A removed the doubled component-local interval).
+  // Phase A removed the doubled component-local interval). Team chat rides
+  // along on the same tick (spec 1.4c: "poll with battle fetch").
   startPolling: (battleId) => {
     polledBattleId = battleId;
     if (!poller) {
       poller = createPoller(async () => {
         if (polledBattleId) {
           await get().fetchBattle(polledBattleId);
+          await get().fetchChat(polledBattleId);
         }
       }, 2000);
     }
@@ -259,7 +343,8 @@ export const useTeamBattleStore = create<TeamBattleState>()((set, get) => ({
 
   reset: () => {
     get().stopPolling();
-    set({ current: null, error: null });
+    clearChatCursor();
+    set({ current: null, error: null, chatMessages: [], chatError: null });
   },
 
   clearError: () => set({ error: null }),

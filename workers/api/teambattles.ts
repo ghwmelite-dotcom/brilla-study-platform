@@ -255,6 +255,55 @@ async function addMemberToBattle(
 }
 
 // =============================================
+// TEAM BATTLE CHAT HELPERS (spec 1.4c)
+// =============================================
+
+// Battle chat reuses the chat.ts message table: the channel is the
+// chat_messages row set with room_id = 'team_battle:<battleId>'. Membership
+// is derived from team_battle_members (never chat_room_members), so the
+// channel is invisible to the rest of the chat system.
+const TEAM_BATTLE_CHAT_MAX_LENGTH = 1000;
+const TEAM_BATTLE_CHAT_PAGE_SIZE = 50;
+
+function teamBattleChatRoomId(battleId: string): string {
+  return `team_battle:${battleId}`;
+}
+
+const generateMessageId = () => `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+// chat_messages.created_at is written with datetime('now') ("YYYY-MM-DD
+// HH:MM:SS", UTC); serve clients a parseable ISO string.
+function sqlUtcToIso(raw: string): string {
+  const s = String(raw);
+  return s.includes('T') ? s : `${s.replace(' ', 'T')}Z`;
+}
+
+// Inverse of sqlUtcToIso for the `since` query param, so the string compare
+// against datetime('now') values stays correct ('T' > ' ' would break it).
+function isoToSqlUtc(raw: string): string {
+  return new Date(raw).toISOString().replace('T', ' ').slice(0, 19);
+}
+
+// Battle lookup + membership gate shared by both chat endpoints. Returns the
+// error response to send, or null when the caller may proceed.
+async function requireTeamBattleMember(
+  db: D1Database,
+  battleId: string,
+  userId: string,
+): Promise<{ error: string; status: number } | null> {
+  const battle = await db.prepare(
+    'SELECT id FROM team_battles WHERE id = ?'
+  ).bind(battleId).first();
+  if (!battle) return { error: 'Battle not found', status: 404 };
+
+  const membership = await db.prepare(
+    'SELECT team_number FROM team_battle_members WHERE battle_id = ? AND user_id = ?'
+  ).bind(battleId, userId).first();
+  if (!membership) return { error: 'You are not in this battle', status: 403 };
+  return null;
+}
+
+// =============================================
 // TEAM BATTLES ENDPOINTS
 // =============================================
 
@@ -660,6 +709,124 @@ teamBattlesApp.get('/:battleId', async (c) => {
   } catch (error) {
     console.error('Error fetching battle:', error);
     return c.json({ success: false, error: 'Failed to fetch battle' }, 500);
+  }
+});
+
+// Team chat (spec 1.4c): latest messages for the battle channel, newest-50
+// bounded, with `since` (ISO) for incremental polls. `since` compares with >=
+// because created_at has second granularity — clients dedupe by message id.
+teamBattlesApp.get('/:battleId/chat', async (c) => {
+  try {
+    const user = c.get('user');
+    const battleId = c.req.param('battleId');
+
+    const denied = await requireTeamBattleMember(c.env.DB, battleId, user.userId);
+    if (denied) {
+      return c.json({ success: false, error: denied.error }, denied.status as 403);
+    }
+
+    let since: string | null = null;
+    const sinceParam = c.req.query('since');
+    if (sinceParam) {
+      if (Number.isNaN(Date.parse(sinceParam))) {
+        return c.json({ success: false, error: 'Invalid since parameter' }, 400);
+      }
+      since = isoToSqlUtc(sinceParam);
+    }
+
+    let query = `
+      SELECT cm.id, cm.sender_id, cm.content, cm.created_at,
+        u.name as sender_name, u.avatar_url as sender_avatar
+      FROM chat_messages cm
+      LEFT JOIN users u ON cm.sender_id = u.id
+      WHERE cm.room_id = ? AND cm.is_deleted = 0 AND cm.content_type = 'text'
+    `;
+    const params: string[] = [teamBattleChatRoomId(battleId)];
+    if (since) {
+      query += ' AND cm.created_at >= ?';
+      params.push(since);
+    }
+    query += ' ORDER BY cm.created_at DESC LIMIT ?';
+
+    const messages = await c.env.DB.prepare(query)
+      .bind(...params, TEAM_BATTLE_CHAT_PAGE_SIZE).all();
+
+    return c.json({
+      success: true,
+      data: {
+        messages: (messages.results as Record<string, unknown>[]).reverse().map((m) => ({
+          id: m.id,
+          senderId: m.sender_id,
+          senderName: m.sender_name,
+          avatarUrl: m.sender_avatar,
+          content: m.content,
+          createdAt: sqlUtcToIso(m.created_at as string),
+        })),
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching battle chat:', error);
+    return c.json({ success: false, error: 'Failed to fetch chat' }, 500);
+  }
+});
+
+// Post a team chat message. Same send policy as chat.ts (trim, non-empty,
+// demo-data flags) plus an explicit length cap. The backing chat_rooms row is
+// materialized lazily (chat_messages.room_id FK -> chat_rooms.id) so battles
+// created before this feature need no backfill.
+teamBattlesApp.post('/:battleId/chat', async (c) => {
+  try {
+    const user = c.get('user');
+    const battleId = c.req.param('battleId');
+    const body = await c.req.json().catch(() => ({}));
+    const raw = (body as { message?: unknown })?.message;
+
+    if (typeof raw !== 'string' || !raw.trim()) {
+      return c.json({ success: false, error: 'Message is required' }, 400);
+    }
+    const content = raw.trim();
+    if (content.length > TEAM_BATTLE_CHAT_MAX_LENGTH) {
+      return c.json({ success: false, error: `Message is too long (max ${TEAM_BATTLE_CHAT_MAX_LENGTH} characters)` }, 400);
+    }
+
+    const denied = await requireTeamBattleMember(c.env.DB, battleId, user.userId);
+    if (denied) {
+      return c.json({ success: false, error: denied.error }, denied.status as 403);
+    }
+
+    const roomId = teamBattleChatRoomId(battleId);
+    await c.env.DB.prepare(`
+      INSERT OR IGNORE INTO chat_rooms (id, name, type, max_members, created_by, created_at, updated_at)
+      VALUES (?, ?, 'private', 6, ?, datetime('now'), datetime('now'))
+    `).bind(roomId, `Team battle ${battleId} chat`, user.userId).run();
+
+    const messageId = generateMessageId();
+    const demoFlags = getDemoDataFlags(user.userId);
+    await c.env.DB.prepare(`
+      INSERT INTO chat_messages (id, room_id, sender_id, content, content_type, is_demo_data, expires_at, created_at, updated_at)
+      VALUES (?, ?, ?, ?, 'text', ?, ?, datetime('now'), datetime('now'))
+    `).bind(messageId, roomId, user.userId, content, demoFlags.is_demo_data, demoFlags.expires_at).run();
+
+    const sender = await c.env.DB.prepare(
+      'SELECT id, name, avatar_url FROM users WHERE id = ?'
+    ).bind(user.userId).first();
+
+    return c.json({
+      success: true,
+      data: {
+        message: {
+          id: messageId,
+          senderId: user.userId,
+          senderName: sender?.name ?? null,
+          avatarUrl: sender?.avatar_url ?? null,
+          content,
+          createdAt: new Date().toISOString(),
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Error sending battle chat:', error);
+    return c.json({ success: false, error: 'Failed to send message' }, 500);
   }
 });
 

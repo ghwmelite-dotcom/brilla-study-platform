@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Check, Clock, Crown, Loader2, Trophy, X } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Clock, Crown, Loader2, MessageSquare, Send, Trophy, X } from 'lucide-react';
 import { cn } from '@/utils';
 import { useAuthStore } from '@/stores/authStore';
 import {
   getTeamColors,
   useTeamBattleStore,
+  type TeamBattleChatMessage,
   type TeamBattleData,
   type TeamBattleMember,
 } from '@/stores/teamBattleStore';
@@ -81,7 +82,8 @@ export function TeamBattleArena({ data, userId, onComplete }: TeamBattleArenaPro
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto flex flex-col lg:flex-row gap-6 items-start">
+      <div className="flex-1 min-w-0 w-full space-y-6">
       {/* Scoreboard */}
       <div className="bg-white rounded-xl shadow-card p-4">
         <div className="grid grid-cols-3 items-center gap-4">
@@ -223,8 +225,144 @@ export function TeamBattleArena({ data, userId, onComplete }: TeamBattleArenaPro
           </>
         )}
       </div>
+      </div>
+
+      {/* Team chat (spec 1.4c) — store polls it on the battle tick */}
+      <TeamBattleChatPanel userId={userId} />
     </div>
   );
+}
+
+// Collapsible battle-scoped chat. Messages/polling come from the team battle
+// store; this component owns only the draft, open state, and auto-scroll.
+function TeamBattleChatPanel({ userId }: { userId: string }) {
+  const chatMessages = useTeamBattleStore((s) => s.chatMessages);
+  const chatError = useTeamBattleStore((s) => s.chatError);
+  const sendChatMessage = useTeamBattleStore((s) => s.sendChatMessage);
+  const fetchChat = useTeamBattleStore((s) => s.fetchChat);
+  const battleId = useTeamBattleStore((s) => s.current?.battle.id);
+
+  const [isOpen, setIsOpen] = useState(true);
+  const [draft, setDraft] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  // First paint shouldn't wait for the 2s battle poll.
+  useEffect(() => {
+    if (battleId) void fetchChat(battleId);
+  }, [battleId, fetchChat]);
+
+  // Auto-scroll to the latest message. jsdom lacks scrollIntoView, so the
+  // optional call doubles as the test-environment guard.
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView?.({ behavior: 'smooth' });
+  }, [chatMessages.length, isOpen]);
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const text = draft.trim();
+    if (!text || isSending) return;
+    setIsSending(true);
+    setSendError(null);
+    try {
+      await sendChatMessage(text);
+      setDraft('');
+    } catch (error) {
+      setSendError(error instanceof Error ? error.message : 'Failed to send message');
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  return (
+    <aside className="w-full lg:w-80 lg:sticky lg:top-4 bg-white rounded-xl shadow-card overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
+        aria-expanded={isOpen}
+        className="w-full flex items-center justify-between p-3 hover:bg-neutral-50 transition-colors"
+      >
+        <span className="flex items-center gap-2 text-sm font-semibold text-neutral-800">
+          <MessageSquare className="w-4 h-4 text-primary" />
+          Team chat
+          {chatMessages.length > 0 && (
+            <span className="text-xs font-normal text-neutral-400">({chatMessages.length})</span>
+          )}
+        </span>
+        {isOpen ? (
+          <ChevronUp className="w-4 h-4 text-neutral-400" />
+        ) : (
+          <ChevronDown className="w-4 h-4 text-neutral-400" />
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="border-t border-neutral-100 flex flex-col">
+          <div className="h-64 overflow-y-auto p-3 space-y-3">
+            {chatMessages.length === 0 ? (
+              <p className="text-xs text-neutral-400 text-center py-6">
+                {chatError ?? 'No messages yet — coordinate with your team here.'}
+              </p>
+            ) : (
+              chatMessages.map((message) => (
+                <ChatBubble key={message.id} message={message} isMine={message.senderId === userId} />
+              ))
+            )}
+            <div ref={bottomRef} />
+          </div>
+
+          <form onSubmit={handleSend} className="p-3 border-t border-neutral-100">
+            {sendError && <p className="mb-2 text-xs text-red-600">{sendError}</p>}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                maxLength={1000}
+                placeholder="Message your team..."
+                aria-label="Message your team"
+                className="flex-1 min-w-0 px-3 py-2 text-sm border border-neutral-200 rounded-lg focus:border-primary focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={isSending || !draft.trim()}
+                aria-label="Send message"
+                className="px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </aside>
+  );
+}
+
+function ChatBubble({ message, isMine }: { message: TeamBattleChatMessage; isMine: boolean }) {
+  const time = formatChatTime(message.createdAt);
+  return (
+    <div className={cn('flex flex-col', isMine ? 'items-end' : 'items-start')}>
+      <p className="text-xs text-neutral-400 mb-0.5">
+        {isMine ? 'You' : message.senderName ?? 'Teammate'} · {time}
+      </p>
+      <p
+        className={cn(
+          'max-w-[85%] px-3 py-2 rounded-lg text-sm whitespace-pre-wrap break-words',
+          isMine ? 'bg-primary/10 text-primary-dark' : 'bg-neutral-100 text-neutral-800',
+        )}
+      >
+        {message.content}
+      </p>
+    </div>
+  );
+}
+
+function formatChatTime(createdAt: string): string {
+  const ms = Date.parse(createdAt);
+  if (Number.isNaN(ms)) return '';
+  return new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 function secondsUntil(roundEndsAt: string | null): number {
