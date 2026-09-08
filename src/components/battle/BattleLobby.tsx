@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Swords, Users, RefreshCw, Zap, Bot, KeyRound } from 'lucide-react';
+import { Swords, Users, RefreshCw, Zap, Bot, KeyRound, Trophy, Loader2, X } from 'lucide-react';
 import { useBattleStore } from '@/stores/battleStore';
 import { useAuthStore } from '@/stores/authStore';
 import { usePolling } from '@/hooks/usePolling';
@@ -19,6 +19,11 @@ export function BattleLobby({ onBattleStart }: BattleLobbyProps) {
     createBattle,
     joinBattle,
     joinByCode,
+    fetchBattle,
+    joinRankedQueue,
+    fetchRankedQueueStatus,
+    leaveRankedQueue,
+    rankedQueueStatus,
   } = useBattleStore();
 
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -30,10 +35,17 @@ export function BattleLobby({ onBattleStart }: BattleLobbyProps) {
   const [joinCode, setJoinCode] = useState('');
   const [isJoiningByCode, setIsJoiningByCode] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
+  const [isQueueingRanked, setIsQueueingRanked] = useState(false);
+  const [rankedError, setRankedError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAvailableBattles();
-  }, [fetchAvailableBattles]);
+    // Picks up the player's rating and resumes the queue UI when they return
+    // to the lobby mid-wait.
+    fetchRankedQueueStatus().then((status) => {
+      if (status?.queued) setIsQueueingRanked(true);
+    });
+  }, [fetchAvailableBattles, fetchRankedQueueStatus]);
 
   // Poll for new battles (pauses while the tab is hidden)
   usePolling(fetchAvailableBattles, 5000);
@@ -98,6 +110,50 @@ export function BattleLobby({ onBattleStart }: BattleLobbyProps) {
     }
   };
 
+  const handleRankedMatch = async () => {
+    setIsQueueingRanked(true);
+    setRankedError(null);
+    try {
+      // Matched immediately → battle returned; otherwise we're queued and the
+      // 2s status poll below picks up the match.
+      const battle = await joinRankedQueue({
+        difficulty: selectedDifficulty,
+        questionCount,
+      });
+      if (battle) {
+        setIsQueueingRanked(false);
+        onBattleStart({ ...battle, status: 'active' });
+      }
+    } catch (err) {
+      setIsQueueingRanked(false);
+      setRankedError(err instanceof Error ? err.message : 'Failed to join ranked queue');
+    }
+  };
+
+  const handleCancelRankedQueue = async () => {
+    setIsQueueingRanked(false);
+    try {
+      await leaveRankedQueue();
+    } catch (err) {
+      console.error('Failed to leave ranked queue:', err);
+    }
+  };
+
+  // 2s queue-status poll while waiting for a ranked opponent
+  usePolling(async () => {
+    const status = await fetchRankedQueueStatus();
+    if (status?.matched && status.battleId) {
+      setIsQueueingRanked(false);
+      const battle = await fetchBattle(status.battleId);
+      if (battle) {
+        onBattleStart({ ...battle, status: 'active' });
+      }
+    } else if (status && !status.queued) {
+      // Queue entry lapsed (60s window) without a match
+      setIsQueueingRanked(false);
+    }
+  }, 2000, isQueueingRanked);
+
   const difficultyColors = {
     easy: 'bg-green-100 text-green-700 border-green-200',
     medium: 'bg-yellow-100 text-yellow-700 border-yellow-200',
@@ -109,23 +165,72 @@ export function BattleLobby({ onBattleStart }: BattleLobbyProps) {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-primary-dark rounded-xl p-6 text-white">
-        <div className="flex items-center gap-3 mb-2">
-          <Swords className="w-8 h-8" />
-          <h1 className="text-2xl font-display font-bold">Battle Arena</h1>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Swords className="w-8 h-8" />
+              <h1 className="text-2xl font-display font-bold">Battle Arena</h1>
+            </div>
+            <p className="text-white/80">Challenge other students to a real-time quiz battle!</p>
+          </div>
+          {rankedQueueStatus?.rating !== undefined && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-white/15 rounded-lg">
+              <Trophy className="w-5 h-5 text-yellow-300" />
+              <div className="text-right">
+                <p className="text-lg font-bold leading-none">{rankedQueueStatus.rating}</p>
+                <p className="text-xs text-white/70">Rating</p>
+              </div>
+            </div>
+          )}
         </div>
-        <p className="text-white/80">Challenge other students to a real-time quiz battle!</p>
       </div>
 
+      {/* Ranked queue waiting state */}
+      {isQueueingRanked && (
+        <div className="bg-white rounded-xl shadow-card p-6 text-center">
+          <Loader2 className="w-10 h-10 mx-auto mb-3 text-primary animate-spin" />
+          <h3 className="text-lg font-semibold text-neutral-900 mb-1">
+            Finding a ranked opponent...
+          </h3>
+          <p className="text-sm text-neutral-500 mb-4">
+            Matching you with a player near your rating
+            {rankedQueueStatus?.rating !== undefined && ` (${rankedQueueStatus.rating})`}.
+          </p>
+          <button
+            onClick={handleCancelRankedQueue}
+            className="inline-flex items-center gap-2 px-4 py-2 border-2 border-neutral-200 text-neutral-700 rounded-lg font-medium hover:bg-neutral-50 transition-colors"
+          >
+            <X className="w-4 h-4" />
+            Cancel
+          </button>
+        </div>
+      )}
+      {rankedError && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          {rankedError}
+        </div>
+      )}
+
       {/* Quick actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Quick match */}
         <button
           onClick={handleQuickMatch}
-          disabled={isLoading}
+          disabled={isLoading || isQueueingRanked}
           className="flex items-center justify-center gap-3 p-6 bg-secondary text-neutral-900 rounded-xl font-semibold hover:bg-secondary-dark transition-all active:scale-[0.98] disabled:opacity-50"
         >
           <Zap className="w-6 h-6" />
           Quick Match
+        </button>
+
+        {/* Ranked match */}
+        <button
+          onClick={handleRankedMatch}
+          disabled={isLoading || isQueueingRanked}
+          className="flex items-center justify-center gap-3 p-6 bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-all active:scale-[0.98] disabled:opacity-50"
+        >
+          <Trophy className="w-6 h-6" />
+          Ranked Match
         </button>
 
         {/* Create battle */}

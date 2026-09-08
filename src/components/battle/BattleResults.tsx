@@ -1,5 +1,7 @@
-import { Trophy, Medal, RotateCcw, Home } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Trophy, Medal, RotateCcw, Home, TrendingUp, TrendingDown } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { useBattleStore, type RankedDelta } from '@/stores/battleStore';
 import type { Battle } from '@/types';
 
 interface BattleResultsProps {
@@ -10,6 +12,20 @@ interface BattleResultsProps {
 
 export function BattleResults({ battle, onRematch, onExit }: BattleResultsProps) {
   const { user } = useAuthStore();
+  const { fetchRankedDelta } = useBattleStore();
+  const [rankedDelta, setRankedDelta] = useState<RankedDelta | null>(null);
+
+  // Ranked battles surface the applied ELO delta (+/-N) and new rating;
+  // unranked battles 404 on this endpoint and simply hide the block.
+  useEffect(() => {
+    let cancelled = false;
+    fetchRankedDelta(battle.id).then((delta) => {
+      if (!cancelled && delta) setRankedDelta(delta);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [battle.id, fetchRankedDelta]);
 
   const isChallenger = user?.id === battle.challengerId;
   const myScore = isChallenger ? battle.challengerScore : battle.opponentScore;
@@ -128,6 +144,30 @@ export function BattleResults({ battle, onRematch, onExit }: BattleResultsProps)
             </p>
           )}
         </div>
+
+        {/* Ranked rating change */}
+        {rankedDelta && (
+          <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {rankedDelta.delta >= 0 ? (
+                  <TrendingUp className="w-5 h-5 text-emerald-600" />
+                ) : (
+                  <TrendingDown className="w-5 h-5 text-red-500" />
+                )}
+                <span className="text-sm font-medium text-neutral-600">Battle Rating</span>
+              </div>
+              <div className="text-right">
+                <span className={`text-lg font-bold ${rankedDelta.delta >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                  {rankedDelta.delta >= 0 ? `+${rankedDelta.delta}` : rankedDelta.delta}
+                </span>
+                {rankedDelta.rating !== null && (
+                  <span className="ml-2 text-sm text-neutral-500">({rankedDelta.rating})</span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Stats summary */}
         <div className="grid grid-cols-3 gap-4 text-center">

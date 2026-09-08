@@ -15,9 +15,11 @@ import {
   Flag,
   Timer,
   Send,
+  Swords,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { useLeaderboardStore } from '@/stores/leaderboardStore';
+import { useBattleStore } from '@/stores/battleStore';
 import { useRaceStore } from '@/stores/raceStore';
 import type { RaceCurrent } from '@/stores/raceStore';
 import type { LeaderboardPeriod, LeaderboardEntry } from '@/types';
@@ -500,6 +502,94 @@ function RacePanel({
   );
 }
 
+// Ranked tab content: top ELO battle ratings (spec 1.4b)
+function RankedPanel() {
+  const { user } = useAuthStore();
+  const { rankedLeaderboard, rankedLeaderboardLoading, fetchRankedLeaderboard } = useBattleStore();
+
+  useEffect(() => {
+    fetchRankedLeaderboard();
+  }, [fetchRankedLeaderboard]);
+
+  if (rankedLeaderboardLoading && rankedLeaderboard.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
+      </div>
+    );
+  }
+
+  if (rankedLeaderboard.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl border border-neutral-200 p-12 text-center">
+        <Trophy className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
+        <h3 className="text-xl font-semibold text-neutral-900 mb-2">No Ranked Players Yet</h3>
+        <p className="text-neutral-500">Play a ranked battle to claim a spot!</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
+      <div className="p-4 border-b border-neutral-200">
+        <h2 className="font-semibold text-neutral-900">Ranked Standings</h2>
+      </div>
+      <div className="p-4 space-y-3 max-h-[500px] overflow-y-auto">
+        {rankedLeaderboard.map((entry) => (
+          <div
+            key={entry.id}
+            className={cn(
+              'flex items-center gap-4 p-4 rounded-xl border transition-all',
+              getRankBgColor(entry.rank),
+              entry.id === user?.id && 'ring-2 ring-indigo-500 ring-offset-2',
+              entry.rank <= 3 && 'shadow-md'
+            )}
+          >
+            <div className="w-12 flex items-center justify-center">
+              {getRankIcon(entry.rank) || (
+                <span className={cn(
+                  'text-lg font-bold',
+                  entry.rank <= 10 ? 'text-indigo-600' : 'text-neutral-500'
+                )}>
+                  #{entry.rank}
+                </span>
+              )}
+            </div>
+            <div className="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold">
+              {entry.avatarUrl ? (
+                <img src={entry.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" />
+              ) : (
+                entry.name.charAt(0).toUpperCase()
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className={cn(
+                'font-semibold truncate',
+                entry.id === user?.id ? 'text-indigo-700' : 'text-neutral-900'
+              )}>
+                {entry.name}
+                {entry.id === user?.id && (
+                  <span className="ml-2 text-xs text-indigo-500">(You)</span>
+                )}
+              </p>
+              <p className="text-sm text-neutral-500">
+                {entry.wins}W - {entry.losses}L
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center gap-1 text-lg font-bold text-indigo-600">
+                <Trophy className="w-4 h-4 text-yellow-500" />
+                <span>{entry.rating}</span>
+              </div>
+              <p className="text-xs text-neutral-500">Rating</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Leaderboard() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
@@ -514,13 +604,17 @@ export default function Leaderboard() {
     fetchUserRank,
     setPeriod,
   } = useLeaderboardStore();
-  const [tab, setTab] = useState<'xp' | 'race'>('xp');
+  const [tab, setTab] = useState<'xp' | 'race' | 'ranked'>('xp');
   const {
     current: race,
     isLoading: raceLoading,
     error: raceError,
     fetchCurrent: fetchRace,
   } = useRaceStore();
+  const {
+    rankedLeaderboardLoading,
+    fetchRankedLeaderboard,
+  } = useBattleStore();
 
   useEffect(() => {
     fetchLeaderboard();
@@ -563,12 +657,12 @@ export default function Leaderboard() {
           </div>
 
           <button
-            onClick={() => (tab === 'race' ? fetchRace() : fetchLeaderboard())}
-            disabled={tab === 'race' ? raceLoading : isLoading}
+            onClick={() => (tab === 'race' ? fetchRace() : tab === 'ranked' ? fetchRankedLeaderboard() : fetchLeaderboard())}
+            disabled={tab === 'race' ? raceLoading : tab === 'ranked' ? rankedLeaderboardLoading : isLoading}
             aria-label="Refresh leaderboard"
             className="p-2.5 text-neutral-600 hover:text-neutral-900 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
           >
-            <RefreshCw className={cn('w-5 h-5', (tab === 'race' ? raceLoading : isLoading) && 'animate-spin')} />
+            <RefreshCw className={cn('w-5 h-5', (tab === 'race' ? raceLoading : tab === 'ranked' ? rankedLeaderboardLoading : isLoading) && 'animate-spin')} />
           </button>
         </div>
 
@@ -599,11 +693,25 @@ export default function Leaderboard() {
               <Flag className="w-4 h-4" />
               Weekly Race
             </button>
+            <button
+              onClick={() => setTab('ranked')}
+              className={cn(
+                'flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2',
+                tab === 'ranked'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+              )}
+            >
+              <Swords className="w-4 h-4" />
+              Ranked
+            </button>
           </div>
         </div>
 
         {tab === 'race' ? (
           <RacePanel current={race} isLoading={raceLoading} error={raceError} />
+        ) : tab === 'ranked' ? (
+          <RankedPanel />
         ) : (
           <>
         {/* Stats Bar */}

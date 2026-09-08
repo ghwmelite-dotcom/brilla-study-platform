@@ -599,7 +599,9 @@ CREATE TABLE IF NOT EXISTS users (
     -- the original squash dropped these three columns even though 092 ran on prod)
     longest_streak INTEGER DEFAULT 0,
     rejected_by TEXT,
-    rejected_at TEXT
+    rejected_at TEXT,
+    -- added by migrations/370_battle_rating.sql
+    battle_rating INTEGER NOT NULL DEFAULT 1200
 );
 
 -- Source: schema.sql
@@ -785,7 +787,9 @@ CREATE TABLE IF NOT EXISTS battles (
     -- added by migrations/282_battle_demo_data_integrity.sql
     is_demo_data INTEGER NOT NULL DEFAULT 0 CHECK (is_demo_data IN (0, 1)),
     -- added by migrations/282_battle_demo_data_integrity.sql
-    expires_at TEXT
+    expires_at TEXT,
+    -- added by migrations/370_battle_rating.sql
+    is_ranked INTEGER NOT NULL DEFAULT 0 CHECK (is_ranked IN (0, 1))
 );
 
 -- Source: schema.sql
@@ -3462,6 +3466,21 @@ CREATE TABLE IF NOT EXISTS team_battle_answers (
     UNIQUE(battle_id, user_id, question_index)
 );
 
+-- Source: migrations/370_battle_rating.sql
+CREATE TABLE IF NOT EXISTS ranked_queue (
+    user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    rating INTEGER NOT NULL,
+    queued_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Source: migrations/370_battle_rating.sql
+CREATE TABLE IF NOT EXISTS battle_rating_updates (
+    battle_id TEXT PRIMARY KEY REFERENCES battles(id) ON DELETE CASCADE,
+    challenger_delta INTEGER NOT NULL,
+    opponent_delta INTEGER NOT NULL,
+    applied_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Source: migrations/072_o_a_level_system.sql
 CREATE TABLE IF NOT EXISTS topic_syllabus_mapping (
     id TEXT PRIMARY KEY,
@@ -4696,6 +4715,7 @@ CREATE INDEX IF NOT EXISTS idx_battles_status ON battles(status);
 CREATE INDEX IF NOT EXISTS idx_battles_challenger ON battles(challenger_id);
 CREATE INDEX IF NOT EXISTS idx_battles_opponent ON battles(opponent_id);
 CREATE INDEX IF NOT EXISTS idx_battles_demo ON battles(is_demo_data, expires_at);
+CREATE INDEX IF NOT EXISTS idx_battles_ranked ON battles(is_ranked, status);
 CREATE INDEX IF NOT EXISTS idx_battle_answers_demo ON battle_answers(is_demo_data, expires_at);
 CREATE INDEX IF NOT EXISTS idx_chat_teacher_assignments_teacher ON chat_teacher_assignments(teacher_id);
 CREATE INDEX IF NOT EXISTS idx_chat_teacher_assignments_subject ON chat_teacher_assignments(subject_id);
