@@ -50,6 +50,7 @@ import tutorClassroomApp from './tutor-classroom';
 import { cleanupExpiredDemoData } from './demoUtils';
 import { awardPoints } from './points';
 import { battleWinStreakBonus, computeBattleWinStreak } from './battle-streak';
+import { rankedApp, applyRankedDelta } from './ranked';
 import {
   getSelfRegistrationStatus,
   IMMEDIATE_STUDENT_REGISTRATION_MESSAGE,
@@ -62,6 +63,7 @@ import {
 import { raceApp, runRaceCycleMaintenance } from './race';
 import { telegramWebhookApp } from './telegram';
 import { runTelegramRaceAlerts } from './race-alerts';
+import { runWeeklyParentDigests } from './weekly-digests';
 import { prepareAttemptProgress } from './attempt-progress';
 import { getParentGuidance } from './parent-guidance';
 import { parseEssaySubmission } from './essay-content';
@@ -3673,6 +3675,10 @@ async function finalizeBattleIfComplete(
     WHERE id = ? AND status = 'active'
   `).bind(winnerId, battleId).run();
   if (completion.meta.changes === 0) return true;
+
+  // Ranked battles: apply the ELO update (idempotent via battle_rating_updates;
+  // no-ops for casual battles).
+  await applyRankedDelta(db, battleId);
 
   if (winnerId && winnerId !== BATTLE_BOT_ID) {
     const winnerScore = winnerId === battle.challenger_id ? battle.challenger_score : battle.opponent_score;
@@ -13255,6 +13261,7 @@ app.route('/api/activity', activityFeedApp);
 app.route('/api/events', eventsApp);
 app.route('/api/guidance', guidanceApp);
 app.route('/api/team-battles', teamBattlesApp);
+app.route('/api/battles/ranked', rankedApp);
 app.route('/api/study-groups', studyGroupsApp);
 app.route('/api/flashcard-decks', flashcardDecksApp);
 app.route('/api/cosmetics', cosmeticsApp);
@@ -13302,7 +13309,7 @@ export default {
   fetch: app.fetch,
 
   // Scheduled handler for Cron triggers
-  async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+  async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
     console.log(`Scheduled cleanup triggered at ${new Date().toISOString()}`);
 
     try {
@@ -13362,5 +13369,19 @@ export default {
         .then((r) => console.log(`Telegram alerts: ${r.posts} posts, ${r.dms} DMs`))
         .catch((e) => console.error('Telegram race alerts failed:', e))
     );
+
+    // Weekly parent progress digests: Monday 06:00 UTC only — a low-traffic
+    // hour because the digest shares the 3 DM/day 'notify' budget with race
+    // alerts. Same fire-and-forget contract: skips log loudly, never fail
+    // the cron. The every-6-hour jobs above run unchanged for both crons.
+    if (event.cron === '0 6 * * 1') {
+      ctx.waitUntil(
+        runWeeklyParentDigests(env.DB, env)
+          .then((r) => console.log(
+            `Weekly parent digests: ${r.parents} parents, ${r.digestsSent} sent, ${r.digestsSkipped} skipped, ${r.notificationsWritten} notifications written`,
+          ))
+          .catch((e) => console.error('Weekly parent digests failed:', e))
+      );
+    }
   },
 };
