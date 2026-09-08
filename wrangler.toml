@@ -71,10 +71,11 @@ migrations_dir = "database/migrations"
 port = 8787
 local_protocol = "http"
 
-# Cron trigger for demo data cleanup (runs every 6 hours)
-# This cleans up expired demo user data to keep production database clean
+# Cron triggers: demo data cleanup every 6 hours, plus the weekly parent
+# progress digest on Mondays at 06:00 UTC (low-traffic hour — the digest
+# shares the Telegram 3 DM/day budget with race alerts).
 [triggers]
-crons = ["0 */6 * * *"]
+crons = ["0 */6 * * *", "0 6 * * 1"]
 
 # Local development environment (wrangler dev --env dev)
 #
