@@ -1,0 +1,2288 @@
+{
+  "batchId": "wassce-core-math-sprint3-001",
+  "status": "approved_for_beta",
+  "examTypeId": "exam_wassce",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment, Ghana",
+      "title": "Secondary Education Curriculum — Core Mathematics",
+      "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T14:30:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Core Mathematics practice questions; not official WAEC (West African Examinations Council) examination material. Use the enabled feedback channel to report corrections.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_wassce_core_math",
+      "specificationCode": "BRILLA-WASSCE-COREMATH-S3-001",
+      "sources": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum — Core Mathematics",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "WCM3-ALG",
+          "title": "Algebraic processes",
+          "objective": "Manipulate linear and simultaneous equations and change the subject of a formula accurately."
+        },
+        {
+          "code": "WCM3-GEO",
+          "title": "Plane geometry",
+          "objective": "Apply angle, triangle, polygon and circle properties to calculate unknown measures."
+        },
+        {
+          "code": "WCM3-STA",
+          "title": "Statistics",
+          "objective": "Summarise data with measures of central tendency and spread, including frequency tables."
+        },
+        {
+          "code": "WCM3-QDR",
+          "title": "Quadratic functions",
+          "objective": "Factorise and solve quadratic equations and analyse their roots and graphs."
+        },
+        {
+          "code": "WCM3-TRG",
+          "title": "Trigonometry",
+          "objective": "Use trigonometric ratios and Pythagoras to solve right-angled triangle problems."
+        },
+        {
+          "code": "WCM3-INE",
+          "title": "Inequalities",
+          "objective": "Solve linear inequalities, represent them on a number line and state extreme integer solutions."
+        },
+        {
+          "code": "WCM3-NALG",
+          "title": "Algebraic Reasoning",
+          "objective": "Use symbols and relationships to model and solve everyday algebraic problems."
+        },
+        {
+          "code": "WCM3-NUM",
+          "title": "Numbers for Everyday Life",
+          "objective": "Apply number operations, percentages and financial mathematics to everyday life."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_wcms3_001",
+          "original": true,
+          "topicCode": "WCM3-ALG",
+          "type": "multiple_choice",
+          "prompt": "Simplify 4a + 2b − a + 5b.",
+          "difficulty": "easy",
+          "commandWord": "Simplify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "3a + 7b",
+              "rationale": "This is the supported answer. Collect the a-terms: 4a − a = 3a. Collect the b-terms: 2b + 5b = 7b. Hence 4a + 2b − a + 5b = 3a + 7b. (9ab wrongly multiplies unlike terms together; 3a + 3b mis-adds the b-terms.)"
+            },
+            {
+              "label": "B",
+              "text": "3a + 3b",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "5a + 7b",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "9ab",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Collect the a-terms: 4a − a = 3a. Collect the b-terms: 2b + 5b = 7b. Hence 4a + 2b − a + 5b = 3a + 7b. (9ab wrongly multiplies unlike terms together; 3a + 3b mis-adds the b-terms.) Therefore the correct answer is A: 3a + 7b.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_002",
+          "original": true,
+          "topicCode": "WCM3-ALG",
+          "type": "multiple_choice",
+          "prompt": "Solve the equation 5x − 3 = 17.",
+          "difficulty": "easy",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "x = 20",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "x = 4",
+              "rationale": "This is the supported answer. Add 3 to both sides: 5x = 20. Divide both sides by 5: x = 4. Check: 5(4) − 3 = 20 − 3 = 17, as required. (x = 20 forgets the final division; x = 14/5 subtracts 3 instead of adding.)"
+            },
+            {
+              "label": "C",
+              "text": "x = 14/5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "x = 3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Add 3 to both sides: 5x = 20. Divide both sides by 5: x = 4. Check: 5(4) − 3 = 20 − 3 = 17, as required. (x = 20 forgets the final division; x = 14/5 subtracts 3 instead of adding.) Therefore the correct answer is B: x = 4.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_003",
+          "original": true,
+          "topicCode": "WCM3-ALG",
+          "type": "multiple_choice",
+          "prompt": "Expand the expression 2(3y − 5).",
+          "difficulty": "easy",
+          "commandWord": "Expand",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "6y − 5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "3y − 10",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "6y − 10",
+              "rationale": "This is the supported answer. Multiply each term inside the bracket by 2: 2 × 3y = 6y and 2 × (−5) = −10, giving 6y − 10. (6y − 5 multiplies only the first term by 2.)"
+            },
+            {
+              "label": "D",
+              "text": "6y + 10",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Multiply each term inside the bracket by 2: 2 × 3y = 6y and 2 × (−5) = −10, giving 6y − 10. (6y − 5 multiplies only the first term by 2.) Therefore the correct answer is C: 6y − 10.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_004",
+          "original": true,
+          "topicCode": "WCM3-ALG",
+          "type": "multiple_choice",
+          "prompt": "Given that p = 3q + 2, find the value of p when q = 4.",
+          "difficulty": "easy",
+          "commandWord": "Evaluate",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "24",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "12",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "9",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "14",
+              "rationale": "This is the supported answer. Substitute q = 4 into the formula: p = 3(4) + 2 = 12 + 2 = 14. (24 comes from wrongly computing 3 × (4 + 2); 12 forgets to add 2.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Substitute q = 4 into the formula: p = 3(4) + 2 = 12 + 2 = 14. (24 comes from wrongly computing 3 × (4 + 2); 12 forgets to add 2.) Therefore the correct answer is D: 14.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_005",
+          "original": true,
+          "topicCode": "WCM3-ALG",
+          "type": "multiple_choice",
+          "prompt": "Solve the equation 4(x + 3) = 2x + 18.",
+          "difficulty": "medium",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "x = 3",
+              "rationale": "This is the supported answer. Expand the bracket: 4x + 12 = 2x + 18. Subtract 2x from both sides: 2x + 12 = 18. Subtract 12: 2x = 6, so x = 3. Check: 4(3 + 3) = 24 and 2(3) + 18 = 24, as required. (x = 6 stops after finding 2x.)"
+            },
+            {
+              "label": "B",
+              "text": "x = 6",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "x = 15",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "x = 30",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Expand the bracket: 4x + 12 = 2x + 18. Subtract 2x from both sides: 2x + 12 = 18. Subtract 12: 2x = 6, so x = 3. Check: 4(3 + 3) = 24 and 2(3) + 18 = 24, as required. (x = 6 stops after finding 2x.) Therefore the correct answer is A: x = 3.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_006",
+          "original": true,
+          "topicCode": "WCM3-ALG",
+          "type": "multiple_choice",
+          "prompt": "Given that x + 2y = 8 and x − y = 2, find the value of x + y.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "6",
+              "rationale": "This is the supported answer. Subtract the second equation from the first: (x + 2y) − (x − y) = 8 − 2, so 3y = 6 and y = 2. Then x = 2 + y = 4, and x + y = 4 + 2 = 6. (4 and 2 are the individual values of x and y.)"
+            },
+            {
+              "label": "C",
+              "text": "2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "10",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Subtract the second equation from the first: (x + 2y) − (x − y) = 8 − 2, so 3y = 6 and y = 2. Then x = 2 + y = 4, and x + y = 4 + 2 = 6. (4 and 2 are the individual values of x and y.) Therefore the correct answer is B: 6.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_007",
+          "original": true,
+          "topicCode": "WCM3-ALG",
+          "type": "multiple_choice",
+          "prompt": "Make t the subject of the formula s = ½(u + v)t.",
+          "difficulty": "medium",
+          "commandWord": "Rearrange",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "t = s(u + v)/2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "t = 2s(u + v)",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "t = 2s/(u + v)",
+              "rationale": "This is the supported answer. Multiply both sides by 2 to clear the fraction: 2s = (u + v)t. Then divide both sides by (u + v): t = 2s/(u + v). (t = 2s(u + v) multiplies instead of dividing by (u + v).)"
+            },
+            {
+              "label": "D",
+              "text": "t = (u + v)/(2s)",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Multiply both sides by 2 to clear the fraction: 2s = (u + v)t. Then divide both sides by (u + v): t = 2s/(u + v). (t = 2s(u + v) multiplies instead of dividing by (u + v).) Therefore the correct answer is C: t = 2s/(u + v).",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_008",
+          "original": true,
+          "topicCode": "WCM3-ALG",
+          "type": "multiple_choice",
+          "prompt": "Simplify (3x²)² × 2x.",
+          "difficulty": "medium",
+          "commandWord": "Simplify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "18x⁴",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "6x⁵",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "9x⁵",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "18x⁵",
+              "rationale": "This is the supported answer. Square the bracket first: (3x²)² = 9x⁴. Then multiply by 2x: 9x⁴ × 2x = 18x⁵, since x⁴ × x = x⁵. (6x⁵ wrongly doubles 3 instead of squaring it; 18x⁴ forgets to add the powers of x.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Square the bracket first: (3x²)² = 9x⁴. Then multiply by 2x: 9x⁴ × 2x = 18x⁵, since x⁴ × x = x⁵. (6x⁵ wrongly doubles 3 instead of squaring it; 18x⁴ forgets to add the powers of x.) Therefore the correct answer is D: 18x⁵.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_009",
+          "original": true,
+          "topicCode": "WCM3-GEO",
+          "type": "multiple_choice",
+          "prompt": "Two angles lie on a straight line. One of them is 65°. Find the other angle.",
+          "difficulty": "easy",
+          "commandWord": "Find",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "115°",
+              "rationale": "This is the supported answer. Angles on a straight line sum to 180°, so the other angle is 180° − 65° = 115°. (25° is the complement 90° − 65°, confusing straight-line with right-angle pairs.)"
+            },
+            {
+              "label": "B",
+              "text": "25°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "65°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "90°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Angles on a straight line sum to 180°, so the other angle is 180° − 65° = 115°. (25° is the complement 90° − 65°, confusing straight-line with right-angle pairs.) Therefore the correct answer is A: 115°.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_010",
+          "original": true,
+          "topicCode": "WCM3-GEO",
+          "type": "multiple_choice",
+          "prompt": "Two angles of a triangle are 50° and 60°. Find the third angle.",
+          "difficulty": "easy",
+          "commandWord": "Find",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "110°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "70°",
+              "rationale": "This is the supported answer. The angles of a triangle sum to 180°: 50° + 60° = 110°, so the third angle is 180° − 110° = 70°. (110° is the sum of the two given angles, not the third angle.)"
+            },
+            {
+              "label": "C",
+              "text": "30°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "120°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The angles of a triangle sum to 180°: 50° + 60° = 110°, so the third angle is 180° − 110° = 70°. (110° is the sum of the two given angles, not the third angle.) Therefore the correct answer is B: 70°.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_011",
+          "original": true,
+          "topicCode": "WCM3-GEO",
+          "type": "multiple_choice",
+          "prompt": "Find the complement of an angle of 35°.",
+          "difficulty": "easy",
+          "commandWord": "Find",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "145°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "65°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "55°",
+              "rationale": "This is the supported answer. Complementary angles sum to 90°, so the complement of 35° is 90° − 35° = 55°. (145° is the supplement 180° − 35°, the wrong angle pair.)"
+            },
+            {
+              "label": "D",
+              "text": "325°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Complementary angles sum to 90°, so the complement of 35° is 90° − 35° = 55°. (145° is the supplement 180° − 35°, the wrong angle pair.) Therefore the correct answer is C: 55°.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_012",
+          "original": true,
+          "topicCode": "WCM3-GEO",
+          "type": "multiple_choice",
+          "prompt": "The perimeter of a square is 36 cm. Find the length of one side.",
+          "difficulty": "easy",
+          "commandWord": "Find",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "6 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "12 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "18 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "9 cm",
+              "rationale": "This is the supported answer. A square has four equal sides, so each side is 36 ÷ 4 = 9 cm. (6 cm divides by 6 instead of 4; 18 cm halves the perimeter.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A square has four equal sides, so each side is 36 ÷ 4 = 9 cm. (6 cm divides by 6 instead of 4; 18 cm halves the perimeter.) Therefore the correct answer is D: 9 cm.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_013",
+          "original": true,
+          "topicCode": "WCM3-GEO",
+          "type": "multiple_choice",
+          "prompt": "Calculate the size of each interior angle of a regular pentagon.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "108°",
+              "rationale": "This is the supported answer. A pentagon has interior-angle sum (5 − 2) × 180° = 540°. A regular pentagon has five equal angles, so each is 540° ÷ 5 = 108°. (72° is the exterior angle; 120° belongs to a regular hexagon.)"
+            },
+            {
+              "label": "B",
+              "text": "120°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "72°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "540°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A pentagon has interior-angle sum (5 − 2) × 180° = 540°. A regular pentagon has five equal angles, so each is 540° ÷ 5 = 108°. (72° is the exterior angle; 120° belongs to a regular hexagon.) Therefore the correct answer is A: 108°.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_014",
+          "original": true,
+          "topicCode": "WCM3-GEO",
+          "type": "multiple_choice",
+          "prompt": "An isosceles triangle has a vertex angle of 40°. Calculate the size of each base angle.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "140°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "70°",
+              "rationale": "This is the supported answer. The base angles of an isosceles triangle are equal, and all three angles sum to 180°: each base angle is (180° − 40°) ÷ 2 = 140° ÷ 2 = 70°. (140° forgets the division by 2.)"
+            },
+            {
+              "label": "C",
+              "text": "40°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "100°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The base angles of an isosceles triangle are equal, and all three angles sum to 180°: each base angle is (180° − 40°) ÷ 2 = 140° ÷ 2 = 70°. (140° forgets the division by 2.) Therefore the correct answer is B: 70°.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_015",
+          "original": true,
+          "topicCode": "WCM3-GEO",
+          "type": "multiple_choice",
+          "prompt": "Two parallel lines are cut by a transversal. If one of a pair of co-interior angles is 110°, find the other co-interior angle.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "110°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "90°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "70°",
+              "rationale": "This is the supported answer. Co-interior (allied) angles between parallel lines are supplementary: 180° − 110° = 70°. (110° would be correct for corresponding or alternate angles, not co-interior ones.)"
+            },
+            {
+              "label": "D",
+              "text": "20°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Co-interior (allied) angles between parallel lines are supplementary: 180° − 110° = 70°. (110° would be correct for corresponding or alternate angles, not co-interior ones.) Therefore the correct answer is C: 70°.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_016",
+          "original": true,
+          "topicCode": "WCM3-GEO",
+          "type": "multiple_choice",
+          "prompt": "Calculate the size of each exterior angle of a regular hexagon.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "120°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "90°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "45°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "60°",
+              "rationale": "This is the supported answer. The exterior angles of any polygon sum to 360°, and a regular hexagon has six equal exterior angles: 360° ÷ 6 = 60°. (120° is each interior angle, 180° − 60°.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The exterior angles of any polygon sum to 360°, and a regular hexagon has six equal exterior angles: 360° ÷ 6 = 60°. (120° is each interior angle, 180° − 60°.) Therefore the correct answer is D: 60°.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_017",
+          "original": true,
+          "topicCode": "WCM3-STA",
+          "type": "multiple_choice",
+          "prompt": "Write down the mode of the data set 2, 3, 3, 5, 7, 3, 8.",
+          "difficulty": "easy",
+          "commandWord": "Write down",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "3",
+              "rationale": "This is the supported answer. The mode is the value that occurs most often. Here 3 occurs three times, more than any other value, so the mode is 3. (4.4 is approximately the mean, 31 ÷ 7, a different average.)"
+            },
+            {
+              "label": "B",
+              "text": "5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "4.4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "6",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The mode is the value that occurs most often. Here 3 occurs three times, more than any other value, so the mode is 3. (4.4 is approximately the mean, 31 ÷ 7, a different average.) Therefore the correct answer is A: 3.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_018",
+          "original": true,
+          "topicCode": "WCM3-STA",
+          "type": "multiple_choice",
+          "prompt": "Find the median of the numbers 4, 7, 9, 11 and 13.",
+          "difficulty": "easy",
+          "commandWord": "Find",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "7",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "9",
+              "rationale": "This is the supported answer. The numbers are already in order, and the median of five values is the third (middle) one: 9. (8.8 is the mean, 44 ÷ 5, not the median.)"
+            },
+            {
+              "label": "C",
+              "text": "8.8",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "11",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The numbers are already in order, and the median of five values is the third (middle) one: 9. (8.8 is the mean, 44 ÷ 5, not the median.) Therefore the correct answer is B: 9.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_019",
+          "original": true,
+          "topicCode": "WCM3-STA",
+          "type": "multiple_choice",
+          "prompt": "Find the range of the data set 12, 5, 9, 20 and 7.",
+          "difficulty": "easy",
+          "commandWord": "Find",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "25",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "12",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "15",
+              "rationale": "This is the supported answer. Range = largest value − smallest value = 20 − 5 = 15. (25 adds the extremes instead of subtracting them; 10.6 is the mean, 53 ÷ 5.)"
+            },
+            {
+              "label": "D",
+              "text": "10.6",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Range = largest value − smallest value = 20 − 5 = 15. (25 adds the extremes instead of subtracting them; 10.6 is the mean, 53 ÷ 5.) Therefore the correct answer is C: 15.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_020",
+          "original": true,
+          "topicCode": "WCM3-STA",
+          "type": "multiple_choice",
+          "prompt": "Calculate the mean of the numbers 4, 8, 6, 10 and 2.",
+          "difficulty": "easy",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "30",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "8",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "7.5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "6",
+              "rationale": "This is the supported answer. The sum of the numbers is 4 + 8 + 6 + 10 + 2 = 30, and there are five numbers, so the mean is 30 ÷ 5 = 6. (30 is the total before dividing; 8 is the range.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The sum of the numbers is 4 + 8 + 6 + 10 + 2 = 30, and there are five numbers, so the mean is 30 ÷ 5 = 6. (30 is the total before dividing; 8 is the range.) Therefore the correct answer is D: 6.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_021",
+          "original": true,
+          "topicCode": "WCM3-STA",
+          "type": "multiple_choice",
+          "prompt": "Find the median of the data set 3, 5, 8, 10, 12 and 15.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "9",
+              "rationale": "This is the supported answer. With six ordered values the median is the mean of the third and fourth: (8 + 10) ÷ 2 = 9. (8 or 10 alone forgets to average the two middle values.)"
+            },
+            {
+              "label": "B",
+              "text": "8",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "10",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "8.8",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "With six ordered values the median is the mean of the third and fourth: (8 + 10) ÷ 2 = 9. (8 or 10 alone forgets to average the two middle values.) Therefore the correct answer is A: 9.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_022",
+          "original": true,
+          "topicCode": "WCM3-STA",
+          "type": "multiple_choice",
+          "prompt": "The mean of six numbers is 7. Five of the numbers add up to 30. Find the sixth number.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "6",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "12",
+              "rationale": "This is the supported answer. The six numbers total 6 × 7 = 42. The five known numbers total 30, so the sixth number is 42 − 30 = 12. (6 is the mean of the five known numbers, 30 ÷ 5.)"
+            },
+            {
+              "label": "C",
+              "text": "7",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The six numbers total 6 × 7 = 42. The five known numbers total 30, so the sixth number is 42 − 30 = 12. (6 is the mean of the five known numbers, 30 ÷ 5.) Therefore the correct answer is B: 12.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_023",
+          "original": true,
+          "topicCode": "WCM3-STA",
+          "type": "multiple_choice",
+          "prompt": "In a frequency table, the value 1 occurs 2 times, the value 2 occurs 3 times and the value 3 occurs 5 times. Calculate the mean of the data.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "2.5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "2.3",
+              "rationale": "This is the supported answer. Total of values = (1 × 2) + (2 × 3) + (3 × 5) = 2 + 6 + 15 = 23. Total frequency = 2 + 3 + 5 = 10. Mean = 23 ÷ 10 = 2.3. (2 is the mean of the values 1, 2, 3 ignoring their frequencies.)"
+            },
+            {
+              "label": "D",
+              "text": "3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Total of values = (1 × 2) + (2 × 3) + (3 × 5) = 2 + 6 + 15 = 23. Total frequency = 2 + 3 + 5 = 10. Mean = 23 ÷ 10 = 2.3. (2 is the mean of the values 1, 2, 3 ignoring their frequencies.) Therefore the correct answer is C: 2.3.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_024",
+          "original": true,
+          "topicCode": "WCM3-STA",
+          "type": "multiple_choice",
+          "prompt": "The mean of the numbers 2, 5, x and 9 is 6. Find the value of x.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "10",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "7",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "8",
+              "rationale": "This is the supported answer. The four numbers total 4 × 6 = 24. The three known numbers total 2 + 5 + 9 = 16, so x = 24 − 16 = 8. (4 wrongly divides 16 by 4 instead of subtracting from 24.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The four numbers total 4 × 6 = 24. The three known numbers total 2 + 5 + 9 = 16, so x = 24 − 16 = 8. (4 wrongly divides 16 by 4 instead of subtracting from 24.) Therefore the correct answer is D: 8.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_025",
+          "original": true,
+          "topicCode": "WCM3-QDR",
+          "type": "multiple_choice",
+          "prompt": "Write down the roots of the equation (x − 4)(x + 1) = 0.",
+          "difficulty": "easy",
+          "commandWord": "Write down",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "x = 4 or x = −1",
+              "rationale": "This is the supported answer. A product is zero only when a factor is zero: x − 4 = 0 gives x = 4, and x + 1 = 0 gives x = −1. (x = −4 or x = 1 reverses both signs.)"
+            },
+            {
+              "label": "B",
+              "text": "x = −4 or x = 1",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "x = 4 or x = 1",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "x = −4 or x = −1",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A product is zero only when a factor is zero: x − 4 = 0 gives x = 4, and x + 1 = 0 gives x = −1. (x = −4 or x = 1 reverses both signs.) Therefore the correct answer is A: x = 4 or x = −1.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_026",
+          "original": true,
+          "topicCode": "WCM3-QDR",
+          "type": "multiple_choice",
+          "prompt": "Factorise x² + 7x + 12.",
+          "difficulty": "easy",
+          "commandWord": "Factorise",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "(x + 2)(x + 6)",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "(x + 3)(x + 4)",
+              "rationale": "This is the supported answer. Find two numbers that multiply to 12 and add to 7: they are 3 and 4. Hence x² + 7x + 12 = (x + 3)(x + 4). ((x + 2)(x + 6) adds to 8, and (x − 3)(x − 4) gives −7x.)"
+            },
+            {
+              "label": "C",
+              "text": "(x − 3)(x − 4)",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "(x + 1)(x + 12)",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Find two numbers that multiply to 12 and add to 7: they are 3 and 4. Hence x² + 7x + 12 = (x + 3)(x + 4). ((x + 2)(x + 6) adds to 8, and (x − 3)(x − 4) gives −7x.) Therefore the correct answer is B: (x + 3)(x + 4).",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_027",
+          "original": true,
+          "topicCode": "WCM3-QDR",
+          "type": "multiple_choice",
+          "prompt": "Given that y = x² + 1, find the value of y when x = 3.",
+          "difficulty": "easy",
+          "commandWord": "Evaluate",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "7",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "9",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "10",
+              "rationale": "This is the supported answer. Substitute x = 3: y = 3² + 1 = 9 + 1 = 10. (7 treats x² as 2x; 9 forgets to add 1.)"
+            },
+            {
+              "label": "D",
+              "text": "4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Substitute x = 3: y = 3² + 1 = 9 + 1 = 10. (7 treats x² as 2x; 9 forgets to add 1.) Therefore the correct answer is C: 10.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_028",
+          "original": true,
+          "topicCode": "WCM3-QDR",
+          "type": "multiple_choice",
+          "prompt": "Write down the sum of the roots of the equation x² − 6x + 8 = 0.",
+          "difficulty": "easy",
+          "commandWord": "Write down",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "−6",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "8",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "−8",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "6",
+              "rationale": "This is the supported answer. For ax² + bx + c = 0 the sum of the roots is −b/a. Here −b/a = −(−6)/1 = 6. (8 is the product of the roots, c/a — a common mix-up; −6 forgets the leading minus.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "For ax² + bx + c = 0 the sum of the roots is −b/a. Here −b/a = −(−6)/1 = 6. (8 is the product of the roots, c/a — a common mix-up; −6 forgets the leading minus.) Therefore the correct answer is D: 6.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_029",
+          "original": true,
+          "topicCode": "WCM3-QDR",
+          "type": "multiple_choice",
+          "prompt": "Solve the equation x² − 9 = 0.",
+          "difficulty": "medium",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "x = 3 or x = −3",
+              "rationale": "This is the supported answer. Factorise the difference of two squares: (x − 3)(x + 3) = 0, so x = 3 or x = −3. (x = 3 only forgets the negative square root of 9; x = ±9 forgets to take the square root.)"
+            },
+            {
+              "label": "B",
+              "text": "x = 3 only",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "x = 9 or x = −9",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "x = 81",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Factorise the difference of two squares: (x − 3)(x + 3) = 0, so x = 3 or x = −3. (x = 3 only forgets the negative square root of 9; x = ±9 forgets to take the square root.) Therefore the correct answer is A: x = 3 or x = −3.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_030",
+          "original": true,
+          "topicCode": "WCM3-QDR",
+          "type": "multiple_choice",
+          "prompt": "Solve the equation x² − 7x + 10 = 0 by factorisation.",
+          "difficulty": "medium",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "x = −2 or x = −5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "x = 2 or x = 5",
+              "rationale": "This is the supported answer. Two numbers that multiply to 10 and add to −7 are −2 and −5, so x² − 7x + 10 = (x − 2)(x − 5) = 0, giving x = 2 or x = 5. Check: 2 + 5 = 7 and 2 × 5 = 10. (x = −2 or x = −5 solves x² + 7x + 10 = 0 instead.)"
+            },
+            {
+              "label": "C",
+              "text": "x = 1 or x = 10",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "x = −2 or x = 5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Two numbers that multiply to 10 and add to −7 are −2 and −5, so x² − 7x + 10 = (x − 2)(x − 5) = 0, giving x = 2 or x = 5. Check: 2 + 5 = 7 and 2 × 5 = 10. (x = −2 or x = −5 solves x² + 7x + 10 = 0 instead.) Therefore the correct answer is B: x = 2 or x = 5.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_031",
+          "original": true,
+          "topicCode": "WCM3-QDR",
+          "type": "multiple_choice",
+          "prompt": "Find the minimum value of y = x² − 4x + 3.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "−4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "−1",
+              "rationale": "This is the supported answer. Complete the square: y = (x − 2)² − 4 + 3 = (x − 2)² − 1. Since (x − 2)² ≥ 0, the least value of y is −1, occurring at x = 2. (2 is the x-value at the minimum, not the minimum value; 3 is just the constant term.)"
+            },
+            {
+              "label": "D",
+              "text": "2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Complete the square: y = (x − 2)² − 4 + 3 = (x − 2)² − 1. Since (x − 2)² ≥ 0, the least value of y is −1, occurring at x = 2. (2 is the x-value at the minimum, not the minimum value; 3 is just the constant term.) Therefore the correct answer is C: −1.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_032",
+          "original": true,
+          "topicCode": "WCM3-QDR",
+          "type": "multiple_choice",
+          "prompt": "Calculate the discriminant of the quadratic equation 2x² + 3x + 1 = 0.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "17",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "−7",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "1",
+              "rationale": "This is the supported answer. The discriminant is b² − 4ac with a = 2, b = 3 and c = 1: 3² − 4(2)(1) = 9 − 8 = 1. The positive discriminant confirms two real roots. (17 wrongly adds 9 + 8 instead of subtracting.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The discriminant is b² − 4ac with a = 2, b = 3 and c = 1: 3² − 4(2)(1) = 9 − 8 = 1. The positive discriminant confirms two real roots. (17 wrongly adds 9 + 8 instead of subtracting.) Therefore the correct answer is D: 1.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_033",
+          "original": true,
+          "topicCode": "WCM3-TRG",
+          "type": "multiple_choice",
+          "prompt": "Write down the value of sin 30°.",
+          "difficulty": "easy",
+          "commandWord": "Write down",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "1/2",
+              "rationale": "This is the supported answer. sin 30° is a standard exact value: 1/2. (√3/2 is the value of sin 60°, confusing the two complementary special angles.)"
+            },
+            {
+              "label": "B",
+              "text": "√3/2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "√2/2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "1",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "sin 30° is a standard exact value: 1/2. (√3/2 is the value of sin 60°, confusing the two complementary special angles.) Therefore the correct answer is A: 1/2.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_034",
+          "original": true,
+          "topicCode": "WCM3-TRG",
+          "type": "multiple_choice",
+          "prompt": "Write down the value of tan 45°.",
+          "difficulty": "easy",
+          "commandWord": "Write down",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "0",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "1",
+              "rationale": "This is the supported answer. At 45° the opposite and adjacent sides of the right-angled triangle are equal, so tan 45° = opposite ÷ adjacent = 1. (√3 is tan 60° and 1/√3 is tan 30°.)"
+            },
+            {
+              "label": "C",
+              "text": "1/√3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "√3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "At 45° the opposite and adjacent sides of the right-angled triangle are equal, so tan 45° = opposite ÷ adjacent = 1. (√3 is tan 60° and 1/√3 is tan 30°.) Therefore the correct answer is B: 1.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_035",
+          "original": true,
+          "topicCode": "WCM3-TRG",
+          "type": "multiple_choice",
+          "prompt": "A right-angled triangle has shorter sides of 3 cm and 4 cm. Find the length of the hypotenuse.",
+          "difficulty": "easy",
+          "commandWord": "Find",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "7 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "12 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "5 cm",
+              "rationale": "This is the supported answer. By the theorem of Pythagoras: hypotenuse = √(3² + 4²) = √(9 + 16) = √25 = 5 cm. (7 cm just adds the two sides; √7 cm subtracts the squares, which applies only when the hypotenuse is given.)"
+            },
+            {
+              "label": "D",
+              "text": "√7 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "By the theorem of Pythagoras: hypotenuse = √(3² + 4²) = √(9 + 16) = √25 = 5 cm. (7 cm just adds the two sides; √7 cm subtracts the squares, which applies only when the hypotenuse is given.) Therefore the correct answer is C: 5 cm.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_036",
+          "original": true,
+          "topicCode": "WCM3-TRG",
+          "type": "multiple_choice",
+          "prompt": "Write down the value of cos 60°.",
+          "difficulty": "easy",
+          "commandWord": "Write down",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "√3/2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "1",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "0",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "0.5",
+              "rationale": "This is the supported answer. cos 60° is a standard exact value: 0.5 (that is, 1/2). (√3/2 is cos 30°, confusing the complementary special angles.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "cos 60° is a standard exact value: 0.5 (that is, 1/2). (√3/2 is cos 30°, confusing the complementary special angles.) Therefore the correct answer is D: 0.5.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_037",
+          "original": true,
+          "topicCode": "WCM3-TRG",
+          "type": "multiple_choice",
+          "prompt": "In a right-angled triangle, the side opposite angle θ is 6 cm and the side adjacent to θ is 8 cm. Find tan θ.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "3/4",
+              "rationale": "This is the supported answer. tan θ = opposite ÷ adjacent = 6/8 = 3/4. (3/5 is sin θ: the hypotenuse is √(6² + 8²) = 10 cm, so sin θ = 6/10 = 3/5 — the wrong ratio.)"
+            },
+            {
+              "label": "B",
+              "text": "4/3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "3/5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "4/5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "tan θ = opposite ÷ adjacent = 6/8 = 3/4. (3/5 is sin θ: the hypotenuse is √(6² + 8²) = 10 cm, so sin θ = 6/10 = 3/5 — the wrong ratio.) Therefore the correct answer is A: 3/4.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_038",
+          "original": true,
+          "topicCode": "WCM3-TRG",
+          "type": "multiple_choice",
+          "prompt": "A right-angled triangle has a hypotenuse of 10 cm and an angle of 30°. Find the length of the side opposite the 30° angle.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "8.7 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "5 cm",
+              "rationale": "This is the supported answer. The opposite side equals hypotenuse × sin 30° = 10 × 0.5 = 5 cm. (5√3 cm ≈ 8.7 cm is the adjacent side, 10 cos 30°, not the side asked for.)"
+            },
+            {
+              "label": "C",
+              "text": "5√3 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "10 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The opposite side equals hypotenuse × sin 30° = 10 × 0.5 = 5 cm. (5√3 cm ≈ 8.7 cm is the adjacent side, 10 cos 30°, not the side asked for.) Therefore the correct answer is B: 5 cm.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_039",
+          "original": true,
+          "topicCode": "WCM3-TRG",
+          "type": "multiple_choice",
+          "prompt": "A boy stands 20 m from the foot of a vertical mast. The angle of elevation of the top of the mast from the boy is 45°. Calculate the height of the mast.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "20√2 m",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "10 m",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "20 m",
+              "rationale": "This is the supported answer. tan 45° = height ÷ distance = height ÷ 20. Since tan 45° = 1, the height is 20 × 1 = 20 m. (20√2 m ≈ 28.3 m is the line-of-sight distance from the boy to the top, not the height.)"
+            },
+            {
+              "label": "D",
+              "text": "40 m",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "tan 45° = height ÷ distance = height ÷ 20. Since tan 45° = 1, the height is 20 × 1 = 20 m. (20√2 m ≈ 28.3 m is the line-of-sight distance from the boy to the top, not the height.) Therefore the correct answer is C: 20 m.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_040",
+          "original": true,
+          "topicCode": "WCM3-TRG",
+          "type": "multiple_choice",
+          "prompt": "A right-angled triangle has a hypotenuse of 8 cm and an angle of 60°. Find the length of the side adjacent to the 60° angle.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "4√3 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "8 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "16 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "4 cm",
+              "rationale": "This is the supported answer. The adjacent side equals hypotenuse × cos 60° = 8 × 0.5 = 4 cm. (4√3 cm ≈ 6.9 cm is the side opposite the 60° angle, 8 sin 60°.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The adjacent side equals hypotenuse × cos 60° = 8 × 0.5 = 4 cm. (4√3 cm ≈ 6.9 cm is the side opposite the 60° angle, 8 sin 60°.) Therefore the correct answer is D: 4 cm.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_041",
+          "original": true,
+          "topicCode": "WCM3-INE",
+          "type": "multiple_choice",
+          "prompt": "Solve the inequality x + 5 > 9 for x.",
+          "difficulty": "easy",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "x > 4",
+              "rationale": "This is the supported answer. Subtract 5 from both sides: x > 9 − 5, so x > 4. Check: 4 + 5 = 9, so any value above 4 works. (x > 14 adds 5 instead of subtracting; x < 4 reverses the sign for no reason.)"
+            },
+            {
+              "label": "B",
+              "text": "x > 14",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "x < 4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "x > 5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Subtract 5 from both sides: x > 9 − 5, so x > 4. Check: 4 + 5 = 9, so any value above 4 works. (x > 14 adds 5 instead of subtracting; x < 4 reverses the sign for no reason.) Therefore the correct answer is A: x > 4.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_042",
+          "original": true,
+          "topicCode": "WCM3-INE",
+          "type": "multiple_choice",
+          "prompt": "Solve the inequality 2x ≤ 10.",
+          "difficulty": "easy",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "x ≥ 5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "x ≤ 5",
+              "rationale": "This is the supported answer. Divide both sides by the positive number 2, keeping the sign: x ≤ 5. (x < 5 drops the equality, excluding x = 5 which satisfies 2(5) = 10 ≤ 10.)"
+            },
+            {
+              "label": "C",
+              "text": "x ≤ 8",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "x < 5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Divide both sides by the positive number 2, keeping the sign: x ≤ 5. (x < 5 drops the equality, excluding x = 5 which satisfies 2(5) = 10 ≤ 10.) Therefore the correct answer is B: x ≤ 5.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_043",
+          "original": true,
+          "topicCode": "WCM3-INE",
+          "type": "multiple_choice",
+          "prompt": "Which of the following values satisfies the inequality x − 2 < 5?",
+          "difficulty": "easy",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "x = 7",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "x = 8",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "x = 6",
+              "rationale": "This is the supported answer. Substituting x = 6 gives 6 − 2 = 4, and 4 < 5, so x = 6 satisfies the inequality. The other values give 5, 6 and 7, none of which is less than 5. Equivalently, solving gives x < 7, and only 6 qualifies."
+            },
+            {
+              "label": "D",
+              "text": "x = 9",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Substituting x = 6 gives 6 − 2 = 4, and 4 < 5, so x = 6 satisfies the inequality. The other values give 5, 6 and 7, none of which is less than 5. Equivalently, solving gives x < 7, and only 6 qualifies. Therefore the correct answer is C: x = 6.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_044",
+          "original": true,
+          "topicCode": "WCM3-INE",
+          "type": "multiple_choice",
+          "prompt": "Solve the inequality 3x > 12.",
+          "difficulty": "easy",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "x < 4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "x > 36",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "x > 9",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "x > 4",
+              "rationale": "This is the supported answer. Divide both sides by the positive number 3: x > 4. Check: 3 × 4 = 12, so values above 4 work. (x > 36 multiplies by 3 instead of dividing; x > 9 subtracts 3.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Divide both sides by the positive number 3: x > 4. Check: 3 × 4 = 12, so values above 4 work. (x > 36 multiplies by 3 instead of dividing; x > 9 subtracts 3.) Therefore the correct answer is D: x > 4.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_045",
+          "original": true,
+          "topicCode": "WCM3-INE",
+          "type": "multiple_choice",
+          "prompt": "Solve the inequality 3x − 4 ≤ 11.",
+          "difficulty": "medium",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "x ≤ 5",
+              "rationale": "This is the supported answer. Add 4 to both sides: 3x ≤ 15. Divide by the positive number 3: x ≤ 5. Check: 3(5) − 4 = 11, and 11 ≤ 11 holds. (x ≤ 7/3 subtracts 4 from 11 instead of adding.)"
+            },
+            {
+              "label": "B",
+              "text": "x ≤ 7/3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "x < 5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "x ≥ 5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Add 4 to both sides: 3x ≤ 15. Divide by the positive number 3: x ≤ 5. Check: 3(5) − 4 = 11, and 11 ≤ 11 holds. (x ≤ 7/3 subtracts 4 from 11 instead of adding.) Therefore the correct answer is A: x ≤ 5.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_046",
+          "original": true,
+          "topicCode": "WCM3-INE",
+          "type": "multiple_choice",
+          "prompt": "Solve the inequality 5 − 2x ≥ 1.",
+          "difficulty": "medium",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "x ≥ 2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "x ≤ 2",
+              "rationale": "This is the supported answer. Subtract 5 from both sides: −2x ≥ −4. Dividing by the negative number −2 reverses the inequality sign: x ≤ 2. Check: 5 − 2(2) = 1, and 1 ≥ 1 holds. (x ≥ 2 forgets to reverse the sign when dividing by a negative.)"
+            },
+            {
+              "label": "C",
+              "text": "x ≤ −2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "x ≥ −2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Subtract 5 from both sides: −2x ≥ −4. Dividing by the negative number −2 reverses the inequality sign: x ≤ 2. Check: 5 − 2(2) = 1, and 1 ≥ 1 holds. (x ≥ 2 forgets to reverse the sign when dividing by a negative.) Therefore the correct answer is B: x ≤ 2.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_047",
+          "original": true,
+          "topicCode": "WCM3-INE",
+          "type": "multiple_choice",
+          "prompt": "Find the largest integer that satisfies the inequality 4x + 1 < 15.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "3.5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "3",
+              "rationale": "This is the supported answer. Subtract 1: 4x < 14, so x < 3.5. The largest whole number below 3.5 is 3. Check: 4(3) + 1 = 13 < 15, while 4(4) + 1 = 17, which fails. (4 rounds 3.5 up without checking the inequality.)"
+            },
+            {
+              "label": "D",
+              "text": "2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Subtract 1: 4x < 14, so x < 3.5. The largest whole number below 3.5 is 3. Check: 4(3) + 1 = 13 < 15, while 4(4) + 1 = 17, which fails. (4 rounds 3.5 up without checking the inequality.) Therefore the correct answer is C: 3.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_048",
+          "original": true,
+          "topicCode": "WCM3-INE",
+          "type": "multiple_choice",
+          "prompt": "Solve the inequality (x/2) + 3 > 5.",
+          "difficulty": "medium",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "x > 16",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "x > 1",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "x < 4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "x > 4",
+              "rationale": "This is the supported answer. Subtract 3 from both sides: x/2 > 2. Multiply both sides by the positive number 2: x > 4. Check: (4/2) + 3 = 5, so values above 4 work. (x > 16 adds 3 before doubling: (5 + 3) × 2.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Subtract 3 from both sides: x/2 > 2. Multiply both sides by the positive number 2: x > 4. Check: (4/2) + 3 = 5, so values above 4 work. (x > 16 adds 3 before doubling: (5 + 3) × 2.) Therefore the correct answer is D: x > 4.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_wcms3_049",
+          "original": true,
+          "topicCode": "WCM3-NALG",
+          "type": "calculation",
+          "prompt": "Three consecutive even numbers add up to 78. Taking the smallest number as n, form an equation in n and find the three numbers.",
+          "difficulty": "hard",
+          "commandWord": "Form",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "24, 26 and 28",
+          "workedSolution": "Let the smallest even number be n; the next two consecutive even numbers are n + 2 and n + 4. Their sum gives the equation n + (n + 2) + (n + 4) = 78, so 3n + 6 = 78. Subtracting 6 gives 3n = 72, and dividing by 3 gives n = 24. The three numbers are therefore 24, 26 and 28. Check: 24 + 26 + 28 = 78, as required. Answer: 24, 26 and 28.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_wcms3_050",
+          "original": true,
+          "topicCode": "WCM3-NUM",
+          "type": "calculation",
+          "prompt": "A shopkeeper increased the price of a bag of rice by 20%. Some weeks later the new price was reduced by 20%. If the original price was GH₵250.00, calculate the final price.",
+          "difficulty": "hard",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "GH₵240.00",
+          "workedSolution": "After the 20% increase the price is 250 × 1.20 = GH₵300.00. The 20% reduction applies to the new price, not the original: 300 × 0.80 = GH₵240.00. So the final price is GH₵240.00, which is GH₵10.00 below the original price — the two 20% changes do not cancel out because they act on different bases. Equivalently, 250 × 1.20 × 0.80 = 250 × 0.96 = GH₵240.00. Answer: GH₵240.00.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        }
+      ]
+    }
+  ]
+}
