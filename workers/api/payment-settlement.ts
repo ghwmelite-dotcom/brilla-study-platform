@@ -1,6 +1,7 @@
 const PAYSTACK_API = 'https://api.paystack.co';
 const DEFAULT_RECONCILIATION_LIMIT = 25;
-const MAX_RECONCILIATION_LIMIT = 50;
+
+import { settleSchoolSeatPayment } from './school-seats';const MAX_RECONCILIATION_LIMIT = 50;
 const TERMINAL_FAILURE_STATUSES = new Set([
   'abandoned',
   'cancelled',
@@ -71,6 +72,8 @@ interface PaymentSettlementRow {
   affiliate_processed_at: string | null;
   ai_grading_quota: number;
   referred_by: string | null;
+  metadata: string | null;
+  user_type: string;
 }
 
 interface PaystackVerificationResult {
@@ -181,7 +184,7 @@ export async function settleVerifiedSubscriptionPayment(
     SELECT
       pt.id, pt.user_id, pt.reference, pt.amount, pt.currency, pt.plan_id,
       pt.billing_cycle, pt.status, pt.settlement_applied_at,
-      pt.affiliate_processed_at, st.ai_grading_quota, u.referred_by
+      pt.affiliate_processed_at, pt.metadata, st.ai_grading_quota, st.user_type, u.referred_by
     FROM payment_transactions pt
     JOIN users u ON u.id = pt.user_id
     JOIN subscription_tiers st ON st.id = pt.plan_id
@@ -220,6 +223,13 @@ export async function settleVerifiedSubscriptionPayment(
   if (row.settlement_applied_at || row.status === 'success') {
     if (source === 'webhook') await recordChargeReceipt(db, row.reference, 'already_applied');
     return { outcome: 'already_applied', context, planId: row.plan_id };
+  }
+
+  // School seat packages settle onto the SCHOOL (seats, expiry, code) — never
+  // the payer's users row. Affiliate commission does not apply to school sales.
+  if (row.user_type === 'school') {
+    const schoolResult = await settleSchoolSeatPayment(db, row, source);
+    return { outcome: schoolResult.outcome, context, planId: row.plan_id, expiresAt: schoolResult.seatExpiresAt };
   }
 
   const expiresAt = calculateExpiry(row.billing_cycle);

@@ -16,6 +16,7 @@ import { chatApp } from './chat';
 import { moderationApp } from './moderation';
 import { paymentsApp, runPaymentReconciliation } from './payments';
 import { subscriptionsApp } from './subscriptions';
+import { schoolSeatsApp, adminSchoolSeatsApp, expireLapsedSchoolSeats, releaseSchoolSeat } from './school-seats';
 import {
   affiliatesApp,
   isValidReferralCode,
@@ -10402,12 +10403,20 @@ adminApp.delete('/schools/:id/students/:userId', async (c) => {
     if (result.meta.changes === 0) {
       return c.json({ success: false, error: 'Student is not assigned to this school' }, 404);
     }
+    // If the student held a school seat, release it (restore prior entitlement,
+    // free the seat back to the pool). No-op when they had no active seat.
+    await releaseSchoolSeat(c.env.DB, schoolId, userId, 'revoked');
     return c.json({ success: true, data: { userId } });
   } catch (error) {
     console.error('Admin unassign student error:', error);
     return c.json({ success: false, error: 'Failed to unassign student' }, 500);
   }
 });
+
+// School seat-package routes (Phase 1, spec 2026-09-08-school-subscriptions):
+// purchase recording, seat-code rotation, seat list/revoke. The sub-app
+// carries its own requireAdmin.
+adminApp.route('/schools', adminSchoolSeatsApp);
 
 // Mount admin routes
 app.route('/api/admin', adminApp);
@@ -13276,6 +13285,9 @@ app.route('/api/revision-classroom', revisionClassroomApp);
 app.route('/api/study-rooms', studyRoomsApp);
 app.route('/api/tutor-classroom', tutorClassroomApp);
 
+// School seat-package redemption (students): POST /api/schools/redeem-code
+app.route('/api/schools', schoolSeatsApp);
+
 // Mount Race routes (growth loop; /current authed, /cycles public, param-free paths)
 app.route('/api/race', raceApp);
 
@@ -13373,6 +13385,15 @@ export default {
         .then((r) => console.log(`Telegram alerts: ${r.posts} posts, ${r.dms} DMs`))
         .catch((e) => console.error('Telegram race alerts failed:', e))
     );
+
+    // School seat packages: downgrade members of lapsed schools and restore
+    // their prior individual entitlements (bounded batch, drains over runs).
+    try {
+      const lapsed = await expireLapsedSchoolSeats(env.DB);
+      console.log(`School seat expiry: ${lapsed.schoolsProcessed} schools lapsed, ${lapsed.seatsExpired} seats expired`);
+    } catch (error) {
+      console.error('School seat expiry failed:', error);
+    }
 
     // Weekly parent progress digests: Monday 06:00 UTC only — a low-traffic
     // hour because the digest shares the 3 DM/day 'notify' budget with race

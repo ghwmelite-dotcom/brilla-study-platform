@@ -59,7 +59,8 @@ function createPaymentDb() {
     );
     CREATE TABLE subscription_tiers (
       id TEXT PRIMARY KEY,
-      ai_grading_quota INTEGER NOT NULL
+      ai_grading_quota INTEGER NOT NULL,
+      user_type TEXT NOT NULL DEFAULT 'student'
     );
     CREATE TABLE payment_transactions (
       id TEXT PRIMARY KEY,
