@@ -106,15 +106,15 @@ Drop presence theater until then.
 
 | Item | Gap | Cost |
 |---|---|---|
-| Past papers 2015–2022 | only 2023–2024 (46 papers) exist | L — content sourcing/OCR/authoring pipeline |
-| Seasonal leagues | weekly race cycles exist; no seasons/promotion | L |
-| Real-time battles | 2s HTTP polling; true realtime = Durable Objects/WebSocket | L |
+| ~~Seasonal leagues~~ **DEFERRED** (owner decision 2026-09-08 — revisit on request) | weekly race cycles exist; no seasons/promotion | L |
+| ~~Real-time battles~~ **DEFERRED** (owner decision 2026-09-08 — revisit on request) | 2s HTTP polling; true realtime = Durable Objects/WebSocket | L |
+| ~~In-platform tutoring video~~ **DEFERRED** (owner decision 2026-09-08 — revisit on request) | Zoom/Meet link field today | L — Daily/Twilio/WebRTC |
+| Past papers 2015–2022 | only 2023–2024 (46 papers) exist | L — content sourcing/OCR/authoring pipeline — IN PROGRESS (2026-09-08) |
 | AI score prediction | current: client arithmetic heuristic | M — needs real model or honest rebrand (Tier 0 does the rebrand) |
-| Adaptive question serving | mastery tracked; serving not adaptive | M — item-selection engine on topic_mastery |
-| In-platform tutoring video | Zoom/Meet link field today | L — Daily/Twilio/WebRTC |
-| Neural TTS voice | browser speechSynthesis today | M — Workers AI TTS spike exists admin-side |
-| Flashcard content + retention metric | 40 cards; no retention computation | M — author ~500 cards + per-user retention from reviews |
-| NSMQ bank depth | 36 questions + 10 riddles | M — content authoring |
+| Adaptive question serving | ~~mastery tracked; serving not adaptive~~ **SHIPPED 2026-09-08** (98fe5a3) | M |
+| Neural TTS voice | ~~browser speechSynthesis today~~ **SHIPPED 2026-09-08** (98fe5a3, premium voice conversations) | M |
+| Flashcard content + retention metric | retention metric **SHIPPED 2026-09-08**; ~500-card authoring remains | M — content authoring |
+| NSMQ bank depth | 36 questions + 10 riddles | M — content authoring — IN PROGRESS (2026-09-08) |
 
 ---
 
