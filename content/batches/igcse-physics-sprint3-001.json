@@ -1,0 +1,2132 @@
+{
+  "batchId": "igcse-physics-sprint3-001",
+  "status": "approved_for_beta",
+  "examTypeId": "igcse",
+  "provenance": [
+    {
+      "publisher": "Cambridge International Education",
+      "title": "Cambridge IGCSE Physics (0625) syllabus",
+      "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T14:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_igcse_physics",
+      "specificationCode": "BRILLA-0625-IGPHY-S3-001",
+      "sources": [
+        {
+          "publisher": "Cambridge International Education",
+          "title": "Cambridge IGCSE Physics (0625) syllabus",
+          "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "0625-MECH",
+          "title": "Motion, Forces and Energy",
+          "objective": "Apply knowledge of speed, acceleration, equations of motion and Newton’s laws to moving objects."
+        },
+        {
+          "code": "0625-THERM",
+          "title": "Thermal Physics",
+          "objective": "Apply knowledge of the kinetic model, conduction, convection, radiation, evaporation and specific heat capacity."
+        },
+        {
+          "code": "0625-WAVE",
+          "title": "Waves",
+          "objective": "Apply knowledge of wave properties, the wave equation, reflection, refraction, total internal reflection and the electromagnetic spectrum."
+        },
+        {
+          "code": "0625-ELEC",
+          "title": "Electricity and Magnetism",
+          "objective": "Apply knowledge of current, voltage, resistance, circuits, electromagnets, motors and transformers."
+        },
+        {
+          "code": "0625-NUCL",
+          "title": "Nuclear Physics",
+          "objective": "Apply knowledge of atomic structure, isotopes, radioactive decay, half-life, fission and fusion."
+        },
+        {
+          "code": "0625-SPCE",
+          "title": "Space Physics",
+          "objective": "Apply knowledge of the Solar System, orbital motion, stars, galaxies and the expanding Universe."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_igphy_mechanics_s3_001",
+          "original": true,
+          "topicCode": "0625-MECH",
+          "type": "multiple_choice",
+          "prompt": "A car travelling at 20 m/s brakes uniformly to rest in 5.0 s. What distance does the car travel while braking?",
+          "options": [
+            {
+              "label": "A",
+              "text": "50 m",
+              "rationale": "This is the supported answer. The deceleration is a = Δv ÷ t = 20 ÷ 5.0 = 4.0 m/s². Because the deceleration is uniform, the average velocity while braking is (20 + 0) ÷ 2 = 10 m/s, so the distance is 10 × 5.0 = 50 m (equivalently s = ut + ½at² = 100 − 50 = 50 m). (100 m uses s = vt and ignores the deceleration entirely; 8 m confuses the distance with the quantity 2a.)"
+            },
+            {
+              "label": "B",
+              "text": "100 m",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "8 m",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "4 m",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The deceleration is a = Δv ÷ t = 20 ÷ 5.0 = 4.0 m/s². Because the deceleration is uniform, the average velocity while braking is (20 + 0) ÷ 2 = 10 m/s, so the distance is 10 × 5.0 = 50 m (equivalently s = ut + ½at² = 100 − 50 = 50 m). (100 m uses s = vt and ignores the deceleration entirely; 8 m confuses the distance with the quantity 2a.) Therefore the correct answer is A: 50 m.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_mechanics_s3_002",
+          "original": true,
+          "topicCode": "0625-MECH",
+          "type": "multiple_choice",
+          "prompt": "A ball is thrown vertically upwards with an initial velocity of 30 m/s. Taking the gravitational field strength as 10 N/kg and neglecting air resistance, what is the maximum height the ball reaches?",
+          "options": [
+            {
+              "label": "A",
+              "text": "90 m",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "45 m",
+              "rationale": "This is the supported answer. At maximum height the velocity is zero. Using v² = u² + 2as with a = −g = −10 m/s²: 0 = 30² − 2 × 10 × h, so h = 900 ÷ 20 = 45 m. (90 m omits the factor of 2 in the term 2as; 15 m halves the initial speed instead of squaring it.)"
+            },
+            {
+              "label": "C",
+              "text": "15 m",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "3 m",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "At maximum height the velocity is zero. Using v² = u² + 2as with a = −g = −10 m/s²: 0 = 30² − 2 × 10 × h, so h = 900 ÷ 20 = 45 m. (90 m omits the factor of 2 in the term 2as; 15 m halves the initial speed instead of squaring it.) Therefore the correct answer is B: 45 m.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_mechanics_s3_003",
+          "original": true,
+          "topicCode": "0625-MECH",
+          "type": "structured",
+          "prompt": "A cyclist starts from rest and accelerates along a straight, level road.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Define acceleration.",
+              "marks": 1,
+              "correctAnswer": "Acceleration is the rate of change of velocity — the change in velocity divided by the time taken — measured in metres per second squared (m/s²)."
+            },
+            {
+              "label": "b",
+              "text": "The cyclist reaches a velocity of 12 m/s in 6.0 s. Calculate the acceleration of the cyclist.",
+              "marks": 2,
+              "correctAnswer": "Acceleration a = (v − u) ÷ t = (12 − 0) ÷ 6.0 = 2.0 m/s²."
+            },
+            {
+              "label": "c",
+              "text": "The total mass of the cyclist and bicycle is 80 kg. Calculate the resultant force producing this acceleration.",
+              "marks": 2,
+              "correctAnswer": "Resultant force F = ma = 80 × 2.0 = 160 N."
+            }
+          ],
+          "correctAnswer": "(a) Acceleration is the rate of change of velocity — the change in velocity divided by the time taken — measured in metres per second squared (m/s²). (b) Acceleration a = (v − u) ÷ t = (12 − 0) ÷ 6.0 = 2.0 m/s². (c) Resultant force F = ma = 80 × 2.0 = 160 N.",
+          "workedSolution": "(a) Acceleration is the rate of change of velocity — the change in velocity divided by the time taken — measured in metres per second squared (m/s²). (b) Acceleration a = (v − u) ÷ t = (12 − 0) ÷ 6.0 = 2.0 m/s². (c) Resultant force F = ma = 80 × 2.0 = 160 N.",
+          "difficulty": "medium",
+          "marks": 5,
+          "points": 5,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned IGCSE Physics practice content; not official WAEC or Cambridge International examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_thermal_s3_001",
+          "original": true,
+          "topicCode": "0625-THERM",
+          "type": "multiple_choice",
+          "prompt": "Thermal energy is conducted through one end of a metal rod to the other. Which statement correctly describes conduction in a solid?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Particles flow from the hot end of the rod to the cold end",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Energy travels through the rod as infrared waves",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Energy is transferred as vibrating particles pass energy to neighbouring particles, without the particles moving through the solid",
+              "rationale": "This is the supported answer. In conduction the particles at the hot end vibrate more vigorously and pass energy to their neighbours through collisions (in metals, free electrons also carry energy); the particles themselves stay in their fixed positions. A flow of particles or of hot, less-dense material describes convection in a fluid, and infrared waves describe radiation, which needs no medium."
+            },
+            {
+              "label": "D",
+              "text": "Hot, less-dense regions of the metal rise towards the cold end",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "In conduction the particles at the hot end vibrate more vigorously and pass energy to their neighbours through collisions (in metals, free electrons also carry energy); the particles themselves stay in their fixed positions. A flow of particles or of hot, less-dense material describes convection in a fluid, and infrared waves describe radiation, which needs no medium. Therefore the correct answer is C: Energy is transferred as vibrating particles pass energy to neighbouring particles, without the particles moving through the solid.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_thermal_s3_002",
+          "original": true,
+          "topicCode": "0625-THERM",
+          "type": "multiple_choice",
+          "prompt": "A 0.50 kg aluminium block of specific heat capacity 900 J/(kg °C) is heated from 20 °C to 70 °C. Calculate the thermal energy transferred to the block.",
+          "options": [
+            {
+              "label": "A",
+              "text": "45,000 J",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "9,000 J",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "31,500 J",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "22,500 J",
+              "rationale": "This is the supported answer. The temperature rise is ΔT = 70 − 20 = 50 °C, so E = mcΔT = 0.50 × 900 × 50 = 22,500 J. (31,500 J uses the final temperature 70 °C instead of the temperature change; 9,000 J uses the initial temperature 20 °C; 45,000 J doubles the mass.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The temperature rise is ΔT = 70 − 20 = 50 °C, so E = mcΔT = 0.50 × 900 × 50 = 22,500 J. (31,500 J uses the final temperature 70 °C instead of the temperature change; 9,000 J uses the initial temperature 20 °C; 45,000 J doubles the mass.) Therefore the correct answer is D: 22,500 J.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_thermal_s3_003",
+          "original": true,
+          "topicCode": "0625-THERM",
+          "type": "multiple_choice",
+          "prompt": "Why does evaporation cause the temperature of the remaining liquid to fall?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The fastest-moving (most energetic) molecules escape from the surface, so the average kinetic energy of the molecules left behind decreases",
+              "rationale": "This is the supported answer. Temperature is a measure of the average kinetic energy of the molecules. The molecules with the greatest kinetic energy are the ones that escape from the surface during evaporation, so the average kinetic energy — and hence the temperature — of the remaining liquid falls. The energy is carried away by the vapour (latent heat), not destroyed."
+            },
+            {
+              "label": "B",
+              "text": "Evaporation draws cold air from the surroundings into the liquid",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The slowest molecules leave the liquid first, taking no energy with them",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Energy is destroyed as the liquid turns into a gas",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Temperature is a measure of the average kinetic energy of the molecules. The molecules with the greatest kinetic energy are the ones that escape from the surface during evaporation, so the average kinetic energy — and hence the temperature — of the remaining liquid falls. The energy is carried away by the vapour (latent heat), not destroyed. Therefore the correct answer is A: The fastest-moving (most energetic) molecules escape from the surface, so the average kinetic energy of the molecules left behind decreases.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_thermal_s3_004",
+          "original": true,
+          "topicCode": "0625-THERM",
+          "type": "multiple_choice",
+          "prompt": "Which surface is the best emitter of infrared radiation?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A shiny black surface",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A dull (matt) black surface",
+              "rationale": "This is the supported answer. Dull black surfaces are the best absorbers and the best emitters of infrared radiation. Shiny surfaces reflect infrared rather than emitting it efficiently, and white or light-coloured surfaces emit less strongly than black ones, so a shiny white surface is the worst emitter of the four."
+            },
+            {
+              "label": "C",
+              "text": "A dull white surface",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A shiny white surface",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Dull black surfaces are the best absorbers and the best emitters of infrared radiation. Shiny surfaces reflect infrared rather than emitting it efficiently, and white or light-coloured surfaces emit less strongly than black ones, so a shiny white surface is the worst emitter of the four. Therefore the correct answer is B: A dull (matt) black surface.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_thermal_s3_005",
+          "original": true,
+          "topicCode": "0625-THERM",
+          "type": "multiple_choice",
+          "prompt": "Calculate the energy needed to convert 2.0 kg of water at 100 °C completely into steam at 100 °C. The specific latent heat of vaporisation of water is 2.3 × 10⁶ J/kg.",
+          "options": [
+            {
+              "label": "A",
+              "text": "2.3 × 10⁶ J",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "4.6 × 10⁵ J",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "4.6 × 10⁶ J",
+              "rationale": "This is the supported answer. During a change of state the temperature stays constant, so no mcΔT term applies: E = ml = 2.0 × 2.3 × 10⁶ = 4.6 × 10⁶ J. (2.3 × 10⁶ J is the energy for only 1.0 kg; 4.6 × 10⁵ J is a power-of-ten slip; 1.15 × 10⁶ J divides by the mass instead of multiplying.)"
+            },
+            {
+              "label": "D",
+              "text": "1.15 × 10⁶ J",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "During a change of state the temperature stays constant, so no mcΔT term applies: E = ml = 2.0 × 2.3 × 10⁶ = 4.6 × 10⁶ J. (2.3 × 10⁶ J is the energy for only 1.0 kg; 4.6 × 10⁵ J is a power-of-ten slip; 1.15 × 10⁶ J divides by the mass instead of multiplying.) Therefore the correct answer is C: 4.6 × 10⁶ J.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_thermal_s3_006",
+          "original": true,
+          "topicCode": "0625-THERM",
+          "type": "multiple_choice",
+          "prompt": "An 800 W immersion heater is placed in 0.20 kg of water. Assuming no thermal energy is lost to the surroundings, calculate the time needed to raise the temperature of the water by 30 °C. (Specific heat capacity of water = 4,200 J/(kg °C).)",
+          "options": [
+            {
+              "label": "A",
+              "text": "3.15 s",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "63 s",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "10.5 s",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "31.5 s",
+              "rationale": "This is the supported answer. The energy required is E = mcΔT = 0.20 × 4,200 × 30 = 25,200 J. Power is energy per unit time, so t = E ÷ P = 25,200 ÷ 800 = 31.5 s. (3.15 s is a power-of-ten slip; 63 s doubles the energy needed; 10.5 s results from tripling the power by mistake.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The energy required is E = mcΔT = 0.20 × 4,200 × 30 = 25,200 J. Power is energy per unit time, so t = E ÷ P = 25,200 ÷ 800 = 31.5 s. (3.15 s is a power-of-ten slip; 63 s doubles the energy needed; 10.5 s results from tripling the power by mistake.) Therefore the correct answer is D: 31.5 s.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_thermal_s3_007",
+          "original": true,
+          "topicCode": "0625-THERM",
+          "type": "structured",
+          "prompt": "A student pours hot water into a beaker and records its temperature as the water cools to room temperature.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Name the three main processes by which thermal energy is transferred from the hot water to the surroundings.",
+              "marks": 2,
+              "correctAnswer": "Conduction (through the beaker walls and into the table), convection (in the air above and around the beaker) and infrared radiation (emitted by the hot surfaces)."
+            },
+            {
+              "label": "b",
+              "text": "Explain, in terms of particles, how a convection current forms in the air above the hot water.",
+              "marks": 3,
+              "correctAnswer": "Air particles near the hot water gain kinetic energy and move faster; the air expands and its density decreases, so the warm air rises. Cooler, denser air sinks in to take its place, and the cycle repeats as a circulating convection current."
+            },
+            {
+              "label": "c",
+              "text": "Suggest one change that would reduce the rate at which the water cools, and explain why it works.",
+              "marks": 2,
+              "correctAnswer": "Placing a lid on the beaker reduces evaporation and traps the layer of warm air above the water, cutting the energy lost by evaporation and convection (accept: wrapping the beaker in an insulating material reduces conduction through its walls)."
+            }
+          ],
+          "correctAnswer": "(a) Conduction (through the beaker walls and into the table), convection (in the air above and around the beaker) and infrared radiation (emitted by the hot surfaces). (b) Air particles near the hot water gain kinetic energy and move faster; the air expands and its density decreases, so the warm air rises. Cooler, denser air sinks in to take its place, and the cycle repeats as a circulating convection current. (c) Placing a lid on the beaker reduces evaporation and traps the layer of warm air above the water, cutting the energy lost by evaporation and convection (accept: wrapping the beaker in an insulating material reduces conduction through its walls).",
+          "workedSolution": "(a) Conduction (through the beaker walls and into the table), convection (in the air above and around the beaker) and infrared radiation (emitted by the hot surfaces). (b) Air particles near the hot water gain kinetic energy and move faster; the air expands and its density decreases, so the warm air rises. Cooler, denser air sinks in to take its place, and the cycle repeats as a circulating convection current. (c) Placing a lid on the beaker reduces evaporation and traps the layer of warm air above the water, cutting the energy lost by evaporation and convection (accept: wrapping the beaker in an insulating material reduces conduction through its walls).",
+          "difficulty": "medium",
+          "marks": 7,
+          "points": 7,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned IGCSE Physics practice content; not official WAEC or Cambridge International examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_waves_s3_001",
+          "original": true,
+          "topicCode": "0625-WAVE",
+          "type": "multiple_choice",
+          "prompt": "A water wave has a frequency of 5.0 Hz and a wavelength of 0.60 m. Calculate the speed of the wave.",
+          "options": [
+            {
+              "label": "A",
+              "text": "3.0 m/s",
+              "rationale": "This is the supported answer. The wave equation gives v = fλ = 5.0 × 0.60 = 3.0 m/s. (0.12 m/s divides wavelength by frequency, 8.3 m/s divides frequency by wavelength, and 30 m/s makes a power-of-ten slip when multiplying.)"
+            },
+            {
+              "label": "B",
+              "text": "0.12 m/s",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "8.3 m/s",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "30 m/s",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The wave equation gives v = fλ = 5.0 × 0.60 = 3.0 m/s. (0.12 m/s divides wavelength by frequency, 8.3 m/s divides frequency by wavelength, and 30 m/s makes a power-of-ten slip when multiplying.) Therefore the correct answer is A: 3.0 m/s.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_waves_s3_002",
+          "original": true,
+          "topicCode": "0625-WAVE",
+          "type": "multiple_choice",
+          "prompt": "Which region of the electromagnetic spectrum has the longest wavelength?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Gamma rays",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Radio waves",
+              "rationale": "This is the supported answer. The spectrum runs radio waves → microwaves → infrared → visible light → ultraviolet → X-rays → gamma rays in order of decreasing wavelength and increasing frequency, so radio waves have the longest wavelength and gamma rays the shortest."
+            },
+            {
+              "label": "C",
+              "text": "Visible light",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "X-rays",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The spectrum runs radio waves → microwaves → infrared → visible light → ultraviolet → X-rays → gamma rays in order of decreasing wavelength and increasing frequency, so radio waves have the longest wavelength and gamma rays the shortest. Therefore the correct answer is B: Radio waves.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_waves_s3_003",
+          "original": true,
+          "topicCode": "0625-WAVE",
+          "type": "multiple_choice",
+          "prompt": "A ray of light travelling in air enters a glass block and bends towards the normal. What is this change of direction called, and why does it occur?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Reflection, because the surface of the glass is smooth",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Diffraction, because the ray spreads out on entering the block",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Refraction, because light travels more slowly in glass than in air",
+              "rationale": "This is the supported answer. Refraction is the change in direction of a wave when its speed changes at a boundary between two media. Light slows down in the optically denser glass, so the ray bends towards the normal. Reflection is bouncing off the surface, diffraction is spreading through gaps or around edges, and dispersion is the splitting of white light into colours."
+            },
+            {
+              "label": "D",
+              "text": "Dispersion, because white light splits into colours inside the glass",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Refraction is the change in direction of a wave when its speed changes at a boundary between two media. Light slows down in the optically denser glass, so the ray bends towards the normal. Reflection is bouncing off the surface, diffraction is spreading through gaps or around edges, and dispersion is the splitting of white light into colours. Therefore the correct answer is C: Refraction, because light travels more slowly in glass than in air.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_waves_s3_004",
+          "original": true,
+          "topicCode": "0625-WAVE",
+          "type": "multiple_choice",
+          "prompt": "The critical angle for a glass–air boundary is 42°. A ray of light travelling inside the glass strikes the boundary at an angle of incidence of 50°. What happens to the ray?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It is refracted away from the normal and leaves the glass",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It passes straight through the boundary without bending",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It is absorbed by the surface of the glass",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It is totally internally reflected back into the glass",
+              "rationale": "This is the supported answer. The ray is travelling from a more dense medium towards a less dense one and its angle of incidence (50°) exceeds the critical angle (42°), so no refracted ray can form and all the light is totally internally reflected. Refraction away from the normal occurs only when the angle of incidence is less than the critical angle."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The ray is travelling from a more dense medium towards a less dense one and its angle of incidence (50°) exceeds the critical angle (42°), so no refracted ray can form and all the light is totally internally reflected. Refraction away from the normal occurs only when the angle of incidence is less than the critical angle. Therefore the correct answer is D: It is totally internally reflected back into the glass.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_waves_s3_005",
+          "original": true,
+          "topicCode": "0625-WAVE",
+          "type": "multiple_choice",
+          "prompt": "A student sees a flash of lightning and hears the thunder 6.0 s later. Taking the speed of sound in air as 340 m/s, calculate the distance of the lightning strike from the student.",
+          "options": [
+            {
+              "label": "A",
+              "text": "2,040 m",
+              "rationale": "This is the supported answer. Light travels so fast that its journey time is negligible, so the 6.0 s delay is the time taken by the sound: distance = speed × time = 340 × 6.0 = 2,040 m. (56.7 m divides 340 by 6.0 instead of multiplying; 346 m adds the two numbers; 20.4 m is a power-of-ten slip.)"
+            },
+            {
+              "label": "B",
+              "text": "56.7 m",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "346 m",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "20.4 m",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Light travels so fast that its journey time is negligible, so the 6.0 s delay is the time taken by the sound: distance = speed × time = 340 × 6.0 = 2,040 m. (56.7 m divides 340 by 6.0 instead of multiplying; 346 m adds the two numbers; 20.4 m is a power-of-ten slip.) Therefore the correct answer is A: 2,040 m.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_waves_s3_006",
+          "original": true,
+          "topicCode": "0625-WAVE",
+          "type": "structured",
+          "prompt": "A student uses a ripple tank to investigate the properties of water waves.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Define the terms wavelength and frequency of a wave.",
+              "marks": 2,
+              "correctAnswer": "Wavelength is the distance between two adjacent points on the wave that are in phase, such as one crest and the next; frequency is the number of complete waves passing a fixed point per second, measured in hertz (Hz)."
+            },
+            {
+              "label": "b",
+              "text": "A water wave has wavelength 0.040 m and frequency 10 Hz. Calculate the speed of the wave.",
+              "marks": 2,
+              "correctAnswer": "Wave speed v = fλ = 10 × 0.040 = 0.40 m/s."
+            },
+            {
+              "label": "c",
+              "text": "Describe the difference between a transverse wave and a longitudinal wave, giving one example of each.",
+              "marks": 3,
+              "correctAnswer": "In a transverse wave the oscillations are perpendicular to the direction in which the wave transfers energy — for example water ripples or light; in a longitudinal wave the oscillations are parallel to the direction of energy transfer, forming a series of compressions and rarefactions — for example sound in air."
+            }
+          ],
+          "correctAnswer": "(a) Wavelength is the distance between two adjacent points on the wave that are in phase, such as one crest and the next; frequency is the number of complete waves passing a fixed point per second, measured in hertz (Hz). (b) Wave speed v = fλ = 10 × 0.040 = 0.40 m/s. (c) In a transverse wave the oscillations are perpendicular to the direction in which the wave transfers energy — for example water ripples or light; in a longitudinal wave the oscillations are parallel to the direction of energy transfer, forming a series of compressions and rarefactions — for example sound in air.",
+          "workedSolution": "(a) Wavelength is the distance between two adjacent points on the wave that are in phase, such as one crest and the next; frequency is the number of complete waves passing a fixed point per second, measured in hertz (Hz). (b) Wave speed v = fλ = 10 × 0.040 = 0.40 m/s. (c) In a transverse wave the oscillations are perpendicular to the direction in which the wave transfers energy — for example water ripples or light; in a longitudinal wave the oscillations are parallel to the direction of energy transfer, forming a series of compressions and rarefactions — for example sound in air.",
+          "difficulty": "medium",
+          "marks": 7,
+          "points": 7,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned IGCSE Physics practice content; not official WAEC or Cambridge International examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_electricity_s3_001",
+          "original": true,
+          "topicCode": "0625-ELEC",
+          "type": "multiple_choice",
+          "prompt": "Which quantity is measured in amperes?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Potential difference",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Electric current",
+              "rationale": "This is the supported answer. The ampere (A) is the SI unit of electric current, which is the rate of flow of charge: I = Q ÷ t. Potential difference is measured in volts, resistance in ohms, and charge in coulombs."
+            },
+            {
+              "label": "C",
+              "text": "Resistance",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Electric charge",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The ampere (A) is the SI unit of electric current, which is the rate of flow of charge: I = Q ÷ t. Potential difference is measured in volts, resistance in ohms, and charge in coulombs. Therefore the correct answer is B: Electric current.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_electricity_s3_002",
+          "original": true,
+          "topicCode": "0625-ELEC",
+          "type": "multiple_choice",
+          "prompt": "Which arrangement is used to measure the potential difference across a fixed resistor in a circuit?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A voltmeter connected in series with the resistor",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "An ammeter connected in parallel with the resistor",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A voltmeter connected in parallel with the resistor",
+              "rationale": "This is the supported answer. Potential difference is measured across a component, so the voltmeter is connected in parallel with it. An ammeter measures the current through the circuit and must be connected in series; connecting an ammeter in parallel would short-circuit the resistor."
+            },
+            {
+              "label": "D",
+              "text": "An ammeter connected in series with the resistor",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Potential difference is measured across a component, so the voltmeter is connected in parallel with it. An ammeter measures the current through the circuit and must be connected in series; connecting an ammeter in parallel would short-circuit the resistor. Therefore the correct answer is C: A voltmeter connected in parallel with the resistor.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_electricity_s3_003",
+          "original": true,
+          "topicCode": "0625-ELEC",
+          "type": "multiple_choice",
+          "prompt": "A current of 2.0 A flows through a resistor when the potential difference across it is 12 V. Calculate the resistance of the resistor.",
+          "options": [
+            {
+              "label": "A",
+              "text": "24 Ω",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "0.17 Ω",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "10 Ω",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "6.0 Ω",
+              "rationale": "This is the supported answer. From V = IR, the resistance is R = V ÷ I = 12 ÷ 2.0 = 6.0 Ω. (24 Ω multiplies instead of dividing; 0.17 Ω inverts the ratio to I/V; 10 Ω subtracts the current from the voltage.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "From V = IR, the resistance is R = V ÷ I = 12 ÷ 2.0 = 6.0 Ω. (24 Ω multiplies instead of dividing; 0.17 Ω inverts the ratio to I/V; 10 Ω subtracts the current from the voltage.) Therefore the correct answer is D: 6.0 Ω.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_electricity_s3_004",
+          "original": true,
+          "topicCode": "0625-ELEC",
+          "type": "multiple_choice",
+          "prompt": "Two resistors of resistance 4.0 Ω and 6.0 Ω are connected in series across a 20 V supply. Calculate the current in the circuit.",
+          "options": [
+            {
+              "label": "A",
+              "text": "2.0 A",
+              "rationale": "This is the supported answer. Resistors in series add: R = 4.0 + 6.0 = 10 Ω. The current is I = V ÷ R = 20 ÷ 10 = 2.0 A. (5.0 A uses only the 4.0 Ω resistor and 3.3 A only the 6.0 Ω resistor — both ignore the series combination; 0.50 A inverts V/R.)"
+            },
+            {
+              "label": "B",
+              "text": "5.0 A",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "3.3 A",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "0.50 A",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Resistors in series add: R = 4.0 + 6.0 = 10 Ω. The current is I = V ÷ R = 20 ÷ 10 = 2.0 A. (5.0 A uses only the 4.0 Ω resistor and 3.3 A only the 6.0 Ω resistor — both ignore the series combination; 0.50 A inverts V/R.) Therefore the correct answer is A: 2.0 A.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_electricity_s3_005",
+          "original": true,
+          "topicCode": "0625-ELEC",
+          "type": "multiple_choice",
+          "prompt": "Which material is most suitable for the core of an electromagnet that must switch on and off rapidly?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Steel, because it retains its magnetism permanently",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Soft iron, because it magnetises and demagnetises easily",
+              "rationale": "This is the supported answer. An electromagnet core must be a soft magnetic material: soft iron magnetises strongly while the current flows and loses its magnetism almost as soon as the current is switched off. Steel is a hard magnetic material that retains its magnetism, and copper and aluminium are not magnetic at all."
+            },
+            {
+              "label": "C",
+              "text": "Copper, because it is a good electrical conductor",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Aluminium, because it is light and does not rust",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "An electromagnet core must be a soft magnetic material: soft iron magnetises strongly while the current flows and loses its magnetism almost as soon as the current is switched off. Steel is a hard magnetic material that retains its magnetism, and copper and aluminium are not magnetic at all. Therefore the correct answer is B: Soft iron, because it magnetises and demagnetises easily.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_electricity_s3_006",
+          "original": true,
+          "topicCode": "0625-ELEC",
+          "type": "multiple_choice",
+          "prompt": "A transformer has 500 turns on its primary coil and 100 turns on its secondary coil. The primary voltage is 230 V. Calculate the secondary voltage.",
+          "options": [
+            {
+              "label": "A",
+              "text": "1,150 V",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "23 V",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "46 V",
+              "rationale": "This is the supported answer. For a transformer, Vs ÷ Vp = Ns ÷ Np, so Vs = 230 × (100 ÷ 500) = 230 × 0.2 = 46 V. (1,150 V inverts the turns ratio, stepping the voltage up instead of down; 23 V divides by 10 unnecessarily; 460 V doubles the correct value.)"
+            },
+            {
+              "label": "D",
+              "text": "460 V",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "For a transformer, Vs ÷ Vp = Ns ÷ Np, so Vs = 230 × (100 ÷ 500) = 230 × 0.2 = 46 V. (1,150 V inverts the turns ratio, stepping the voltage up instead of down; 23 V divides by 10 unnecessarily; 460 V doubles the correct value.) Therefore the correct answer is C: 46 V.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_electricity_s3_007",
+          "original": true,
+          "topicCode": "0625-ELEC",
+          "type": "multiple_choice",
+          "prompt": "What is the function of the split-ring commutator in a simple d.c. electric motor?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It increases the current flowing through the coil",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It prevents the wires from the battery from touching the coil",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It converts the direct current into alternating current",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It reverses the direction of the current in the coil every half turn, so the coil keeps rotating in the same direction",
+              "rationale": "This is the supported answer. When the coil passes the vertical position the split ring swaps the connections to the brushes, reversing the current in the coil every half turn. This keeps the turning force acting in the same sense, so the coil rotates continuously instead of oscillating back and forth."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "When the coil passes the vertical position the split ring swaps the connections to the brushes, reversing the current in the coil every half turn. This keeps the turning force acting in the same sense, so the coil rotates continuously instead of oscillating back and forth. Therefore the correct answer is D: It reverses the direction of the current in the coil every half turn, so the coil keeps rotating in the same direction.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_electricity_s3_008",
+          "original": true,
+          "topicCode": "0625-ELEC",
+          "type": "multiple_choice",
+          "prompt": "Two 12 Ω resistors connected in parallel are joined in series with a 6.0 Ω resistor across a 12 V battery. Calculate the current supplied by the battery.",
+          "options": [
+            {
+              "label": "A",
+              "text": "1.0 A",
+              "rationale": "This is the supported answer. The parallel pair has resistance (1/12 + 1/12)⁻¹ = 6.0 Ω, so the total resistance is 6.0 + 6.0 = 12 Ω and the battery current is I = V ÷ R = 12 ÷ 12 = 1.0 A. (2.0 A ignores the parallel pair entirely; 0.40 A wrongly adds the two 12 Ω resistors in series to give 30 Ω; 0.67 A uses 18 Ω, keeping one 12 Ω resistor.)"
+            },
+            {
+              "label": "B",
+              "text": "2.0 A",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "0.40 A",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "0.67 A",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The parallel pair has resistance (1/12 + 1/12)⁻¹ = 6.0 Ω, so the total resistance is 6.0 + 6.0 = 12 Ω and the battery current is I = V ÷ R = 12 ÷ 12 = 1.0 A. (2.0 A ignores the parallel pair entirely; 0.40 A wrongly adds the two 12 Ω resistors in series to give 30 Ω; 0.67 A uses 18 Ω, keeping one 12 Ω resistor.) Therefore the correct answer is A: 1.0 A.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_electricity_s3_009",
+          "original": true,
+          "topicCode": "0625-ELEC",
+          "type": "multiple_choice",
+          "prompt": "An electric kettle rated at 3.0 kW operates on a 230 V mains supply. Calculate the current drawn and select the most suitable fuse rating.",
+          "options": [
+            {
+              "label": "A",
+              "text": "3 A fuse (current ≈ 13 A)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "13 A fuse (current ≈ 13 A)",
+              "rationale": "This is the supported answer. The current is I = P ÷ V = 3,000 ÷ 230 ≈ 13.0 A. A fuse should be rated just above the normal operating current, so a 13 A fuse is correct. (3 A and 5 A fuses would melt during normal use; 0.08 A comes from inverting the relation to V/P.)"
+            },
+            {
+              "label": "C",
+              "text": "5 A fuse (current ≈ 13 A)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "30 A fuse (current ≈ 0.08 A)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The current is I = P ÷ V = 3,000 ÷ 230 ≈ 13.0 A. A fuse should be rated just above the normal operating current, so a 13 A fuse is correct. (3 A and 5 A fuses would melt during normal use; 0.08 A comes from inverting the relation to V/P.) Therefore the correct answer is B: 13 A fuse (current ≈ 13 A).",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_electricity_s3_010",
+          "original": true,
+          "topicCode": "0625-ELEC",
+          "type": "structured",
+          "prompt": "A student investigates how the current through a fixed resistor varies with the potential difference across it.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Describe the circuit the student should use, naming the meters and stating where each is connected.",
+              "marks": 2,
+              "correctAnswer": "A d.c. supply or battery connected in series with an ammeter, a variable resistor (rheostat) and the fixed resistor; a voltmeter is connected in parallel across the fixed resistor to measure the potential difference."
+            },
+            {
+              "label": "b",
+              "text": "State the relationship between the current and the potential difference for a resistor that obeys Ohm’s law.",
+              "marks": 2,
+              "correctAnswer": "The current is directly proportional to the potential difference across the resistor, provided the temperature and other physical conditions remain constant (V = IR with R constant)."
+            },
+            {
+              "label": "c",
+              "text": "The student records a current of 0.40 A when the potential difference is 6.0 V. Calculate the resistance of the resistor, and the current when the potential difference is increased to 9.0 V.",
+              "marks": 3,
+              "correctAnswer": "R = V ÷ I = 6.0 ÷ 0.40 = 15 Ω; at 9.0 V the current is I = V ÷ R = 9.0 ÷ 15 = 0.60 A."
+            }
+          ],
+          "correctAnswer": "(a) A d.c. supply or battery connected in series with an ammeter, a variable resistor (rheostat) and the fixed resistor; a voltmeter is connected in parallel across the fixed resistor to measure the potential difference. (b) The current is directly proportional to the potential difference across the resistor, provided the temperature and other physical conditions remain constant (V = IR with R constant). (c) R = V ÷ I = 6.0 ÷ 0.40 = 15 Ω; at 9.0 V the current is I = V ÷ R = 9.0 ÷ 15 = 0.60 A.",
+          "workedSolution": "(a) A d.c. supply or battery connected in series with an ammeter, a variable resistor (rheostat) and the fixed resistor; a voltmeter is connected in parallel across the fixed resistor to measure the potential difference. (b) The current is directly proportional to the potential difference across the resistor, provided the temperature and other physical conditions remain constant (V = IR with R constant). (c) R = V ÷ I = 6.0 ÷ 0.40 = 15 Ω; at 9.0 V the current is I = V ÷ R = 9.0 ÷ 15 = 0.60 A.",
+          "difficulty": "hard",
+          "marks": 7,
+          "points": 7,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned IGCSE Physics practice content; not official WAEC or Cambridge International examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_nuclear_s3_001",
+          "original": true,
+          "topicCode": "0625-NUCL",
+          "type": "multiple_choice",
+          "prompt": "Which type of nuclear radiation is the most strongly ionising?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Beta (β) radiation",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Gamma (γ) radiation",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Alpha (α) radiation",
+              "rationale": "This is the supported answer. Alpha particles are helium nuclei with charge +2 and a relatively large mass, so they collide frequently and ionise matter most strongly — which is also why they are the least penetrating. Beta and gamma ionise progressively less, and X-rays, like gamma rays, are weakly ionising electromagnetic waves."
+            },
+            {
+              "label": "D",
+              "text": "X-rays",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Alpha particles are helium nuclei with charge +2 and a relatively large mass, so they collide frequently and ionise matter most strongly — which is also why they are the least penetrating. Beta and gamma ionise progressively less, and X-rays, like gamma rays, are weakly ionising electromagnetic waves. Therefore the correct answer is C: Alpha (α) radiation.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_nuclear_s3_002",
+          "original": true,
+          "topicCode": "0625-NUCL",
+          "type": "multiple_choice",
+          "prompt": "A nucleus of uranium is represented as ²³⁵₉₂U. How many neutrons does this nucleus contain?",
+          "options": [
+            {
+              "label": "A",
+              "text": "92",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "235",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "327",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "143",
+              "rationale": "This is the supported answer. The number of neutrons is the mass (nucleon) number minus the proton number: 235 − 92 = 143. (92 is the number of protons, 235 is the total number of protons and neutrons, and 327 adds the two numbers instead of subtracting.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The number of neutrons is the mass (nucleon) number minus the proton number: 235 − 92 = 143. (92 is the number of protons, 235 is the total number of protons and neutrons, and 327 adds the two numbers instead of subtracting.) Therefore the correct answer is D: 143.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_nuclear_s3_003",
+          "original": true,
+          "topicCode": "0625-NUCL",
+          "type": "multiple_choice",
+          "prompt": "What is meant by the half-life of a radioactive isotope?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The time taken for half of the undecayed nuclei in a sample to decay",
+              "rationale": "This is the supported answer. Radioactive decay is a random process, so half-life is defined statistically: after one half-life, half of the original undecayed nuclei remain and the activity of the sample has halved. A sample never decays completely in a fixed time, and no single nucleus has its own predictable decay time."
+            },
+            {
+              "label": "B",
+              "text": "The time taken for all the nuclei in a sample to decay",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Half the time taken for the sample to decay completely",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The time taken for a single nucleus to decay",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Radioactive decay is a random process, so half-life is defined statistically: after one half-life, half of the original undecayed nuclei remain and the activity of the sample has halved. A sample never decays completely in a fixed time, and no single nucleus has its own predictable decay time. Therefore the correct answer is A: The time taken for half of the undecayed nuclei in a sample to decay.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_nuclear_s3_004",
+          "original": true,
+          "topicCode": "0625-NUCL",
+          "type": "multiple_choice",
+          "prompt": "Which statement about nuclear fusion is correct?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A heavy nucleus splits into two lighter nuclei, releasing energy",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Two light nuclei join together to form a heavier nucleus, releasing energy",
+              "rationale": "This is the supported answer. Fusion joins light nuclei such as hydrogen isotopes to form heavier nuclei like helium, converting some mass into energy; it powers the Sun and other stars. Splitting a heavy nucleus is fission, fusion happens naturally in stars rather than only in reactors, and it is a nuclear process — far more energetic than any chemical reaction."
+            },
+            {
+              "label": "C",
+              "text": "It takes place only inside nuclear reactors on Earth",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It is a chemical reaction between hydrogen atoms",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Fusion joins light nuclei such as hydrogen isotopes to form heavier nuclei like helium, converting some mass into energy; it powers the Sun and other stars. Splitting a heavy nucleus is fission, fusion happens naturally in stars rather than only in reactors, and it is a nuclear process — far more energetic than any chemical reaction. Therefore the correct answer is B: Two light nuclei join together to form a heavier nucleus, releasing energy.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_nuclear_s3_005",
+          "original": true,
+          "topicCode": "0625-NUCL",
+          "type": "multiple_choice",
+          "prompt": "A radioactive isotope has a half-life of 8 days. A sample of the isotope has an initial activity of 640 Bq. What is the activity of the sample after 24 days?",
+          "options": [
+            {
+              "label": "A",
+              "text": "160 Bq",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "213 Bq",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "80 Bq",
+              "rationale": "This is the supported answer. 24 days is 24 ÷ 8 = 3 half-lives, so the activity halves three times: 640 → 320 → 160 → 80 Bq. (160 Bq stops after only two half-lives; 213 Bq simply divides 640 by 3; 27 Bq divides 640 by 24.)"
+            },
+            {
+              "label": "D",
+              "text": "27 Bq",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "24 days is 24 ÷ 8 = 3 half-lives, so the activity halves three times: 640 → 320 → 160 → 80 Bq. (160 Bq stops after only two half-lives; 213 Bq simply divides 640 by 3; 27 Bq divides 640 by 24.) Therefore the correct answer is C: 80 Bq.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_nuclear_s3_006",
+          "original": true,
+          "topicCode": "0625-NUCL",
+          "type": "multiple_choice",
+          "prompt": "In a nuclear fission reactor, what is the function of the moderator?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It absorbs excess neutrons to control the rate of the reaction",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It transfers thermal energy from the core to the turbines",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It prevents radiation from escaping the reactor",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It slows down the fast neutrons so that they can go on to cause further fission",
+              "rationale": "This is the supported answer. Fission is sustained by slow (thermal) neutrons, so the moderator — graphite or water — slows the fast neutrons released by fission so they can trigger further fission of ²³⁵U. Absorbing excess neutrons is the job of the control rods, transferring thermal energy is the role of the coolant, and containment is provided by the shielding."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Fission is sustained by slow (thermal) neutrons, so the moderator — graphite or water — slows the fast neutrons released by fission so they can trigger further fission of ²³⁵U. Absorbing excess neutrons is the job of the control rods, transferring thermal energy is the role of the coolant, and containment is provided by the shielding. Therefore the correct answer is D: It slows down the fast neutrons so that they can go on to cause further fission.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_nuclear_s3_007",
+          "original": true,
+          "topicCode": "0625-NUCL",
+          "type": "structured",
+          "prompt": "Radioactive isotopes have many important uses in medicine and industry.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Compare the ionising power and penetrating power of alpha, beta and gamma radiation.",
+              "marks": 3,
+              "correctAnswer": "Alpha is the most strongly ionising but least penetrating, stopped by paper or a few centimetres of air; beta is less ionising and more penetrating, stopped by a few millimetres of aluminium; gamma is the least ionising and most penetrating, requiring thick lead or concrete to reduce it significantly."
+            },
+            {
+              "label": "b",
+              "text": "A medical tracer uses an isotope with a half-life of 6 hours. Explain why a short half-life is an advantage for the patient.",
+              "marks": 2,
+              "correctAnswer": "The activity of the tracer falls quickly after the scan, so the patient is exposed to ionising radiation for only a limited time, while the source remains active long enough for a clear image to be obtained."
+            },
+            {
+              "label": "c",
+              "text": "State one safety precaution that should be taken when handling radioactive sources.",
+              "marks": 1,
+              "correctAnswer": "Use tongs to handle the source at a distance (accept: store sources in lead-lined containers, keep exposure time as short as possible, never point a source at anyone)."
+            }
+          ],
+          "correctAnswer": "(a) Alpha is the most strongly ionising but least penetrating, stopped by paper or a few centimetres of air; beta is less ionising and more penetrating, stopped by a few millimetres of aluminium; gamma is the least ionising and most penetrating, requiring thick lead or concrete to reduce it significantly. (b) The activity of the tracer falls quickly after the scan, so the patient is exposed to ionising radiation for only a limited time, while the source remains active long enough for a clear image to be obtained. (c) Use tongs to handle the source at a distance (accept: store sources in lead-lined containers, keep exposure time as short as possible, never point a source at anyone).",
+          "workedSolution": "(a) Alpha is the most strongly ionising but least penetrating, stopped by paper or a few centimetres of air; beta is less ionising and more penetrating, stopped by a few millimetres of aluminium; gamma is the least ionising and most penetrating, requiring thick lead or concrete to reduce it significantly. (b) The activity of the tracer falls quickly after the scan, so the patient is exposed to ionising radiation for only a limited time, while the source remains active long enough for a clear image to be obtained. (c) Use tongs to handle the source at a distance (accept: store sources in lead-lined containers, keep exposure time as short as possible, never point a source at anyone).",
+          "difficulty": "medium",
+          "marks": 6,
+          "points": 6,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned IGCSE Physics practice content; not official WAEC or Cambridge International examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_space_s3_001",
+          "original": true,
+          "topicCode": "0625-SPCE",
+          "type": "multiple_choice",
+          "prompt": "Which planet in the Solar System is closest to the Sun?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Mercury",
+              "rationale": "This is the supported answer. The order of the planets from the Sun is Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, so Mercury is closest and experiences the strongest gravitational pull and the shortest orbital period."
+            },
+            {
+              "label": "B",
+              "text": "Venus",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Earth",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Mars",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The order of the planets from the Sun is Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, so Mercury is closest and experiences the strongest gravitational pull and the shortest orbital period. Therefore the correct answer is A: Mercury.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_space_s3_002",
+          "original": true,
+          "topicCode": "0625-SPCE",
+          "type": "multiple_choice",
+          "prompt": "What is the name of the galaxy that contains our Solar System?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Andromeda",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The Milky Way",
+              "rationale": "This is the supported answer. The Solar System lies in the Milky Way, a spiral galaxy containing billions of stars. Andromeda is the nearest large galaxy to our own, the North Star (Polaris) is a single star within the Milky Way, and the solar nebula was the cloud from which the Solar System formed, not a galaxy."
+            },
+            {
+              "label": "C",
+              "text": "The North Star",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The Solar Nebula",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The Solar System lies in the Milky Way, a spiral galaxy containing billions of stars. Andromeda is the nearest large galaxy to our own, the North Star (Polaris) is a single star within the Milky Way, and the solar nebula was the cloud from which the Solar System formed, not a galaxy. Therefore the correct answer is B: The Milky Way.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_space_s3_003",
+          "original": true,
+          "topicCode": "0625-SPCE",
+          "type": "multiple_choice",
+          "prompt": "Approximately how long does the Earth take to make one complete orbit of the Sun?",
+          "options": [
+            {
+              "label": "A",
+              "text": "One day (24 hours)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "One month (about 28 days)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "One year (about 365 days)",
+              "rationale": "This is the supported answer. The Earth completes one orbit of the Sun in about 365 days — one year. One day is the time for the Earth to rotate once on its own axis, which causes day and night, and about 28 days is the orbital period of the Moon around the Earth."
+            },
+            {
+              "label": "D",
+              "text": "One decade (10 years)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The Earth completes one orbit of the Sun in about 365 days — one year. One day is the time for the Earth to rotate once on its own axis, which causes day and night, and about 28 days is the orbital period of the Moon around the Earth. Therefore the correct answer is C: One year (about 365 days).",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_space_s3_004",
+          "original": true,
+          "topicCode": "0625-SPCE",
+          "type": "multiple_choice",
+          "prompt": "Which force keeps the planets in orbit around the Sun?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The magnetic field of the Sun",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Friction between the planet and space",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Electrostatic attraction between charged particles",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The gravitational attraction between the Sun and each planet",
+              "rationale": "This is the supported answer. Gravity provides the centripetal force that continually pulls each planet towards the Sun, bending its path into an orbit. Space is essentially a vacuum, so there is no friction, and magnetic and electrostatic forces are far too weak to hold planets in orbit."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Gravity provides the centripetal force that continually pulls each planet towards the Sun, bending its path into an orbit. Space is essentially a vacuum, so there is no friction, and magnetic and electrostatic forces are far too weak to hold planets in orbit. Therefore the correct answer is D: The gravitational attraction between the Sun and each planet.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_space_s3_005",
+          "original": true,
+          "topicCode": "0625-SPCE",
+          "type": "multiple_choice",
+          "prompt": "Why does the Sun appear to move across the sky from east to west during the day?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The Earth rotates on its axis once every 24 hours",
+              "rationale": "This is the supported answer. The apparent daily motion of the Sun is caused by the Earth spinning eastwards on its axis once every 24 hours, so the Sun appears to rise in the east and set in the west. The Earth’s orbit around the Sun takes a whole year and produces the seasons, not the daily motion."
+            },
+            {
+              "label": "B",
+              "text": "The Sun orbits the Earth once every day",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The Earth orbits the Sun once every day",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The Moon blocks the Sun as it moves across the sky",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The apparent daily motion of the Sun is caused by the Earth spinning eastwards on its axis once every 24 hours, so the Sun appears to rise in the east and set in the west. The Earth’s orbit around the Sun takes a whole year and produces the seasons, not the daily motion. Therefore the correct answer is A: The Earth rotates on its axis once every 24 hours.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_space_s3_006",
+          "original": true,
+          "topicCode": "0625-SPCE",
+          "type": "multiple_choice",
+          "prompt": "What observation provides evidence that the Universe is expanding?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Light from all galaxies is blueshifted",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Light from distant galaxies is redshifted, and the further away a galaxy is, the greater its redshift",
+              "rationale": "This is the supported answer. The absorption lines in the spectra of distant galaxies are shifted to longer wavelengths (redshift), showing that the galaxies are receding; the redshift increases with distance, exactly as expected if space itself is expanding. Blueshift would indicate approach, and changes inside our own galaxy or Solar System cannot show the expansion of the Universe."
+            },
+            {
+              "label": "C",
+              "text": "The number of stars in the Milky Way is increasing",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The planets are moving further from the Sun each year",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The absorption lines in the spectra of distant galaxies are shifted to longer wavelengths (redshift), showing that the galaxies are receding; the redshift increases with distance, exactly as expected if space itself is expanding. Blueshift would indicate approach, and changes inside our own galaxy or Solar System cannot show the expansion of the Universe. Therefore the correct answer is B: Light from distant galaxies is redshifted, and the further away a galaxy is, the greater its redshift.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_space_s3_007",
+          "original": true,
+          "topicCode": "0625-SPCE",
+          "type": "multiple_choice",
+          "prompt": "A star such as the Sun remains stable for billions of years. Which statement best describes this equilibrium?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The nuclear reactions switch off the force of gravity",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The outward pressure from fusion is much greater than gravity, so the star slowly expands",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The inward force of gravity is balanced by the outward pressure of the hot gas and radiation",
+              "rationale": "This is the supported answer. In a stable star there is a balance (hydrostatic equilibrium): gravity pulls the gas inwards while the pressure of the hot gas and the radiation from nuclear fusion pushes outwards. If gravity were unopposed the star would collapse, and if the pressure were much greater the star would expand."
+            },
+            {
+              "label": "D",
+              "text": "The star’s mass is too small for gravity to have any effect",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "In a stable star there is a balance (hydrostatic equilibrium): gravity pulls the gas inwards while the pressure of the hot gas and the radiation from nuclear fusion pushes outwards. If gravity were unopposed the star would collapse, and if the pressure were much greater the star would expand. Therefore the correct answer is C: The inward force of gravity is balanced by the outward pressure of the hot gas and radiation.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_space_s3_008",
+          "original": true,
+          "topicCode": "0625-SPCE",
+          "type": "multiple_choice",
+          "prompt": "Light from the Sun takes about 500 s to reach the Earth. Taking the speed of light as 3.0 × 10⁸ m/s, calculate the distance from the Sun to the Earth.",
+          "options": [
+            {
+              "label": "A",
+              "text": "1.5 × 10⁹ m",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "6.0 × 10⁵ m",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "1.5 × 10¹³ m",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "1.5 × 10¹¹ m",
+              "rationale": "This is the supported answer. Distance = speed × time = 3.0 × 10⁸ × 500 = 1.5 × 10¹¹ m (about 150 million kilometres). (1.5 × 10⁹ m misreads the 500 s as 5 s; 6.0 × 10⁵ m divides the speed by the time; 1.5 × 10¹³ m is a power-of-ten slip.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Distance = speed × time = 3.0 × 10⁸ × 500 = 1.5 × 10¹¹ m (about 150 million kilometres). (1.5 × 10⁹ m misreads the 500 s as 5 s; 6.0 × 10⁵ m divides the speed by the time; 1.5 × 10¹³ m is a power-of-ten slip.) Therefore the correct answer is D: 1.5 × 10¹¹ m.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_space_s3_009",
+          "original": true,
+          "topicCode": "0625-SPCE",
+          "type": "multiple_choice",
+          "prompt": "An absorption line in the spectrum of a distant galaxy has a wavelength of 500 nm, compared with 400 nm for the same line measured in the laboratory. Taking the speed of light as 3.0 × 10⁸ m/s, what can be concluded about the galaxy?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It is moving away from us at about 7.5 × 10⁷ m/s",
+              "rationale": "This is the supported answer. The wavelength has increased, so the light is redshifted and the galaxy is receding. The recession speed is v = c × Δλ ÷ λ = 3.0 × 10⁸ × (100 ÷ 400) = 7.5 × 10⁷ m/s. (Approach would produce a blueshift; 6.0 × 10⁷ m/s wrongly uses Δλ ÷ λobserved = 100 ÷ 500.)"
+            },
+            {
+              "label": "B",
+              "text": "It is moving towards us at about 7.5 × 10⁷ m/s",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It is moving away from us at about 6.0 × 10⁷ m/s",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It is not moving relative to the Earth",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The wavelength has increased, so the light is redshifted and the galaxy is receding. The recession speed is v = c × Δλ ÷ λ = 3.0 × 10⁸ × (100 ÷ 400) = 7.5 × 10⁷ m/s. (Approach would produce a blueshift; 6.0 × 10⁷ m/s wrongly uses Δλ ÷ λobserved = 100 ÷ 500.) Therefore the correct answer is A: It is moving away from us at about 7.5 × 10⁷ m/s.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO3",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_space_s3_010",
+          "original": true,
+          "topicCode": "0625-SPCE",
+          "type": "multiple_choice",
+          "prompt": "A satellite in a circular orbit around the Earth moves into a lower orbit. What happens to its orbital speed and its orbital period?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Both the speed and the period decrease",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The speed increases and the period decreases",
+              "rationale": "This is the supported answer. In a lower orbit the gravitational pull is stronger, so the satellite must travel faster to maintain its circular path; the shorter circumference and higher speed together make the orbital period shorter. This is why low-orbit satellites circle the Earth in about 90 minutes while geostationary satellites, much higher up, take 24 hours."
+            },
+            {
+              "label": "C",
+              "text": "The speed decreases and the period increases",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Both the speed and the period increase",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "In a lower orbit the gravitational pull is stronger, so the satellite must travel faster to maintain its circular path; the shorter circumference and higher speed together make the orbital period shorter. This is why low-orbit satellites circle the Earth in about 90 minutes while geostationary satellites, much higher up, take 24 hours. Therefore the correct answer is B: The speed increases and the period decreases.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO3",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_space_s3_011",
+          "original": true,
+          "topicCode": "0625-SPCE",
+          "type": "calculation",
+          "prompt": "The Moon orbits the Earth at an average distance of 3.84 × 10⁸ m with an orbital period of 27.3 days. Assuming the orbit is circular, calculate the orbital speed of the Moon. (1 day = 86,400 s.)",
+          "correctAnswer": "approximately 1.0 × 10³ m/s",
+          "workedSolution": "The circumference of the orbit is 2πr = 2 × 3.14 × 3.84 × 10⁸ = 2.41 × 10⁹ m. The period in seconds is T = 27.3 × 86,400 = 2.36 × 10⁶ s. Orbital speed v = distance ÷ time = 2.41 × 10⁹ ÷ 2.36 × 10⁶ ≈ 1.02 × 10³ m/s. Answer: the Moon orbits at approximately 1.0 × 10³ m/s (about 1 km/s).",
+          "difficulty": "medium",
+          "marks": 3,
+          "points": 5,
+          "timeLimit": 240,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_space_s3_012",
+          "original": true,
+          "topicCode": "0625-SPCE",
+          "type": "short_answer",
+          "prompt": "Explain why the Sun is classified as a star but Jupiter is not.",
+          "correctAnswer": "The Sun releases its own energy by nuclear fusion of hydrogen in its core and emits its own light and heat, while Jupiter is a planet: it is not massive enough for fusion and shines only by reflecting sunlight.",
+          "workedSolution": "A star is a body massive enough for gravity to compress and heat its core until nuclear fusion begins, so it generates and emits its own energy. Jupiter, although large for a planet, has far too little mass for fusion to start; it produces no light of its own and is visible only because it reflects sunlight. Therefore the Sun is a star and Jupiter is a planet.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 3,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Physics (0625) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igphy_space_s3_013",
+          "original": true,
+          "topicCode": "0625-SPCE",
+          "type": "structured",
+          "prompt": "Astronomers can describe the life cycle of a star such as the Sun.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Describe how a star forms from a nebula.",
+              "marks": 2,
+              "correctAnswer": "A cloud of gas and dust (a nebula) collapses under its own gravitational attraction into an increasingly dense protostar; as it contracts it heats up until the core is hot and dense enough for the nuclear fusion of hydrogen to begin."
+            },
+            {
+              "label": "b",
+              "text": "Describe what happens to a star like the Sun when it runs out of hydrogen fuel.",
+              "marks": 3,
+              "correctAnswer": "The star expands and its surface cools to become a red giant; it then sheds its outer layers as a planetary nebula, leaving the hot core behind as a white dwarf, which gradually cools and fades."
+            },
+            {
+              "label": "c",
+              "text": "State how the final stages differ for a star with a much greater mass than the Sun.",
+              "marks": 2,
+              "correctAnswer": "A much more massive star explodes as a supernova, leaving behind a neutron star — or, if the remaining core is massive enough, a black hole — instead of quietly becoming a white dwarf."
+            }
+          ],
+          "correctAnswer": "(a) A cloud of gas and dust (a nebula) collapses under its own gravitational attraction into an increasingly dense protostar; as it contracts it heats up until the core is hot and dense enough for the nuclear fusion of hydrogen to begin. (b) The star expands and its surface cools to become a red giant; it then sheds its outer layers as a planetary nebula, leaving the hot core behind as a white dwarf, which gradually cools and fades. (c) A much more massive star explodes as a supernova, leaving behind a neutron star — or, if the remaining core is massive enough, a black hole — instead of quietly becoming a white dwarf.",
+          "workedSolution": "(a) A cloud of gas and dust (a nebula) collapses under its own gravitational attraction into an increasingly dense protostar; as it contracts it heats up until the core is hot and dense enough for the nuclear fusion of hydrogen to begin. (b) The star expands and its surface cools to become a red giant; it then sheds its outer layers as a planetary nebula, leaving the hot core behind as a white dwarf, which gradually cools and fades. (c) A much more massive star explodes as a supernova, leaving behind a neutron star — or, if the remaining core is massive enough, a black hole — instead of quietly becoming a white dwarf.",
+          "difficulty": "hard",
+          "marks": 7,
+          "points": 7,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned IGCSE Physics practice content; not official WAEC or Cambridge International examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Physics (0625) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
