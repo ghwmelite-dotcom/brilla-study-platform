@@ -51,6 +51,8 @@ import { cleanupExpiredDemoData } from './demoUtils';
 import { awardPoints } from './points';
 import { battleWinStreakBonus, computeBattleWinStreak } from './battle-streak';
 import { rankedApp, applyRankedDelta } from './ranked';
+import { adaptiveApp } from './adaptive';
+import { ttsApp } from './tts';
 import {
   getSelfRegistrationStatus,
   IMMEDIATE_STUDENT_REGISTRATION_MESSAGE,
@@ -13262,6 +13264,8 @@ app.route('/api/events', eventsApp);
 app.route('/api/guidance', guidanceApp);
 app.route('/api/team-battles', teamBattlesApp);
 app.route('/api/battles/ranked', rankedApp);
+app.route('/api/adaptive', adaptiveApp);
+app.route('/api/tts', ttsApp);
 app.route('/api/study-groups', studyGroupsApp);
 app.route('/api/flashcard-decks', flashcardDecksApp);
 app.route('/api/cosmetics', cosmeticsApp);
