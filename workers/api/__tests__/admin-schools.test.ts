@@ -516,6 +516,10 @@ describe('admin pilot-schools endpoints (Task 1)', () => {
         telegramChannelId: '-1001234567890',
         telegramChannelName: 'Achimota Announcements',
         telegramChannelBroken: true,
+        seatCap: 0,
+        seatTierId: null,
+        seatExpiresAt: null,
+        seatCodeUses: 0,
         createdAt: '2026-08-01 00:00:00',
       },
       {
@@ -528,6 +532,10 @@ describe('admin pilot-schools endpoints (Task 1)', () => {
         telegramChannelId: null,
         telegramChannelName: null,
         telegramChannelBroken: false,
+        seatCap: 0,
+        seatTierId: null,
+        seatExpiresAt: null,
+        seatCodeUses: 0,
         createdAt: '2026-08-02 00:00:00',
       },
     ]);

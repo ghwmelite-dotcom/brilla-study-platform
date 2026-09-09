@@ -26,6 +26,8 @@
 import { Hono } from 'hono';
 import { requireAuth, requireAdmin } from './auth-middleware';
 import { parseJsonBody } from './http';
+import { notifySchoolChannel, type TelegramEnv } from './telegram';
+import { createNotification } from './notifications';
 
 interface Env {
   DB: D1Database;
@@ -146,6 +148,14 @@ export async function settleSchoolSeatPayment(
     : SCHOOL_TIER_SEATS[tx.plan_id] ?? null;
   if (!schoolId || !seats) return { outcome: 'not_found' };
 
+  // Phase 2: renewal checkouts may have consumed schools.seat_credit as a
+  // discount (metadata.credit_applied, set by POST /api/school-admin/billing/renew).
+  // The credit is burned atomically with settlement under the same guard, so a
+  // replayed webhook never double-consumes it.
+  const creditApplied = Number.isInteger(metadata.credit_applied) && (metadata.credit_applied as number) > 0
+    ? (metadata.credit_applied as number)
+    : 0;
+
   const school = await db.prepare(`
     SELECT id, seat_expires_at, seat_cap, seat_code FROM schools WHERE id = ?
   `).bind(schoolId).first<{
@@ -175,7 +185,7 @@ export async function settleSchoolSeatPayment(
     )
   `;
 
-  const results = await db.batch([
+  const settlementStatements: D1PreparedStatement[] = [
     db.prepare(`
       UPDATE schools
       SET seat_tier_id = ?,
@@ -194,7 +204,16 @@ export async function settleSchoolSeatPayment(
         AND settlement_applied_at IS NULL
         AND status NOT IN ('success', 'refunded')
     `).bind(source, tx.reference),
-  ]);
+  ];
+  if (creditApplied > 0) {
+    settlementStatements.push(db.prepare(`
+      UPDATE schools
+      SET seat_credit = MAX(seat_credit - ?, 0)
+      WHERE id = ? AND ${guard}
+    `).bind(creditApplied, schoolId, tx.reference));
+  }
+
+  const results = await db.batch(settlementStatements);
 
   const settlementWrite = results[1] as D1Result;
   if (!settlementWrite.meta?.changes) {
@@ -530,6 +549,113 @@ export async function expireLapsedSchoolSeats(
   return result;
 }
 
+export interface RenewalReminderResult {
+  schoolsReminded: number;
+  channelPosts: number;
+  emailsSent: number;
+  notificationsWritten: number;
+}
+
+const RENEWAL_WINDOW_DAYS = 7;
+const RENEWAL_LAPSED_GRACE_DAYS = 1;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Renewal reminder fan-out (phase 2), called from the every-6-hours scheduled
+ * handler. A school is reminded when its seat package expires within the next
+ * 7 days or lapsed at most 1 day ago, and it has not already been reminded
+ * for this expiry (renewal_reminded_at guard — renewal pushes seat_expires_at
+ * forward, which re-arms the guard, and a re-run inside the same window is a
+ * no-op). Fan-out per school: Telegram school channel (if configured), one
+ * in-app notification per school_admin, and one email per school_admin when a
+ * sender is injected (the cron wires sendEmail when RESEND_API_KEY exists).
+ * Bounded to 25 schools per invocation; backlog drains on subsequent runs.
+ */
+export async function sendSchoolRenewalReminders(
+  db: D1Database,
+  env: TelegramEnv,
+  deps: { sendEmail?: (to: string, subject: string, html: string) => Promise<boolean> } = {},
+  nowIso: string = new Date().toISOString(),
+): Promise<RenewalReminderResult> {
+  const now = Date.parse(nowIso);
+  const windowEnd = new Date(now + RENEWAL_WINDOW_DAYS * DAY_MS).toISOString();
+  const windowStart = new Date(now - RENEWAL_LAPSED_GRACE_DAYS * DAY_MS).toISOString();
+
+  const { results: schools } = await db.prepare(`
+    SELECT id, name, seat_expires_at, renewal_reminded_at
+    FROM schools
+    WHERE status = 'active'
+      AND seat_expires_at IS NOT NULL
+      AND seat_expires_at <= ?
+      AND seat_expires_at >= ?
+    ORDER BY seat_expires_at
+    LIMIT 25
+  `).bind(windowEnd, windowStart).all<{
+    id: string;
+    name: string;
+    seat_expires_at: string;
+    renewal_reminded_at: string | null;
+  }>();
+
+  const result: RenewalReminderResult = {
+    schoolsReminded: 0,
+    channelPosts: 0,
+    emailsSent: 0,
+    notificationsWritten: 0,
+  };
+
+  for (const school of schools) {
+    const expiryTs = Date.parse(school.seat_expires_at);
+    if (!Number.isFinite(expiryTs)) continue;
+    // Idempotency guard: skip when already reminded for this expiry window.
+    const rearmThreshold = new Date(expiryTs - RENEWAL_WINDOW_DAYS * DAY_MS).toISOString();
+    if (school.renewal_reminded_at && school.renewal_reminded_at >= rearmThreshold) continue;
+
+    const daysRemaining = Math.max(0, Math.ceil((expiryTs - now) / DAY_MS));
+    const expiryDate = school.seat_expires_at.slice(0, 10);
+    const timing = daysRemaining > 0
+      ? `expires in ${daysRemaining} day${daysRemaining === 1 ? '' : 's'}`
+      : 'has just expired';
+    const text = `⏳ ${school.name}: your Brilla seat package ${timing} (${expiryDate}). Renew from the school dashboard or contact Brilla to keep student premium seats active.`;
+
+    const posted = await notifySchoolChannel(db, env, school.id, text);
+    if (posted) result.channelPosts += 1;
+
+    const { results: admins } = await db.prepare(`
+      SELECT id, name, email FROM users
+      WHERE role = 'school_admin' AND school_id = ? AND is_active = 1
+    `).bind(school.id).all<{ id: string; name: string; email: string }>();
+
+    for (const admin of admins) {
+      await createNotification(
+        db,
+        admin.id,
+        'school_renewal',
+        'Seat package renewal due',
+        `Your school's Brilla seat package ${timing} (${expiryDate}). Renew to keep student seats active.`,
+        { icon: 'alert-triangle', link: '/school-admin' },
+      );
+      result.notificationsWritten += 1;
+
+      if (deps.sendEmail && admin.email) {
+        const sent = await deps.sendEmail(
+          admin.email,
+          `${school.name}: Brilla seat package renewal due`,
+          `<p>Hi ${admin.name.replace(/[<>&]/g, '')},</p><p>Your school's Brilla seat package <strong>${timing}</strong> (${expiryDate}). Renew from the school dashboard or reply to this email to keep student premium seats active.</p>`,
+        );
+        if (sent) result.emailsSent += 1;
+      }
+    }
+
+    await db.prepare(`
+      UPDATE schools SET renewal_reminded_at = ? WHERE id = ?
+    `).bind(nowIso, school.id).run();
+    result.schoolsReminded += 1;
+  }
+
+  return result;
+}
+
 // ============================================================================
 // Student-facing routes — mount: app.route('/api/schools', schoolSeatsApp)
 // ============================================================================
@@ -560,6 +686,112 @@ schoolSeatsApp.post('/redeem-code', requireAuth, async (c) => {
   } catch (error) {
     console.error('Redeem school seat code error:', error);
     return c.json({ success: false, error: 'Failed to redeem seat code' }, 500);
+  }
+});
+
+// ============================================================================
+// Student analytics consent (phase 2). SHS-only, mirroring the parent-link
+// opt-out precedent (protectedApp DELETE /students/parent-link/:parentId).
+// The flag lives on the student's ACTIVE school_seats row; school-side
+// analytics (GET /api/school-admin/students/:studentId/progress) 403s on it.
+// ============================================================================
+
+// The caller's ACTIVE seat state (or null) — lets the student UI render the
+// school card and the analytics-consent toggle without guessing.
+schoolSeatsApp.get('/seat', requireAuth, async (c) => {
+  try {
+    const seat = await c.env.DB.prepare(`
+      SELECT ss.school_id, ss.granted_at, ss.analytics_opted_out, ss.analytics_opted_out_at,
+             s.name AS school_name, s.seat_expires_at
+      FROM school_seats ss
+      JOIN schools s ON s.id = ss.school_id
+      WHERE ss.user_id = ? AND ss.status = 'active'
+    `).bind(c.get('userId') as string).first<{
+      school_id: string;
+      granted_at: string;
+      analytics_opted_out: number;
+      analytics_opted_out_at: string | null;
+      school_name: string;
+      seat_expires_at: string | null;
+    }>();
+
+    if (!seat) {
+      return c.json({ success: true, data: null });
+    }
+    return c.json({
+      success: true,
+      data: {
+        schoolId: seat.school_id,
+        schoolName: seat.school_name,
+        grantedAt: seat.granted_at,
+        analyticsOptedOut: seat.analytics_opted_out === 1,
+        analyticsOptedOutAt: seat.analytics_opted_out_at,
+        seatExpiresAt: seat.seat_expires_at,
+      },
+    });
+  } catch (error) {
+    console.error('Get my school seat error:', error);
+    return c.json({ success: false, error: 'Failed to load seat state' }, 500);
+  }
+});
+
+type ConsentResult = { ok: true } | { ok: false; status: number; error: string };
+
+async function setSeatAnalyticsConsent(
+  db: D1Database,
+  userId: string,
+  optedOut: boolean,
+): Promise<ConsentResult> {
+  const user = await db.prepare(`
+    SELECT role, school_level FROM users WHERE id = ?
+  `).bind(userId).first<{ role: string; school_level: string | null }>();
+  if (!user) return { ok: false, status: 404, error: 'User not found' };
+  if (user.role !== 'student') {
+    return { ok: false, status: 403, error: 'Only students can manage school analytics consent' };
+  }
+  if (user.school_level !== 'shs') {
+    return { ok: false, status: 403, error: 'Only SHS students can change school analytics consent' };
+  }
+
+  const seat = await db.prepare(`
+    SELECT id FROM school_seats WHERE user_id = ? AND status = 'active'
+  `).bind(userId).first<{ id: string }>();
+  if (!seat) {
+    return { ok: false, status: 404, error: 'You do not hold an active school seat' };
+  }
+
+  await db.prepare(`
+    UPDATE school_seats
+    SET analytics_opted_out = ?, analytics_opted_out_at = ${optedOut ? "datetime('now')" : 'NULL'}
+    WHERE id = ? AND status = 'active'
+  `).bind(optedOut ? 1 : 0, seat.id).run();
+
+  return { ok: true };
+}
+
+schoolSeatsApp.post('/seat/analytics-opt-out', requireAuth, async (c) => {
+  try {
+    const result = await setSeatAnalyticsConsent(c.env.DB, c.get('userId') as string, true);
+    if (!result.ok) {
+      return c.json({ success: false, error: result.error }, result.status as 400);
+    }
+    return c.json({ success: true, data: { analyticsOptedOut: true } });
+  } catch (error) {
+    console.error('School analytics opt-out error:', error);
+    return c.json({ success: false, error: 'Failed to update analytics consent' }, 500);
+  }
+});
+
+schoolSeatsApp.post('/seat/analytics-opt-in', requireAuth, async (c) => {
+  try {
+    const result = await setSeatAnalyticsConsent(c.env.DB, c.get('userId') as string, false);
+    if (!result.ok) {
+      return c.json({ success: false, error: result.error }, result.status as 400);
+    }
+    return c.json({ success: true, data: { analyticsOptedOut: false } });
+  } catch (error) {
+    console.error('School analytics opt-in error:', error);
+    return c.json({ success: false, error: 'Failed to update analytics consent' }, 500);
   }
 });
 
@@ -838,5 +1070,237 @@ adminSchoolSeatsApp.delete('/:id/seats/:userId', async (c) => {
   } catch (error) {
     console.error('Admin revoke school seat error:', error);
     return c.json({ success: false, error: 'Failed to revoke seat' }, 500);
+  }
+});
+
+// ============================================================================
+// Phase 2 admin routes: school_admin assignment + prorated seat reduction.
+// ============================================================================
+
+// List the school's school_admin accounts (phase 2) so the admin UI can show
+// who manages each school before assigning/removing.
+adminSchoolSeatsApp.get('/:id/school-admins', async (c) => {
+  try {
+    const schoolId = c.req.param('id');
+    const { results: admins } = await c.env.DB.prepare(`
+      SELECT id, name, email, status, created_at FROM users
+      WHERE role = 'school_admin' AND school_id = ?
+      ORDER BY created_at DESC
+    `).bind(schoolId).all<{
+      id: string;
+      name: string;
+      email: string;
+      status: string;
+      created_at: string;
+    }>();
+
+    return c.json({
+      success: true,
+      data: admins.map((a) => ({
+        userId: a.id,
+        name: a.name,
+        email: a.email,
+        status: a.status,
+        createdAt: a.created_at,
+      })),
+    });
+  } catch (error) {
+    console.error('Admin list school admins error:', error);
+    return c.json({ success: false, error: 'Failed to list school admins' }, 500);
+  }
+});
+
+// Promote a user to school_admin for this school (phase 2). A school_admin
+// gets the self-serve dashboard at /api/school-admin scoped to users.school_id.
+// Platform admins are never converted; a school_admin of ANOTHER school must
+// be demoted there first (no silent school-hop, same rule as seat redemption).
+adminSchoolSeatsApp.post('/:id/school-admins', async (c) => {
+  try {
+    const schoolId = c.req.param('id');
+    const body = await parseJsonBody(c);
+    if (!body) {
+      return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+    }
+    const userId = typeof body.userId === 'string' ? body.userId.trim() : '';
+    if (!userId) {
+      return c.json({ success: false, error: 'userId is required' }, 400);
+    }
+
+    const school = await c.env.DB.prepare(
+      'SELECT id FROM schools WHERE id = ?'
+    ).bind(schoolId).first<{ id: string }>();
+    if (!school) {
+      return c.json({ success: false, error: 'School not found' }, 404);
+    }
+
+    const user = await c.env.DB.prepare(`
+      SELECT id, role, school_id FROM users WHERE id = ?
+    `).bind(userId).first<{ id: string; role: string; school_id: string | null }>();
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+    if (user.role === 'admin') {
+      return c.json({ success: false, error: 'Platform admins cannot be assigned as school admins' }, 400);
+    }
+    if (user.role === 'school_admin' && user.school_id && user.school_id !== schoolId) {
+      return c.json({ success: false, error: 'User is already a school admin of another school' }, 409);
+    }
+    if (user.role === 'school_admin' && user.school_id === schoolId) {
+      return c.json({ success: true, data: { schoolId, userId, role: 'school_admin', alreadyAssigned: true } });
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE users SET role = 'school_admin', school_id = ? WHERE id = ?
+    `).bind(schoolId, userId).run();
+
+    return c.json({ success: true, data: { schoolId, userId, role: 'school_admin' } });
+  } catch (error) {
+    console.error('Admin assign school admin error:', error);
+    return c.json({ success: false, error: 'Failed to assign school admin' }, 500);
+  }
+});
+
+// Demote a school_admin. The original role is not stored, so teachers are
+// detected by their teacher-profile fields (teacher_license_number /
+// subjects_taught); everyone else returns to 'student'. school_id is cleared
+// only when it still points at THIS school.
+adminSchoolSeatsApp.delete('/:id/school-admins/:userId', async (c) => {
+  try {
+    const schoolId = c.req.param('id');
+    const userId = c.req.param('userId');
+
+    const user = await c.env.DB.prepare(`
+      SELECT id, role, school_id, teacher_license_number, subjects_taught FROM users WHERE id = ?
+    `).bind(userId).first<{
+      id: string;
+      role: string;
+      school_id: string | null;
+      teacher_license_number: string | null;
+      subjects_taught: string | null;
+    }>();
+    if (!user || user.role !== 'school_admin') {
+      return c.json({ success: false, error: 'User is not a school admin' }, 404);
+    }
+
+    const restoredRole = user.teacher_license_number || user.subjects_taught ? 'teacher' : 'student';
+
+    await c.env.DB.prepare(`
+      UPDATE users
+      SET role = ?,
+          school_id = CASE WHEN school_id = ? THEN NULL ELSE school_id END
+      WHERE id = ? AND role = 'school_admin'
+    `).bind(restoredRole, schoolId, userId).run();
+
+    return c.json({ success: true, data: { schoolId, userId, role: restoredRole } });
+  } catch (error) {
+    console.error('Admin remove school admin error:', error);
+    return c.json({ success: false, error: 'Failed to remove school admin' }, 500);
+  }
+});
+
+// Prorated mid-cycle seat reduction (phase 2). The cap drops by the requested
+// amount (409 when active seats would exceed the new cap — revoke first) and
+// the unused remainder is credited to schools.seat_credit at the tier's
+// per-seat rate, prorated by remaining days:
+//   credit = floor(perSeatRate × seats × remainingDays / periodDays)
+// perSeatRate = period price / package seats; periodDays = 30 monthly, 365
+// yearly (billing cycle inferred from the school's most recent successful
+// payment for the tier, default monthly). The credit is returned here and
+// consumed as a discount by POST /api/school-admin/billing/renew.
+adminSchoolSeatsApp.post('/:id/seats/reduce', async (c) => {
+  try {
+    const schoolId = c.req.param('id');
+    const body = await parseJsonBody(c);
+    if (!body) {
+      return c.json({ success: false, error: 'Invalid JSON body' }, 400);
+    }
+    const seats = Number.isInteger(body.seats) && (body.seats as number) > 0
+      ? (body.seats as number)
+      : null;
+    if (!seats) {
+      return c.json({ success: false, error: 'seats must be a positive integer' }, 400);
+    }
+
+    const school = await c.env.DB.prepare(`
+      SELECT id, seat_tier_id, seat_expires_at, seat_cap, seat_credit FROM schools WHERE id = ?
+    `).bind(schoolId).first<{
+      id: string;
+      seat_tier_id: string | null;
+      seat_expires_at: string | null;
+      seat_cap: number;
+      seat_credit: number;
+    }>();
+    if (!school) {
+      return c.json({ success: false, error: 'School not found' }, 404);
+    }
+    if (!school.seat_tier_id) {
+      return c.json({ success: false, error: 'School has no seat package' }, 400);
+    }
+
+    const packageSeats = SCHOOL_TIER_SEATS[school.seat_tier_id] ?? null;
+    if (!packageSeats) {
+      return c.json({ success: false, error: 'Prorated reduction is not available for custom-priced tiers — contact Brilla' }, 400);
+    }
+
+    const newCap = school.seat_cap - seats;
+    if (newCap < 0) {
+      return c.json({ success: false, error: `Cannot reduce by ${seats}: the school only has a cap of ${school.seat_cap}` }, 400);
+    }
+
+    const activeCount = await c.env.DB.prepare(`
+      SELECT COUNT(*) AS n FROM school_seats WHERE school_id = ? AND status = 'active'
+    `).bind(schoolId).first<{ n: number }>();
+    if ((activeCount?.n ?? 0) > newCap) {
+      return c.json({
+        success: false,
+        error: `Active seats (${activeCount?.n ?? 0}) exceed the new cap (${newCap}) — revoke seats first`,
+      }, 409);
+    }
+
+    const tier = await c.env.DB.prepare(`
+      SELECT price_monthly, price_yearly FROM subscription_tiers WHERE id = ?
+    `).bind(school.seat_tier_id).first<{ price_monthly: number; price_yearly: number }>();
+    if (!tier) {
+      return c.json({ success: false, error: 'School seat tier not found' }, 500);
+    }
+
+    const lastPayment = await c.env.DB.prepare(`
+      SELECT billing_cycle FROM payment_transactions
+      WHERE plan_id = ? AND status = 'success' AND metadata LIKE ?
+      ORDER BY created_at DESC LIMIT 1
+    `).bind(school.seat_tier_id, `%"school_id":"${schoolId}"%`).first<{ billing_cycle: string }>();
+    const cycle = lastPayment?.billing_cycle === 'yearly' ? 'yearly' : 'monthly';
+
+    const periodDays = cycle === 'yearly' ? 365 : 30;
+    const periodPrice = cycle === 'yearly' ? tier.price_yearly : tier.price_monthly;
+    const perSeatRate = periodPrice / packageSeats;
+    const remainingDays = school.seat_expires_at
+      ? Math.max(0, Math.floor((Date.parse(school.seat_expires_at) - Date.now()) / (24 * 60 * 60 * 1000)))
+      : 0;
+    const credit = Math.floor((perSeatRate * seats * remainingDays) / periodDays);
+
+    await c.env.DB.prepare(`
+      UPDATE schools SET seat_cap = ?, seat_credit = seat_credit + ? WHERE id = ?
+    `).bind(newCap, credit, schoolId).run();
+
+    console.log(
+      `School seat reduction: school=${schoolId} removed=${seats} newCap=${newCap} cycle=${cycle} remainingDays=${remainingDays} credit=GHS ${credit}`,
+    );
+
+    return c.json({
+      success: true,
+      data: {
+        schoolId,
+        seatsRemoved: seats,
+        newCap,
+        billingCycle: cycle,
+        remainingDays,
+        creditGhs: credit,
+        seatCredit: (school.seat_credit ?? 0) + credit,
+      },
+    });
+  } catch (error) {
+    console.error('Admin reduce school seats error:', error);
+    return c.json({ success: false, error: 'Failed to reduce seats' }, 500);
   }
 });

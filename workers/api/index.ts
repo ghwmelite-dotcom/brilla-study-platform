@@ -16,7 +16,8 @@ import { chatApp } from './chat';
 import { moderationApp } from './moderation';
 import { paymentsApp, runPaymentReconciliation } from './payments';
 import { subscriptionsApp } from './subscriptions';
-import { schoolSeatsApp, adminSchoolSeatsApp, expireLapsedSchoolSeats, releaseSchoolSeat } from './school-seats';
+import { schoolSeatsApp, adminSchoolSeatsApp, expireLapsedSchoolSeats, releaseSchoolSeat, sendSchoolRenewalReminders } from './school-seats';
+import { schoolAdminApp } from './school-admin';
 import {
   affiliatesApp,
   isValidReferralCode,
@@ -10048,6 +10049,7 @@ adminApp.get('/schools', async (c) => {
     // system-generated @ambassador.brilla mailbox.
     const result = await c.env.DB.prepare(`
       SELECT s.id, s.name, s.slug, s.status, s.created_at,
+        s.seat_cap, s.seat_tier_id, s.seat_expires_at, s.seat_code_uses,
         (SELECT COUNT(*) FROM users u WHERE u.school_id = s.id
           AND u.email NOT LIKE '%@ambassador.brilla') AS student_count,
         (SELECT ap.referral_code FROM affiliate_profiles ap
@@ -10061,6 +10063,10 @@ adminApp.get('/schools', async (c) => {
       LEFT JOIN school_channels sc ON sc.school_id = s.id
       ORDER BY s.created_at DESC
     `).all<SchoolRow & {
+      seat_cap: number | null;
+      seat_tier_id: string | null;
+      seat_expires_at: string | null;
+      seat_code_uses: number | null;
       student_count: number;
       ambassador_code: string | null;
       telegram_channel_id: string | null;
@@ -10078,6 +10084,10 @@ adminApp.get('/schools', async (c) => {
       telegramChannelId: row.telegram_channel_id ?? null,
       telegramChannelName: row.telegram_channel_name ?? null,
       telegramChannelBroken: Boolean(row.telegram_channel_broken),
+      seatCap: row.seat_cap ?? 0,
+      seatTierId: row.seat_tier_id ?? null,
+      seatExpiresAt: row.seat_expires_at ?? null,
+      seatCodeUses: row.seat_code_uses ?? 0,
       createdAt: row.created_at,
     }));
     return c.json({ success: true, data: { schools } });
@@ -13288,6 +13298,10 @@ app.route('/api/tutor-classroom', tutorClassroomApp);
 // School seat-package redemption (students): POST /api/schools/redeem-code
 app.route('/api/schools', schoolSeatsApp);
 
+// School self-serve dashboard (phase 2, school_admin role). The sub-app
+// carries its own requireAuth + role gate + school scoping.
+app.route('/api/school-admin', schoolAdminApp);
+
 // Mount Race routes (growth loop; /current authed, /cycles public, param-free paths)
 app.route('/api/race', raceApp);
 
@@ -13393,6 +13407,27 @@ export default {
       console.log(`School seat expiry: ${lapsed.schoolsProcessed} schools lapsed, ${lapsed.seatsExpired} seats expired`);
     } catch (error) {
       console.error('School seat expiry failed:', error);
+    }
+
+    // School seat packages (phase 2): renewal reminders to schools whose
+    // package expires within 7 days (or lapsed <= 1 day ago) — Telegram school
+    // channel + in-app notification + email per school_admin. Idempotent via
+    // schools.renewal_reminded_at.
+    try {
+      const reminders = await sendSchoolRenewalReminders(env.DB, env, {
+        sendEmail: env.RESEND_API_KEY
+          ? (to, subject, html) => sendEmail(
+              env.RESEND_API_KEY as string,
+              env.FROM_EMAIL || 'Brilla Study Platform <noreply@brillaprep.org>',
+              to,
+              subject,
+              html,
+            )
+          : undefined,
+      });
+      console.log(`School renewal reminders: ${reminders.schoolsReminded} schools, ${reminders.channelPosts} channel posts, ${reminders.emailsSent} emails, ${reminders.notificationsWritten} notifications`);
+    } catch (error) {
+      console.error('School renewal reminders failed:', error);
     }
 
     // Weekly parent progress digests: Monday 06:00 UTC only — a low-traffic

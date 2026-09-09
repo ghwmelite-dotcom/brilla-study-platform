@@ -1,7 +1,7 @@
 const PAYSTACK_API = 'https://api.paystack.co';
 const DEFAULT_RECONCILIATION_LIMIT = 25;
 
-import { settleSchoolSeatPayment } from './school-seats';const MAX_RECONCILIATION_LIMIT = 50;
+import { settleSchoolSeatPayment, SCHOOL_TIER_SEATS } from './school-seats';const MAX_RECONCILIATION_LIMIT = 50;
 const TERMINAL_FAILURE_STATUSES = new Set([
   'abandoned',
   'cancelled',
@@ -426,4 +426,91 @@ export async function reconcilePendingSubscriptionPayments(
   }
 
   return aggregate;
+}
+
+/**
+ * Settle a Paystack RECURRING charge for a school seat plan (phase 2 enablement).
+ * Recurring charges arrive with provider-generated references (no SUB_ prefix)
+ * and no local payment_transactions row. When the charge's plan_code maps to a
+ * subscription_tiers.paystack_plan_code with user_type='school', the school is
+ * resolved from its most recent successful school-tier payment, a pending row
+ * is recorded (storing paystack_subscription_code on the row), and settlement
+ * converges through settleVerifiedSubscriptionPayment → settleSchoolSeatPayment.
+ * Fully defensive: unknown plan codes, unmappable schools, and non-success
+ * charges are ignored gracefully (the webhook still 200s), and replays are
+ * idempotent by reference (the recorded row is found already settled).
+ */
+export async function settleRecurringSchoolPlanCharge(
+  db: D1Database,
+  providerTransaction: ProviderTransaction,
+  planCode: string,
+  subscriptionCode: string | null,
+): Promise<SettlementResult> {
+  const provider = sanitizeProviderTransaction(providerTransaction);
+  if (provider.status !== 'success') return { outcome: 'not_success' };
+  if (!provider.reference) return { outcome: 'not_found' };
+
+  const tier = await db.prepare(`
+    SELECT id, price_monthly, price_yearly FROM subscription_tiers
+    WHERE paystack_plan_code = ? AND user_type = 'school'
+  `).bind(planCode).first<{ id: string; price_monthly: number; price_yearly: number }>();
+  if (!tier) return { outcome: 'not_found' };
+
+  // Resolve the school from its most recent successful school-tier payment.
+  const { results: recentPayments } = await db.prepare(`
+    SELECT user_id, metadata FROM payment_transactions
+    WHERE plan_id = ? AND status = 'success'
+    ORDER BY created_at DESC LIMIT 10
+  `).bind(tier.id).all<{ user_id: string; metadata: string | null }>();
+  let payer: { userId: string; schoolId: string } | null = null;
+  for (const row of recentPayments) {
+    try {
+      const meta = row.metadata ? JSON.parse(row.metadata) : {};
+      if (typeof meta.school_id === 'string' && meta.school_id) {
+        payer = { userId: row.user_id, schoolId: meta.school_id };
+        break;
+      }
+    } catch {
+      // keep scanning older payments
+    }
+  }
+  if (!payer) return { outcome: 'not_found' };
+
+  const existing = await db.prepare(`
+    SELECT id FROM payment_transactions WHERE reference = ?
+  `).bind(provider.reference).first<{ id: string }>();
+
+  if (!existing) {
+    const amountGhs = provider.amount !== null ? provider.amount / 100 : tier.price_monthly;
+    const billingCycle = amountGhs === tier.price_yearly ? 'yearly' : 'monthly';
+    const metadata = JSON.stringify({
+      school_id: payer.schoolId,
+      seats: SCHOOL_TIER_SEATS[tier.id] ?? null,
+      recurring: true,
+      paystack_plan_code: planCode,
+    });
+    await db.prepare(`
+      INSERT INTO payment_transactions (
+        id, user_id, reference, amount, currency, plan_id, plan_type, billing_cycle,
+        status, paystack_subscription_code, metadata
+      ) VALUES (?, ?, ?, ?, 'GHS', ?, 'school', ?, 'pending', ?, ?)
+    `).bind(
+      `pay_${crypto.randomUUID()}`,
+      payer.userId,
+      provider.reference,
+      amountGhs,
+      tier.id,
+      billingCycle,
+      subscriptionCode,
+      metadata,
+    ).run();
+  } else if (subscriptionCode) {
+    await db.prepare(`
+      UPDATE payment_transactions
+      SET paystack_subscription_code = COALESCE(paystack_subscription_code, ?)
+      WHERE reference = ?
+    `).bind(subscriptionCode, provider.reference).run();
+  }
+
+  return settleVerifiedSubscriptionPayment(db, providerTransaction, 'webhook');
 }

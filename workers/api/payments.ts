@@ -11,6 +11,7 @@ import {
   isTerminalProviderFailure,
   reconcilePendingSubscriptionPayments,
   sanitizeProviderTransaction,
+  settleRecurringSchoolPlanCharge,
   settleVerifiedSubscriptionPayment,
   verifyPaystackTransaction,
   type SettledPaymentContext,
@@ -34,7 +35,7 @@ const PAYSTACK_API = 'https://api.paystack.co';
 // =============================================
 
 // Initialize a Paystack transaction
-async function initializeTransaction(
+export async function initializeTransaction(
   secretKey: string,
   email: string,
   amount: number, // in pesewas (100 pesewas = 1 GHS)
@@ -139,7 +140,7 @@ const MOBILE_MONEY_CODES: Record<string, string> = {
 };
 
 // Generate unique reference
-function generateReference(prefix: string = 'BRL'): string {
+export function generateReference(prefix: string = 'BRL'): string {
   const timestamp = Date.now().toString(36);
   const randomPart = Math.random().toString(36).substring(2, 8);
   return `${prefix}_${timestamp}_${randomPart}`.toUpperCase();
@@ -800,11 +801,45 @@ paymentsApp.post('/webhook', async (c) => {
     switch (event.event) {
       case 'charge.success': {
         const reference = event.data.reference;
-        if (
-          typeof reference !== 'string'
-          || !reference.startsWith('SUB_')
-          || reference.length > 200
-        ) {
+        if (typeof reference !== 'string' || reference.length > 200) {
+          break;
+        }
+
+        // Paystack recurring/subscription charges carry plan + subscription
+        // objects. Tolerate them in any payload (never crash on their shape).
+        const planCode = event.data.plan && typeof event.data.plan === 'object'
+          && typeof event.data.plan.plan_code === 'string'
+          ? event.data.plan.plan_code
+          : null;
+        const subscriptionCode = event.data.subscription && typeof event.data.subscription === 'object'
+          && typeof event.data.subscription.subscription_code === 'string'
+          ? event.data.subscription.subscription_code
+          : null;
+
+        // Recurring charges have provider-generated references (no SUB_
+        // prefix) and usually no local payment_transactions row. Only school
+        // seat plans (subscription_tiers.paystack_plan_code) are actionable;
+        // anything else is ignored gracefully (still a 200 below).
+        if (!reference.startsWith('SUB_')) {
+          if (planCode) {
+            const verification = await verifyPaystackTransaction(
+              c.env.PAYSTACK_SECRET_KEY,
+              reference,
+            );
+            if (!verification.ok || !verification.data) {
+              console.error('Paystack recurring-charge webhook verification unavailable');
+              return c.json({ success: false, error: 'Verification unavailable' }, 503);
+            }
+            const recurring = await settleRecurringSchoolPlanCharge(
+              c.env.DB,
+              verification.data,
+              planCode,
+              subscriptionCode,
+            );
+            if (recurring.outcome === 'not_found') {
+              console.log(`Recurring charge ${reference}: no school plan mapping — ignored`);
+            }
+          }
           break;
         }
 
@@ -832,6 +867,16 @@ paymentsApp.post('/webhook', async (c) => {
           if (!affiliateComplete) {
             console.error('Affiliate webhook effects require scheduled retry');
           }
+        }
+
+        // Persist the subscription code (recurring enablement) on the matched
+        // row when the charge carries one; never overwrites an existing code.
+        if (subscriptionCode) {
+          await c.env.DB.prepare(`
+            UPDATE payment_transactions
+            SET paystack_subscription_code = COALESCE(paystack_subscription_code, ?)
+            WHERE reference = ?
+          `).bind(subscriptionCode, reference).run();
         }
         break;
       }

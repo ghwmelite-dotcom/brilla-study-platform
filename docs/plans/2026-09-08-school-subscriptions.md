@@ -56,12 +56,12 @@ Top-ups: same per-seat rate as the school's active tier; expiry aligned to the s
 - Top-up before expiry → cap and expiry extend, existing seat-holders untouched.
 - `seat_code_uses` and active `school_seats` count drift (failed transactions) → admin seat list shows both; cron logs mismatch.
 
-## Phase 2 follow-ups (not in this build)
+## Phase 2 (built)
 
-- `school_admin` role + users-rebuild migration (092 pattern) + school self-serve dashboard (seat list, code, usage).
-- Read-only per-student analytics for schools, gated on the parent consent/opt-out precedent (`student_opted_out` semantics).
-- Paystack recurring plans for auto-renewal; renewal-reminder emails/Telegram to the school contact.
-- Per-seat prorated mid-cycle seat reductions.
+- **`school_admin` role + school self-serve dashboard** — migration `633_users_school_admin_role.sql` (092-style users rebuild with the full 53-column shape; `PRAGMA defer_foreign_keys` + drop/same-name-recreate so it replays inside the bootstrap verifier's per-file transactions) adds the role CHECK value. New module `workers/api/school-admin.ts` mounted at `/api/school-admin` with its own requireAuth + school_admin gate + users.school_id scoping: `GET /overview` (usage, drift, days remaining, credit, renewal state), `GET /seats`, `POST /seat-code/regenerate`, `POST /billing/renew` (Paystack checkout at the tier price minus `schools.seat_credit`; metadata carries school_id + seats + credit_applied so settlement converges through `settleSchoolSeatPayment`, which burns the credit atomically).
+- **Consent-gated per-student analytics** — migration `634_school_phase2_columns.sql` adds `school_seats.analytics_opted_out(+_at)`; `GET /api/school-admin/students/:studentId/progress` reuses the parents progress query shape (403 on opt-out, active-seat required); SHS-only student flips via `POST /api/schools/seat/analytics-opt-out|opt-in` (mirrors the parent-link school_level precedent).
+- **Paystack recurring enablement + renewal reminders** — `634` adds `subscription_tiers.paystack_plan_code` and `schools.renewal_reminded_at`; the webhook tolerates charge.success payloads with plan/subscription objects and settles mapped school-plan recurring charges (`settleRecurringSchoolPlanCharge` in payment-settlement.ts, idempotent by reference, unknown plan codes ignored); `sendSchoolRenewalReminders` runs in the every-6-hours cron (Telegram school channel + email + in-app notification per school_admin, idempotent via the reminded_at guard).
+- **Prorated mid-cycle seat reductions** — `POST /api/admin/schools/:id/seats/reduce` drops the cap (409 when active seats exceed the new cap) and credits `floor(perSeatRate × seats × remainingDays / periodDays)` to `schools.seat_credit` (per-seat rate from the tier row; cycle inferred from the school's latest successful payment, default monthly). School-admin assign/demote: `POST|DELETE /api/admin/schools/:id/school-admins[/:userId]` (409 cross-school, platform admins refused, demote restores teacher role when teacher-profile fields exist).
 
 ## Acceptance criteria & mandatory tests
 
