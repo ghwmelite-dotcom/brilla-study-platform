@@ -12,7 +12,14 @@ export default defineConfig({
     include: ['src/**/*.test.{ts,tsx}', 'workers/**/*.test.ts', 'shared/**/*.test.ts'],
     // Canvas/Fabric suites are CPU-heavy. Bounding concurrency prevents
     // resource contention from turning deterministic 5s tests into flakes.
-    maxWorkers: 4,
+    // Local runs cap at 2 workers: this suite flakes on memory-constrained
+    // Windows dev machines with unhandled `Timeout calling "onTaskUpdate"`
+    // RPC errors (vitest#6479) when worker heaps push the machine into
+    // paging — the main vitest process then stalls past birpc's hardcoded
+    // 60s RPC timeout even though every test passes. Fewer live workers
+    // keeps the combined node heap small enough to avoid the stalls.
+    // CI runners are clean VMs with headroom, so they keep 4.
+    maxWorkers: process.env.CI ? 4 : 2,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json-summary'],
