@@ -1,0 +1,2188 @@
+{
+  "batchId": "wassce-int-science-sprint1-001",
+  "status": "approved_for_beta",
+  "examTypeId": "exam_wassce",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment, Ghana",
+      "title": "Secondary Education Curriculum (SHS core Integrated Science)",
+      "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T00:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science practice; not official WAEC examination material.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_wassce_int_science",
+      "specificationCode": "BRILLA-WASSCE-ISC-SPRINT1-001",
+      "sources": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum — Integrated Science",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "WASSCE-ISC-ECO",
+          "title": "Ecosystems",
+          "objective": "Describe ecosystem components and construct food chains that show energy flow between organisms."
+        },
+        {
+          "code": "WASSCE-ISC-MAT",
+          "title": "Matter and mixtures",
+          "objective": "Select and justify physical separation techniques for the components of common mixtures."
+        },
+        {
+          "code": "WASSCE-ISC-ENR",
+          "title": "Electricity and energy",
+          "objective": "Analyse simple series circuits, relating current, resistance and lamp brightness quantitatively."
+        },
+        {
+          "code": "WASSCE-ISC-BIO",
+          "title": "Human digestion",
+          "objective": "Explain the stages of human digestion, naming the enzymes and organs responsible at each stage."
+        },
+        {
+          "code": "WASSCE-ISC-HLT",
+          "title": "Disease and health",
+          "objective": "Explain the transmission, symptoms and prevention of common communicable diseases in Ghana."
+        },
+        {
+          "code": "WASSCE-ISC-REP",
+          "title": "Reproduction and Heredity",
+          "objective": "Reproduction in plants and animals, growth and basic genetics"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_wisc_eco_b001_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ECO",
+          "prompt": "Which of the following is an abiotic component of a pond ecosystem?",
+          "workedSolution": "Abiotic factors are the non-living parts of an ecosystem, such as sunlight, water and temperature. Algae, tadpoles and pond snails are all living (biotic) components of the pond.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "C",
+          "options": [
+            {
+              "label": "A",
+              "text": "Algae",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Tadpoles",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Sunlight",
+              "rationale": "This is the supported answer. Abiotic factors are the non-living parts of an ecosystem, such as sunlight, water and temperature. Algae, tadpoles and pond snails are all living (biotic) components of the pond."
+            },
+            {
+              "label": "D",
+              "text": "Pond snails",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_eco_b001_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ECO",
+          "prompt": "In a food chain, the organisms that make their own food by photosynthesis are called:",
+          "workedSolution": "Producers (green plants and algae) make their own food by photosynthesis. Herbivores and secondary consumers eat other organisms, and decomposers feed on dead organic matter.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "A",
+          "options": [
+            {
+              "label": "A",
+              "text": "Producers",
+              "rationale": "This is the supported answer. Producers (green plants and algae) make their own food by photosynthesis. Herbivores and secondary consumers eat other organisms, and decomposers feed on dead organic matter."
+            },
+            {
+              "label": "B",
+              "text": "Herbivores",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Decomposers",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Secondary consumers",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_eco_b001_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ECO",
+          "prompt": "The place where an organism lives and obtains its food and shelter is its:",
+          "workedSolution": "A habitat is the physical place where an organism lives and finds food and shelter. A niche is the organism’s role in the ecosystem, and a population is a group of one species.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "D",
+          "options": [
+            {
+              "label": "A",
+              "text": "Niche",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Population",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Biome",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Habitat",
+              "rationale": "This is the supported answer. A habitat is the physical place where an organism lives and finds food and shelter. A niche is the organism’s role in the ecosystem, and a population is a group of one species."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_eco_b001_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ECO",
+          "prompt": "Which group of organisms breaks down dead plants and animals, returning nutrients to the soil?",
+          "workedSolution": "Decomposers (bacteria and fungi) break down dead organisms, releasing nutrients such as nitrates into the soil for producers to use. Predators and primary consumers do not recycle nutrients.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "B",
+          "options": [
+            {
+              "label": "A",
+              "text": "Producers",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Decomposers",
+              "rationale": "This is the supported answer. Decomposers (bacteria and fungi) break down dead organisms, releasing nutrients such as nitrates into the soil for producers to use. Predators and primary consumers do not recycle nutrients."
+            },
+            {
+              "label": "C",
+              "text": "Primary consumers",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Predators",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_eco_b001_005",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ECO",
+          "prompt": "Consider the food chain: maize → grasshopper → lizard → hawk. The secondary consumer in this chain is the:",
+          "workedSolution": "Maize is the producer, the grasshopper eating it is the primary consumer, the lizard eating the grasshopper is the secondary consumer, and the hawk is the tertiary consumer.",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "C",
+          "options": [
+            {
+              "label": "A",
+              "text": "Maize",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Grasshopper",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Lizard",
+              "rationale": "This is the supported answer. Maize is the producer, the grasshopper eating it is the primary consumer, the lizard eating the grasshopper is the secondary consumer, and the hawk is the tertiary consumer."
+            },
+            {
+              "label": "D",
+              "text": "Hawk",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_eco_b001_006",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ECO",
+          "prompt": "In an energy pyramid for a savanna ecosystem, the greatest amount of energy is found at the level of the:",
+          "workedSolution": "Only about 10% of the energy passes from one trophic level to the next; the rest is lost as heat. Producers trap all the incoming solar energy, so they hold the greatest amount.",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "A",
+          "options": [
+            {
+              "label": "A",
+              "text": "Producers",
+              "rationale": "This is the supported answer. Only about 10% of the energy passes from one trophic level to the next; the rest is lost as heat. Producers trap all the incoming solar energy, so they hold the greatest amount."
+            },
+            {
+              "label": "B",
+              "text": "Top carnivores",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Primary consumers",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Secondary consumers",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_eco_b001_007",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ECO",
+          "prompt": "A grassland ecosystem traps 50 000 kJ of energy at the producer level. If only about 10% of the energy is transferred to the next trophic level, the energy reaching the primary consumers is approximately:",
+          "workedSolution": "Energy transferred = 10% of 50 000 kJ = 0.1 × 50 000 = 5 000 kJ. The other 45 000 kJ is lost through respiration, heat, uneaten material and waste.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "D",
+          "options": [
+            {
+              "label": "A",
+              "text": "500 kJ",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "50 kJ",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "45 000 kJ",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "5 000 kJ",
+              "rationale": "This is the supported answer. Energy transferred = 10% of 50 000 kJ = 0.1 × 50 000 = 5 000 kJ. The other 45 000 kJ is lost through respiration, heat, uneaten material and waste."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_eco_b001_008",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ECO",
+          "prompt": "Natural food chains rarely have more than four or five trophic levels mainly because:",
+          "workedSolution": "About 90% of the energy is lost as heat, in respiration and in waste at each level, so after four or five transfers too little energy remains to support a viable population at another level.",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "B",
+          "options": [
+            {
+              "label": "A",
+              "text": "Top carnivores are always hunted by humans",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Most of the energy is lost at each transfer, leaving too little for higher levels",
+              "rationale": "This is the supported answer. About 90% of the energy is lost as heat, in respiration and in waste at each level, so after four or five transfers too little energy remains to support a viable population at another level."
+            },
+            {
+              "label": "C",
+              "text": "Producers stop growing after a certain height",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Decomposers attack organisms at higher trophic levels",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_mat_b001_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-MAT",
+          "prompt": "The best method for obtaining solid salt from seawater is:",
+          "workedSolution": "Salt is dissolved in seawater, so it passes through filter paper with the water. Evaporation removes the water and leaves solid salt; magnets and decantation cannot separate dissolved solids.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "B",
+          "options": [
+            {
+              "label": "A",
+              "text": "Filtration",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Evaporation",
+              "rationale": "This is the supported answer. Salt is dissolved in seawater, so it passes through filter paper with the water. Evaporation removes the water and leaves solid salt; magnets and decantation cannot separate dissolved solids."
+            },
+            {
+              "label": "C",
+              "text": "Use of a magnet",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Decantation",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_mat_b001_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-MAT",
+          "prompt": "Filtration is the method used to separate:",
+          "workedSolution": "The pores of filter paper let the liquid and dissolved particles through but trap insoluble solid particles as the residue. Miscible liquids need distillation and dissolved salts need evaporation.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "D",
+          "options": [
+            {
+              "label": "A",
+              "text": "Two miscible liquids",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Dissolved salt from water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "A mixture of two gases",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "An insoluble solid from a liquid",
+              "rationale": "This is the supported answer. The pores of filter paper let the liquid and dissolved particles through but trap insoluble solid particles as the residue. Miscible liquids need distillation and dissolved salts need evaporation."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_mat_b001_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-MAT",
+          "prompt": "Which of the following is a mixture?",
+          "workedSolution": "Air is a physical mixture of nitrogen, oxygen, carbon dioxide and other gases. Distilled water is a pure compound, while gold and oxygen gas are pure elements.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "A",
+          "options": [
+            {
+              "label": "A",
+              "text": "Air",
+              "rationale": "This is the supported answer. Air is a physical mixture of nitrogen, oxygen, carbon dioxide and other gases. Distilled water is a pure compound, while gold and oxygen gas are pure elements."
+            },
+            {
+              "label": "B",
+              "text": "Distilled water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Gold",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Oxygen gas",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_mat_b001_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-MAT",
+          "prompt": "A magnet would be most useful for separating a mixture of:",
+          "workedSolution": "Iron is magnetic and sand is not, so a magnet pulls out the filings. Salt and sand need dissolving and filtering; ethanol and water need distillation; oil and water need a separating funnel.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "C",
+          "options": [
+            {
+              "label": "A",
+              "text": "Salt and sand",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Ethanol and water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Iron filings and sand",
+              "rationale": "This is the supported answer. Iron is magnetic and sand is not, so a magnet pulls out the filings. Salt and sand need dissolving and filtering; ethanol and water need distillation; oil and water need a separating funnel."
+            },
+            {
+              "label": "D",
+              "text": "Oil and water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_mat_b001_005",
+          "original": true,
+          "topicCode": "WASSCE-ISC-MAT",
+          "prompt": "The different coloured dyes in a sample of black ink can best be separated and identified by:",
+          "workedSolution": "In paper chromatography the dyes dissolve in the solvent and travel up the paper at different rates, separating into distinct spots. Distillation, sieving and crystallisation cannot separate dissolved dyes.",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "D",
+          "options": [
+            {
+              "label": "A",
+              "text": "Simple distillation",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Sieving",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Crystallisation",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Paper chromatography",
+              "rationale": "This is the supported answer. In paper chromatography the dyes dissolve in the solvent and travel up the paper at different rates, separating into distinct spots. Distillation, sieving and crystallisation cannot separate dissolved dyes."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_mat_b001_006",
+          "original": true,
+          "topicCode": "WASSCE-ISC-MAT",
+          "prompt": "Ethanol (boiling point 78 °C) and water (boiling point 100 °C) mix completely with each other. The most suitable method for separating the two liquids is:",
+          "workedSolution": "The miscible liquids boil at different temperatures, so ethanol vaporises first and is condensed and collected separately. A separating funnel works only for immiscible liquids; filtration cannot separate liquids.",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "A",
+          "options": [
+            {
+              "label": "A",
+              "text": "Fractional distillation",
+              "rationale": "This is the supported answer. The miscible liquids boil at different temperatures, so ethanol vaporises first and is condensed and collected separately. A separating funnel works only for immiscible liquids; filtration cannot separate liquids."
+            },
+            {
+              "label": "B",
+              "text": "Filtration",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Evaporation to dryness",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Use of a separating funnel",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_mat_b001_007",
+          "original": true,
+          "topicCode": "WASSCE-ISC-MAT",
+          "prompt": "A student dissolves salt in water and then filters the solution. The filtrate still contains the salt because:",
+          "workedSolution": "Dissolved salt particles are far smaller than the pores of filter paper, so they pass through with the water; only undissolved solids are trapped. The salt can be recovered by evaporating the filtrate.",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "C",
+          "options": [
+            {
+              "label": "A",
+              "text": "The salt reacted chemically with the filter paper",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "The water dissolved the filter paper",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Dissolved salt particles are small enough to pass through the filter paper pores",
+              "rationale": "This is the supported answer. Dissolved salt particles are far smaller than the pores of filter paper, so they pass through with the water; only undissolved solids are trapped. The salt can be recovered by evaporating the filtrate."
+            },
+            {
+              "label": "D",
+              "text": "The salt turned into a gas during filtration",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_mat_b001_008",
+          "original": true,
+          "topicCode": "WASSCE-ISC-MAT",
+          "prompt": "Which property distinguishes a pure substance from a mixture?",
+          "workedSolution": "A pure substance has a fixed composition and melts and boils at sharp, definite temperatures, whereas a mixture melts or boils over a range because its composition can vary.",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "B",
+          "options": [
+            {
+              "label": "A",
+              "text": "A pure substance always separates into two visible layers",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "A pure substance melts at a sharp, definite temperature",
+              "rationale": "This is the supported answer. A pure substance has a fixed composition and melts and boils at sharp, definite temperatures, whereas a mixture melts or boils over a range because its composition can vary."
+            },
+            {
+              "label": "C",
+              "text": "A pure substance contains more than one kind of atom",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "A pure substance is always a solid at room temperature",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_enr_b001_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENR",
+          "prompt": "The SI unit of electric current is the:",
+          "workedSolution": "Electric current is the rate of flow of electric charge and is measured in amperes (A). The volt measures potential difference, the ohm resistance, and the watt power.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "C",
+          "options": [
+            {
+              "label": "A",
+              "text": "Volt",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Ohm",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Ampere",
+              "rationale": "This is the supported answer. Electric current is the rate of flow of electric charge and is measured in amperes (A). The volt measures potential difference, the ohm resistance, and the watt power."
+            },
+            {
+              "label": "D",
+              "text": "Watt",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_enr_b001_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENR",
+          "prompt": "The instrument used to measure the electric current flowing in a circuit is the:",
+          "workedSolution": "An ammeter is connected in series so that the circuit current flows through it. A voltmeter measures potential difference, an ohmmeter resistance, and a wattmeter electrical power.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "D",
+          "options": [
+            {
+              "label": "A",
+              "text": "Voltmeter",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Ohmmeter",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Wattmeter",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Ammeter",
+              "rationale": "This is the supported answer. An ammeter is connected in series so that the circuit current flows through it. A voltmeter measures potential difference, an ohmmeter resistance, and a wattmeter electrical power."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_enr_b001_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENR",
+          "prompt": "When a dry cell powers a torch, the energy transformation that takes place is:",
+          "workedSolution": "A dry cell stores chemical energy and releases it as electrical energy in the circuit. The reverse change (electrical to chemical) occurs while charging a rechargeable cell.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "B",
+          "options": [
+            {
+              "label": "A",
+              "text": "Electrical energy to chemical energy",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Chemical energy to electrical energy",
+              "rationale": "This is the supported answer. A dry cell stores chemical energy and releases it as electrical energy in the circuit. The reverse change (electrical to chemical) occurs while charging a rechargeable cell."
+            },
+            {
+              "label": "C",
+              "text": "Heat energy to electrical energy",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Mechanical energy to electrical energy",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_enr_b001_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENR",
+          "prompt": "In a series circuit containing a battery and two lamps, the electric current is:",
+          "workedSolution": "In a series circuit there is only one path, so the same charge passes every point each second; current is the same everywhere and is not used up by the lamps.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "A",
+          "options": [
+            {
+              "label": "A",
+              "text": "The same at every point in the circuit",
+              "rationale": "This is the supported answer. In a series circuit there is only one path, so the same charge passes every point each second; current is the same everywhere and is not used up by the lamps."
+            },
+            {
+              "label": "B",
+              "text": "Greater near the positive terminal of the battery",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Permanently stored inside each lamp",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Zero when the two lamps are identical",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_enr_b001_005",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENR",
+          "prompt": "A 12 V battery is connected across a 4 Ω resistor. The current flowing through the resistor is:",
+          "workedSolution": "By Ohm’s law, I = V ÷ R = 12 V ÷ 4 Ω = 3 A. Multiplying the values (48 A) or inverting the division (0.33 A) misapplies the formula.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "C",
+          "options": [
+            {
+              "label": "A",
+              "text": "48 A",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "0.33 A",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "3 A",
+              "rationale": "This is the supported answer. By Ohm’s law, I = V ÷ R = 12 V ÷ 4 Ω = 3 A. Multiplying the values (48 A) or inverting the division (0.33 A) misapplies the formula."
+            },
+            {
+              "label": "D",
+              "text": "8 A",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_enr_b001_006",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENR",
+          "prompt": "A third identical lamp is added in series to a circuit containing a battery and two lamps. All the lamps become dimmer because:",
+          "workedSolution": "Series resistances add, so the third lamp raises the total resistance; by I = V ÷ R the current falls and each lamp converts less power to light.",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "B",
+          "options": [
+            {
+              "label": "A",
+              "text": "The battery produces a lower voltage for series lamps",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "The total resistance increases, so the current decreases",
+              "rationale": "This is the supported answer. Series resistances add, so the third lamp raises the total resistance; by I = V ÷ R the current falls and each lamp converts less power to light."
+            },
+            {
+              "label": "C",
+              "text": "The current is permanently used up by the lamps",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "The connecting wires stop the current",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_enr_b001_007",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENR",
+          "prompt": "Which of the following is an advantage of connecting household lamps in parallel rather than in series?",
+          "workedSolution": "In parallel, each branch connects across the supply, so every lamp gets the full mains voltage and a switch or fault in one branch does not affect the others.",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "D",
+          "options": [
+            {
+              "label": "A",
+              "text": "Parallel lamps always use less wire than series lamps",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "The total resistance of the circuit becomes very large",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "The current is the same through every lamp",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Each lamp receives the full supply voltage and can be switched independently",
+              "rationale": "This is the supported answer. In parallel, each branch connects across the supply, so every lamp gets the full mains voltage and a switch or fault in one branch does not affect the others."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_enr_b001_008",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENR",
+          "prompt": "Metals such as copper are good conductors of electricity mainly because:",
+          "workedSolution": "Free (delocalised) electrons drift through the metal lattice when a voltage is applied; this flow of charge is the current. Protons and nuclei stay fixed in the lattice.",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "A",
+          "options": [
+            {
+              "label": "A",
+              "text": "They contain free electrons that can drift through the metal",
+              "rationale": "This is the supported answer. Free (delocalised) electrons drift through the metal lattice when a voltage is applied; this flow of charge is the current. Protons and nuclei stay fixed in the lattice."
+            },
+            {
+              "label": "B",
+              "text": "Their atoms are packed loosely with large spaces",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Their protons are free to move through the lattice",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Their nuclei vibrate when a battery is connected",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_bio_b001_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BIO",
+          "prompt": "In humans, the digestion of starch begins in the:",
+          "workedSolution": "Saliva contains salivary amylase (ptyalin), which begins breaking starch into maltose while food is chewed. The stomach digests proteins; starch digestion continues in the small intestine.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "D",
+          "options": [
+            {
+              "label": "A",
+              "text": "Stomach",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Small intestine",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Large intestine",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Mouth",
+              "rationale": "This is the supported answer. Saliva contains salivary amylase (ptyalin), which begins breaking starch into maltose while food is chewed. The stomach digests proteins; starch digestion continues in the small intestine."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_bio_b001_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BIO",
+          "prompt": "The enzyme present in saliva that acts on cooked starch is:",
+          "workedSolution": "Salivary amylase digests starch into maltose. Pepsin and trypsin digest proteins in the stomach and small intestine respectively, and lipase digests fats, so none of them acts on starch.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "B",
+          "options": [
+            {
+              "label": "A",
+              "text": "Pepsin",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Amylase",
+              "rationale": "This is the supported answer. Salivary amylase digests starch into maltose. Pepsin and trypsin digest proteins in the stomach and small intestine respectively, and lipase digests fats, so none of them acts on starch."
+            },
+            {
+              "label": "C",
+              "text": "Lipase",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Trypsin",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_bio_b001_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BIO",
+          "prompt": "Most digested food is absorbed into the bloodstream in the:",
+          "workedSolution": "The villi of the small intestine give a very large surface area with thin walls and a rich blood supply, so digested food molecules diffuse quickly into the blood. The large intestine absorbs mainly water.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "C",
+          "options": [
+            {
+              "label": "A",
+              "text": "Stomach",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Large intestine",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Small intestine",
+              "rationale": "This is the supported answer. The villi of the small intestine give a very large surface area with thin walls and a rich blood supply, so digested food molecules diffuse quickly into the blood. The large intestine absorbs mainly water."
+            },
+            {
+              "label": "D",
+              "text": "Oesophagus",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_bio_b001_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BIO",
+          "prompt": "Bile, the substance that acts on fats during digestion, is produced by the:",
+          "workedSolution": "Bile is made by the liver; the gall bladder only stores it and releases it into the small intestine. The pancreas produces digestive enzymes such as lipase, and the stomach produces gastric juice.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "A",
+          "options": [
+            {
+              "label": "A",
+              "text": "Liver",
+              "rationale": "This is the supported answer. Bile is made by the liver; the gall bladder only stores it and releases it into the small intestine. The pancreas produces digestive enzymes such as lipase, and the stomach produces gastric juice."
+            },
+            {
+              "label": "B",
+              "text": "Pancreas",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Gall bladder",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Stomach",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_bio_b001_005",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BIO",
+          "prompt": "Pepsin begins the digestion of proteins in the stomach. Pepsin works effectively there because the stomach provides:",
+          "workedSolution": "The stomach lining secretes hydrochloric acid, giving the low pH that pepsin needs to work. Bile and pancreatic juice are alkaline but act in the small intestine, and saliva is nearly neutral.",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "B",
+          "options": [
+            {
+              "label": "A",
+              "text": "An alkaline medium from bile",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "An acidic medium from hydrochloric acid",
+              "rationale": "This is the supported answer. The stomach lining secretes hydrochloric acid, giving the low pH that pepsin needs to work. Bile and pancreatic juice are alkaline but act in the small intestine, and saliva is nearly neutral."
+            },
+            {
+              "label": "C",
+              "text": "A neutral medium from saliva",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "An alkaline medium from pancreatic juice",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_bio_b001_006",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BIO",
+          "prompt": "Apart from providing the acidic conditions needed by pepsin, another important function of the hydrochloric acid in the stomach is to:",
+          "workedSolution": "The strong acid kills many of the micro-organisms swallowed with food, protecting the body from infection. Bile emulsifies fats, and water is absorbed mainly in the large intestine.",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "C",
+          "options": [
+            {
+              "label": "A",
+              "text": "Digest starch into glucose",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Emulsify fats into tiny droplets",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Kill most of the bacteria taken in with food",
+              "rationale": "This is the supported answer. The strong acid kills many of the micro-organisms swallowed with food, protecting the body from infection. Bile emulsifies fats, and water is absorbed mainly in the large intestine."
+            },
+            {
+              "label": "D",
+              "text": "Absorb water from the food",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_bio_b001_007",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BIO",
+          "prompt": "Bile helps the digestion of fats by:",
+          "workedSolution": "Bile salts break large fat globules into small droplets (emulsification), increasing the surface area for lipase to act. Bile contains no enzyme; lipase does the chemical breakdown of fats.",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "D",
+          "options": [
+            {
+              "label": "A",
+              "text": "Chemically breaking fat molecules into fatty acids and glycerol",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Neutralising all the acid produced in the stomach",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Converting fats into glucose for easy absorption",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Emulsifying the fats — breaking large fat globules into smaller droplets",
+              "rationale": "This is the supported answer. Bile salts break large fat globules into small droplets (emulsification), increasing the surface area for lipase to act. Bile contains no enzyme; lipase does the chemical breakdown of fats."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_bio_b001_008",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BIO",
+          "prompt": "The end product of protein digestion that is absorbed into the blood is:",
+          "workedSolution": "Proteins are digested by pepsin, trypsin and peptidases into amino acids, which are small and soluble enough to be absorbed. Glucose comes from carbohydrates; fatty acids and glycerol come from fats.",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "A",
+          "options": [
+            {
+              "label": "A",
+              "text": "Amino acids",
+              "rationale": "This is the supported answer. Proteins are digested by pepsin, trypsin and peptidases into amino acids, which are small and soluble enough to be absorbed. Glucose comes from carbohydrates; fatty acids and glycerol come from fats."
+            },
+            {
+              "label": "B",
+              "text": "Glucose",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Fatty acids and glycerol",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Maltose",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_hlt_b001_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLT",
+          "prompt": "Malaria is transmitted to humans through the bite of an infected:",
+          "workedSolution": "Only female mosquitoes take blood meals, and the female Anopheles mosquito carries the Plasmodium parasite. The tsetse fly transmits sleeping sickness and houseflies spread diarrhoeal diseases.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "C",
+          "options": [
+            {
+              "label": "A",
+              "text": "Male Culex mosquito",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Tsetse fly",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Female Anopheles mosquito",
+              "rationale": "This is the supported answer. Only female mosquitoes take blood meals, and the female Anopheles mosquito carries the Plasmodium parasite. The tsetse fly transmits sleeping sickness and houseflies spread diarrhoeal diseases."
+            },
+            {
+              "label": "D",
+              "text": "Housefly",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_hlt_b001_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLT",
+          "prompt": "Cholera is commonly spread when people:",
+          "workedSolution": "Cholera bacteria pass out in the faeces of patients and contaminate drinking water or food, infecting the next person who swallows them. Cholera is not spread by mosquitoes, droplets or casual contact.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "D",
+          "options": [
+            {
+              "label": "A",
+              "text": "Are bitten by infected mosquitoes",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Inhale droplets from a coughing patient",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Touch the skin of an infected person",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Drink water or eat food contaminated with faeces",
+              "rationale": "This is the supported answer. Cholera bacteria pass out in the faeces of patients and contaminate drinking water or food, infecting the next person who swallows them. Cholera is not spread by mosquitoes, droplets or casual contact."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_hlt_b001_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLT",
+          "prompt": "Which of the following is a non-communicable disease?",
+          "workedSolution": "Diabetes mellitus results from the body failing to control blood glucose properly and cannot pass from person to person. Tuberculosis, measles and cholera are communicable diseases caused by pathogens.",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "A",
+          "options": [
+            {
+              "label": "A",
+              "text": "Diabetes mellitus",
+              "rationale": "This is the supported answer. Diabetes mellitus results from the body failing to control blood glucose properly and cannot pass from person to person. Tuberculosis, measles and cholera are communicable diseases caused by pathogens."
+            },
+            {
+              "label": "B",
+              "text": "Tuberculosis",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Measles",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Cholera",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_hlt_b001_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLT",
+          "prompt": "Vaccination protects a person against a disease mainly by:",
+          "workedSolution": "A vaccine introduces a harmless form of the pathogen (or part of it), so the immune system makes antibodies and memory cells that respond rapidly if the real pathogen arrives later.",
+          "difficulty": "easy",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "B",
+          "options": [
+            {
+              "label": "A",
+              "text": "Instantly killing all the germs in the blood",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Stimulating the body to produce antibodies before infection occurs",
+              "rationale": "This is the supported answer. A vaccine introduces a harmless form of the pathogen (or part of it), so the immune system makes antibodies and memory cells that respond rapidly if the real pathogen arrives later."
+            },
+            {
+              "label": "C",
+              "text": "Replacing infected blood with healthy blood",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Making the skin completely germ-proof",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_hlt_b001_005",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLT",
+          "prompt": "Clearing stagnant water from around homes helps to control malaria because it:",
+          "workedSolution": "Mosquitoes lay eggs in stagnant water where the larvae develop; draining or covering such water breaks the life cycle, so fewer adult mosquitoes emerge to transmit the parasite.",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "C",
+          "options": [
+            {
+              "label": "A",
+              "text": "Kills the Plasmodium parasite directly",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Stops mosquitoes from feeding at night",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Destroys the breeding sites where mosquito larvae develop",
+              "rationale": "This is the supported answer. Mosquitoes lay eggs in stagnant water where the larvae develop; draining or covering such water breaks the life cycle, so fewer adult mosquitoes emerge to transmit the parasite."
+            },
+            {
+              "label": "D",
+              "text": "Makes the air too dry for adult mosquitoes to fly",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_hlt_b001_006",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLT",
+          "prompt": "The most immediate danger to a person suffering from cholera is:",
+          "workedSolution": "Cholera causes profuse watery diarrhoea and vomiting; rapid loss of water and salts leads to fatal dehydration within hours, so oral rehydration solution is the key first treatment.",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "D",
+          "options": [
+            {
+              "label": "A",
+              "text": "High fever causing brain damage",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "The bacteria invading the lungs",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Permanent damage to the eyesight",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Severe dehydration from the rapid loss of water and salts through diarrhoea",
+              "rationale": "This is the supported answer. Cholera causes profuse watery diarrhoea and vomiting; rapid loss of water and salts leads to fatal dehydration within hours, so oral rehydration solution is the key first treatment."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_hlt_b001_007",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLT",
+          "prompt": "Tuberculosis is mainly spread when:",
+          "workedSolution": "Tuberculosis is an airborne disease: a patient releases bacteria-laden droplets when coughing, sneezing or speaking, and people nearby inhale them into their lungs.",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "A",
+          "options": [
+            {
+              "label": "A",
+              "text": "Droplets coughed or sneezed by an infected person are inhaled",
+              "rationale": "This is the supported answer. Tuberculosis is an airborne disease: a patient releases bacteria-laden droplets when coughing, sneezing or speaking, and people nearby inhale them into their lungs."
+            },
+            {
+              "label": "B",
+              "text": "Contaminated food is eaten",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "An infected mosquito bites a healthy person",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Open wounds come into contact with soil",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_hlt_b001_008",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLT",
+          "prompt": "Community pipe-borne water is treated with chlorine mainly to:",
+          "workedSolution": "Chlorination disinfects water by killing bacteria, viruses and other pathogens, preventing water-borne diseases such as cholera and typhoid.",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "B",
+          "options": [
+            {
+              "label": "A",
+              "text": "Give the water a salty taste",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Kill disease-causing micro-organisms in the water",
+              "rationale": "This is the supported answer. Chlorination disinfects water by killing bacteria, viruses and other pathogens, preventing water-borne diseases such as cholera and typhoid."
+            },
+            {
+              "label": "C",
+              "text": "Remove all dissolved minerals from the water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Increase the oxygen content of the water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_reproduction_b001_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-REP",
+          "prompt": "Which of the following is an example of asexual reproduction?",
+          "workedSolution": "Budding involves a single parent and no fusion of gametes, so it is asexual reproduction. Fertilisation, pollination (leading to fertilisation) and cross-breeding all involve gametes from two parents.",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "D",
+          "options": [
+            {
+              "label": "A",
+              "text": "Fertilisation in humans",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Pollination in maize",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Cross-breeding of cattle",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Budding in yeast",
+              "rationale": "This is the supported answer. Budding involves a single parent and no fusion of gametes, so it is asexual reproduction. Fertilisation, pollination (leading to fertilisation) and cross-breeding all involve gametes from two parents."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_reproduction_b001_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-REP",
+          "prompt": "In flowering plants, pollination is best described as the:",
+          "workedSolution": "Pollination is the transfer of pollen (carrying the male gametes) from anther to stigma by wind, insects or other agents. The fusion of gametes that follows is fertilisation, a separate event.",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "B",
+          "options": [
+            {
+              "label": "A",
+              "text": "Fusion of the male and female gametes",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Transfer of pollen grains from the anther to the stigma",
+              "rationale": "This is the supported answer. Pollination is the transfer of pollen (carrying the male gametes) from anther to stigma by wind, insects or other agents. The fusion of gametes that follows is fertilisation, a separate event."
+            },
+            {
+              "label": "C",
+              "text": "Development of the ovule into a seed",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Release of seeds from a ripe fruit",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_reproduction_b001_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-REP",
+          "prompt": "In humans, fertilisation of the egg normally takes place in the:",
+          "workedSolution": "After ovulation the egg travels along the oviduct, where it may meet sperm and be fertilised; the embryo then implants in the uterus. The ovary releases the egg but is not the site of fertilisation.",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "C",
+          "options": [
+            {
+              "label": "A",
+              "text": "Ovary",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Uterus",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Oviduct (fallopian tube)",
+              "rationale": "This is the supported answer. After ovulation the egg travels along the oviduct, where it may meet sperm and be fertilised; the embryo then implants in the uterus. The ovary releases the egg but is not the site of fertilisation."
+            },
+            {
+              "label": "D",
+              "text": "Vagina",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_reproduction_b001_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-REP",
+          "prompt": "In genetics, an allele is:",
+          "workedSolution": "Alleles are alternative versions of the same gene, for example T (tall) and t (short) in pea plants. The physical appearance produced by the alleles is the phenotype, which is a different concept.",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "A",
+          "options": [
+            {
+              "label": "A",
+              "text": "An alternative form of a gene",
+              "rationale": "This is the supported answer. Alleles are alternative versions of the same gene, for example T (tall) and t (short) in pea plants. The physical appearance produced by the alleles is the phenotype, which is a different concept."
+            },
+            {
+              "label": "B",
+              "text": "A chromosome found only in males",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "The physical appearance of an organism",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "A cell that carries gametes",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_reproduction_b001_005",
+          "original": true,
+          "topicCode": "WASSCE-ISC-REP",
+          "prompt": "Two heterozygous tall pea plants (Tt × Tt) are crossed, where the allele T for tallness is dominant over t for shortness. The expected genotypic ratio of the offspring is:",
+          "workedSolution": "A Punnett square for Tt × Tt gives TT, Tt, Tt and tt, a genotypic ratio of 1 : 2 : 1. The 3 : 1 ratio is the phenotypic ratio (three tall to one short), which describes appearance, not genotype.",
+          "difficulty": "hard",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "B",
+          "options": [
+            {
+              "label": "A",
+              "text": "3 tall : 1 short",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "1 TT : 2 Tt : 1 tt",
+              "rationale": "This is the supported answer. A Punnett square for Tt × Tt gives TT, Tt, Tt and tt, a genotypic ratio of 1 : 2 : 1. The 3 : 1 ratio is the phenotypic ratio (three tall to one short), which describes appearance, not genotype."
+            },
+            {
+              "label": "C",
+              "text": "1 Tt : 1 tt",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "All Tt",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_reproduction_b001_006",
+          "original": true,
+          "topicCode": "WASSCE-ISC-REP",
+          "prompt": "In humans, the sex of a child is determined by:",
+          "workedSolution": "Every egg carries an X chromosome, while each sperm carries either X or Y. An X-carrying sperm gives an XX (female) zygote and a Y-carrying sperm an XY (male) zygote, so the sperm determines sex.",
+          "difficulty": "hard",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "multiple_choice",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "correctAnswer": "C",
+          "options": [
+            {
+              "label": "A",
+              "text": "Whether the egg carries an X or a Y chromosome",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "The number of chromosomes in the mother’s blood",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Whether the fertilising sperm carries an X or a Y chromosome",
+              "rationale": "This is the supported answer. Every egg carries an X chromosome, while each sperm carries either X or Y. An X-carrying sperm gives an XX (female) zygote and a Y-carrying sperm an XY (male) zygote, so the sperm determines sex."
+            },
+            {
+              "label": "D",
+              "text": "The age of the mother at conception",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_enr_b001_009",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENR",
+          "prompt": "A 6 Ω resistor is connected across a 12 V battery. Calculate (a) the current flowing through the resistor and (b) the power dissipated by the resistor.",
+          "workedSolution": "(a) By Ohm’s law, current I = V ÷ R = 12 V ÷ 6 Ω = 2 A. (b) Power P = V × I = 12 V × 2 A = 24 W (equivalently P = I²R = (2 A)² × 6 Ω = 24 W). Both parts must carry the correct units to earn full marks.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "calculation",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "correctAnswer": "(a) 2 A (b) 24 W"
+        },
+        {
+          "id": "q_wisc_enr_b001_010",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENR",
+          "prompt": "An electric kettle is rated at 2 000 W. Calculate the electrical energy it consumes when it is used for 5 minutes, giving your answer in joules.",
+          "workedSolution": "Energy E = power × time, with time in seconds: t = 5 × 60 = 300 s. So E = 2 000 W × 300 s = 600 000 J = 600 kJ. A common error is to multiply 2 000 by 5 (giving 10 000 J), forgetting to convert minutes to seconds.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "type": "calculation",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "correctAnswer": "600 000 J (600 kJ)"
+        }
+      ]
+    }
+  ]
+}
