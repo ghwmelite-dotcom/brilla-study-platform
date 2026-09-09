@@ -1,0 +1,2429 @@
+{
+  "batchId": "wassce-int-science-sprint2-001",
+  "status": "approved_for_beta",
+  "examTypeId": "exam_wassce",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+      "title": "Secondary Education Curriculum — Integrated Science",
+      "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T00:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science practice; not official WAEC examination material.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_wassce_int_science",
+      "specificationCode": "BRILLA-WASSCE-ISC-S2-001",
+      "sources": [
+        {
+          "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+          "title": "Secondary Education Curriculum — Integrated Science",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "WASSCE-ISC-AGR",
+          "title": "Soil and crop production",
+          "objective": "Explain soil properties and apply crop-production practices used by Ghanaian farmers."
+        },
+        {
+          "code": "WASSCE-ISC-WST",
+          "title": "Waste management",
+          "objective": "Classify waste and evaluate safe methods of reducing, reusing, recycling and disposing of refuse."
+        },
+        {
+          "code": "WASSCE-ISC-ENV",
+          "title": "Water and pollution",
+          "objective": "Describe water treatment and purification and explain the causes and effects of water pollution."
+        },
+        {
+          "code": "WASSCE-ISC-ACD",
+          "title": "Acids, Bases and Salts",
+          "objective": "Apply acid-base reactions and carry out simple mole and concentration calculations."
+        },
+        {
+          "code": "WASSCE-ISC-ECO",
+          "title": "Ecosystems",
+          "objective": "Analyse energy flow and nutrient cycling in ecosystems."
+        },
+        {
+          "code": "WASSCE-ISC-MAT",
+          "title": "Matter and mixtures",
+          "objective": "Select and justify separation techniques for mixtures."
+        },
+        {
+          "code": "WASSCE-ISC-ENR",
+          "title": "Electricity and energy",
+          "objective": "Analyse circuits and electrical safety devices."
+        },
+        {
+          "code": "WASSCE-ISC-BIO",
+          "title": "Human digestion",
+          "objective": "Analyse the enzymes and adaptations of the human alimentary canal."
+        },
+        {
+          "code": "WASSCE-ISC-HLT",
+          "title": "Disease and health",
+          "objective": "Distinguish pathogens from vectors and evaluate disease-control measures."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_wisc_agr_b002_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGR",
+          "type": "multiple_choice",
+          "prompt": "Which mineral soil particles are the largest and feel gritty when rubbed between the fingers?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Sand",
+              "rationale": "This is the supported answer. Sand particles are the largest mineral particles in soil and feel gritty; silt feels smooth and floury, clay is the finest and becomes sticky when wet, and humus is decomposed organic matter rather than a mineral particle at all."
+            },
+            {
+              "label": "B",
+              "text": "Clay",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Silt",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Humus",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Sand particles are the largest mineral particles in soil and feel gritty; silt feels smooth and floury, clay is the finest and becomes sticky when wet, and humus is decomposed organic matter rather than a mineral particle at all. Therefore the correct answer is A: Sand.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agr_b002_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGR",
+          "type": "multiple_choice",
+          "prompt": "Which of the following crops is a legume commonly included in crop rotation in Ghana?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Maize",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Cowpea",
+              "rationale": "This is the supported answer. Cowpea is a legume whose root nodules host Rhizobium bacteria that fix atmospheric nitrogen into the soil, so it restores fertility for the next crop; maize, cassava and plantain are not legumes and cannot fix nitrogen."
+            },
+            {
+              "label": "C",
+              "text": "Cassava",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Plantain",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Cowpea is a legume whose root nodules host Rhizobium bacteria that fix atmospheric nitrogen into the soil, so it restores fertility for the next crop; maize, cassava and plantain are not legumes and cannot fix nitrogen. Therefore the correct answer is B: Cowpea.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agr_b002_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGR",
+          "type": "multiple_choice",
+          "prompt": "The dark, decomposed organic matter in topsoil that improves soil fertility is called",
+          "options": [
+            {
+              "label": "A",
+              "text": "laterite",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "loam",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "humus",
+              "rationale": "This is the supported answer. Humus is the stable product of microbial decomposition of plant and animal remains; it darkens topsoil, improves water retention and slowly releases nutrients. Loam is a balanced soil texture, laterite is an iron-rich subsoil, and gravel is coarse rock fragments."
+            },
+            {
+              "label": "D",
+              "text": "gravel",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Humus is the stable product of microbial decomposition of plant and animal remains; it darkens topsoil, improves water retention and slowly releases nutrients. Loam is a balanced soil texture, laterite is an iron-rich subsoil, and gravel is coarse rock fragments. Therefore the correct answer is C: humus.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agr_b002_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGR",
+          "type": "multiple_choice",
+          "prompt": "Which simple tool is most appropriate for weeding a small school garden?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Tractor",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Combine harvester",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Boom sprayer",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Hoe",
+              "rationale": "This is the supported answer. A hoe is a simple hand tool suited to uprooting weeds on small plots; a tractor is used for large-scale land preparation, a combine harvester for harvesting grain, and a boom sprayer for applying agrochemicals, none of which suit a small garden."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A hoe is a simple hand tool suited to uprooting weeds on small plots; a tractor is used for large-scale land preparation, a combine harvester for harvesting grain, and a boom sprayer for applying agrochemicals, none of which suit a small garden. Therefore the correct answer is D: Hoe.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agr_b002_005",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGR",
+          "type": "multiple_choice",
+          "prompt": "On a fertilizer bag labelled NPK 15-15-15, the letters N, P and K stand for",
+          "options": [
+            {
+              "label": "A",
+              "text": "nitrogen, phosphorus and potassium",
+              "rationale": "This is the supported answer. NPK lists the three primary macronutrients in the fixed order nitrogen (promotes leafy growth), phosphorus (root and seed development) and potassium (disease resistance and water regulation); sodium, iron and calcium are not the primary nutrients named by the NPK grade."
+            },
+            {
+              "label": "B",
+              "text": "sodium, phosphorus and potassium",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "nitrogen, iron and calcium",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "potassium, nitrogen and phosphorus",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "NPK lists the three primary macronutrients in the fixed order nitrogen (promotes leafy growth), phosphorus (root and seed development) and potassium (disease resistance and water regulation); sodium, iron and calcium are not the primary nutrients named by the NPK grade. Therefore the correct answer is A: nitrogen, phosphorus and potassium.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "State",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agr_b002_006",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGR",
+          "type": "multiple_choice",
+          "prompt": "Why do Ghanaian farmers often grow groundnut or cowpea in rotation with maize?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The legumes shade the maize from excessive sunlight",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "The legumes fix nitrogen that later benefits the maize crop",
+              "rationale": "This is the supported answer. Legume root nodules contain Rhizobium bacteria which convert inert atmospheric nitrogen into nitrates that remain in the soil after harvest; the following maize crop absorbs this nitrogen, cutting fertilizer costs. The other claims are not the agronomic reason for rotating with legumes."
+            },
+            {
+              "label": "C",
+              "text": "The legumes release chemicals that repel all maize pests",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "The legumes dry the soil so maize roots grow deeper",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Legume root nodules contain Rhizobium bacteria which convert inert atmospheric nitrogen into nitrates that remain in the soil after harvest; the following maize crop absorbs this nitrogen, cutting fertilizer costs. The other claims are not the agronomic reason for rotating with legumes. Therefore the correct answer is B: The legumes fix nitrogen that later benefits the maize crop.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agr_b002_007",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGR",
+          "type": "multiple_choice",
+          "prompt": "The gradual washing away of dissolved mineral nutrients from the topsoil by percolating rainwater is called",
+          "options": [
+            {
+              "label": "A",
+              "text": "erosion",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "mulching",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "leaching",
+              "rationale": "This is the supported answer. Leaching is the downward movement of soluble nutrients such as nitrates in percolating water, carrying them below the reach of crop roots. Erosion is the physical removal of topsoil particles, mulching is covering the soil surface, and capillarity is the upward movement of water."
+            },
+            {
+              "label": "D",
+              "text": "capillarity",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Leaching is the downward movement of soluble nutrients such as nitrates in percolating water, carrying them below the reach of crop roots. Erosion is the physical removal of topsoil particles, mulching is covering the soil surface, and capillarity is the upward movement of water. Therefore the correct answer is C: leaching.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agr_b002_008",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGR",
+          "type": "multiple_choice",
+          "prompt": "Ploughing along the contour lines of a sloping field mainly helps to",
+          "options": [
+            {
+              "label": "A",
+              "text": "increase the temperature of the topsoil",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "raise the pH of acidic soil",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "kill soil-borne pests before planting",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "reduce soil erosion by slowing run-off water",
+              "rationale": "This is the supported answer. Contour ridges act as small barriers across the slope; they slow surface run-off so rainwater soaks into the soil instead of rushing downhill and carrying the fertile topsoil away. Contour ploughing does not change soil temperature, pH or pest populations."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Contour ridges act as small barriers across the slope; they slow surface run-off so rainwater soaks into the soil instead of rushing downhill and carrying the fertile topsoil away. Contour ploughing does not change soil temperature, pH or pest populations. Therefore the correct answer is D: reduce soil erosion by slowing run-off water.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agr_b002_009",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGR",
+          "type": "multiple_choice",
+          "prompt": "A soil test on a farm reads pH 4.8 and the crops grow poorly. Which treatment is most appropriate, and why?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Apply agricultural lime such as calcium hydroxide to raise the soil pH",
+              "rationale": "This is the supported answer. Acidic soils are corrected by liming: calcium hydroxide neutralises excess hydrogen ions and raises the pH toward the range of about 5.5 to 7 that most food crops prefer. Ammonium sulfate is acid-forming and would worsen the problem, and dilution by watering cannot remove the reserve acidity held on clay and humus particles."
+            },
+            {
+              "label": "B",
+              "text": "Apply ammonium sulfate fertilizer to supply more nitrogen",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Water the field continuously to dilute the acidity",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Add only fresh acidic compost to feed the crops",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Acidic soils are corrected by liming: calcium hydroxide neutralises excess hydrogen ions and raises the pH toward the range of about 5.5 to 7 that most food crops prefer. Ammonium sulfate is acid-forming and would worsen the problem, and dilution by watering cannot remove the reserve acidity held on clay and humus particles. Therefore the correct answer is A: Apply agricultural lime such as calcium hydroxide to raise the soil pH.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agr_b002_010",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGR",
+          "type": "multiple_choice",
+          "prompt": "In a waterlogged clay soil, crop roots often die mainly because",
+          "options": [
+            {
+              "label": "A",
+              "text": "the standing water makes the soil too cold for enzymes",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "the air spaces fill with water, so roots cannot obtain oxygen for respiration",
+              "rationale": "This is the supported answer. Roots respire aerobically, taking oxygen from soil air spaces. When water fills those spaces, oxygen diffusion to the roots stops; the roots switch to anaerobic respiration, accumulate toxic products and die, so the shoot wilts even though water is abundant. Cold, instant humus loss and nitrogen overload are not the cause."
+            },
+            {
+              "label": "C",
+              "text": "the excess water dissolves all the humus immediately",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "the roots absorb dangerously large amounts of nitrogen",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Roots respire aerobically, taking oxygen from soil air spaces. When water fills those spaces, oxygen diffusion to the roots stops; the roots switch to anaerobic respiration, accumulate toxic products and die, so the shoot wilts even though water is abundant. Cold, instant humus loss and nitrogen overload are not the cause. Therefore the correct answer is B: the air spaces fill with water, so roots cannot obtain oxygen for respiration.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agr_b002_011",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGR",
+          "type": "calculation",
+          "prompt": "A school maize plot measures 40 m by 25 m. Maize is planted at a spacing of 1 m between rows and 0.5 m between plants within a row. Calculate the expected plant population on the plot.",
+          "correctAnswer": "2 000 plants",
+          "workedSolution": "Area per plant = spacing between rows x spacing within a row = 1 m x 0.5 m = 0.5 square metres. Plot area = 40 m x 25 m = 1 000 square metres. Plant population = plot area / area per plant = 1 000 / 0.5 = 2 000 plants.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agr_b002_012",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGR",
+          "type": "calculation",
+          "prompt": "A farmer applies one 50 kg bag of NPK 15-15-15 fertilizer to a field. Calculate the mass of nitrogen contained in the bag.",
+          "correctAnswer": "7.5 kg",
+          "workedSolution": "The grade 15-15-15 means the fertilizer contains 15% nitrogen by mass. Mass of nitrogen = (15 / 100) x 50 kg = 0.15 x 50 = 7.5 kg. The same bag also contains 7.5 kg of P2O5 equivalent and 7.5 kg of K2O equivalent.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_wst_b002_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WST",
+          "type": "multiple_choice",
+          "prompt": "Which of the following waste items is biodegradable?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Plastic sachet",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Glass bottle",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Banana peel",
+              "rationale": "This is the supported answer. A banana peel is broken down by micro-organisms within weeks, so it is biodegradable; plastic sachets, glass bottles and aluminium cans resist microbial attack and persist in the environment for decades or even centuries."
+            },
+            {
+              "label": "D",
+              "text": "Aluminium can",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A banana peel is broken down by micro-organisms within weeks, so it is biodegradable; plastic sachets, glass bottles and aluminium cans resist microbial attack and persist in the environment for decades or even centuries. Therefore the correct answer is C: Banana peel.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_wst_b002_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WST",
+          "type": "multiple_choice",
+          "prompt": "The three Rs of waste management are",
+          "options": [
+            {
+              "label": "A",
+              "text": "Read, Repair and Recycle",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Reduce, Remove and Rot",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Reuse, Repackage and Release",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Reduce, Reuse and Recycle",
+              "rationale": "This is the supported answer. Waste management hierarchy starts with reducing what we consume, then reusing items where possible, and finally recycling materials into new products; only what remains after the three Rs should be disposed of in a controlled way."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Waste management hierarchy starts with reducing what we consume, then reusing items where possible, and finally recycling materials into new products; only what remains after the three Rs should be disposed of in a controlled way. Therefore the correct answer is D: Reduce, Reuse and Recycle.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_wst_b002_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WST",
+          "type": "multiple_choice",
+          "prompt": "Converting kitchen and garden waste into manure through controlled decomposition is called",
+          "options": [
+            {
+              "label": "A",
+              "text": "composting",
+              "rationale": "This is the supported answer. Composting is the managed aerobic decomposition of organic waste by micro-organisms into a humus-like material used as manure; incineration burns waste, landfilling buries it, and leaching is the washing out of dissolved substances."
+            },
+            {
+              "label": "B",
+              "text": "incineration",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "landfilling",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "leaching",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Composting is the managed aerobic decomposition of organic waste by micro-organisms into a humus-like material used as manure; incineration burns waste, landfilling buries it, and leaching is the washing out of dissolved substances. Therefore the correct answer is A: composting.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_wst_b002_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WST",
+          "type": "multiple_choice",
+          "prompt": "The safest first step in managing household refuse is to",
+          "options": [
+            {
+              "label": "A",
+              "text": "burn all the waste in the backyard",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "separate biodegradable from non-biodegradable waste",
+              "rationale": "This is the supported answer. Separating waste at source keeps recyclables clean and makes organic matter available for composting. Open burning of plastics releases toxic fumes, dumping in gutters blocks drains and causes floods and disease, and buried plastics do not decompose."
+            },
+            {
+              "label": "C",
+              "text": "dump the waste into the nearest gutter",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "bury all plastics in the garden",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Separating waste at source keeps recyclables clean and makes organic matter available for composting. Open burning of plastics releases toxic fumes, dumping in gutters blocks drains and causes floods and disease, and buried plastics do not decompose. Therefore the correct answer is B: separate biodegradable from non-biodegradable waste.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_wst_b002_005",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WST",
+          "type": "multiple_choice",
+          "prompt": "Why is the open burning of plastic waste strongly discouraged?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It releases extra oxygen into the atmosphere",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "It makes the plastics biodegradable",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "It releases toxic fumes such as dioxins that damage health",
+              "rationale": "This is the supported answer. Incomplete combustion of plastics emits carbon monoxide, dioxins and fine particulates linked to respiratory disease and cancer; the fumes settle on soil and crops. Burning does not make plastics biodegradable, nor does it sterilise or improve soil."
+            },
+            {
+              "label": "D",
+              "text": "It sterilises the soil for farming",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Incomplete combustion of plastics emits carbon monoxide, dioxins and fine particulates linked to respiratory disease and cancer; the fumes settle on soil and crops. Burning does not make plastics biodegradable, nor does it sterilise or improve soil. Therefore the correct answer is C: It releases toxic fumes such as dioxins that damage health.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_wst_b002_006",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WST",
+          "type": "multiple_choice",
+          "prompt": "The main difference between a sanitary landfill and an open refuse dump is that a sanitary landfill",
+          "options": [
+            {
+              "label": "A",
+              "text": "is always sited in the centre of town for easy access",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "burns all incoming waste on arrival",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "accepts only liquid waste from factories",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "is lined and the waste is covered with soil each day to control leachate and pests",
+              "rationale": "This is the supported answer. An engineered sanitary landfill uses an impermeable liner to stop leachate reaching groundwater and compacts and covers the waste with soil daily to control flies, rodents and odours; an open dump leaves waste exposed to scavengers, wind and rain."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "An engineered sanitary landfill uses an impermeable liner to stop leachate reaching groundwater and compacts and covers the waste with soil daily to control flies, rodents and odours; an open dump leaves waste exposed to scavengers, wind and rain. Therefore the correct answer is D: is lined and the waste is covered with soil each day to control leachate and pests.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_wst_b002_007",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WST",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is classified as hazardous household waste?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Used dry-cell batteries",
+              "rationale": "This is the supported answer. Used dry-cell batteries contain heavy metals such as lead, cadmium and mercury which leach into soil and water and poison organisms, so they need special collection; eggshells, paper and grass cuttings are ordinary biodegradable or recyclable waste."
+            },
+            {
+              "label": "B",
+              "text": "Eggshells",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Paper wrappers",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Grass cuttings",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Used dry-cell batteries contain heavy metals such as lead, cadmium and mercury which leach into soil and water and poison organisms, so they need special collection; eggshells, paper and grass cuttings are ordinary biodegradable or recyclable waste. Therefore the correct answer is A: Used dry-cell batteries.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_wst_b002_008",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WST",
+          "type": "multiple_choice",
+          "prompt": "Recycling aluminium cans conserves resources mainly because",
+          "options": [
+            {
+              "label": "A",
+              "text": "aluminium cans cannot rust in the environment",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "remelting scrap aluminium uses far less energy than extracting new aluminium from bauxite",
+              "rationale": "This is the supported answer. Producing aluminium from bauxite is extremely energy-intensive; remelting scrap uses only a small fraction of that energy and also conserves the ore. Rusting and magnetism are irrelevant here, and bauxite mining continues, so recycling is an energy and resource saving, not a necessity."
+            },
+            {
+              "label": "C",
+              "text": "recycled aluminium is magnetic and easy to sort",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "new aluminium can no longer be mined in Ghana",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Producing aluminium from bauxite is extremely energy-intensive; remelting scrap uses only a small fraction of that energy and also conserves the ore. Rusting and magnetism are irrelevant here, and bauxite mining continues, so recycling is an energy and resource saving, not a necessity. Therefore the correct answer is B: remelting scrap aluminium uses far less energy than extracting new aluminium from bauxite.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_wst_b002_009",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WST",
+          "type": "multiple_choice",
+          "prompt": "The greatest long-term environmental danger at informal e-waste burning sites such as Agbogbloshie is that",
+          "options": [
+            {
+              "label": "A",
+              "text": "the smoke produces an unpleasant smell over the city",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "the noise from the site disturbs nearby residents",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "heavy metals such as lead and mercury leach into soil and groundwater and enter food chains",
+              "rationale": "This is the supported answer. Burning cables and circuit boards releases lead, mercury and cadmium; these metals persist for decades, leach into soil and groundwater, and bioaccumulate in crops, fish and people, causing neurological and kidney damage long after burning stops. Smell, noise and land loss are real but short-term local nuisances by comparison."
+            },
+            {
+              "label": "D",
+              "text": "the land becomes unavailable for growing vegetables",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Burning cables and circuit boards releases lead, mercury and cadmium; these metals persist for decades, leach into soil and groundwater, and bioaccumulate in crops, fish and people, causing neurological and kidney damage long after burning stops. Smell, noise and land loss are real but short-term local nuisances by comparison. Therefore the correct answer is C: heavy metals such as lead and mercury leach into soil and groundwater and enter food chains.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Evaluate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_wst_b002_010",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WST",
+          "type": "multiple_choice",
+          "prompt": "Methane produced by decomposing refuse in landfills is a concern mainly because it",
+          "options": [
+            {
+              "label": "A",
+              "text": "gives refuse its characteristic sweet smell",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "reacts with rainwater to form acid rain directly",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "attracts mosquitoes that spread malaria",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "is a potent greenhouse gas and can form explosive mixtures in enclosed spaces",
+              "rationale": "This is the supported answer. Anaerobic decomposition of organic waste releases methane, which traps far more heat per molecule than carbon dioxide and can accumulate to explosive concentrations in buildings or pipes near landfills; modern sites therefore vent or capture it. It is odourless, does not form acid rain directly and does not attract mosquitoes."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Anaerobic decomposition of organic waste releases methane, which traps far more heat per molecule than carbon dioxide and can accumulate to explosive concentrations in buildings or pipes near landfills; modern sites therefore vent or capture it. It is odourless, does not form acid rain directly and does not attract mosquitoes. Therefore the correct answer is D: is a potent greenhouse gas and can form explosive mixtures in enclosed spaces.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_wst_b002_011",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WST",
+          "type": "calculation",
+          "prompt": "A community of 400 households generates an average of 2.5 kg of refuse per household per day. Calculate the mass of refuse generated in the community per week, and the number of trips a 5-tonne truck must make per week to remove it. (1 tonne = 1 000 kg)",
+          "correctAnswer": "7 000 kg per week; 2 trips",
+          "workedSolution": "Daily refuse = 400 x 2.5 kg = 1 000 kg. Weekly refuse = 1 000 kg x 7 = 7 000 kg = 7 tonnes. Number of trips = 7 / 5 = 1.4, so the truck must make 2 trips per week (a fraction of a trip still requires a full journey).",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_wst_b002_012",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WST",
+          "type": "calculation",
+          "prompt": "A school collects 250 kg of waste every week. If 60% of the waste is organic material suitable for composting, calculate the mass of organic waste available for the school compost heap each week.",
+          "correctAnswer": "150 kg",
+          "workedSolution": "Organic fraction = 60% of 250 kg = (60 / 100) x 250 = 0.6 x 250 = 150 kg. So 150 kg of organic waste goes to the compost heap weekly, leaving 100 kg of non-organic waste for recycling or disposal.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_wst_b002_013",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WST",
+          "type": "structured",
+          "prompt": "A household in Accra produces mixed refuse every day. Describe how the household can manage its waste safely from generation to final disposal.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State two ways the household should separate its waste at source.",
+              "marks": 2,
+              "correctAnswer": "Separate biodegradable waste such as food scraps from non-biodegradable waste such as plastics, glass and metals into different covered bins; keep hazardous items such as used batteries and broken bulbs apart for special collection."
+            },
+            {
+              "label": "b",
+              "text": "Describe one beneficial way of disposing of the organic fraction of the waste.",
+              "marks": 2,
+              "correctAnswer": "Compost it: place the organic waste in a pit or bin, keep it moist and turn it regularly so that micro-organisms decompose it aerobically into compost manure that can be used on a garden or farm."
+            },
+            {
+              "label": "c",
+              "text": "State two dangers of dumping refuse into gutters instead of using a waste container.",
+              "marks": 2,
+              "correctAnswer": "Refuse blocks the gutters so rainwater cannot flow, causing flooding; the dump also breeds mosquitoes, flies and rats and can contaminate water, spreading diseases such as malaria and cholera."
+            }
+          ],
+          "correctAnswer": "(a) Separate biodegradable waste such as food scraps from non-biodegradable waste such as plastics, glass and metals into different covered bins; keep hazardous items such as used batteries and broken bulbs apart for special collection. (b) Compost it: place the organic waste in a pit or bin, keep it moist and turn it regularly so that micro-organisms decompose it aerobically into compost manure that can be used on a garden or farm. (c) Refuse blocks the gutters so rainwater cannot flow, causing flooding; the dump also breeds mosquitoes, flies and rats and can contaminate water, spreading diseases such as malaria and cholera.",
+          "workedSolution": "(a) Separate biodegradable waste such as food scraps from non-biodegradable waste such as plastics, glass and metals into different covered bins; keep hazardous items such as used batteries and broken bulbs apart for special collection. (b) Compost it: place the organic waste in a pit or bin, keep it moist and turn it regularly so that micro-organisms decompose it aerobically into compost manure that can be used on a garden or farm. (c) Refuse blocks the gutters so rainwater cannot flow, causing flooding; the dump also breeds mosquitoes, flies and rats and can contaminate water, spreading diseases such as malaria and cholera.",
+          "difficulty": "medium",
+          "marks": 6,
+          "points": 6,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science practice content; not official WAEC examination material.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_env_b002_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENV",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is the safest source of drinking water for a community?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Treated pipe-borne water",
+              "rationale": "This is the supported answer. Treated pipe-borne water has been filtered and disinfected before distribution, so it is the safest source; streams, ponds and flood water are exposed to faecal contamination, parasites and chemical pollutants and must be treated before drinking."
+            },
+            {
+              "label": "B",
+              "text": "Stream water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Pond water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Flood water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Treated pipe-borne water has been filtered and disinfected before distribution, so it is the safest source; streams, ponds and flood water are exposed to faecal contamination, parasites and chemical pollutants and must be treated before drinking. Therefore the correct answer is A: Treated pipe-borne water.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_env_b002_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENV",
+          "type": "multiple_choice",
+          "prompt": "Boiling drinking water for several minutes makes it safe mainly by",
+          "options": [
+            {
+              "label": "A",
+              "text": "adding chlorine to the water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "killing germs as heat destroys their enzymes and proteins",
+              "rationale": "This is the supported answer. Boiling denatures the enzymes and structural proteins of bacteria, viruses and parasite cysts, killing them without any chemical additive; it does not add chlorine, remove dissolved minerals or meaningfully change the oxygen content."
+            },
+            {
+              "label": "C",
+              "text": "removing all dissolved minerals",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "increasing the oxygen content of the water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Boiling denatures the enzymes and structural proteins of bacteria, viruses and parasite cysts, killing them without any chemical additive; it does not add chlorine, remove dissolved minerals or meaningfully change the oxygen content. Therefore the correct answer is B: killing germs as heat destroys their enzymes and proteins.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_env_b002_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENV",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is a common pollutant of river water in Ghana?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Clean rainwater",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Distilled water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Untreated sewage",
+              "rationale": "This is the supported answer. Untreated sewage introduces disease-causing organisms and excess nutrients into rivers; clean rainwater, distilled water and protected spring water contain few impurities and are not pollutants."
+            },
+            {
+              "label": "D",
+              "text": "Spring water from a protected source",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Untreated sewage introduces disease-causing organisms and excess nutrients into rivers; clean rainwater, distilled water and protected spring water contain few impurities and are not pollutants. Therefore the correct answer is C: Untreated sewage.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_env_b002_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENV",
+          "type": "multiple_choice",
+          "prompt": "The process of adding chlorine to kill bacteria during water treatment is called",
+          "options": [
+            {
+              "label": "A",
+              "text": "filtration",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "sedimentation",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "aeration",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "chlorination",
+              "rationale": "This is the supported answer. Chlorination is the disinfection stage of water treatment in which a controlled dose of chlorine kills remaining bacteria and viruses; filtration removes suspended solids, sedimentation lets heavy particles settle, and aeration adds air to improve taste."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Chlorination is the disinfection stage of water treatment in which a controlled dose of chlorine kills remaining bacteria and viruses; filtration removes suspended solids, sedimentation lets heavy particles settle, and aeration adds air to improve taste. Therefore the correct answer is D: chlorination.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_env_b002_005",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENV",
+          "type": "multiple_choice",
+          "prompt": "Fertilizer run-off from farms enters a lake and causes rapid growth of algae. This process is known as",
+          "options": [
+            {
+              "label": "A",
+              "text": "eutrophication",
+              "rationale": "This is the supported answer. Nitrates and phosphates from fertilizer are plant nutrients that are normally scarce in natural waters; their sudden input feeds an algal bloom, a process called eutrophication. Evaporation, sedimentation and neutralisation are unrelated physical or chemical processes."
+            },
+            {
+              "label": "B",
+              "text": "evaporation",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "sedimentation",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "neutralisation",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Nitrates and phosphates from fertilizer are plant nutrients that are normally scarce in natural waters; their sudden input feeds an algal bloom, a process called eutrophication. Evaporation, sedimentation and neutralisation are unrelated physical or chemical processes. Therefore the correct answer is A: eutrophication.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_env_b002_006",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENV",
+          "type": "multiple_choice",
+          "prompt": "Which sequence shows the stages of municipal water treatment in the correct order?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Chlorination, filtration, sedimentation, screening",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Screening, coagulation and sedimentation, filtration, chlorination",
+              "rationale": "This is the supported answer. Raw water is first screened to remove large debris, then alum is added so fine particles clump and settle (coagulation and sedimentation), then sand filters remove remaining solids, and finally chlorine disinfects the clear water before distribution."
+            },
+            {
+              "label": "C",
+              "text": "Filtration, screening, chlorination, sedimentation",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Sedimentation, chlorination, screening, filtration",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Raw water is first screened to remove large debris, then alum is added so fine particles clump and settle (coagulation and sedimentation), then sand filters remove remaining solids, and finally chlorine disinfects the clear water before distribution. Therefore the correct answer is B: Screening, coagulation and sedimentation, filtration, chlorination.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_env_b002_007",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENV",
+          "type": "multiple_choice",
+          "prompt": "Cholera outbreaks in Ghanaian communities are most strongly linked to water that has been polluted by",
+          "options": [
+            {
+              "label": "A",
+              "text": "dissolved oxygen from fast-flowing streams",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "harmless clay particles after heavy rain",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "faecal matter from poor sanitation and open defecation",
+              "rationale": "This is the supported answer. Cholera is caused by Vibrio cholerae, which spreads through water contaminated with human faeces; prevention relies on proper latrines, handwashing and boiling or chlorinating drinking water. Dissolved oxygen, clay turbidity and correct chlorination do not transmit cholera."
+            },
+            {
+              "label": "D",
+              "text": "chlorine added during treatment",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Cholera is caused by Vibrio cholerae, which spreads through water contaminated with human faeces; prevention relies on proper latrines, handwashing and boiling or chlorinating drinking water. Dissolved oxygen, clay turbidity and correct chlorination do not transmit cholera. Therefore the correct answer is C: faecal matter from poor sanitation and open defecation.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_env_b002_008",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENV",
+          "type": "multiple_choice",
+          "prompt": "Turbidity in a water sample refers to its",
+          "options": [
+            {
+              "label": "A",
+              "text": "temperature measured in the shade",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "hardness caused by dissolved salts",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "acidity measured with litmus paper",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "cloudiness caused by suspended particles",
+              "rationale": "This is the supported answer. Turbidity is the scattering of light by suspended clay, silt and organic particles, which makes water look cloudy; high turbidity can shield microbes from disinfectants, so it is removed by sedimentation and filtration before chlorination."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Turbidity is the scattering of light by suspended clay, silt and organic particles, which makes water look cloudy; high turbidity can shield microbes from disinfectants, so it is removed by sedimentation and filtration before chlorination. Therefore the correct answer is D: cloudiness caused by suspended particles.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_env_b002_009",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENV",
+          "type": "multiple_choice",
+          "prompt": "After an algal bloom dies in a polluted lake, fish often die in large numbers mainly because",
+          "options": [
+            {
+              "label": "A",
+              "text": "bacteria decomposing the dead algae use up the dissolved oxygen, so the fish suffocate",
+              "rationale": "This is the supported answer. Dead algae are decomposed by aerobic bacteria whose multiplication consumes dissolved oxygen faster than it is replaced, so the water becomes hypoxic and fish die of suffocation. Algae do not release chlorine, and physical entrapment or water clarity are not the cause of the mass deaths."
+            },
+            {
+              "label": "B",
+              "text": "the dead algae release chlorine into the water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "the algae physically trap the fish in thick mats",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "the water becomes too clear for fish to hide",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Dead algae are decomposed by aerobic bacteria whose multiplication consumes dissolved oxygen faster than it is replaced, so the water becomes hypoxic and fish die of suffocation. Algae do not release chlorine, and physical entrapment or water clarity are not the cause of the mass deaths. Therefore the correct answer is A: bacteria decomposing the dead algae use up the dissolved oxygen, so the fish suffocate.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_env_b002_010",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENV",
+          "type": "multiple_choice",
+          "prompt": "Hard water does not lather easily with soap because it contains dissolved",
+          "options": [
+            {
+              "label": "A",
+              "text": "sodium chloride crystals",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "calcium and magnesium ions",
+              "rationale": "This is the supported answer. Dissolved calcium and magnesium ions react with soap to form an insoluble scum instead of lather, wasting soap; boiling removes temporary hardness and washing soda or ion exchange removes permanent hardness. Sodium chloride, chlorine and nitrates do not cause hardness."
+            },
+            {
+              "label": "C",
+              "text": "chlorine gas",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "nitrate fertilizers only",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Dissolved calcium and magnesium ions react with soap to form an insoluble scum instead of lather, wasting soap; boiling removes temporary hardness and washing soda or ion exchange removes permanent hardness. Sodium chloride, chlorine and nitrates do not cause hardness. Therefore the correct answer is B: calcium and magnesium ions.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_env_b002_011",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENV",
+          "type": "calculation",
+          "prompt": "A water treatment plant doses water with 0.5 mg of chlorine per litre. Calculate the mass of chlorine, in grams, needed to treat 20 000 litres of water.",
+          "correctAnswer": "10 g",
+          "workedSolution": "Mass of chlorine = dose x volume = 0.5 mg per litre x 20 000 litres = 10 000 mg. Converting to grams: 10 000 mg / 1 000 = 10 g of chlorine.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_env_b002_012",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENV",
+          "type": "calculation",
+          "prompt": "A household uses 150 litres of water per day. Calculate the total volume of water the household uses in June (30 days), and the cost if the water company charges GHS 0.02 per litre.",
+          "correctAnswer": "4 500 litres; GHS 90",
+          "workedSolution": "Volume for June = 150 litres x 30 days = 4 500 litres. Cost = 4 500 litres x GHS 0.02 per litre = GHS 90.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_env_b002_013",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENV",
+          "type": "structured",
+          "prompt": "A family in a rural community collects its drinking water from a river. Describe how the family can make the water safe for drinking and keep it safe during storage.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Describe how the family can remove the suspended particles from the river water.",
+              "marks": 2,
+              "correctAnswer": "Allow the water to stand so the heavy particles settle, decant the clearer water, then filter it through a clean cloth or a sand filter to remove the remaining suspended particles."
+            },
+            {
+              "label": "b",
+              "text": "Describe one method the family can use to kill the germs in the filtered water.",
+              "marks": 2,
+              "correctAnswer": "Boil the filtered water for several minutes so that the heat kills bacteria, viruses and parasite cysts; alternatively add the correct dose of chlorine tablets and wait the recommended time before drinking."
+            },
+            {
+              "label": "c",
+              "text": "State two precautions the family should take when storing the treated water.",
+              "marks": 2,
+              "correctAnswer": "Keep the water in a clean container with a tight cover, and draw it with a clean ladle or tap rather than dipping cups or hands into it; store the container off the ground and away from animals and chemicals."
+            }
+          ],
+          "correctAnswer": "(a) Allow the water to stand so the heavy particles settle, decant the clearer water, then filter it through a clean cloth or a sand filter to remove the remaining suspended particles. (b) Boil the filtered water for several minutes so that the heat kills bacteria, viruses and parasite cysts; alternatively add the correct dose of chlorine tablets and wait the recommended time before drinking. (c) Keep the water in a clean container with a tight cover, and draw it with a clean ladle or tap rather than dipping cups or hands into it; store the container off the ground and away from animals and chemicals.",
+          "workedSolution": "(a) Allow the water to stand so the heavy particles settle, decant the clearer water, then filter it through a clean cloth or a sand filter to remove the remaining suspended particles. (b) Boil the filtered water for several minutes so that the heat kills bacteria, viruses and parasite cysts; alternatively add the correct dose of chlorine tablets and wait the recommended time before drinking. (c) Keep the water in a clean container with a tight cover, and draw it with a clean ladle or tap rather than dipping cups or hands into it; store the container off the ground and away from animals and chemicals.",
+          "difficulty": "medium",
+          "marks": 6,
+          "points": 6,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science practice content; not official WAEC examination material.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_acids_b002_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ACD",
+          "type": "multiple_choice",
+          "prompt": "Blue litmus paper dipped into dilute hydrochloric acid turns",
+          "options": [
+            {
+              "label": "A",
+              "text": "white",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "green",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "red",
+              "rationale": "This is the supported answer. Acids turn blue litmus paper red, and hydrochloric acid is a strong acid, so the paper turns red at once; it does not bleach to white, turn green or remain blue, which is the colour litmus keeps in neutral or alkaline solutions."
+            },
+            {
+              "label": "D",
+              "text": "deeper blue",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Acids turn blue litmus paper red, and hydrochloric acid is a strong acid, so the paper turns red at once; it does not bleach to white, turn green or remain blue, which is the colour litmus keeps in neutral or alkaline solutions. Therefore the correct answer is C: red.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_acids_b002_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ACD",
+          "type": "multiple_choice",
+          "prompt": "When dilute hydrochloric acid reacts completely with sodium hydroxide solution, the products are",
+          "options": [
+            {
+              "label": "A",
+              "text": "sodium chloride and hydrogen gas",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "hydrogen gas and oxygen gas",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "sodium metal and chlorine gas",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "sodium chloride and water",
+              "rationale": "This is the supported answer. An acid plus a base gives a salt and water: HCl + NaOH produce NaCl + H2O. This neutralisation does not release hydrogen or oxygen gases, and it certainly cannot produce free sodium metal or chlorine gas from aqueous solution."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "An acid plus a base gives a salt and water: HCl + NaOH produce NaCl + H2O. This neutralisation does not release hydrogen or oxygen gases, and it certainly cannot produce free sodium metal or chlorine gas from aqueous solution. Therefore the correct answer is D: sodium chloride and water.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_acids_b002_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ACD",
+          "type": "multiple_choice",
+          "prompt": "Dilute hydrochloric acid is added to zinc granules. The gas evolved and its correct test are",
+          "options": [
+            {
+              "label": "A",
+              "text": "hydrogen, which gives a pop sound with a lighted splint",
+              "rationale": "This is the supported answer. Zinc + hydrochloric acid give zinc chloride and hydrogen: Zn + 2HCl produce ZnCl2 + H2. Hydrogen burns with a pop at a lighted splint; the glowing-splint, limewater and bleaching tests belong to oxygen, carbon dioxide and chlorine respectively."
+            },
+            {
+              "label": "B",
+              "text": "oxygen, which relights a glowing splint",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "carbon dioxide, which turns limewater milky",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "chlorine, which bleaches damp litmus paper",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Zinc + hydrochloric acid give zinc chloride and hydrogen: Zn + 2HCl produce ZnCl2 + H2. Hydrogen burns with a pop at a lighted splint; the glowing-splint, limewater and bleaching tests belong to oxygen, carbon dioxide and chlorine respectively. Therefore the correct answer is A: hydrogen, which gives a pop sound with a lighted splint.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_acids_b002_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ACD",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is a weak acid commonly found in the kitchen?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Hydrochloric acid",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Ethanoic acid in vinegar",
+              "rationale": "This is the supported answer. Vinegar is a dilute solution of ethanoic acid, which ionises only partially in water and is therefore a weak acid. Hydrochloric acid is a strong mineral acid, sodium hydroxide is a base, and sodium chloride is a neutral salt."
+            },
+            {
+              "label": "C",
+              "text": "Sodium hydroxide",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Sodium chloride",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Vinegar is a dilute solution of ethanoic acid, which ionises only partially in water and is therefore a weak acid. Hydrochloric acid is a strong mineral acid, sodium hydroxide is a base, and sodium chloride is a neutral salt. Therefore the correct answer is B: Ethanoic acid in vinegar.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_acids_b002_005",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ACD",
+          "type": "multiple_choice",
+          "prompt": "The difference between a strong acid and a concentrated acid is that",
+          "options": [
+            {
+              "label": "A",
+              "text": "the two terms always mean exactly the same thing",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "a strong acid is one that contains more water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "strength describes the degree of ionisation while concentration describes the amount of acid per unit volume",
+              "rationale": "This is the supported answer. Strength is about how completely the acid ionises: hydrochloric acid is strong even when very dilute because it ionises fully. Concentration is about moles per unit volume: ethanoic acid can be highly concentrated yet weak because only a small fraction of its molecules ionise."
+            },
+            {
+              "label": "D",
+              "text": "a concentrated acid is always fully ionised",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Strength is about how completely the acid ionises: hydrochloric acid is strong even when very dilute because it ionises fully. Concentration is about moles per unit volume: ethanoic acid can be highly concentrated yet weak because only a small fraction of its molecules ionise. Therefore the correct answer is C: strength describes the degree of ionisation while concentration describes the amount of acid per unit volume.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Distinguish",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_acids_b002_006",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ACD",
+          "type": "multiple_choice",
+          "prompt": "Which of the following salts forms an acidic solution when dissolved in water?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Sodium chloride",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Sodium carbonate",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Potassium nitrate",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Ammonium chloride",
+              "rationale": "This is the supported answer. Ammonium chloride is the salt of a weak base (ammonia) and a strong acid (hydrochloric acid); the ammonium ion hydrolyses in water to release hydroxonium ions, so the solution is acidic. Sodium chloride and potassium nitrate give neutral solutions, while sodium carbonate solution is alkaline."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Ammonium chloride is the salt of a weak base (ammonia) and a strong acid (hydrochloric acid); the ammonium ion hydrolyses in water to release hydroxonium ions, so the solution is acidic. Sodium chloride and potassium nitrate give neutral solutions, while sodium carbonate solution is alkaline. Therefore the correct answer is D: Ammonium chloride.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_acids_b002_007",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ACD",
+          "type": "calculation",
+          "prompt": "In a titration, 25.0 cubic centimetres of 0.10 mol per cubic decimetre hydrochloric acid exactly neutralise 20.0 cubic centimetres of sodium hydroxide solution. Calculate the concentration of the sodium hydroxide solution in mol per cubic decimetre.",
+          "correctAnswer": "0.125 mol per cubic decimetre",
+          "workedSolution": "Moles of HCl = concentration x volume = 0.10 x 25.0/1000 = 0.0025 mol. The equation HCl + NaOH produce NaCl + H2O shows a 1:1 mole ratio, so moles of NaOH = 0.0025 mol. Concentration of NaOH = moles / volume = 0.0025 / (20.0/1000) = 0.0025 / 0.020 = 0.125 mol per cubic decimetre.",
+          "difficulty": "hard",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_acids_b002_008",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ACD",
+          "type": "calculation",
+          "prompt": "Calculate the mass of sodium hydroxide, NaOH, needed to prepare 500 cubic centimetres of a 0.20 mol per cubic decimetre solution. (Relative atomic masses: Na = 23, O = 16, H = 1)",
+          "correctAnswer": "4.0 g",
+          "workedSolution": "Moles of NaOH = concentration x volume = 0.20 x 500/1000 = 0.20 x 0.5 = 0.10 mol. Molar mass of NaOH = 23 + 16 + 1 = 40 g per mol. Mass = moles x molar mass = 0.10 x 40 = 4.0 g.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_eco_b002_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ECO",
+          "type": "multiple_choice",
+          "prompt": "In the food chain grass to grasscutter to hawk, only about 10% of the energy passes from one level to the next mainly because",
+          "options": [
+            {
+              "label": "A",
+              "text": "most of the energy is lost as heat in respiration and in undigested remains at each level",
+              "rationale": "This is the supported answer. At each trophic level organisms use most of their energy in respiration, movement and reproduction, and some energy is lost in faeces and unconsumed parts; only roughly 10% is stored as biomass that the next level can eat, which is why food chains rarely exceed four or five levels."
+            },
+            {
+              "label": "B",
+              "text": "hawks refuse to eat weak grasscutters",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "grass uses up all the sunlight before animals can graze",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "energy increases as it moves up the food chain",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "At each trophic level organisms use most of their energy in respiration, movement and reproduction, and some energy is lost in faeces and unconsumed parts; only roughly 10% is stored as biomass that the next level can eat, which is why food chains rarely exceed four or five levels. Therefore the correct answer is A: most of the energy is lost as heat in respiration and in undigested remains at each level.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_eco_b002_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ECO",
+          "type": "multiple_choice",
+          "prompt": "Decomposers such as fungi and bacteria are essential to an ecosystem because they",
+          "options": [
+            {
+              "label": "A",
+              "text": "produce oxygen for animals by photosynthesis",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "release nutrients from dead organisms back into the soil for producers to absorb",
+              "rationale": "This is the supported answer. Decomposers break down dead plants and animals and mineralise the organic matter, returning nitrates, phosphates and other ions to the soil where producers absorb them again; without decomposers, nutrients would stay locked in corpses and the nutrient cycle would halt. They neither photosynthesise nor control predators."
+            },
+            {
+              "label": "C",
+              "text": "control the population of hawks and other top predators",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "convert sunlight directly into chemical energy",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Decomposers break down dead plants and animals and mineralise the organic matter, returning nitrates, phosphates and other ions to the soil where producers absorb them again; without decomposers, nutrients would stay locked in corpses and the nutrient cycle would halt. They neither photosynthesise nor control predators. Therefore the correct answer is B: release nutrients from dead organisms back into the soil for producers to absorb.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_mat_b002_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-MAT",
+          "type": "multiple_choice",
+          "prompt": "The best method for separating a mixture of ethanol (boiling point 78 degrees Celsius) and water is",
+          "options": [
+            {
+              "label": "A",
+              "text": "paper filtration",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "evaporation to dryness",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "fractional distillation",
+              "rationale": "This is the supported answer. Ethanol and water are miscible liquids with different but close boiling points, so a fractionating column is used to separate them cleanly as their vapours condense at different heights; filtration cannot separate dissolved or miscible components, evaporation to dryness loses both liquids, and chromatography suits small samples of coloured mixtures, not bulk liquids."
+            },
+            {
+              "label": "D",
+              "text": "paper chromatography",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Ethanol and water are miscible liquids with different but close boiling points, so a fractionating column is used to separate them cleanly as their vapours condense at different heights; filtration cannot separate dissolved or miscible components, evaporation to dryness loses both liquids, and chromatography suits small samples of coloured mixtures, not bulk liquids. Therefore the correct answer is C: fractional distillation.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Select",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_mat_b002_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-MAT",
+          "type": "multiple_choice",
+          "prompt": "In paper chromatography, a component of a mixture moves furthest up the paper when it",
+          "options": [
+            {
+              "label": "A",
+              "text": "has the largest and heaviest molecules in the mixture",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "is the most abundant component of the mixture",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "has the deepest colour of all the components",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "is most soluble in the solvent and least strongly adsorbed onto the paper",
+              "rationale": "This is the supported answer. Each component partitions between the moving solvent and the stationary paper: a substance that dissolves readily in the solvent and clings weakly to the paper travels furthest. Molecular size alone, abundance and colour depth do not determine the distance moved."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Each component partitions between the moving solvent and the stationary paper: a substance that dissolves readily in the solvent and clings weakly to the paper travels furthest. Molecular size alone, abundance and colour depth do not determine the distance moved. Therefore the correct answer is D: is most soluble in the solvent and least strongly adsorbed onto the paper.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_enr_b002_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENR",
+          "type": "multiple_choice",
+          "prompt": "Lamps in a house are wired in parallel rather than in series because in parallel",
+          "options": [
+            {
+              "label": "A",
+              "text": "each lamp receives the full mains voltage and can be switched on or off independently",
+              "rationale": "This is the supported answer. In parallel each lamp is connected directly across the 240 V mains, so every lamp gets full voltage and its own switch controls only its branch; in series the voltage is divided between the lamps, they glow dimly, and one failed lamp breaks the whole circuit."
+            },
+            {
+              "label": "B",
+              "text": "the lamps share the current equally and so shine brighter",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "a burnt-out lamp makes all the other lamps brighter",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "the total resistance of the circuit becomes very large",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "In parallel each lamp is connected directly across the 240 V mains, so every lamp gets full voltage and its own switch controls only its branch; in series the voltage is divided between the lamps, they glow dimly, and one failed lamp breaks the whole circuit. Therefore the correct answer is A: each lamp receives the full mains voltage and can be switched on or off independently.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_enr_b002_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENR",
+          "type": "multiple_choice",
+          "prompt": "A fuse protects an electrical circuit by",
+          "options": [
+            {
+              "label": "A",
+              "text": "increasing the voltage supplied to the appliances",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "melting to break the circuit when the current exceeds a safe value",
+              "rationale": "This is the supported answer. A fuse contains a thin wire with a low melting point; when the current exceeds the rated value, the heating effect of the current melts the wire and opens the circuit before the cables can overheat and start a fire. It neither boosts voltage, stores energy nor converts current type."
+            },
+            {
+              "label": "C",
+              "text": "storing charge for use during a power cut",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "converting alternating current into direct current",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A fuse contains a thin wire with a low melting point; when the current exceeds the rated value, the heating effect of the current melts the wire and opens the circuit before the cables can overheat and start a fire. It neither boosts voltage, stores energy nor converts current type. Therefore the correct answer is B: melting to break the circuit when the current exceeds a safe value.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_bio_b002_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BIO",
+          "type": "multiple_choice",
+          "prompt": "The digestion of starch begins in the mouth because saliva contains the enzyme",
+          "options": [
+            {
+              "label": "A",
+              "text": "pepsin",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "lipase",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "amylase",
+              "rationale": "This is the supported answer. Salivary amylase (ptyalin) in saliva hydrolyses starch into maltose as food is chewed. Pepsin digests protein in the stomach, lipase digests fats further down the gut, and bile is not an enzyme at all but an emulsifier made by the liver."
+            },
+            {
+              "label": "D",
+              "text": "bile",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Salivary amylase (ptyalin) in saliva hydrolyses starch into maltose as food is chewed. Pepsin digests protein in the stomach, lipase digests fats further down the gut, and bile is not an enzyme at all but an emulsifier made by the liver. Therefore the correct answer is C: amylase.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_bio_b002_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BIO",
+          "type": "multiple_choice",
+          "prompt": "Most digested food is absorbed into the blood in the ileum because its inner surface",
+          "options": [
+            {
+              "label": "A",
+              "text": "secretes the strongest acid in the digestive system",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "stores food for the longest time before absorption",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "produces the greatest number of digestive enzymes",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "bears numerous villi that give a very large surface area with a rich blood supply",
+              "rationale": "This is the supported answer. The ileum is folded and covered with millions of finger-like villi and microvilli, multiplying the surface area; each villus contains blood capillaries and a lacteal, so digested nutrients cross quickly into the circulation. Acid secretion belongs to the stomach, and storage time and enzyme output are not the reason for absorption."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The ileum is folded and covered with millions of finger-like villi and microvilli, multiplying the surface area; each villus contains blood capillaries and a lacteal, so digested nutrients cross quickly into the circulation. Acid secretion belongs to the stomach, and storage time and enzyme output are not the reason for absorption. Therefore the correct answer is D: bears numerous villi that give a very large surface area with a rich blood supply.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_hlt_b002_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLT",
+          "type": "multiple_choice",
+          "prompt": "In malaria, the pathogen and its vector are respectively",
+          "options": [
+            {
+              "label": "A",
+              "text": "Plasmodium and the female Anopheles mosquito",
+              "rationale": "This is the supported answer. Malaria is caused by Plasmodium, a protozoan parasite; the female Anopheles mosquito is only the vector that carries it between people when taking blood meals. Reversing the two confuses cause with carrier, and the housefly and tsetse fly transmit other diseases."
+            },
+            {
+              "label": "B",
+              "text": "the Anopheles mosquito and Plasmodium",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "a virus and the housefly",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "a bacterium and the tsetse fly",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Malaria is caused by Plasmodium, a protozoan parasite; the female Anopheles mosquito is only the vector that carries it between people when taking blood meals. Reversing the two confuses cause with carrier, and the housefly and tsetse fly transmit other diseases. Therefore the correct answer is A: Plasmodium and the female Anopheles mosquito.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Distinguish",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_hlt_b002_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLT",
+          "type": "multiple_choice",
+          "prompt": "Antibiotics do not cure the common cold mainly because",
+          "options": [
+            {
+              "label": "A",
+              "text": "cold viruses multiply too slowly for drugs to find them",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "colds are caused by viruses, and antibiotics act only against bacteria",
+              "rationale": "This is the supported answer. Antibiotics attack bacterial structures such as cell walls and bacterial ribosomes; viruses have no such targets and replicate inside host cells using host machinery, so antibiotics are useless against colds. Taking them anyway encourages antibiotic-resistant bacteria, which is a serious public-health danger."
+            },
+            {
+              "label": "C",
+              "text": "antibiotics are always destroyed by stomach acid",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "colds are inherited and cannot be treated",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Antibiotics attack bacterial structures such as cell walls and bacterial ribosomes; viruses have no such targets and replicate inside host cells using host machinery, so antibiotics are useless against colds. Taking them anyway encourages antibiotic-resistant bacteria, which is a serious public-health danger. Therefore the correct answer is B: colds are caused by viruses, and antibiotics act only against bacteria.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
