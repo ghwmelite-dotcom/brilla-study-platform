@@ -1,0 +1,1920 @@
+{
+  "batchId": "nsmq-expansion-beta-001",
+  "status": "approved_for_beta",
+  "examTypeId": "exam_nsmq",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment, Ghana",
+      "title": "Secondary Education Curriculum (SHS core mathematics and sciences)",
+      "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T00:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep practice content aligned to the published NaCCA Ghana secondary curriculum; not official NSMQ or Primetime material.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_nsmq_math",
+      "specificationCode": "BRILLA-NSMQ-MATH-BETA-001",
+      "sources": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum — Core Mathematics",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "NSMQ-MATH-ALG",
+          "title": "Algebra",
+          "objective": "Manipulate symbols, solve equations and work with algebraic expressions."
+        },
+        {
+          "code": "NSMQ-MATH-QUAD",
+          "title": "Quadratic Equations",
+          "objective": "Solve and analyse quadratic equations and their roots."
+        },
+        {
+          "code": "NSMQ-MATH-GEO",
+          "title": "Geometry",
+          "objective": "Apply properties of shapes, angles and solids to measurements."
+        },
+        {
+          "code": "NSMQ-MATH-TRIG",
+          "title": "Trigonometry",
+          "objective": "Use trigonometric ratios and identities for triangles and angles."
+        },
+        {
+          "code": "NSMQ-MATH-STAT",
+          "title": "Statistics & Probability",
+          "objective": "Analyse data and compute probabilities of events."
+        },
+        {
+          "code": "NSMQ-MATH-CALC",
+          "title": "Calculus",
+          "objective": "Differentiate and integrate elementary functions."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_nsmq_math_pod_b001_001",
+          "original": true,
+          "topicCode": "NSMQ-MATH-ALG",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "Solve for x: 2(x − 3) + 4 = 3x − 7",
+          "correctAnswer": "x = 5",
+          "workedSolution": "Expand the brackets: 2x − 6 + 4 = 3x − 7, so 2x − 2 = 3x − 7. Subtract 2x from both sides: −2 = x − 7. Add 7 to both sides: x = 5. Check: 2(5 − 3) + 4 = 4 + 4 = 8 and 3(5) − 7 = 15 − 7 = 8, so the solution x = 5 is consistent.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Solve",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_math_pod_b001_002",
+          "original": true,
+          "topicCode": "NSMQ-MATH-QUAD",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "Find the sum of the squares of the roots of x² − 7x + 12 = 0",
+          "correctAnswer": "25",
+          "workedSolution": "Factorise: (x − 3)(x − 4) = 0, so the roots are x = 3 and x = 4. Their squares are 9 and 16, giving a sum of 25. Cross-check with root relations: sum of roots = 7 and product = 12, so sum of squares = 7² − 2(12) = 49 − 24 = 25.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_math_pod_b001_003",
+          "original": true,
+          "topicCode": "NSMQ-MATH-GEO",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "A cylinder has radius 7 cm and height 10 cm. Using π = 22/7, calculate its volume.",
+          "correctAnswer": "1540 cm³",
+          "workedSolution": "Volume of a cylinder V = πr²h. Substitute r = 7 cm and h = 10 cm: V = (22/7) × 7² × 10 = (22/7) × 49 × 10 = 22 × 7 × 10 = 1540 cm³. The 7 in the denominator cancels with the 49 from r², which is why 22/7 is a convenient approximation here.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_math_pod_b001_004",
+          "original": true,
+          "topicCode": "NSMQ-MATH-STAT",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "A bag contains 3 red and 2 blue balls. Two balls are drawn at random without replacement. What is the probability that both are red?",
+          "correctAnswer": "3/10",
+          "workedSolution": "P(first red) = 3/5. After removing one red ball, 2 red remain out of 4 balls, so P(second red | first red) = 2/4 = 1/2. Multiply because the draws are dependent: P(both red) = 3/5 × 1/2 = 3/10 = 0.3.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_math_sr_b001_001",
+          "original": true,
+          "topicCode": "NSMQ-MATH-ALG",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "Evaluate log base 10 of 1000.",
+          "correctAnswer": "3",
+          "workedSolution": "Since 1000 = 10³, log₁₀ 1000 = 3 by the definition of a logarithm as the power to which the base must be raised.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_math_sr_b001_002",
+          "original": true,
+          "topicCode": "NSMQ-MATH-CALC",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "What is the derivative of x³ with respect to x?",
+          "correctAnswer": "3x²",
+          "workedSolution": "By the power rule d/dx(xⁿ) = nxⁿ⁻¹ with n = 3, the derivative is 3x². This gives the gradient of the cubic curve at any point x.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_math_sr_b001_003",
+          "original": true,
+          "topicCode": "NSMQ-MATH-TRIG",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "What is the exact value of cos 60°?",
+          "correctAnswer": "1/2",
+          "workedSolution": "From the standard 30-60-90 triangle, cos 60° = adjacent/hypotenuse = 1/2. It is one of the exact trigonometric values expected to be recalled instantly.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_math_sr_b001_004",
+          "original": true,
+          "topicCode": "NSMQ-MATH-STAT",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "What is the next term of the sequence 2, 5, 8, 11, …?",
+          "correctAnswer": "14",
+          "workedSolution": "Each term increases by a common difference of 3, so the sequence is arithmetic. The next term is 11 + 3 = 14.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_math_r1_b001_001",
+          "original": true,
+          "topicCode": "NSMQ-MATH-ALG",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "If 3x − 7 = 11, what is the value of x?",
+          "correctAnswer": "A",
+          "workedSolution": "Add 7 to both sides: 3x = 18. Divide both sides by 3: x = 6. Substitution confirms it: 3(6) − 7 = 18 − 7 = 11.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Solve",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "6",
+              "rationale": "This is the supported answer. Add 7 to both sides: 3x = 18. Divide both sides by 3: x = 6. Substitution confirms it: 3(6) − 7 = 18 − 7 = 11."
+            },
+            {
+              "label": "B",
+              "text": "4",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "8",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "18",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_math_r1_b001_002",
+          "original": true,
+          "topicCode": "NSMQ-MATH-ALG",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "Simplify the expression 2³ × 2⁴.",
+          "correctAnswer": "B",
+          "workedSolution": "When multiplying powers with the same base, add the indices: 2³ × 2⁴ = 2⁷ = 128. A common error is multiplying the bases or the indices, giving wrong values such as 4¹².",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "32",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "128",
+              "rationale": "This is the supported answer. When multiplying powers with the same base, add the indices: 2³ × 2⁴ = 2⁷ = 128. A common error is multiplying the bases or the indices, giving wrong values such as 4¹²."
+            },
+            {
+              "label": "C",
+              "text": "64",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "256",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_math_r1_b001_003",
+          "original": true,
+          "topicCode": "NSMQ-MATH-GEO",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "What is the size of each exterior angle of a regular octagon?",
+          "correctAnswer": "C",
+          "workedSolution": "The exterior angles of any convex polygon sum to 360°. A regular octagon has 8 equal exterior angles, so each is 360° ÷ 8 = 45°. (Each interior angle is then 180° − 45° = 135°.)",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "40°",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "60°",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "45°",
+              "rationale": "This is the supported answer. The exterior angles of any convex polygon sum to 360°. A regular octagon has 8 equal exterior angles, so each is 360° ÷ 8 = 45°. (Each interior angle is then 180° − 45° = 135°.)"
+            },
+            {
+              "label": "D",
+              "text": "135°",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_math_r1_b001_004",
+          "original": true,
+          "topicCode": "NSMQ-MATH-TRIG",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "If tan θ = 1 and θ is acute, what is the value of θ?",
+          "correctAnswer": "D",
+          "workedSolution": "tan θ = sin θ / cos θ = 1 means sin θ = cos θ, which for an acute angle occurs only at θ = 45°. At 90° tangent is undefined, and at 30° and 60° it equals 1/√3 and √3 respectively.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "30°",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "60°",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "90°",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "45°",
+              "rationale": "This is the supported answer. tan θ = sin θ / cos θ = 1 means sin θ = cos θ, which for an acute angle occurs only at θ = 45°. At 90° tangent is undefined, and at 30° and 60° it equals 1/√3 and √3 respectively."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subjectId": "subj_nsmq_physics",
+      "specificationCode": "BRILLA-NSMQ-PHYS-BETA-001",
+      "sources": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum — Physics",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "NSMQ-PHYS-MECH",
+          "title": "Mechanics",
+          "objective": "Apply the laws of motion, forces and energy to physical systems."
+        },
+        {
+          "code": "NSMQ-PHYS-KIN",
+          "title": "Kinematics",
+          "objective": "Describe motion using displacement, velocity, acceleration and time."
+        },
+        {
+          "code": "NSMQ-PHYS-ELEC",
+          "title": "Electricity & Magnetism",
+          "objective": "Analyse circuits, fields and electromagnetic interactions."
+        },
+        {
+          "code": "NSMQ-PHYS-WAVES",
+          "title": "Waves & Optics",
+          "objective": "Relate wave speed, frequency, wavelength and light behaviour."
+        },
+        {
+          "code": "NSMQ-PHYS-THERMO",
+          "title": "Thermodynamics",
+          "objective": "Quantify heat, work, temperature and energy transfer."
+        },
+        {
+          "code": "NSMQ-PHYS-MOD",
+          "title": "Modern Physics",
+          "objective": "Apply quantum and nuclear concepts to radiation and matter."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_nsmq_phys_pod_b001_001",
+          "original": true,
+          "topicCode": "NSMQ-PHYS-KIN",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "A car starts from rest and accelerates uniformly at 4 m/s² for 5 s. How far does it travel?",
+          "correctAnswer": "50 m",
+          "workedSolution": "Use s = ut + ½at² with u = 0, a = 4 m/s² and t = 5 s: s = 0 + ½ × 4 × 5² = 2 × 25 = 50 m. The final speed would be v = u + at = 20 m/s, but the question asks only for distance.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Physics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_phys_pod_b001_002",
+          "original": true,
+          "topicCode": "NSMQ-PHYS-ELEC",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "A 12 V battery is connected across a 4 Ω and an 8 Ω resistor in series. Calculate the power dissipated in the 8 Ω resistor.",
+          "correctAnswer": "8 W",
+          "workedSolution": "Series resistances add: R = 4 + 8 = 12 Ω. Circuit current I = V/R = 12/12 = 1 A, and the same current flows through each resistor in series. Power in the 8 Ω resistor: P = I²R = 1² × 8 = 8 W.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Physics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_phys_pod_b001_003",
+          "original": true,
+          "topicCode": "NSMQ-PHYS-THERMO",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "Calculate the heat required to raise the temperature of 0.5 kg of water from 20 °C to 70 °C. (c = 4200 J/kg°C)",
+          "correctAnswer": "105 000 J (105 kJ)",
+          "workedSolution": "Q = mcΔT with m = 0.5 kg, c = 4200 J/kg°C and ΔT = 70 − 20 = 50 °C: Q = 0.5 × 4200 × 50 = 105 000 J = 105 kJ. Note the temperature change is used, not the final temperature.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Physics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_phys_pod_b001_004",
+          "original": true,
+          "topicCode": "NSMQ-PHYS-WAVES",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "A wave covers 340 m in 2.0 s. If its frequency is 85 Hz, what is its wavelength?",
+          "correctAnswer": "2.0 m",
+          "workedSolution": "First find the speed: v = distance/time = 340/2.0 = 170 m/s. Then apply the wave equation v = fλ, so λ = v/f = 170/85 = 2.0 m. Two steps are required: speed from kinematics, then wavelength from the wave relation.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Physics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_phys_sr_b001_001",
+          "original": true,
+          "topicCode": "NSMQ-PHYS-MECH",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "What is the SI unit of energy?",
+          "correctAnswer": "Joule",
+          "workedSolution": "The joule (J) is the SI unit of energy and work; 1 J = 1 N·m = 1 kg·m²/s². It is named after James Prescott Joule.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Physics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_phys_sr_b001_002",
+          "original": true,
+          "topicCode": "NSMQ-PHYS-ELEC",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "What is the SI unit of electrical power?",
+          "correctAnswer": "Watt",
+          "workedSolution": "The watt (W) is the SI unit of power, equal to one joule per second. In circuits P = IV = I²R = V²/R, all giving watts.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Physics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_phys_sr_b001_003",
+          "original": true,
+          "topicCode": "NSMQ-PHYS-WAVES",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "What is the bending of light as it passes from air into water called?",
+          "correctAnswer": "Refraction",
+          "workedSolution": "Refraction is the change in direction of a wave when its speed changes at a boundary between media. Snell’s law, n₁sinθ₁ = n₂sinθ₂, quantifies it.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Physics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_phys_sr_b001_004",
+          "original": true,
+          "topicCode": "NSMQ-PHYS-MOD",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "Which particle is emitted from a nucleus during beta-minus decay?",
+          "correctAnswer": "Electron",
+          "workedSolution": "In beta-minus decay a neutron converts to a proton and emits an electron (the beta particle) plus an antineutrino. The atomic number rises by one while the mass number is unchanged.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Physics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_phys_r1_b001_001",
+          "original": true,
+          "topicCode": "NSMQ-PHYS-MECH",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "Which of the following quantities is a vector?",
+          "correctAnswer": "A",
+          "workedSolution": "A vector has both magnitude and direction. Velocity includes direction, unlike speed (its magnitude), mass and temperature, which are scalars. Other common vectors are force, acceleration and displacement.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Physics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Velocity",
+              "rationale": "This is the supported answer. A vector has both magnitude and direction. Velocity includes direction, unlike speed (its magnitude), mass and temperature, which are scalars. Other common vectors are force, acceleration and displacement."
+            },
+            {
+              "label": "B",
+              "text": "Speed",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Mass",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Temperature",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_phys_r1_b001_002",
+          "original": true,
+          "topicCode": "NSMQ-PHYS-ELEC",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "According to Ohm’s law, the voltage V across a resistor of resistance R carrying current I equals",
+          "correctAnswer": "B",
+          "workedSolution": "Ohm’s law states V = IR: voltage equals current times resistance for an ohmic conductor at constant temperature. I²R is power dissipated, not voltage.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Physics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "I/R",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "IR",
+              "rationale": "This is the supported answer. Ohm’s law states V = IR: voltage equals current times resistance for an ohmic conductor at constant temperature. I²R is power dissipated, not voltage."
+            },
+            {
+              "label": "C",
+              "text": "I²R",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "R/I",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_phys_r1_b001_003",
+          "original": true,
+          "topicCode": "NSMQ-PHYS-WAVES",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "Which colour of visible light has the longest wavelength?",
+          "correctAnswer": "C",
+          "workedSolution": "In the visible spectrum, red light has the longest wavelength (about 700 nm) and violet the shortest (about 400 nm). Frequency runs the opposite way because v = fλ for a fixed speed of light.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Physics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Violet",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Green",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Red",
+              "rationale": "This is the supported answer. In the visible spectrum, red light has the longest wavelength (about 700 nm) and violet the shortest (about 400 nm). Frequency runs the opposite way because v = fλ for a fixed speed of light."
+            },
+            {
+              "label": "D",
+              "text": "Blue",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_phys_r1_b001_004",
+          "original": true,
+          "topicCode": "NSMQ-PHYS-MOD",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "The photoelectric effect provides evidence that light can behave as",
+          "correctAnswer": "D",
+          "workedSolution": "Einstein explained the photoelectric effect by treating light as quanta (photons) with energy E = hf. The existence of a threshold frequency cannot be explained by a purely continuous wave model.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Physics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Only a continuous wave",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A longitudinal sound wave",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A standing wave",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A stream of particles (photons)",
+              "rationale": "This is the supported answer. Einstein explained the photoelectric effect by treating light as quanta (photons) with energy E = hf. The existence of a threshold frequency cannot be explained by a purely continuous wave model."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subjectId": "subj_nsmq_chemistry",
+      "specificationCode": "BRILLA-NSMQ-CHEM-BETA-001",
+      "sources": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum — Chemistry",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "NSMQ-CHEM-ATOM",
+          "title": "Atomic Structure",
+          "objective": "Describe subatomic particles and electron arrangements in atoms."
+        },
+        {
+          "code": "NSMQ-CHEM-BOND",
+          "title": "Chemical Bonding",
+          "objective": "Explain how ionic, covalent and metallic bonds form compounds."
+        },
+        {
+          "code": "NSMQ-CHEM-STOICH",
+          "title": "Stoichiometry",
+          "objective": "Calculate reacting quantities using moles and balanced equations."
+        },
+        {
+          "code": "NSMQ-CHEM-EQUIL",
+          "title": "Chemical Equilibrium",
+          "objective": "Apply equilibrium expressions and Le Chatelier’s principle."
+        },
+        {
+          "code": "NSMQ-CHEM-ORG",
+          "title": "Organic Chemistry",
+          "objective": "Name and classify carbon compounds and their reactions."
+        },
+        {
+          "code": "NSMQ-CHEM-ELEC",
+          "title": "Electrochemistry",
+          "objective": "Relate electric charge to chemical change in cells and electrolysis."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_nsmq_chem_pod_b001_001",
+          "original": true,
+          "topicCode": "NSMQ-CHEM-STOICH",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "Calculate the number of moles in 20.0 g of sodium hydroxide, NaOH. (Na = 23, O = 16, H = 1)",
+          "correctAnswer": "0.5 mol",
+          "workedSolution": "Molar mass of NaOH = 23 + 16 + 1 = 40 g/mol. Moles n = mass/molar mass = 20.0/40 = 0.5 mol. This is the standard n = m/M relationship used throughout quantitative chemistry.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Chemistry",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_chem_pod_b001_002",
+          "original": true,
+          "topicCode": "NSMQ-CHEM-STOICH",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "What volume does 0.25 mol of an ideal gas occupy at s.t.p.? (Molar volume = 22.4 dm³/mol)",
+          "correctAnswer": "5.6 dm³",
+          "workedSolution": "Volume = moles × molar volume = 0.25 × 22.4 = 5.6 dm³. At standard temperature and pressure one mole of any ideal gas occupies 22.4 dm³, so a quarter mole occupies a quarter of that volume.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Chemistry",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_chem_pod_b001_003",
+          "original": true,
+          "topicCode": "NSMQ-CHEM-ELEC",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "A current of 2.0 A is passed through a solution of AgNO₃ for 965 s. Calculate the mass of silver deposited. (F = 96 500 C/mol, Ag = 108 g/mol)",
+          "correctAnswer": "2.16 g",
+          "workedSolution": "Charge Q = It = 2.0 × 965 = 1930 C. Moles of electrons = Q/F = 1930/96 500 = 0.02 mol. The half-equation Ag⁺ + e⁻ → Ag shows one electron deposits one silver atom, so n(Ag) = 0.02 mol. Mass = 0.02 × 108 = 2.16 g.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Chemistry",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_chem_pod_b001_004",
+          "original": true,
+          "topicCode": "NSMQ-CHEM-EQUIL",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "For N₂(g) + 3H₂(g) ⇌ 2NH₃(g) at equilibrium, [N₂] = 0.10 M, [H₂] = 0.10 M and [NH₃] = 0.20 M. Calculate the value of Kc.",
+          "correctAnswer": "400 mol⁻² dm⁶",
+          "workedSolution": "Kc = [NH₃]²/([N₂][H₂]³) using the stoichiometric coefficients as powers. Substituting: Kc = (0.20)²/(0.10 × (0.10)³) = 0.04/0.0001 = 400. The units are (mol dm⁻³)²/(mol dm⁻³)⁴ = mol⁻² dm⁶.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Chemistry",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_chem_sr_b001_001",
+          "original": true,
+          "topicCode": "NSMQ-CHEM-ATOM",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "How many protons are in the nucleus of a carbon atom?",
+          "correctAnswer": "6",
+          "workedSolution": "The atomic number Z counts the protons in the nucleus. Carbon has 6 protons, so Z = 6; this fixes its position in group 14 of the periodic table.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Chemistry",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_chem_sr_b001_002",
+          "original": true,
+          "topicCode": "NSMQ-CHEM-BOND",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "What type of bond holds the atoms together within a water molecule?",
+          "correctAnswer": "Covalent bond",
+          "workedSolution": "Within H₂O, hydrogen and oxygen share electron pairs, forming covalent bonds. (The attraction between separate water molecules is hydrogen bonding, a much weaker intermolecular force.)",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Chemistry",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_chem_sr_b001_003",
+          "original": true,
+          "topicCode": "NSMQ-CHEM-ORG",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "What is the general molecular formula of alkenes?",
+          "correctAnswer": "CₙH₂ₙ",
+          "workedSolution": "Alkenes contain one carbon–carbon double bond and follow the general formula CₙH₂ₙ; for n = 2 the compound is ethene, C₂H₄. Alkanes are CₙH₂ₙ₊₂ and alkynes CₙH₂ₙ₋₂.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Chemistry",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_chem_sr_b001_004",
+          "original": true,
+          "topicCode": "NSMQ-CHEM-EQUIL",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "What is the pH of a 0.001 M solution of hydrochloric acid?",
+          "correctAnswer": "3",
+          "workedSolution": "HCl is a strong acid and ionises fully, so [H⁺] = 0.001 = 10⁻³ M. Then pH = −log₁₀[H⁺] = −log₁₀(10⁻³) = 3.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Chemistry",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_chem_r1_b001_001",
+          "original": true,
+          "topicCode": "NSMQ-CHEM-ATOM",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "Which subatomic particle carries a negative charge?",
+          "correctAnswer": "A",
+          "workedSolution": "Electrons carry a charge of −1.6 × 10⁻¹⁹ C and occupy the region around the nucleus. Protons are positively charged, neutrons are neutral, and the nucleus as a whole is positive.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Chemistry",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Electron",
+              "rationale": "This is the supported answer. Electrons carry a charge of −1.6 × 10⁻¹⁹ C and occupy the region around the nucleus. Protons are positively charged, neutrons are neutral, and the nucleus as a whole is positive."
+            },
+            {
+              "label": "B",
+              "text": "Proton",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Neutron",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Atomic nucleus",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_chem_r1_b001_002",
+          "original": true,
+          "topicCode": "NSMQ-CHEM-BOND",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "Which type of bond forms when electrons are completely transferred from a metal atom to a non-metal atom?",
+          "correctAnswer": "B",
+          "workedSolution": "Complete transfer of electrons produces oppositely charged ions that attract electrostatically — an ionic bond, as in NaCl. Covalent bonding involves sharing, and metallic bonding involves a sea of delocalised electrons.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Chemistry",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Covalent bond",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Ionic bond",
+              "rationale": "This is the supported answer. Complete transfer of electrons produces oppositely charged ions that attract electrostatically — an ionic bond, as in NaCl. Covalent bonding involves sharing, and metallic bonding involves a sea of delocalised electrons."
+            },
+            {
+              "label": "C",
+              "text": "Metallic bond",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Hydrogen bond",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_chem_r1_b001_003",
+          "original": true,
+          "topicCode": "NSMQ-CHEM-ORG",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "What is the IUPAC name of CH₃CH(OH)CH₃?",
+          "correctAnswer": "C",
+          "workedSolution": "The longest chain has three carbons (propan-) and the −OH group sits on carbon 2, so the name is propan-2-ol. Propan-1-ol is the straight-chain isomer CH₃CH₂CH₂OH, and propanone is the ketone CH₃COCH₃.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Chemistry",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Propan-1-ol",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Ethanol",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Propan-2-ol",
+              "rationale": "This is the supported answer. The longest chain has three carbons (propan-) and the −OH group sits on carbon 2, so the name is propan-2-ol. Propan-1-ol is the straight-chain isomer CH₃CH₂CH₂OH, and propanone is the ketone CH₃COCH₃."
+            },
+            {
+              "label": "D",
+              "text": "Propanone",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_chem_r1_b001_004",
+          "original": true,
+          "topicCode": "NSMQ-CHEM-STOICH",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "How many moles are present in 54 g of water? (H₂O = 18 g/mol)",
+          "correctAnswer": "D",
+          "workedSolution": "n = m/M = 54/18 = 3 mol. This uses the defining mole relation; each mole of water contains 6.02 × 10²³ molecules, so 54 g holds about 1.8 × 10²⁴ molecules.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Chemistry",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "1",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "2",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "6",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "3",
+              "rationale": "This is the supported answer. n = m/M = 54/18 = 3 mol. This uses the defining mole relation; each mole of water contains 6.02 × 10²³ molecules, so 54 g holds about 1.8 × 10²⁴ molecules."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subjectId": "subj_nsmq_biology",
+      "specificationCode": "BRILLA-NSMQ-BIO-BETA-001",
+      "sources": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum — Biology",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "NSMQ-BIO-CELL",
+          "title": "Cell Biology",
+          "objective": "Explain cell structure, organelles and transport across membranes."
+        },
+        {
+          "code": "NSMQ-BIO-GEN",
+          "title": "Genetics",
+          "objective": "Apply Mendelian and molecular principles of heredity."
+        },
+        {
+          "code": "NSMQ-BIO-ECO",
+          "title": "Ecology",
+          "objective": "Analyse energy flow and relationships within ecosystems."
+        },
+        {
+          "code": "NSMQ-BIO-PHYS",
+          "title": "Human Physiology",
+          "objective": "Explain how human organ systems function and are regulated."
+        },
+        {
+          "code": "NSMQ-BIO-BIOCHEM",
+          "title": "Biochemistry",
+          "objective": "Relate enzymes, respiration and molecular processes in cells."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_nsmq_bio_pod_b001_001",
+          "original": true,
+          "topicCode": "NSMQ-BIO-GEN",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "In a population in Hardy-Weinberg equilibrium, 9% of individuals show a recessive phenotype. What percentage of the population are heterozygous carriers?",
+          "correctAnswer": "42%",
+          "workedSolution": "Recessive phenotype frequency q² = 0.09, so q = √0.09 = 0.3. Then p = 1 − q = 0.7. Heterozygote frequency = 2pq = 2 × 0.7 × 0.3 = 0.42, so 42% of the population are carriers.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Biology",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_bio_pod_b001_002",
+          "original": true,
+          "topicCode": "NSMQ-BIO-PHYS",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "A student’s heart beats 72 times per minute with a stroke volume of 75 mL. Calculate the cardiac output in litres per minute.",
+          "correctAnswer": "5.4 L/min",
+          "workedSolution": "Cardiac output = heart rate × stroke volume = 72 × 75 mL = 5400 mL per minute. Converting to litres: 5400/1000 = 5.4 L/min, a typical resting value for a healthy young adult.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Biology",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_bio_pod_b001_003",
+          "original": true,
+          "topicCode": "NSMQ-BIO-BIOCHEM",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "A DNA molecule contains 30% guanine. What percentage of its bases are adenine?",
+          "correctAnswer": "20%",
+          "workedSolution": "By Chargaff’s base-pairing rules G = C, so cytosine is also 30% and G + C = 60%. The remaining 40% is shared equally between A and T because A = T, giving adenine = 20%.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Biology",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_bio_pod_b001_004",
+          "original": true,
+          "topicCode": "NSMQ-BIO-ECO",
+          "roundType": "problem_of_day",
+          "type": "problem",
+          "prompt": "Producers in an ecosystem store 50 000 kJ of energy. If only 10% of energy is transferred between trophic levels, how much energy reaches the secondary consumers?",
+          "correctAnswer": "500 kJ",
+          "workedSolution": "Each transfer passes on 10%: producers 50 000 kJ → primary consumers 5000 kJ → secondary consumers 500 kJ. The rest is lost mainly as heat through respiration and in undigested material.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 5,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Biology",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_bio_sr_b001_001",
+          "original": true,
+          "topicCode": "NSMQ-BIO-CELL",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "Which pigment captures light energy for photosynthesis?",
+          "correctAnswer": "Chlorophyll",
+          "workedSolution": "Chlorophyll, located in the thylakoid membranes of chloroplasts, absorbs mainly red and blue light and reflects green, which is why leaves appear green.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Biology",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_bio_sr_b001_002",
+          "original": true,
+          "topicCode": "NSMQ-BIO-PHYS",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "Which blood cells transport oxygen around the body?",
+          "correctAnswer": "Red blood cells",
+          "workedSolution": "Red blood cells (erythrocytes) contain haemoglobin, which binds oxygen in the lungs and releases it in the tissues. They lose their nucleus when mature to carry more haemoglobin.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Biology",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_bio_sr_b001_003",
+          "original": true,
+          "topicCode": "NSMQ-BIO-GEN",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "What is the basic unit of heredity?",
+          "correctAnswer": "Gene",
+          "workedSolution": "A gene is a section of DNA that codes for a protein (or functional RNA) and is passed from parents to offspring. Genes occur in alternative forms called alleles.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Biology",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_bio_sr_b001_004",
+          "original": true,
+          "topicCode": "NSMQ-BIO-CELL",
+          "roundType": "speed_race",
+          "type": "direct_answer",
+          "prompt": "What is the movement of water across a partially permeable membrane called?",
+          "correctAnswer": "Osmosis",
+          "workedSolution": "Osmosis is the diffusion of water from a region of higher water potential to lower water potential across a partially permeable membrane; it needs no metabolic energy.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 15,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Biology",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_bio_r1_b001_001",
+          "original": true,
+          "topicCode": "NSMQ-BIO-PHYS",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "Which vessel returns oxygen-rich blood to the left atrium of the heart?",
+          "correctAnswer": "A",
+          "workedSolution": "The pulmonary vein returns oxygenated blood from the lungs to the left atrium. The pulmonary artery is unusual in carrying deoxygenated blood (from the heart to the lungs), and the aorta distributes blood from the heart to the body.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Biology",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Pulmonary vein",
+              "rationale": "This is the supported answer. The pulmonary vein returns oxygenated blood from the lungs to the left atrium. The pulmonary artery is unusual in carrying deoxygenated blood (from the heart to the lungs), and the aorta distributes blood from the heart to the body."
+            },
+            {
+              "label": "B",
+              "text": "Pulmonary artery",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Vena cava",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Aorta",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_bio_r1_b001_002",
+          "original": true,
+          "topicCode": "NSMQ-BIO-BIOCHEM",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "Which enzyme in saliva begins the digestion of starch?",
+          "correctAnswer": "B",
+          "workedSolution": "Salivary amylase hydrolyses starch into maltose in the mouth. Pepsin and trypsin digest proteins (in the stomach and small intestine), and lipase digests fats.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Biology",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Pepsin",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Amylase",
+              "rationale": "This is the supported answer. Salivary amylase hydrolyses starch into maltose in the mouth. Pepsin and trypsin digest proteins (in the stomach and small intestine), and lipase digests fats."
+            },
+            {
+              "label": "C",
+              "text": "Lipase",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Trypsin",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_bio_r1_b001_003",
+          "original": true,
+          "topicCode": "NSMQ-BIO-PHYS",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "Which product forms in human muscles during anaerobic respiration?",
+          "correctAnswer": "C",
+          "workedSolution": "When oxygen supply cannot meet demand, muscles respire anaerobically, converting glucose to lactic acid and releasing a small amount of energy. Ethanol and CO₂ are produced by anaerobic respiration in yeast, not humans.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Biology",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Ethanol and carbon dioxide",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Oxygen",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Lactic acid",
+              "rationale": "This is the supported answer. When oxygen supply cannot meet demand, muscles respire anaerobically, converting glucose to lactic acid and releasing a small amount of energy. Ethanol and CO₂ are produced by anaerobic respiration in yeast, not humans."
+            },
+            {
+              "label": "D",
+              "text": "Glucose",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            }
+          ]
+        },
+        {
+          "id": "q_nsmq_bio_r1_b001_004",
+          "original": true,
+          "topicCode": "NSMQ-BIO-ECO",
+          "roundType": "round_one",
+          "type": "multiple_choice",
+          "prompt": "To which kingdom do mushrooms belong?",
+          "correctAnswer": "D",
+          "workedSolution": "Mushrooms are the fruiting bodies of fungi, which have chitin cell walls, lack chlorophyll and feed by absorbing nutrients from decaying matter. They are neither plants nor animals.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 30,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Biology",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Plantae",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Protista",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Animalia",
+              "rationale": "This option is a plausible misconception, but it does not follow the scientific or mathematical principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Fungi",
+              "rationale": "This is the supported answer. Mushrooms are the fruiting bodies of fungi, which have chitin cell walls, lack chlorophyll and feed by absorbing nutrients from decaying matter. They are neither plants nor animals."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "riddles": [
+    {
+      "id": "riddle_011",
+      "subjectId": "subj_nsmq_math",
+      "answer": "Prime number",
+      "clues": [
+        "I am a whole number greater than one",
+        "I have exactly two factors: one and myself",
+        "Two is my smallest member and the only even one",
+        "Euclid proved that my family is infinite",
+        "Modern encryption multiplies large members of my family together"
+      ],
+      "difficulty": "easy",
+      "provenance": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum (SHS core mathematics and sciences)",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ]
+    },
+    {
+      "id": "riddle_012",
+      "subjectId": "subj_nsmq_math",
+      "answer": "Imaginary unit i",
+      "clues": [
+        "I am a number, yet I am not real",
+        "Squaring me produces a negative result",
+        "My square is exactly minus one",
+        "Electrical engineers write me as j in circuit analysis",
+        "Euler’s identity links me with e and π"
+      ],
+      "difficulty": "hard",
+      "provenance": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum (SHS core mathematics and sciences)",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ]
+    },
+    {
+      "id": "riddle_013",
+      "subjectId": "subj_nsmq_physics",
+      "answer": "Inertia",
+      "clues": [
+        "I am a resistance to change",
+        "Newton’s first law of motion describes me",
+        "Mass is the measure of me",
+        "You feel me when a moving bus suddenly brakes"
+      ],
+      "difficulty": "medium",
+      "provenance": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum (SHS core mathematics and sciences)",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ]
+    },
+    {
+      "id": "riddle_014",
+      "subjectId": "subj_nsmq_physics",
+      "answer": "Electron",
+      "clues": [
+        "I am a subatomic particle",
+        "I carry a negative electric charge",
+        "J. J. Thomson discovered me in 1897",
+        "My drift through a wire is an electric current",
+        "My charge is about −1.6 × 10⁻¹⁹ coulombs"
+      ],
+      "difficulty": "easy",
+      "provenance": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum (SHS core mathematics and sciences)",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ]
+    },
+    {
+      "id": "riddle_015",
+      "subjectId": "subj_nsmq_chemistry",
+      "answer": "Periodic table",
+      "clues": [
+        "I am a chart, not a piece of furniture",
+        "I organise all known chemical elements",
+        "Mendeleev published my first recognisable form in 1869",
+        "My rows are called periods and my columns are called groups",
+        "Elements in the same column of mine tend to react alike"
+      ],
+      "difficulty": "easy",
+      "provenance": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum (SHS core mathematics and sciences)",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ]
+    },
+    {
+      "id": "riddle_016",
+      "subjectId": "subj_nsmq_chemistry",
+      "answer": "Catalyst",
+      "clues": [
+        "I make a chemical reaction go faster",
+        "I am not consumed in the reaction",
+        "I work by providing a path of lower activation energy",
+        "Enzymes are my biological relatives",
+        "Catalytic converters in car exhausts contain me"
+      ],
+      "difficulty": "medium",
+      "provenance": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum (SHS core mathematics and sciences)",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ]
+    },
+    {
+      "id": "riddle_017",
+      "subjectId": "subj_nsmq_chemistry",
+      "answer": "pH",
+      "clues": [
+        "I am a number that tells you how acidic something is",
+        "My usual scale runs from 0 to 14",
+        "Seven on my scale means neutral",
+        "Litmus paper changes colour because of what I measure",
+        "I am the negative logarithm of the hydrogen-ion concentration"
+      ],
+      "difficulty": "medium",
+      "provenance": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum (SHS core mathematics and sciences)",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ]
+    },
+    {
+      "id": "riddle_018",
+      "subjectId": "subj_nsmq_biology",
+      "answer": "Chlorophyll",
+      "clues": [
+        "I am a pigment",
+        "I make leaves look green",
+        "I absorb mainly red and blue light",
+        "Photosynthesis cannot proceed without me",
+        "I sit in the thylakoid membranes inside chloroplasts"
+      ],
+      "difficulty": "easy",
+      "provenance": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum (SHS core mathematics and sciences)",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ]
+    },
+    {
+      "id": "riddle_019",
+      "subjectId": "subj_nsmq_biology",
+      "answer": "Neuron",
+      "clues": [
+        "I am a cell that carries messages",
+        "My signals are both electrical and chemical",
+        "I have dendrites that receive and an axon that transmits",
+        "I pass information across junctions called synapses",
+        "Some of my kind run from your spinal cord to your toes"
+      ],
+      "difficulty": "medium",
+      "provenance": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum (SHS core mathematics and sciences)",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ]
+    },
+    {
+      "id": "riddle_020",
+      "subjectId": "subj_nsmq_biology",
+      "answer": "Ribosome",
+      "clues": [
+        "I am a tiny machine inside every cell",
+        "I am built from RNA and protein",
+        "I read messenger RNA codon by codon",
+        "I am the site of protein synthesis",
+        "I float free in the cytoplasm or stud the rough endoplasmic reticulum"
+      ],
+      "difficulty": "hard",
+      "provenance": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum (SHS core mathematics and sciences)",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ]
+    }
+  ]
+}

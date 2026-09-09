@@ -1,6 +1,6 @@
 const VALID_STATUSES = new Set(['draft_automated_qa', 'approved_for_beta', 'approved_for_production']);
 const VALID_DIFFICULTIES = new Set(['easy', 'medium', 'hard']);
-const VALID_TYPES = new Set(['multiple_choice', 'short_answer', 'calculation', 'essay', 'structured']);
+const VALID_TYPES = new Set(['multiple_choice', 'short_answer', 'calculation', 'essay', 'structured', 'direct_answer', 'problem']);
 const VALID_AOS = new Set(['AO1', 'AO2', 'AO3']);
 
 export function normalizeQuestionText(value) {
