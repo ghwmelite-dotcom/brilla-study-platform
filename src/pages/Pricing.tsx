@@ -7,6 +7,15 @@ import type { SubscriptionPlan } from '@/types';
 
 type BillingCycle = 'monthly' | 'yearly';
 
+// School seat packages (spec pricing table, migration 372). Phase 1 is
+// admin-operated, so these are display-only — no self-serve checkout.
+const SCHOOL_PACKAGES = [
+  { seats: 25, perSeat: 35, monthly: 875, yearly: 8750 },
+  { seats: 50, perSeat: 30, monthly: 1500, yearly: 15000 },
+  { seats: 100, perSeat: 25, monthly: 2500, yearly: 25000 },
+  { seats: 250, perSeat: 20, monthly: 5000, yearly: 50000 },
+];
+
 function getPlanBillingCycle(plan: SubscriptionPlan): BillingCycle {
   if (plan.priceYearly != null && plan.priceMonthly == null) {
     return 'yearly';
@@ -296,25 +305,82 @@ export default function Pricing() {
             })}
         </div>
 
-        {/* Schools & Institutions — B2B, sales-led (no self-serve checkout
-            until the school dashboard ships; see landing-claims spec B-1) */}
-        <div className="mt-12 bg-neutral-900 rounded-2xl p-8 text-white flex flex-col md:flex-row items-center gap-6 md:gap-10">
-          <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center flex-shrink-0">
-            <Building2 className="w-7 h-7 text-secondary" />
-          </div>
-          <div className="flex-1 text-center md:text-left">
-            <h2 className="text-xl font-bold mb-2">For Schools & Institutions</h2>
-            <p className="text-white/70 text-sm max-w-2xl">
-              Bulk student seats, class management for your teachers, assessment tools, and priority
-              onboarding support — priced per school. Tell us about your school and we'll tailor a plan.
+        {/* Schools & Institutions — seat packages (admin-operated in Phase 1;
+            purchases are recorded by Brilla admins, so cards show pricing with
+            a contact CTA instead of self-serve checkout). Prices mirror the
+            tier_school_* rows from migration 372. */}
+        <div className="mt-12">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 text-primary font-semibold mb-2">
+              <Building2 className="w-5 h-5" />
+              <span>For Schools & Institutions</span>
+            </div>
+            <h2 className="text-2xl font-bold text-neutral-900 mb-2">
+              Student Seat Packages
+            </h2>
+            <p className="text-neutral-600 max-w-2xl mx-auto text-sm">
+              Give every student premium access with one school code. Bulk seats, class
+              management for your teachers, assessment tools, and priority onboarding support.
+              Yearly packages are 10× the monthly price (2 months free).
             </p>
           </div>
-          <a
-            href="mailto:admissions@brillaprep.org?subject=School%20plan%20enquiry"
-            className="flex-shrink-0 bg-secondary text-neutral-900 px-6 py-3 rounded-xl font-semibold hover:bg-yellow-400 transition-colors"
-          >
-            Talk to Us
-          </a>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {SCHOOL_PACKAGES.map((pkg) => (
+              <div
+                key={pkg.seats}
+                className="bg-white rounded-2xl border border-neutral-200 p-6 flex flex-col"
+              >
+                <h3 className="text-lg font-semibold text-neutral-900 mb-1">
+                  {pkg.seats} Seats
+                </h3>
+                <p className="text-sm text-neutral-500 mb-4">{pkg.perSeat} GHS per seat/month</p>
+                <div className="flex items-baseline mb-1">
+                  <span className="text-3xl font-bold text-neutral-900">
+                    {pkg.monthly.toLocaleString()}
+                  </span>
+                  <span className="text-sm text-neutral-500 ml-1">GHS/month</span>
+                </div>
+                <p className="text-sm text-neutral-500 mb-6">
+                  {pkg.yearly.toLocaleString()} GHS/year
+                </p>
+                <ul className="space-y-2 mb-6 flex-1">
+                  {['All premium features per seat', 'One join code for the whole school', 'Admin-managed onboarding'].map((feature) => (
+                    <li key={feature} className="flex items-center gap-2 text-sm text-neutral-600">
+                      <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={`mailto:admissions@brillaprep.org?subject=School%20package%20(${pkg.seats}%20seats)`}
+                  className="w-full py-2.5 px-4 rounded-xl border border-neutral-300 text-neutral-700 font-medium hover:bg-neutral-50 transition-colors text-center"
+                >
+                  Enquire
+                </a>
+              </div>
+            ))}
+          </div>
+
+          {/* 250+ / custom stays sales-led */}
+          <div className="mt-6 bg-neutral-900 rounded-2xl p-8 text-white flex flex-col md:flex-row items-center gap-6 md:gap-10 max-w-6xl mx-auto">
+            <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center flex-shrink-0">
+              <Building2 className="w-7 h-7 text-secondary" />
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <h3 className="text-xl font-bold mb-2">Need 250+ seats or a custom package?</h3>
+              <p className="text-white/70 text-sm max-w-2xl">
+                Multi-school groups, district rollouts, and custom terms — tell us about your
+                institution and we'll tailor a plan.
+              </p>
+            </div>
+            <a
+              href="mailto:admissions@brillaprep.org?subject=School%20plan%20enquiry%20(250%2B%20seats)"
+              className="flex-shrink-0 bg-secondary text-neutral-900 px-6 py-3 rounded-xl font-semibold hover:bg-yellow-400 transition-colors"
+            >
+              Talk to Us
+            </a>
+          </div>
         </div>
 
         {/* FAQ or Additional Info */}

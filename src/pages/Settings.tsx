@@ -24,6 +24,7 @@ import {
   Unlink,
   Send,
   GraduationCap,
+  Building2,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { useExamStore } from '@/stores/examStore';
@@ -35,7 +36,7 @@ import { cn } from '@/utils';
 import { Turnstile } from '@/components/common/Turnstile';
 import { useTurnstile } from '@/hooks/useTurnstile';
 
-type SettingsTab = 'profile' | 'exams' | 'password' | 'notifications' | 'appearance';
+type SettingsTab = 'profile' | 'school' | 'exams' | 'password' | 'notifications' | 'appearance';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -138,6 +139,12 @@ export default function Settings() {
   const [tg, setTg] = useState<{ linked: boolean; username: string | null; stale: boolean } | null>(null);
   const [tgConnecting, setTgConnecting] = useState(false);
   const [tgError, setTgError] = useState<string | null>(null);
+
+  // School seat code redemption (students join a school's seat package)
+  const [seatCode, setSeatCode] = useState('');
+  const [seatSaving, setSeatSaving] = useState(false);
+  const [seatError, setSeatError] = useState<string | null>(null);
+  const [seatJoined, setSeatJoined] = useState<{ schoolName: string; seatExpiresAt: string | null } | null>(null);
 
   // Appearance preferences - load from localStorage
   const [appearance, setAppearance] = useState(() => {
@@ -242,6 +249,37 @@ export default function Settings() {
     }
   };
 
+  const handleSeatCodeRedeem = async () => {
+    const code = seatCode.trim();
+    if (!code) {
+      setSeatError('Enter the seat code from your school');
+      return;
+    }
+    setSeatSaving(true);
+    setSeatError(null);
+    try {
+      const response = await api.post<{
+        schoolId: string;
+        schoolName: string;
+        seatExpiresAt: string | null;
+        alreadySeated: boolean;
+        extended: boolean;
+      }>('/schools/redeem-code', { code });
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to redeem seat code');
+      }
+      setSeatJoined({
+        schoolName: response.data.schoolName,
+        seatExpiresAt: response.data.seatExpiresAt,
+      });
+      setSeatCode('');
+    } catch (error) {
+      setSeatError(error instanceof Error ? error.message : 'Failed to redeem seat code');
+    } finally {
+      setSeatSaving(false);
+    }
+  };
+
   const loadTelegramStatus = async () => {
     try {
       const res = await api.get<{ linked: boolean; username: string | null; stale: boolean }>(
@@ -321,6 +359,10 @@ export default function Settings() {
 
   const tabs = [
     { id: 'profile' as const, label: 'Profile', icon: User },
+    // School seat-code redemption is a student flow (teachers are premium by role)
+    ...(user?.role === 'student'
+      ? [{ id: 'school' as const, label: 'School', icon: Building2 }]
+      : []),
     // Exam preferences only exist for students and teachers
     ...((user?.role === 'student' || user?.role === 'teacher')
       ? [{ id: 'exams' as const, label: 'Exam Mode', icon: GraduationCap }]
@@ -785,6 +827,74 @@ export default function Settings() {
                         <Save className="w-4 h-4" />
                       )}
                       Save Changes
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* School Tab — join a school's seat package with its seat code */}
+              {activeTab === 'school' && (
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-lg font-semibold text-neutral-900 mb-1">Join a School</h2>
+                    <p className="text-sm text-neutral-500">
+                      If your school has a Brilla seat package, enter its seat code to link your
+                      account and get premium access through the school.
+                    </p>
+                  </div>
+
+                  {seatError && (
+                    <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      {seatError}
+                    </div>
+                  )}
+
+                  {seatJoined && (
+                    <div className="p-3 bg-green-50 text-green-700 rounded-lg text-sm flex items-center gap-2">
+                      <Check className="w-4 h-4" />
+                      <span>
+                        You're now linked to <span className="font-semibold">{seatJoined.schoolName}</span>
+                        {seatJoined.seatExpiresAt && (
+                          <> — school access until {new Date(seatJoined.seatExpiresAt).toLocaleDateString()}</>
+                        )}
+                        .
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-1">
+                        School Seat Code
+                      </label>
+                      <input
+                        type="text"
+                        value={seatCode}
+                        onChange={(e) => setSeatCode(e.target.value.toUpperCase())}
+                        placeholder="e.g. SCH-7K2PX9"
+                        maxLength={32}
+                        className="w-full px-4 py-2.5 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent uppercase tracking-wider"
+                      />
+                      <p className="mt-1 text-xs text-neutral-400">
+                        Your school administrator or teacher has this code. One code works for every
+                        student at the school.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-4 border-t border-neutral-200">
+                    <button
+                      onClick={handleSeatCodeRedeem}
+                      disabled={seatSaving || !seatCode.trim()}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50"
+                    >
+                      {seatSaving ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Building2 className="w-4 h-4" />
+                      )}
+                      Redeem Code
                     </button>
                   </div>
                 </div>
