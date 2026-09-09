@@ -1,0 +1,2787 @@
+{
+  "batchId": "wassce-social-studies-sprint3-001",
+  "status": "approved_for_beta",
+  "examTypeId": "exam_wassce",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment, Ghana",
+      "title": "Secondary Education Curriculum — Social Studies",
+      "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T15:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Social Studies practice questions; not official WAEC (West African Examinations Council) examination material. Use the enabled feedback channel to report corrections.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_wassce_social",
+      "specificationCode": "BRILLA-WASSCE-SOCIAL-S3-001",
+      "sources": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum — Social Studies",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "SOC-GOV",
+          "title": "Governance and democracy",
+          "objective": "Explain how the 1992 Constitution, the arms of government and democratic principles promote good governance in Ghana."
+        },
+        {
+          "code": "SOC-CIV",
+          "title": "Elections and civic life",
+          "objective": "Analyse Ghana’s electoral processes and the civic rights and responsibilities of citizens."
+        },
+        {
+          "code": "SOC-MED",
+          "title": "Media and national development",
+          "objective": "Assess the roles, ethics and effects of the media in Ghana’s national development."
+        },
+        {
+          "code": "SOC-MIG",
+          "title": "Population and migration",
+          "objective": "Evaluate the causes and consequences of population change and rural-urban migration in Ghana."
+        },
+        {
+          "code": "SOC-CUL",
+          "title": "Culture and globalization",
+          "objective": "Explain Ghanaian cultural values and how they can be preserved amid globalizing influences."
+        },
+        {
+          "code": "SOC-EDU",
+          "title": "Adolescent health and education",
+          "objective": "Analyse adolescent health issues and their consequences for education and life chances in Ghana."
+        },
+        {
+          "code": "SOC-ECO",
+          "title": "Agriculture and the economy",
+          "objective": "Explain the contribution of agriculture to employment, food security and industrial growth in Ghana."
+        },
+        {
+          "code": "SOC-ENV",
+          "title": "Environment and illegal mining",
+          "objective": "Evaluate the environmental and social effects of illegal mining and the measures available to control it."
+        },
+        {
+          "code": "SOC-EMP",
+          "title": "Work and unemployment",
+          "objective": "Describe the world of work, the types of unemployment and the measures that reduce youth unemployment."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_was_soc_s3_001",
+          "original": true,
+          "topicCode": "SOC-GOV",
+          "type": "multiple_choice",
+          "prompt": "Which system of government gives citizens the power to choose their leaders through regular, free elections?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Democracy",
+              "rationale": "This is the supported answer. Democracy vests supreme power in the people, who exercise it directly or through freely elected representatives chosen in periodic elections. (An autocracy concentrates power in one ruler, a monarchy vests it in a hereditary sovereign, and military rule seizes power by force — none of these rests on elections.)"
+            },
+            {
+              "label": "B",
+              "text": "Autocracy",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Monarchy",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Military rule",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Democracy vests supreme power in the people, who exercise it directly or through freely elected representatives chosen in periodic elections. (An autocracy concentrates power in one ruler, a monarchy vests it in a hereditary sovereign, and military rule seizes power by force — none of these rests on elections.) Therefore the correct answer is A: Democracy.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_002",
+          "original": true,
+          "topicCode": "SOC-GOV",
+          "type": "multiple_choice",
+          "prompt": "How many arms of government does the 1992 Constitution of Ghana establish?",
+          "difficulty": "easy",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Two",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Three",
+              "rationale": "This is the supported answer. The 1992 Constitution establishes three arms of government: the Executive (President and ministers), the Legislature (Parliament) and the Judiciary (the courts). (Four wrongly counts the civil service, which supports the Executive but is not an arm of government.)"
+            },
+            {
+              "label": "C",
+              "text": "Four",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Five",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The 1992 Constitution establishes three arms of government: the Executive (President and ministers), the Legislature (Parliament) and the Judiciary (the courts). (Four wrongly counts the civil service, which supports the Executive but is not an arm of government.) Therefore the correct answer is B: Three.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_003",
+          "original": true,
+          "topicCode": "SOC-GOV",
+          "type": "multiple_choice",
+          "prompt": "Which arm of government is responsible for interpreting the laws of Ghana?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "The Executive",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The Legislature",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The Judiciary",
+              "rationale": "This is the supported answer. The Judiciary — the courts headed by the Chief Justice — interprets and applies the laws. The Legislature makes the laws and the Executive implements and enforces them, so those options swap the functions of the three arms. The Electoral Commission only conducts elections."
+            },
+            {
+              "label": "D",
+              "text": "The Electoral Commission",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The Judiciary — the courts headed by the Chief Justice — interprets and applies the laws. The Legislature makes the laws and the Executive implements and enforces them, so those options swap the functions of the three arms. The Electoral Commission only conducts elections. Therefore the correct answer is C: The Judiciary.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_004",
+          "original": true,
+          "topicCode": "SOC-GOV",
+          "type": "multiple_choice",
+          "prompt": "In which year did Ghana’s Fourth Republic come into being?",
+          "difficulty": "easy",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "1992",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "1957",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "1979",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "1993",
+              "rationale": "This is the supported answer. Although the Constitution was approved by referendum in April 1992, the Fourth Republic was inaugurated on 7 January 1993 when the first President and Parliament under it took office. (1992 is the referendum year — the common mix-up; 1957 is independence; 1979 began the short-lived Third Republic.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Although the Constitution was approved by referendum in April 1992, the Fourth Republic was inaugurated on 7 January 1993 when the first President and Parliament under it took office. (1992 is the referendum year — the common mix-up; 1957 is independence; 1979 began the short-lived Third Republic.) Therefore the correct answer is D: 1993.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_005",
+          "original": true,
+          "topicCode": "SOC-GOV",
+          "type": "multiple_choice",
+          "prompt": "The constitutional arrangement that allows each arm of government to limit the powers of the others so that no arm becomes too powerful is known as...",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Checks and balances",
+              "rationale": "This is the supported answer. Separation of powers merely divides government functions among the three arms; checks and balances is the further mechanism by which each arm restrains the others — for example, presidential assent to bills and judicial review of executive action. (Rule of law means everyone is subject to the law; judicial independence protects judges from interference.)"
+            },
+            {
+              "label": "B",
+              "text": "Separation of powers",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Rule of law",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Judicial independence",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Separation of powers merely divides government functions among the three arms; checks and balances is the further mechanism by which each arm restrains the others — for example, presidential assent to bills and judicial review of executive action. (Rule of law means everyone is subject to the law; judicial independence protects judges from interference.) Therefore the correct answer is A: Checks and balances.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_006",
+          "original": true,
+          "topicCode": "SOC-GOV",
+          "type": "multiple_choice",
+          "prompt": "Which court in Ghana has the final authority to interpret the provisions of the 1992 Constitution?",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "The High Court",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The Supreme Court",
+              "rationale": "This is the supported answer. Article 130 of the 1992 Constitution gives the Supreme Court exclusive, original jurisdiction in the interpretation and enforcement of the Constitution, so its word is final. The High Court and Court of Appeal handle ordinary civil and criminal matters and appeals, and regional tribunals no longer exist under the current court structure."
+            },
+            {
+              "label": "C",
+              "text": "The Court of Appeal",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The Regional Tribunal",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Article 130 of the 1992 Constitution gives the Supreme Court exclusive, original jurisdiction in the interpretation and enforcement of the Constitution, so its word is final. The High Court and Court of Appeal handle ordinary civil and criminal matters and appeals, and regional tribunals no longer exist under the current court structure. Therefore the correct answer is B: The Supreme Court.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_007",
+          "original": true,
+          "topicCode": "SOC-GOV",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is NOT a feature of a democratic system of government?",
+          "difficulty": "medium",
+          "commandWord": "Select",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Free and fair periodic elections",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Protection of fundamental human rights",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Rule by a single political party without periodic elections",
+              "rationale": "This is the supported answer. Democracies hold periodic competitive elections, protect fundamental human rights and treat citizens equally before the law. Permanent one-party rule without elections removes the people’s power to change leaders, so it contradicts democracy. (The other three options are all standard features of democratic governance.)"
+            },
+            {
+              "label": "D",
+              "text": "Equality of all citizens before the law",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Democracies hold periodic competitive elections, protect fundamental human rights and treat citizens equally before the law. Permanent one-party rule without elections removes the people’s power to change leaders, so it contradicts democracy. (The other three options are all standard features of democratic governance.) Therefore the correct answer is C: Rule by a single political party without periodic elections.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_008",
+          "original": true,
+          "topicCode": "SOC-GOV",
+          "type": "multiple_choice",
+          "prompt": "Under the 1992 Constitution of Ghana, a person elected as President may serve a maximum of...",
+          "difficulty": "medium",
+          "commandWord": "State",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Three four-year terms",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Two five-year terms",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Unlimited terms of office",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Two four-year terms",
+              "rationale": "This is the supported answer. Article 66 of the 1992 Constitution sets a presidential term at four years and bars anyone who has been elected twice from standing again — a maximum of two four-year terms. (Two five-year terms confuses Ghana with countries such as Nigeria’s neighbours with five-year terms; unlimited terms would remove a key check on executive power.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Article 66 of the 1992 Constitution sets a presidential term at four years and bars anyone who has been elected twice from standing again — a maximum of two four-year terms. (Two five-year terms confuses Ghana with countries such as Nigeria’s neighbours with five-year terms; unlimited terms would remove a key check on executive power.) Therefore the correct answer is D: Two four-year terms.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_009",
+          "original": true,
+          "topicCode": "SOC-CIV",
+          "type": "multiple_choice",
+          "prompt": "What is the minimum age at which a Ghanaian citizen may register to vote in public elections?",
+          "difficulty": "easy",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "18 years",
+              "rationale": "This is the supported answer. Article 42 of the 1992 Constitution grants the vote to every citizen of Ghana who is eighteen years or above and of sound mind. (16 is below the legal age of majority; 21 confuses voting with older historical thresholds; 25 is the minimum age for election to Parliament, not for voting.)"
+            },
+            {
+              "label": "B",
+              "text": "16 years",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "21 years",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "25 years",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Article 42 of the 1992 Constitution grants the vote to every citizen of Ghana who is eighteen years or above and of sound mind. (16 is below the legal age of majority; 21 confuses voting with older historical thresholds; 25 is the minimum age for election to Parliament, not for voting.) Therefore the correct answer is A: 18 years.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_010",
+          "original": true,
+          "topicCode": "SOC-CIV",
+          "type": "multiple_choice",
+          "prompt": "Which body is responsible for conducting and supervising all public elections and referenda in Ghana?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "The National Commission for Civic Education",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The Electoral Commission",
+              "rationale": "This is the supported answer. The Electoral Commission of Ghana, established under Article 43 of the 1992 Constitution, registers voters, demarcates constituencies and conducts elections. (The NCCE only educates citizens on their civic duties, the Judicial Service administers the courts, and the Ministry of the Interior handles internal security — none conducts elections.)"
+            },
+            {
+              "label": "C",
+              "text": "The Judicial Service",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The Ministry of the Interior",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The Electoral Commission of Ghana, established under Article 43 of the 1992 Constitution, registers voters, demarcates constituencies and conducts elections. (The NCCE only educates citizens on their civic duties, the Judicial Service administers the courts, and the Ministry of the Interior handles internal security — none conducts elections.) Therefore the correct answer is B: The Electoral Commission.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_011",
+          "original": true,
+          "topicCode": "SOC-CIV",
+          "type": "multiple_choice",
+          "prompt": "The right of qualified citizens to vote in elections is known as...",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "A referendum",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Naturalization",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The franchise",
+              "rationale": "This is the supported answer. The franchise (or suffrage) is the right to vote in public elections. A referendum is a vote on a single national question, naturalization is the legal process of acquiring citizenship, and a census is an official population count — none of them names the right to vote itself."
+            },
+            {
+              "label": "D",
+              "text": "A census",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The franchise (or suffrage) is the right to vote in public elections. A referendum is a vote on a single national question, naturalization is the legal process of acquiring citizenship, and a census is an official population count — none of them names the right to vote itself. Therefore the correct answer is C: The franchise.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_012",
+          "original": true,
+          "topicCode": "SOC-CIV",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is a civic responsibility of a Ghanaian citizen?",
+          "difficulty": "easy",
+          "commandWord": "Select",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Evading taxes when business is slow",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Refusing to obey lawful court orders",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Destroying posters of rival political parties",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Paying taxes honestly and promptly",
+              "rationale": "This is the supported answer. Civic responsibilities include paying taxes, voting, obeying the law and defending the state. Tax revenue funds schools, hospitals and roads. (Tax evasion, defying court orders and destroying opponents’ campaign materials are all unlawful acts that undermine civic life.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Civic responsibilities include paying taxes, voting, obeying the law and defending the state. Tax revenue funds schools, hospitals and roads. (Tax evasion, defying court orders and destroying opponents’ campaign materials are all unlawful acts that undermine civic life.) Therefore the correct answer is D: Paying taxes honestly and promptly.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_013",
+          "original": true,
+          "topicCode": "SOC-CIV",
+          "type": "multiple_choice",
+          "prompt": "The main reason Ghana uses the secret ballot in elections is to...",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Protect voters from intimidation so they can choose freely",
+              "rationale": "This is the supported answer. Because no one can see how an individual voted, the secret ballot shields voters from threats, bribery and victimization, making the choice genuinely free. (Counting speed and cost depend on logistics, not secrecy, and the voter register — not the ballot — stops unregistered persons from voting.)"
+            },
+            {
+              "label": "B",
+              "text": "Speed up the counting of ballots",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Reduce the cost of conducting elections",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Prevent unregistered persons from voting",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Because no one can see how an individual voted, the secret ballot shields voters from threats, bribery and victimization, making the choice genuinely free. (Counting speed and cost depend on logistics, not secrecy, and the voter register — not the ballot — stops unregistered persons from voting.) Therefore the correct answer is A: Protect voters from intimidation so they can choose freely.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_014",
+          "original": true,
+          "topicCode": "SOC-CIV",
+          "type": "multiple_choice",
+          "prompt": "An election held to fill a parliamentary seat that falls vacant between general elections is called...",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "A referendum",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A by-election",
+              "rationale": "This is the supported answer. A by-election fills a single seat vacated through death, resignation or disqualification of a Member of Parliament between general elections. (A referendum decides a national question, a primary selects a party’s candidate, and a run-off is a second round held when no presidential candidate wins an outright majority.)"
+            },
+            {
+              "label": "C",
+              "text": "A party primary",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A run-off election",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A by-election fills a single seat vacated through death, resignation or disqualification of a Member of Parliament between general elections. (A referendum decides a national question, a primary selects a party’s candidate, and a run-off is a second round held when no presidential candidate wins an outright majority.) Therefore the correct answer is B: A by-election.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_015",
+          "original": true,
+          "topicCode": "SOC-CIV",
+          "type": "multiple_choice",
+          "prompt": "A referendum differs from a general election because a referendum...",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Chooses the President and Members of Parliament",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Is held on a fixed four-year cycle",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Asks voters to decide a single specific national question",
+              "rationale": "This is the supported answer. In a referendum the electorate votes Yes or No on one question — such as the approval of the 1992 Constitution — rather than choosing office holders. General elections choose leaders, follow a constitutional timetable and are conducted by the Electoral Commission, not by parties. (The other options describe general-election features wrongly attributed to a referendum.)"
+            },
+            {
+              "label": "D",
+              "text": "Is organized by the political parties themselves",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "In a referendum the electorate votes Yes or No on one question — such as the approval of the 1992 Constitution — rather than choosing office holders. General elections choose leaders, follow a constitutional timetable and are conducted by the Electoral Commission, not by parties. (The other options describe general-election features wrongly attributed to a referendum.) Therefore the correct answer is C: Asks voters to decide a single specific national question.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_016",
+          "original": true,
+          "topicCode": "SOC-CIV",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is most likely to promote free and fair elections in Ghana?",
+          "difficulty": "medium",
+          "commandWord": "Select",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Allowing each party to count its own ballots",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Restricting voter registration to property owners",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Banning domestic and foreign election observers",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Continuous voter education by the NCCE and an independent Electoral Commission",
+              "rationale": "This is the supported answer. Informed voters and a neutral, independent election management body are the twin pillars of credible elections. (Party-controlled counting invites fraud, property-based registration violates universal adult suffrage, and barring observers removes transparency that deters malpractice.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Informed voters and a neutral, independent election management body are the twin pillars of credible elections. (Party-controlled counting invites fraud, property-based registration violates universal adult suffrage, and barring observers removes transparency that deters malpractice.) Therefore the correct answer is D: Continuous voter education by the NCCE and an independent Electoral Commission.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_017",
+          "original": true,
+          "topicCode": "SOC-MED",
+          "type": "multiple_choice",
+          "prompt": "The media are often described as the Fourth Estate because they...",
+          "difficulty": "easy",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Act as a watchdog over the Executive, Legislature and Judiciary",
+              "rationale": "This is the supported answer. By investigating and publicizing the actions of those in power, the media hold the three arms of government accountable — hence the label Fourth Estate. The media are not a formal arm of government, most Ghanaian media are privately owned, and court decisions remain the preserve of the Judiciary."
+            },
+            {
+              "label": "B",
+              "text": "Form the fourth arm of government",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Are owned entirely by the state",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Control the decisions of the courts",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "By investigating and publicizing the actions of those in power, the media hold the three arms of government accountable — hence the label Fourth Estate. The media are not a formal arm of government, most Ghanaian media are privately owned, and court decisions remain the preserve of the Judiciary. Therefore the correct answer is A: Act as a watchdog over the Executive, Legislature and Judiciary.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_018",
+          "original": true,
+          "topicCode": "SOC-MED",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is an example of print media in Ghana?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "An FM radio station",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The Daily Graphic newspaper",
+              "rationale": "This is the supported answer. Print media communicate through printed words and images — newspapers and magazines such as the Daily Graphic. Radio and television are electronic (broadcast) media, and WhatsApp messages are digital or new media, so neither category is print."
+            },
+            {
+              "label": "C",
+              "text": "A television news channel",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A WhatsApp broadcast message",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Print media communicate through printed words and images — newspapers and magazines such as the Daily Graphic. Radio and television are electronic (broadcast) media, and WhatsApp messages are digital or new media, so neither category is print. Therefore the correct answer is B: The Daily Graphic newspaper.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_019",
+          "original": true,
+          "topicCode": "SOC-MED",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is a form of electronic media widely used in Ghana?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "A printed newspaper",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A roadside billboard",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "FM radio broadcasting",
+              "rationale": "This is the supported answer. Electronic media transmit information by electronic signals — radio and television broadcasting reach most Ghanaian households. Newspapers and billboards are print and outdoor media respectively, and a hand-written letter is personal correspondence, not a mass medium."
+            },
+            {
+              "label": "D",
+              "text": "A hand-written letter",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Electronic media transmit information by electronic signals — radio and television broadcasting reach most Ghanaian households. Newspapers and billboards are print and outdoor media respectively, and a hand-written letter is personal correspondence, not a mass medium. Therefore the correct answer is C: FM radio broadcasting.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_020",
+          "original": true,
+          "topicCode": "SOC-MED",
+          "type": "multiple_choice",
+          "prompt": "Which of these is a social media platform commonly used by young Ghanaians?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "The Ghana Broadcasting Corporation",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The Daily Graphic",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "GTV",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "WhatsApp",
+              "rationale": "This is the supported answer. WhatsApp is a social networking and messaging platform on which users create and share content. The Ghana Broadcasting Corporation, the Daily Graphic and GTV are traditional state or print media houses that produce one-way mass communication rather than interactive social networking."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "WhatsApp is a social networking and messaging platform on which users create and share content. The Ghana Broadcasting Corporation, the Daily Graphic and GTV are traditional state or print media houses that produce one-way mass communication rather than interactive social networking. Therefore the correct answer is D: WhatsApp.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_021",
+          "original": true,
+          "topicCode": "SOC-MED",
+          "type": "multiple_choice",
+          "prompt": "Which of the following best explains how the media contribute to the national development of Ghana?",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "They educate the public on health, agriculture and civic matters and expose wrongdoing",
+              "rationale": "This is the supported answer. Radio, television, newspapers and digital platforms carry health campaigns, agricultural extension advice and civic education in local languages, while investigative reporting exposes corruption — all of which support development. (Schools, tax collection and appointments are the work of the education system, the Ghana Revenue Authority and constitutional office holders, not the media.)"
+            },
+            {
+              "label": "B",
+              "text": "They replace the formal school system entirely",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "They collect taxes on behalf of the government",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "They appoint ministers and Members of Parliament",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Radio, television, newspapers and digital platforms carry health campaigns, agricultural extension advice and civic education in local languages, while investigative reporting exposes corruption — all of which support development. (Schools, tax collection and appointments are the work of the education system, the Ghana Revenue Authority and constitutional office holders, not the media.) Therefore the correct answer is A: They educate the public on health, agriculture and civic matters and expose wrongdoing.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_022",
+          "original": true,
+          "topicCode": "SOC-MED",
+          "type": "multiple_choice",
+          "prompt": "The deliberate creation and spread of false information through the media in order to deceive the public is known as...",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Misinformation",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Disinformation",
+              "rationale": "This is the supported answer. Disinformation is false information spread with the intent to deceive; misinformation is false information shared without that intent — the key distinction examiners look for. Sensationalism is exaggerating true stories to attract attention, and censorship is the suppression of information by authority."
+            },
+            {
+              "label": "C",
+              "text": "Sensationalism",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Censorship",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Disinformation is false information spread with the intent to deceive; misinformation is false information shared without that intent — the key distinction examiners look for. Sensationalism is exaggerating true stories to attract attention, and censorship is the suppression of information by authority. Therefore the correct answer is B: Disinformation.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_023",
+          "original": true,
+          "topicCode": "SOC-MED",
+          "type": "multiple_choice",
+          "prompt": "A journalist who reports only the viewpoint of one political party in a contested election story violates the media ethic of...",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Confidentiality of sources",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Copyright protection",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Balance and fairness",
+              "rationale": "This is the supported answer. Professional ethics require journalists to give all sides of a contested story a fair hearing so the public can judge for itself. Confidentiality of sources protects informants, copyright protects creative work, and press freedom protects the journalist — none of them addresses one-sided reporting."
+            },
+            {
+              "label": "D",
+              "text": "Freedom of the press",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Professional ethics require journalists to give all sides of a contested story a fair hearing so the public can judge for itself. Confidentiality of sources protects informants, copyright protects creative work, and press freedom protects the journalist — none of them addresses one-sided reporting. Therefore the correct answer is C: Balance and fairness.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_024",
+          "original": true,
+          "topicCode": "SOC-MED",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is a negative effect of media misuse on national development?",
+          "difficulty": "medium",
+          "commandWord": "Select",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Health campaigns on radio improve public hygiene",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Coverage of budgets keeps citizens informed",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Advertising creates markets for local businesses",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The spread of fake news can incite panic, hatred and social conflict",
+              "rationale": "This is the supported answer. When media houses or users publish unverified or fabricated stories, the resulting panic and inter-group hostility can destabilize communities and slow development. The other three options are positive developmental roles of the media, so they cannot be answers to a question about negative effects."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "When media houses or users publish unverified or fabricated stories, the resulting panic and inter-group hostility can destabilize communities and slow development. The other three options are positive developmental roles of the media, so they cannot be answers to a question about negative effects. Therefore the correct answer is D: The spread of fake news can incite panic, hatred and social conflict.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_025",
+          "original": true,
+          "topicCode": "SOC-MIG",
+          "type": "multiple_choice",
+          "prompt": "The official count of all the people living in a country at a particular time is called...",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "A population census",
+              "rationale": "This is the supported answer. A population census enumerates every person in the country, recording numbers, age, sex and housing conditions. A voter register lists only eligible voters, and opinion polls and sample surveys collect data from small selected groups rather than the whole population."
+            },
+            {
+              "label": "B",
+              "text": "A voter register",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "An opinion poll",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A sample survey",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A population census enumerates every person in the country, recording numbers, age, sex and housing conditions. A voter register lists only eligible voters, and opinion polls and sample surveys collect data from small selected groups rather than the whole population. Therefore the correct answer is A: A population census.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_026",
+          "original": true,
+          "topicCode": "SOC-MIG",
+          "type": "multiple_choice",
+          "prompt": "Ghana aims to conduct a national population and housing census approximately every...",
+          "difficulty": "easy",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Two years",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Ten years",
+              "rationale": "This is the supported answer. Ghana’s censuses — 1960, 1970, 1984, 2000, 2010 and 2021 — follow the international decennial (ten-year) standard recommended by the United Nations. Two- and five-year intervals would be prohibitively expensive, and twenty years would leave planners with badly outdated data."
+            },
+            {
+              "label": "C",
+              "text": "Five years",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Twenty years",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Ghana’s censuses — 1960, 1970, 1984, 2000, 2010 and 2021 — follow the international decennial (ten-year) standard recommended by the United Nations. Two- and five-year intervals would be prohibitively expensive, and twenty years would leave planners with badly outdated data. Therefore the correct answer is B: Ten years.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_027",
+          "original": true,
+          "topicCode": "SOC-MIG",
+          "type": "multiple_choice",
+          "prompt": "The movement of people from the countryside to settle permanently in towns and cities is known as...",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Emigration",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Immigration",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Rural-urban migration",
+              "rationale": "This is the supported answer. Rural-urban migration is internal movement from villages to urban centres within the same country. Emigration and immigration cross international borders (leaving and entering a country respectively), and transhumance is the seasonal movement of livestock herders in search of pasture."
+            },
+            {
+              "label": "D",
+              "text": "Transhumance",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Rural-urban migration is internal movement from villages to urban centres within the same country. Emigration and immigration cross international borders (leaving and entering a country respectively), and transhumance is the seasonal movement of livestock herders in search of pasture. Therefore the correct answer is C: Rural-urban migration.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_028",
+          "original": true,
+          "topicCode": "SOC-MIG",
+          "type": "multiple_choice",
+          "prompt": "A Ghanaian who leaves Ghana to settle permanently in another country is described in Ghana as...",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "An immigrant",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A refugee",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A commuter",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "An emigrant",
+              "rationale": "This is the supported answer. An emigrant exits (e-) his or her home country to live abroad; the same person is an immigrant (im-) to the receiving country. A refugee flees persecution or war — a specific legal status, not every migrant — and a commuter travels daily between home and work without relocating."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "An emigrant exits (e-) his or her home country to live abroad; the same person is an immigrant (im-) to the receiving country. A refugee flees persecution or war — a specific legal status, not every migrant — and a commuter travels daily between home and work without relocating. Therefore the correct answer is D: An emigrant.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_029",
+          "original": true,
+          "topicCode": "SOC-MIG",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is a push factor of rural-urban migration in Ghana?",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Lack of jobs and social amenities in the villages",
+              "rationale": "This is the supported answer. Push factors are conditions at the origin that drive people away — rural poverty, few jobs and poor schools, hospitals and water supply. Better-paid city jobs are a pull factor (an attraction at the destination), and abundant farmland and peace would keep people in the village rather than push them out."
+            },
+            {
+              "label": "B",
+              "text": "Better-paid employment in the cities",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Abundant fertile farmland in the village",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Peaceful and secure rural communities",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Push factors are conditions at the origin that drive people away — rural poverty, few jobs and poor schools, hospitals and water supply. Better-paid city jobs are a pull factor (an attraction at the destination), and abundant farmland and peace would keep people in the village rather than push them out. Therefore the correct answer is A: Lack of jobs and social amenities in the villages.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_030",
+          "original": true,
+          "topicCode": "SOC-MIG",
+          "type": "multiple_choice",
+          "prompt": "The persistent departure of highly trained Ghanaians such as doctors, nurses and lecturers to work abroad is commonly referred to as...",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Labour turnover",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Brain drain",
+              "rationale": "This is the supported answer. Brain drain is the loss of skilled human capital through emigration, which deprives Ghana’s hospitals and universities of expertise the state paid to train. Labour turnover is routine movement between jobs, deportation is forced removal by a state, and internal migration stays within Ghana’s borders."
+            },
+            {
+              "label": "C",
+              "text": "Deportation",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Internal migration",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Brain drain is the loss of skilled human capital through emigration, which deprives Ghana’s hospitals and universities of expertise the state paid to train. Labour turnover is routine movement between jobs, deportation is forced removal by a state, and internal migration stays within Ghana’s borders. Therefore the correct answer is B: Brain drain.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_031",
+          "original": true,
+          "topicCode": "SOC-MIG",
+          "type": "multiple_choice",
+          "prompt": "The dependency ratio of a population measures...",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "The ratio of births to deaths in a year",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The share of the population in formal employment",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The proportion of the young and the elderly who depend on the working-age population",
+              "rationale": "This is the supported answer. The dependency ratio compares those below 15 and above 64 with the working-age group (15–64); a high ratio means each worker supports many non-workers, straining family income and state services. (Births-to-deaths is about natural increase, and formal employment share and tax claims are unrelated concepts.)"
+            },
+            {
+              "label": "D",
+              "text": "The number of dependants a taxpayer claims",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The dependency ratio compares those below 15 and above 64 with the working-age group (15–64); a high ratio means each worker supports many non-workers, straining family income and state services. (Births-to-deaths is about natural increase, and formal employment share and tax claims are unrelated concepts.) Therefore the correct answer is C: The proportion of the young and the elderly who depend on the working-age population.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_032",
+          "original": true,
+          "topicCode": "SOC-MIG",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is a negative effect of rapid urban growth driven by rural-urban migration in Ghana?",
+          "difficulty": "medium",
+          "commandWord": "Select",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "A steady fall in the urban population",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Reduced demand for urban services",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The disappearance of traffic congestion",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The growth of overcrowded slums and severe pressure on housing and sanitation",
+              "rationale": "This is the supported answer. When migration outpaces planning, cities such as Accra and Kumasi develop overcrowded settlements where housing, water, toilets and waste disposal cannot cope. The other options are the opposite of what happens: rapid in-migration raises the urban population and the demand for services, and worsens congestion."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "When migration outpaces planning, cities such as Accra and Kumasi develop overcrowded settlements where housing, water, toilets and waste disposal cannot cope. The other options are the opposite of what happens: rapid in-migration raises the urban population and the demand for services, and worsens congestion. Therefore the correct answer is D: The growth of overcrowded slums and severe pressure on housing and sanitation.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_033",
+          "original": true,
+          "topicCode": "SOC-CUL",
+          "type": "multiple_choice",
+          "prompt": "The total way of life of a people — including their language, food, dress, beliefs and values — is known as...",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Culture",
+              "rationale": "This is the supported answer. Culture is the learned, shared way of life of a group, covering both material objects and non-material elements such as language and beliefs. Climate describes weather patterns, population describes numbers of people, and governance is only one narrow institution within a way of life."
+            },
+            {
+              "label": "B",
+              "text": "Climate",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Population",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Governance",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Culture is the learned, shared way of life of a group, covering both material objects and non-material elements such as language and beliefs. Climate describes weather patterns, population describes numbers of people, and governance is only one narrow institution within a way of life. Therefore the correct answer is A: Culture.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_034",
+          "original": true,
+          "topicCode": "SOC-CUL",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is a traditional festival celebrated in Ghana?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Christmas",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Homowo of the Ga people",
+              "rationale": "This is the supported answer. Homowo — the Ga “hooting at hunger” harvest festival — is an indigenous Ghanaian festival, like Aboakyir of the Effutu and Odwira of the Akan. Christmas, Eid al-Fitr and Easter are Christian and Islamic festivals of foreign origin, not traditional Ghanaian festivals."
+            },
+            {
+              "label": "C",
+              "text": "Eid al-Fitr",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Easter",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Homowo — the Ga “hooting at hunger” harvest festival — is an indigenous Ghanaian festival, like Aboakyir of the Effutu and Odwira of the Akan. Christmas, Eid al-Fitr and Easter are Christian and Islamic festivals of foreign origin, not traditional Ghanaian festivals. Therefore the correct answer is B: Homowo of the Ga people.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_035",
+          "original": true,
+          "topicCode": "SOC-CUL",
+          "type": "multiple_choice",
+          "prompt": "The process by which countries and peoples of the world become increasingly interconnected through trade, technology and communication is called...",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Urbanization",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Industrialization",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Globalization",
+              "rationale": "This is the supported answer. Globalization is the growing integration of economies, cultures and communication across borders. Urbanization is the growth of towns, industrialization is the spread of manufacturing industry, and nationalization is state takeover of private assets — none of them describes worldwide interconnectedness."
+            },
+            {
+              "label": "D",
+              "text": "Nationalization",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Globalization is the growing integration of economies, cultures and communication across borders. Urbanization is the growth of towns, industrialization is the spread of manufacturing industry, and nationalization is state takeover of private assets — none of them describes worldwide interconnectedness. Therefore the correct answer is C: Globalization.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_036",
+          "original": true,
+          "topicCode": "SOC-CUL",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is an aspect of Ghana’s material culture?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Respect for elders",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The Twi language",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Belief in the Supreme Being",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Kente cloth and carved traditional stools",
+              "rationale": "This is the supported answer. Material culture consists of tangible, physical objects a society makes — cloth, stools, pottery and tools. Respect for elders, language and religious belief are intangible, non-material culture: they exist as values, symbols and ideas rather than objects."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Material culture consists of tangible, physical objects a society makes — cloth, stools, pottery and tools. Respect for elders, language and religious belief are intangible, non-material culture: they exist as values, symbols and ideas rather than objects. Therefore the correct answer is D: Kente cloth and carved traditional stools.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_037",
+          "original": true,
+          "topicCode": "SOC-CUL",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is a negative effect of globalization on Ghanaian culture?",
+          "difficulty": "medium",
+          "commandWord": "Select",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "The erosion of local languages and customs as foreign lifestyles dominate the youth",
+              "rationale": "This is the supported answer. Constant exposure to foreign media and lifestyles leads many young Ghanaians to abandon mother tongues, dress and customs, weakening cultural identity. Faster communication, wider markets and easier information access are widely recognized benefits of globalization, so they cannot answer a question about its negative effects."
+            },
+            {
+              "label": "B",
+              "text": "Faster communication with relatives abroad",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Wider export markets for Ghanaian products",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Easier access to global information and technology",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Constant exposure to foreign media and lifestyles leads many young Ghanaians to abandon mother tongues, dress and customs, weakening cultural identity. Faster communication, wider markets and easier information access are widely recognized benefits of globalization, so they cannot answer a question about its negative effects. Therefore the correct answer is A: The erosion of local languages and customs as foreign lifestyles dominate the youth.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_038",
+          "original": true,
+          "topicCode": "SOC-CUL",
+          "type": "multiple_choice",
+          "prompt": "The spread of cultural traits such as music, dress styles and foods from one society to another is known as...",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Ethnocentrism",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Cultural diffusion",
+              "rationale": "This is the supported answer. Cultural diffusion is the transmission of cultural elements between societies — for example the spread of hiplife rhythms or foreign fast food. Ethnocentrism is judging other cultures by the standards of one’s own, enculturation is learning one’s own culture from birth, and cultural conflict is a clash between incompatible cultural values."
+            },
+            {
+              "label": "C",
+              "text": "Enculturation",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Cultural conflict",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Cultural diffusion is the transmission of cultural elements between societies — for example the spread of hiplife rhythms or foreign fast food. Ethnocentrism is judging other cultures by the standards of one’s own, enculturation is learning one’s own culture from birth, and cultural conflict is a clash between incompatible cultural values. Therefore the correct answer is B: Cultural diffusion.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_039",
+          "original": true,
+          "topicCode": "SOC-CUL",
+          "type": "multiple_choice",
+          "prompt": "Traditional festivals in Ghana contribute to national development mainly by...",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Replacing the work of Metropolitan and District Assemblies",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Providing free housing for community members",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Promoting unity and attracting tourists whose spending supports local economies",
+              "rationale": "This is the supported answer. Festivals such as Aboakyir and Hogbetsotso reunite families and clans, settle disputes and draw domestic and foreign tourists whose spending boosts hospitality, transport and crafts. Assemblies remain responsible for local administration, and festivals neither build houses nor pay down sovereign debt."
+            },
+            {
+              "label": "D",
+              "text": "Reducing the country’s national debt directly",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Festivals such as Aboakyir and Hogbetsotso reunite families and clans, settle disputes and draw domestic and foreign tourists whose spending boosts hospitality, transport and crafts. Assemblies remain responsible for local administration, and festivals neither build houses nor pay down sovereign debt. Therefore the correct answer is C: Promoting unity and attracting tourists whose spending supports local economies.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_040",
+          "original": true,
+          "topicCode": "SOC-CUL",
+          "type": "multiple_choice",
+          "prompt": "A global citizen is best described as a person who...",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Holds the citizenship of many different countries",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Travels abroad frequently on business",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Completely rejects his or her own culture",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Identifies with the wider world community and acts on global issues while respecting local cultures",
+              "rationale": "This is the supported answer. Global citizenship is an outlook: awareness of worldwide interdependence, concern for issues such as climate change and human rights, and respect for diversity — not a legal status. Multiple passports and frequent travel are neither necessary nor sufficient, and rejecting one’s own culture contradicts the respect for diversity the concept requires."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Global citizenship is an outlook: awareness of worldwide interdependence, concern for issues such as climate change and human rights, and respect for diversity — not a legal status. Multiple passports and frequent travel are neither necessary nor sufficient, and rejecting one’s own culture contradicts the respect for diversity the concept requires. Therefore the correct answer is D: Identifies with the wider world community and acts on global issues while respecting local cultures.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_041",
+          "original": true,
+          "topicCode": "SOC-EDU",
+          "type": "multiple_choice",
+          "prompt": "According to the World Health Organization, adolescence covers the age range...",
+          "difficulty": "easy",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "10 to 19 years",
+              "rationale": "This is the supported answer. The WHO defines adolescents as persons aged 10–19 years, the transition from childhood to adulthood. Ages 1–5 are early childhood, 5–12 spans middle childhood with only its tail entering adolescence, and 20–29 is youth or early adulthood."
+            },
+            {
+              "label": "B",
+              "text": "1 to 5 years",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "5 to 12 years",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "20 to 29 years",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The WHO defines adolescents as persons aged 10–19 years, the transition from childhood to adulthood. Ages 1–5 are early childhood, 5–12 spans middle childhood with only its tail entering adolescence, and 20–29 is youth or early adulthood. Therefore the correct answer is A: 10 to 19 years.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_042",
+          "original": true,
+          "topicCode": "SOC-EDU",
+          "type": "multiple_choice",
+          "prompt": "The period of physical and emotional changes during which a child develops into an adult is called...",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Menopause",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Puberty",
+              "rationale": "This is the supported answer. Puberty is the stage of rapid growth and sexual maturation — breast development, voice change, menstruation — marking the move into adulthood. Menopause ends reproductive life in middle age, infancy is the first year of life, and senescence is old-age decline."
+            },
+            {
+              "label": "C",
+              "text": "Infancy",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Senescence",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Puberty is the stage of rapid growth and sexual maturation — breast development, voice change, menstruation — marking the move into adulthood. Menopause ends reproductive life in middle age, infancy is the first year of life, and senescence is old-age decline. Therefore the correct answer is B: Puberty.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_043",
+          "original": true,
+          "topicCode": "SOC-EDU",
+          "type": "multiple_choice",
+          "prompt": "The surest way for an adolescent to avoid sexually transmitted infections and unplanned pregnancy is...",
+          "difficulty": "easy",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Taking antibiotics regularly",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Avoiding all social contact with friends",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Abstinence from premarital sex",
+              "rationale": "This is the supported answer. Abstinence is the only method that is completely effective against sexually transmitted infections and pregnancy because it removes the risk entirely. Antibiotics do not prevent infection and misuse breeds resistance, avoiding friends is neither necessary nor protective, and unverified herbal mixtures offer no protection at all."
+            },
+            {
+              "label": "D",
+              "text": "Using herbal mixtures after intercourse",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Abstinence is the only method that is completely effective against sexually transmitted infections and pregnancy because it removes the risk entirely. Antibiotics do not prevent infection and misuse breeds resistance, avoiding friends is neither necessary nor protective, and unverified herbal mixtures offer no protection at all. Therefore the correct answer is C: Abstinence from premarital sex.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_044",
+          "original": true,
+          "topicCode": "SOC-EDU",
+          "type": "multiple_choice",
+          "prompt": "Which of the following best describes a balanced diet for a growing adolescent?",
+          "difficulty": "easy",
+          "commandWord": "Select",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Eating only energy-giving foods such as rice and yam",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Eating large quantities of meat every day",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Skipping breakfast in order to stay slim",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Meals containing the right proportions of carbohydrates, proteins, vitamins, minerals, fats and water",
+              "rationale": "This is the supported answer. A balanced diet supplies every nutrient class in adequate proportion to fuel growth, learning and immunity. Starch-only meals lack protein and micronutrients, excessive meat unbalances the diet, and skipping meals deprives the growing body of energy and impairs concentration."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A balanced diet supplies every nutrient class in adequate proportion to fuel growth, learning and immunity. Starch-only meals lack protein and micronutrients, excessive meat unbalances the diet, and skipping meals deprives the growing body of energy and impairs concentration. Therefore the correct answer is D: Meals containing the right proportions of carbohydrates, proteins, vitamins, minerals, fats and water.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_045",
+          "original": true,
+          "topicCode": "SOC-EDU",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is a major consequence of teenage pregnancy for the education of the girl in Ghana?",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Many pregnant girls drop out of school and lose qualifications and career prospects",
+              "rationale": "This is the supported answer. Pregnancy and childcare interrupt schooling; many girls are withdrawn or drop out, ending their education and narrowing future employment options. The other options are plainly false — pregnancy brings no scholarship, has no effect on the school calendar, and the burden of childcare lowers rather than raises performance."
+            },
+            {
+              "label": "B",
+              "text": "It automatically earns the girl a scholarship",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It shortens the school year for her classmates",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It improves the girl’s academic performance",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Pregnancy and childcare interrupt schooling; many girls are withdrawn or drop out, ending their education and narrowing future employment options. The other options are plainly false — pregnancy brings no scholarship, has no effect on the school calendar, and the burden of childcare lowers rather than raises performance. Therefore the correct answer is A: Many pregnant girls drop out of school and lose qualifications and career prospects.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_046",
+          "original": true,
+          "topicCode": "SOC-EDU",
+          "type": "multiple_choice",
+          "prompt": "HIV CANNOT be transmitted through which of the following?",
+          "difficulty": "medium",
+          "commandWord": "Select",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Unprotected sexual intercourse",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Shaking hands with or sharing meals with an infected person",
+              "rationale": "This is the supported answer. HIV spreads through specific body fluids during unprotected sex, contaminated blood and shared needles — not through casual contact such as handshakes, hugging, sharing food or mosquito bites. Knowing what does not transmit HIV helps adolescents avoid both infection and stigma towards infected persons."
+            },
+            {
+              "label": "C",
+              "text": "Transfusion of infected blood",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Sharing contaminated needles and syringes",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "HIV spreads through specific body fluids during unprotected sex, contaminated blood and shared needles — not through casual contact such as handshakes, hugging, sharing food or mosquito bites. Knowing what does not transmit HIV helps adolescents avoid both infection and stigma towards infected persons. Therefore the correct answer is B: Shaking hands with or sharing meals with an infected person.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_047",
+          "original": true,
+          "topicCode": "SOC-EDU",
+          "type": "multiple_choice",
+          "prompt": "An adolescent who politely but firmly refuses to join friends in stealing an examination paper is demonstrating...",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Low self-esteem",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Rebellion against lawful authority",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Assertiveness in resisting negative peer pressure",
+              "rationale": "This is the supported answer. Assertiveness is the ability to state one’s position and stand by sound values without aggression; refusing examination malpractice despite peer pressure is a textbook example. The student is confident rather than low in self-esteem, is upholding rather than defying lawful authority, and is calm rather than aggressive."
+            },
+            {
+              "label": "D",
+              "text": "Aggressive behaviour",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Assertiveness is the ability to state one’s position and stand by sound values without aggression; refusing examination malpractice despite peer pressure is a textbook example. The student is confident rather than low in self-esteem, is upholding rather than defying lawful authority, and is calm rather than aggressive. Therefore the correct answer is C: Assertiveness in resisting negative peer pressure.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_048",
+          "original": true,
+          "topicCode": "SOC-EDU",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is a long-term effect of substance abuse on an adolescent?",
+          "difficulty": "medium",
+          "commandWord": "Select",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Improved concentration in class",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Stronger and warmer family relationships",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Better physical fitness and stamina",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Addiction and damage to vital organs such as the liver and the brain",
+              "rationale": "This is the supported answer. Prolonged abuse of alcohol, tramadol or cannabis produces dependence (addiction) and harms the liver, brain and heart, wrecking schooling and health. The other options describe benefits that substance abuse destroys: it impairs concentration, strains family ties and weakens the body."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Prolonged abuse of alcohol, tramadol or cannabis produces dependence (addiction) and harms the liver, brain and heart, wrecking schooling and health. The other options describe benefits that substance abuse destroys: it impairs concentration, strains family ties and weakens the body. Therefore the correct answer is D: Addiction and damage to vital organs such as the liver and the brain.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_049",
+          "original": true,
+          "topicCode": "SOC-ECO",
+          "type": "multiple_choice",
+          "prompt": "Which sector of the Ghanaian economy employs the largest share of the labour force?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Agriculture, including fishing and forestry",
+              "rationale": "This is the supported answer. Agriculture remains Ghana’s largest single employer, engaging a large share of workers in crop farming, livestock, fishing and forestry, especially in rural areas. Banking, mining and manufacturing are capital-intensive and employ far fewer people despite their high output per worker."
+            },
+            {
+              "label": "B",
+              "text": "Banking and finance",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Mining and quarrying",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Manufacturing industry",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Agriculture remains Ghana’s largest single employer, engaging a large share of workers in crop farming, livestock, fishing and forestry, especially in rural areas. Banking, mining and manufacturing are capital-intensive and employ far fewer people despite their high output per worker. Therefore the correct answer is A: Agriculture, including fishing and forestry.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_050",
+          "original": true,
+          "topicCode": "SOC-ECO",
+          "type": "multiple_choice",
+          "prompt": "Ghana’s leading traditional cash crop, which earns the country significant foreign exchange, is...",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Cassava",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Cocoa",
+              "rationale": "This is the supported answer. Cocoa, grown mainly in the forest belt, is Ghana’s flagship export crop and a major earner of foreign exchange through the Ghana Cocoa Board. Cassava, maize and plantain are staple food crops grown largely for the domestic market rather than for export."
+            },
+            {
+              "label": "C",
+              "text": "Maize",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Plantain",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Cocoa, grown mainly in the forest belt, is Ghana’s flagship export crop and a major earner of foreign exchange through the Ghana Cocoa Board. Cassava, maize and plantain are staple food crops grown largely for the domestic market rather than for export. Therefore the correct answer is B: Cocoa.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_051",
+          "original": true,
+          "topicCode": "SOC-ECO",
+          "type": "multiple_choice",
+          "prompt": "Farming mainly to feed one’s own family, with little or no surplus for sale, is known as...",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Commercial farming",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Plantation agriculture",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Subsistence farming",
+              "rationale": "This is the supported answer. Subsistence farmers cultivate small plots with simple tools and consume nearly all they produce. Commercial and plantation farming target the market on a large scale, while mixed farming — combining crops and livestock — describes what is produced, not whether output is eaten or sold."
+            },
+            {
+              "label": "D",
+              "text": "Mixed farming",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Subsistence farmers cultivate small plots with simple tools and consume nearly all they produce. Commercial and plantation farming target the market on a large scale, while mixed farming — combining crops and livestock — describes what is produced, not whether output is eaten or sold. Therefore the correct answer is C: Subsistence farming.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_052",
+          "original": true,
+          "topicCode": "SOC-ECO",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is an example of agro-processing in Ghana?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Planting maize on a family plot",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Harvesting fish from the Volta Lake",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Rearing cattle for fresh milk",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Turning cocoa beans into cocoa butter and chocolate",
+              "rationale": "This is the supported answer. Agro-processing adds value to raw farm produce by manufacturing it into new products — cocoa beans into butter and chocolate, cassava into gari, tomatoes into paste. Planting, harvesting and rearing are primary farm activities that produce raw materials without transforming them."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Agro-processing adds value to raw farm produce by manufacturing it into new products — cocoa beans into butter and chocolate, cassava into gari, tomatoes into paste. Planting, harvesting and rearing are primary farm activities that produce raw materials without transforming them. Therefore the correct answer is D: Turning cocoa beans into cocoa butter and chocolate.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_053",
+          "original": true,
+          "topicCode": "SOC-ENV",
+          "type": "multiple_choice",
+          "prompt": "The local Ghanaian term for illegal small-scale gold mining is...",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Galamsey",
+              "rationale": "This is the supported answer. Galamsey — a corruption of “gather them and sell” — denotes unlicensed gold mining that evades regulation, unlike registered small-scale mining, which is legal. Quarrying extracts stone, surface mining is a legitimate licensed technique, and sand winning removes sand for construction."
+            },
+            {
+              "label": "B",
+              "text": "Quarrying",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Surface mining",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Sand winning",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Galamsey — a corruption of “gather them and sell” — denotes unlicensed gold mining that evades regulation, unlike registered small-scale mining, which is legal. Quarrying extracts stone, surface mining is a legitimate licensed technique, and sand winning removes sand for construction. Therefore the correct answer is A: Galamsey.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_054",
+          "original": true,
+          "topicCode": "SOC-ENV",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is a direct environmental effect of galamsey operations in Ghana?",
+          "difficulty": "easy",
+          "commandWord": "Select",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Increased fish stocks in the rivers",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Pollution of rivers such as the Pra and Ankobra with silt and mercury",
+              "rationale": "This is the supported answer. Galamsey washes soil and mercury into rivers such as the Pra, Ankobra and Birim, making water turbid, costly to treat and poisonous to fish and people. Fish stocks fall, farmland is excavated and degraded, and forest is cleared — the exact opposite of the three distractors."
+            },
+            {
+              "label": "C",
+              "text": "Improved fertility of cocoa farmland",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Expansion of forest cover in mining areas",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Galamsey washes soil and mercury into rivers such as the Pra, Ankobra and Birim, making water turbid, costly to treat and poisonous to fish and people. Fish stocks fall, farmland is excavated and degraded, and forest is cleared — the exact opposite of the three distractors. Therefore the correct answer is B: Pollution of rivers such as the Pra and Ankobra with silt and mercury.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_055",
+          "original": true,
+          "topicCode": "SOC-ENV",
+          "type": "multiple_choice",
+          "prompt": "The clearing of forests without replanting, leading to permanent loss of tree cover, is called...",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Afforestation",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Reforestation",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Deforestation",
+              "rationale": "This is the supported answer. Deforestation is the removal of forest without replacement. Afforestation is planting trees where none existed, reforestation is replanting cleared forest, and desertification is the degradation of dry land into desert — a possible result of deforestation, not the clearing itself."
+            },
+            {
+              "label": "D",
+              "text": "Desertification",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Deforestation is the removal of forest without replacement. Afforestation is planting trees where none existed, reforestation is replanting cleared forest, and desertification is the degradation of dry land into desert — a possible result of deforestation, not the clearing itself. Therefore the correct answer is C: Deforestation.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_056",
+          "original": true,
+          "topicCode": "SOC-ENV",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is a renewable natural resource in Ghana?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Gold deposits",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Crude oil reserves",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Bauxite ore",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Forest timber, when trees are replanted",
+              "rationale": "This is the supported answer. Renewable resources regenerate within a human timescale: forests regrow if harvested sustainably and replanted, as do fisheries and solar energy. Gold, crude oil and bauxite are minerals that take millions of years to form, so once mined they are gone — non-renewable resources."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Renewable resources regenerate within a human timescale: forests regrow if harvested sustainably and replanted, as do fisheries and solar energy. Gold, crude oil and bauxite are minerals that take millions of years to form, so once mined they are gone — non-renewable resources. Therefore the correct answer is D: Forest timber, when trees are replanted.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_057",
+          "original": true,
+          "topicCode": "SOC-EMP",
+          "type": "multiple_choice",
+          "prompt": "Unemployment is best defined as the situation in which...",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "People who are willing and able to work cannot find jobs",
+              "rationale": "This is the supported answer. The unemployed are members of the labour force who are willing, able and actively seeking work but cannot find it. Striking workers already have jobs, and retirees and full-time students are not in the labour force at all, so none of them counts as unemployed."
+            },
+            {
+              "label": "B",
+              "text": "Workers go on strike for higher pay",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "People retire from active service",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Students attend school on a full-time basis",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The unemployed are members of the labour force who are willing, able and actively seeking work but cannot find it. Striking workers already have jobs, and retirees and full-time students are not in the labour force at all, so none of them counts as unemployed. Therefore the correct answer is A: People who are willing and able to work cannot find jobs.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_058",
+          "original": true,
+          "topicCode": "SOC-EMP",
+          "type": "multiple_choice",
+          "prompt": "A farmer who is idle during the dry season, when no planting or harvesting takes place, experiences...",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Structural unemployment",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Seasonal unemployment",
+              "rationale": "This is the supported answer. Seasonal unemployment follows the calendar: farmhands, fishing crews and construction workers lose work in off-seasons. Structural unemployment comes from a mismatch of skills, frictional unemployment is the short gap while moving between jobs, and cyclical unemployment follows downturns in the business cycle."
+            },
+            {
+              "label": "C",
+              "text": "Frictional unemployment",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Cyclical unemployment",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Seasonal unemployment follows the calendar: farmhands, fishing crews and construction workers lose work in off-seasons. Structural unemployment comes from a mismatch of skills, frictional unemployment is the short gap while moving between jobs, and cyclical unemployment follows downturns in the business cycle. Therefore the correct answer is B: Seasonal unemployment.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_059",
+          "original": true,
+          "topicCode": "SOC-EMP",
+          "type": "multiple_choice",
+          "prompt": "A person who identifies a business opportunity, organizes resources and bears the risk of starting an enterprise is called...",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "A civil servant",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A shareholder",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "An entrepreneur",
+              "rationale": "This is the supported answer. An entrepreneur combines land, labour and capital, takes the risk of failure and earns profit if the venture succeeds. A civil servant is a salaried state employee, a shareholder merely owns part of a company, and a middleman only links producers to buyers without organizing production."
+            },
+            {
+              "label": "D",
+              "text": "A middleman",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "An entrepreneur combines land, labour and capital, takes the risk of failure and earns profit if the venture succeeds. A civil servant is a salaried state employee, a shareholder merely owns part of a company, and a middleman only links producers to buyers without organizing production. Therefore the correct answer is C: An entrepreneur.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_soc_s3_060",
+          "original": true,
+          "topicCode": "SOC-EMP",
+          "type": "multiple_choice",
+          "prompt": "Which of the following workers operates in Ghana’s informal sector?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Social Studies",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "A teacher employed by the Ghana Education Service",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A bank manager in a commercial bank",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "An engineer at a licensed mining company",
+              "rationale": "This is a plausible misconception, but it does not follow from the analysis in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A self-employed market trader whose business is not registered",
+              "rationale": "This is the supported answer. The informal sector covers unregistered, unregulated, mostly small-scale work — market trading, street vending, artisan work — without formal contracts or social security. Teaching in public schools, banking and licensed mining are formal-sector jobs with registered employers and regulated conditions."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The informal sector covers unregistered, unregulated, mostly small-scale work — market trading, street vending, artisan work — without formal contracts or social security. Teaching in public schools, banking and licensed mining are formal-sector jobs with registered employers and regulated conditions. Therefore the correct answer is D: A self-employed market trader whose business is not registered.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        }
+      ]
+    }
+  ]
+}
