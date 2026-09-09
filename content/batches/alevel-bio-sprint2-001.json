@@ -1,0 +1,2200 @@
+{
+  "batchId": "alevel-bio-sprint2-001",
+  "status": "approved_for_beta",
+  "examTypeId": "cambridge_a2",
+  "provenance": [
+    {
+      "publisher": "Cambridge International Education",
+      "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+      "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T00:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge International AS & A Level Biology (9700) syllabus; not official Cambridge International or WAEC examination material. Use the enabled feedback channel to report corrections.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_alevel_biology",
+      "specificationCode": "BRILLA-9700-ALBIO-S2-001",
+      "sources": [
+        {
+          "publisher": "Cambridge International Education",
+          "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+          "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "9700-ECOL",
+          "title": "Ecology and Nutrient Cycles",
+          "objective": "Apply knowledge of energy flow through ecosystems, productivity, nutrient cycling and population sampling to ecological problems."
+        },
+        {
+          "code": "9700-CELLS",
+          "title": "Cells and Biological Molecules",
+          "objective": "Apply knowledge of cell ultrastructure and the chemistry of carbohydrates, lipids, proteins and nucleic acids."
+        },
+        {
+          "code": "9700-MEMB",
+          "title": "Membranes and Transport",
+          "objective": "Apply knowledge of membrane structure and transport mechanisms to explain movement of substances into and out of cells."
+        },
+        {
+          "code": "9700-METAB",
+          "title": "Metabolism: Respiration and Photosynthesis",
+          "objective": "Apply knowledge of respiration and photosynthesis pathways, including the sites and carriers involved in ATP synthesis."
+        },
+        {
+          "code": "9700-GEN",
+          "title": "Genetics, Inheritance and Evolution",
+          "objective": "Apply knowledge of genes, inheritance patterns and mutations to genetic problems."
+        },
+        {
+          "code": "9700-HOME",
+          "title": "Control and Homeostasis",
+          "objective": "Apply knowledge of hormonal control, osmoregulation and feedback mechanisms to homeostatic regulation."
+        },
+        {
+          "code": "9700-BIODIV",
+          "title": "Biodiversity and Conservation",
+          "objective": "Apply knowledge of species concepts, diversity measurement and conservation strategies."
+        },
+        {
+          "code": "9700-BIOTECH",
+          "title": "Biotechnology and Gene Technology",
+          "objective": "Apply knowledge of genetic engineering, PCR and DNA analysis to biotechnological applications."
+        },
+        {
+          "code": "9700-IMM",
+          "title": "Immunity",
+          "objective": "Apply knowledge of immune responses, types of immunity and immunological memory to defence against disease."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_albio_ecology_s2_001",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "multiple_choice",
+          "prompt": "In the nitrogen cycle, which process is carried out by Rhizobium bacteria living in the root nodules of legumes such as cowpea and groundnut?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Conversion of atmospheric nitrogen gas into ammonia (nitrogen fixation)",
+              "rationale": "This is the supported answer. Rhizobium is a mutualistic nitrogen-fixing bacterium: inside root nodules it uses the enzyme nitrogenase to reduce inert atmospheric nitrogen gas to ammonia, which the host plant uses to make amino acids, while the plant supplies the bacteria with carbohydrates. Oxidising ammonium to nitrite and nitrite to nitrate is nitrification (carried out by Nitrosomonas and Nitrobacter), and converting nitrate back to nitrogen gas is denitrification, carried out by bacteria such as Pseudomonas in anaerobic, waterlogged soils."
+            },
+            {
+              "label": "B",
+              "text": "Oxidation of ammonium ions to nitrite ions",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Oxidation of nitrite ions to nitrate ions",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Conversion of nitrate ions into nitrogen gas",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Rhizobium is a mutualistic nitrogen-fixing bacterium: inside root nodules it uses the enzyme nitrogenase to reduce inert atmospheric nitrogen gas to ammonia, which the host plant uses to make amino acids, while the plant supplies the bacteria with carbohydrates. Oxidising ammonium to nitrite and nitrite to nitrate is nitrification (carried out by Nitrosomonas and Nitrobacter), and converting nitrate back to nitrogen gas is denitrification, carried out by bacteria such as Pseudomonas in anaerobic, waterlogged soils. Therefore the correct answer is A: Conversion of atmospheric nitrogen gas into ammonia (nitrogen fixation).",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_002",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "multiple_choice",
+          "prompt": "In the food chain grass → grasshopper → lizard → hawk, which organism is the secondary consumer?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Grasshopper",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Lizard",
+              "rationale": "This is the supported answer. Trophic levels count from the producer: grass (producer) is eaten by the grasshopper (primary consumer, a herbivore), which is eaten by the lizard (secondary consumer, the first carnivore), which is eaten by the hawk (tertiary consumer). A common error is to label the grasshopper as the secondary consumer by counting the producer as the first consumer, but consumers are numbered only from the herbivore level."
+            },
+            {
+              "label": "C",
+              "text": "Hawk",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Grass",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Trophic levels count from the producer: grass (producer) is eaten by the grasshopper (primary consumer, a herbivore), which is eaten by the lizard (secondary consumer, the first carnivore), which is eaten by the hawk (tertiary consumer). A common error is to label the grasshopper as the secondary consumer by counting the producer as the first consumer, but consumers are numbered only from the herbivore level. Therefore the correct answer is B: Lizard.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_003",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "multiple_choice",
+          "prompt": "What name is given to all the populations of different species living and interacting in the same area at the same time?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A population",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "An ecosystem",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A community",
+              "rationale": "This is the supported answer. A community is all the biotic components — every population of every species living and interacting in one area at one time. A population is the members of a single species only; an ecosystem includes the community together with the non-living (abiotic) environment; a habitat is simply the place where an organism lives, not the set of organisms itself."
+            },
+            {
+              "label": "D",
+              "text": "A habitat",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A community is all the biotic components — every population of every species living and interacting in one area at one time. A population is the members of a single species only; an ecosystem includes the community together with the non-living (abiotic) environment; a habitat is simply the place where an organism lives, not the set of organisms itself. Therefore the correct answer is C: A community.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_004",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "multiple_choice",
+          "prompt": "Which equation correctly relates gross primary productivity (GPP), respiration losses (R) and net primary productivity (NPP)?",
+          "options": [
+            {
+              "label": "A",
+              "text": "NPP = GPP + R",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "GPP = NPP − R",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "NPP = R − GPP",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "NPP = GPP − R",
+              "rationale": "This is the supported answer. Gross primary productivity is the total chemical energy that producers fix in photosynthesis. Producers respire, releasing some of that energy as heat, so the energy left available for growth, reproduction and transfer to herbivores is net primary productivity: NPP = GPP − R. Adding respiration back, or rearranging the equation so that GPP loses NPP, confuses the direction of the relationship — respiration is a loss from GPP, never an addition to NPP."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Gross primary productivity is the total chemical energy that producers fix in photosynthesis. Producers respire, releasing some of that energy as heat, so the energy left available for growth, reproduction and transfer to herbivores is net primary productivity: NPP = GPP − R. Adding respiration back, or rearranging the equation so that GPP loses NPP, confuses the direction of the relationship — respiration is a loss from GPP, never an addition to NPP. Therefore the correct answer is D: NPP = GPP − R.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_005",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "multiple_choice",
+          "prompt": "Which statement best explains why only about 10% of the energy at one trophic level is typically transferred to the next?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Most of the energy is lost as heat from respiration, and some remains in parts that are not eaten or cannot be digested, or is lost in excretory products",
+              "rationale": "This is the supported answer. Energy transfer is inefficient because consumers use much of the energy they assimilate in respiration, which is lost as heat that cannot re-enter the food chain, while energy in bones, cellulose and other indigestible or uneaten material, and in urea and faeces, passes to decomposers rather than to the next trophic level. Energy is never destroyed — that would violate the conservation of energy — and the 10% figure is an ecological average, not a behavioural rule about how much predators choose to eat."
+            },
+            {
+              "label": "B",
+              "text": "Decomposers directly absorb 90% of the energy before herbivores can feed",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Predators deliberately consume only about 10% of the prey population",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "About 90% of the energy is destroyed during digestion inside the consumer",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Energy transfer is inefficient because consumers use much of the energy they assimilate in respiration, which is lost as heat that cannot re-enter the food chain, while energy in bones, cellulose and other indigestible or uneaten material, and in urea and faeces, passes to decomposers rather than to the next trophic level. Energy is never destroyed — that would violate the conservation of energy — and the 10% figure is an ecological average, not a behavioural rule about how much predators choose to eat. Therefore the correct answer is A: Most of the energy is lost as heat from respiration, and some remains in parts that are not eaten or cannot be digested, or is lost in excretory products.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_006",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "multiple_choice",
+          "prompt": "Which sequence correctly describes nitrification in the soil?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Nitrobacter oxidises ammonium ions to nitrite ions, then Nitrosomonas oxidises nitrite ions to nitrate ions",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Nitrosomonas oxidises ammonium ions to nitrite ions, then Nitrobacter oxidises nitrite ions to nitrate ions",
+              "rationale": "This is the supported answer. Nitrification is a two-step oxidation carried out by different soil bacteria: Nitrosomonas oxidises ammonium ions (NH4+) to nitrite ions (NO2−), then Nitrobacter oxidises nitrite ions to nitrate ions (NO3−), the form most plants absorb. Swapping the two genera or the two ions confuses the steps. Rhizobium fixes atmospheric nitrogen gas in legume root nodules and plays no part in nitrification, and the conversion of nitrogen gas to ammonium ions is nitrogen fixation, not the first step of nitrification."
+            },
+            {
+              "label": "C",
+              "text": "Rhizobium oxidises ammonium ions directly to nitrate ions in root nodules",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Nitrosomonas converts nitrogen gas to ammonium ions, then Nitrobacter converts ammonium ions to nitrate ions",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Nitrification is a two-step oxidation carried out by different soil bacteria: Nitrosomonas oxidises ammonium ions (NH4+) to nitrite ions (NO2−), then Nitrobacter oxidises nitrite ions to nitrate ions (NO3−), the form most plants absorb. Swapping the two genera or the two ions confuses the steps. Rhizobium fixes atmospheric nitrogen gas in legume root nodules and plays no part in nitrification, and the conversion of nitrogen gas to ammonium ions is nitrogen fixation, not the first step of nitrification. Therefore the correct answer is B: Nitrosomonas oxidises ammonium ions to nitrite ions, then Nitrobacter oxidises nitrite ions to nitrate ions.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_007",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "multiple_choice",
+          "prompt": "In a eutrophic lake, which event is the direct cause of large-scale fish deaths?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Direct poisoning of fish tissues by nitrate ions from the fertiliser",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Algal cells physically blocking the gills of the fish",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Depletion of dissolved oxygen by the respiration of huge populations of decomposer bacteria feeding on dead algae",
+              "rationale": "This is the supported answer. Nitrate enrichment triggers an algal bloom; when the algae die, saprotrophic bacteria multiply and respire aerobically as they decompose the biomass, stripping dissolved oxygen from the water (a high biological oxygen demand) until fish suffocate. Nitrate at these concentrations is not acutely toxic to fish, gill blockage by algal cells is not the mechanism, and decomposers feed on dead organic matter, not on living fish."
+            },
+            {
+              "label": "D",
+              "text": "Decomposer bacteria feeding directly on the living fish",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Nitrate enrichment triggers an algal bloom; when the algae die, saprotrophic bacteria multiply and respire aerobically as they decompose the biomass, stripping dissolved oxygen from the water (a high biological oxygen demand) until fish suffocate. Nitrate at these concentrations is not acutely toxic to fish, gill blockage by algal cells is not the mechanism, and decomposers feed on dead organic matter, not on living fish. Therefore the correct answer is C: Depletion of dissolved oxygen by the respiration of huge populations of decomposer bacteria feeding on dead algae.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_008",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "multiple_choice",
+          "prompt": "Why do persistent pesticides such as DDT reach their highest concentrations in top carnivores?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Top carnivores drink more contaminated water than organisms at lower trophic levels",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "DDT becomes progressively more water-soluble as it passes up the food chain",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The faster metabolism of top carnivores manufactures DDT from harmless precursors",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "DDT is fat-soluble and cannot be broken down or excreted, so it accumulates in body fat and its concentration increases at each successive trophic level",
+              "rationale": "This is the supported answer. Persistent organic pollutants such as DDT resist biodegradation and dissolve in lipids rather than water, so an organism stores every dose it ever consumes in its fatty tissues. Because each trophic level must eat many organisms from the level below, the stored dose is passed up and concentrated — biomagnification — leaving top carnivores such as fish eagles with the highest tissue concentrations. DDT is not manufactured by any animal, and it does not become more soluble as it moves up the chain."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Persistent organic pollutants such as DDT resist biodegradation and dissolve in lipids rather than water, so an organism stores every dose it ever consumes in its fatty tissues. Because each trophic level must eat many organisms from the level below, the stored dose is passed up and concentrated — biomagnification — leaving top carnivores such as fish eagles with the highest tissue concentrations. DDT is not manufactured by any animal, and it does not become more soluble as it moves up the chain. Therefore the correct answer is D: DDT is fat-soluble and cannot be broken down or excreted, so it accumulates in body fat and its concentration increases at each successive trophic level.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_009",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "multiple_choice",
+          "prompt": "In an oak woodland, the pyramid of numbers is inverted because one tree supports thousands of aphids, yet the pyramid of energy for the same community is never inverted. Which statement explains this?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Energy is always lost from the ecosystem between trophic levels, mainly as respiratory heat, so the rate of energy flow through each level must decrease regardless of the size or number of individual organisms",
+              "rationale": "This is the supported answer. Pyramids of numbers count individuals and ignore size, so a single large producer can support many small consumers and invert the pattern. A pyramid of energy plots the rate of energy flow (kJ m⁻² yr⁻¹) through each trophic level; because respiration, excretion and undigested material always remove energy between levels, each bar must be smaller than the one below, so the pyramid can never be inverted. Insects respire like all animals, trees supply the energy that defines the base bar, and the two pyramids describe different quantities that need not share a shape."
+            },
+            {
+              "label": "B",
+              "text": "Large producers such as trees are excluded from pyramids of energy",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Insects do not respire, so their energy is not counted in the pyramid",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The pyramid of energy is inverted whenever the pyramid of numbers is inverted",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Pyramids of numbers count individuals and ignore size, so a single large producer can support many small consumers and invert the pattern. A pyramid of energy plots the rate of energy flow (kJ m⁻² yr⁻¹) through each trophic level; because respiration, excretion and undigested material always remove energy between levels, each bar must be smaller than the one below, so the pyramid can never be inverted. Insects respire like all animals, trees supply the energy that defines the base bar, and the two pyramids describe different quantities that need not share a shape. Therefore the correct answer is A: Energy is always lost from the ecosystem between trophic levels, mainly as respiratory heat, so the rate of energy flow through each level must decrease regardless of the size or number of individual organisms.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_010",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "multiple_choice",
+          "prompt": "In a mark–release–recapture study of a tilapia population, some of the marks wear off before the second sample is taken. How will this affect the population estimate?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The estimate will be too low, because fewer marked fish are recaptured",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The estimate will be too high, because fewer marked fish are recaptured than expected, reducing the denominator in N = (n1 × n2) ÷ m",
+              "rationale": "This is the supported answer. The Lincoln index assumes marks are not lost between samples. If marks wear off, m (the number of marked fish in the second sample) is smaller than it should be; since m is the denominator of N = (n1 × n2) ÷ m, dividing by too small a value inflates the estimate. The number of unmarked fish caught does not compensate in the formula, and the marks certainly remain relevant after release — the whole method depends on recognising them."
+            },
+            {
+              "label": "C",
+              "text": "The estimate is unaffected, because the marks are irrelevant after release",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The estimate will be too high, because more unmarked fish are caught in the second sample",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The Lincoln index assumes marks are not lost between samples. If marks wear off, m (the number of marked fish in the second sample) is smaller than it should be; since m is the denominator of N = (n1 × n2) ÷ m, dividing by too small a value inflates the estimate. The number of unmarked fish caught does not compensate in the formula, and the marks certainly remain relevant after release — the whole method depends on recognising them. Therefore the correct answer is B: The estimate will be too high, because fewer marked fish are recaptured than expected, reducing the denominator in N = (n1 × n2) ÷ m.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Analyse",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_011",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "multiple_choice",
+          "prompt": "A farmer ploughs a cowpea crop into the soil as green manure. Which sequence correctly explains the rise in soil nitrate over the following months?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Rhizobium in the dead nodules continues to fix nitrogen gas directly into nitrate",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Denitrifying bacteria convert the organic nitrogen straight into nitrate",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Decomposers break down the plant proteins and release ammonium ions (ammonification), then nitrifying bacteria oxidise the ammonium ions to nitrate",
+              "rationale": "This is the supported answer. Once ploughed in, the crop — including its nitrogen-rich root nodules — is dead organic matter. Saprotrophic bacteria and fungi decompose its proteins, releasing ammonium ions (ammonification); Nitrosomonas and Nitrobacter then oxidise the ammonium ions to nitrite and nitrate (nitrification), enriching the soil for the next crop. Nitrogen fixation stops when the nodules die, denitrification removes nitrate from the soil rather than producing it, and dead roots excrete nothing."
+            },
+            {
+              "label": "D",
+              "text": "The living legume roots excrete nitrate ions after the crop is ploughed in",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Once ploughed in, the crop — including its nitrogen-rich root nodules — is dead organic matter. Saprotrophic bacteria and fungi decompose its proteins, releasing ammonium ions (ammonification); Nitrosomonas and Nitrobacter then oxidise the ammonium ions to nitrite and nitrate (nitrification), enriching the soil for the next crop. Nitrogen fixation stops when the nodules die, denitrification removes nitrate from the soil rather than producing it, and dead roots excrete nothing. Therefore the correct answer is C: Decomposers break down the plant proteins and release ammonium ions (ammonification), then nitrifying bacteria oxidise the ammonium ions to nitrate.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_012",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "calculation",
+          "prompt": "In a grassland survey, students caught and marked 96 grasshoppers, then released them. The next day they caught a second sample of 84 grasshoppers, of which 12 were marked. Using the Lincoln index, estimate the size of the grasshopper population.",
+          "correctAnswer": "672 grasshoppers",
+          "workedSolution": "The Lincoln index is N = (n1 × n2) ÷ m, where n1 = number caught, marked and released = 96, n2 = number caught in the second sample = 84, and m = marked individuals recaptured = 12. Substituting: N = (96 × 84) ÷ 12 = 8064 ÷ 12 = 672. The estimated population is therefore 672 grasshoppers. The estimate assumes that no births, deaths, immigration or emigration occurred between the samples, that the marks were not lost, and that marked individuals mixed randomly and were just as likely to be caught as unmarked ones.",
+          "difficulty": "medium",
+          "marks": 3,
+          "points": 5,
+          "timeLimit": 240,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_013",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "calculation",
+          "prompt": "In a lake ecosystem, the producers fix 9.0 × 10⁴ kJ m⁻² yr⁻¹ as gross primary productivity and lose 5.4 × 10⁴ kJ m⁻² yr⁻¹ in respiration. The primary consumers assimilate 4.32 × 10³ kJ m⁻² yr⁻¹. Calculate the net primary productivity of the producers and the percentage efficiency of energy transfer from the producers to the primary consumers.",
+          "correctAnswer": "NPP = 3.6 × 10⁴ kJ m⁻² yr⁻¹; transfer efficiency = 12%",
+          "workedSolution": "Net primary productivity is gross primary productivity minus respiration losses: NPP = (9.0 × 10⁴) − (5.4 × 10⁴) = 3.6 × 10⁴ kJ m⁻² yr⁻¹. Transfer efficiency = (energy assimilated by primary consumers ÷ NPP) × 100 = (4.32 × 10³ ÷ 3.6 × 10⁴) × 100 = 0.12 × 100 = 12%. The efficiency must be calculated against NPP, not GPP, because only net production is available to herbivores; using GPP would wrongly give 4.8%.",
+          "difficulty": "hard",
+          "marks": 3,
+          "points": 5,
+          "timeLimit": 240,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_014",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "structured",
+          "prompt": "A student studies the nitrogen cycle in the soil of a maize farm in northern Ghana.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State what is meant by nitrogen fixation.",
+              "marks": 2,
+              "correctAnswer": "The conversion of inert atmospheric nitrogen gas (N₂) into ammonia or ammonium compounds that plants can use (1); carried out by nitrogen-fixing bacteria such as Rhizobium in legume root nodules and free-living bacteria such as Azotobacter, or industrially in the Haber process (1)."
+            },
+            {
+              "label": "b",
+              "text": "Describe how ammonium ions in the soil are converted into nitrate ions that the maize plants can absorb, naming the bacteria involved.",
+              "marks": 3,
+              "correctAnswer": "The process is nitrification (1): Nitrosomonas oxidises ammonium ions to nitrite ions (1); Nitrobacter then oxidises nitrite ions to nitrate ions (1). Accept a correct two-step description without genus names for a maximum of 2 marks."
+            },
+            {
+              "label": "c",
+              "text": "The field becomes waterlogged after heavy rain. Explain why the concentration of nitrate ions in the waterlogged soil falls.",
+              "marks": 2,
+              "correctAnswer": "Waterlogging fills the soil air spaces with water, so conditions become anaerobic (1); denitrifying bacteria such as Pseudomonas then use nitrate in place of oxygen for respiration and convert it to nitrogen gas, which escapes to the atmosphere — denitrification (1)."
+            }
+          ],
+          "correctAnswer": "(a) The conversion of inert atmospheric nitrogen gas (N₂) into ammonia or ammonium compounds that plants can use (1); carried out by nitrogen-fixing bacteria such as Rhizobium in legume root nodules and free-living bacteria such as Azotobacter, or industrially in the Haber process (1). (b) The process is nitrification (1): Nitrosomonas oxidises ammonium ions to nitrite ions (1); Nitrobacter then oxidises nitrite ions to nitrate ions (1). Accept a correct two-step description without genus names for a maximum of 2 marks. (c) Waterlogging fills the soil air spaces with water, so conditions become anaerobic (1); denitrifying bacteria such as Pseudomonas then use nitrate in place of oxygen for respiration and convert it to nitrogen gas, which escapes to the atmosphere — denitrification (1).",
+          "workedSolution": "(a) The conversion of inert atmospheric nitrogen gas (N₂) into ammonia or ammonium compounds that plants can use (1); carried out by nitrogen-fixing bacteria such as Rhizobium in legume root nodules and free-living bacteria such as Azotobacter, or industrially in the Haber process (1). (b) The process is nitrification (1): Nitrosomonas oxidises ammonium ions to nitrite ions (1); Nitrobacter then oxidises nitrite ions to nitrate ions (1). Accept a correct two-step description without genus names for a maximum of 2 marks. (c) Waterlogging fills the soil air spaces with water, so conditions become anaerobic (1); denitrifying bacteria such as Pseudomonas then use nitrate in place of oxygen for respiration and convert it to nitrogen gas, which escapes to the atmosphere — denitrification (1).",
+          "difficulty": "medium",
+          "marks": 7,
+          "points": 7,
+          "timeLimit": null,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned A-Level Biology practice content; not official WAEC or Cambridge International examination material.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_015",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "structured",
+          "prompt": "Fertiliser is washed from fields into a lake near an intensive poultry farm.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State what is meant by eutrophication.",
+              "marks": 2,
+              "correctAnswer": "The enrichment of a body of water with nutrients, especially nitrate and phosphate ions (1), leading to excessive growth of producers such as algae (1)."
+            },
+            {
+              "label": "b",
+              "text": "Describe the sequence of events that links the algal bloom to the death of fish in the lake.",
+              "marks": 4,
+              "correctAnswer": "The algae multiply until they block light, so submerged plants and deeper algae die (1); decomposer (saprotrophic) bacteria multiply as they break down the dead organic matter (1); the bacteria respire aerobically and remove dissolved oxygen from the water, raising the biological oxygen demand (1); fish and other aerobic animals suffocate and die from the lack of dissolved oxygen (1)."
+            },
+            {
+              "label": "c",
+              "text": "Suggest one farming practice that would reduce the nutrient run-off responsible for eutrophication.",
+              "marks": 1,
+              "correctAnswer": "Any one of: applying fertiliser only at recommended rates and times, and not just before heavy rain; using slow-release organic manure instead of soluble inorganic fertiliser; planting vegetated buffer strips along the lake edge; fencing livestock away from the water (1)."
+            }
+          ],
+          "correctAnswer": "(a) The enrichment of a body of water with nutrients, especially nitrate and phosphate ions (1), leading to excessive growth of producers such as algae (1). (b) The algae multiply until they block light, so submerged plants and deeper algae die (1); decomposer (saprotrophic) bacteria multiply as they break down the dead organic matter (1); the bacteria respire aerobically and remove dissolved oxygen from the water, raising the biological oxygen demand (1); fish and other aerobic animals suffocate and die from the lack of dissolved oxygen (1). (c) Any one of: applying fertiliser only at recommended rates and times, and not just before heavy rain; using slow-release organic manure instead of soluble inorganic fertiliser; planting vegetated buffer strips along the lake edge; fencing livestock away from the water (1).",
+          "workedSolution": "(a) The enrichment of a body of water with nutrients, especially nitrate and phosphate ions (1), leading to excessive growth of producers such as algae (1). (b) The algae multiply until they block light, so submerged plants and deeper algae die (1); decomposer (saprotrophic) bacteria multiply as they break down the dead organic matter (1); the bacteria respire aerobically and remove dissolved oxygen from the water, raising the biological oxygen demand (1); fish and other aerobic animals suffocate and die from the lack of dissolved oxygen (1). (c) Any one of: applying fertiliser only at recommended rates and times, and not just before heavy rain; using slow-release organic manure instead of soluble inorganic fertiliser; planting vegetated buffer strips along the lake edge; fencing livestock away from the water (1).",
+          "difficulty": "medium",
+          "marks": 7,
+          "points": 7,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned A-Level Biology practice content; not official WAEC or Cambridge International examination material.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_ecology_s2_016",
+          "original": true,
+          "topicCode": "9700-ECOL",
+          "type": "structured",
+          "prompt": "A student investigates energy flow through a savanna grassland ecosystem.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Distinguish between gross primary productivity and net primary productivity.",
+              "marks": 2,
+              "correctAnswer": "Gross primary productivity (GPP) is the total rate at which producers convert light energy into chemical energy in photosynthesis (1); net primary productivity (NPP) is GPP minus the energy the producers lose in respiration (NPP = GPP − R), the energy available for growth and for transfer to consumers (1)."
+            },
+            {
+              "label": "b",
+              "text": "Explain why food chains rarely have more than four or five trophic levels.",
+              "marks": 3,
+              "correctAnswer": "Only about 10% of the energy at each level is transferred to the next (1); energy is lost as heat in respiration, in excretory products and in uneaten or undigested material (1); so after four or five transfers too little energy remains to support a viable breeding population of top consumers (1)."
+            },
+            {
+              "label": "c",
+              "text": "Explain why a pyramid of energy for an ecosystem is never inverted.",
+              "marks": 2,
+              "correctAnswer": "A pyramid of energy shows the rate of energy flow through each trophic level over a fixed period (1); because energy is always lost between levels and cannot flow back from consumers to producers, each successive level receives less energy, so the bars must always decrease upwards (1)."
+            }
+          ],
+          "correctAnswer": "(a) Gross primary productivity (GPP) is the total rate at which producers convert light energy into chemical energy in photosynthesis (1); net primary productivity (NPP) is GPP minus the energy the producers lose in respiration (NPP = GPP − R), the energy available for growth and for transfer to consumers (1). (b) Only about 10% of the energy at each level is transferred to the next (1); energy is lost as heat in respiration, in excretory products and in uneaten or undigested material (1); so after four or five transfers too little energy remains to support a viable breeding population of top consumers (1). (c) A pyramid of energy shows the rate of energy flow through each trophic level over a fixed period (1); because energy is always lost between levels and cannot flow back from consumers to producers, each successive level receives less energy, so the bars must always decrease upwards (1).",
+          "workedSolution": "(a) Gross primary productivity (GPP) is the total rate at which producers convert light energy into chemical energy in photosynthesis (1); net primary productivity (NPP) is GPP minus the energy the producers lose in respiration (NPP = GPP − R), the energy available for growth and for transfer to consumers (1). (b) Only about 10% of the energy at each level is transferred to the next (1); energy is lost as heat in respiration, in excretory products and in uneaten or undigested material (1); so after four or five transfers too little energy remains to support a viable breeding population of top consumers (1). (c) A pyramid of energy shows the rate of energy flow through each trophic level over a fixed period (1); because energy is always lost between levels and cannot flow back from consumers to producers, each successive level receives less energy, so the bars must always decrease upwards (1).",
+          "difficulty": "hard",
+          "marks": 7,
+          "points": 7,
+          "timeLimit": null,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned A-Level Biology practice content; not official WAEC or Cambridge International examination material.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_cells_s2_001",
+          "original": true,
+          "topicCode": "9700-CELLS",
+          "type": "multiple_choice",
+          "prompt": "Which type of bond joins adjacent amino acids together in a polypeptide chain?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Hydrogen bond",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Glycosidic bond",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Phosphodiester bond",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Peptide bond",
+              "rationale": "This is the supported answer. Amino acids are joined by condensation reactions between the amino group of one and the carboxyl group of the next, forming covalent peptide bonds and releasing water. Hydrogen bonds stabilise secondary structure such as alpha-helices and beta-pleated sheets but do not link the residues of the backbone; glycosidic bonds join monosaccharides in carbohydrates; phosphodiester bonds join nucleotides in nucleic acids."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Amino acids are joined by condensation reactions between the amino group of one and the carboxyl group of the next, forming covalent peptide bonds and releasing water. Hydrogen bonds stabilise secondary structure such as alpha-helices and beta-pleated sheets but do not link the residues of the backbone; glycosidic bonds join monosaccharides in carbohydrates; phosphodiester bonds join nucleotides in nucleic acids. Therefore the correct answer is D: Peptide bond.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_cells_s2_002",
+          "original": true,
+          "topicCode": "9700-CELLS",
+          "type": "multiple_choice",
+          "prompt": "A student adds Biuret reagent (sodium hydroxide solution followed by dilute copper(II) sulfate solution) to an egg-white extract. Which result confirms that protein is present?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The solution turns lilac (violet)",
+              "rationale": "This is the supported answer. The Biuret test detects peptide bonds: in alkaline solution, copper(II) ions form a lilac or violet complex with the peptide bonds of protein. A brick-red precipitate is the positive Benedict’s result for a reducing sugar on heating; blue-black is iodine in potassium iodide detecting starch; a white emulsion is the ethanol-and-water test for lipids."
+            },
+            {
+              "label": "B",
+              "text": "A brick-red precipitate forms",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The solution turns blue-black",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A white emulsion forms",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The Biuret test detects peptide bonds: in alkaline solution, copper(II) ions form a lilac or violet complex with the peptide bonds of protein. A brick-red precipitate is the positive Benedict’s result for a reducing sugar on heating; blue-black is iodine in potassium iodide detecting starch; a white emulsion is the ethanol-and-water test for lipids. Therefore the correct answer is A: The solution turns lilac (violet).",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_cells_s2_003",
+          "original": true,
+          "topicCode": "9700-CELLS",
+          "type": "multiple_choice",
+          "prompt": "A pancreatic cell that secretes large quantities of protein digestive enzymes would be expected to contain particularly large amounts of which organelles?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Smooth endoplasmic reticulum and lysosomes",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Rough endoplasmic reticulum and Golgi apparatus",
+              "rationale": "This is the supported answer. Secreted proteins are synthesised on ribosomes bound to the rough endoplasmic reticulum, which folds and transports them, then they are modified, packaged and dispatched in vesicles by the Golgi apparatus — so secretory cells are rich in both. Smooth endoplasmic reticulum synthesises lipids and would dominate in steroid-producing cells; chloroplasts and large vacuoles are plant organelles; centrioles organise the spindle in dividing animal cells and are not linked to secretion."
+            },
+            {
+              "label": "C",
+              "text": "Chloroplasts and large vacuoles",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Centrioles and peroxisomes",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Secreted proteins are synthesised on ribosomes bound to the rough endoplasmic reticulum, which folds and transports them, then they are modified, packaged and dispatched in vesicles by the Golgi apparatus — so secretory cells are rich in both. Smooth endoplasmic reticulum synthesises lipids and would dominate in steroid-producing cells; chloroplasts and large vacuoles are plant organelles; centrioles organise the spindle in dividing animal cells and are not linked to secretion. Therefore the correct answer is B: Rough endoplasmic reticulum and Golgi apparatus.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_cells_s2_004",
+          "original": true,
+          "topicCode": "9700-CELLS",
+          "type": "multiple_choice",
+          "prompt": "Which statement correctly explains why an electron microscope can resolve much finer detail than a light microscope?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The electron microscope simply provides a much higher magnification than the light microscope",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Electrons travel faster than light, so they detect smaller objects",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Electrons have a much shorter wavelength than visible light, and the resolving power of a microscope is limited by the wavelength of the radiation used",
+              "rationale": "This is the supported answer. Resolution (resolving power) is the ability to distinguish two points as separate, and it cannot exceed roughly half the wavelength of the imaging radiation. Electron beams have wavelengths far shorter than visible light, so electron microscopes resolve structures down to about 0.5 nm, versus about 200 nm for light microscopes. Magnification alone is useless without resolution — enlarging a blurred image only gives a bigger blurred image — and stains improve contrast, not resolution."
+            },
+            {
+              "label": "D",
+              "text": "Heavy-metal stains used in electron microscopy make small structures physically larger",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Resolution (resolving power) is the ability to distinguish two points as separate, and it cannot exceed roughly half the wavelength of the imaging radiation. Electron beams have wavelengths far shorter than visible light, so electron microscopes resolve structures down to about 0.5 nm, versus about 200 nm for light microscopes. Magnification alone is useless without resolution — enlarging a blurred image only gives a bigger blurred image — and stains improve contrast, not resolution. Therefore the correct answer is C: Electrons have a much shorter wavelength than visible light, and the resolving power of a microscope is limited by the wavelength of the radiation used.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_membranes_s2_001",
+          "original": true,
+          "topicCode": "9700-MEMB",
+          "type": "multiple_choice",
+          "prompt": "Which property of phospholipid molecules causes them to form a bilayer in water?",
+          "options": [
+            {
+              "label": "A",
+              "text": "They are fully hydrophilic, so they dissolve in the cell sap",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "They are polymers built from glucose monomers",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "They contain peptide bonds that cross-link the two layers",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "They are amphipathic, with a hydrophilic phosphate head and hydrophobic fatty acid tails",
+              "rationale": "This is the supported answer. Phospholipids have a polar, hydrophilic phosphate head and non-polar, hydrophobic fatty acid tails. In water the heads face the aqueous solutions on each side while the tails avoid water and point inwards, so a bilayer forms spontaneously. Phospholipids are lipids, not glucose polymers, and contain no peptide bonds; a fully hydrophilic molecule would dissolve rather than form a membrane."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Phospholipids have a polar, hydrophilic phosphate head and non-polar, hydrophobic fatty acid tails. In water the heads face the aqueous solutions on each side while the tails avoid water and point inwards, so a bilayer forms spontaneously. Phospholipids are lipids, not glucose polymers, and contain no peptide bonds; a fully hydrophilic molecule would dissolve rather than form a membrane. Therefore the correct answer is D: They are amphipathic, with a hydrophilic phosphate head and hydrophobic fatty acid tails.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_membranes_s2_002",
+          "original": true,
+          "topicCode": "9700-MEMB",
+          "type": "multiple_choice",
+          "prompt": "Which statement correctly defines osmosis?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The net movement of water molecules across a partially permeable membrane from a region of higher (less negative) water potential to a region of lower (more negative) water potential",
+              "rationale": "This is the supported answer. Osmosis concerns water, not solute: water moves by diffusion across a partially permeable membrane down its own water potential gradient — from higher (less negative) to lower (more negative) water potential. No ATP is involved, so osmosis cannot be active transport, and water cannot diffuse up its own potential gradient."
+            },
+            {
+              "label": "B",
+              "text": "The movement of solute molecules from a dilute solution to a concentrated solution",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The active transport of water molecules against their water potential gradient",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The diffusion of water from a region of lower water potential to a region of higher water potential",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Osmosis concerns water, not solute: water moves by diffusion across a partially permeable membrane down its own water potential gradient — from higher (less negative) to lower (more negative) water potential. No ATP is involved, so osmosis cannot be active transport, and water cannot diffuse up its own potential gradient. Therefore the correct answer is A: The net movement of water molecules across a partially permeable membrane from a region of higher (less negative) water potential to a region of lower (more negative) water potential.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_membranes_s2_003",
+          "original": true,
+          "topicCode": "9700-MEMB",
+          "type": "multiple_choice",
+          "prompt": "Which change would increase the rate of simple diffusion of oxygen across a cell surface membrane?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Decreasing the temperature of the cell",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Increasing the concentration gradient of oxygen across the membrane",
+              "rationale": "This is the supported answer. Fick’s law states that the rate of diffusion is proportional to (surface area × concentration gradient) ÷ thickness of the exchange surface. A steeper concentration gradient therefore speeds diffusion, while a thicker membrane, a smaller surface area or a lower temperature (which slows molecular motion) all reduce the rate. Oxygen is small and non-polar, so it dissolves through the phospholipid bilayer and needs no carrier protein."
+            },
+            {
+              "label": "C",
+              "text": "Increasing the thickness of the membrane",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Decreasing the surface area of the membrane",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Fick’s law states that the rate of diffusion is proportional to (surface area × concentration gradient) ÷ thickness of the exchange surface. A steeper concentration gradient therefore speeds diffusion, while a thicker membrane, a smaller surface area or a lower temperature (which slows molecular motion) all reduce the rate. Oxygen is small and non-polar, so it dissolves through the phospholipid bilayer and needs no carrier protein. Therefore the correct answer is B: Increasing the concentration gradient of oxygen across the membrane.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_membranes_s2_004",
+          "original": true,
+          "topicCode": "9700-MEMB",
+          "type": "multiple_choice",
+          "prompt": "Which statement correctly describes the role of cholesterol in the cell surface membrane?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It forms channels that allow ions to cross the membrane by facilitated diffusion",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It acts as an energy store that is respired when ATP runs low",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It sits between the phospholipids and regulates fluidity, restraining phospholipid movement to give the membrane mechanical stability",
+              "rationale": "This is the supported answer. Cholesterol is a small lipid that inserts between the phospholipid tails, with its hydroxyl group held near the heads. It buffers fluidity: at higher temperatures it restrains phospholipid movement, and at lower temperatures it stops the tails packing too closely, while also reducing permeability to small water-soluble molecules. Transport channels are proteins, energy storage is not a membrane role of cholesterol, and hormone receptors are glycoproteins or glycolipids."
+            },
+            {
+              "label": "D",
+              "text": "It acts as the main receptor molecule for hormone recognition",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Cholesterol is a small lipid that inserts between the phospholipid tails, with its hydroxyl group held near the heads. It buffers fluidity: at higher temperatures it restrains phospholipid movement, and at lower temperatures it stops the tails packing too closely, while also reducing permeability to small water-soluble molecules. Transport channels are proteins, energy storage is not a membrane role of cholesterol, and hormone receptors are glycoproteins or glycolipids. Therefore the correct answer is C: It sits between the phospholipids and regulates fluidity, restraining phospholipid movement to give the membrane mechanical stability.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_membranes_s2_005",
+          "original": true,
+          "topicCode": "9700-MEMB",
+          "type": "multiple_choice",
+          "prompt": "Glucose is absorbed from the small intestine into epithelial cells even when its concentration in the gut lumen is lower than inside the cells. Which mechanism makes this possible?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Simple diffusion of glucose through the phospholipid bilayer",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Facilitated diffusion of glucose down its own concentration gradient",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Exocytosis of glucose-containing vesicles into the epithelial cells",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Cotransport, in which sodium ions move down their electrochemical gradient through a carrier protein that simultaneously carries glucose in against its gradient",
+              "rationale": "This is the supported answer. This is secondary active transport: the sodium–potassium pump keeps the sodium concentration low inside the epithelial cell, so sodium ions flow back in down their gradient through a cotransporter protein, dragging glucose with them even against the glucose gradient. Glucose is polar and cannot cross the bilayer by simple diffusion; facilitated diffusion can only move glucose down, not against, its gradient; and exocytosis exports material from cells in vesicles — it does not absorb glucose."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "This is secondary active transport: the sodium–potassium pump keeps the sodium concentration low inside the epithelial cell, so sodium ions flow back in down their gradient through a cotransporter protein, dragging glucose with them even against the glucose gradient. Glucose is polar and cannot cross the bilayer by simple diffusion; facilitated diffusion can only move glucose down, not against, its gradient; and exocytosis exports material from cells in vesicles — it does not absorb glucose. Therefore the correct answer is D: Cotransport, in which sodium ions move down their electrochemical gradient through a carrier protein that simultaneously carries glucose in against its gradient.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_metabolism_s2_001",
+          "original": true,
+          "topicCode": "9700-METAB",
+          "type": "multiple_choice",
+          "prompt": "Which gas is released when water molecules are split during the light-dependent reactions of photosynthesis?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Oxygen",
+              "rationale": "This is the supported answer. Photolysis of water at photosystem II splits water into oxygen, protons and electrons: 2H₂O → O₂ + 4H⁺ + 4e⁻. The oxygen is released as a gas, while the protons and electrons reduce NADP and replace the electrons lost from the photosystems. Carbon dioxide is fixed later in the Calvin cycle, not released by photolysis, and hydrogen is transferred to NADP rather than released as a gas."
+            },
+            {
+              "label": "B",
+              "text": "Carbon dioxide",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Nitrogen",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Hydrogen",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Photolysis of water at photosystem II splits water into oxygen, protons and electrons: 2H₂O → O₂ + 4H⁺ + 4e⁻. The oxygen is released as a gas, while the protons and electrons reduce NADP and replace the electrons lost from the photosystems. Carbon dioxide is fixed later in the Calvin cycle, not released by photolysis, and hydrogen is transferred to NADP rather than released as a gas. Therefore the correct answer is A: Oxygen.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_metabolism_s2_002",
+          "original": true,
+          "topicCode": "9700-METAB",
+          "type": "multiple_choice",
+          "prompt": "In a eukaryotic cell carrying out aerobic respiration, where is most of the ATP produced?",
+          "options": [
+            {
+              "label": "A",
+              "text": "In the cytoplasm during glycolysis",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "At ATP synthase enzymes on the inner mitochondrial membrane during oxidative phosphorylation",
+              "rationale": "This is the supported answer. The bulk of ATP — around 30 or more molecules per glucose — comes from oxidative phosphorylation: the electron transport chain pumps protons across the inner mitochondrial membrane and the resulting chemiosmotic gradient drives ATP synthase on the cristae. Glycolysis in the cytoplasm nets only 2 ATP, and the Krebs cycle in the matrix yields little ATP directly; its main job is producing reduced NAD and reduced FAD to feed the electron transport chain. The outer membrane plays no part in ATP synthesis."
+            },
+            {
+              "label": "C",
+              "text": "In the mitochondrial matrix during the Krebs cycle",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "On the outer mitochondrial membrane",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The bulk of ATP — around 30 or more molecules per glucose — comes from oxidative phosphorylation: the electron transport chain pumps protons across the inner mitochondrial membrane and the resulting chemiosmotic gradient drives ATP synthase on the cristae. Glycolysis in the cytoplasm nets only 2 ATP, and the Krebs cycle in the matrix yields little ATP directly; its main job is producing reduced NAD and reduced FAD to feed the electron transport chain. The outer membrane plays no part in ATP synthesis. Therefore the correct answer is B: At ATP synthase enzymes on the inner mitochondrial membrane during oxidative phosphorylation.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_metabolism_s2_003",
+          "original": true,
+          "topicCode": "9700-METAB",
+          "type": "multiple_choice",
+          "prompt": "In the Calvin cycle, which molecule directly supplies the hydrogen that reduces glycerate-3-phosphate (GP) to triose phosphate (TP)?",
+          "options": [
+            {
+              "label": "A",
+              "text": "ATP",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Reduced NAD",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Reduced NADP",
+              "rationale": "This is the supported answer. The reduction of GP to TP uses reduced NADP (NADPH) as the reducing agent, with ATP supplying the energy for the reaction — both are products of the light-dependent reactions. ATP carries energy but no hydrogen, so it cannot reduce GP. NAD and FAD are the hydrogen carriers of respiration, not photosynthesis; the chloroplast light reactions reduce NADP, not NAD."
+            },
+            {
+              "label": "D",
+              "text": "Reduced FAD",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The reduction of GP to TP uses reduced NADP (NADPH) as the reducing agent, with ATP supplying the energy for the reaction — both are products of the light-dependent reactions. ATP carries energy but no hydrogen, so it cannot reduce GP. NAD and FAD are the hydrogen carriers of respiration, not photosynthesis; the chloroplast light reactions reduce NADP, not NAD. Therefore the correct answer is C: Reduced NADP.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_genetics_s2_001",
+          "original": true,
+          "topicCode": "9700-GEN",
+          "type": "multiple_choice",
+          "prompt": "Which statement best defines a gene?",
+          "options": [
+            {
+              "label": "A",
+              "text": "An entire chromosome inherited from one parent",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A sequence of three amino acids that codes for a nucleotide",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A protein that switches other proteins on and off",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A sequence of DNA nucleotides at a particular locus on a chromosome that codes for a specific polypeptide",
+              "rationale": "This is the supported answer. A gene is a length of DNA occupying a fixed position (locus) that carries the coded instructions for making one polypeptide. A chromosome is a whole DNA molecule carrying many genes, so a gene cannot be a whole chromosome; the coding relationship runs from nucleotide triplets (codons) to amino acids, not the reverse; and regulatory proteins are gene products, not the definition of a gene itself."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A gene is a length of DNA occupying a fixed position (locus) that carries the coded instructions for making one polypeptide. A chromosome is a whole DNA molecule carrying many genes, so a gene cannot be a whole chromosome; the coding relationship runs from nucleotide triplets (codons) to amino acids, not the reverse; and regulatory proteins are gene products, not the definition of a gene itself. Therefore the correct answer is D: A sequence of DNA nucleotides at a particular locus on a chromosome that codes for a specific polypeptide.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_genetics_s2_002",
+          "original": true,
+          "topicCode": "9700-GEN",
+          "type": "multiple_choice",
+          "prompt": "In shorthorn cattle, coat colour shows codominance: the genotype RR gives a red coat, WW gives a white coat and RW gives a roan (mixed red-and-white) coat. Two roan cattle are crossed. What phenotypic ratio is expected among their offspring?",
+          "options": [
+            {
+              "label": "A",
+              "text": "1 red : 2 roan : 1 white",
+              "rationale": "This is the supported answer. The cross is RW × RW, giving genotypes 1 RR : 2 RW : 1 WW. Because the alleles are codominant, the heterozygote has its own distinct roan phenotype rather than blending or full dominance, so the phenotypic ratio matches the genotypic ratio: 1 red : 2 roan : 1 white. The classic 3 : 1 ratio appears only when one allele is fully dominant, and 1 : 1 is a test-cross ratio."
+            },
+            {
+              "label": "B",
+              "text": "3 red : 1 white",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "1 red : 1 white",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "All roan",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The cross is RW × RW, giving genotypes 1 RR : 2 RW : 1 WW. Because the alleles are codominant, the heterozygote has its own distinct roan phenotype rather than blending or full dominance, so the phenotypic ratio matches the genotypic ratio: 1 red : 2 roan : 1 white. The classic 3 : 1 ratio appears only when one allele is fully dominant, and 1 : 1 is a test-cross ratio. Therefore the correct answer is A: 1 red : 2 roan : 1 white.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_genetics_s2_003",
+          "original": true,
+          "topicCode": "9700-GEN",
+          "type": "multiple_choice",
+          "prompt": "Sickle cell anaemia is caused by a mutation in the β-globin gene in which one DNA base is substituted, replacing the amino acid glutamic acid with valine at position 6 of the polypeptide. Which type of mutation is this?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A frameshift mutation caused by a base deletion",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A missense mutation — a base substitution that changes one codon and therefore one amino acid",
+              "rationale": "This is the supported answer. Substituting one base (A for T in the sixth codon, changing GAG to GTG) changes a single codon so that a different amino acid — valine instead of glutamic acid — is inserted; this is a missense point mutation. No bases are added or removed, so the reading frame is preserved and it cannot be a frameshift; the new codon still specifies an amino acid, so it is not a nonsense mutation; and because the amino acid changes, it is by definition not silent."
+            },
+            {
+              "label": "C",
+              "text": "A nonsense mutation that creates a premature stop codon",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A silent mutation that leaves the amino acid sequence unchanged",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Substituting one base (A for T in the sixth codon, changing GAG to GTG) changes a single codon so that a different amino acid — valine instead of glutamic acid — is inserted; this is a missense point mutation. No bases are added or removed, so the reading frame is preserved and it cannot be a frameshift; the new codon still specifies an amino acid, so it is not a nonsense mutation; and because the amino acid changes, it is by definition not silent. Therefore the correct answer is B: A missense mutation — a base substitution that changes one codon and therefore one amino acid.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Analyse",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_homeostasis_s2_001",
+          "original": true,
+          "topicCode": "9700-HOME",
+          "type": "multiple_choice",
+          "prompt": "Which region of the brain contains the osmoreceptors and thermoreceptors that monitor the water potential and the temperature of the blood?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The cerebellum",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The medulla oblongata",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The hypothalamus",
+              "rationale": "This is the supported answer. The hypothalamus is the body’s homeostatic control centre: its osmoreceptors detect changes in the water potential of the blood and trigger ADH release, and its thermoregulatory centre monitors blood temperature. The cerebellum coordinates movement and balance, and the medulla controls heart rate and breathing. The pituitary gland is the classic misconception — it releases ADH into the blood, but the hormone is made in, and its release is controlled by, the hypothalamus."
+            },
+            {
+              "label": "D",
+              "text": "The pituitary gland",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The hypothalamus is the body’s homeostatic control centre: its osmoreceptors detect changes in the water potential of the blood and trigger ADH release, and its thermoregulatory centre monitors blood temperature. The cerebellum coordinates movement and balance, and the medulla controls heart rate and breathing. The pituitary gland is the classic misconception — it releases ADH into the blood, but the hormone is made in, and its release is controlled by, the hypothalamus. Therefore the correct answer is C: The hypothalamus.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_homeostasis_s2_002",
+          "original": true,
+          "topicCode": "9700-HOME",
+          "type": "multiple_choice",
+          "prompt": "Which cells of the islets of Langerhans in the pancreas secrete insulin?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Alpha (α) cells",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Delta (δ) cells",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Acinar cells",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Beta (β) cells",
+              "rationale": "This is the supported answer. The beta cells of the islets of Langerhans detect a rise in blood glucose and secrete insulin, which stimulates cells to absorb glucose and the liver and muscles to store it as glycogen. Alpha cells secrete glucagon, which raises blood glucose — the two hormones are antagonistic and easily confused. Delta cells secrete somatostatin, and acinar cells secrete digestive enzymes into the pancreatic duct, not hormones into the blood."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The beta cells of the islets of Langerhans detect a rise in blood glucose and secrete insulin, which stimulates cells to absorb glucose and the liver and muscles to store it as glycogen. Alpha cells secrete glucagon, which raises blood glucose — the two hormones are antagonistic and easily confused. Delta cells secrete somatostatin, and acinar cells secrete digestive enzymes into the pancreatic duct, not hormones into the blood. Therefore the correct answer is D: Beta (β) cells.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_homeostasis_s2_003",
+          "original": true,
+          "topicCode": "9700-HOME",
+          "type": "multiple_choice",
+          "prompt": "Why is the control of blood glucose concentration described as a negative feedback mechanism?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A rise in glucose triggers insulin release, which lowers glucose back towards the set point, and this fall then reduces further insulin secretion, preventing overshoot",
+              "rationale": "This is the supported answer. In negative feedback, the output of a process counteracts the original stimulus: the response to high glucose (insulin driving glucose uptake and glycogenesis) removes the stimulus itself, so insulin secretion falls again as glucose returns to the set point. This self-limiting loop keeps the concentration oscillating narrowly around a norm instead of overshooting into hypoglycaemia. “Negative” refers to the direction of correction, not to any harmful effect, and the pancreas and liver cooperate rather than the pancreas permanently inhibiting the liver."
+            },
+            {
+              "label": "B",
+              "text": "Because insulin always has a negative (harmful) effect on body cells",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Because blood glucose concentration is always falling in a healthy person",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Because the pancreas permanently inhibits the liver from releasing glucose",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "In negative feedback, the output of a process counteracts the original stimulus: the response to high glucose (insulin driving glucose uptake and glycogenesis) removes the stimulus itself, so insulin secretion falls again as glucose returns to the set point. This self-limiting loop keeps the concentration oscillating narrowly around a norm instead of overshooting into hypoglycaemia. “Negative” refers to the direction of correction, not to any harmful effect, and the pancreas and liver cooperate rather than the pancreas permanently inhibiting the liver. Therefore the correct answer is A: A rise in glucose triggers insulin release, which lowers glucose back towards the set point, and this fall then reduces further insulin secretion, preventing overshoot.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biodiversity_s2_001",
+          "original": true,
+          "topicCode": "9700-BIODIV",
+          "type": "multiple_choice",
+          "prompt": "Which statement best defines a species?",
+          "options": [
+            {
+              "label": "A",
+              "text": "All the organisms living in the same habitat",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A group of similar organisms that can interbreed to produce fertile offspring",
+              "rationale": "This is the supported answer. The biological species concept defines a species by reproductive compatibility: members can interbreed in nature and produce fertile offspring, whereas hybrids between different species (such as the mule) are sterile. Occupying the same habitat describes a community, not a species; individuals of a species vary genetically, so identical DNA is neither possible nor required; and a genus is a taxonomic rank that may contain many species."
+            },
+            {
+              "label": "C",
+              "text": "Organisms that share completely identical DNA",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "All the organisms placed in the same genus",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The biological species concept defines a species by reproductive compatibility: members can interbreed in nature and produce fertile offspring, whereas hybrids between different species (such as the mule) are sterile. Occupying the same habitat describes a community, not a species; individuals of a species vary genetically, so identical DNA is neither possible nor required; and a genus is a taxonomic rank that may contain many species. Therefore the correct answer is B: A group of similar organisms that can interbreed to produce fertile offspring.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biodiversity_s2_002",
+          "original": true,
+          "topicCode": "9700-BIODIV",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is an example of ex situ conservation?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Establishing a national park to protect a savanna ecosystem",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Declaring a forest reserve where logging is banned",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Storing seeds in a seed bank away from the species’ natural habitat",
+              "rationale": "This is the supported answer. Ex situ means “out of place”: conservation outside the natural habitat, such as seed banks, botanic gardens, zoos and captive breeding programmes. National parks, forest reserves and habitat restoration all protect species within their natural environment, which is in situ conservation — the distinction between the two strategies is a favourite examination target."
+            },
+            {
+              "label": "D",
+              "text": "Restoring a degraded wetland so that native species recolonise it",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Ex situ means “out of place”: conservation outside the natural habitat, such as seed banks, botanic gardens, zoos and captive breeding programmes. National parks, forest reserves and habitat restoration all protect species within their natural environment, which is in situ conservation — the distinction between the two strategies is a favourite examination target. Therefore the correct answer is C: Storing seeds in a seed bank away from the species’ natural habitat.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biodiversity_s2_003",
+          "original": true,
+          "topicCode": "9700-BIODIV",
+          "type": "multiple_choice",
+          "prompt": "Which change in a habitat would increase the value of Simpson’s index of diversity (D)?",
+          "options": [
+            {
+              "label": "A",
+              "text": "One species becoming strongly dominant over all the others",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A fall in the total number of species present",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "An increase in the physical area of the habitat alone",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A greater number of species, with individuals more evenly distributed among those species",
+              "rationale": "This is the supported answer. Simpson’s index rises with both species richness (more species) and evenness (similar abundances), because the formula D = 1 − Σ(n/N)² penalises communities dominated by a few species. Strong dominance by one species or a fall in species number lowers D. A larger area may allow more species to exist, but area by itself does not enter the calculation, so it is not a direct cause of a higher index."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Simpson’s index rises with both species richness (more species) and evenness (similar abundances), because the formula D = 1 − Σ(n/N)² penalises communities dominated by a few species. Strong dominance by one species or a fall in species number lowers D. A larger area may allow more species to exist, but area by itself does not enter the calculation, so it is not a direct cause of a higher index. Therefore the correct answer is D: A greater number of species, with individuals more evenly distributed among those species.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biodiversity_s2_004",
+          "original": true,
+          "topicCode": "9700-BIODIV",
+          "type": "multiple_choice",
+          "prompt": "Why is maintaining genetic diversity within a species important for its long-term survival?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Genetic variation gives natural selection raw material with which to adapt the population to changing conditions such as new diseases or a shifting climate",
+              "rationale": "This is the supported answer. A population with high genetic diversity is likely to contain some individuals whose alleles suit new selection pressures, so the population can evolve rather than go extinct when the environment changes. Diversity does not raise the mutation rate — it reflects variation already present; it improves resilience rather than guaranteeing population growth; and it matters for wild populations just as much as captive ones, as bottlenecked species such as the cheetah illustrate."
+            },
+            {
+              "label": "B",
+              "text": "Genetic diversity directly increases the mutation rate of the population",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Genetically diverse populations are guaranteed to grow larger",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Genetic diversity is only important for species kept in captivity",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A population with high genetic diversity is likely to contain some individuals whose alleles suit new selection pressures, so the population can evolve rather than go extinct when the environment changes. Diversity does not raise the mutation rate — it reflects variation already present; it improves resilience rather than guaranteeing population growth; and it matters for wild populations just as much as captive ones, as bottlenecked species such as the cheetah illustrate. Therefore the correct answer is A: Genetic variation gives natural selection raw material with which to adapt the population to changing conditions such as new diseases or a shifting climate.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biodiversity_s2_005",
+          "original": true,
+          "topicCode": "9700-BIODIV",
+          "type": "multiple_choice",
+          "prompt": "Scientists compare the amino acid sequences of the respiratory protein cytochrome c in different species. Species with more similar cytochrome c sequences are interpreted as being…",
+          "options": [
+            {
+              "label": "A",
+              "text": "…adapted to more similar habitats, because the environment determines the protein sequence",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "…more closely related, having diverged from a common ancestor more recently, because fewer mutations have accumulated since their lineages split",
+              "rationale": "This is the supported answer. Cytochrome c performs the same conserved function in aerobic respiration across species, so differences in its sequence accumulate largely by mutation over time. The fewer the differences between two species, the more recently their lineages shared a common ancestor — the basis of molecular phylogenetics. Habitat similarity does not directly write protein sequences, chromosome number is unrelated to the sequence of a single protein, and shared ancestry — not convergence — is the correct inference for such a conserved molecule."
+            },
+            {
+              "label": "C",
+              "text": "…possessing the same number of chromosomes, since sequence similarity fixes the karyotype",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "…products of convergent evolution, because similar proteins must arise independently",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Cytochrome c performs the same conserved function in aerobic respiration across species, so differences in its sequence accumulate largely by mutation over time. The fewer the differences between two species, the more recently their lineages shared a common ancestor — the basis of molecular phylogenetics. Habitat similarity does not directly write protein sequences, chromosome number is unrelated to the sequence of a single protein, and shared ancestry — not convergence — is the correct inference for such a conserved molecule. Therefore the correct answer is B: …more closely related, having diverged from a common ancestor more recently, because fewer mutations have accumulated since their lineages split.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Analyse",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biotech_s2_001",
+          "original": true,
+          "topicCode": "9700-BIOTECH",
+          "type": "multiple_choice",
+          "prompt": "What is the role of the enzyme DNA ligase in genetic engineering?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It cuts DNA at specific recognition sequences",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It separates the two strands of DNA by breaking hydrogen bonds",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It joins DNA fragments together by forming phosphodiester bonds in the sugar–phosphate backbone",
+              "rationale": "This is the supported answer. After a restriction endonuclease cuts both the plasmid vector and the donor DNA to give complementary sticky ends, DNA ligase seals the sugar–phosphate backbone by catalysing the formation of phosphodiester bonds, producing recombinant DNA. Cutting is the job of restriction enzymes; strand separation is achieved by heat in PCR or by helicase in living cells; and copying mRNA into DNA is the role of reverse transcriptase."
+            },
+            {
+              "label": "D",
+              "text": "It synthesises a complementary DNA copy from an mRNA template",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "After a restriction endonuclease cuts both the plasmid vector and the donor DNA to give complementary sticky ends, DNA ligase seals the sugar–phosphate backbone by catalysing the formation of phosphodiester bonds, producing recombinant DNA. Cutting is the job of restriction enzymes; strand separation is achieved by heat in PCR or by helicase in living cells; and copying mRNA into DNA is the role of reverse transcriptase. Therefore the correct answer is C: It joins DNA fragments together by forming phosphodiester bonds in the sugar–phosphate backbone.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biotech_s2_002",
+          "original": true,
+          "topicCode": "9700-BIOTECH",
+          "type": "multiple_choice",
+          "prompt": "Which feature makes bacteria such as Escherichia coli useful as hosts for producing human proteins?",
+          "options": [
+            {
+              "label": "A",
+              "text": "They contain no DNA of their own, so the human gene is the only DNA present",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "They are eukaryotes, so they process proteins exactly as human cells do",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "They lack ribosomes, so no unwanted bacterial proteins are made",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "They contain plasmids that can be modified as vectors, and they reproduce rapidly so large quantities of the gene product are made quickly",
+              "rationale": "This is the supported answer. Bacteria carry small circular plasmids that are easy to cut, modify with a foreign gene and reinsert, and they divide as often as every 20 minutes in fermenters, amplifying the gene and its protein product at industrial scale. Bacteria certainly have their own DNA; they are prokaryotes — a genuine limitation, because they cannot always add the carbohydrate groups found on human glycoproteins; and they must have ribosomes to translate the human gene at all."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Bacteria carry small circular plasmids that are easy to cut, modify with a foreign gene and reinsert, and they divide as often as every 20 minutes in fermenters, amplifying the gene and its protein product at industrial scale. Bacteria certainly have their own DNA; they are prokaryotes — a genuine limitation, because they cannot always add the carbohydrate groups found on human glycoproteins; and they must have ribosomes to translate the human gene at all. Therefore the correct answer is D: They contain plasmids that can be modified as vectors, and they reproduce rapidly so large quantities of the gene product are made quickly.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biotech_s2_003",
+          "original": true,
+          "topicCode": "9700-BIOTECH",
+          "type": "multiple_choice",
+          "prompt": "In the polymerase chain reaction, why must two short DNA primers be added to the reaction mixture?",
+          "options": [
+            {
+              "label": "A",
+              "text": "DNA polymerase can only add nucleotides to an existing strand, so the primers anneal to the template and mark the two ends of the region to be copied",
+              "rationale": "This is the supported answer. Taq DNA polymerase needs a free 3′ end to extend, and the two primers — complementary to sequences flanking the target region on opposite strands — provide those starting points and define exactly which stretch of DNA is amplified. Primers are not enzymes, so they cannot cut DNA; the energy for synthesis comes from the nucleotide triphosphates themselves; and specificity comes from choosing primer sequences unique to the target, not from binding contaminants."
+            },
+            {
+              "label": "B",
+              "text": "The primers cut the template DNA into fragments that are easier to copy",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The primers supply the energy needed for DNA synthesis",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The primers sterilise the mixture by binding any contaminating DNA",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Taq DNA polymerase needs a free 3′ end to extend, and the two primers — complementary to sequences flanking the target region on opposite strands — provide those starting points and define exactly which stretch of DNA is amplified. Primers are not enzymes, so they cannot cut DNA; the energy for synthesis comes from the nucleotide triphosphates themselves; and specificity comes from choosing primer sequences unique to the target, not from binding contaminants. Therefore the correct answer is A: DNA polymerase can only add nucleotides to an existing strand, so the primers anneal to the template and mark the two ends of the region to be copied.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biotech_s2_004",
+          "original": true,
+          "topicCode": "9700-BIOTECH",
+          "type": "multiple_choice",
+          "prompt": "Which statement correctly states an advantage of producing human insulin from genetically engineered bacteria rather than extracting insulin from pigs or cattle?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Animal insulin works faster than human insulin because it is a stronger molecule",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The bacterial product is identical to human insulin, so it is less likely to trigger an immune response and can be produced in large, pure quantities",
+              "rationale": "This is the supported answer. Animal insulins differ from human insulin by a few amino acids, so some patients developed allergic reactions and antibody resistance; recombinant human insulin has exactly the human amino acid sequence, avoiding this, and fermenters yield unlimited, consistent and ethically uncontroversial supplies. Animal insulin is not “stronger”; every pharmaceutical protein must be rigorously purified from the bacterial culture; and the bacteria produce insulin during fermentation, not in response to patient demand."
+            },
+            {
+              "label": "C",
+              "text": "Bacterial insulin does not need to be purified before medical use",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "GM bacteria produce insulin only when patients need it, avoiding storage",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Animal insulins differ from human insulin by a few amino acids, so some patients developed allergic reactions and antibody resistance; recombinant human insulin has exactly the human amino acid sequence, avoiding this, and fermenters yield unlimited, consistent and ethically uncontroversial supplies. Animal insulin is not “stronger”; every pharmaceutical protein must be rigorously purified from the bacterial culture; and the bacteria produce insulin during fermentation, not in response to patient demand. Therefore the correct answer is B: The bacterial product is identical to human insulin, so it is less likely to trigger an immune response and can be produced in large, pure quantities.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biotech_s2_005",
+          "original": true,
+          "topicCode": "9700-BIOTECH",
+          "type": "multiple_choice",
+          "prompt": "In gel electrophoresis of DNA, why do the fragments migrate towards the positive electrode (anode), and why do the smallest fragments travel furthest?",
+          "options": [
+            {
+              "label": "A",
+              "text": "DNA is positively charged because of its nitrogenous bases, and longer fragments carry more charge so move faster",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Fragments move by simple diffusion, so the distance travelled is random and unrelated to size",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "DNA is negatively charged because of its phosphate groups, so it is attracted to the anode, and shorter fragments move through the pores of the agarose gel faster than longer ones",
+              "rationale": "This is the supported answer. Every phosphate group in the DNA backbone carries a negative charge, so all fragments — regardless of length — are drawn towards the anode when the electric field is applied. The agarose gel acts as a molecular sieve: short fragments thread through its pores more easily and travel further in a given time, separating the sample by size. Charge per unit length is the same for all fragments, movement is driven by the field rather than random diffusion, and the gel matrix is neutral."
+            },
+            {
+              "label": "D",
+              "text": "DNA is repelled by the negative electrode because the gel itself is positively charged",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Every phosphate group in the DNA backbone carries a negative charge, so all fragments — regardless of length — are drawn towards the anode when the electric field is applied. The agarose gel acts as a molecular sieve: short fragments thread through its pores more easily and travel further in a given time, separating the sample by size. Charge per unit length is the same for all fragments, movement is driven by the field rather than random diffusion, and the gel matrix is neutral. Therefore the correct answer is C: DNA is negatively charged because of its phosphate groups, so it is attracted to the anode, and shorter fragments move through the pores of the agarose gel faster than longer ones.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_immunity_s2_001",
+          "original": true,
+          "topicCode": "9700-IMM",
+          "type": "multiple_choice",
+          "prompt": "A breastfed baby receives antibodies against intestinal infections in its mother’s milk. Which type of immunity does this give the baby?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Artificial passive immunity",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Natural active immunity",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Artificial active immunity",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Natural passive immunity",
+              "rationale": "This is the supported answer. The baby receives ready-made antibodies rather than making its own, so the immunity is passive; it happens naturally through breast milk (or across the placenta), not by medical injection, so it is natural. Artificial passive immunity is an injection of antibodies such as antivenom; active immunity — natural or artificial — means the person’s own lymphocytes respond to antigen and produce antibodies and memory cells, which gives longer-lasting protection."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The baby receives ready-made antibodies rather than making its own, so the immunity is passive; it happens naturally through breast milk (or across the placenta), not by medical injection, so it is natural. Artificial passive immunity is an injection of antibodies such as antivenom; active immunity — natural or artificial — means the person’s own lymphocytes respond to antigen and produce antibodies and memory cells, which gives longer-lasting protection. Therefore the correct answer is D: Natural passive immunity.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_immunity_s2_002",
+          "original": true,
+          "topicCode": "9700-IMM",
+          "type": "multiple_choice",
+          "prompt": "A helper T cell recognises antigen presented on the surface of a macrophage. Which events then follow?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The helper T cell clones itself and secretes cytokines that stimulate B cells to become plasma cells and that activate cytotoxic T cells and macrophages",
+              "rationale": "This is the supported answer. Helper T cells are the coordinators of the specific immune response: once activated by an antigen-presenting cell they proliferate and release cytokines that drive B-cell clonal selection and differentiation into antibody-secreting plasma cells, stimulate cytotoxic (killer) T cells, and enhance macrophage activity. Only plasma cells derived from B cells secrete antibody — the commonest confusion at this level; T cells are not phagocytes and cannot become plasma cells."
+            },
+            {
+              "label": "B",
+              "text": "The helper T cell immediately secretes large quantities of antibody",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The helper T cell engulfs the macrophage by phagocytosis",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The helper T cell converts directly into a plasma cell",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Helper T cells are the coordinators of the specific immune response: once activated by an antigen-presenting cell they proliferate and release cytokines that drive B-cell clonal selection and differentiation into antibody-secreting plasma cells, stimulate cytotoxic (killer) T cells, and enhance macrophage activity. Only plasma cells derived from B cells secrete antibody — the commonest confusion at this level; T cells are not phagocytes and cannot become plasma cells. Therefore the correct answer is A: The helper T cell clones itself and secretes cytokines that stimulate B cells to become plasma cells and that activate cytotoxic T cells and macrophages.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_immunity_s2_003",
+          "original": true,
+          "topicCode": "9700-IMM",
+          "type": "multiple_choice",
+          "prompt": "Why is the secondary immune response to a previously encountered pathogen faster, and why does it produce a higher antibody concentration, than the primary response?",
+          "options": [
+            {
+              "label": "A",
+              "text": "High levels of antibody from the first infection remain in the blood for life",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Memory B cells and memory T cells made during the first exposure proliferate rapidly on re-exposure, producing many plasma cells at once",
+              "rationale": "This is the supported answer. The primary response leaves long-lived memory cells; on re-infection these are already specific for the pathogen, so clonal expansion begins immediately, the antibody concentration rises steeply within hours rather than days, and it peaks far higher. Antibody from the first infection actually falls to low levels within months — that is the misconception this question targets; the pathogen is not weaker, and existing antibodies do not mutate — the new antibody comes from newly generated plasma cells."
+            },
+            {
+              "label": "C",
+              "text": "The pathogen is weaker the second time it infects the body",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Antibodies from the first infection mutate to match the pathogen better",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The primary response leaves long-lived memory cells; on re-infection these are already specific for the pathogen, so clonal expansion begins immediately, the antibody concentration rises steeply within hours rather than days, and it peaks far higher. Antibody from the first infection actually falls to low levels within months — that is the misconception this question targets; the pathogen is not weaker, and existing antibodies do not mutate — the new antibody comes from newly generated plasma cells. Therefore the correct answer is B: Memory B cells and memory T cells made during the first exposure proliferate rapidly on re-exposure, producing many plasma cells at once.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_immunity_s2_004",
+          "original": true,
+          "topicCode": "9700-IMM",
+          "type": "multiple_choice",
+          "prompt": "HIV destroys helper T cells, eventually causing AIDS. Why does the loss of helper T cells make patients vulnerable to opportunistic infections?",
+          "options": [
+            {
+              "label": "A",
+              "text": "HIV directly attacks and kills every type of body cell, including skin and nerve cells",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "HIV destroys the bone marrow, so no blood cells of any kind are produced",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Helper T cells coordinate both the humoral and the cell-mediated responses, so without them B cells cannot be properly activated and cytotoxic T cells cannot be stimulated, crippling defence against many pathogens",
+              "rationale": "This is the supported answer. Helper T cells sit at the hub of specific immunity: their cytokines are required for full B-cell activation and antibody production, for activating the cytotoxic T cells that kill virus-infected cells, and for boosting macrophage activity. As HIV depletes them, the whole network fails, so normally harmless organisms cause severe opportunistic infections. HIV does not kill skin or nerve cells directly, does not destroy the bone marrow, and AIDS is immune collapse, not autoimmunity."
+            },
+            {
+              "label": "D",
+              "text": "The patient’s antibodies attack their own tissues once helper T cells are gone",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Helper T cells sit at the hub of specific immunity: their cytokines are required for full B-cell activation and antibody production, for activating the cytotoxic T cells that kill virus-infected cells, and for boosting macrophage activity. As HIV depletes them, the whole network fails, so normally harmless organisms cause severe opportunistic infections. HIV does not kill skin or nerve cells directly, does not destroy the bone marrow, and AIDS is immune collapse, not autoimmunity. Therefore the correct answer is C: Helper T cells coordinate both the humoral and the cell-mediated responses, so without them B cells cannot be properly activated and cytotoxic T cells cannot be stimulated, crippling defence against many pathogens.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
