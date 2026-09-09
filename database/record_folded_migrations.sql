@@ -49,4 +49,14 @@ INSERT OR IGNORE INTO d1_migrations (name) VALUES
   -- canonical paper_attempt_answers columns, so its legacy-column INSERT
   -- cannot parse on a fresh baseline. Prod applied it for real; staging
   -- recorded it without running (already canonical).
-  ('367_paper_attempt_answers_column_rename.sql');
+  ('367_paper_attempt_answers_column_rename.sql'),
+  -- 370 is folded: schema.sql carries battle_rating/is_ranked, ranked_queue,
+  -- and battle_rating_updates (marked with "-- added by/Source:
+  -- migrations/370_battle_rating.sql"), so its ALTERs fail as duplicates on a
+  -- fresh baseline. Prod/staging applied it for real (2026-09-08).
+  ('370_battle_rating.sql'),
+  -- 371 is a prod-drift remediation in the 367 pattern: schema.sql always had
+  -- the chat_messages demo columns + idx_chat_messages_demo; only prod lacked
+  -- them and applied the file for real (2026-09-08). Staging already had the
+  -- columns.
+  ('371_chat_messages_demo_columns.sql');
