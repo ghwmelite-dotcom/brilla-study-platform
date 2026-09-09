@@ -1,0 +1,2597 @@
+{
+  "batchId": "bece-ghlang-sprint2-001",
+  "status": "approved_for_beta",
+  "examTypeId": "exam_bece",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+      "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+      "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T12:30:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep practice content aligned to Ghana's published NaCCA Common Core Programme Ghanaian Language curriculum; not official WAEC or NaCCA examination material. Use the enabled feedback channel to report corrections.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_bece_gh_lang",
+      "specificationCode": "BRILLA-NACCA-CCP-GHL-S2-001",
+      "sources": [
+        {
+          "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+          "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+          "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "GHL-GREET",
+          "title": "Greetings and Forms of Address",
+          "objective": "Use Akan (Twi) greetings, farewells, polite expressions and respectful titles appropriate to the time of day and the person addressed."
+        },
+        {
+          "code": "GHL-ALPHA",
+          "title": "Alphabet and Phonetics",
+          "objective": "Identify the letters, special vowels, digraphs and tonal features of the Akan (Twi) writing system."
+        },
+        {
+          "code": "GHL-NUM",
+          "title": "Numbers and Counting",
+          "objective": "Use Akan (Twi) cardinal and ordinal numbers correctly and explain how compound numerals are built."
+        },
+        {
+          "code": "GHL-FAM",
+          "title": "Family and Kinship",
+          "objective": "Use Akan kinship terms correctly and describe how family membership is traced in the matrilineal system."
+        },
+        {
+          "code": "GHL-GRAM",
+          "title": "Grammar and Sentence Structure",
+          "objective": "Identify Akan pronouns, question words, plural formation, word order and the prefixes that mark tense and negation."
+        },
+        {
+          "code": "GHL-PROV",
+          "title": "Proverbs and Idioms",
+          "objective": "Interpret common Akan proverbs and idioms and explain the wisdom they teach."
+        },
+        {
+          "code": "GHL-CULT",
+          "title": "Oral Literature and Culture",
+          "objective": "Describe Akan oral literature, day names, festivals, libation and the roles of the okyeame and talking drums."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_bghl_greetings_s2_001",
+          "original": true,
+          "topicCode": "GHL-GREET",
+          "type": "multiple_choice",
+          "prompt": "In Twi, the greeting “Maakye” is used at which time of day?",
+          "options": [
+            {
+              "label": "A",
+              "text": "In the morning",
+              "rationale": "This is the supported answer. Maakye is the Akan morning greeting, used from dawn until about midday. The afternoon greeting is “Maaha” and the evening greeting is “Maadwo”, so the other options belong to different parts of the day."
+            },
+            {
+              "label": "B",
+              "text": "In the afternoon",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "In the evening",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "At midnight",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Maakye is the Akan morning greeting, used from dawn until about midday. The afternoon greeting is “Maaha” and the evening greeting is “Maadwo”, so the other options belong to different parts of the day. Therefore the correct answer is A: In the morning.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_greetings_s2_002",
+          "original": true,
+          "topicCode": "GHL-GREET",
+          "type": "multiple_choice",
+          "prompt": "What does the Twi expression “Akwaaba” mean?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Goodbye",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Welcome",
+              "rationale": "This is the supported answer. Akwaaba means “welcome” and is said to a person who has just arrived. A farewell is “Nante yie” and thanks is “Medaase”, so those options describe different expressions."
+            },
+            {
+              "label": "C",
+              "text": "Thank you",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "I am sorry",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Akwaaba means “welcome” and is said to a person who has just arrived. A farewell is “Nante yie” and thanks is “Medaase”, so those options describe different expressions. Therefore the correct answer is B: Welcome.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_greetings_s2_003",
+          "original": true,
+          "topicCode": "GHL-GREET",
+          "type": "multiple_choice",
+          "prompt": "After receiving a gift, Kofi says “Medaase” to the giver. What has Kofi said?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Good morning",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Welcome",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Thank you",
+              "rationale": "This is the supported answer. Medaase (me da wo ase) is the Akan way of saying “thank you”. “Good morning” is Maakye, “welcome” is Akwaaba and “how are you?” is Ɛte sɛn?, so none of the distractors expresses gratitude."
+            },
+            {
+              "label": "D",
+              "text": "How are you?",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Medaase (me da wo ase) is the Akan way of saying “thank you”. “Good morning” is Maakye, “welcome” is Akwaaba and “how are you?” is Ɛte sɛn?, so none of the distractors expresses gratitude. Therefore the correct answer is C: Thank you.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_greetings_s2_004",
+          "original": true,
+          "topicCode": "GHL-GREET",
+          "type": "multiple_choice",
+          "prompt": "A pupil answers a greeting with the respectful reply “Yaa agya”. To whom is the pupil most likely responding?",
+          "options": [
+            {
+              "label": "A",
+              "text": "An elderly woman",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A chief or grandparent",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A younger sibling",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "An elderly man",
+              "rationale": "This is the supported answer. “Yaa agya” is the respectful greeting response given to an elderly man (agya means father). An elderly woman receives “Yaa ɛna”, and a chief or grandparent receives “Yaa nana”; a younger sibling is addressed without these honorific replies."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "“Yaa agya” is the respectful greeting response given to an elderly man (agya means father). An elderly woman receives “Yaa ɛna”, and a chief or grandparent receives “Yaa nana”; a younger sibling is addressed without these honorific replies. Therefore the correct answer is D: An elderly man.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_greetings_s2_005",
+          "original": true,
+          "topicCode": "GHL-GREET",
+          "type": "multiple_choice",
+          "prompt": "What is the appropriate response to the Twi question “Ɛte sɛn?”",
+          "options": [
+            {
+              "label": "A",
+              "text": "“Me ho yɛ” (I am fine)",
+              "rationale": "This is the supported answer. Ɛte sɛn? means “How are you?”, and the usual reply is “Me ho yɛ” — I am fine. Nante yie is a farewell, Akwaaba means welcome and Maadwo is the evening greeting, so they answer different situations."
+            },
+            {
+              "label": "B",
+              "text": "“Nante yie” (farewell)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "“Akwaaba” (welcome)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "“Maadwo” (good evening)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Ɛte sɛn? means “How are you?”, and the usual reply is “Me ho yɛ” — I am fine. Nante yie is a farewell, Akwaaba means welcome and Maadwo is the evening greeting, so they answer different situations. Therefore the correct answer is A: “Me ho yɛ” (I am fine).",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_greetings_s2_006",
+          "original": true,
+          "topicCode": "GHL-GREET",
+          "type": "multiple_choice",
+          "prompt": "What does the Twi farewell “Nante yie” literally mean?",
+          "options": [
+            {
+              "label": "A",
+              "text": "“Sleep well”",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "“Walk well” — a farewell wish",
+              "rationale": "This is the supported answer. Nante yie literally means “walk well” and is said when people part, wishing the traveller a safe journey. It is a farewell expression, not a wish about sleeping, eating or returning."
+            },
+            {
+              "label": "C",
+              "text": "“Eat well”",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "“Come back soon”",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Nante yie literally means “walk well” and is said when people part, wishing the traveller a safe journey. It is a farewell expression, not a wish about sleeping, eating or returning. Therefore the correct answer is B: “Walk well” — a farewell wish.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_greetings_s2_007",
+          "original": true,
+          "topicCode": "GHL-GREET",
+          "type": "multiple_choice",
+          "prompt": "Which Akan title is correctly used to address or refer to a traditional ruler or a grandparent?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Sewaa",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Wɔfa",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Nana",
+              "rationale": "This is the supported answer. Nana is the honorific title for a chief, a king or a grandparent. Sewaa is a paternal aunt (father’s sister), wɔfa is a maternal uncle (mother’s brother) and onua is a sibling, so none of those titles fits a ruler or grandparent."
+            },
+            {
+              "label": "D",
+              "text": "Onua",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Nana is the honorific title for a chief, a king or a grandparent. Sewaa is a paternal aunt (father’s sister), wɔfa is a maternal uncle (mother’s brother) and onua is a sibling, so none of those titles fits a ruler or grandparent. Therefore the correct answer is C: Nana.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_greetings_s2_008",
+          "original": true,
+          "topicCode": "GHL-GREET",
+          "type": "multiple_choice",
+          "prompt": "Which Twi expression is used to say “please” when making a polite request?",
+          "options": [
+            {
+              "label": "A",
+              "text": "“Meda wo ase”",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "“Nante yie”",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "“Maakye”",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "“Me pa wo kyɛw”",
+              "rationale": "This is the supported answer. Me pa wo kyɛw (often heard as mepaakyɛw) literally means “I beg you” and is the polite way to say “please” in Twi. Meda wo ase expresses thanks, Nante yie is a farewell and Maakye is a morning greeting."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Me pa wo kyɛw (often heard as mepaakyɛw) literally means “I beg you” and is the polite way to say “please” in Twi. Meda wo ase expresses thanks, Nante yie is a farewell and Maakye is a morning greeting. Therefore the correct answer is D: “Me pa wo kyɛw”.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_alphabet_s2_001",
+          "original": true,
+          "topicCode": "GHL-ALPHA",
+          "type": "multiple_choice",
+          "prompt": "How many vowels does the Akan (Twi) alphabet have?",
+          "options": [
+            {
+              "label": "A",
+              "text": "7",
+              "rationale": "This is the supported answer. The Twi alphabet has seven vowels: a, e, ɛ, i, o, ɔ and u. English has five basic vowel letters, which is why 5 is a tempting but wrong answer for Twi."
+            },
+            {
+              "label": "B",
+              "text": "5",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "6",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "10",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The Twi alphabet has seven vowels: a, e, ɛ, i, o, ɔ and u. English has five basic vowel letters, which is why 5 is a tempting but wrong answer for Twi. Therefore the correct answer is A: 7.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_alphabet_s2_002",
+          "original": true,
+          "topicCode": "GHL-ALPHA",
+          "type": "multiple_choice",
+          "prompt": "Which letter does NOT appear in the Twi alphabet?",
+          "options": [
+            {
+              "label": "A",
+              "text": "ɛ",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "c",
+              "rationale": "This is the supported answer. The Twi alphabet does not contain the letters c, j, q, v, x or z. The special vowels ɛ and ɔ and the consonant y are all genuine Twi letters, so c is the only option that is excluded."
+            },
+            {
+              "label": "C",
+              "text": "ɔ",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "y",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The Twi alphabet does not contain the letters c, j, q, v, x or z. The special vowels ɛ and ɔ and the consonant y are all genuine Twi letters, so c is the only option that is excluded. Therefore the correct answer is B: c.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_alphabet_s2_003",
+          "original": true,
+          "topicCode": "GHL-ALPHA",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is a vowel in the Twi alphabet?",
+          "options": [
+            {
+              "label": "A",
+              "text": "b",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "t",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "ɔ",
+              "rationale": "This is the supported answer. Ɔ (open o) is one of the seven Twi vowels — a, e, ɛ, i, o, ɔ, u. The letters b, t and s are consonants, so they cannot be vowel sounds."
+            },
+            {
+              "label": "D",
+              "text": "s",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Ɔ (open o) is one of the seven Twi vowels — a, e, ɛ, i, o, ɔ, u. The letters b, t and s are consonants, so they cannot be vowel sounds. Therefore the correct answer is C: ɔ.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_alphabet_s2_004",
+          "original": true,
+          "topicCode": "GHL-ALPHA",
+          "type": "multiple_choice",
+          "prompt": "In Twi spelling, “hw” in the word “hwɛ” (look) is an example of what?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A diphthong — two vowels gliding together",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A tone mark placed above a syllable",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A pair of silent letters",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A digraph — two letters written together to represent a single sound",
+              "rationale": "This is the supported answer. Twi uses digraphs such as dw, gw, hw, kw, ky, nw, ny and tw, where two letters together spell one consonant sound. Since h and w are consonants, “hw” cannot be a diphthong, and both letters are pronounced."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Twi uses digraphs such as dw, gw, hw, kw, ky, nw, ny and tw, where two letters together spell one consonant sound. Since h and w are consonants, “hw” cannot be a diphthong, and both letters are pronounced. Therefore the correct answer is D: A digraph — two letters written together to represent a single sound.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_alphabet_s2_005",
+          "original": true,
+          "topicCode": "GHL-ALPHA",
+          "type": "multiple_choice",
+          "prompt": "Twi is described as a tonal language. What does this mean?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The pitch at which a syllable is spoken can change the meaning of a word",
+              "rationale": "This is the supported answer. In a tonal language, high and low pitch distinguish words that otherwise have the same letters — for example “papa” can mean “good” or “fan” depending on the tones. Tone is about pitch, not loudness or singing, and it is normally not written in everyday Twi spelling."
+            },
+            {
+              "label": "B",
+              "text": "Every sentence must be sung to a fixed melody",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Words are stressed only by making them louder",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Words are written with musical notes",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "In a tonal language, high and low pitch distinguish words that otherwise have the same letters — for example “papa” can mean “good” or “fan” depending on the tones. Tone is about pitch, not loudness or singing, and it is normally not written in everyday Twi spelling. Therefore the correct answer is A: The pitch at which a syllable is spoken can change the meaning of a word.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_alphabet_s2_006",
+          "original": true,
+          "topicCode": "GHL-ALPHA",
+          "type": "multiple_choice",
+          "prompt": "Which two special vowels does the Twi alphabet add to the basic Latin vowels?",
+          "options": [
+            {
+              "label": "A",
+              "text": "ɑ and ə",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "ɛ and ɔ",
+              "rationale": "This is the supported answer. Twi writing adds ɛ (open e) and ɔ (open o) to the five Latin vowels, giving the seven-vowel set a, e, ɛ, i, o, ɔ, u. The pairs ɑ/ə, ë/ö and æ/œ do not belong to the standard Twi alphabet."
+            },
+            {
+              "label": "C",
+              "text": "ë and ö",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "æ and œ",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Twi writing adds ɛ (open e) and ɔ (open o) to the five Latin vowels, giving the seven-vowel set a, e, ɛ, i, o, ɔ, u. The pairs ɑ/ə, ë/ö and æ/œ do not belong to the standard Twi alphabet. Therefore the correct answer is B: ɛ and ɔ.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_alphabet_s2_007",
+          "original": true,
+          "topicCode": "GHL-ALPHA",
+          "type": "multiple_choice",
+          "prompt": "How many letters are there in the full Akan (Twi) alphabet?",
+          "options": [
+            {
+              "label": "A",
+              "text": "21",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "24",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "22",
+              "rationale": "This is the supported answer. The Twi alphabet has 22 letters: 15 consonants (b, d, f, g, h, k, l, m, n, p, r, s, t, w, y) and 7 vowels (a, e, ɛ, i, o, ɔ, u). The English alphabet has 26 letters, which makes 26 a common wrong guess."
+            },
+            {
+              "label": "D",
+              "text": "26",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The Twi alphabet has 22 letters: 15 consonants (b, d, f, g, h, k, l, m, n, p, r, s, t, w, y) and 7 vowels (a, e, ɛ, i, o, ɔ, u). The English alphabet has 26 letters, which makes 26 a common wrong guess. Therefore the correct answer is C: 22.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "State",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_alphabet_s2_008",
+          "original": true,
+          "topicCode": "GHL-ALPHA",
+          "type": "multiple_choice",
+          "prompt": "Which of these words begins with a Twi digraph?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Hene (chief)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Wura (owner)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Ase (under)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Hwɛ (look)",
+              "rationale": "This is the supported answer. Hwɛ begins with the digraph “hw”, two letters spelling one consonant sound. Hene begins with the single letter h, wura with w, and ase with the vowel a, so none of them starts with a digraph."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Hwɛ begins with the digraph “hw”, two letters spelling one consonant sound. Hene begins with the single letter h, wura with w, and ase with the vowel a, so none of them starts with a digraph. Therefore the correct answer is D: Hwɛ (look).",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_numbers_s2_001",
+          "original": true,
+          "topicCode": "GHL-NUM",
+          "type": "multiple_choice",
+          "prompt": "What does the Twi numeral “baako” mean?",
+          "options": [
+            {
+              "label": "A",
+              "text": "One",
+              "rationale": "This is the supported answer. Baako means one. Two is mmienu, three is mmiɛnsa and ten is du, so the other options are different numerals."
+            },
+            {
+              "label": "B",
+              "text": "Two",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Three",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Ten",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Baako means one. Two is mmienu, three is mmiɛnsa and ten is du, so the other options are different numerals. Therefore the correct answer is A: One.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_numbers_s2_002",
+          "original": true,
+          "topicCode": "GHL-NUM",
+          "type": "multiple_choice",
+          "prompt": "A trader sells “du” oranges to a customer. How many oranges did the customer buy?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Five",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Ten",
+              "rationale": "This is the supported answer. Du means ten in Twi. Five is enum, twenty is aduonu and one hundred is ɔha, so only ten matches the numeral in the sentence."
+            },
+            {
+              "label": "C",
+              "text": "Twenty",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "One hundred",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Du means ten in Twi. Five is enum, twenty is aduonu and one hundred is ɔha, so only ten matches the numeral in the sentence. Therefore the correct answer is B: Ten.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_numbers_s2_003",
+          "original": true,
+          "topicCode": "GHL-NUM",
+          "type": "multiple_choice",
+          "prompt": "Which Twi numeral means “two”?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Mmiɛnsa",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Enum",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Mmienu",
+              "rationale": "This is the supported answer. Mmienu means two. Mmiɛnsa is three, enum is five and nson is seven, so they are all distractors from the basic counting list."
+            },
+            {
+              "label": "D",
+              "text": "Nson",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Mmienu means two. Mmiɛnsa is three, enum is five and nson is seven, so they are all distractors from the basic counting list. Therefore the correct answer is C: Mmienu.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_numbers_s2_004",
+          "original": true,
+          "topicCode": "GHL-NUM",
+          "type": "multiple_choice",
+          "prompt": "The numeral “aduonu” in Twi stands for which number?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Twelve",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Thirty",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Two hundred",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Twenty",
+              "rationale": "This is the supported answer. Aduonu is built from adu- (tens) and -nu (two): two lots of ten, which is 2 × 10 = 20. Twelve is dumienu, thirty is aduasa and two hundred is ahaenu, so twenty is the only match."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Aduonu is built from adu- (tens) and -nu (two): two lots of ten, which is 2 × 10 = 20. Twelve is dumienu, thirty is aduasa and two hundred is ahaenu, so twenty is the only match. Therefore the correct answer is D: Twenty.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_numbers_s2_005",
+          "original": true,
+          "topicCode": "GHL-NUM",
+          "type": "multiple_choice",
+          "prompt": "How do you say “fifteen” in Twi?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Dunum",
+              "rationale": "This is the supported answer. Dunum joins du (ten) and num (five): 10 + 5 = 15. Dunan is fourteen (10 + 4), aduonum is fifty (5 × 10) and enum is simply five, so they do not give fifteen."
+            },
+            {
+              "label": "B",
+              "text": "Dunan",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Aduonum",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Enum",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Dunum joins du (ten) and num (five): 10 + 5 = 15. Dunan is fourteen (10 + 4), aduonum is fifty (5 × 10) and enum is simply five, so they do not give fifteen. Therefore the correct answer is A: Dunum.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_numbers_s2_006",
+          "original": true,
+          "topicCode": "GHL-NUM",
+          "type": "multiple_choice",
+          "prompt": "What number is “ɔha” in Akan counting?",
+          "options": [
+            {
+              "label": "A",
+              "text": "One thousand",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "One hundred",
+              "rationale": "This is the supported answer. Ɔha means one hundred. One thousand is apem, ten is du and sixty is aduosia, so those options name other counting milestones."
+            },
+            {
+              "label": "C",
+              "text": "Ten",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Sixty",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Ɔha means one hundred. One thousand is apem, ten is du and sixty is aduosia, so those options name other counting milestones. Therefore the correct answer is B: One hundred.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_numbers_s2_007",
+          "original": true,
+          "topicCode": "GHL-NUM",
+          "type": "multiple_choice",
+          "prompt": "The Twi numeral “aduasa” represents which number?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Thirteen",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Three",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Thirty",
+              "rationale": "This is the supported answer. Aduasa is a compound numeral: adu- (tens) plus -sa (three) gives 3 × 10 = 30. Thirteen is dumiɛnsa (10 + 3), three alone is mmiɛnsa and three hundred is ahasa, so only thirty fits."
+            },
+            {
+              "label": "D",
+              "text": "Three hundred",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Aduasa is a compound numeral: adu- (tens) plus -sa (three) gives 3 × 10 = 30. Thirteen is dumiɛnsa (10 + 3), three alone is mmiɛnsa and three hundred is ahasa, so only thirty fits. Therefore the correct answer is C: Thirty.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_numbers_s2_008",
+          "original": true,
+          "topicCode": "GHL-NUM",
+          "type": "multiple_choice",
+          "prompt": "How are ordinal numbers such as “second” and “third” formed in Akan?",
+          "options": [
+            {
+              "label": "A",
+              "text": "By adding “fo” after the cardinal number",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "By repeating the cardinal number twice",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "By adding “de” before the cardinal number",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "By placing “ɔto so” before the cardinal number, as in “ɔto so mmienu” (second)",
+              "rationale": "This is the supported answer. Akan forms ordinals with the pattern “ɔto so” plus the cardinal number: ɔto so mmienu is second and ɔto so mmiɛnsa is third. “First” is the exception and is expressed with “a ɔdi kan” (the one that leads)."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Akan forms ordinals with the pattern “ɔto so” plus the cardinal number: ɔto so mmienu is second and ɔto so mmiɛnsa is third. “First” is the exception and is expressed with “a ɔdi kan” (the one that leads). Therefore the correct answer is D: By placing “ɔto so” before the cardinal number, as in “ɔto so mmienu” (second).",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_family_s2_001",
+          "original": true,
+          "topicCode": "GHL-FAM",
+          "type": "multiple_choice",
+          "prompt": "In Twi, “agya” refers to which family member?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Father",
+              "rationale": "This is the supported answer. Agya means father. Mother is ɛna, a (maternal) uncle is wɔfa and a grandfather is nanabarima or nana, so the distractors are different relatives."
+            },
+            {
+              "label": "B",
+              "text": "Mother",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Uncle",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Grandfather",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Agya means father. Mother is ɛna, a (maternal) uncle is wɔfa and a grandfather is nanabarima or nana, so the distractors are different relatives. Therefore the correct answer is A: Father.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_family_s2_002",
+          "original": true,
+          "topicCode": "GHL-FAM",
+          "type": "multiple_choice",
+          "prompt": "What does the Twi word “ɛna” mean?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Sister",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Mother",
+              "rationale": "This is the supported answer. Ɛna means mother. A sister is nua ɔbaa, a grandmother is nana and a paternal aunt is sewaa, so none of the other options matches."
+            },
+            {
+              "label": "C",
+              "text": "Grandmother",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Aunt",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Ɛna means mother. A sister is nua ɔbaa, a grandmother is nana and a paternal aunt is sewaa, so none of the other options matches. Therefore the correct answer is B: Mother.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_family_s2_003",
+          "original": true,
+          "topicCode": "GHL-FAM",
+          "type": "multiple_choice",
+          "prompt": "The Akan word “abusua” refers to what?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The nuclear household only",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A group of close friends",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The extended family or clan",
+              "rationale": "This is the supported answer. Abusua is the extended family or clan — among the Akan it is the matrilineal family group traced through the mother. It goes far beyond the parents-and-children household, and it is defined by blood descent, not friendship or age."
+            },
+            {
+              "label": "D",
+              "text": "People of the same age group",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Abusua is the extended family or clan — among the Akan it is the matrilineal family group traced through the mother. It goes far beyond the parents-and-children household, and it is defined by blood descent, not friendship or age. Therefore the correct answer is C: The extended family or clan.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_family_s2_004",
+          "original": true,
+          "topicCode": "GHL-FAM",
+          "type": "multiple_choice",
+          "prompt": "In Akan kinship, your “wɔfa” is which relative?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Your father’s brother",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Your sister’s husband",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Your grandfather",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Your mother’s brother (maternal uncle)",
+              "rationale": "This is the supported answer. Wɔfa is the maternal uncle — the mother’s brother — who plays an important role in the matrilineal family. A father’s brother is regarded as another “father” (agya), and a sister’s husband and grandfather have different terms."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Wɔfa is the maternal uncle — the mother’s brother — who plays an important role in the matrilineal family. A father’s brother is regarded as another “father” (agya), and a sister’s husband and grandfather have different terms. Therefore the correct answer is D: Your mother’s brother (maternal uncle).",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_family_s2_005",
+          "original": true,
+          "topicCode": "GHL-FAM",
+          "type": "multiple_choice",
+          "prompt": "“Sewaa” in Akan kinship refers to which relative?",
+          "options": [
+            {
+              "label": "A",
+              "text": "One’s father’s sister (paternal aunt)",
+              "rationale": "This is the supported answer. Sewaa is the paternal aunt — the father’s sister. The mother’s brother is wɔfa, a grandmother is nana, and a stepmother is described differently, so only the father’s sister is correct."
+            },
+            {
+              "label": "B",
+              "text": "One’s mother’s brother",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "One’s grandmother",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "One’s stepmother",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Sewaa is the paternal aunt — the father’s sister. The mother’s brother is wɔfa, a grandmother is nana, and a stepmother is described differently, so only the father’s sister is correct. Therefore the correct answer is A: One’s father’s sister (paternal aunt).",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_family_s2_006",
+          "original": true,
+          "topicCode": "GHL-FAM",
+          "type": "multiple_choice",
+          "prompt": "The word “onua” refers to which family member?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A cousin only",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A sibling — a brother or a sister",
+              "rationale": "This is the supported answer. Onua means a sibling. When the sex must be specified, Akan says nua barima (brother) or nua ɔbaa (sister). Parents are agya and ɛna, so onua cannot mean a parent or grandchild."
+            },
+            {
+              "label": "C",
+              "text": "A parent",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A grandchild",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Onua means a sibling. When the sex must be specified, Akan says nua barima (brother) or nua ɔbaa (sister). Parents are agya and ɛna, so onua cannot mean a parent or grandchild. Therefore the correct answer is B: A sibling — a brother or a sister.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_family_s2_007",
+          "original": true,
+          "topicCode": "GHL-FAM",
+          "type": "multiple_choice",
+          "prompt": "Among the Akan, a child traditionally inherits abusua (clan) membership from which side of the family?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The father’s line",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Both parents equally",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The mother’s line",
+              "rationale": "This is the supported answer. The Akan practise matrilineal descent: abusua membership and inheritance pass through the mother, which is why the wɔfa (mother’s brother) is so important. Descent through the father’s line is patrilineal, the opposite system."
+            },
+            {
+              "label": "D",
+              "text": "The chief’s lineage",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The Akan practise matrilineal descent: abusua membership and inheritance pass through the mother, which is why the wɔfa (mother’s brother) is so important. Descent through the father’s line is patrilineal, the opposite system. Therefore the correct answer is C: The mother’s line.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_family_s2_008",
+          "original": true,
+          "topicCode": "GHL-FAM",
+          "type": "multiple_choice",
+          "prompt": "Kofi calls little Adjoa his “wɔfase”. What is their most likely relationship?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Adjoa is Kofi’s own daughter",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Kofi is Adjoa’s paternal uncle",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Adjoa is Kofi’s cousin",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Kofi is Adjoa’s maternal uncle — she is his sister’s child",
+              "rationale": "This is the supported answer. Wɔfase is the nephew or niece of a wɔfa (maternal uncle) — that is, the sister’s child, who belongs to the same matrilineal abusua. A man’s own daughter belongs to her mother’s clan, not his, so she would not be his wɔfase."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Wɔfase is the nephew or niece of a wɔfa (maternal uncle) — that is, the sister’s child, who belongs to the same matrilineal abusua. A man’s own daughter belongs to her mother’s clan, not his, so she would not be his wɔfase. Therefore the correct answer is D: Kofi is Adjoa’s maternal uncle — she is his sister’s child.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_grammar_s2_001",
+          "original": true,
+          "topicCode": "GHL-GRAM",
+          "type": "multiple_choice",
+          "prompt": "In Twi, the pronoun “me” means what?",
+          "options": [
+            {
+              "label": "A",
+              "text": "I / me",
+              "rationale": "This is the supported answer. Me is the first-person singular pronoun (I/me). The basic set is me (I), wo (you), ɔno (he/she), yɛn (we), mo (you plural) and wɔn (they), so the other options are different pronouns."
+            },
+            {
+              "label": "B",
+              "text": "You",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "He or she",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "We",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Me is the first-person singular pronoun (I/me). The basic set is me (I), wo (you), ɔno (he/she), yɛn (we), mo (you plural) and wɔn (they), so the other options are different pronouns. Therefore the correct answer is A: I / me.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_grammar_s2_002",
+          "original": true,
+          "topicCode": "GHL-GRAM",
+          "type": "multiple_choice",
+          "prompt": "In the sentence “Wɔn reba” (they are coming), what does “wɔn” mean?",
+          "options": [
+            {
+              "label": "A",
+              "text": "We",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "They",
+              "rationale": "This is the supported answer. Wɔn is the third-person plural pronoun “they”. “We” is yɛn, “you” plural is mo and “he” is ɔno, so they cannot fit the translation “they are coming”."
+            },
+            {
+              "label": "C",
+              "text": "You (plural)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "He",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Wɔn is the third-person plural pronoun “they”. “We” is yɛn, “you” plural is mo and “he” is ɔno, so they cannot fit the translation “they are coming”. Therefore the correct answer is B: They.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_grammar_s2_003",
+          "original": true,
+          "topicCode": "GHL-GRAM",
+          "type": "multiple_choice",
+          "prompt": "What is the basic word order of a simple Twi sentence such as “Kwame di aduane” (Kwame eats food)?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Verb – subject – object",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Object – verb – subject",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Subject – verb – object",
+              "rationale": "This is the supported answer. Twi, like English, uses subject – verb – object order: Kwame (subject) di (verb) aduane (object). Placing the verb or object first would produce an unusual or ungrammatical simple sentence."
+            },
+            {
+              "label": "D",
+              "text": "Subject – object – verb",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Twi, like English, uses subject – verb – object order: Kwame (subject) di (verb) aduane (object). Placing the verb or object first would produce an unusual or ungrammatical simple sentence. Therefore the correct answer is C: Subject – verb – object.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_grammar_s2_004",
+          "original": true,
+          "topicCode": "GHL-GRAM",
+          "type": "multiple_choice",
+          "prompt": "In “Ama redidi” (Ama is eating), what does the prefix “re-” on the verb show?",
+          "options": [
+            {
+              "label": "A",
+              "text": "That the action is completed",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "That the action will happen tomorrow",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "That the action is a command",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "That the action is happening now (progressive)",
+              "rationale": "This is the supported answer. The prefix re- marks the progressive aspect — an action in progress: Ama redidi means “Ama is eating”. A completed action would take the a- prefix (Ama adidi — Ama has eaten), so “completed” is the opposite of what re- shows."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The prefix re- marks the progressive aspect — an action in progress: Ama redidi means “Ama is eating”. A completed action would take the a- prefix (Ama adidi — Ama has eaten), so “completed” is the opposite of what re- shows. Therefore the correct answer is D: That the action is happening now (progressive).",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_grammar_s2_005",
+          "original": true,
+          "topicCode": "GHL-GRAM",
+          "type": "multiple_choice",
+          "prompt": "Which Twi question word means “who”?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Hena",
+              "rationale": "This is the supported answer. Hena asks “who”. Dɛn means “what”, hen means “where” and sɛn means “how”, so each distractor asks a different kind of question."
+            },
+            {
+              "label": "B",
+              "text": "Dɛn",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Hen",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Sɛn",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Hena asks “who”. Dɛn means “what”, hen means “where” and sɛn means “how”, so each distractor asks a different kind of question. Therefore the correct answer is A: Hena.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_grammar_s2_006",
+          "original": true,
+          "topicCode": "GHL-GRAM",
+          "type": "multiple_choice",
+          "prompt": "What is the plural of “ɔbarima” (man) in Twi?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Mbarima",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Mmarima",
+              "rationale": "This is the supported answer. Many Akan nouns form the plural by changing the singular a/ɔ-class prefix to the m(m)-class prefix: ɔbarima becomes mmarima, just as abɔfra (child) becomes mmɔfra (children). The other forms are not valid plurals."
+            },
+            {
+              "label": "C",
+              "text": "Ɔbarimafo",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Mmarimafo",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Many Akan nouns form the plural by changing the singular a/ɔ-class prefix to the m(m)-class prefix: ɔbarima becomes mmarima, just as abɔfra (child) becomes mmɔfra (children). The other forms are not valid plurals. Therefore the correct answer is B: Mmarima.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Determine",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_grammar_s2_007",
+          "original": true,
+          "topicCode": "GHL-GRAM",
+          "type": "multiple_choice",
+          "prompt": "In “Kofi akɔ sukuu” (Kofi has gone to school), the prefix “a-” on the verb “kɔ” indicates what?",
+          "options": [
+            {
+              "label": "A",
+              "text": "An action still in progress",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A future action",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A completed action (perfective past)",
+              "rationale": "This is the supported answer. The a- prefix marks a completed (perfective) action: akɔ means “has gone”. An action in progress would use re- (Kofi rekɔ — Kofi is going), and negation uses the n- prefix, so a- cannot show progress or negation."
+            },
+            {
+              "label": "D",
+              "text": "A negative action",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The a- prefix marks a completed (perfective) action: akɔ means “has gone”. An action in progress would use re- (Kofi rekɔ — Kofi is going), and negation uses the n- prefix, so a- cannot show progress or negation. Therefore the correct answer is C: A completed action (perfective past).",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_grammar_s2_008",
+          "original": true,
+          "topicCode": "GHL-GRAM",
+          "type": "multiple_choice",
+          "prompt": "The “n” inside “mennim” (I do not know) marks which grammatical feature?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The future tense",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A question",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The plural",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Negation",
+              "rationale": "This is the supported answer. Menim means “I know”; inserting the negative prefix n- gives mennim, “I do not know”. Negation in Akan is shown by this n- prefix on the verb, not by a separate word for “not”."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Menim means “I know”; inserting the negative prefix n- gives mennim, “I do not know”. Negation in Akan is shown by this n- prefix on the verb, not by a separate word for “not”. Therefore the correct answer is D: Negation.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_proverbs_s2_001",
+          "original": true,
+          "topicCode": "GHL-PROV",
+          "type": "multiple_choice",
+          "prompt": "What is an “abɛ” in Akan speech?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A proverb — a short, wise saying",
+              "rationale": "This is the supported answer. Abɛ is the Akan word for a proverb, a short traditional saying that carries wisdom. Folktales are anansesem, while dirges and praise songs are performed pieces, not proverbs."
+            },
+            {
+              "label": "B",
+              "text": "A folktale about Ananse",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A funeral dirge",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A praise song",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Abɛ is the Akan word for a proverb, a short traditional saying that carries wisdom. Folktales are anansesem, while dirges and praise songs are performed pieces, not proverbs. Therefore the correct answer is A: A proverb — a short, wise saying.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_proverbs_s2_002",
+          "original": true,
+          "topicCode": "GHL-PROV",
+          "type": "multiple_choice",
+          "prompt": "The proverb “Tikoro nko agyina” teaches which lesson?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It is best to stand alone in every matter",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "One person alone cannot hold council — unity and cooperation are needed",
+              "rationale": "This is the supported answer. Tikoro nko agyina literally means “one head does not go into council”: important decisions need more than one mind. It teaches the value of cooperation and consultation, the opposite of standing alone."
+            },
+            {
+              "label": "C",
+              "text": "A leader needs no advice from anyone",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Meetings are a waste of time",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Tikoro nko agyina literally means “one head does not go into council”: important decisions need more than one mind. It teaches the value of cooperation and consultation, the opposite of standing alone. Therefore the correct answer is B: One person alone cannot hold council — unity and cooperation are needed.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_proverbs_s2_003",
+          "original": true,
+          "topicCode": "GHL-PROV",
+          "type": "multiple_choice",
+          "prompt": "Why do Akan speakers value proverbs in everyday speech?",
+          "options": [
+            {
+              "label": "A",
+              "text": "They make speech longer without adding meaning",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "They are used only to insult listeners",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "They pass on wisdom and advice in a memorable, indirect way",
+              "rationale": "This is the supported answer. Proverbs package the community’s wisdom into short, memorable sayings, allowing speakers to advise or correct others politely and indirectly. Skilful use of proverbs is a mark of a good speaker in Akan culture."
+            },
+            {
+              "label": "D",
+              "text": "They completely replace ordinary greetings",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Proverbs package the community’s wisdom into short, memorable sayings, allowing speakers to advise or correct others politely and indirectly. Skilful use of proverbs is a mark of a good speaker in Akan culture. Therefore the correct answer is C: They pass on wisdom and advice in a memorable, indirect way.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_proverbs_s2_004",
+          "original": true,
+          "topicCode": "GHL-PROV",
+          "type": "multiple_choice",
+          "prompt": "“Woforo dua pa a, na yɛpia wo” means what?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Never climb trees without permission",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Good trees belong only to the elders",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "You should never ask anyone for help",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "If you climb a good tree, we give you a push — society supports a worthy cause",
+              "rationale": "This is the supported answer. The proverb says that when you climb a good tree, people push you up: when a person pursues a good and worthy goal, the community rallies to support them. It encourages worthwhile effort rather than forbidding climbing or help."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The proverb says that when you climb a good tree, people push you up: when a person pursues a good and worthy goal, the community rallies to support them. It encourages worthwhile effort rather than forbidding climbing or help. Therefore the correct answer is D: If you climb a good tree, we give you a push — society supports a worthy cause.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_proverbs_s2_005",
+          "original": true,
+          "topicCode": "GHL-PROV",
+          "type": "multiple_choice",
+          "prompt": "The saying behind Sankofa — “Sɛ wo were fi na wosan kɔ fa a, yɛnkyiri” — teaches that...",
+          "options": [
+            {
+              "label": "A",
+              "text": "It is not wrong to go back for what you have forgotten — we should learn from the past",
+              "rationale": "This is the supported answer. The Sankofa saying means “it is not taboo to go back and fetch what you forgot”: revisiting the past to recover wisdom is honourable, not shameful. This is why the Sankofa bird looks backwards, and it is the opposite of forgetting the past."
+            },
+            {
+              "label": "B",
+              "text": "The past must be forgotten completely",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "You should never turn back on a journey",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Old things are always useless",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The Sankofa saying means “it is not taboo to go back and fetch what you forgot”: revisiting the past to recover wisdom is honourable, not shameful. This is why the Sankofa bird looks backwards, and it is the opposite of forgetting the past. Therefore the correct answer is A: It is not wrong to go back for what you have forgotten — we should learn from the past.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_proverbs_s2_006",
+          "original": true,
+          "topicCode": "GHL-PROV",
+          "type": "multiple_choice",
+          "prompt": "“Aboa bi bɛka wo a, na ofiri wo ntoma mu” warns that...",
+          "options": [
+            {
+              "label": "A",
+              "text": "Insects like hiding inside clothes",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Danger or betrayal can come from people who are very close to you",
+              "rationale": "This is the supported answer. Literally, “the insect that will bite you comes from your own cloth”: the people closest to us are often the ones in a position to harm or betray us. The cloth and the insect are images, so the literal readings are distractors."
+            },
+            {
+              "label": "C",
+              "text": "Only strangers can ever hurt you",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "You should never wear other people’s clothes",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Literally, “the insect that will bite you comes from your own cloth”: the people closest to us are often the ones in a position to harm or betray us. The cloth and the insect are images, so the literal readings are distractors. Therefore the correct answer is B: Danger or betrayal can come from people who are very close to you.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_proverbs_s2_007",
+          "original": true,
+          "topicCode": "GHL-PROV",
+          "type": "multiple_choice",
+          "prompt": "The proverb “Obi nkyere abɔfra Nyame” (no one points out God to a child) suggests what?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Children must never be taught about religion",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "God reveals Himself only to adults",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Some truths are so evident that they need no explanation",
+              "rationale": "This is the supported answer. The proverb means that no one has to show God to a child, because the evidence of God in creation is plain for all to see: some truths are self-evident. It does not forbid religious teaching or claim children know more than elders."
+            },
+            {
+              "label": "D",
+              "text": "Children always know more than elders",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The proverb means that no one has to show God to a child, because the evidence of God in creation is plain for all to see: some truths are self-evident. It does not forbid religious teaching or claim children know more than elders. Therefore the correct answer is C: Some truths are so evident that they need no explanation.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_proverbs_s2_008",
+          "original": true,
+          "topicCode": "GHL-PROV",
+          "type": "multiple_choice",
+          "prompt": "How does an idiom (nsɛnkyerɛnne) differ from a proverb?",
+          "options": [
+            {
+              "label": "A",
+              "text": "An idiom is always longer than a proverb",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Idioms are used only in written Twi",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "There is no difference between the two",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "An idiom is a fixed phrase whose meaning cannot be worked out from its individual words, while a proverb is a complete wise saying",
+              "rationale": "This is the supported answer. An idiom is a fixed expression with a figurative meaning that its separate words do not reveal, whereas a proverb is a full traditional saying that states a piece of wisdom. Both are used freely in spoken Twi, and length is not what separates them."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "An idiom is a fixed expression with a figurative meaning that its separate words do not reveal, whereas a proverb is a full traditional saying that states a piece of wisdom. Both are used freely in spoken Twi, and length is not what separates them. Therefore the correct answer is D: An idiom is a fixed phrase whose meaning cannot be worked out from its individual words, while a proverb is a complete wise saying.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_culture_s2_001",
+          "original": true,
+          "topicCode": "GHL-CULT",
+          "type": "multiple_choice",
+          "prompt": "“Anansesem” are traditional Akan stories that usually feature which character?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Kwaku Ananse, the spider",
+              "rationale": "This is the supported answer. Anansesem are folktales built around Kwaku Ananse, the clever and tricky spider whose exploits teach moral lessons. Lions, crocodiles and drums appear in some tales, but the central character of anansesem is the spider."
+            },
+            {
+              "label": "B",
+              "text": "The lion, king of the forest",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The crocodile of the river",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A magical talking drum",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Anansesem are folktales built around Kwaku Ananse, the clever and tricky spider whose exploits teach moral lessons. Lions, crocodiles and drums appear in some tales, but the central character of anansesem is the spider. Therefore the correct answer is A: Kwaku Ananse, the spider.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_culture_s2_002",
+          "original": true,
+          "topicCode": "GHL-CULT",
+          "type": "multiple_choice",
+          "prompt": "What is “mpaebo” in Akan custom?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A naming ceremony for a baby",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The pouring of libation — offering drink with prayers to God and the ancestors",
+              "rationale": "This is the supported answer. Mpaebo is the pouring of libation: drink is poured while prayers are said to God (Onyankopɔn), the earth and the ancestors to open important occasions. A naming ceremony is abadinto, so that option belongs to a different rite."
+            },
+            {
+              "label": "C",
+              "text": "A funeral dance",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A harvest meal",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Mpaebo is the pouring of libation: drink is poured while prayers are said to God (Onyankopɔn), the earth and the ancestors to open important occasions. A naming ceremony is abadinto, so that option belongs to a different rite. Therefore the correct answer is B: The pouring of libation — offering drink with prayers to God and the ancestors.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_culture_s2_003",
+          "original": true,
+          "topicCode": "GHL-CULT",
+          "type": "multiple_choice",
+          "prompt": "A boy born on a Monday among the Akan is commonly given which day-name?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Kwabena",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Kofi",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Kwadwo",
+              "rationale": "This is the supported answer. Monday-born boys are called Kwadwo (and girls Adwoa). Kwabena is Tuesday, Kofi is Friday and Kwame is Saturday, so the other names belong to different days."
+            },
+            {
+              "label": "D",
+              "text": "Kwame",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Monday-born boys are called Kwadwo (and girls Adwoa). Kwabena is Tuesday, Kofi is Friday and Kwame is Saturday, so the other names belong to different days. Therefore the correct answer is C: Kwadwo.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_culture_s2_004",
+          "original": true,
+          "topicCode": "GHL-CULT",
+          "type": "multiple_choice",
+          "prompt": "A girl born on a Sunday among the Akan is commonly named...",
+          "options": [
+            {
+              "label": "A",
+              "text": "Adwoa",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Yaa",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Ama",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Akosua",
+              "rationale": "This is the supported answer. Sunday-born girls are Akosua (boys are Kwesi). Adwoa is Monday, Yaa is Thursday and Ama is Saturday, so those names belong to other days of the week."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Sunday-born girls are Akosua (boys are Kwesi). Adwoa is Monday, Yaa is Thursday and Ama is Saturday, so those names belong to other days of the week. Therefore the correct answer is D: Akosua.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_culture_s2_005",
+          "original": true,
+          "topicCode": "GHL-CULT",
+          "type": "multiple_choice",
+          "prompt": "The Aboakyer festival of the Effutu people of Winneba is famous for what?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The hunt for a live deer, which is offered to their god",
+              "rationale": "This is the supported answer. At Aboakyer, two warrior groups compete to catch a live deer and present it to the god Penkye Otu. Hooting at hunger describes the Ga Homowo festival, so that distractor belongs to a different celebration."
+            },
+            {
+              "label": "B",
+              "text": "Hooting at hunger with sprinkled mashed food",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The first eating of the new yam",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A canoe race on the sea",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "At Aboakyer, two warrior groups compete to catch a live deer and present it to the god Penkye Otu. Hooting at hunger describes the Ga Homowo festival, so that distractor belongs to a different celebration. Therefore the correct answer is A: The hunt for a live deer, which is offered to their god.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_culture_s2_006",
+          "original": true,
+          "topicCode": "GHL-CULT",
+          "type": "multiple_choice",
+          "prompt": "“Homowo”, the festival whose name means “hooting at hunger”, belongs to which people?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The Asante people",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The Ga people",
+              "rationale": "This is the supported answer. Homowo is the festival of the Ga people of Accra, celebrating the end of a historic famine: kpokpoi (a special dish) is sprinkled while hunger is hooted at and mocked. The Asante celebrate Adae, so the other peoples are distractors."
+            },
+            {
+              "label": "C",
+              "text": "The Ewe people",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The Dagomba people",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Homowo is the festival of the Ga people of Accra, celebrating the end of a historic famine: kpokpoi (a special dish) is sprinkled while hunger is hooted at and mocked. The Asante celebrate Adae, so the other peoples are distractors. Therefore the correct answer is B: The Ga people.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_culture_s2_007",
+          "original": true,
+          "topicCode": "GHL-CULT",
+          "type": "multiple_choice",
+          "prompt": "What is the role of the “okyeame” in an Akan chief’s court?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The lead drummer of the atumpan drums",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The chief’s eldest son and heir",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The linguist who relays, polishes and speaks on behalf of the chief",
+              "rationale": "This is the supported answer. The okyeame is the chief’s linguist and spokesperson: visitors speak through him, and he repeats and adorns the chief’s words with proverbs. Drumming, succession and libation belong to other office holders in the court."
+            },
+            {
+              "label": "D",
+              "text": "The priest who pours libation",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The okyeame is the chief’s linguist and spokesperson: visitors speak through him, and he repeats and adorns the chief’s words with proverbs. Drumming, succession and libation belong to other office holders in the court. Therefore the correct answer is C: The linguist who relays, polishes and speaks on behalf of the chief.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bghl_culture_s2_008",
+          "original": true,
+          "topicCode": "GHL-CULT",
+          "type": "multiple_choice",
+          "prompt": "Why are the atumpan called “talking drums”?",
+          "options": [
+            {
+              "label": "A",
+              "text": "They have recorded human voices hidden inside them",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "They are beaten only at funeral dances",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "They can be heard by everyone over long distances",
+              "rationale": "This option is a plausible misconception, but it conflicts with the explanation established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Their tones imitate the pitch patterns of speech, so skilled drummers can send messages and praise names",
+              "rationale": "This is the supported answer. Because Akan is a tonal language, the high and low tones of the atumpan can mirror the pitch of spoken phrases, allowing drummers to “speak” proverbs, praise names and announcements. The drums contain no voices, and being loud alone would not make them “talk”."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Because Akan is a tonal language, the high and low tones of the atumpan can mirror the pitch of spoken phrases, allowing drummers to “speak” proverbs, praise names and announcements. The drums contain no voices, and being loud alone would not make them “talk”. Therefore the correct answer is D: Their tones imitate the pitch patterns of speech, so skilled drummers can send messages and praise names.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Common Core Programme Curriculum — Ghanaian Language (Basic 7–10)",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
