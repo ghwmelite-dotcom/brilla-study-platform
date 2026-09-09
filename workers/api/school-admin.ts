@@ -75,6 +75,23 @@ interface CallerSchoolRow {
 
 type CallerSchool = { ok: true; school: CallerSchoolRow } | { ok: false; response: Response };
 
+interface TopicProgressRow {
+  topic_id: string;
+  topic_name: string;
+  subject_name: string;
+  mastery_level: number;
+  questions_attempted: number;
+  questions_correct: number;
+}
+
+interface AchievementRow {
+  achievement_id: string;
+  name: string;
+  description: string;
+  icon: string;
+  unlocked_at: string;
+}
+
 /**
  * Resolve the caller's school. Every route funnels through this so
  * cross-school access is impossible by construction: the school id always
@@ -277,10 +294,10 @@ schoolAdminApp.get('/students/:studentId/progress', async (c) => {
       JOIN subjects s ON t.subject_id = s.id
       WHERE up.user_id = ?
       ORDER BY up.mastery_level DESC
-    `).bind(studentId).all();
+    `).bind(studentId).all<TopicProgressRow>();
 
-    const strengths = topicProgress.filter((t: any) => t.mastery_level >= 70).slice(0, 5);
-    const weaknesses = topicProgress.filter((t: any) => t.mastery_level < 50 && t.questions_attempted >= 5).slice(0, 5);
+    const strengths = topicProgress.filter((t) => t.mastery_level >= 70).slice(0, 5);
+    const weaknesses = topicProgress.filter((t) => t.mastery_level < 50 && t.questions_attempted >= 5).slice(0, 5);
 
     const { results: achievements } = await c.env.DB.prepare(`
       SELECT ua.*, a.name, a.description, a.icon
@@ -289,7 +306,7 @@ schoolAdminApp.get('/students/:studentId/progress', async (c) => {
       WHERE ua.user_id = ?
       ORDER BY ua.unlocked_at DESC
       LIMIT 5
-    `).bind(studentId).all();
+    `).bind(studentId).all<AchievementRow>();
 
     const userRecord = await c.env.DB.prepare(`
       SELECT MAX(streak_days) as longest_streak FROM users WHERE id = ?
@@ -314,8 +331,8 @@ schoolAdminApp.get('/students/:studentId/progress', async (c) => {
           ? Math.round((attemptStats.total_correct / attemptStats.total_attempted) * 100)
           : 0,
         topicsStarted: topicProgress.length,
-        topicsMastered: topicProgress.filter((t: any) => t.mastery_level >= 80).length,
-        strengthAreas: strengths.map((t: any) => ({
+        topicsMastered: topicProgress.filter((t) => t.mastery_level >= 80).length,
+        strengthAreas: strengths.map((t) => ({
           topicId: t.topic_id,
           topicName: t.topic_name,
           subjectName: t.subject_name,
@@ -323,7 +340,7 @@ schoolAdminApp.get('/students/:studentId/progress', async (c) => {
           questionsAttempted: t.questions_attempted,
           questionsCorrect: t.questions_correct,
         })),
-        weakAreas: weaknesses.map((t: any) => ({
+        weakAreas: weaknesses.map((t) => ({
           topicId: t.topic_id,
           topicName: t.topic_name,
           subjectName: t.subject_name,
@@ -331,7 +348,7 @@ schoolAdminApp.get('/students/:studentId/progress', async (c) => {
           questionsAttempted: t.questions_attempted,
           questionsCorrect: t.questions_correct,
         })),
-        recentAchievements: achievements.map((a: any) => ({
+        recentAchievements: achievements.map((a) => ({
           id: a.achievement_id,
           name: a.name,
           description: a.description,
