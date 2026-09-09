@@ -15,6 +15,7 @@ import { Badge, Button, Card, ConfirmModal, Input, Modal, Select, Textarea } fro
 import { api } from '@/lib/api';
 import { useExamStore } from '@/stores/examStore';
 import { cn } from '@/utils';
+import { RetentionStatsCard, type DeckRetention } from './RetentionStats';
 
 export interface UserFlashcardDeck {
   id: string;
@@ -74,6 +75,13 @@ export function MyDecks({ onStudyDeck }: MyDecksProps) {
   const [decks, setDecks] = useState<UserFlashcardDeck[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retentionByDeck, setRetentionByDeck] = useState<Record<string, DeckRetention>>({});
+
+  const handleRetentionLoaded = useCallback((stats: { decks: DeckRetention[] } | null) => {
+    const map: Record<string, DeckRetention> = {};
+    for (const d of stats?.decks || []) map[d.deckId] = d;
+    setRetentionByDeck(map);
+  }, []);
 
   // Deck create/edit modal
   const [deckModalOpen, setDeckModalOpen] = useState(false);
@@ -329,6 +337,8 @@ export function MyDecks({ onStudyDeck }: MyDecksProps) {
         </Button>
       </div>
 
+      <RetentionStatsCard onLoaded={handleRetentionLoaded} />
+
       {error && (
         <Card className="p-4 mb-4 border-red-200 bg-red-50">
           <p className="text-sm text-red-600">{error}</p>
@@ -370,6 +380,11 @@ export function MyDecks({ onStudyDeck }: MyDecksProps) {
                       <p className="font-medium text-neutral-900 truncate">{deck.name}</p>
                       <div className="flex items-center gap-2 text-xs text-neutral-500">
                         <span>{cardCount} {cardCount === 1 ? 'card' : 'cards'}</span>
+                        {retentionByDeck[deck.id]?.retentionRate != null && (
+                          <Badge variant="success">
+                            {retentionByDeck[deck.id].retentionRate}% recall
+                          </Badge>
+                        )}
                         {deck.is_public === 1 ? (
                           <Badge variant="success">
                             <Globe className="w-3 h-3 mr-1" />

@@ -124,6 +124,99 @@ function jsonError(error: string, status: 400 | 401 | 403 | 404 | 500): Response
 }
 
 // =============================================
+// RETENTION METRICS
+// =============================================
+
+const RETENTION_WINDOW_DAYS = 30;
+const MIN_REVIEWS_FOR_METRIC = 10;
+
+interface RetentionDeckRow {
+  deck_id: string;
+  deck_name: string;
+  reviews_30d: number;
+  recalled_30d: number;
+  mature_reviews_30d: number;
+  mature_recalled_30d: number;
+}
+
+const pct = (recalled: number, total: number): number | null =>
+  total > 0 ? Math.round((recalled / total) * 1000) / 10 : null;
+
+// Per-user flashcard retention: share of reviews in the trailing 30 days
+// rated ease_rating >= 3 (recalled), overall and per deck. Mature retention
+// restricts to reviews of cards with repetitions >= 2 (Anki-style). Users
+// with fewer than MIN_REVIEWS_FOR_METRIC recent reviews get no number.
+flashcardDecksApp.get('/retention', async (c) => {
+  const user = c.get('user');
+  try {
+    const { results: deckRows } = await c.env.DB.prepare(`
+      SELECT
+        fr.deck_id,
+        fd.name AS deck_name,
+        COUNT(*) AS reviews_30d,
+        SUM(CASE WHEN fr.ease_rating >= 3 THEN 1 ELSE 0 END) AS recalled_30d,
+        SUM(CASE WHEN fr.repetitions >= 2 THEN 1 ELSE 0 END) AS mature_reviews_30d,
+        SUM(CASE WHEN fr.repetitions >= 2 AND fr.ease_rating >= 3 THEN 1 ELSE 0 END) AS mature_recalled_30d
+      FROM flashcard_reviews fr
+      JOIN flashcard_decks fd ON fd.id = fr.deck_id
+      WHERE fr.user_id = ?
+        AND datetime(fr.reviewed_at) >= datetime('now', '-${RETENTION_WINDOW_DAYS} days')
+      GROUP BY fr.deck_id
+      ORDER BY reviews_30d DESC
+    `).bind(user.userId).all<RetentionDeckRow>();
+
+    // Cards whose most recent review is due now.
+    const dueRow = await c.env.DB.prepare(`
+      SELECT COUNT(*) AS due_now
+      FROM flashcard_reviews fr
+      WHERE fr.user_id = ?
+        AND fr.next_review_at IS NOT NULL
+        AND datetime(fr.next_review_at) <= datetime('now')
+        AND fr.reviewed_at = (
+          SELECT MAX(fr2.reviewed_at) FROM flashcard_reviews fr2
+          WHERE fr2.user_id = fr.user_id AND fr2.flashcard_id = fr.flashcard_id
+        )
+    `).bind(user.userId).first<{ due_now: number }>();
+
+    const rows = deckRows || [];
+    const totalReviews30d = rows.reduce((sum, r) => sum + r.reviews_30d, 0);
+    const totalRecalled30d = rows.reduce((sum, r) => sum + r.recalled_30d, 0);
+    const matureReviews30d = rows.reduce((sum, r) => sum + r.mature_reviews_30d, 0);
+    const matureRecalled30d = rows.reduce((sum, r) => sum + r.mature_recalled_30d, 0);
+    const insufficientData = totalReviews30d < MIN_REVIEWS_FOR_METRIC;
+
+    return c.json({
+      success: true,
+      data: {
+        windowDays: RETENTION_WINDOW_DAYS,
+        totalReviews30d,
+        insufficientData,
+        retentionRate: insufficientData ? null : pct(totalRecalled30d, totalReviews30d),
+        matureReviews30d,
+        matureRetentionRate:
+          insufficientData || matureReviews30d === 0 ? null : pct(matureRecalled30d, matureReviews30d),
+        dueNow: dueRow?.due_now ?? 0,
+        decks: rows.map((r) => ({
+          deckId: r.deck_id,
+          deckName: r.deck_name,
+          reviews30d: r.reviews_30d,
+          insufficientData: r.reviews_30d < MIN_REVIEWS_FOR_METRIC,
+          retentionRate: r.reviews_30d < MIN_REVIEWS_FOR_METRIC ? null : pct(r.recalled_30d, r.reviews_30d),
+          matureReviews30d: r.mature_reviews_30d,
+          matureRetentionRate:
+            r.reviews_30d < MIN_REVIEWS_FOR_METRIC || r.mature_reviews_30d === 0
+              ? null
+              : pct(r.mature_recalled_30d, r.mature_reviews_30d),
+        })),
+      },
+    });
+  } catch (error) {
+    console.error('Failed to compute flashcard retention:', error);
+    return c.json({ success: false, error: 'Failed to compute retention' }, 500);
+  }
+});
+
+// =============================================
 // DECK ROUTES
 // =============================================
 

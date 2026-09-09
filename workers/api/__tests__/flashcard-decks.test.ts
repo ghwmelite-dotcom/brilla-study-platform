@@ -318,6 +318,139 @@ describe('PUT /cards/:cardId', () => {
   });
 });
 
+describe('GET /retention', () => {
+  // Per-user fixture rows, keyed by user id. The handler filters on binds[0]
+  // so it simulates the WHERE fr.user_id = ? clause, and the due-count
+  // handler does the same for the dueNow query.
+  const reviewRowsByUser: Record<string, Record<string, number | string>[]> = {
+    user_a: [
+      { deck_id: 'deck_1', deck_name: 'Physics', reviews_30d: 6, recalled_30d: 5, mature_reviews_30d: 4, mature_recalled_30d: 3 },
+      { deck_id: 'deck_2', deck_name: 'Chemistry', reviews_30d: 4, recalled_30d: 2, mature_reviews_30d: 2, mature_recalled_30d: 2 },
+    ],
+    user_b: [
+      { deck_id: 'deck_9', deck_name: 'Biology', reviews_30d: 20, recalled_30d: 20, mature_reviews_30d: 10, mature_recalled_30d: 10 },
+    ],
+    sparse_user: [
+      { deck_id: 'deck_3', deck_name: 'Math', reviews_30d: 9, recalled_30d: 9, mature_reviews_30d: 9, mature_recalled_30d: 9 },
+    ],
+    new_user: [],
+  };
+  const dueByUser: Record<string, number> = { user_a: 3, user_b: 12, sparse_user: 0, new_user: 0 };
+
+  const retentionHandlers = (): MockHandler[] => [
+    authHandler(),
+    {
+      match: /FROM flashcard_reviews fr\s+JOIN flashcard_decks/,
+      all: (binds) => ({ results: reviewRowsByUser[binds[0] as string] || [] }),
+    },
+    {
+      match: /SELECT COUNT\(\*\) AS due_now/,
+      first: (binds) => ({ due_now: dueByUser[binds[0] as string] ?? 0 }),
+    },
+  ];
+
+  it('rejects requests without a token', async () => {
+    const db = createMockD1([authHandler()]);
+    const res = await flashcardDecksApp.fetch(req('http://x/retention', 'GET', null), env(db));
+    expect(res.status).toBe(401);
+  });
+
+  it('computes overall retention, mature retention, due count and per-deck breakdown', async () => {
+    const db = createMockD1(retentionHandlers());
+    const t = await token('user_a');
+    const res = await flashcardDecksApp.fetch(req('http://x/retention', 'GET', t), env(db));
+    expect(res.status).toBe(200);
+
+    const body = (await res.json()) as {
+      data: {
+        windowDays: number;
+        totalReviews30d: number;
+        insufficientData: boolean;
+        retentionRate: number | null;
+        matureReviews30d: number;
+        matureRetentionRate: number | null;
+        dueNow: number;
+        decks: {
+          deckId: string;
+          deckName: string;
+          reviews30d: number;
+          retentionRate: number | null;
+          matureReviews30d: number;
+          matureRetentionRate: number | null;
+        }[];
+      };
+    };
+    const d = body.data;
+    expect(d.windowDays).toBe(30);
+    expect(d.totalReviews30d).toBe(10);
+    expect(d.insufficientData).toBe(false);
+    // 7 of 10 reviews recalled
+    expect(d.retentionRate).toBe(70);
+    // mature subset: 5 of 6 recalled → 83.3
+    expect(d.matureReviews30d).toBe(6);
+    expect(d.matureRetentionRate).toBe(83.3);
+    expect(d.dueNow).toBe(3);
+    expect(d.decks).toHaveLength(2);
+    expect(d.decks[0]).toMatchObject({ deckId: 'deck_1', deckName: 'Physics', reviews30d: 6 });
+    expect(d.decks[1]).toMatchObject({ deckId: 'deck_2', deckName: 'Chemistry', reviews30d: 4 });
+    // Per-deck rows below the 10-review minimum report no number.
+    expect(d.decks[0].retentionRate).toBeNull();
+    expect(d.decks[1].matureRetentionRate).toBeNull();
+  });
+
+  it('marks users with fewer than 10 recent reviews as insufficientData with no numbers', async () => {
+    const db = createMockD1(retentionHandlers());
+    const t = await token('sparse_user');
+    const res = await flashcardDecksApp.fetch(req('http://x/retention', 'GET', t), env(db));
+    expect(res.status).toBe(200);
+
+    const body = (await res.json()) as {
+      data: { totalReviews30d: number; insufficientData: boolean; retentionRate: number | null; matureRetentionRate: number | null };
+    };
+    expect(body.data.totalReviews30d).toBe(9);
+    expect(body.data.insufficientData).toBe(true);
+    expect(body.data.retentionRate).toBeNull();
+    expect(body.data.matureRetentionRate).toBeNull();
+  });
+
+  it('returns insufficientData for a user with no reviews at all', async () => {
+    const db = createMockD1(retentionHandlers());
+    const t = await token('new_user');
+    const res = await flashcardDecksApp.fetch(req('http://x/retention', 'GET', t), env(db));
+    expect(res.status).toBe(200);
+
+    const body = (await res.json()) as {
+      data: { totalReviews30d: number; insufficientData: boolean; dueNow: number; decks: unknown[] };
+    };
+    expect(body.data.totalReviews30d).toBe(0);
+    expect(body.data.insufficientData).toBe(true);
+    expect(body.data.dueNow).toBe(0);
+    expect(body.data.decks).toEqual([]);
+  });
+
+  it('scopes every query to the JWT user so user A never sees user B numbers', async () => {
+    const db = createMockD1(retentionHandlers());
+    const t = await token('user_a');
+    const res = await flashcardDecksApp.fetch(req('http://x/retention?userId=user_b', 'GET', t), env(db));
+    expect(res.status).toBe(200);
+
+    // Both queries must bind the JWT identity and nothing else.
+    const retentionQuery = db.calls.find((c) => c.sql.includes('JOIN flashcard_decks'));
+    const dueQuery = db.calls.find((c) => c.sql.includes('AS due_now'));
+    expect(retentionQuery!.binds).toEqual(['user_a']);
+    expect(dueQuery!.binds).toEqual(['user_a']);
+
+    const body = (await res.json()) as {
+      data: { totalReviews30d: number; retentionRate: number | null; dueNow: number; decks: { deckId: string }[] };
+    };
+    // user_b has 20 reviews at 100% retention; user_a's payload must reflect only user_a.
+    expect(body.data.totalReviews30d).toBe(10);
+    expect(body.data.retentionRate).toBe(70);
+    expect(body.data.dueNow).toBe(3);
+    expect(body.data.decks.some((deck) => deck.deckId === 'deck_9')).toBe(false);
+  });
+});
+
 describe('DELETE /cards/:cardId', () => {
   it('blocks a non-owner and never issues a DELETE', async () => {
     const db = createMockD1([
