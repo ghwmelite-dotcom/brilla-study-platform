@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { ComponentProps } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, Sparkles } from "lucide-react";
 import { ExamLayout, ExamQuestionCard } from "@/components/exam";
 import {
   DailyUsageIndicator,
@@ -58,6 +58,19 @@ interface PracticeResult {
   timeTaken: number;
 }
 
+interface AdaptiveFocusArea {
+  topicId: string;
+  topicName: string | null;
+  masteryLevel: number;
+  dueForRevision: boolean;
+}
+
+interface AdaptivePracticeSet {
+  questions: ApiQuestion[];
+  focusAreas: AdaptiveFocusArea[];
+  adaptive: boolean;
+}
+
 interface PendingAttemptRequest {
   questionId: string;
   answer: string;
@@ -84,6 +97,7 @@ export default function ExamModePractice() {
 
   // Get params from URL or state
   const mode = searchParams.get("mode") || "drill"; // drill, speed
+  const adaptive = searchParams.get("adaptive") === "1";
   const topic = searchParams.get("topic") || "";
   const subject = searchParams.get("subject") || "all";
   const difficulty = searchParams.get("difficulty") || "all";
@@ -92,6 +106,7 @@ export default function ExamModePractice() {
     ?.questions;
 
   const [questions, setQuestions] = useState<Question[]>(passedQuestions || []);
+  const [focusAreas, setFocusAreas] = useState<AdaptiveFocusArea[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [answeredSet, setAnsweredSet] = useState<Set<string>>(new Set());
@@ -133,6 +148,38 @@ export default function ExamModePractice() {
       setIsLoading(true);
       setError(null);
       try {
+        // Adaptive mode: ask the backend to weight questions toward weak/due
+        // topics. Any failure falls back to the normal random draw silently.
+        if (adaptive && !topic && subject !== "all") {
+          try {
+            const subjectId =
+              useExamStore.getState().subjects.find((s) => s.slug === subject)
+                ?.id || subject;
+            let adaptiveUrl = `/adaptive/practice-set?subjectId=${encodeURIComponent(subjectId)}&count=${count}`;
+            if (difficulty !== "all") {
+              adaptiveUrl += `&difficulty=${difficulty}`;
+            }
+            const adaptiveRes = await api.get<AdaptivePracticeSet>(adaptiveUrl);
+            const adaptiveData = adaptiveRes.success ? adaptiveRes.data : null;
+            if (
+              adaptiveData &&
+              Array.isArray(adaptiveData.questions) &&
+              adaptiveData.questions.length > 0
+            ) {
+              setQuestions(adaptiveData.questions.map(transformQuestion));
+              setFocusAreas(
+                adaptiveData.adaptive ? adaptiveData.focusAreas || [] : [],
+              );
+              return;
+            }
+          } catch (adaptiveErr) {
+            console.warn(
+              "Adaptive practice set unavailable, using standard draw:",
+              adaptiveErr,
+            );
+          }
+        }
+
         let url = `/questions?limit=${count}`;
         if (mode === "speed") {
           url += "&round=speed_race";
@@ -168,7 +215,7 @@ export default function ExamModePractice() {
     };
 
     fetchQuestions();
-  }, [passedQuestions, mode, topic, subject, difficulty, count, navigate]);
+  }, [passedQuestions, mode, adaptive, topic, subject, difficulty, count, navigate]);
 
   const currentQuestion = questions[currentIndex];
   const totalQuestions = questions.length;
@@ -552,6 +599,26 @@ export default function ExamModePractice() {
       isNextDisabled={isAnswerSubmitting || (mode !== "speed" && !showFeedback)}
       examType={mode === "speed" ? "speed" : "practice"}
     >
+      {focusAreas.length > 0 && (
+        <div
+          className={cn(
+            "mx-6 mb-4 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm lg:mx-8",
+            isDark
+              ? "border-purple-400/20 bg-purple-400/10 text-purple-200"
+              : "border-purple-200 bg-purple-50 text-purple-800",
+          )}
+        >
+          <Sparkles aria-hidden="true" className="h-4 w-4 shrink-0" />
+          <span>
+            Focusing on:{" "}
+            {focusAreas
+              .map((area) => area.topicName)
+              .filter(Boolean)
+              .join(", ")}
+          </span>
+        </div>
+      )}
+
       <ExamQuestionCard
         questionNumber={currentIndex + 1}
         questionText={currentQuestion.questionText}

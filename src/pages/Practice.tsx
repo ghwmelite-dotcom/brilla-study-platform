@@ -14,6 +14,7 @@ import {
   Loader2,
   AlertTriangle,
   FlaskConical,
+  Sparkles,
 } from 'lucide-react';
 import { Card, Button, Badge, Select } from '@/components/common';
 import { TopicDrill, SpeedRace, Flashcard } from '@/components/practice';
@@ -84,10 +85,19 @@ interface ApiFlashcardDeck {
   cards?: ApiFlashcard[];
 }
 
-type PracticeMode = 'drill' | 'speed' | 'flashcard' | null;
+type PracticeMode = 'drill' | 'speed' | 'flashcard' | 'adaptive' | null;
 
 // Base practice modes available to all
 const basePracticeModes = [
+  {
+    id: 'adaptive',
+    name: 'Adaptive',
+    description: 'Smart practice that targets your weakest topics',
+    icon: Sparkles,
+    color: 'bg-primary',
+    recommended: true,
+    features: ['Prioritizes weak topics', 'Surfaces due revisions', 'Explains each pick'],
+  },
   {
     id: 'drill',
     name: 'Topic Drill',
@@ -446,12 +456,25 @@ export function PracticePage() {
       return;
     }
 
-    // For drill and speed modes, navigate to distraction-free exam mode
-    if (mode === 'drill' || mode === 'speed') {
+    // For drill, speed and adaptive modes, navigate to distraction-free exam mode
+    if (mode === 'drill' || mode === 'speed' || mode === 'adaptive') {
       const params = new URLSearchParams();
-      params.set('mode', mode);
+      params.set('mode', mode === 'adaptive' ? 'drill' : mode);
       if (selectedTopic) params.set('topic', selectedTopic);
-      if (selectedSubject !== 'all') params.set('subject', selectedSubject);
+
+      // Adaptive selection works per subject; without a specific subject we
+      // silently fall back to the normal random draw.
+      let effectiveSubject = selectedSubject;
+      if (mode === 'adaptive' && effectiveSubject === 'all') {
+        const firstOpen = examSubjects.find((subject) => !isSubjectLocked(subject.slug));
+        if (firstOpen) {
+          effectiveSubject = firstOpen.slug;
+        }
+      }
+      if (mode === 'adaptive' && effectiveSubject !== 'all') {
+        params.set('adaptive', '1');
+      }
+      if (effectiveSubject !== 'all') params.set('subject', effectiveSubject);
       if (selectedDifficulty !== 'all') params.set('difficulty', selectedDifficulty);
       params.set('count', questionCount.toString());
       navigate(`/exam/practice?${params.toString()}`);
@@ -702,7 +725,12 @@ export function PracticePage() {
               <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center text-white mb-4', mode.color)}>
                 <mode.icon className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-semibold text-neutral-900 mb-2">{mode.name}</h3>
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="text-lg font-semibold text-neutral-900">{mode.name}</h3>
+                {'recommended' in mode && mode.recommended && (
+                  <Badge variant="primary">Recommended</Badge>
+                )}
+              </div>
               <p className="text-sm text-neutral-500 mb-4">{mode.description}</p>
               <ul className="space-y-1">
                 {mode.features.map((feature, index) => (
