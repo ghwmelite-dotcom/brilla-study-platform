@@ -59,6 +59,7 @@ const ParentDashboardPage = lazyWithRetry(() => import('@/pages/ParentDashboard'
 const ParentSettingsPage = lazyWithRetry(() => import('@/pages/ParentSettings').then(m => ({ default: m.ParentSettingsPage })));
 const ParentReportsPage = lazyWithRetry(() => import('@/pages/ParentReports').then(m => ({ default: m.ParentReportsPage })));
 const ParentNotificationsPage = lazyWithRetry(() => import('@/pages/ParentNotifications').then(m => ({ default: m.ParentNotificationsPage })));
+const SchoolAdminDashboardPage = lazyWithRetry(() => import('@/pages/SchoolAdminDashboard'));
 const VirtualLabPage = lazyWithRetry(() => import('@/components/lab').then(m => ({ default: m.VirtualLabPage })));
 
 // Teacher pages (lazy loaded)
@@ -232,6 +233,11 @@ function HomeRoute() {
   // Redirect parents to parent dashboard
   if (user?.role === 'parent') {
     return <Navigate to="/parent" replace />;
+  }
+
+  // Redirect school admins to the school dashboard
+  if (user?.role === 'school_admin') {
+    return <Navigate to="/school-admin" replace />;
   }
 
   return (
@@ -760,6 +766,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['parent']}>
                 <LazyPage><ParentReportsPage /></LazyPage>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* School admin routes */}
+          <Route
+            path="school-admin"
+            element={
+              <ProtectedRoute allowedRoles={['school_admin']}>
+                <LazyPage><SchoolAdminDashboardPage /></LazyPage>
               </ProtectedRoute>
             }
           />

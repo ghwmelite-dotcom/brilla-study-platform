@@ -267,7 +267,7 @@ export interface SubscriptionTier {
 
 export type UserStatus = 'pending' | 'approved' | 'rejected';
 export type SchoolLevel = 'jss' | 'shs';
-export type UserRole = 'student' | 'teacher' | 'admin' | 'parent';
+export type UserRole = 'student' | 'teacher' | 'admin' | 'parent' | 'school_admin';
 
 export interface User {
   id: string;
@@ -303,7 +303,7 @@ export interface PendingUserData {
   // Common
   email: string;
   name: string;
-  role: 'student' | 'teacher' | 'admin' | 'parent';
+  role: UserRole;
 
   // Student-specific
   schoolLevel?: SchoolLevel;

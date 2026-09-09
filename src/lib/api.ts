@@ -364,7 +364,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'student' | 'teacher' | 'admin';
+  role: 'student' | 'teacher' | 'admin' | 'parent' | 'school_admin';
   status: 'pending' | 'approved' | 'rejected' | 'suspended';
   house?: string;
   yearGroup?: number;
@@ -393,7 +393,7 @@ export interface PendingUser {
   id: string;
   email: string;
   name: string;
-  role: 'student' | 'teacher' | 'admin';
+  role: 'student' | 'teacher' | 'admin' | 'parent' | 'school_admin';
   schoolLevel?: 'jhs' | 'shs';
   yearGroup?: number;
   schoolName?: string;

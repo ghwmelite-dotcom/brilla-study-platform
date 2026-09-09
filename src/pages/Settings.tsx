@@ -34,9 +34,20 @@ import { EXAM_ID_TO_SLUG } from '@/data/examData';
 import { api, fetchWithAuth } from '@/lib/api';
 import { cn } from '@/utils';
 import { Turnstile } from '@/components/common/Turnstile';
+import { ConfirmModal } from '@/components/common/Modal';
 import { useTurnstile } from '@/hooks/useTurnstile';
 
 type SettingsTab = 'profile' | 'school' | 'exams' | 'password' | 'notifications' | 'appearance';
+
+// The student's own active school seat, from GET /api/schools/seat.
+interface MySchoolSeat {
+  schoolId: string;
+  schoolName: string;
+  grantedAt: string;
+  analyticsOptedOut: boolean;
+  analyticsOptedOutAt: string | null;
+  seatExpiresAt: string | null;
+}
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -146,6 +157,13 @@ export default function Settings() {
   const [seatError, setSeatError] = useState<string | null>(null);
   const [seatJoined, setSeatJoined] = useState<{ schoolName: string; seatExpiresAt: string | null } | null>(null);
 
+  // School analytics consent (SHS students can hide analytics from their school).
+  // seatInfo: undefined = not loaded yet, null = no active seat.
+  const [seatInfo, setSeatInfo] = useState<MySchoolSeat | null | undefined>(undefined);
+  const [seatConsentSaving, setSeatConsentSaving] = useState(false);
+  const [seatConsentError, setSeatConsentError] = useState<string | null>(null);
+  const [seatConsentConfirm, setSeatConsentConfirm] = useState<'out' | 'in' | null>(null);
+
   // Appearance preferences - load from localStorage
   const [appearance, setAppearance] = useState(() => {
     const saved = localStorage.getItem('brilla-appearance');
@@ -249,6 +267,26 @@ export default function Settings() {
     }
   };
 
+  // Load the student's own seat state when the school tab opens (SHS only —
+  // the consent endpoints are SHS-gated, and non-SHS students never see the
+  // toggle, so there is no reason to call the API for them).
+  useEffect(() => {
+    if (activeTab === 'school' && user?.schoolLevel === 'shs') {
+      void loadSeatInfo();
+    }
+  }, [activeTab, user?.schoolLevel]);
+
+  const loadSeatInfo = async () => {
+    try {
+      const response = await api.get<MySchoolSeat | null>('/schools/seat');
+      if (response.success) {
+        setSeatInfo(response.data ?? null);
+      }
+    } catch (error) {
+      console.error('Failed to load school seat state:', error);
+    }
+  };
+
   const handleSeatCodeRedeem = async () => {
     const code = seatCode.trim();
     if (!code) {
@@ -273,10 +311,35 @@ export default function Settings() {
         seatExpiresAt: response.data.seatExpiresAt,
       });
       setSeatCode('');
+      // Refresh seat state so the analytics-sharing toggle appears immediately
+      if (user?.schoolLevel === 'shs') {
+        void loadSeatInfo();
+      }
     } catch (error) {
       setSeatError(error instanceof Error ? error.message : 'Failed to redeem seat code');
     } finally {
       setSeatSaving(false);
+    }
+  };
+
+  const handleSeatAnalyticsConsent = async (optOut: boolean) => {
+    setSeatConsentSaving(true);
+    setSeatConsentError(null);
+    try {
+      const response = await api.post<{ analyticsOptedOut: boolean }>(
+        optOut ? '/schools/seat/analytics-opt-out' : '/schools/seat/analytics-opt-in'
+      );
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to update analytics sharing');
+      }
+      setSeatConsentConfirm(null);
+      // Refetch rather than trusting the action response, so the toggle
+      // always reflects server state.
+      await loadSeatInfo();
+    } catch (error) {
+      setSeatConsentError(error instanceof Error ? error.message : 'Failed to update analytics sharing');
+    } finally {
+      setSeatConsentSaving(false);
     }
   };
 
@@ -897,6 +960,103 @@ export default function Settings() {
                       Redeem Code
                     </button>
                   </div>
+
+                  {/* Analytics sharing with the school. SHS students with an
+                      active seat get a stateful toggle driven by GET
+                      /api/schools/seat; non-SHS students never call the API. */}
+                  {user?.schoolLevel !== 'shs' ? (
+                    <div className="pt-6 border-t border-neutral-200">
+                      <h3 className="text-base font-semibold text-neutral-900 mb-1">
+                        Analytics sharing with your school
+                      </h3>
+                      <p className="text-sm text-neutral-500">
+                        Analytics sharing for your account is managed by your school.
+                      </p>
+                    </div>
+                  ) : seatInfo ? (
+                    <div className="pt-6 border-t border-neutral-200 space-y-3">
+                      <div>
+                        <h3 className="text-base font-semibold text-neutral-900 mb-1">
+                          Analytics sharing with your school
+                        </h3>
+                        <p className="text-sm text-neutral-500">
+                          While you hold a seat at <span className="font-medium text-neutral-700">{seatInfo.schoolName}</span>,
+                          the school can view your learning analytics (questions attempted, topic
+                          mastery, streaks). You can turn sharing off at any time and back on later.
+                        </p>
+                      </div>
+
+                      {seatConsentError && (
+                        <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4" />
+                          {seatConsentError}
+                        </div>
+                      )}
+
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={!seatInfo.analyticsOptedOut}
+                          aria-label="Share analytics with your school"
+                          disabled={seatConsentSaving}
+                          onClick={() => setSeatConsentConfirm(seatInfo.analyticsOptedOut ? 'in' : 'out')}
+                          className={cn(
+                            'relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors disabled:opacity-50',
+                            seatInfo.analyticsOptedOut ? 'bg-neutral-300' : 'bg-indigo-600',
+                          )}
+                        >
+                          <span
+                            className={cn(
+                              'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                              seatInfo.analyticsOptedOut ? 'translate-x-1' : 'translate-x-6',
+                            )}
+                          />
+                        </button>
+                        <p className="text-sm text-neutral-700">
+                          {seatConsentSaving ? (
+                            <span className="inline-flex items-center gap-2">
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              Updating…
+                            </span>
+                          ) : seatInfo.analyticsOptedOut ? (
+                            <>
+                              <span className="font-medium">Sharing off</span>
+                              <span className="text-neutral-500">
+                                {seatInfo.analyticsOptedOutAt && (
+                                  <> since {new Date(seatInfo.analyticsOptedOutAt).toLocaleDateString()}</>
+                                )}
+                                {' '}— your school cannot see your analytics.
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="font-medium">Sharing on</span>
+                              <span className="text-neutral-500"> — your school can see your analytics.</span>
+                            </>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  ) : seatInfo === undefined && user?.schoolLevel === 'shs' ? (
+                    <div className="pt-6 border-t border-neutral-200 flex items-center gap-2 text-sm text-neutral-400">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Loading school seat…
+                    </div>
+                  ) : null}
+
+                  <ConfirmModal
+                    isOpen={seatConsentConfirm !== null}
+                    onClose={() => setSeatConsentConfirm(null)}
+                    onConfirm={() => handleSeatAnalyticsConsent(seatConsentConfirm === 'out')}
+                    title={seatConsentConfirm === 'out' ? 'Turn off analytics sharing?' : 'Turn on analytics sharing?'}
+                    message={seatConsentConfirm === 'out'
+                      ? 'Your school will no longer be able to view your learning analytics. You can turn sharing back on at any time from this page.'
+                      : 'Your school will be able to view your learning analytics (questions attempted, topic mastery, streaks) again.'}
+                    confirmText={seatConsentConfirm === 'out' ? 'Turn off' : 'Turn on'}
+                    variant={seatConsentConfirm === 'out' ? 'danger' : 'primary'}
+                    isLoading={seatConsentSaving}
+                  />
                 </div>
               )}
 

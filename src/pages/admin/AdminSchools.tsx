@@ -12,8 +12,10 @@ import {
   UserPlus,
   UserMinus,
   Send,
+  UserCog,
+  MinusCircle,
 } from 'lucide-react';
-import { AdminCard, AdminCardHeader, AdminButton, AdminBadge, AdminInput, AdminTextarea } from '@/components/admin';
+import { AdminCard, AdminCardHeader, AdminButton, AdminBadge, AdminInput, AdminTextarea, AdminConfirmModal } from '@/components/admin';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/utils';
@@ -28,7 +30,34 @@ interface SchoolRow {
   telegramChannelId: string | null;
   telegramChannelName: string | null;
   telegramChannelBroken: boolean;
+  seatCap: number;
+  seatTierId: string | null;
+  seatExpiresAt: string | null;
+  seatCodeUses: number;
   createdAt: string;
+}
+
+interface SchoolAdminRow {
+  userId: string;
+  name: string;
+  email: string;
+  status: string;
+  createdAt: string;
+}
+
+// Package seat counts keyed by tier id — same mapping as
+// SCHOOL_TIER_SEATS in workers/api/school-seats.ts (migration 372).
+const SCHOOL_TIER_SEATS: Record<string, number> = {
+  tier_school_25: 25,
+  tier_school_50: 50,
+  tier_school_100: 100,
+  tier_school_250: 250,
+};
+
+function tierLabel(tierId: string | null): string {
+  if (!tierId) return 'No package';
+  const seats = SCHOOL_TIER_SEATS[tierId];
+  return seats ? `${seats}-seat package` : 'Custom package';
 }
 
 interface BulkResult {
@@ -115,6 +144,30 @@ export default function AdminSchools() {
   const [individualNotice, setIndividualNotice] = useState<string | null>(null);
   const [forceUserId, setForceUserId] = useState<string | null>(null);
 
+  // School admin management (phase 2: /admin/schools/:id/school-admins).
+  // The list shows current school_admins; the search below assigns new ones.
+  const [schoolAdmins, setSchoolAdmins] = useState<SchoolAdminRow[]>([]);
+  const [schoolAdminsLoading, setSchoolAdminsLoading] = useState(false);
+  const [adminSearch, setAdminSearch] = useState('');
+  const [schoolAdminLoading, setSchoolAdminLoading] = useState<string | null>(null);
+  const [schoolAdminError, setSchoolAdminError] = useState<string | null>(null);
+  const [schoolAdminNotice, setSchoolAdminNotice] = useState<string | null>(null);
+  const [demoteTarget, setDemoteTarget] = useState<{ id: string; name: string } | null>(null);
+
+  // Prorated seat reduction (phase 2: /admin/schools/:id/seats/reduce)
+  const [reduceSeatsInput, setReduceSeatsInput] = useState('');
+  const [reduceOpen, setReduceOpen] = useState(false);
+  const [reduceLoading, setReduceLoading] = useState(false);
+  const [reduceError, setReduceError] = useState<string | null>(null);
+  const [reduceResult, setReduceResult] = useState<{
+    seatsRemoved: number;
+    newCap: number;
+    billingCycle: string;
+    remainingDays: number;
+    creditGhs: number;
+    seatCredit: number;
+  } | null>(null);
+
   useEffect(() => {
     loadSchools();
   }, []);
@@ -136,6 +189,18 @@ export default function AdminSchools() {
     [schools, selectedSchoolId]
   );
 
+  const loadSchoolAdmins = async (schoolId: string) => {
+    setSchoolAdminsLoading(true);
+    const res = await api.get<SchoolAdminRow[]>(`/admin/schools/${schoolId}/school-admins`);
+    setSchoolAdminsLoading(false);
+    if (res.success && res.data) {
+      setSchoolAdmins(res.data);
+    } else {
+      setSchoolAdmins([]);
+      setSchoolAdminError(res.error || 'Failed to load school admins');
+    }
+  };
+
   const handleSelectSchool = (schoolId: string) => {
     setSelectedSchoolId(schoolId);
     // Reset per-school action state so stale results never leak across schools
@@ -148,6 +213,16 @@ export default function AdminSchools() {
     setIndividualError(null);
     setIndividualNotice(null);
     setForceUserId(null);
+    setAdminSearch('');
+    setSchoolAdminError(null);
+    setSchoolAdminNotice(null);
+    setDemoteTarget(null);
+    setReduceSeatsInput('');
+    setReduceOpen(false);
+    setReduceError(null);
+    setReduceResult(null);
+    setSchoolAdmins([]);
+    loadSchoolAdmins(schoolId);
     // Prefill the channel form from the school's current row
     const school = schools.find((s) => s.id === schoolId);
     setChannelIdInput(school?.telegramChannelId ?? '');
@@ -312,6 +387,91 @@ export default function AdminSchools() {
       loadSchools();
     } else {
       setIndividualError(res.error || 'Failed to unassign student');
+    }
+  };
+
+  // School admin search: same admin user list as the individual assign card.
+  const adminMatches = useMemo(() => {
+    const q = adminSearch.trim().toLowerCase();
+    if (q.length < 3) return [];
+    return allUsers
+      .filter(
+        (u) =>
+          u.email.toLowerCase().includes(q) &&
+          !u.email.endsWith('@ambassador.brilla')
+      )
+      .slice(0, 8);
+  }, [allUsers, adminSearch]);
+
+  const handleAssignSchoolAdmin = async (userId: string) => {
+    if (!selectedSchool) return;
+    setSchoolAdminLoading(userId);
+    setSchoolAdminError(null);
+    setSchoolAdminNotice(null);
+    const res = await api.post<{
+      schoolId: string;
+      userId: string;
+      role: string;
+      alreadyAssigned?: boolean;
+    }>(`/admin/schools/${selectedSchool.id}/school-admins`, { userId });
+    setSchoolAdminLoading(null);
+    if (res.success && res.data) {
+      setSchoolAdminNotice(
+        res.data.alreadyAssigned
+          ? 'User is already a school admin of this school'
+          : 'School admin assigned — they now have the self-serve school dashboard'
+      );
+      loadSchoolAdmins(selectedSchool.id);
+    } else {
+      setSchoolAdminError(res.error || 'Failed to assign school admin');
+    }
+  };
+
+  const handleDemoteSchoolAdmin = async () => {
+    if (!selectedSchool || !demoteTarget) return;
+    setSchoolAdminLoading(demoteTarget.id);
+    setSchoolAdminError(null);
+    setSchoolAdminNotice(null);
+    const res = await api.delete<{ schoolId: string; userId: string; role: string }>(
+      `/admin/schools/${selectedSchool.id}/school-admins/${demoteTarget.id}`
+    );
+    setSchoolAdminLoading(null);
+    if (res.success && res.data) {
+      setSchoolAdminNotice(`School admin removed — role restored to ${res.data.role}`);
+      setDemoteTarget(null);
+      loadSchoolAdmins(selectedSchool.id);
+    } else {
+      setSchoolAdminError(res.error || 'Failed to remove school admin');
+      setDemoteTarget(null);
+    }
+  };
+
+  const reduceSeatsValue = parseInt(reduceSeatsInput, 10);
+  const reduceSeatsValid = Number.isInteger(reduceSeatsValue) && reduceSeatsValue > 0;
+
+  const handleReduceSeats = async () => {
+    if (!selectedSchool || !reduceSeatsValid) return;
+    setReduceLoading(true);
+    setReduceError(null);
+    setReduceResult(null);
+    const res = await api.post<{
+      schoolId: string;
+      seatsRemoved: number;
+      newCap: number;
+      billingCycle: string;
+      remainingDays: number;
+      creditGhs: number;
+      seatCredit: number;
+    }>(`/admin/schools/${selectedSchool.id}/seats/reduce`, { seats: reduceSeatsValue });
+    setReduceLoading(false);
+    setReduceOpen(false);
+    if (res.success && res.data) {
+      setReduceResult(res.data);
+      setReduceSeatsInput('');
+      // Refresh the school row so the displayed cap reflects the reduction
+      loadSchools();
+    } else {
+      setReduceError(res.error || 'Failed to reduce seats');
     }
   };
 
@@ -752,6 +912,217 @@ export default function AdminSchools() {
               </div>
             )}
           </AdminCard>
+          {/* School admins card (phase 2) */}
+          <AdminCard>
+            <AdminCardHeader
+              title={`School admins — ${selectedSchool.name}`}
+              subtitle="School admins get the self-serve school dashboard (/school-admin) scoped to this school"
+              icon={<UserCog className="w-5 h-5" />}
+            />
+
+            {/* Current school admins (GET /admin/schools/:id/school-admins) */}
+            {schoolAdminsLoading ? (
+              <p className="mb-4 text-sm text-admin-text-muted">Loading school admins…</p>
+            ) : schoolAdmins.length > 0 ? (
+              <div className="mb-4 overflow-x-auto border border-admin-border rounded-lg">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-admin-border">
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Name</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Email</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Since</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-admin-border">
+                    {schoolAdmins.map((a) => (
+                      <tr key={a.userId} className="hover:bg-admin-bg-tertiary/50 transition-colors">
+                        <td className="px-4 py-3 text-sm font-medium text-admin-text">{a.name}</td>
+                        <td className="px-4 py-3 text-sm text-admin-text">{a.email}</td>
+                        <td className="px-4 py-3 text-sm text-admin-text-secondary">
+                          {new Date(a.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="px-4 py-3">
+                          <AdminButton
+                            variant="ghost"
+                            size="sm"
+                            isLoading={schoolAdminLoading === a.userId}
+                            onClick={() => setDemoteTarget({ id: a.userId, name: a.name })}
+                          >
+                            <UserMinus className="w-4 h-4 mr-1" />
+                            Remove
+                          </AdminButton>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="mb-4 text-sm text-admin-text-muted">
+                No school admins yet — search a user below to assign one.
+              </p>
+            )}
+
+            <AdminInput
+              placeholder="Search a user by email…"
+              value={adminSearch}
+              leftIcon={<Search className="w-4 h-4" />}
+              onFocus={() => {
+                if (allUsers.length === 0) loadAllUsers();
+              }}
+              onChange={(e) => {
+                setAdminSearch(e.target.value);
+                setSchoolAdminError(null);
+                setSchoolAdminNotice(null);
+              }}
+            />
+            {schoolAdminNotice && (
+              <p className="mt-3 text-sm text-admin-accent-emerald">{schoolAdminNotice}</p>
+            )}
+            {schoolAdminError && (
+              <p className="mt-3 text-sm text-admin-accent-rose">{schoolAdminError}</p>
+            )}
+            {adminSearch.trim().length >= 3 && (
+              <div className="mt-4 overflow-x-auto border border-admin-border rounded-lg">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-admin-border">
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Name</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Email</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Role</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-admin-border">
+                    {adminMatches.map((u) => (
+                      <tr key={u.id} className="hover:bg-admin-bg-tertiary/50 transition-colors">
+                        <td className="px-4 py-3 text-sm font-medium text-admin-text">{u.name}</td>
+                        <td className="px-4 py-3 text-sm text-admin-text">{u.email}</td>
+                        <td className="px-4 py-3 text-sm text-admin-text capitalize">{u.role.replace('_', ' ')}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <AdminButton
+                              variant="primary"
+                              size="sm"
+                              isLoading={schoolAdminLoading === u.id}
+                              onClick={() => handleAssignSchoolAdmin(u.id)}
+                            >
+                              <UserPlus className="w-4 h-4 mr-1" />
+                              Make school admin
+                            </AdminButton>
+                            <AdminButton
+                              variant="ghost"
+                              size="sm"
+                              isLoading={schoolAdminLoading === u.id}
+                              onClick={() => setDemoteTarget({ id: u.id, name: u.name })}
+                            >
+                              <UserMinus className="w-4 h-4 mr-1" />
+                              Remove
+                            </AdminButton>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {adminMatches.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="px-4 py-8 text-center text-admin-text-muted">
+                          No users match this email
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </AdminCard>
+
+          {/* Reduce seats card (phase 2, prorated credit) */}
+          <AdminCard>
+            <AdminCardHeader
+              title={`Reduce seats — ${selectedSchool.name}`}
+              subtitle="Lower the seat cap mid-cycle; the unused remainder is credited to the school, prorated by remaining days"
+              icon={<MinusCircle className="w-5 h-5" />}
+            />
+            <div className="mb-4 p-4 border border-admin-border rounded-lg flex flex-wrap gap-x-8 gap-y-1 text-sm">
+              <p className="text-admin-text-secondary">
+                Current cap: <span className="font-semibold text-admin-text">{selectedSchool.seatCap} seats</span>
+              </p>
+              <p className="text-admin-text-secondary">
+                Package: <span className="font-semibold text-admin-text">{tierLabel(selectedSchool.seatTierId)}</span>
+              </p>
+              <p className="text-admin-text-secondary">
+                Expires: <span className="font-semibold text-admin-text">
+                  {selectedSchool.seatExpiresAt
+                    ? new Date(selectedSchool.seatExpiresAt).toLocaleDateString()
+                    : '—'}
+                </span>
+              </p>
+              <p className="text-admin-text-secondary">
+                Code redemptions: <span className="font-semibold text-admin-text">{selectedSchool.seatCodeUses}</span>
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 items-start">
+              <div className="flex-1">
+                <AdminInput
+                  type="number"
+                  min={1}
+                  placeholder="Seats to remove, e.g. 10"
+                  value={reduceSeatsInput}
+                  hint="Fails when active seats would exceed the new cap — revoke seats first"
+                  onChange={(e) => {
+                    setReduceSeatsInput(e.target.value);
+                    setReduceError(null);
+                  }}
+                />
+              </div>
+              <AdminButton
+                variant="danger"
+                leftIcon={<MinusCircle className="w-4 h-4" />}
+                disabled={!reduceSeatsValid}
+                onClick={() => setReduceOpen(true)}
+              >
+                Reduce seats
+              </AdminButton>
+            </div>
+            {reduceError && (
+              <p className="mt-3 text-sm text-admin-accent-rose">{reduceError}</p>
+            )}
+            {reduceResult && (
+              <div className="mt-4 p-4 border border-admin-border rounded-lg">
+                <p className="text-sm text-admin-accent-emerald">
+                  Removed {reduceResult.seatsRemoved} seat{reduceResult.seatsRemoved === 1 ? '' : 's'} — new cap is {reduceResult.newCap}.
+                </p>
+                <p className="mt-1 text-sm text-admin-text-secondary">
+                  Prorated credit: <span className="font-semibold text-admin-text">GHS {reduceResult.creditGhs.toLocaleString()}</span>
+                  {' '}({reduceResult.billingCycle} cycle, {reduceResult.remainingDays} days remaining).
+                  Total seat credit: GHS {reduceResult.seatCredit.toLocaleString()}.
+                </p>
+              </div>
+            )}
+          </AdminCard>
+
+          <AdminConfirmModal
+            isOpen={demoteTarget !== null}
+            onClose={() => setDemoteTarget(null)}
+            onConfirm={handleDemoteSchoolAdmin}
+            title="Remove school admin?"
+            message={`Remove ${demoteTarget?.name ?? 'this user'} as a school admin of ${selectedSchool.name}? Their role is restored (teacher when they have a teacher profile, otherwise student) and the school link is cleared.`}
+            confirmText="Remove school admin"
+            variant="danger"
+            isLoading={schoolAdminLoading === demoteTarget?.id}
+          />
+
+          <AdminConfirmModal
+            isOpen={reduceOpen}
+            onClose={() => setReduceOpen(false)}
+            onConfirm={handleReduceSeats}
+            title="Reduce seat cap?"
+            message={`Reduce the seat cap of ${selectedSchool.name} by ${reduceSeatsValid ? reduceSeatsValue : 0} seat(s)? The reduction fails when active seats would exceed the new cap — revoke seats first. The unused remainder becomes prorated seat credit.`}
+            confirmText="Reduce seats"
+            variant="danger"
+            isLoading={reduceLoading}
+          />
         </>
       )}
     </div>

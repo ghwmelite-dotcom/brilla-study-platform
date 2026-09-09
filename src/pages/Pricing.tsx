@@ -7,8 +7,9 @@ import type { SubscriptionPlan } from '@/types';
 
 type BillingCycle = 'monthly' | 'yearly';
 
-// School seat packages (spec pricing table, migration 372). Phase 1 is
-// admin-operated, so these are display-only — no self-serve checkout.
+// School seat packages (spec pricing table, migration 372). Purchases and
+// first-time setup stay admin-led; school admins manage renewals from
+// /school-admin (phase 2), everyone else gets the contact CTA.
 const SCHOOL_PACKAGES = [
   { seats: 25, perSeat: 35, monthly: 875, yearly: 8750 },
   { seats: 50, perSeat: 30, monthly: 1500, yearly: 15000 },
@@ -305,10 +306,10 @@ export default function Pricing() {
             })}
         </div>
 
-        {/* Schools & Institutions — seat packages (admin-operated in Phase 1;
-            purchases are recorded by Brilla admins, so cards show pricing with
-            a contact CTA instead of self-serve checkout). Prices mirror the
-            tier_school_* rows from migration 372. */}
+        {/* Schools & Institutions — seat packages (first purchase is
+            admin-operated; school admins get a link to the self-serve
+            /school-admin dashboard instead of the contact CTA). Prices mirror
+            the tier_school_* rows from migration 372. */}
         <div className="mt-12">
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 text-primary font-semibold mb-2">
@@ -352,12 +353,21 @@ export default function Pricing() {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href={`mailto:admissions@brillaprep.org?subject=School%20package%20(${pkg.seats}%20seats)`}
-                  className="w-full py-2.5 px-4 rounded-xl border border-neutral-300 text-neutral-700 font-medium hover:bg-neutral-50 transition-colors text-center"
-                >
-                  Enquire
-                </a>
+                {user?.role === 'school_admin' ? (
+                  <button
+                    onClick={() => navigate('/school-admin')}
+                    className="w-full py-2.5 px-4 rounded-xl bg-primary text-white font-medium hover:bg-primary-dark transition-colors text-center"
+                  >
+                    Manage your school package →
+                  </button>
+                ) : (
+                  <a
+                    href={`mailto:admissions@brillaprep.org?subject=School%20package%20(${pkg.seats}%20seats)`}
+                    className="w-full py-2.5 px-4 rounded-xl border border-neutral-300 text-neutral-700 font-medium hover:bg-neutral-50 transition-colors text-center"
+                  >
+                    Enquire
+                  </a>
+                )}
               </div>
             ))}
           </div>

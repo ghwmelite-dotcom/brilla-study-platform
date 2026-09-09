@@ -226,6 +226,7 @@ export function EditUserModal({ isOpen, user, onClose, onSuccess }: EditUserModa
       teacher: { icon: BookOpen, color: 'bg-green-100 text-green-700', label: 'Teacher' },
       admin: { icon: Shield, color: 'bg-purple-100 text-purple-700', label: 'Administrator' },
       parent: { icon: Users, color: 'bg-amber-100 text-amber-700', label: 'Parent' },
+      school_admin: { icon: School, color: 'bg-cyan-100 text-cyan-700', label: 'School Admin' },
     };
     const badge = badges[user.role];
     const Icon = badge.icon;
