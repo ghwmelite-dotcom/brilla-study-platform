@@ -41,12 +41,12 @@ const subjects = [
     subjectId: 'subj_nsmq_math',
     source: nsmqSource('Secondary Education Curriculum — Core Mathematics'),
     topics: [
-      ['NSMQ-MATH-ALG', 'topic_algebra', 'Algebra', 'Manipulate symbols, solve equations and work with algebraic expressions.'],
-      ['NSMQ-MATH-QUAD', 'topic_quadratic', 'Quadratic Equations', 'Solve and analyse quadratic equations and their roots.'],
-      ['NSMQ-MATH-GEO', 'topic_geometry', 'Geometry', 'Apply properties of shapes, angles and solids to measurements.'],
-      ['NSMQ-MATH-TRIG', 'topic_trigonometry', 'Trigonometry', 'Use trigonometric ratios and identities for triangles and angles.'],
-      ['NSMQ-MATH-STAT', 'topic_statistics', 'Statistics & Probability', 'Analyse data and compute probabilities of events.'],
-      ['NSMQ-MATH-CALC', 'topic_calculus', 'Calculus', 'Differentiate and integrate elementary functions.'],
+      ['NSMQ-MATH-ALG', 'topic_nsmq_math_algebra', 'Algebra', 'Manipulate symbols, solve equations and work with algebraic expressions.'],
+      ['NSMQ-MATH-QUAD', 'topic_nsmq_math_quadratic', 'Quadratic Equations', 'Solve and analyse quadratic equations and their roots.'],
+      ['NSMQ-MATH-GEO', 'topic_nsmq_math_geometry', 'Geometry', 'Apply properties of shapes, angles and solids to measurements.'],
+      ['NSMQ-MATH-TRIG', 'topic_nsmq_math_trigonometry', 'Trigonometry', 'Use trigonometric ratios and identities for triangles and angles.'],
+      ['NSMQ-MATH-STAT', 'topic_nsmq_math_statistics', 'Statistics & Probability', 'Analyse data and compute probabilities of events.'],
+      ['NSMQ-MATH-CALC', 'topic_nsmq_math_calculus', 'Calculus', 'Differentiate and integrate elementary functions.'],
     ],
     pod: [
       pod('NSMQ-MATH-ALG', 'medium', 'Solve for x: 2(x − 3) + 4 = 3x − 7', 'x = 5',
@@ -86,12 +86,12 @@ const subjects = [
     subjectId: 'subj_nsmq_physics',
     source: nsmqSource('Secondary Education Curriculum — Physics'),
     topics: [
-      ['NSMQ-PHYS-MECH', 'topic_mechanics', 'Mechanics', 'Apply the laws of motion, forces and energy to physical systems.'],
-      ['NSMQ-PHYS-KIN', 'topic_kinematics', 'Kinematics', 'Describe motion using displacement, velocity, acceleration and time.'],
-      ['NSMQ-PHYS-ELEC', 'topic_electricity', 'Electricity & Magnetism', 'Analyse circuits, fields and electromagnetic interactions.'],
-      ['NSMQ-PHYS-WAVES', 'topic_waves', 'Waves & Optics', 'Relate wave speed, frequency, wavelength and light behaviour.'],
-      ['NSMQ-PHYS-THERMO', 'topic_thermodynamics', 'Thermodynamics', 'Quantify heat, work, temperature and energy transfer.'],
-      ['NSMQ-PHYS-MOD', 'topic_modern_physics', 'Modern Physics', 'Apply quantum and nuclear concepts to radiation and matter.'],
+      ['NSMQ-PHYS-MECH', 'topic_nsmq_phys_mechanics', 'Mechanics', 'Apply the laws of motion, forces and energy to physical systems.'],
+      ['NSMQ-PHYS-KIN', 'topic_nsmq_phys_kinematics', 'Kinematics', 'Describe motion using displacement, velocity, acceleration and time.'],
+      ['NSMQ-PHYS-ELEC', 'topic_nsmq_phys_electricity', 'Electricity & Magnetism', 'Analyse circuits, fields and electromagnetic interactions.'],
+      ['NSMQ-PHYS-WAVES', 'topic_nsmq_phys_waves', 'Waves & Optics', 'Relate wave speed, frequency, wavelength and light behaviour.'],
+      ['NSMQ-PHYS-THERMO', 'topic_nsmq_phys_thermodynamics', 'Thermodynamics', 'Quantify heat, work, temperature and energy transfer.'],
+      ['NSMQ-PHYS-MOD', 'topic_nsmq_phys_modern_physics', 'Modern Physics', 'Apply quantum and nuclear concepts to radiation and matter.'],
     ],
     pod: [
       pod('NSMQ-PHYS-KIN', 'medium', 'A car starts from rest and accelerates uniformly at 4 m/s² for 5 s. How far does it travel?', '50 m',
@@ -131,12 +131,12 @@ const subjects = [
     subjectId: 'subj_nsmq_chemistry',
     source: nsmqSource('Secondary Education Curriculum — Chemistry'),
     topics: [
-      ['NSMQ-CHEM-ATOM', 'topic_atomic', 'Atomic Structure', 'Describe subatomic particles and electron arrangements in atoms.'],
-      ['NSMQ-CHEM-BOND', 'topic_bonding', 'Chemical Bonding', 'Explain how ionic, covalent and metallic bonds form compounds.'],
-      ['NSMQ-CHEM-STOICH', 'topic_stoichiometry', 'Stoichiometry', 'Calculate reacting quantities using moles and balanced equations.'],
-      ['NSMQ-CHEM-EQUIL', 'topic_equilibrium', 'Chemical Equilibrium', 'Apply equilibrium expressions and Le Chatelier’s principle.'],
-      ['NSMQ-CHEM-ORG', 'topic_organic', 'Organic Chemistry', 'Name and classify carbon compounds and their reactions.'],
-      ['NSMQ-CHEM-ELEC', 'topic_electrochemistry', 'Electrochemistry', 'Relate electric charge to chemical change in cells and electrolysis.'],
+      ['NSMQ-CHEM-ATOM', 'topic_nsmq_chem_atomic', 'Atomic Structure', 'Describe subatomic particles and electron arrangements in atoms.'],
+      ['NSMQ-CHEM-BOND', 'topic_nsmq_chem_bonding', 'Chemical Bonding', 'Explain how ionic, covalent and metallic bonds form compounds.'],
+      ['NSMQ-CHEM-STOICH', 'topic_nsmq_chem_stoichiometry', 'Stoichiometry', 'Calculate reacting quantities using moles and balanced equations.'],
+      ['NSMQ-CHEM-EQUIL', 'topic_nsmq_chem_equilibrium', 'Chemical Equilibrium', 'Apply equilibrium expressions and Le Chatelier’s principle.'],
+      ['NSMQ-CHEM-ORG', 'topic_nsmq_chem_organic', 'Organic Chemistry', 'Name and classify carbon compounds and their reactions.'],
+      ['NSMQ-CHEM-ELEC', 'topic_nsmq_chem_electrochemistry', 'Electrochemistry', 'Relate electric charge to chemical change in cells and electrolysis.'],
     ],
     pod: [
       pod('NSMQ-CHEM-STOICH', 'medium', 'Calculate the number of moles in 20.0 g of sodium hydroxide, NaOH. (Na = 23, O = 16, H = 1)', '0.5 mol',
@@ -176,11 +176,11 @@ const subjects = [
     subjectId: 'subj_nsmq_biology',
     source: nsmqSource('Secondary Education Curriculum — Biology'),
     topics: [
-      ['NSMQ-BIO-CELL', 'topic_cells', 'Cell Biology', 'Explain cell structure, organelles and transport across membranes.'],
-      ['NSMQ-BIO-GEN', 'topic_genetics', 'Genetics', 'Apply Mendelian and molecular principles of heredity.'],
-      ['NSMQ-BIO-ECO', 'topic_ecology', 'Ecology', 'Analyse energy flow and relationships within ecosystems.'],
-      ['NSMQ-BIO-PHYS', 'topic_physiology', 'Human Physiology', 'Explain how human organ systems function and are regulated.'],
-      ['NSMQ-BIO-BIOCHEM', 'topic_biochemistry', 'Biochemistry', 'Relate enzymes, respiration and molecular processes in cells.'],
+      ['NSMQ-BIO-CELL', 'topic_nsmq_bio_cells', 'Cell Biology', 'Explain cell structure, organelles and transport across membranes.'],
+      ['NSMQ-BIO-GEN', 'topic_nsmq_bio_genetics', 'Genetics', 'Apply Mendelian and molecular principles of heredity.'],
+      ['NSMQ-BIO-ECO', 'topic_nsmq_bio_ecology', 'Ecology', 'Analyse energy flow and relationships within ecosystems.'],
+      ['NSMQ-BIO-PHYS', 'topic_nsmq_bio_physiology', 'Human Physiology', 'Explain how human organ systems function and are regulated.'],
+      ['NSMQ-BIO-BIOCHEM', 'topic_nsmq_bio_biochemistry', 'Biochemistry', 'Relate enzymes, respiration and molecular processes in cells.'],
     ],
     pod: [
       pod('NSMQ-BIO-GEN', 'hard', 'In a population in Hardy-Weinberg equilibrium, 9% of individuals show a recessive phenotype. What percentage of the population are heterozygous carriers?', '42%',
@@ -215,6 +215,47 @@ const subjects = [
     ],
   },
 ];
+
+// Prod-canonical NSMQ topic rows. Prod was remediated to per-subject topic ids
+// (see scripts/nsmq-topic-identity-resolver.cjs and migrations 267-270/278-280);
+// schema.sql/seed.sql still carry the legacy seed-style rows, so the foundation
+// migration INSERT OR IGNOREs these copies (content copied from the seed rows)
+// for fresh baselines and scratch tests. On prod every id already exists, so
+// the inserts no-op. This is also the allowlist of prod-verified topic ids.
+// [id, subjectId, parentId, name, slug, description, theoryContent, keyFormulas, displayOrder]
+const canonicalTopicRows = [
+  ['topic_nsmq_math_algebra', 'subj_nsmq_math', null, 'Algebra', 'algebra', 'Fundamental algebraic concepts and operations', 'Algebra is the branch of mathematics dealing with symbols and the rules for manipulating those symbols. It includes solving equations, working with polynomials, and understanding functions.', '["ax + b = c → x = (c-b)/a", "(a+b)² = a² + 2ab + b²", "(a-b)² = a² - 2ab + b²", "a² - b² = (a+b)(a-b)"]', 1],
+  ['topic_nsmq_math_calculus', 'subj_nsmq_math', null, 'Calculus', 'calculus', 'Study of rates of change and accumulation', 'Calculus is the mathematical study of continuous change. It has two major branches: differential calculus and integral calculus.', '["d/dx(xⁿ) = nxⁿ⁻¹", "∫xⁿdx = xⁿ⁺¹/(n+1) + C", "d/dx(sin x) = cos x", "d/dx(eˣ) = eˣ"]', 4],
+  ['topic_nsmq_math_geometry', 'subj_nsmq_math', null, 'Geometry', 'geometry', 'Study of shapes, sizes, and properties of space', 'Geometry deals with the properties, measurement, and relationships of points, lines, angles, surfaces, and solids.', '["Area of circle = πr²", "Circumference = 2πr", "Area of triangle = ½bh", "Pythagorean theorem: a² + b² = c²"]', 2],
+  ['topic_nsmq_math_statistics', 'subj_nsmq_math', null, 'Statistics & Probability', 'statistics-probability', 'Analysis of data and chance', 'Statistics involves collecting, analyzing, and interpreting data. Probability measures the likelihood of events occurring.', '["Mean = Σx/n", "Variance = Σ(x-μ)²/n", "P(A∪B) = P(A) + P(B) - P(A∩B)", "P(A|B) = P(A∩B)/P(B)"]', 5],
+  ['topic_nsmq_math_trigonometry', 'subj_nsmq_math', null, 'Trigonometry', 'trigonometry', 'Study of triangles and trigonometric functions', 'Trigonometry studies relationships between side lengths and angles of triangles. The main functions are sine, cosine, and tangent.', '["sin²θ + cos²θ = 1", "tan θ = sin θ / cos θ", "sin 2θ = 2 sin θ cos θ", "cos 2θ = cos²θ - sin²θ"]', 3],
+  ['topic_nsmq_math_quadratic', 'subj_nsmq_math', 'topic_nsmq_math_algebra', 'Quadratic Equations', 'quadratic-equations', 'Solving and graphing quadratic equations', 'A quadratic equation has the standard form ax² + bx + c = 0. Solutions can be found using factoring, completing the square, or the quadratic formula.', '["x = (-b ± √(b²-4ac)) / 2a", "Sum of roots = -b/a", "Product of roots = c/a", "Discriminant Δ = b² - 4ac"]', 1],
+  ['topic_nsmq_phys_electricity', 'subj_nsmq_physics', null, 'Electricity & Magnetism', 'electricity-magnetism', 'Study of electric charges and magnetic fields', 'This branch covers electric charges, electric fields, magnetic fields, and electromagnetic interactions.', '["V = IR (Ohm\'s Law)", "P = IV = I²R", "F = qE", "F = BIL"]', 2],
+  ['topic_nsmq_phys_mechanics', 'subj_nsmq_physics', null, 'Mechanics', 'mechanics', 'Study of motion and forces', 'Mechanics is the branch of physics dealing with motion and the forces that produce motion. It includes kinematics, dynamics, and statics.', '["v = u + at", "s = ut + ½at²", "v² = u² + 2as", "F = ma"]', 1],
+  ['topic_nsmq_phys_kinematics', 'subj_nsmq_physics', 'topic_nsmq_phys_mechanics', 'Kinematics', 'kinematics', 'Description of motion without considering forces', 'Kinematics describes motion using concepts of displacement, velocity, and acceleration without reference to the forces causing the motion.', '["Average velocity = Δs/Δt", "Instantaneous velocity = ds/dt", "Acceleration = dv/dt", "Range = u²sin2θ/g"]', 1],
+  ['topic_nsmq_phys_modern_physics', 'subj_nsmq_physics', null, 'Modern Physics', 'modern-physics', 'Quantum mechanics and relativity', 'Modern physics covers theories developed in the 20th century including quantum mechanics, special relativity, and atomic physics.', '["E = mc²", "E = hf", "λ = h/mv", "ΔxΔp ≥ ℏ/2"]', 5],
+  ['topic_nsmq_phys_thermodynamics', 'subj_nsmq_physics', null, 'Thermodynamics', 'thermodynamics', 'Study of heat and energy transfer', 'Thermodynamics studies the relationships between heat, work, temperature, and energy in physical systems.', '["Q = mcΔT", "PV = nRT", "W = PΔV", "Efficiency = W/Q_in"]', 4],
+  ['topic_nsmq_phys_waves', 'subj_nsmq_physics', null, 'Waves & Optics', 'waves-optics', 'Study of wave motion and light', 'Waves transfer energy without transferring matter. Optics is the study of light behavior including reflection, refraction, and diffraction.', '["v = fλ", "n = c/v", "n₁sinθ₁ = n₂sinθ₂ (Snell\'s Law)", "1/f = 1/u + 1/v"]', 3],
+  ['topic_nsmq_chem_atomic', 'subj_nsmq_chemistry', null, 'Atomic Structure', 'atomic-structure', 'Structure of atoms and electron configuration', 'Atoms consist of protons, neutrons, and electrons. Understanding electron configuration is key to predicting chemical behavior.', '["Mass number A = Z + N", "E = -13.6/n² eV (hydrogen)", "λ = h/mv (de Broglie)"]', 1],
+  ['topic_nsmq_chem_bonding', 'subj_nsmq_chemistry', null, 'Chemical Bonding', 'chemical-bonding', 'How atoms combine to form compounds', 'Chemical bonds form when atoms share or transfer electrons. Main types include ionic, covalent, and metallic bonds.', '["Bond order = (bonding e⁻ - antibonding e⁻)/2", "Electronegativity difference determines bond type"]', 2],
+  ['topic_nsmq_chem_stoichiometry', 'subj_nsmq_chemistry', null, 'Stoichiometry', 'stoichiometry', 'Quantitative relationships in chemical reactions', 'Stoichiometry involves calculating the quantities of reactants and products in chemical reactions using balanced equations.', '["n = m/M", "Molarity M = n/V", "PV = nRT", "% yield = (actual/theoretical) × 100"]', 3],
+  ['topic_nsmq_chem_equilibrium', 'subj_nsmq_chemistry', null, 'Chemical Equilibrium', 'chemical-equilibrium', 'Balance in reversible reactions', 'Chemical equilibrium occurs when the rates of forward and reverse reactions are equal. Le Chatelier\'s principle predicts equilibrium shifts.', '["Kc = [products]/[reactants]", "Kp = Kc(RT)^Δn", "ΔG = -RT ln K"]', 4],
+  ['topic_nsmq_chem_organic', 'subj_nsmq_chemistry', null, 'Organic Chemistry', 'organic-chemistry', 'Chemistry of carbon compounds', 'Organic chemistry studies carbon-containing compounds. It covers nomenclature, reactions, and properties of organic molecules.', '["CₙH₂ₙ₊₂ (alkanes)", "CₙH₂ₙ (alkenes)", "CₙH₂ₙ₋₂ (alkynes)"]', 5],
+  ['topic_nsmq_chem_electrochemistry', 'subj_nsmq_chemistry', null, 'Electrochemistry', 'electrochemistry', 'Chemical reactions involving electricity', 'Electrochemistry studies the relationship between electrical energy and chemical changes, including batteries and electrolysis.', '["E°cell = E°cathode - E°anode", "ΔG = -nFE°", "Faraday\'s laws"]', 6],
+  ['topic_nsmq_bio_cells', 'subj_nsmq_biology', null, 'Cell Biology', 'cell-biology', 'Structure and function of cells', 'The cell is the basic unit of life. Understanding cell structure and organelle functions is fundamental to biology.', '["Cell theory", "Prokaryotic vs Eukaryotic", "Organelle functions"]', 1],
+  ['topic_nsmq_bio_genetics', 'subj_nsmq_biology', null, 'Genetics', 'genetics', 'Study of heredity and variation', 'Genetics studies how traits are passed from parents to offspring through genes and DNA.', '["Mendel\'s laws", "Punnett squares", "DNA structure: A-T, G-C"]', 2],
+  ['topic_nsmq_bio_ecology', 'subj_nsmq_biology', null, 'Ecology', 'ecology', 'Study of organisms and their environment', 'Ecology examines the relationships between organisms and their environment, including ecosystems and biodiversity.', '["Food chains/webs", "Energy flow (10% rule)", "Population dynamics"]', 3],
+  ['topic_nsmq_bio_physiology', 'subj_nsmq_biology', null, 'Human Physiology', 'human-physiology', 'Functions of the human body', 'Human physiology studies how the body\'s organ systems work together to maintain life and health.', '["Homeostasis", "Nervous system", "Circulatory system", "Respiratory system"]', 4],
+  ['topic_nsmq_bio_biochemistry', 'subj_nsmq_biology', null, 'Biochemistry', 'biochemistry', 'Chemical processes in living organisms', 'Biochemistry explores the chemical reactions that occur within living cells, including metabolism and enzyme function.', '["ATP → ADP + P + energy", "Photosynthesis: 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂", "Cellular respiration"]', 5],
+];
+
+for (const subject of subjects) {
+  for (const [code, id] of subject.topics) {
+    const row = canonicalTopicRows.find(([topicId]) => topicId === id);
+    if (!row) throw new Error(`${code}: topic id ${id} is not a prod-verified canonical NSMQ topic`);
+    if (row[1] !== subject.subjectId) throw new Error(`${code}: topic id ${id} belongs to ${row[1]}, not ${subject.subjectId}`);
+  }
+}
 
 const riddles = [
   riddle('riddle_011', 'subj_nsmq_math', 'Prime number', [
@@ -545,9 +586,12 @@ let migrationNumber = 387;
 {
   const name = `${migrationNumber}_nsmq_expansion_beta_foundation.sql`;
   const allTopicIds = subjects.flatMap((subject) => subject.topics.map(([, id]) => id));
+  const orderedTopicRows = [...canonicalTopicRows].sort((a, b) => (a[2] == null ? 0 : 1) - (b[2] == null ? 0 : 1));
   const lines = [
     `-- ${migrationNumber}: Foundation guard for NSMQ question bank expansion beta batch 001.`,
     '-- Original BrillaPrep practice content; not official NSMQ (Primetime) material.',
+    '-- Also seeds the prod-canonical per-subject NSMQ topic rows (copied from the legacy',
+    '-- seed-style rows) for fresh baselines; INSERT OR IGNORE no-ops on prod where they exist.',
     'PRAGMA foreign_keys = ON;',
     `CREATE TABLE IF NOT EXISTS question_content_releases (
     question_id TEXT PRIMARY KEY REFERENCES questions(id) ON DELETE CASCADE,
@@ -561,9 +605,16 @@ let migrationNumber = 387;
     released_at TEXT NOT NULL DEFAULT (datetime('now'))
   );`,
     'CREATE INDEX IF NOT EXISTS idx_question_content_releases_batch ON question_content_releases(batch_id);',
+    ...orderedTopicRows.map(([id, subjectId, parentId, topicName, , description, theoryContent, keyFormulas, displayOrder]) =>
+      // The slug is derived from the canonical id (e.g. 'nsmq-math-algebra') rather than
+      // copied from the seed row: the legacy seed-style topics still own the human slugs
+      // ('algebra', 'mechanics', ...) on fresh baselines and topics is UNIQUE(subject_id,
+      // slug). On prod these rows already exist, so INSERT OR IGNORE no-ops and the slug
+      // below never lands there.
+      `INSERT OR IGNORE INTO topics (id, subject_id, parent_id, name, slug, description, theory_content, key_formulas, display_order, created_at) VALUES (${sql(id)}, ${sql(subjectId)}, ${sql(parentId)}, ${sql(topicName)}, ${sql(id.slice(6).replaceAll('_', '-'))}, ${sql(description)}, ${sql(theoryContent)}, ${sql(keyFormulas)}, ${displayOrder}, '2026-08-04T00:00:00.000Z');`),
     `CREATE TABLE IF NOT EXISTS _migration_${migrationNumber}_guard (valid INTEGER NOT NULL CHECK (valid = 1));`,
     `DELETE FROM _migration_${migrationNumber}_guard;`,
-    `INSERT INTO _migration_${migrationNumber}_guard(valid) SELECT CASE WHEN EXISTS (SELECT 1 FROM exam_types WHERE id = 'exam_nsmq') AND (SELECT COUNT(*) FROM subjects WHERE id IN ('subj_nsmq_math', 'subj_nsmq_physics', 'subj_nsmq_chemistry', 'subj_nsmq_biology') AND exam_type_id = 'exam_nsmq') = 4 AND (SELECT COUNT(*) FROM topics WHERE id IN (${allTopicIds.map(sql).join(', ')})) = ${allTopicIds.length} THEN 1 ELSE 0 END;`,
+    `INSERT INTO _migration_${migrationNumber}_guard(valid) SELECT CASE WHEN EXISTS (SELECT 1 FROM exam_types WHERE id = 'exam_nsmq') AND (SELECT COUNT(*) FROM subjects WHERE id IN ('subj_nsmq_math', 'subj_nsmq_physics', 'subj_nsmq_chemistry', 'subj_nsmq_biology') AND exam_type_id = 'exam_nsmq') = 4 AND (SELECT COUNT(*) FROM topics t JOIN subjects s ON s.id = t.subject_id WHERE t.id IN (${allTopicIds.map(sql).join(', ')}) AND s.exam_type_id = 'exam_nsmq') = ${allTopicIds.length} THEN 1 ELSE 0 END;`,
     `DROP TABLE _migration_${migrationNumber}_guard;`,
   ];
   await emitMigration(name, lines);

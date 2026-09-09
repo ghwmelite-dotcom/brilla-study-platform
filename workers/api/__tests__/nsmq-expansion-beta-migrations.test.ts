@@ -80,8 +80,10 @@ function createFixture() {
     CREATE TABLE topics (
       id TEXT PRIMARY KEY,
       subject_id TEXT NOT NULL REFERENCES subjects(id),
+      parent_id TEXT REFERENCES topics(id),
       name TEXT NOT NULL, slug TEXT NOT NULL,
-      description TEXT, display_order INTEGER
+      description TEXT, theory_content TEXT, key_formulas TEXT,
+      display_order INTEGER, created_at TEXT DEFAULT (datetime('now'))
     );
     CREATE TABLE questions (
       id TEXT PRIMARY KEY, topic_id TEXT REFERENCES topics(id),
@@ -187,11 +189,15 @@ describe('NSMQ question bank expansion automated-beta migrations', () => {
       { roundType: 'speed_race', questionType: 'direct_answer', count: 16 },
     ]);
     expect(db.prepare(`
+      SELECT COUNT(*) AS count FROM topics WHERE id LIKE 'topic_nsmq_%'
+    `).get()).toEqual({ count: 23 });
+    expect(db.prepare(`
       SELECT COUNT(*) AS count
       FROM questions q
       JOIN topics t ON t.id = q.topic_id
       JOIN question_content_releases qcr ON qcr.question_id = q.id
       WHERE q.id LIKE 'q_nsmq_%_b001_%'
+        AND q.topic_id LIKE 'topic_nsmq_%'
         AND q.subject_id = t.subject_id
         AND q.subject_id LIKE 'subj_nsmq_%'
         AND q.exam_type_id = 'exam_nsmq'
@@ -275,7 +281,7 @@ describe('NSMQ question bank expansion automated-beta migrations', () => {
     db.exec(migrations[0]);
     db.prepare(`
       INSERT INTO questions (id, topic_id, subject_id, exam_type_id, question_text, question_type, correct_answer, difficulty)
-      VALUES ('q_nsmq_math_pod_b001_001', 'topic_algebra', 'subj_nsmq_math', 'exam_nsmq',
+      VALUES ('q_nsmq_math_pod_b001_001', 'topic_nsmq_math_algebra', 'subj_nsmq_math', 'exam_nsmq',
         'Corrupted content under a reserved stable ID', 'problem', 'fixture', 'easy')
     `).run();
     expect(() => db.exec(migrations[1])).toThrow();
