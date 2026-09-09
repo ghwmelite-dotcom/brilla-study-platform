@@ -43,7 +43,7 @@ describe('landing stats text', () => {
   });
 
   it('falls back to the static strings when the fetch fails', () => {
-    expect(heroStatsText(null)).toEqual({ questions: '4,000+', subjects: '50+' });
-    expect(communityStatsText(null)).toEqual({ students: '10K+', studyGroups: '500+', chatRooms: '50+' });
+    expect(heroStatsText(null)).toEqual({ questions: '4,000+', subjects: '60+' });
+    expect(communityStatsText(null)).toEqual({ students: 'Growing', studyGroups: 'Open', chatRooms: 'Open' });
   });
 });

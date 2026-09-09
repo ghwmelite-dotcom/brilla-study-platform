@@ -398,7 +398,7 @@ export const examConfigs: Record<GhanaExamTypeSlug | 'igcse' | 'cambridge-a-leve
     features: [
       {
         icon: BookOpen,
-        title: '50+ Subjects',
+        title: '40+ Subjects',
         description: 'Core subjects, Science, Business, Arts, Technical and Languages',
       },
       {
@@ -480,7 +480,7 @@ export const examConfigs: Record<GhanaExamTypeSlug | 'igcse' | 'cambridge-a-leve
         {
           id: 'subjects',
           label: 'All Subjects',
-          description: '50+ subjects',
+          description: '40+ subjects',
           icon: BookOpen,
           link: '/topics',
           color: 'text-blue-600',

@@ -25,20 +25,21 @@ export function formatStatCount(value: number, step: number): string {
 export function heroStatsText(stats: PublicStats | null): { questions: string; subjects: string } {
   return {
     questions: stats ? formatStatCount(stats.questions, 100) : '4,000+',
-    subjects: stats ? formatStatCount(stats.subjectsWithQuestions, 10) : '50+',
+    subjects: stats ? formatStatCount(stats.subjectsWithQuestions, 10) : '60+',
   };
 }
 
-// Community stats row: real student/group/room counts, static fallbacks.
+// Community stats row: real student/group/room counts. On fetch failure fall
+// back to non-numeric words rather than invented counts.
 export function communityStatsText(stats: PublicStats | null): {
   students: string;
   studyGroups: string;
   chatRooms: string;
 } {
   return {
-    students: stats ? formatStatCount(stats.students, 100) : '10K+',
-    studyGroups: stats ? formatStatCount(stats.studyGroups, 10) : '500+',
-    chatRooms: stats ? formatStatCount(stats.chatRooms, 10) : '50+',
+    students: stats ? formatStatCount(stats.students, 100) : 'Growing',
+    studyGroups: stats ? formatStatCount(stats.studyGroups, 10) : 'Open',
+    chatRooms: stats ? formatStatCount(stats.chatRooms, 10) : 'Open',
   };
 }
 

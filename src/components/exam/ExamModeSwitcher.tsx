@@ -224,7 +224,7 @@ export function ExamModeSwitcher() {
           <div className="px-3 py-2 mt-1 border-t border-neutral-100">
             <p className="text-xs text-neutral-500">
               {currentExamType === 'nsmq' && 'Competition prep for SHS students'}
-              {currentExamType === 'wassce' && '50+ subjects for SHS final exams'}
+              {currentExamType === 'wassce' && '40+ subjects for SHS final exams'}
               {currentExamType === 'bece' && 'JHS exam preparation'}
               {currentExamType === 'igcse' && 'Cambridge O-Level international curriculum'}
               {currentExamType === 'cambridge-a-level' && 'Cambridge A-Level pre-university'}

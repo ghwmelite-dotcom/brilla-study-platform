@@ -22,7 +22,7 @@ export function ReferralLink({ variant = 'full', showShareButtons = true }: Refe
   const referralLink = profile?.referralLink || '';
   const referralCode = profile?.referralCode || '';
 
-  const shareText = `Join me on Brilla - Ghana's #1 study platform for BECE, WASSCE & NSMQ prep! Get premium features free for 14 days. Use my link: ${referralLink}`;
+  const shareText = `Join me on Brilla - the study platform built for Ghanaian BECE, WASSCE & NSMQ prep! Get premium features free for 14 days. Use my link: ${referralLink}`;
 
   const shareLinks = {
     whatsapp: `https://wa.me/?text=${encodeURIComponent(shareText)}`,

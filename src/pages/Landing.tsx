@@ -18,7 +18,6 @@ import {
   Sparkles,
   ChevronRight,
   ChevronLeft,
-  Quote,
   Menu,
   X,
   Download,
@@ -625,7 +624,7 @@ function PromoPopup({ onOpenAuth }: { onOpenAuth: (mode: 'login' | 'register') =
               <div className="bg-gradient-to-br from-purple-500/10 to-cyan-500/10 border border-purple-500/20 rounded-xl p-2.5 sm:p-3 relative">
                 <div className="absolute -top-2 left-1/2 -translate-x-1/2">
                   <span className="px-1.5 sm:px-2 py-0.5 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full text-white text-[8px] sm:text-[10px] font-bold">
-                    7 DAYS FREE
+                    14 DAYS FREE
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3 mt-1">
@@ -652,7 +651,7 @@ function PromoPopup({ onOpenAuth }: { onOpenAuth: (mode: 'login' | 'register') =
                 className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-xl font-semibold text-white text-sm sm:text-base hover:shadow-lg hover:shadow-purple-500/30 transition-all flex items-center justify-center gap-2 group"
               >
                 <Rocket className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-0.5 transition-transform" />
-                Start 7-Day Premium Trial
+                Start 14-Day Premium Trial
                 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </button>
               <button
@@ -759,7 +758,7 @@ function PWAInstallBanner() {
 const stats = [
   { text: '4,000+', label: 'Practice Questions', icon: BookOpen },
   { text: '5 Exams', label: 'NSMQ, WASSCE, BECE, IGCSE, A-Level', icon: Target },
-  { text: '50+', label: 'Subjects Covered', icon: TrendingUp },
+  { text: '60+', label: 'Subjects Covered', icon: TrendingUp },
   { text: 'AI-Powered', label: 'Learning & Tutoring', icon: Brain },
 ];
 
@@ -778,11 +777,11 @@ const examModes = [
     id: 'wassce',
     name: 'WASSCE',
     fullName: 'West African Senior School Certificate',
-    description: '50+ subjects with comprehensive past papers and AI-powered essay grading',
+    description: '40+ subjects with comprehensive past papers and AI-powered essay grading',
     icon: GraduationCap,
     color: 'from-blue-500 via-indigo-500 to-purple-500',
     bgImage: 'radial-gradient(circle at 70% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%)',
-    features: ['Past Papers (2015-2024)', 'AI Essay Grading', 'Theory & Objectives', 'Marking Schemes'],
+    features: ['Past Papers (2023-2024)', 'AI Essay Grading', 'Theory & Objectives', 'Marking Schemes'],
   },
   {
     id: 'bece',
@@ -824,7 +823,7 @@ const features = [
   {
     icon: Target,
     title: 'Smart Practice',
-    description: 'Adaptive questions that evolve with your skill level for maximum learning.',
+    description: 'Mastery tracking with smart recommendations for maximum learning.',
     gradient: 'from-indigo-500 to-purple-500',
   },
   {
@@ -876,7 +875,7 @@ const platformCapabilities = [
     category: 'Competition & Games',
     items: [
       { name: 'NSMQ Simulation', description: 'All 5 rounds recreated' },
-      { name: '1v1 & 3v3 Battles', description: 'Real-time solo & team fights' },
+      { name: '1v1 & 3v3 Battles', description: 'Solo & team fights with live score updates' },
       { name: 'House Cup', description: 'Compete for your school house' },
       { name: 'Leaderboards', description: 'National & school rankings' },
     ],
@@ -924,7 +923,7 @@ const audienceTabs = [
       { icon: Library, text: 'Upload and share materials in the E-Library' },
       { icon: Wallet, text: 'Earn 85% of fees tutoring on the marketplace' },
       { icon: BarChart3, text: 'Class analytics and performance insights' },
-      { icon: Presentation, text: 'School dashboard for your whole department' },
+      { icon: Presentation, text: 'Class dashboard' },
     ],
   },
   {
@@ -945,30 +944,6 @@ const audienceTabs = [
   },
 ] as const;
 
-const testimonials = [
-  {
-    quote: "Brilla Prep completely transformed how I prepare for NSMQ. The speed rounds are incredibly effective!",
-    author: "Kwame Asante",
-    role: "SHS 3, Presec Legon",
-    avatar: "K",
-    rating: 5,
-  },
-  {
-    quote: "The AI essay grading gave me instant feedback that helped me improve my WASSCE writing skills.",
-    author: "Abena Mensah",
-    role: "SHS 2, Wesley Girls",
-    avatar: "A",
-    rating: 5,
-  },
-  {
-    quote: "Our school's NSMQ team uses Brilla Prep daily. It's become essential to our training regimen.",
-    author: "Mr. Samuel Osei",
-    role: "Science Teacher, Mfantsipim",
-    avatar: "S",
-    rating: 5,
-  },
-];
-
 // ============================================
 // MAIN COMPONENT
 // ============================================
@@ -983,7 +958,6 @@ export function LandingPage() {
   const statsRef = useInView(0.3);
   const modesRef = useInView(0.2);
   const featuresRef = useInView(0.2);
-  const testimonialsRef = useInView(0.2);
   const ctaRef = useInView(0.3);
 
   // Real platform counts (GET /api/public/stats); static strings remain as
@@ -1317,7 +1291,7 @@ export function LandingPage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-5 py-2.5 glass rounded-full mb-8 animate-pulse-glow">
             <Sparkles className="w-4 h-4 text-secondary" />
-            <span className="text-sm text-white/90 font-medium">Ghana's #1 Exam Prep Platform</span>
+            <span className="text-sm text-white/90 font-medium">Built for Ghanaian students</span>
             <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
           </div>
 
@@ -1375,7 +1349,7 @@ export function LandingPage() {
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-green-400" />
-              <span>Trusted by Schools</span>
+              <span>14-Day Free Trial</span>
             </div>
           </div>
         </div>
@@ -1928,7 +1902,7 @@ export function LandingPage() {
                   {
                     icon: UsersRound,
                     title: 'AI Study Rooms',
-                    desc: 'Invite friends to study together with a shared AI tutor. Real-time collaboration with multiplayer whiteboards',
+                    desc: 'Invite friends to study together with a shared AI tutor. Multiplayer whiteboards for group work',
                     color: 'from-emerald-500 to-green-500',
                     badge: 'NEW'
                   },
@@ -1990,7 +1964,7 @@ export function LandingPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {[
                 { value: '4', label: 'Learning Modes', icon: Sparkles, color: 'text-violet-400' },
-                { value: '∞', label: 'Voice Conversations', icon: Mic, color: 'text-cyan-400' },
+                { value: 'Unlimited', label: 'Voice on Premium', icon: Mic, color: 'text-cyan-400' },
                 { value: '100%', label: 'Immersive Focus', icon: Focus, color: 'text-fuchsia-400' },
                 { value: '24/7', label: 'Always Available', icon: Zap, color: 'text-amber-400' },
               ].map((stat, i) => (
@@ -2119,7 +2093,7 @@ export function LandingPage() {
               </span>
             </h2>
             <p className="text-sm sm:text-base lg:text-xl text-white/60 max-w-3xl mx-auto">
-              Challenge friends to 1v1 duels or form teams for epic 3v3 school battles. Real-time competition with live leaderboards.
+              Challenge friends to 1v1 duels or form teams for epic 3v3 school battles. Live score updates with leaderboards.
             </p>
           </div>
 
@@ -2141,7 +2115,7 @@ export function LandingPage() {
                   </div>
 
                   <p className="text-white/70 text-sm sm:text-base mb-6 leading-relaxed">
-                    Challenge any student to a real-time quiz battle. Answer faster and more accurately to claim victory and climb the rankings.
+                    Challenge any student to a quiz battle. Answer faster and more accurately to claim victory and climb the rankings.
                   </p>
 
                   {/* Battle Preview */}
@@ -2265,7 +2239,7 @@ export function LandingPage() {
                     </div>
                     <div className="flex items-center gap-2 text-white/70 text-sm">
                       <GraduationCap className="w-4 h-4 text-rose-400 flex-shrink-0" />
-                      <span>School rankings</span>
+                      <span>Weekly races</span>
                     </div>
                     <div className="flex items-center gap-2 text-white/70 text-sm">
                       <MessageCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
@@ -2273,7 +2247,7 @@ export function LandingPage() {
                     </div>
                     <div className="flex items-center gap-2 text-white/70 text-sm">
                       <Trophy className="w-4 h-4 text-rose-400 flex-shrink-0" />
-                      <span>Seasonal leagues</span>
+                      <span>House rankings</span>
                     </div>
                   </div>
                 </div>
@@ -2285,8 +2259,8 @@ export function LandingPage() {
           <div className="glass rounded-2xl p-6 sm:p-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
               <div className="text-center">
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent mb-1">Real-time</div>
-                <div className="text-white/60 text-xs sm:text-sm">Live Battles</div>
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent mb-1">Live Score</div>
+                <div className="text-white/60 text-xs sm:text-sm">Updates</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-rose-400 to-pink-400 bg-clip-text text-transparent mb-1">3v3</div>
@@ -2364,14 +2338,14 @@ export function LandingPage() {
                       </div>
                     </div>
                     <div className="hidden sm:flex flex-col items-end">
-                      <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">160</span>
+                      <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">225</span>
                       <span className="text-white/50 text-xs sm:text-sm">Questions</span>
                     </div>
                   </div>
 
                   {/* Description */}
                   <p className="text-white/70 text-sm sm:text-base mb-6 leading-relaxed">
-                    Explore our growing Cambridge IGCSE practice banks with live availability shown for each subject. Designed for students aged 14-16 preparing for international qualifications.
+                    Explore our growing Cambridge IGCSE practice banks across each core subject. Designed for students aged 14-16 preparing for international qualifications.
                   </p>
 
                   {/* Subjects Grid */}
@@ -2382,7 +2356,7 @@ export function LandingPage() {
                       </div>
                       <div>
                         <p className="text-white font-semibold text-sm sm:text-base">Physics</p>
-                        <p className="text-white/50 text-xs">40 Questions</p>
+                        <p className="text-white/50 text-xs">Question Bank</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all">
@@ -2391,7 +2365,7 @@ export function LandingPage() {
                       </div>
                       <div>
                         <p className="text-white font-semibold text-sm sm:text-base">Chemistry</p>
-                        <p className="text-white/50 text-xs">40 Questions</p>
+                        <p className="text-white/50 text-xs">Question Bank</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-rose-500/30 hover:bg-rose-500/5 transition-all">
@@ -2400,7 +2374,7 @@ export function LandingPage() {
                       </div>
                       <div>
                         <p className="text-white font-semibold text-sm sm:text-base">Biology</p>
-                        <p className="text-white/50 text-xs">40 Questions</p>
+                        <p className="text-white/50 text-xs">Question Bank</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all">
@@ -2409,7 +2383,7 @@ export function LandingPage() {
                       </div>
                       <div>
                         <p className="text-white font-semibold text-sm sm:text-base">Mathematics</p>
-                        <p className="text-white/50 text-xs">40 Questions</p>
+                        <p className="text-white/50 text-xs">Question Bank</p>
                       </div>
                     </div>
                   </div>
@@ -2471,7 +2445,7 @@ export function LandingPage() {
                       </div>
                     </div>
                     <div className="hidden sm:flex flex-col items-end">
-                      <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">160</span>
+                      <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">270</span>
                       <span className="text-white/50 text-xs sm:text-sm">Questions</span>
                     </div>
                   </div>
@@ -2489,7 +2463,7 @@ export function LandingPage() {
                       </div>
                       <div>
                         <p className="text-white font-semibold text-sm sm:text-base">Physics</p>
-                        <p className="text-white/50 text-xs">40 Questions</p>
+                        <p className="text-white/50 text-xs">Question Bank</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-pink-500/30 hover:bg-pink-500/5 transition-all">
@@ -2498,7 +2472,7 @@ export function LandingPage() {
                       </div>
                       <div>
                         <p className="text-white font-semibold text-sm sm:text-base">Chemistry</p>
-                        <p className="text-white/50 text-xs">40 Questions</p>
+                        <p className="text-white/50 text-xs">Question Bank</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-rose-500/30 hover:bg-rose-500/5 transition-all">
@@ -2507,7 +2481,7 @@ export function LandingPage() {
                       </div>
                       <div>
                         <p className="text-white font-semibold text-sm sm:text-base">Biology</p>
-                        <p className="text-white/50 text-xs">40 Questions</p>
+                        <p className="text-white/50 text-xs">Question Bank</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-orange-500/30 hover:bg-orange-500/5 transition-all">
@@ -2516,7 +2490,7 @@ export function LandingPage() {
                       </div>
                       <div>
                         <p className="text-white font-semibold text-sm sm:text-base">Mathematics</p>
-                        <p className="text-white/50 text-xs">40 Questions</p>
+                        <p className="text-white/50 text-xs">Question Bank</p>
                       </div>
                     </div>
                   </div>
@@ -2551,7 +2525,7 @@ export function LandingPage() {
           <div className="glass rounded-2xl p-6 sm:p-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
               <div className="text-center">
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-1">320</div>
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-1">495</div>
                 <div className="text-white/60 text-xs sm:text-sm">Total Questions</div>
               </div>
               <div className="text-center">
@@ -2559,8 +2533,8 @@ export function LandingPage() {
                 <div className="text-white/60 text-xs sm:text-sm">Subject Areas</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent mb-1">100%</div>
-                <div className="text-white/60 text-xs sm:text-sm">Cambridge Aligned</div>
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent mb-1">Cambridge</div>
+                <div className="text-white/60 text-xs sm:text-sm">Aligned Content</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent mb-1">24/7</div>
@@ -2721,8 +2695,8 @@ export function LandingPage() {
               },
               {
                 icon: Target,
-                title: 'Score Prediction',
-                desc: 'AI-powered grade prediction based on your performance',
+                title: 'Grade Estimate',
+                desc: 'Grade estimate based on your accuracy',
                 color: 'from-amber-500 to-orange-500'
               }
             ].map((feature, i) => (
@@ -2751,7 +2725,7 @@ export function LandingPage() {
                   </div>
                 </div>
                 <h4 className="text-white font-semibold mb-1">Overall Score</h4>
-                <p className="text-white/50 text-sm">Grade: B2 (Predicted)</p>
+                <p className="text-white/50 text-sm">Grade: B2 (Estimated)</p>
               </div>
               <div className="text-center">
                 <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border-4 border-blue-500/30 flex items-center justify-center">
@@ -3111,14 +3085,10 @@ export function LandingPage() {
               </div>
 
               {/* Stats Row */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="glass rounded-xl p-4 text-center">
-                  <span className="text-2xl sm:text-3xl font-bold text-amber-400">500+</span>
-                  <p className="text-white/50 text-xs sm:text-sm mt-1">Pre-made Cards</p>
-                </div>
-                <div className="glass rounded-xl p-4 text-center">
-                  <span className="text-2xl sm:text-3xl font-bold text-blue-400">95%</span>
-                  <p className="text-white/50 text-xs sm:text-sm mt-1">Retention Rate</p>
+                  <span className="text-2xl sm:text-3xl font-bold text-amber-400">Pre-made</span>
+                  <p className="text-white/50 text-xs sm:text-sm mt-1">Decks for core subjects</p>
                 </div>
                 <div className="glass rounded-xl p-4 text-center">
                   <span className="text-2xl sm:text-3xl font-bold text-purple-400">∞</span>
@@ -3259,7 +3229,7 @@ export function LandingPage() {
                       {/* Predicted Score Card */}
                       <div className="glass rounded-xl p-4 border border-teal-500/20">
                         <div className="flex items-center justify-between mb-3">
-                          <span className="text-white/70 text-sm">Predicted WASSCE Grade</span>
+                          <span className="text-white/70 text-sm">Estimated WASSCE Grade</span>
                           <Target className="w-4 h-4 text-teal-400" />
                         </div>
                         <div className="flex items-end gap-2">
@@ -3272,7 +3242,7 @@ export function LandingPage() {
                         <div className="mt-3 h-2 bg-white/10 rounded-full overflow-hidden">
                           <div className="h-full w-[72%] bg-gradient-to-r from-teal-500 to-cyan-400 rounded-full" />
                         </div>
-                        <p className="text-white/50 text-xs mt-2">72% confidence based on 234 questions</p>
+                        <p className="text-white/50 text-xs mt-2">Grade estimate based on your accuracy</p>
                       </div>
 
                       {/* Study Streak */}
@@ -3413,8 +3383,8 @@ export function LandingPage() {
               },
               {
                 icon: Target,
-                title: 'Score Prediction',
-                desc: 'AI-powered grade predictions based on your performance',
+                title: 'Grade Estimate',
+                desc: 'Grade estimate based on your accuracy',
                 color: 'from-purple-500 to-pink-500'
               },
               {
@@ -3479,7 +3449,7 @@ export function LandingPage() {
                 </div>
                 <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Video Calls</h3>
                 <p className="text-white/60 text-sm sm:text-base">
-                  Face-to-face sessions with screen sharing for interactive learning
+                  Video sessions via Zoom/Meet link for interactive learning
                 </p>
               </div>
             </Card3D>
@@ -3701,7 +3671,7 @@ export function LandingPage() {
                     </div>
                     <div>
                       <h3 className="text-xl sm:text-2xl font-bold text-white">Chat Rooms</h3>
-                      <p className="text-white/50 text-sm sm:text-base">Real-time Discussion</p>
+                      <p className="text-white/50 text-sm sm:text-base">Subject Discussions</p>
                     </div>
                   </div>
 
@@ -3748,7 +3718,7 @@ export function LandingPage() {
 
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div className="p-2 rounded-lg bg-white/5">
-                      <span className="text-pink-400 font-bold text-lg">50+</span>
+                      <span className="text-pink-400 font-bold text-lg">{communityCounts.chatRooms}</span>
                       <p className="text-white/50 text-xs">Chat Rooms</p>
                     </div>
                     <div className="p-2 rounded-lg bg-white/5">
@@ -3756,8 +3726,8 @@ export function LandingPage() {
                       <p className="text-white/50 text-xs">Private Chat</p>
                     </div>
                     <div className="p-2 rounded-lg bg-white/5">
-                      <span className="text-pink-400 font-bold text-lg">24/7</span>
-                      <p className="text-white/50 text-xs">Moderated</p>
+                      <span className="text-pink-400 font-bold text-lg">Safe</span>
+                      <p className="text-white/50 text-xs">Moderated community</p>
                     </div>
                   </div>
                 </div>
@@ -3785,66 +3755,6 @@ export function LandingPage() {
                 <div className="text-white/60 text-xs sm:text-sm">Moderated community</div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section
-        ref={testimonialsRef.ref}
-        className="relative py-16 sm:py-24 lg:py-32 overflow-hidden"
-      >
-        <div className="absolute inset-0 bg-slate-950" />
-
-        <div className="relative max-w-7xl mx-auto px-4">
-          <div className={cn(
-            'text-center mb-10 sm:mb-16 lg:mb-20',
-            testimonialsRef.inView ? 'animate-slide-up' : 'opacity-0'
-          )}>
-            <span className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 glass rounded-full text-xs sm:text-sm font-medium text-white/80 mb-4 sm:mb-6">
-              <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-secondary" />
-              Student Stories
-            </span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 sm:mb-6">
-              Loved by{' '}
-              <span className="text-gradient">Students</span>
-            </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-white/60 max-w-2xl mx-auto">
-              Join thousands of students who've transformed their exam preparation.
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={testimonial.author}
-                className={cn(
-                  'relative glass rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 hover:bg-white/10 transition-all duration-300',
-                  testimonialsRef.inView ? 'animate-slide-up' : 'opacity-0'
-                )}
-                style={{ animationDelay: `${index * 0.15}s` }}
-              >
-                {/* Stars */}
-                <div className="flex gap-0.5 sm:gap-1 mb-4 sm:mb-6">
-                  {Array.from({ length: testimonial.rating }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 text-secondary fill-secondary" />
-                  ))}
-                </div>
-
-                <Quote className="w-8 h-8 sm:w-10 sm:h-10 text-white/10 mb-3 sm:mb-4" />
-                <p className="text-white/80 text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 leading-relaxed">"{testimonial.quote}"</p>
-
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm sm:text-lg flex-shrink-0">
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-white text-sm sm:text-base">{testimonial.author}</p>
-                    <p className="text-xs sm:text-sm text-white/50">{testimonial.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -3940,7 +3850,7 @@ export function LandingPage() {
                   {/* Center content */}
                   <div className="absolute inset-6 sm:inset-8 rounded-full bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 backdrop-blur-xl flex flex-col items-center justify-center">
                     <div className="text-5xl sm:text-6xl md:text-7xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                      7
+                      {TRIAL_CONFIG.days}
                     </div>
                     <div className="text-base sm:text-lg md:text-xl text-white/80 font-medium">Days Free</div>
                     <div className="text-xs sm:text-sm text-white/50 mt-0.5 sm:mt-1">Full Access</div>
@@ -4158,8 +4068,7 @@ export function LandingPage() {
 
                   <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-500/10 to-teal-500/10 border border-cyan-500/20">
                     <p className="text-center">
-                      <span className="text-2xl sm:text-3xl font-bold text-cyan-400">GHS 50-200</span>
-                      <span className="text-white/60 text-sm sm:text-base"> /hour typical</span>
+                      <span className="text-2xl sm:text-3xl font-bold text-cyan-400">Set your own rates</span>
                     </p>
                   </div>
                 </div>
@@ -4211,7 +4120,7 @@ export function LandingPage() {
                       <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
                         <Users className="w-4 h-4 text-blue-400" />
                       </div>
-                      <span className="text-sm sm:text-base">5+ active students to qualify</span>
+                      <span className="text-sm sm:text-base">5+ active students to qualify (min. 3 active months)</span>
                     </div>
                     <div className="flex items-center gap-3 text-white/80">
                       <div className="w-8 h-8 rounded-lg bg-rose-500/20 flex items-center justify-center flex-shrink-0">

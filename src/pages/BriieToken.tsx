@@ -300,7 +300,7 @@ export default function BriieTokenPage() {
             </h1>
 
             <p className="text-xl md:text-2xl text-neutral-600 mb-4 font-display">
-              The utility token that powers Ghana's #1 exam prep platform
+              The utility token that powers Ghana's exam prep platform built for students
             </p>
 
             <p className="text-lg text-neutral-500 mb-10 max-w-2xl mx-auto">
@@ -722,7 +722,7 @@ export default function BriieTokenPage() {
                 </span>
               </Link>
               <p className="text-neutral-400 text-sm max-w-sm">
-                Ghana's #1 AI-powered exam preparation platform. Now powered by {TICKER} on Solana.
+                Ghana's exam preparation platform built for students. Now powered by {TICKER} on Solana.
               </p>
             </div>
             <div>
