@@ -936,7 +936,7 @@ const audienceTabs = [
     cta: 'Create Parent Account',
     features: [
       { icon: TrendingUp, text: 'Real-time progress monitoring dashboard' },
-      { icon: FileText, text: 'Weekly performance reports in your inbox' },
+      { icon: FileText, text: 'Weekly progress updates on Telegram' },
       { icon: Clock, text: 'Study time and streak insights' },
       { icon: Target, text: 'Predicted grades ahead of exam season' },
       { icon: MessageCircle, text: 'Notifications on milestones and activity' },
