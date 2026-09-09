@@ -1,0 +1,2280 @@
+{
+  "batchId": "alevel-bio-sprint1-001",
+  "status": "approved_for_beta",
+  "examTypeId": "cambridge_a2",
+  "provenance": [
+    {
+      "publisher": "Cambridge International Education",
+      "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+      "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T00:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge International AS & A Level Biology (9700) syllabus; not official Cambridge International or WAEC examination material. Use the enabled feedback channel to report corrections.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_alevel_biology",
+      "specificationCode": "BRILLA-9700-ALBIO-S1-001",
+      "sources": [
+        {
+          "publisher": "Cambridge International Education",
+          "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+          "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "9700-CELLS",
+          "title": "Cells and Biological Molecules",
+          "objective": "Apply knowledge of cell ultrastructure and the chemistry of carbohydrates, lipids, proteins and nucleic acids."
+        },
+        {
+          "code": "9700-MEMB",
+          "title": "Membranes and Transport",
+          "objective": "Explain membrane structure and the mechanisms that move substances into and out of cells."
+        },
+        {
+          "code": "9700-METAB",
+          "title": "Metabolism: Respiration and Photosynthesis",
+          "objective": "Analyse the stages of aerobic and anaerobic respiration and of photosynthesis, including ATP synthesis."
+        },
+        {
+          "code": "9700-GEN",
+          "title": "Genetics, Inheritance and Evolution",
+          "objective": "Apply Mendelian and molecular genetics, including monohybrid crosses and Hardy-Weinberg calculations."
+        },
+        {
+          "code": "9700-HOME",
+          "title": "Control and Homeostasis",
+          "objective": "Explain negative feedback control of blood glucose and water potential, including hormonal mechanisms."
+        },
+        {
+          "code": "9700-BIODIV",
+          "title": "Biodiversity and Conservation",
+          "objective": "Classify organisms, measure biodiversity quantitatively and evaluate conservation strategies."
+        },
+        {
+          "code": "9700-BIOTECH",
+          "title": "Biotechnology and Gene Technology",
+          "objective": "Explain the tools of gene technology — restriction enzymes, PCR and vectors — and their applications."
+        },
+        {
+          "code": "9700-IMM",
+          "title": "Immunity",
+          "objective": "Explain the specific immune response, the types of immunity and the basis of vaccination."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_albio_cells_s1_001",
+          "original": true,
+          "topicCode": "9700-CELLS",
+          "type": "multiple_choice",
+          "prompt": "Which level of protein structure refers to the sequence of amino acids in a polypeptide chain?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Primary structure",
+              "rationale": "This is the supported answer. The primary structure is the linear sequence of amino acids joined by peptide bonds. Secondary structure is local folding into alpha-helices and beta-pleated sheets held by hydrogen bonds, tertiary structure is the overall three-dimensional fold of one chain, and quaternary structure requires more than one polypeptide subunit."
+            },
+            {
+              "label": "B",
+              "text": "Secondary structure",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Tertiary structure",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Quaternary structure",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The primary structure is the linear sequence of amino acids joined by peptide bonds. Secondary structure is local folding into alpha-helices and beta-pleated sheets held by hydrogen bonds, tertiary structure is the overall three-dimensional fold of one chain, and quaternary structure requires more than one polypeptide subunit. Therefore the correct answer is A: Primary structure.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_cells_s1_002",
+          "original": true,
+          "topicCode": "9700-CELLS",
+          "type": "multiple_choice",
+          "prompt": "Which organelle is the site of protein synthesis (translation) in a eukaryotic cell?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Lysosome",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Ribosome",
+              "rationale": "This is the supported answer. Ribosomes bind messenger RNA and assemble amino acids into polypeptides during translation. Lysosomes contain hydrolytic enzymes for digestion, the Golgi apparatus modifies and packages proteins, and the smooth endoplasmic reticulum synthesises lipids rather than proteins."
+            },
+            {
+              "label": "C",
+              "text": "Golgi apparatus",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Smooth endoplasmic reticulum",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Ribosomes bind messenger RNA and assemble amino acids into polypeptides during translation. Lysosomes contain hydrolytic enzymes for digestion, the Golgi apparatus modifies and packages proteins, and the smooth endoplasmic reticulum synthesises lipids rather than proteins. Therefore the correct answer is B: Ribosome.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_cells_s1_003",
+          "original": true,
+          "topicCode": "9700-CELLS",
+          "type": "multiple_choice",
+          "prompt": "A plant cell is placed in pure water. Which statement describes what happens?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Water leaves by osmosis and the cell becomes flaccid",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Water enters by active transport and the cell bursts",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Water enters by osmosis and the cell becomes turgid but does not burst",
+              "rationale": "This is the supported answer. Pure water has a higher (less negative) water potential than the cell sap, so water moves into the cell by osmosis across the partially permeable membrane. The inelastic cellulose cell wall resists expansion and builds up pressure potential, so the cell becomes turgid rather than bursting."
+            },
+            {
+              "label": "D",
+              "text": "There is no net movement of water in either direction",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Pure water has a higher (less negative) water potential than the cell sap, so water moves into the cell by osmosis across the partially permeable membrane. The inelastic cellulose cell wall resists expansion and builds up pressure potential, so the cell becomes turgid rather than bursting. Therefore the correct answer is C: Water enters by osmosis and the cell becomes turgid but does not burst.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_cells_s1_004",
+          "original": true,
+          "topicCode": "9700-CELLS",
+          "type": "multiple_choice",
+          "prompt": "Which reagent and result confirm the presence of a reducing sugar in a food sample?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Biuret reagent, giving a purple colour",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Iodine solution, giving a blue-black colour",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Ethanol followed by water, giving a milky emulsion",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Benedict's reagent, heated, giving a brick-red precipitate",
+              "rationale": "This is the supported answer. Reducing sugars reduce the blue copper(II) sulfate in Benedict's reagent to brick-red copper(I) oxide when heated. Biuret reagent detects peptide bonds in protein, iodine detects starch, and the ethanol emulsion test detects lipids."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Reducing sugars reduce the blue copper(II) sulfate in Benedict's reagent to brick-red copper(I) oxide when heated. Biuret reagent detects peptide bonds in protein, iodine detects starch, and the ethanol emulsion test detects lipids. Therefore the correct answer is D: Benedict's reagent, heated, giving a brick-red precipitate.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_cells_s1_005",
+          "original": true,
+          "topicCode": "9700-CELLS",
+          "type": "multiple_choice",
+          "prompt": "In a sample of double-stranded DNA, 22% of the bases are adenine. What percentage of the bases are cytosine?",
+          "options": [
+            {
+              "label": "A",
+              "text": "28%",
+              "rationale": "This is the supported answer. By Chargaff's base-pairing rules A = T, so thymine is also 22% and A + T together make 44%. The remaining 56% is shared equally between guanine and cytosine because G = C, so cytosine is 28%."
+            },
+            {
+              "label": "B",
+              "text": "22%",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "44%",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "56%",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "By Chargaff's base-pairing rules A = T, so thymine is also 22% and A + T together make 44%. The remaining 56% is shared equally between guanine and cytosine because G = C, so cytosine is 28%. Therefore the correct answer is A: 28%.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_cells_s1_006",
+          "original": true,
+          "topicCode": "9700-CELLS",
+          "type": "structured",
+          "prompt": "A student investigates the biochemical composition of food samples and how amino acids are joined together.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Describe how the student would test a sample for the presence of lipid, including the expected positive result.",
+              "marks": 2,
+              "correctAnswer": "Shake the sample with ethanol to dissolve any lipid, then pour the ethanol into water. A cloudy (milky-white) emulsion is a positive result, because the lipid comes out of solution as tiny droplets when diluted."
+            },
+            {
+              "label": "b",
+              "text": "State the procedure and positive result for testing a sample for a non-reducing sugar.",
+              "marks": 2,
+              "correctAnswer": "Boil the sample with dilute hydrochloric acid to hydrolyse the disaccharide, neutralise it, then heat with Benedict's reagent; a brick-red (orange-red) precipitate is the positive result."
+            },
+            {
+              "label": "c",
+              "text": "Explain why the formation of a peptide bond between two amino acids is described as a condensation reaction.",
+              "marks": 2,
+              "correctAnswer": "The carboxyl group of one amino acid reacts with the amino group of the other and a molecule of water is released as the peptide bond forms; reactions that join two molecules with the loss of water are called condensation reactions."
+            }
+          ],
+          "correctAnswer": "(a) Shake the sample with ethanol to dissolve any lipid, then pour the ethanol into water. A cloudy (milky-white) emulsion is a positive result, because the lipid comes out of solution as tiny droplets when diluted. (b) Boil the sample with dilute hydrochloric acid to hydrolyse the disaccharide, neutralise it, then heat with Benedict's reagent; a brick-red (orange-red) precipitate is the positive result. (c) The carboxyl group of one amino acid reacts with the amino group of the other and a molecule of water is released as the peptide bond forms; reactions that join two molecules with the loss of water are called condensation reactions.",
+          "workedSolution": "(a) Shake the sample with ethanol to dissolve any lipid, then pour the ethanol into water. A cloudy (milky-white) emulsion is a positive result, because the lipid comes out of solution as tiny droplets when diluted. (b) Boil the sample with dilute hydrochloric acid to hydrolyse the disaccharide, neutralise it, then heat with Benedict's reagent; a brick-red (orange-red) precipitate is the positive result. (c) The carboxyl group of one amino acid reacts with the amino group of the other and a molecule of water is released as the peptide bond forms; reactions that join two molecules with the loss of water are called condensation reactions.",
+          "difficulty": "medium",
+          "marks": 6,
+          "points": 6,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned A-Level Biology practice content; not official WAEC or Cambridge International examination material.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_membranes_s1_001",
+          "original": true,
+          "topicCode": "9700-MEMB",
+          "type": "multiple_choice",
+          "prompt": "In the fluid mosaic model of the cell surface membrane, what does the word 'mosaic' describe?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Phospholipids arranged in a single layer",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Protein molecules scattered within the phospholipid bilayer",
+              "rationale": "This is the supported answer. The mosaic is the patchwork of intrinsic and extrinsic proteins embedded in, or attached to, the fluid phospholipid bilayer. Phospholipids form a bilayer rather than a single layer, cholesterol modulates fluidity rather than forming a frame, and carbohydrate chains occur only on some proteins and lipids."
+            },
+            {
+              "label": "C",
+              "text": "Cholesterol molecules forming a rigid frame",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Carbohydrate chains covering the entire outer surface",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The mosaic is the patchwork of intrinsic and extrinsic proteins embedded in, or attached to, the fluid phospholipid bilayer. Phospholipids form a bilayer rather than a single layer, cholesterol modulates fluidity rather than forming a frame, and carbohydrate chains occur only on some proteins and lipids. Therefore the correct answer is B: Protein molecules scattered within the phospholipid bilayer.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_membranes_s1_002",
+          "original": true,
+          "topicCode": "9700-MEMB",
+          "type": "multiple_choice",
+          "prompt": "Facilitated diffusion differs from simple diffusion across a membrane because facilitated diffusion requires...",
+          "options": [
+            {
+              "label": "A",
+              "text": "ATP hydrolysed by carrier proteins",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "vesicles formed from the membrane",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "transport proteins such as channel or carrier proteins",
+              "rationale": "This is the supported answer. Facilitated diffusion moves polar molecules or ions down their concentration gradient through specific channel or carrier proteins; it is passive, so no ATP is needed. Vesicles mediate endocytosis, and moving substances against their gradient is active transport."
+            },
+            {
+              "label": "D",
+              "text": "movement of molecules against their gradient",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Facilitated diffusion moves polar molecules or ions down their concentration gradient through specific channel or carrier proteins; it is passive, so no ATP is needed. Vesicles mediate endocytosis, and moving substances against their gradient is active transport. Therefore the correct answer is C: transport proteins such as channel or carrier proteins.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_membranes_s1_003",
+          "original": true,
+          "topicCode": "9700-MEMB",
+          "type": "multiple_choice",
+          "prompt": "A red blood cell is placed in a solution with a lower (more negative) water potential than the cell's cytoplasm. Which outcome is most likely?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Water enters the cell and it bursts (haemolysis)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Water enters by active transport and the cell swells",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "No water movement occurs because the membrane is impermeable to water",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Water leaves the cell by osmosis and the cell shrinks (crenation)",
+              "rationale": "This is the supported answer. Water moves from the higher water potential inside the cell to the lower water potential outside, across the partially permeable membrane by osmosis. Red blood cells have no cell wall, so the loss of water makes them shrink and develop a spiky, crenated appearance."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Water moves from the higher water potential inside the cell to the lower water potential outside, across the partially permeable membrane by osmosis. Red blood cells have no cell wall, so the loss of water makes them shrink and develop a spiky, crenated appearance. Therefore the correct answer is D: Water leaves the cell by osmosis and the cell shrinks (crenation).",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_membranes_s1_004",
+          "original": true,
+          "topicCode": "9700-MEMB",
+          "type": "multiple_choice",
+          "prompt": "Which process requires both a carrier protein and a supply of ATP?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Active transport of mineral ions into root hair cells",
+              "rationale": "This is the supported answer. Active transport moves substances against their concentration (electrochemical) gradient using carrier proteins powered by ATP, as when root hair cells absorb mineral ions from very dilute soil water. Facilitated diffusion and osmosis follow gradients and need no ATP, and oxygen crosses membranes by simple diffusion."
+            },
+            {
+              "label": "B",
+              "text": "Facilitated diffusion of glucose into a red blood cell",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Osmosis of water into a plant cell",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Simple diffusion of oxygen into an alveolar cell",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Active transport moves substances against their concentration (electrochemical) gradient using carrier proteins powered by ATP, as when root hair cells absorb mineral ions from very dilute soil water. Facilitated diffusion and osmosis follow gradients and need no ATP, and oxygen crosses membranes by simple diffusion. Therefore the correct answer is A: Active transport of mineral ions into root hair cells.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_membranes_s1_005",
+          "original": true,
+          "topicCode": "9700-MEMB",
+          "type": "multiple_choice",
+          "prompt": "The sodium–potassium pump moves three Na⁺ ions out of a neurone and two K⁺ ions in for each ATP hydrolysed. What is the direct consequence of this stoichiometry?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The membrane potential across the membrane is abolished",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The inside of the cell becomes more negative relative to the outside (the pump is electrogenic)",
+              "rationale": "This is the supported answer. Each cycle of the pump moves a net one positive charge out of the cell (three Na⁺ out versus two K⁺ in), so the pump directly makes the inside more negative and contributes to the resting potential. The stoichiometry is fixed at 3:2, and the pump does not allow sodium to diffuse back through it."
+            },
+            {
+              "label": "C",
+              "text": "Equal numbers of positive charges move in each direction",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Sodium ions diffuse back into the cell through the pump",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Each cycle of the pump moves a net one positive charge out of the cell (three Na⁺ out versus two K⁺ in), so the pump directly makes the inside more negative and contributes to the resting potential. The stoichiometry is fixed at 3:2, and the pump does not allow sodium to diffuse back through it. Therefore the correct answer is B: The inside of the cell becomes more negative relative to the outside (the pump is electrogenic).",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_membranes_s1_006",
+          "original": true,
+          "topicCode": "9700-MEMB",
+          "type": "structured",
+          "prompt": "A student investigates how substances cross cell surface membranes.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Define the term osmosis.",
+              "marks": 2,
+              "correctAnswer": "Osmosis is the net movement of water molecules from a region of higher (less negative) water potential to a region of lower (more negative) water potential across a partially permeable membrane, down the water potential gradient."
+            },
+            {
+              "label": "b",
+              "text": "Explain why active transport requires a supply of ATP.",
+              "marks": 2,
+              "correctAnswer": "Active transport moves substances against their concentration (electrochemical) gradient. Carrier proteins must change shape to move the substance across the membrane, and this shape change is driven by energy released when ATP is hydrolysed to ADP and inorganic phosphate."
+            },
+            {
+              "label": "c",
+              "text": "Describe the role of cholesterol in the cell surface membrane when the temperature falls.",
+              "marks": 2,
+              "correctAnswer": "Cholesterol sits between the phospholipid molecules and, at low temperatures, prevents the phospholipid tails packing too closely together, maintaining fluidity; it therefore buffers the membrane against temperature change and helps stabilise it."
+            }
+          ],
+          "correctAnswer": "(a) Osmosis is the net movement of water molecules from a region of higher (less negative) water potential to a region of lower (more negative) water potential across a partially permeable membrane, down the water potential gradient. (b) Active transport moves substances against their concentration (electrochemical) gradient. Carrier proteins must change shape to move the substance across the membrane, and this shape change is driven by energy released when ATP is hydrolysed to ADP and inorganic phosphate. (c) Cholesterol sits between the phospholipid molecules and, at low temperatures, prevents the phospholipid tails packing too closely together, maintaining fluidity; it therefore buffers the membrane against temperature change and helps stabilise it.",
+          "workedSolution": "(a) Osmosis is the net movement of water molecules from a region of higher (less negative) water potential to a region of lower (more negative) water potential across a partially permeable membrane, down the water potential gradient. (b) Active transport moves substances against their concentration (electrochemical) gradient. Carrier proteins must change shape to move the substance across the membrane, and this shape change is driven by energy released when ATP is hydrolysed to ADP and inorganic phosphate. (c) Cholesterol sits between the phospholipid molecules and, at low temperatures, prevents the phospholipid tails packing too closely together, maintaining fluidity; it therefore buffers the membrane against temperature change and helps stabilise it.",
+          "difficulty": "medium",
+          "marks": 6,
+          "points": 6,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned A-Level Biology practice content; not official WAEC or Cambridge International examination material.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_metabolism_s1_001",
+          "original": true,
+          "topicCode": "9700-METAB",
+          "type": "multiple_choice",
+          "prompt": "Which molecule acts as the immediate universal energy currency of cells?",
+          "options": [
+            {
+              "label": "A",
+              "text": "DNA",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Glucose",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "ATP",
+              "rationale": "This is the supported answer. ATP (adenosine triphosphate) is hydrolysed to ADP and inorganic phosphate to release energy directly for processes such as active transport and muscle contraction. Glucose and NAD store or carry energy, but that energy must be transferred to ATP during respiration before it can drive cellular work."
+            },
+            {
+              "label": "D",
+              "text": "NAD",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "ATP (adenosine triphosphate) is hydrolysed to ADP and inorganic phosphate to release energy directly for processes such as active transport and muscle contraction. Glucose and NAD store or carry energy, but that energy must be transferred to ATP during respiration before it can drive cellular work. Therefore the correct answer is C: ATP.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_metabolism_s1_002",
+          "original": true,
+          "topicCode": "9700-METAB",
+          "type": "multiple_choice",
+          "prompt": "In which part of a eukaryotic cell does glycolysis take place?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Mitochondrial matrix",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Inner mitochondrial membrane",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Chloroplast stroma",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Cytoplasm (cytosol)",
+              "rationale": "This is the supported answer. Glycolysis, the breakdown of glucose to pyruvate with a net gain of two ATP, occurs in the cytoplasm. The link reaction and Krebs cycle occur in the mitochondrial matrix, oxidative phosphorylation on the inner mitochondrial membrane, and the Calvin cycle in the chloroplast stroma."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Glycolysis, the breakdown of glucose to pyruvate with a net gain of two ATP, occurs in the cytoplasm. The link reaction and Krebs cycle occur in the mitochondrial matrix, oxidative phosphorylation on the inner mitochondrial membrane, and the Calvin cycle in the chloroplast stroma. Therefore the correct answer is D: Cytoplasm (cytosol).",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_metabolism_s1_003",
+          "original": true,
+          "topicCode": "9700-METAB",
+          "type": "multiple_choice",
+          "prompt": "During the link reaction, each pyruvate molecule is converted into which product?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Acetyl coenzyme A",
+              "rationale": "This is the supported answer. In the link reaction, pyruvate is decarboxylated (loses carbon dioxide) and dehydrogenated (reducing NAD), and the resulting two-carbon acetyl group combines with coenzyme A to form acetyl coenzyme A, which then enters the Krebs cycle."
+            },
+            {
+              "label": "B",
+              "text": "Lactate",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Oxaloacetate",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Citrate",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "In the link reaction, pyruvate is decarboxylated (loses carbon dioxide) and dehydrogenated (reducing NAD), and the resulting two-carbon acetyl group combines with coenzyme A to form acetyl coenzyme A, which then enters the Krebs cycle. Therefore the correct answer is A: Acetyl coenzyme A.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_metabolism_s1_004",
+          "original": true,
+          "topicCode": "9700-METAB",
+          "type": "multiple_choice",
+          "prompt": "Which enzyme catalyses the fixation of carbon dioxide in the Calvin cycle?",
+          "options": [
+            {
+              "label": "A",
+              "text": "ATP synthase",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "RuBisCO (ribulose bisphosphate carboxylase)",
+              "rationale": "This is the supported answer. RuBisCO catalyses the carboxylation of ribulose bisphosphate (RuBP) with carbon dioxide in the chloroplast stroma, producing two molecules of glycerate-3-phosphate. ATP synthase makes ATP, amylase digests starch, and DNA polymerase replicates DNA."
+            },
+            {
+              "label": "C",
+              "text": "Amylase",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "DNA polymerase",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "RuBisCO catalyses the carboxylation of ribulose bisphosphate (RuBP) with carbon dioxide in the chloroplast stroma, producing two molecules of glycerate-3-phosphate. ATP synthase makes ATP, amylase digests starch, and DNA polymerase replicates DNA. Therefore the correct answer is B: RuBisCO (ribulose bisphosphate carboxylase).",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_metabolism_s1_005",
+          "original": true,
+          "topicCode": "9700-METAB",
+          "type": "multiple_choice",
+          "prompt": "A metabolic poison allows protons to leak across the inner mitochondrial membrane without passing through ATP synthase, but does not block the electron transport chain. Predict the effect on respiration.",
+          "options": [
+            {
+              "label": "A",
+              "text": "Oxygen consumption and ATP synthesis both stop immediately",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Oxygen consumption stops but ATP synthesis increases",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Oxygen consumption continues but much less ATP is synthesised",
+              "rationale": "This is the supported answer. The leak uncouples oxidative phosphorylation: electrons still flow along the transport chain to oxygen, the final electron acceptor, so oxygen consumption continues. However, the proton gradient is dissipated without driving ATP synthase, so ATP yield falls sharply while glycolysis still regenerates NAD."
+            },
+            {
+              "label": "D",
+              "text": "Glycolysis stops because NAD cannot be regenerated",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The leak uncouples oxidative phosphorylation: electrons still flow along the transport chain to oxygen, the final electron acceptor, so oxygen consumption continues. However, the proton gradient is dissipated without driving ATP synthase, so ATP yield falls sharply while glycolysis still regenerates NAD. Therefore the correct answer is C: Oxygen consumption continues but much less ATP is synthesised.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_metabolism_s1_006",
+          "original": true,
+          "topicCode": "9700-METAB",
+          "type": "structured",
+          "prompt": "A student compares aerobic and anaerobic respiration in yeast and in mammalian muscle.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State the net yield of ATP molecules from glycolysis per molecule of glucose, showing how the figure is obtained.",
+              "marks": 2,
+              "correctAnswer": "Net gain of two ATP per glucose: four ATP are produced by substrate-level phosphorylation, but two ATP are consumed phosphorylating glucose and fructose phosphate early in the pathway."
+            },
+            {
+              "label": "b",
+              "text": "Describe the role of NAD in glycolysis and the link reaction.",
+              "marks": 2,
+              "correctAnswer": "NAD is a coenzyme that accepts hydrogen (protons and electrons) removed in dehydrogenation reactions, becoming reduced NAD; the reduced NAD then carries the hydrogen to the electron transport chain, where its energy drives ATP synthesis by oxidative phosphorylation."
+            },
+            {
+              "label": "c",
+              "text": "Explain why anaerobic respiration releases much less energy per glucose molecule than aerobic respiration.",
+              "marks": 2,
+              "correctAnswer": "Without oxygen as the final electron acceptor the electron transport chain stops, so only glycolysis operates, giving a net two ATP; pyruvate is converted to lactate, or to ethanol and carbon dioxide, simply to regenerate NAD, leaving most of the energy locked in those products."
+            }
+          ],
+          "correctAnswer": "(a) Net gain of two ATP per glucose: four ATP are produced by substrate-level phosphorylation, but two ATP are consumed phosphorylating glucose and fructose phosphate early in the pathway. (b) NAD is a coenzyme that accepts hydrogen (protons and electrons) removed in dehydrogenation reactions, becoming reduced NAD; the reduced NAD then carries the hydrogen to the electron transport chain, where its energy drives ATP synthesis by oxidative phosphorylation. (c) Without oxygen as the final electron acceptor the electron transport chain stops, so only glycolysis operates, giving a net two ATP; pyruvate is converted to lactate, or to ethanol and carbon dioxide, simply to regenerate NAD, leaving most of the energy locked in those products.",
+          "workedSolution": "(a) Net gain of two ATP per glucose: four ATP are produced by substrate-level phosphorylation, but two ATP are consumed phosphorylating glucose and fructose phosphate early in the pathway. (b) NAD is a coenzyme that accepts hydrogen (protons and electrons) removed in dehydrogenation reactions, becoming reduced NAD; the reduced NAD then carries the hydrogen to the electron transport chain, where its energy drives ATP synthesis by oxidative phosphorylation. (c) Without oxygen as the final electron acceptor the electron transport chain stops, so only glycolysis operates, giving a net two ATP; pyruvate is converted to lactate, or to ethanol and carbon dioxide, simply to regenerate NAD, leaving most of the energy locked in those products.",
+          "difficulty": "medium",
+          "marks": 6,
+          "points": 6,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned A-Level Biology practice content; not official WAEC or Cambridge International examination material.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_genetics_s1_001",
+          "original": true,
+          "topicCode": "9700-GEN",
+          "type": "multiple_choice",
+          "prompt": "What term describes the different versions of a gene found at the same locus on homologous chromosomes?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Chromatids",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Codons",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Operons",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Alleles",
+              "rationale": "This is the supported answer. Alleles are alternative forms of a gene occupying the same locus on homologous chromosomes, such as the T and t alleles for height in pea plants. Chromatids are the copies of a replicated chromosome, codons are triplets of mRNA bases, and operons are clusters of prokaryotic genes."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Alleles are alternative forms of a gene occupying the same locus on homologous chromosomes, such as the T and t alleles for height in pea plants. Chromatids are the copies of a replicated chromosome, codons are triplets of mRNA bases, and operons are clusters of prokaryotic genes. Therefore the correct answer is D: Alleles.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_genetics_s1_002",
+          "original": true,
+          "topicCode": "9700-GEN",
+          "type": "multiple_choice",
+          "prompt": "In a DNA molecule, which base always pairs with adenine?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Thymine",
+              "rationale": "This is the supported answer. In double-stranded DNA, adenine forms two hydrogen bonds with thymine, while guanine forms three hydrogen bonds with cytosine; this complementary base pairing underlies semi-conservative replication. Uracil replaces thymine in RNA and does not occur in DNA."
+            },
+            {
+              "label": "B",
+              "text": "Guanine",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Cytosine",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Uracil",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "In double-stranded DNA, adenine forms two hydrogen bonds with thymine, while guanine forms three hydrogen bonds with cytosine; this complementary base pairing underlies semi-conservative replication. Uracil replaces thymine in RNA and does not occur in DNA. Therefore the correct answer is A: Thymine.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_genetics_s1_003",
+          "original": true,
+          "topicCode": "9700-GEN",
+          "type": "multiple_choice",
+          "prompt": "Two heterozygous tall pea plants (Tt × Tt) are crossed. What proportion of the offspring are expected to be short?",
+          "options": [
+            {
+              "label": "A",
+              "text": "1/2",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "1/4",
+              "rationale": "This is the supported answer. A Punnett square for Tt × Tt gives genotypes 1 TT : 2 Tt : 1 tt. Because the tall allele T is dominant, only the homozygous recessive tt genotype expresses the short phenotype, so one in four offspring (25%) is expected to be short."
+            },
+            {
+              "label": "C",
+              "text": "3/4",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "All of them",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A Punnett square for Tt × Tt gives genotypes 1 TT : 2 Tt : 1 tt. Because the tall allele T is dominant, only the homozygous recessive tt genotype expresses the short phenotype, so one in four offspring (25%) is expected to be short. Therefore the correct answer is B: 1/4.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_genetics_s1_004",
+          "original": true,
+          "topicCode": "9700-GEN",
+          "type": "multiple_choice",
+          "prompt": "Which statement correctly contrasts transcription and translation?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Transcription occurs at ribosomes; translation occurs in the nucleus",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Both processes produce identical copies of the DNA molecule",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Transcription synthesises mRNA from a DNA template in the nucleus; translation assembles a polypeptide at a ribosome",
+              "rationale": "This is the supported answer. Transcription uses RNA polymerase to build a complementary mRNA copy of a gene in the nucleus. Translation then reads that mRNA codon by codon at ribosomes in the cytoplasm, where transfer RNAs deliver amino acids that are joined by peptide bonds into a polypeptide."
+            },
+            {
+              "label": "D",
+              "text": "Translation synthesises mRNA; transcription joins amino acids together",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Transcription uses RNA polymerase to build a complementary mRNA copy of a gene in the nucleus. Translation then reads that mRNA codon by codon at ribosomes in the cytoplasm, where transfer RNAs deliver amino acids that are joined by peptide bonds into a polypeptide. Therefore the correct answer is C: Transcription synthesises mRNA from a DNA template in the nucleus; translation assembles a polypeptide at a ribosome.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_genetics_s1_005",
+          "original": true,
+          "topicCode": "9700-GEN",
+          "type": "multiple_choice",
+          "prompt": "In a population in Hardy–Weinberg equilibrium, the frequency of the dominant allele A is 0.6. What proportion of the population is expected to be heterozygous?",
+          "options": [
+            {
+              "label": "A",
+              "text": "36%",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "24%",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "16%",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "48%",
+              "rationale": "This is the supported answer. The allele frequency p = 0.6, so q = 1 − p = 0.4. The heterozygote frequency is 2pq = 2 × 0.6 × 0.4 = 0.48, so 48% of the population are heterozygous; the homozygous genotypes are p² = 36% (AA) and q² = 16% (aa)."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The allele frequency p = 0.6, so q = 1 − p = 0.4. The heterozygote frequency is 2pq = 2 × 0.6 × 0.4 = 0.48, so 48% of the population are heterozygous; the homozygous genotypes are p² = 36% (AA) and q² = 16% (aa). Therefore the correct answer is D: 48%.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_genetics_s1_006",
+          "original": true,
+          "topicCode": "9700-GEN",
+          "type": "structured",
+          "prompt": "A student studies how a gene is expressed as a polypeptide and how mutations can affect it.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Outline the role of messenger RNA (mRNA) in protein synthesis.",
+              "marks": 2,
+              "correctAnswer": "mRNA carries a complementary copy of the base sequence of a gene from the DNA in the nucleus to a ribosome in the cytoplasm; its sequence of codons is then read during translation to determine the order of amino acids in the polypeptide."
+            },
+            {
+              "label": "b",
+              "text": "Describe the role of transfer RNA (tRNA) during translation.",
+              "marks": 2,
+              "correctAnswer": "Each tRNA molecule carries a specific amino acid and has an anticodon complementary to an mRNA codon; tRNAs bind to the ribosome in sequence so that their amino acids are joined by peptide bonds in the order specified by the mRNA."
+            },
+            {
+              "label": "c",
+              "text": "Explain why a base substitution mutation in a gene does not always change the amino acid sequence of the polypeptide.",
+              "marks": 2,
+              "correctAnswer": "The genetic code is degenerate: most amino acids are coded for by more than one codon, so a substitution can produce a different codon that still specifies the same amino acid (a silent mutation), leaving the polypeptide sequence unchanged."
+            }
+          ],
+          "correctAnswer": "(a) mRNA carries a complementary copy of the base sequence of a gene from the DNA in the nucleus to a ribosome in the cytoplasm; its sequence of codons is then read during translation to determine the order of amino acids in the polypeptide. (b) Each tRNA molecule carries a specific amino acid and has an anticodon complementary to an mRNA codon; tRNAs bind to the ribosome in sequence so that their amino acids are joined by peptide bonds in the order specified by the mRNA. (c) The genetic code is degenerate: most amino acids are coded for by more than one codon, so a substitution can produce a different codon that still specifies the same amino acid (a silent mutation), leaving the polypeptide sequence unchanged.",
+          "workedSolution": "(a) mRNA carries a complementary copy of the base sequence of a gene from the DNA in the nucleus to a ribosome in the cytoplasm; its sequence of codons is then read during translation to determine the order of amino acids in the polypeptide. (b) Each tRNA molecule carries a specific amino acid and has an anticodon complementary to an mRNA codon; tRNAs bind to the ribosome in sequence so that their amino acids are joined by peptide bonds in the order specified by the mRNA. (c) The genetic code is degenerate: most amino acids are coded for by more than one codon, so a substitution can produce a different codon that still specifies the same amino acid (a silent mutation), leaving the polypeptide sequence unchanged.",
+          "difficulty": "medium",
+          "marks": 6,
+          "points": 6,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned A-Level Biology practice content; not official WAEC or Cambridge International examination material.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_homeostasis_s1_001",
+          "original": true,
+          "topicCode": "9700-HOME",
+          "type": "multiple_choice",
+          "prompt": "Which hormone lowers the concentration of glucose in the blood?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Insulin",
+              "rationale": "This is the supported answer. Insulin, secreted by the beta cells of the islets of Langerhans in the pancreas, increases glucose uptake by cells and the conversion of glucose to glycogen in the liver, lowering blood glucose. Glucagon and adrenaline raise blood glucose, and ADH regulates water reabsorption in the kidney."
+            },
+            {
+              "label": "B",
+              "text": "Glucagon",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Adrenaline",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Antidiuretic hormone (ADH)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Insulin, secreted by the beta cells of the islets of Langerhans in the pancreas, increases glucose uptake by cells and the conversion of glucose to glycogen in the liver, lowering blood glucose. Glucagon and adrenaline raise blood glucose, and ADH regulates water reabsorption in the kidney. Therefore the correct answer is A: Insulin.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_homeostasis_s1_002",
+          "original": true,
+          "topicCode": "9700-HOME",
+          "type": "multiple_choice",
+          "prompt": "What is the term for the maintenance of a constant internal environment in the body?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Osmoregulation",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Homeostasis",
+              "rationale": "This is the supported answer. Homeostasis is the general term for keeping internal conditions such as blood glucose concentration, core temperature and water potential within narrow limits. Osmoregulation and thermoregulation are specific examples of homeostasis, while excretion is the removal of metabolic waste."
+            },
+            {
+              "label": "C",
+              "text": "Excretion",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Thermoregulation",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Homeostasis is the general term for keeping internal conditions such as blood glucose concentration, core temperature and water potential within narrow limits. Osmoregulation and thermoregulation are specific examples of homeostasis, while excretion is the removal of metabolic waste. Therefore the correct answer is B: Homeostasis.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_homeostasis_s1_003",
+          "original": true,
+          "topicCode": "9700-HOME",
+          "type": "multiple_choice",
+          "prompt": "A rise in blood glucose concentration after a meal is detected by the pancreas. Which events follow?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Alpha cells secrete glucagon, stimulating glycogen breakdown",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The liver converts glycogen back into glucose",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Beta cells secrete insulin, increasing glucose uptake and glycogen synthesis",
+              "rationale": "This is the supported answer. High blood glucose stimulates the beta cells of the islets of Langerhans to release insulin. Insulin increases cellular uptake of glucose and promotes its conversion to glycogen and fat in the liver, returning blood glucose towards the set point — an example of negative feedback."
+            },
+            {
+              "label": "D",
+              "text": "ADH release increases water reabsorption in the kidney",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "High blood glucose stimulates the beta cells of the islets of Langerhans to release insulin. Insulin increases cellular uptake of glucose and promotes its conversion to glycogen and fat in the liver, returning blood glucose towards the set point — an example of negative feedback. Therefore the correct answer is C: Beta cells secrete insulin, increasing glucose uptake and glycogen synthesis.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_homeostasis_s1_004",
+          "original": true,
+          "topicCode": "9700-HOME",
+          "type": "multiple_choice",
+          "prompt": "In which region of the nephron is essentially all filtered glucose normally reabsorbed into the blood?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Loop of Henle",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Distal convoluted tubule",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Collecting duct",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Proximal convoluted tubule",
+              "rationale": "This is the supported answer. Glucose is small enough to pass into the filtrate at the glomerulus, but all of it is reabsorbed by co-transport with sodium ions and active transport in the proximal convoluted tubule, so the urine of a healthy person contains no glucose."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Glucose is small enough to pass into the filtrate at the glomerulus, but all of it is reabsorbed by co-transport with sodium ions and active transport in the proximal convoluted tubule, so the urine of a healthy person contains no glucose. Therefore the correct answer is D: Proximal convoluted tubule.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_homeostasis_s1_005",
+          "original": true,
+          "topicCode": "9700-HOME",
+          "type": "multiple_choice",
+          "prompt": "How does antidiuretic hormone (ADH) increase water reabsorption from the collecting duct?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It causes vesicles containing aquaporins to fuse with the cell surface membranes of collecting duct cells",
+              "rationale": "This is the supported answer. ADH binds to receptors on collecting duct cells, triggering vesicles carrying aquaporin water channels to fuse with their cell surface membranes. This raises the permeability of the duct to water, so more water leaves by osmosis into the concentrated tissue fluid of the medulla."
+            },
+            {
+              "label": "B",
+              "text": "It makes the loop of Henle shorter",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It increases the rate of glomerular filtration",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It blocks sodium reabsorption in the proximal tubule",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "ADH binds to receptors on collecting duct cells, triggering vesicles carrying aquaporin water channels to fuse with their cell surface membranes. This raises the permeability of the duct to water, so more water leaves by osmosis into the concentrated tissue fluid of the medulla. Therefore the correct answer is A: It causes vesicles containing aquaporins to fuse with the cell surface membranes of collecting duct cells.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_homeostasis_s1_006",
+          "original": true,
+          "topicCode": "9700-HOME",
+          "type": "structured",
+          "prompt": "A student investigates how the body regulates blood glucose concentration and core temperature.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State what is meant by negative feedback in homeostasis.",
+              "marks": 2,
+              "correctAnswer": "A change in an internal factor away from its set point is detected by receptors and triggers responses by effectors that reverse the change, returning the factor towards normal; the response is then switched off once the set point is restored."
+            },
+            {
+              "label": "b",
+              "text": "Describe the role of glucagon when blood glucose concentration falls below the set point.",
+              "marks": 2,
+              "correctAnswer": "Glucagon, secreted by the alpha cells of the islets of Langerhans, acts on liver cells to stimulate the breakdown of glycogen to glucose (glycogenolysis) and the formation of glucose from other compounds (gluconeogenesis), raising blood glucose concentration."
+            },
+            {
+              "label": "c",
+              "text": "Explain how vasoconstriction of arterioles near the skin surface helps to reduce heat loss.",
+              "marks": 2,
+              "correctAnswer": "Constriction of the arterioles diverts blood away from the surface capillaries of the skin, so less warm blood flows close to the body surface; less heat is therefore transferred to the surroundings by radiation, conserving core temperature."
+            }
+          ],
+          "correctAnswer": "(a) A change in an internal factor away from its set point is detected by receptors and triggers responses by effectors that reverse the change, returning the factor towards normal; the response is then switched off once the set point is restored. (b) Glucagon, secreted by the alpha cells of the islets of Langerhans, acts on liver cells to stimulate the breakdown of glycogen to glucose (glycogenolysis) and the formation of glucose from other compounds (gluconeogenesis), raising blood glucose concentration. (c) Constriction of the arterioles diverts blood away from the surface capillaries of the skin, so less warm blood flows close to the body surface; less heat is therefore transferred to the surroundings by radiation, conserving core temperature.",
+          "workedSolution": "(a) A change in an internal factor away from its set point is detected by receptors and triggers responses by effectors that reverse the change, returning the factor towards normal; the response is then switched off once the set point is restored. (b) Glucagon, secreted by the alpha cells of the islets of Langerhans, acts on liver cells to stimulate the breakdown of glycogen to glucose (glycogenolysis) and the formation of glucose from other compounds (gluconeogenesis), raising blood glucose concentration. (c) Constriction of the arterioles diverts blood away from the surface capillaries of the skin, so less warm blood flows close to the body surface; less heat is therefore transferred to the surroundings by radiation, conserving core temperature.",
+          "difficulty": "medium",
+          "marks": 6,
+          "points": 6,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned A-Level Biology practice content; not official WAEC or Cambridge International examination material.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biodiversity_s1_001",
+          "original": true,
+          "topicCode": "9700-BIODIV",
+          "type": "multiple_choice",
+          "prompt": "In the Linnaean hierarchy, which taxonomic rank comes immediately below kingdom?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Class",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Phylum",
+              "rationale": "This is the supported answer. The hierarchy runs domain, kingdom, phylum, class, order, family, genus, species, so the rank directly below kingdom is phylum. A domain is a higher rank introduced in the three-domain classification system."
+            },
+            {
+              "label": "C",
+              "text": "Order",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Domain",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The hierarchy runs domain, kingdom, phylum, class, order, family, genus, species, so the rank directly below kingdom is phylum. A domain is a higher rank introduced in the three-domain classification system. Therefore the correct answer is B: Phylum.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biodiversity_s1_002",
+          "original": true,
+          "topicCode": "9700-BIODIV",
+          "type": "multiple_choice",
+          "prompt": "In the binomial system, the scientific name of a species such as Panthera leo consists of...",
+          "options": [
+            {
+              "label": "A",
+              "text": "the family name followed by the genus name",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "the species name followed by the phylum name",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "the genus name followed by the species name",
+              "rationale": "This is the supported answer. Binomial nomenclature gives every species a two-part Latinised name: the genus name (with a capital letter) followed by the species name (lower case), both written in italics, for example Panthera leo for the lion."
+            },
+            {
+              "label": "D",
+              "text": "two species names joined together",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Binomial nomenclature gives every species a two-part Latinised name: the genus name (with a capital letter) followed by the species name (lower case), both written in italics, for example Panthera leo for the lion. Therefore the correct answer is C: the genus name followed by the species name.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biodiversity_s1_003",
+          "original": true,
+          "topicCode": "9700-BIODIV",
+          "type": "multiple_choice",
+          "prompt": "Which statement about the three-domain classification system is correct?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Archaea are eukaryotes because they can live in extreme environments",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Bacteria have membrane-bound nuclei",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The three domains are plants, animals and fungi",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Archaea are prokaryotes that are genetically and biochemically distinct from bacteria",
+              "rationale": "This is the supported answer. The three domains are Bacteria, Archaea and Eukarya. Archaea are prokaryotes like bacteria, but they differ in ribosomal RNA sequences, membrane lipids and cell wall chemistry, which justifies placing them in a separate domain."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The three domains are Bacteria, Archaea and Eukarya. Archaea are prokaryotes like bacteria, but they differ in ribosomal RNA sequences, membrane lipids and cell wall chemistry, which justifies placing them in a separate domain. Therefore the correct answer is D: Archaea are prokaryotes that are genetically and biochemically distinct from bacteria.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biodiversity_s1_004",
+          "original": true,
+          "topicCode": "9700-BIODIV",
+          "type": "multiple_choice",
+          "prompt": "What does in situ conservation involve?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Protecting species within their natural habitats, for example in national parks or reserves",
+              "rationale": "This is the supported answer. In situ conservation maintains species in the wild, for example in protected areas such as national parks and nature reserves, so populations continue to live and evolve within their ecosystems. Zoo breeding programmes, seed banks and botanic gardens are ex situ methods carried out away from the natural habitat."
+            },
+            {
+              "label": "B",
+              "text": "Breeding endangered species in zoos",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Storing seeds in seed banks",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Maintaining plant collections in botanic gardens",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "In situ conservation maintains species in the wild, for example in protected areas such as national parks and nature reserves, so populations continue to live and evolve within their ecosystems. Zoo breeding programmes, seed banks and botanic gardens are ex situ methods carried out away from the natural habitat. Therefore the correct answer is A: Protecting species within their natural habitats, for example in national parks or reserves.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biodiversity_s1_005",
+          "original": true,
+          "topicCode": "9700-BIODIV",
+          "type": "multiple_choice",
+          "prompt": "Why is a population bottleneck expected to reduce the genetic diversity of a population?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Mutation rates always increase after a bottleneck",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Only a small, often non-representative sample of the original alleles survives in the few remaining individuals",
+              "rationale": "This is the supported answer. When a population crashes in size, much of its genetic variation is lost because the few survivors carry only a subset of the original alleles. Genetic drift then acts strongly on the small population, and inbreeding among related survivors can reduce heterozygosity still further."
+            },
+            {
+              "label": "C",
+              "text": "Bottlenecks increase gene flow between populations",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Larger populations always have lower genetic diversity",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "When a population crashes in size, much of its genetic variation is lost because the few survivors carry only a subset of the original alleles. Genetic drift then acts strongly on the small population, and inbreeding among related survivors can reduce heterozygosity still further. Therefore the correct answer is B: Only a small, often non-representative sample of the original alleles survives in the few remaining individuals.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biodiversity_s1_006",
+          "original": true,
+          "topicCode": "9700-BIODIV",
+          "type": "calculation",
+          "prompt": "A student sampled a grassland plot and counted three plant species: species P = 20 individuals, species Q = 15 individuals and species R = 5 individuals. Calculate Simpson's Index of Diversity, D = 1 − Σ(n/N)², for this community, giving your answer to two decimal places.",
+          "correctAnswer": "0.59",
+          "workedSolution": "N = 20 + 15 + 5 = 40. For each species n/N is 0.5, 0.375 and 0.125, so Σ(n/N)² = 0.25 + 0.140625 + 0.015625 = 0.40625. Therefore D = 1 − 0.40625 = 0.59375, which rounds to 0.59, a moderate diversity value on the 0 to 1 scale.",
+          "difficulty": "medium",
+          "marks": 3,
+          "points": 5,
+          "timeLimit": 240,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biodiversity_s1_007",
+          "original": true,
+          "topicCode": "9700-BIODIV",
+          "type": "calculation",
+          "prompt": "In a mark–release–recapture study of woodlice, 60 animals were caught, marked and released. Two days later, 50 animals were caught, of which 12 were marked. Use the Lincoln index, N = (m × n) / r, to estimate the population size.",
+          "correctAnswer": "250",
+          "workedSolution": "m = 60 animals marked at first capture, n = 50 animals caught in the second sample and r = 12 marked recaptures. N = (60 × 50) / 12 = 3000 / 12 = 250. The estimate assumes the marks persist, marked animals mix randomly back into the population, and there is no significant immigration, emigration, birth or death between the samples.",
+          "difficulty": "hard",
+          "marks": 3,
+          "points": 5,
+          "timeLimit": 240,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biodiversity_s1_008",
+          "original": true,
+          "topicCode": "9700-BIODIV",
+          "type": "structured",
+          "prompt": "A student is asked about the classification and conservation of organisms.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State two features of their cells that place an organism in the kingdom Prokaryotae.",
+              "marks": 2,
+              "correctAnswer": "Any two of: no true nucleus (circular DNA lies free in the cytoplasm); no membrane-bound organelles such as mitochondria; smaller 70S ribosomes; a cell wall made of peptidoglycan (murein)."
+            },
+            {
+              "label": "b",
+              "text": "Explain why viruses are not classified in any kingdom.",
+              "marks": 2,
+              "correctAnswer": "Viruses are acellular particles of nucleic acid inside a protein coat and cannot carry out metabolism or reproduce independently — they must hijack a host cell — so they are not regarded as living organisms and fall outside the classification of cellular life."
+            },
+            {
+              "label": "c",
+              "text": "Describe one advantage of in situ conservation compared with ex situ conservation.",
+              "marks": 2,
+              "correctAnswer": "Any one developed point, for example: the species remains in its natural ecosystem, so it continues to interact and co-evolve with other species, and the whole community and habitat are protected at once rather than a single species in isolation."
+            }
+          ],
+          "correctAnswer": "(a) Any two of: no true nucleus (circular DNA lies free in the cytoplasm); no membrane-bound organelles such as mitochondria; smaller 70S ribosomes; a cell wall made of peptidoglycan (murein). (b) Viruses are acellular particles of nucleic acid inside a protein coat and cannot carry out metabolism or reproduce independently — they must hijack a host cell — so they are not regarded as living organisms and fall outside the classification of cellular life. (c) Any one developed point, for example: the species remains in its natural ecosystem, so it continues to interact and co-evolve with other species, and the whole community and habitat are protected at once rather than a single species in isolation.",
+          "workedSolution": "(a) Any two of: no true nucleus (circular DNA lies free in the cytoplasm); no membrane-bound organelles such as mitochondria; smaller 70S ribosomes; a cell wall made of peptidoglycan (murein). (b) Viruses are acellular particles of nucleic acid inside a protein coat and cannot carry out metabolism or reproduce independently — they must hijack a host cell — so they are not regarded as living organisms and fall outside the classification of cellular life. (c) Any one developed point, for example: the species remains in its natural ecosystem, so it continues to interact and co-evolve with other species, and the whole community and habitat are protected at once rather than a single species in isolation.",
+          "difficulty": "medium",
+          "marks": 6,
+          "points": 6,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned A-Level Biology practice content; not official WAEC or Cambridge International examination material.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biotech_s1_001",
+          "original": true,
+          "topicCode": "9700-BIOTECH",
+          "type": "multiple_choice",
+          "prompt": "Which enzyme cuts DNA at specific recognition sequences during genetic engineering?",
+          "options": [
+            {
+              "label": "A",
+              "text": "DNA ligase",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "DNA polymerase",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Restriction endonuclease",
+              "rationale": "This is the supported answer. Restriction endonucleases recognise short, specific base sequences and cut the DNA backbone there, often leaving sticky ends. DNA ligase joins fragments together, DNA polymerase synthesises new strands, and reverse transcriptase makes DNA from an RNA template."
+            },
+            {
+              "label": "D",
+              "text": "Reverse transcriptase",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Restriction endonucleases recognise short, specific base sequences and cut the DNA backbone there, often leaving sticky ends. DNA ligase joins fragments together, DNA polymerase synthesises new strands, and reverse transcriptase makes DNA from an RNA template. Therefore the correct answer is C: Restriction endonuclease.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biotech_s1_002",
+          "original": true,
+          "topicCode": "9700-BIOTECH",
+          "type": "multiple_choice",
+          "prompt": "What does the abbreviation PCR stand for?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Protein chain replication",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Polymerase copying of RNA",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Primer-controlled replication",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Polymerase chain reaction",
+              "rationale": "This is the supported answer. PCR, the polymerase chain reaction, amplifies a chosen region of DNA exponentially through repeated cycles of denaturation, primer annealing and extension by a thermostable DNA polymerase such as Taq polymerase."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "PCR, the polymerase chain reaction, amplifies a chosen region of DNA exponentially through repeated cycles of denaturation, primer annealing and extension by a thermostable DNA polymerase such as Taq polymerase. Therefore the correct answer is D: Polymerase chain reaction.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biotech_s1_003",
+          "original": true,
+          "topicCode": "9700-BIOTECH",
+          "type": "multiple_choice",
+          "prompt": "In PCR, why is the extension step carried out at about 72 °C?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Taq DNA polymerase is thermostable and works close to its optimum temperature at 72 °C",
+              "rationale": "This is the supported answer. Taq polymerase, isolated from the thermophilic bacterium Thermus aquaticus, survives the roughly 95 °C denaturation step and extends primers fastest near its optimum of about 72 °C. Strands separate at about 95 °C and primers anneal at about 55 °C."
+            },
+            {
+              "label": "B",
+              "text": "72 °C is needed to separate the two DNA strands",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Primers can only anneal to the template at 72 °C",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The DNA template denatures completely at 72 °C",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Taq polymerase, isolated from the thermophilic bacterium Thermus aquaticus, survives the roughly 95 °C denaturation step and extends primers fastest near its optimum of about 72 °C. Strands separate at about 95 °C and primers anneal at about 55 °C. Therefore the correct answer is A: Taq DNA polymerase is thermostable and works close to its optimum temperature at 72 °C.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biotech_s1_004",
+          "original": true,
+          "topicCode": "9700-BIOTECH",
+          "type": "multiple_choice",
+          "prompt": "Which vector is commonly used to transfer genes into plant cells?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The protein coat of a bacteriophage",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The Ti plasmid of Agrobacterium tumefaciens",
+              "rationale": "This is the supported answer. Agrobacterium tumefaciens naturally transfers part of its Ti (tumour-inducing) plasmid, the T-DNA, into plant cells, where it integrates into the plant genome. Replacing the tumour-causing genes with a desired gene turns the Ti plasmid into a plant transformation vector."
+            },
+            {
+              "label": "C",
+              "text": "Ribosomes from the host plant",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Plasmids isolated from human gut bacteria",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Agrobacterium tumefaciens naturally transfers part of its Ti (tumour-inducing) plasmid, the T-DNA, into plant cells, where it integrates into the plant genome. Replacing the tumour-causing genes with a desired gene turns the Ti plasmid into a plant transformation vector. Therefore the correct answer is B: The Ti plasmid of Agrobacterium tumefaciens.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biotech_s1_005",
+          "original": true,
+          "topicCode": "9700-BIOTECH",
+          "type": "multiple_choice",
+          "prompt": "Bacteria containing an inserted human insulin gene produce functional human insulin. Which feature of the genetic code makes this possible?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Bacteria are able to read the code backwards",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Human genes contain bacterial promoter sequences",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The genetic code is universal — the same codons specify the same amino acids in bacteria and humans",
+              "rationale": "This is the supported answer. Because the genetic code is (almost) universal, a bacterial ribosome translates human mRNA codons into exactly the same amino acid sequence as a human cell would, so the protein produced by the engineered bacteria is genuine human insulin."
+            },
+            {
+              "label": "D",
+              "text": "Insulin is not made of amino acids",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Because the genetic code is (almost) universal, a bacterial ribosome translates human mRNA codons into exactly the same amino acid sequence as a human cell would, so the protein produced by the engineered bacteria is genuine human insulin. Therefore the correct answer is C: The genetic code is universal — the same codons specify the same amino acids in bacteria and humans.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_biotech_s1_006",
+          "original": true,
+          "topicCode": "9700-BIOTECH",
+          "type": "structured",
+          "prompt": "A student outlines how bacteria are genetically engineered to produce human insulin.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State the role of reverse transcriptase in obtaining the human insulin gene.",
+              "marks": 2,
+              "correctAnswer": "Reverse transcriptase synthesises a complementary DNA (cDNA) copy of the insulin gene from the mature mRNA extracted from pancreatic beta cells; this cDNA contains the coding sequence without introns, which bacteria cannot remove."
+            },
+            {
+              "label": "b",
+              "text": "Describe the role of DNA ligase in forming a recombinant plasmid.",
+              "marks": 2,
+              "correctAnswer": "DNA ligase joins the sugar–phosphate backbones of the insulin gene and the cut plasmid by catalysing the formation of phosphodiester bonds between their complementary sticky ends, sealing the gene into the plasmid to make recombinant DNA."
+            },
+            {
+              "label": "c",
+              "text": "Explain one advantage of producing insulin from genetically modified bacteria rather than extracting it from animal pancreases.",
+              "marks": 2,
+              "correctAnswer": "Any one developed point, for example: the product is exact human insulin, so it is less likely to trigger an immune response than pig or cow insulin; or GM bacteria grow rapidly in fermenters, giving large, reliable and cheaper supplies without the use of animals."
+            }
+          ],
+          "correctAnswer": "(a) Reverse transcriptase synthesises a complementary DNA (cDNA) copy of the insulin gene from the mature mRNA extracted from pancreatic beta cells; this cDNA contains the coding sequence without introns, which bacteria cannot remove. (b) DNA ligase joins the sugar–phosphate backbones of the insulin gene and the cut plasmid by catalysing the formation of phosphodiester bonds between their complementary sticky ends, sealing the gene into the plasmid to make recombinant DNA. (c) Any one developed point, for example: the product is exact human insulin, so it is less likely to trigger an immune response than pig or cow insulin; or GM bacteria grow rapidly in fermenters, giving large, reliable and cheaper supplies without the use of animals.",
+          "workedSolution": "(a) Reverse transcriptase synthesises a complementary DNA (cDNA) copy of the insulin gene from the mature mRNA extracted from pancreatic beta cells; this cDNA contains the coding sequence without introns, which bacteria cannot remove. (b) DNA ligase joins the sugar–phosphate backbones of the insulin gene and the cut plasmid by catalysing the formation of phosphodiester bonds between their complementary sticky ends, sealing the gene into the plasmid to make recombinant DNA. (c) Any one developed point, for example: the product is exact human insulin, so it is less likely to trigger an immune response than pig or cow insulin; or GM bacteria grow rapidly in fermenters, giving large, reliable and cheaper supplies without the use of animals.",
+          "difficulty": "medium",
+          "marks": 6,
+          "points": 6,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned A-Level Biology practice content; not official WAEC or Cambridge International examination material.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_immunity_s1_001",
+          "original": true,
+          "topicCode": "9700-IMM",
+          "type": "multiple_choice",
+          "prompt": "Which cells synthesise and secrete antibodies?",
+          "options": [
+            {
+              "label": "A",
+              "text": "T-killer cells",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Macrophages",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Neutrophils",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Plasma cells (activated B-lymphocytes)",
+              "rationale": "This is the supported answer. When a B-lymphocyte whose surface antibody matches an antigen is activated (with help from T-helper cells), it divides by mitosis and differentiates into plasma cells, which mass-produce and secrete that antibody. Macrophages and neutrophils are phagocytes, and T-killer cells destroy infected cells."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "When a B-lymphocyte whose surface antibody matches an antigen is activated (with help from T-helper cells), it divides by mitosis and differentiates into plasma cells, which mass-produce and secrete that antibody. Macrophages and neutrophils are phagocytes, and T-killer cells destroy infected cells. Therefore the correct answer is D: Plasma cells (activated B-lymphocytes).",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_immunity_s1_002",
+          "original": true,
+          "topicCode": "9700-IMM",
+          "type": "multiple_choice",
+          "prompt": "Which statement best defines an antigen?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A molecule, usually on the surface of a pathogen, that triggers a specific immune response",
+              "rationale": "This is the supported answer. Antigens are molecules — typically proteins or polysaccharides on the surface of pathogens — that are recognised as non-self by receptors on lymphocytes, triggering antibody production or a cell-mediated response directed specifically against them."
+            },
+            {
+              "label": "B",
+              "text": "An antibody produced by plasma cells",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A drug that kills bacteria",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A type of white blood cell",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Antigens are molecules — typically proteins or polysaccharides on the surface of pathogens — that are recognised as non-self by receptors on lymphocytes, triggering antibody production or a cell-mediated response directed specifically against them. Therefore the correct answer is A: A molecule, usually on the surface of a pathogen, that triggers a specific immune response.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_immunity_s1_003",
+          "original": true,
+          "topicCode": "9700-IMM",
+          "type": "multiple_choice",
+          "prompt": "A person is injected with a harmless form of a pathogen's antigens and later makes their own antibodies and memory cells. What type of immunity is this?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Artificial passive immunity",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Artificial active immunity",
+              "rationale": "This is the supported answer. The antigens were deliberately introduced by vaccination (artificial), and the person’s own immune system responded by producing antibodies and memory cells (active). Passive immunity instead delivers ready-made antibodies, as in an antiserum injection or transfer across the placenta."
+            },
+            {
+              "label": "C",
+              "text": "Natural passive immunity",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Natural active immunity",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The antigens were deliberately introduced by vaccination (artificial), and the person’s own immune system responded by producing antibodies and memory cells (active). Passive immunity instead delivers ready-made antibodies, as in an antiserum injection or transfer across the placenta. Therefore the correct answer is B: Artificial active immunity.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_immunity_s1_004",
+          "original": true,
+          "topicCode": "9700-IMM",
+          "type": "multiple_choice",
+          "prompt": "Which lymphocyte directly destroys body cells infected with a virus?",
+          "options": [
+            {
+              "label": "A",
+              "text": "T-helper cell",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "B-memory cell",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "T-killer (cytotoxic T) cell",
+              "rationale": "This is the supported answer. Cytotoxic (T-killer) cells recognise viral antigens presented on the surface of infected cells and release substances such as perforin that kill those cells. T-helper cells coordinate the response by secreting cytokines, and plasma cells secrete antibodies into the blood."
+            },
+            {
+              "label": "D",
+              "text": "Plasma cell",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Cytotoxic (T-killer) cells recognise viral antigens presented on the surface of infected cells and release substances such as perforin that kill those cells. T-helper cells coordinate the response by secreting cytokines, and plasma cells secrete antibodies into the blood. Therefore the correct answer is C: T-killer (cytotoxic T) cell.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_immunity_s1_005",
+          "original": true,
+          "topicCode": "9700-IMM",
+          "type": "multiple_choice",
+          "prompt": "Why must new influenza vaccines be developed on a regular basis?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Influenza viruses stop expressing antigens after each season",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Vaccines lose all of their activity within a few months in the body",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Memory cells permanently destroy the viral antigens",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Antigenic variability — mutation changes the virus's surface antigens, so existing memory cells and antibodies no longer match",
+              "rationale": "This is the supported answer. Influenza has an RNA genome that mutates readily (antigenic drift, and occasionally antigenic shift), altering its haemagglutinin and neuraminidase surface antigens. Memory cells from an earlier vaccination then fail to recognise the new variants, so vaccines are reformulated each season to match circulating strains."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Influenza has an RNA genome that mutates readily (antigenic drift, and occasionally antigenic shift), altering its haemagglutinin and neuraminidase surface antigens. Memory cells from an earlier vaccination then fail to recognise the new variants, so vaccines are reformulated each season to match circulating strains. Therefore the correct answer is D: Antigenic variability — mutation changes the virus's surface antigens, so existing memory cells and antibodies no longer match.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_albio_immunity_s1_006",
+          "original": true,
+          "topicCode": "9700-IMM",
+          "type": "structured",
+          "prompt": "A student compares the different ways in which the body is protected against infectious disease.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Distinguish between active and passive immunity.",
+              "marks": 2,
+              "correctAnswer": "In active immunity the person's own lymphocytes respond to an antigen and produce antibodies and memory cells, giving long-lasting protection; in passive immunity ready-made antibodies are received, for example across the placenta or in an antiserum, giving immediate but short-lived protection without memory cells."
+            },
+            {
+              "label": "b",
+              "text": "Describe the role of memory cells in the secondary immune response.",
+              "marks": 2,
+              "correctAnswer": "Memory B- and T-lymphocytes persist after a first infection; on re-exposure to the same antigen they clone rapidly and differentiate into plasma cells and effector T cells, so the antibody concentration rises faster and to a higher level than in the primary response."
+            },
+            {
+              "label": "c",
+              "text": "Explain why antibiotics are ineffective against viral diseases.",
+              "marks": 2,
+              "correctAnswer": "Antibiotics target structures or processes unique to bacteria, such as peptidoglycan cell wall synthesis or 70S ribosomes; viruses lack these targets and replicate inside host cells using the host’s machinery, so antibiotics cannot act on them."
+            }
+          ],
+          "correctAnswer": "(a) In active immunity the person's own lymphocytes respond to an antigen and produce antibodies and memory cells, giving long-lasting protection; in passive immunity ready-made antibodies are received, for example across the placenta or in an antiserum, giving immediate but short-lived protection without memory cells. (b) Memory B- and T-lymphocytes persist after a first infection; on re-exposure to the same antigen they clone rapidly and differentiate into plasma cells and effector T cells, so the antibody concentration rises faster and to a higher level than in the primary response. (c) Antibiotics target structures or processes unique to bacteria, such as peptidoglycan cell wall synthesis or 70S ribosomes; viruses lack these targets and replicate inside host cells using the host’s machinery, so antibiotics cannot act on them.",
+          "workedSolution": "(a) In active immunity the person's own lymphocytes respond to an antigen and produce antibodies and memory cells, giving long-lasting protection; in passive immunity ready-made antibodies are received, for example across the placenta or in an antiserum, giving immediate but short-lived protection without memory cells. (b) Memory B- and T-lymphocytes persist after a first infection; on re-exposure to the same antigen they clone rapidly and differentiate into plasma cells and effector T cells, so the antibody concentration rises faster and to a higher level than in the primary response. (c) Antibiotics target structures or processes unique to bacteria, such as peptidoglycan cell wall synthesis or 70S ribosomes; viruses lack these targets and replicate inside host cells using the host’s machinery, so antibiotics cannot act on them.",
+          "difficulty": "medium",
+          "marks": 6,
+          "points": 6,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned A-Level Biology practice content; not official WAEC or Cambridge International examination material.",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge International AS & A Level Biology (9700) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-biology-9700/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
