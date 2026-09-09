@@ -1,0 +1,2242 @@
+{
+  "batchId": "igcse-bio-sprint2-001",
+  "status": "approved_for_beta",
+  "examTypeId": "igcse",
+  "provenance": [
+    {
+      "publisher": "Cambridge International Education",
+      "title": "Cambridge IGCSE Biology (0610) syllabus",
+      "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T12:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Biology (0610) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_igcse_biology",
+      "specificationCode": "BRILLA-0610-IGBIO-S2-001",
+      "sources": [
+        {
+          "publisher": "Cambridge International Education",
+          "title": "Cambridge IGCSE Biology (0610) syllabus",
+          "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "0610-CELLS",
+          "title": "Cells and Microscopy",
+          "objective": "Apply knowledge of cell structure, specialised cells and magnification calculations with the light microscope."
+        },
+        {
+          "code": "0610-MOLEC",
+          "title": "Biological Molecules and Enzymes",
+          "objective": "Apply knowledge of food tests, biological molecules and enzyme action, specificity and denaturation."
+        },
+        {
+          "code": "0610-NUTR",
+          "title": "Nutrition and Digestion",
+          "objective": "Apply knowledge of photosynthesis, leaf structure, the human digestive system and a balanced diet."
+        },
+        {
+          "code": "0610-MOVE",
+          "title": "Movement into and out of Cells",
+          "objective": "Apply knowledge of diffusion, osmosis and active transport across partially permeable membranes."
+        },
+        {
+          "code": "0610-RESP",
+          "title": "Respiration and Gas Exchange",
+          "objective": "Apply knowledge of aerobic and anaerobic respiration, the breathing system and alveolar gas exchange."
+        },
+        {
+          "code": "0610-REPRO",
+          "title": "Reproduction and Development",
+          "objective": "Apply knowledge of mitosis and meiosis, flower structure, pollination, fertilisation and human development."
+        },
+        {
+          "code": "0610-GEN",
+          "title": "Genetics and Inheritance",
+          "objective": "Apply knowledge of genes and chromosomes, monohybrid crosses, mutation and patterns of variation."
+        },
+        {
+          "code": "0610-ECOL",
+          "title": "Ecology and Ecosystems",
+          "objective": "Apply knowledge of food chains, energy flow, the carbon and nitrogen cycles and human impacts on ecosystems."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_igbio_cells_s2_001",
+          "original": true,
+          "topicCode": "0610-CELLS",
+          "type": "multiple_choice",
+          "prompt": "Which cell structure is present in a plant cell but absent from an animal cell?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Cell wall",
+              "rationale": "This is the supported answer. Plant cells have a cellulose cell wall, chloroplasts and a large permanent vacuole in addition to the structures they share with animal cells. The cell membrane, cytoplasm and mitochondria are found in both cell types, so none of them can distinguish a plant cell from an animal cell."
+            },
+            {
+              "label": "B",
+              "text": "Cell membrane",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Cytoplasm",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Mitochondrion",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Plant cells have a cellulose cell wall, chloroplasts and a large permanent vacuole in addition to the structures they share with animal cells. The cell membrane, cytoplasm and mitochondria are found in both cell types, so none of them can distinguish a plant cell from an animal cell. Therefore the correct answer is A: Cell wall.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_cells_s2_002",
+          "original": true,
+          "topicCode": "0610-CELLS",
+          "type": "multiple_choice",
+          "prompt": "A student's drawing of a cell is 45 mm long. The actual cell is 0.15 mm long. What is the magnification of the drawing?",
+          "options": [
+            {
+              "label": "A",
+              "text": "×30",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "×300",
+              "rationale": "This is the supported answer. Magnification = image size ÷ actual size = 45 mm ÷ 0.15 mm = 300, so the drawing is ×300 the size of the real cell. ×30 comes from a slip in the division, ×6.75 results from multiplying instead of dividing (45 × 0.15), and ×3000 comes from misplacing the decimal point."
+            },
+            {
+              "label": "C",
+              "text": "×6.75",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "×3000",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Magnification = image size ÷ actual size = 45 mm ÷ 0.15 mm = 300, so the drawing is ×300 the size of the real cell. ×30 comes from a slip in the division, ×6.75 results from multiplying instead of dividing (45 × 0.15), and ×3000 comes from misplacing the decimal point. Therefore the correct answer is B: ×300.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_cells_s2_003",
+          "original": true,
+          "topicCode": "0610-CELLS",
+          "type": "multiple_choice",
+          "prompt": "A microscope has an eyepiece lens of ×10 and objective lenses of ×4, ×10 and ×40. Which combination gives a total magnification of ×400?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Eyepiece ×10 with objective ×4",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Eyepiece ×10 with objective ×10",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Eyepiece ×10 with objective ×40",
+              "rationale": "This is the supported answer. Total magnification = eyepiece magnification × objective magnification = 10 × 40 = 400. The ×4 objective gives only ×40 and the ×10 objective gives ×100, and a light microscope image is always viewed through the eyepiece, so the objective cannot be used alone."
+            },
+            {
+              "label": "D",
+              "text": "Objective ×40 alone without the eyepiece",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Total magnification = eyepiece magnification × objective magnification = 10 × 40 = 400. The ×4 objective gives only ×40 and the ×10 objective gives ×100, and a light microscope image is always viewed through the eyepiece, so the objective cannot be used alone. Therefore the correct answer is C: Eyepiece ×10 with objective ×40.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_cells_s2_004",
+          "original": true,
+          "topicCode": "0610-CELLS",
+          "type": "multiple_choice",
+          "prompt": "A student viewing a slide under high power finds the image blurry. Which part of the microscope should the student adjust to make the image sharp?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The coarse adjustment knob",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The mirror, to admit more light",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The eyepiece, changing it for a higher-power lens",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The fine adjustment knob",
+              "rationale": "This is the supported answer. At high power only the fine adjustment knob should be used to focus, because the objective lens is very close to the slide and the coarse knob could drive the lens into the slide. The mirror or lamp changes brightness rather than sharpness, and swapping the eyepiece changes magnification without focusing the image."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "At high power only the fine adjustment knob should be used to focus, because the objective lens is very close to the slide and the coarse knob could drive the lens into the slide. The mirror or lamp changes brightness rather than sharpness, and swapping the eyepiece changes magnification without focusing the image. Therefore the correct answer is D: The fine adjustment knob.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_cells_s2_005",
+          "original": true,
+          "topicCode": "0610-CELLS",
+          "type": "multiple_choice",
+          "prompt": "Root hair cells absorb water from the soil efficiently. Which feature of a root hair cell increases the surface area available for absorption?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A long hair-like projection extending into the soil",
+              "rationale": "This is the supported answer. The root hair is a slender extension of the cell that greatly increases the surface area to volume ratio for the absorption of water and mineral ions. Root hair cells grow underground so they contain no chloroplasts, their cell wall stays thin to let water pass, and the vacuole holds cell sap rather than starch grains."
+            },
+            {
+              "label": "B",
+              "text": "A thick cellulose cell wall",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A large number of chloroplasts",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A permanent vacuole filled with starch grains",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The root hair is a slender extension of the cell that greatly increases the surface area to volume ratio for the absorption of water and mineral ions. Root hair cells grow underground so they contain no chloroplasts, their cell wall stays thin to let water pass, and the vacuole holds cell sap rather than starch grains. Therefore the correct answer is A: A long hair-like projection extending into the soil.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_cells_s2_006",
+          "original": true,
+          "topicCode": "0610-CELLS",
+          "type": "multiple_choice",
+          "prompt": "Which row correctly matches a specialised animal cell with its adaptation?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Red blood cell — has a large nucleus to store more DNA",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Ciliated cell — has cilia that beat to move mucus along the airways",
+              "rationale": "This is the supported answer. Ciliated cells line the trachea and bronchi, and their beating cilia move mucus carrying trapped particles away from the lungs. Red blood cells lose their nucleus so they can carry more haemoglobin, animal cells never contain chloroplasts, and cell walls occur in plant cells, not in nerve cells."
+            },
+            {
+              "label": "C",
+              "text": "Muscle cell — contains chloroplasts to release energy",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Nerve cell — has a thick cell wall for protection",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Ciliated cells line the trachea and bronchi, and their beating cilia move mucus carrying trapped particles away from the lungs. Red blood cells lose their nucleus so they can carry more haemoglobin, animal cells never contain chloroplasts, and cell walls occur in plant cells, not in nerve cells. Therefore the correct answer is B: Ciliated cell — has cilia that beat to move mucus along the airways.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_molecules_s2_001",
+          "original": true,
+          "topicCode": "0610-MOLEC",
+          "type": "multiple_choice",
+          "prompt": "Which reagent is used to test a food sample for starch?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Benedict's solution",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Biuret solution",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Iodine solution",
+              "rationale": "This is the supported answer. Iodine solution turns from yellow-brown to blue-black when starch is present. Benedict's solution tests for reducing sugars, the Biuret test detects protein, and ethanol is used in the emulsion test for lipids, so only iodine detects starch."
+            },
+            {
+              "label": "D",
+              "text": "Ethanol",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Iodine solution turns from yellow-brown to blue-black when starch is present. Benedict's solution tests for reducing sugars, the Biuret test detects protein, and ethanol is used in the emulsion test for lipids, so only iodine detects starch. Therefore the correct answer is C: Iodine solution.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_molecules_s2_002",
+          "original": true,
+          "topicCode": "0610-MOLEC",
+          "type": "multiple_choice",
+          "prompt": "Which chemical element is present in all proteins but absent from carbohydrates and fats?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Carbon",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Hydrogen",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Oxygen",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Nitrogen",
+              "rationale": "This is the supported answer. Proteins always contain nitrogen in the amino groups of their amino acids, whereas carbohydrates and fats contain only carbon, hydrogen and oxygen. Carbon, hydrogen and oxygen are each found in all three food groups, so they cannot be the distinguishing element."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Proteins always contain nitrogen in the amino groups of their amino acids, whereas carbohydrates and fats contain only carbon, hydrogen and oxygen. Carbon, hydrogen and oxygen are each found in all three food groups, so they cannot be the distinguishing element. Therefore the correct answer is D: Nitrogen.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_molecules_s2_003",
+          "original": true,
+          "topicCode": "0610-MOLEC",
+          "type": "multiple_choice",
+          "prompt": "A food sample is heated with Benedict's solution and the mixture changes from blue to brick-red. What does this result show?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A reducing sugar is present in the sample",
+              "rationale": "This is the supported answer. When heated, reducing sugars such as glucose and maltose reduce the blue copper(II) ions in Benedict's solution to a brick-red precipitate of copper(I) oxide. Starch is a non-reducing sugar and gives no colour change with Benedict's, protein is detected by the Biuret test, and the brick-red colour itself proves that a sugar is present."
+            },
+            {
+              "label": "B",
+              "text": "Starch is present in the sample",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Protein is present in the sample",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The sample contains no sugar of any kind",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "When heated, reducing sugars such as glucose and maltose reduce the blue copper(II) ions in Benedict's solution to a brick-red precipitate of copper(I) oxide. Starch is a non-reducing sugar and gives no colour change with Benedict's, protein is detected by the Biuret test, and the brick-red colour itself proves that a sugar is present. Therefore the correct answer is A: A reducing sugar is present in the sample.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_molecules_s2_004",
+          "original": true,
+          "topicCode": "0610-MOLEC",
+          "type": "multiple_choice",
+          "prompt": "Amylase in human saliva works best at about 37 °C. Why does the enzyme stop working when it is boiled?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The enzyme molecules are used up by the reaction",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The high temperature changes the shape of the active site so the substrate no longer fits",
+              "rationale": "This is the supported answer. Boiling denatures the enzyme: the bonds holding the protein in its shape break, the active site changes shape and the substrate can no longer bind to it. Enzymes are catalysts and are not used up by the reaction, boiling the enzyme does not alter the starch substrate, and enzymes are denatured rather than accelerated at 100 °C."
+            },
+            {
+              "label": "C",
+              "text": "Boiling changes the substrate into a different molecule",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The enzyme works fastest at 100 °C so the reaction runs out of substrate",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Boiling denatures the enzyme: the bonds holding the protein in its shape break, the active site changes shape and the substrate can no longer bind to it. Enzymes are catalysts and are not used up by the reaction, boiling the enzyme does not alter the starch substrate, and enzymes are denatured rather than accelerated at 100 °C. Therefore the correct answer is B: The high temperature changes the shape of the active site so the substrate no longer fits.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_molecules_s2_005",
+          "original": true,
+          "topicCode": "0610-MOLEC",
+          "type": "multiple_choice",
+          "prompt": "Which enzyme digests protein in the stomach?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Amylase",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Lipase",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Pepsin (a protease)",
+              "rationale": "This is the supported answer. The stomach lining secretes the protease pepsin, which works well in the acidic conditions of the stomach and breaks proteins into shorter polypeptides. Amylase digests starch, lipase digests fats and maltase digests maltose, so none of them can act on protein."
+            },
+            {
+              "label": "D",
+              "text": "Maltase",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The stomach lining secretes the protease pepsin, which works well in the acidic conditions of the stomach and breaks proteins into shorter polypeptides. Amylase digests starch, lipase digests fats and maltase digests maltose, so none of them can act on protein. Therefore the correct answer is C: Pepsin (a protease).",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_molecules_s2_006",
+          "original": true,
+          "topicCode": "0610-MOLEC",
+          "type": "multiple_choice",
+          "prompt": "Which statement best explains why an enzyme catalyses only one reaction?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Enzymes are destroyed after catalysing one reaction",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Each enzyme works equally well at any temperature and pH",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "All substrate molecules have exactly the same shape",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The shape of the active site is complementary to only one substrate molecule",
+              "rationale": "This is the supported answer. Each enzyme's active site has a shape that fits only its own substrate, like a lock and key, so the enzyme catalyses only one reaction. Enzymes remain unchanged after the reaction, each enzyme has its own narrow optimum temperature and pH, and substrates differ in shape, which is exactly why specificity arises."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Each enzyme's active site has a shape that fits only its own substrate, like a lock and key, so the enzyme catalyses only one reaction. Enzymes remain unchanged after the reaction, each enzyme has its own narrow optimum temperature and pH, and substrates differ in shape, which is exactly why specificity arises. Therefore the correct answer is D: The shape of the active site is complementary to only one substrate molecule.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_nutrition_s2_001",
+          "original": true,
+          "topicCode": "0610-NUTR",
+          "type": "multiple_choice",
+          "prompt": "Which gas do plants take in for photosynthesis?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Carbon dioxide",
+              "rationale": "This is the supported answer. During photosynthesis plants take in carbon dioxide and water and, using light energy trapped by chlorophyll, produce glucose and oxygen. Oxygen is a product rather than a reactant, and nitrogen and hydrogen gases play no direct part in the process."
+            },
+            {
+              "label": "B",
+              "text": "Oxygen",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Nitrogen",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Hydrogen",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "During photosynthesis plants take in carbon dioxide and water and, using light energy trapped by chlorophyll, produce glucose and oxygen. Oxygen is a product rather than a reactant, and nitrogen and hydrogen gases play no direct part in the process. Therefore the correct answer is A: Carbon dioxide.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_nutrition_s2_002",
+          "original": true,
+          "topicCode": "0610-NUTR",
+          "type": "multiple_choice",
+          "prompt": "In which part of a leaf does most photosynthesis take place?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Lower epidermis",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Palisade mesophyll cells",
+              "rationale": "This is the supported answer. Palisade mesophyll cells lie near the upper surface of the leaf, are packed with chloroplasts and receive the most light, so they carry out most photosynthesis. The lower epidermis contains few chloroplasts, guard cells mainly control the stomatal pore, and the air spaces allow gases to circulate rather than photosynthesise."
+            },
+            {
+              "label": "C",
+              "text": "Guard cells",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Spongy mesophyll air spaces",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Palisade mesophyll cells lie near the upper surface of the leaf, are packed with chloroplasts and receive the most light, so they carry out most photosynthesis. The lower epidermis contains few chloroplasts, guard cells mainly control the stomatal pore, and the air spaces allow gases to circulate rather than photosynthesise. Therefore the correct answer is B: Palisade mesophyll cells.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_nutrition_s2_003",
+          "original": true,
+          "topicCode": "0610-NUTR",
+          "type": "multiple_choice",
+          "prompt": "Which organ produces saliva containing amylase to begin the digestion of starch?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Stomach",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Liver",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Salivary glands",
+              "rationale": "This is the supported answer. The salivary glands secrete saliva containing salivary amylase, which starts breaking starch down into maltose in the mouth. The stomach digests protein with pepsin, the liver makes bile, and the large intestine absorbs water; none of these organs secretes amylase."
+            },
+            {
+              "label": "D",
+              "text": "Large intestine",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The salivary glands secrete saliva containing salivary amylase, which starts breaking starch down into maltose in the mouth. The stomach digests protein with pepsin, the liver makes bile, and the large intestine absorbs water; none of these organs secretes amylase. Therefore the correct answer is C: Salivary glands.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_nutrition_s2_004",
+          "original": true,
+          "topicCode": "0610-NUTR",
+          "type": "multiple_choice",
+          "prompt": "Which nutrient group is the main source of energy in the human diet?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Vitamins",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Mineral ions",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Fibre (roughage)",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Carbohydrates",
+              "rationale": "This is the supported answer. Carbohydrates such as starch and sugars are broken down to glucose, which is respired to release energy, making them the main energy source in the diet. Vitamins and mineral ions are needed in small amounts to keep tissues healthy, and fibre cannot be digested and only aids peristalsis."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Carbohydrates such as starch and sugars are broken down to glucose, which is respired to release energy, making them the main energy source in the diet. Vitamins and mineral ions are needed in small amounts to keep tissues healthy, and fibre cannot be digested and only aids peristalsis. Therefore the correct answer is D: Carbohydrates.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_nutrition_s2_005",
+          "original": true,
+          "topicCode": "0610-NUTR",
+          "type": "multiple_choice",
+          "prompt": "A pondweed is exposed to increasing light intensity while carbon dioxide concentration and temperature are kept constant. What happens to the rate of photosynthesis?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It increases and then levels off",
+              "rationale": "This is the supported answer. Light is the limiting factor at first, so the rate rises as light intensity increases, but once another factor such as carbon dioxide concentration becomes limiting, the rate levels off. The rate cannot rise forever while other factors are fixed, cannot stay unchanged while light is limiting, and does not fall when more light becomes available."
+            },
+            {
+              "label": "B",
+              "text": "It increases without limit",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It stays exactly the same",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It decreases steadily",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Light is the limiting factor at first, so the rate rises as light intensity increases, but once another factor such as carbon dioxide concentration becomes limiting, the rate levels off. The rate cannot rise forever while other factors are fixed, cannot stay unchanged while light is limiting, and does not fall when more light becomes available. Therefore the correct answer is A: It increases and then levels off.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_nutrition_s2_006",
+          "original": true,
+          "topicCode": "0610-NUTR",
+          "type": "multiple_choice",
+          "prompt": "Which vessels transport dissolved sugars from the leaves to the rest of the plant?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Xylem",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Phloem",
+              "rationale": "This is the supported answer. The phloem transports sucrose and amino acids from sources such as the leaves to sinks such as roots and fruits by translocation. Xylem carries water and mineral ions upwards, root hair cells absorb water from the soil, and guard cells open and close stomata; none of these transports sugar."
+            },
+            {
+              "label": "C",
+              "text": "Root hair cells",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Guard cells",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The phloem transports sucrose and amino acids from sources such as the leaves to sinks such as roots and fruits by translocation. Xylem carries water and mineral ions upwards, root hair cells absorb water from the soil, and guard cells open and close stomata; none of these transports sugar. Therefore the correct answer is B: Phloem.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_movement_s2_001",
+          "original": true,
+          "topicCode": "0610-MOVE",
+          "type": "multiple_choice",
+          "prompt": "Diffusion is the net movement of particles from a region of…",
+          "options": [
+            {
+              "label": "A",
+              "text": "lower concentration to a region of higher concentration",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "high temperature to a region of low temperature",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "higher concentration to a region of lower concentration",
+              "rationale": "This is the supported answer. Diffusion is the net movement of particles down their concentration gradient, from a region of higher concentration to a region of lower concentration, as a result of their random motion. Movement from low to high concentration is active transport, and temperature or pressure differences are not part of the definition of diffusion."
+            },
+            {
+              "label": "D",
+              "text": "high pressure to a region of low pressure",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Diffusion is the net movement of particles down their concentration gradient, from a region of higher concentration to a region of lower concentration, as a result of their random motion. Movement from low to high concentration is active transport, and temperature or pressure differences are not part of the definition of diffusion. Therefore the correct answer is C: higher concentration to a region of lower concentration.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_movement_s2_002",
+          "original": true,
+          "topicCode": "0610-MOVE",
+          "type": "multiple_choice",
+          "prompt": "By which process does water move into a root hair cell from the soil?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Active transport",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Transpiration",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Diffusion of mineral ions",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Osmosis",
+              "rationale": "This is the supported answer. The soil water has a higher water potential than the cell sap, so water moves across the partially permeable cell membrane into the root hair cell by osmosis. Active transport moves mineral ions rather than water, transpiration is the loss of water vapour from leaves, and the diffusion of mineral ions does not describe the movement of water."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The soil water has a higher water potential than the cell sap, so water moves across the partially permeable cell membrane into the root hair cell by osmosis. Active transport moves mineral ions rather than water, transpiration is the loss of water vapour from leaves, and the diffusion of mineral ions does not describe the movement of water. Therefore the correct answer is D: Osmosis.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_movement_s2_003",
+          "original": true,
+          "topicCode": "0610-MOVE",
+          "type": "multiple_choice",
+          "prompt": "Active transport moves particles…",
+          "options": [
+            {
+              "label": "A",
+              "text": "against their concentration gradient, using energy from respiration",
+              "rationale": "This is the supported answer. Active transport moves particles from a region of lower concentration to a region of higher concentration, against the gradient, using energy released by respiration and carrier proteins in the membrane. Movement down the gradient without energy is diffusion, equal concentrations give no net useful transport, and fully permeable membranes cannot control which particles move."
+            },
+            {
+              "label": "B",
+              "text": "down their concentration gradient without using energy",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "only when the concentrations are equal on both sides",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "only across fully permeable membranes",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Active transport moves particles from a region of lower concentration to a region of higher concentration, against the gradient, using energy released by respiration and carrier proteins in the membrane. Movement down the gradient without energy is diffusion, equal concentrations give no net useful transport, and fully permeable membranes cannot control which particles move. Therefore the correct answer is A: against their concentration gradient, using energy from respiration.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_movement_s2_004",
+          "original": true,
+          "topicCode": "0610-MOVE",
+          "type": "multiple_choice",
+          "prompt": "Which gas diffuses out of a leaf during the day when photosynthesis is faster than respiration?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Carbon dioxide",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Oxygen",
+              "rationale": "This is the supported answer. In bright light photosynthesis produces more oxygen than respiration uses, so the excess oxygen diffuses out of the leaf down its concentration gradient. Carbon dioxide diffuses into the leaf as a raw material for photosynthesis, nitrogen is not exchanged by the leaf, and glucose is a dissolved sugar, not a gas."
+            },
+            {
+              "label": "C",
+              "text": "Nitrogen",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Glucose",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "In bright light photosynthesis produces more oxygen than respiration uses, so the excess oxygen diffuses out of the leaf down its concentration gradient. Carbon dioxide diffuses into the leaf as a raw material for photosynthesis, nitrogen is not exchanged by the leaf, and glucose is a dissolved sugar, not a gas. Therefore the correct answer is B: Oxygen.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_movement_s2_005",
+          "original": true,
+          "topicCode": "0610-MOVE",
+          "type": "multiple_choice",
+          "prompt": "A bag made of partially permeable membrane containing a concentrated sugar solution is weighed, then placed in pure water for 30 minutes. What happens to the mass of the bag, and why?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It decreases because sugar leaves the bag by osmosis",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It stays the same because water cannot cross the membrane",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It increases because water enters the bag by osmosis",
+              "rationale": "This is the supported answer. The pure water outside the bag has a higher water potential than the sugar solution inside, so water moves into the bag across the partially permeable membrane by osmosis and the mass rises. Sugar molecules are too large to cross the membrane, water crosses the membrane readily, and osmosis drives water into the more concentrated solution, not out of it."
+            },
+            {
+              "label": "D",
+              "text": "It decreases because water leaves the bag by diffusion",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The pure water outside the bag has a higher water potential than the sugar solution inside, so water moves into the bag across the partially permeable membrane by osmosis and the mass rises. Sugar molecules are too large to cross the membrane, water crosses the membrane readily, and osmosis drives water into the more concentrated solution, not out of it. Therefore the correct answer is C: It increases because water enters the bag by osmosis.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_movement_s2_006",
+          "original": true,
+          "topicCode": "0610-MOVE",
+          "type": "multiple_choice",
+          "prompt": "The concentration of nitrate ions is lower in the soil than inside a root hair cell, yet the cell continues to absorb nitrate ions. Which process is responsible?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Diffusion",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Osmosis",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Transpiration",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Active transport",
+              "rationale": "This is the supported answer. The nitrate ions are moving from a region of lower concentration to a region of higher concentration, against their gradient, so energy from respiration is required and the process is active transport. Diffusion would move the ions the opposite way, osmosis moves only water, and transpiration is the evaporation of water from leaves."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The nitrate ions are moving from a region of lower concentration to a region of higher concentration, against their gradient, so energy from respiration is required and the process is active transport. Diffusion would move the ions the opposite way, osmosis moves only water, and transpiration is the evaporation of water from leaves. Therefore the correct answer is D: Active transport.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_respiration_s2_001",
+          "original": true,
+          "topicCode": "0610-RESP",
+          "type": "multiple_choice",
+          "prompt": "Which gas is released as a waste product of aerobic respiration?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Carbon dioxide",
+              "rationale": "This is the supported answer. Aerobic respiration breaks down glucose using oxygen, releasing energy and producing carbon dioxide and water; the carbon dioxide diffuses into the blood and is exhaled from the lungs. Oxygen is a reactant rather than a product, nitrogen passes through the lungs unchanged, and methane is not produced by human cells."
+            },
+            {
+              "label": "B",
+              "text": "Oxygen",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Nitrogen",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Methane",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Aerobic respiration breaks down glucose using oxygen, releasing energy and producing carbon dioxide and water; the carbon dioxide diffuses into the blood and is exhaled from the lungs. Oxygen is a reactant rather than a product, nitrogen passes through the lungs unchanged, and methane is not produced by human cells. Therefore the correct answer is A: Carbon dioxide.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_respiration_s2_002",
+          "original": true,
+          "topicCode": "0610-RESP",
+          "type": "multiple_choice",
+          "prompt": "Where does gas exchange between the air and the blood take place in the lungs?",
+          "options": [
+            {
+              "label": "A",
+              "text": "In the trachea",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "In the alveoli",
+              "rationale": "This is the supported answer. The alveoli are tiny air sacs with thin walls, a moist surface, a rich blood supply and a huge surface area, which makes them the site of gas exchange. The trachea, bronchi and larynx are conducting airways with thick walls, and no significant gas exchange occurs across them."
+            },
+            {
+              "label": "C",
+              "text": "In the bronchi",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "In the larynx",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The alveoli are tiny air sacs with thin walls, a moist surface, a rich blood supply and a huge surface area, which makes them the site of gas exchange. The trachea, bronchi and larynx are conducting airways with thick walls, and no significant gas exchange occurs across them. Therefore the correct answer is B: In the alveoli.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_respiration_s2_003",
+          "original": true,
+          "topicCode": "0610-RESP",
+          "type": "multiple_choice",
+          "prompt": "Why does a person's breathing rate increase during vigorous exercise?",
+          "options": [
+            {
+              "label": "A",
+              "text": "To cool the body by blowing out warm air",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "To pump blood faster around the body",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "To supply more oxygen to the muscles and remove the extra carbon dioxide produced by respiration",
+              "rationale": "This is the supported answer. During exercise the muscle cells respire faster, using more oxygen and releasing more carbon dioxide, so faster and deeper breathing brings in extra oxygen and expels the extra carbon dioxide to keep the blood gases balanced. Breathing is not a cooling mechanism, the heart rather than the lungs pumps blood faster, and the breathing rate does not affect digestion."
+            },
+            {
+              "label": "D",
+              "text": "To help the stomach digest food more quickly",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "During exercise the muscle cells respire faster, using more oxygen and releasing more carbon dioxide, so faster and deeper breathing brings in extra oxygen and expels the extra carbon dioxide to keep the blood gases balanced. Breathing is not a cooling mechanism, the heart rather than the lungs pumps blood faster, and the breathing rate does not affect digestion. Therefore the correct answer is C: To supply more oxygen to the muscles and remove the extra carbon dioxide produced by respiration.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_respiration_s2_004",
+          "original": true,
+          "topicCode": "0610-RESP",
+          "type": "multiple_choice",
+          "prompt": "Which word equation summarises anaerobic respiration in yeast?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Glucose → lactic acid",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Glucose + oxygen → carbon dioxide + water",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Carbon dioxide + water → glucose + oxygen",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Glucose → alcohol + carbon dioxide",
+              "rationale": "This is the supported answer. In yeast, anaerobic respiration (fermentation) converts glucose to alcohol (ethanol) and carbon dioxide, releasing a small amount of energy without using oxygen. Glucose → lactic acid is anaerobic respiration in human muscle, glucose + oxygen → carbon dioxide + water is aerobic respiration, and carbon dioxide + water → glucose + oxygen is photosynthesis."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "In yeast, anaerobic respiration (fermentation) converts glucose to alcohol (ethanol) and carbon dioxide, releasing a small amount of energy without using oxygen. Glucose → lactic acid is anaerobic respiration in human muscle, glucose + oxygen → carbon dioxide + water is aerobic respiration, and carbon dioxide + water → glucose + oxygen is photosynthesis. Therefore the correct answer is D: Glucose → alcohol + carbon dioxide.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_respiration_s2_005",
+          "original": true,
+          "topicCode": "0610-RESP",
+          "type": "multiple_choice",
+          "prompt": "Which feature of the alveoli shortens the diffusion distance for gases?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Walls that are only one cell thick",
+              "rationale": "This is the supported answer. The alveolar wall and the surrounding capillary wall are each only one cell thick, so oxygen and carbon dioxide have a very short distance to diffuse between the air and the blood. Cartilage supports the larger airways and would slow diffusion, the alveolar surface is moist so gases can dissolve, and the total surface area of the alveoli is very large rather than small."
+            },
+            {
+              "label": "B",
+              "text": "A thick layer of cartilage around each alveolus",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A dry inner surface",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A small total surface area",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The alveolar wall and the surrounding capillary wall are each only one cell thick, so oxygen and carbon dioxide have a very short distance to diffuse between the air and the blood. Cartilage supports the larger airways and would slow diffusion, the alveolar surface is moist so gases can dissolve, and the total surface area of the alveoli is very large rather than small. Therefore the correct answer is A: Walls that are only one cell thick.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_respiration_s2_006",
+          "original": true,
+          "topicCode": "0610-RESP",
+          "type": "multiple_choice",
+          "prompt": "What happens to the diaphragm and the rib cage when a person breathes in?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The diaphragm relaxes and domes upwards, and the ribs move up and out",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The diaphragm contracts and flattens, and the ribs move up and out",
+              "rationale": "This is the supported answer. Breathing in (inhalation) is driven by the diaphragm contracting and flattening while the external intercostal muscles pull the ribs up and out, increasing the volume of the thorax so air is drawn in. A relaxing, domed diaphragm with the ribs moving down and in describes breathing out, and the mixed combinations cannot produce the volume increase needed for inhalation."
+            },
+            {
+              "label": "C",
+              "text": "The diaphragm contracts and flattens, and the ribs move down and in",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The diaphragm relaxes and domes upwards, and the ribs move down and in",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Breathing in (inhalation) is driven by the diaphragm contracting and flattening while the external intercostal muscles pull the ribs up and out, increasing the volume of the thorax so air is drawn in. A relaxing, domed diaphragm with the ribs moving down and in describes breathing out, and the mixed combinations cannot produce the volume increase needed for inhalation. Therefore the correct answer is B: The diaphragm contracts and flattens, and the ribs move up and out.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_reproduction_s2_001",
+          "original": true,
+          "topicCode": "0610-REPRO",
+          "type": "multiple_choice",
+          "prompt": "Which type of cell division produces two genetically identical daughter cells for growth and repair?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Meiosis",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Fertilisation",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Mitosis",
+              "rationale": "This is the supported answer. Mitosis produces two daughter cells with the same chromosome number and identical genes as the parent cell, which is essential for growth and the repair of damaged tissues. Meiosis produces genetically varied gametes, fertilisation is the fusion of gametes rather than a division, and mutation is a change in DNA, not a cell division process."
+            },
+            {
+              "label": "D",
+              "text": "Mutation",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Mitosis produces two daughter cells with the same chromosome number and identical genes as the parent cell, which is essential for growth and the repair of damaged tissues. Meiosis produces genetically varied gametes, fertilisation is the fusion of gametes rather than a division, and mutation is a change in DNA, not a cell division process. Therefore the correct answer is C: Mitosis.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_reproduction_s2_002",
+          "original": true,
+          "topicCode": "0610-REPRO",
+          "type": "multiple_choice",
+          "prompt": "In an insect-pollinated flower, where are the male gametes made?",
+          "options": [
+            {
+              "label": "A",
+              "text": "In the stigma",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "In the ovary wall",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "In the sepals",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "In the anthers, inside pollen grains",
+              "rationale": "This is the supported answer. The anthers produce pollen grains, and each pollen grain contains the male gametes. The stigma receives pollen during pollination, the ovary contains the female ovules, and the sepals protect the flower bud, so none of these structures produces male gametes."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The anthers produce pollen grains, and each pollen grain contains the male gametes. The stigma receives pollen during pollination, the ovary contains the female ovules, and the sepals protect the flower bud, so none of these structures produces male gametes. Therefore the correct answer is D: In the anthers, inside pollen grains.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_reproduction_s2_003",
+          "original": true,
+          "topicCode": "0610-REPRO",
+          "type": "multiple_choice",
+          "prompt": "Which statement about asexual reproduction is correct?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It produces offspring that are genetically identical to the single parent",
+              "rationale": "This is the supported answer. Asexual reproduction involves one parent and no fusion of gametes, so the offspring are clones that are genetically identical to the parent. Two parents and gamete fusion describe sexual reproduction, which is also the process that generates wide variation, and asexual reproduction occurs in bacteria, fungi and animals as well as in plants."
+            },
+            {
+              "label": "B",
+              "text": "It requires two parents and the fusion of gametes",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It produces offspring showing wide genetic variation",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It occurs only in flowering plants",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Asexual reproduction involves one parent and no fusion of gametes, so the offspring are clones that are genetically identical to the parent. Two parents and gamete fusion describe sexual reproduction, which is also the process that generates wide variation, and asexual reproduction occurs in bacteria, fungi and animals as well as in plants. Therefore the correct answer is A: It produces offspring that are genetically identical to the single parent.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_reproduction_s2_004",
+          "original": true,
+          "topicCode": "0610-REPRO",
+          "type": "multiple_choice",
+          "prompt": "After pollination and fertilisation in a flowering plant, which structure develops into a seed?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The ovary",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The ovule",
+              "rationale": "This is the supported answer. Once the male gamete fuses with the female gamete inside the ovule, the fertilised ovule develops into the seed, while the whole ovary develops into the fruit around it. The ovary forms the fruit rather than the seed, and the petals and stigma wither and die after fertilisation."
+            },
+            {
+              "label": "C",
+              "text": "The petal",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The stigma",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Once the male gamete fuses with the female gamete inside the ovule, the fertilised ovule develops into the seed, while the whole ovary develops into the fruit around it. The ovary forms the fruit rather than the seed, and the petals and stigma wither and die after fertilisation. Therefore the correct answer is B: The ovule.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_reproduction_s2_005",
+          "original": true,
+          "topicCode": "0610-REPRO",
+          "type": "multiple_choice",
+          "prompt": "What is one advantage of cross-pollination over self-pollination?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It guarantees that every flower is pollinated",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It does not require wind or insects",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It increases genetic variation in the offspring",
+              "rationale": "This is the supported answer. Cross-pollination mixes gametes from two different plants, increasing genetic variation and giving the population a better chance of surviving environmental change. Cross-pollination is actually less reliable than self-pollination, still depends on wind or insects, and produces varied offspring rather than identical ones."
+            },
+            {
+              "label": "D",
+              "text": "It produces offspring identical to the parent",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Cross-pollination mixes gametes from two different plants, increasing genetic variation and giving the population a better chance of surviving environmental change. Cross-pollination is actually less reliable than self-pollination, still depends on wind or insects, and produces varied offspring rather than identical ones. Therefore the correct answer is C: It increases genetic variation in the offspring.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_reproduction_s2_006",
+          "original": true,
+          "topicCode": "0610-REPRO",
+          "type": "multiple_choice",
+          "prompt": "What is the main function of the amniotic fluid that surrounds a developing fetus?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It supplies oxygen to the fetus",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It digests food for the fetus",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It produces the hormones of pregnancy",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It cushions and protects the fetus from mechanical damage",
+              "rationale": "This is the supported answer. The amniotic sac and its fluid act as a shock absorber, supporting the fetus and protecting it from bumps and sudden pressure changes. Oxygen and nutrients diffuse across the placenta, the fetus does not digest food before birth, and pregnancy hormones are secreted by the ovary and placenta rather than by the fluid."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The amniotic sac and its fluid act as a shock absorber, supporting the fetus and protecting it from bumps and sudden pressure changes. Oxygen and nutrients diffuse across the placenta, the fetus does not digest food before birth, and pregnancy hormones are secreted by the ovary and placenta rather than by the fluid. Therefore the correct answer is D: It cushions and protects the fetus from mechanical damage.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_genetics_s2_001",
+          "original": true,
+          "topicCode": "0610-GEN",
+          "type": "multiple_choice",
+          "prompt": "Which statement correctly defines a gene?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A length of DNA that codes for a specific protein",
+              "rationale": "This is the supported answer. A gene is a section of a DNA molecule whose base sequence codes for the amino acid sequence of a particular protein. A chromosome carries many genes, an oxygen-carrying protein such as haemoglobin is the product of a gene rather than the gene itself, and genes are lengths of DNA, not cells."
+            },
+            {
+              "label": "B",
+              "text": "A whole chromosome found in the nucleus",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A protein that carries oxygen in the blood",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A type of cell found in the gametes",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A gene is a section of a DNA molecule whose base sequence codes for the amino acid sequence of a particular protein. A chromosome carries many genes, an oxygen-carrying protein such as haemoglobin is the product of a gene rather than the gene itself, and genes are lengths of DNA, not cells. Therefore the correct answer is A: A length of DNA that codes for a specific protein.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_genetics_s2_002",
+          "original": true,
+          "topicCode": "0610-GEN",
+          "type": "multiple_choice",
+          "prompt": "How many chromosomes are there in a normal human sperm cell?",
+          "options": [
+            {
+              "label": "A",
+              "text": "46",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "23",
+              "rationale": "This is the supported answer. Gametes are produced by meiosis and contain half the diploid number — one set of 23 chromosomes — so that the diploid number of 46 is restored at fertilisation. 46 is the number in a body cell, 22 counts only the autosomes and omits the sex chromosome, and 44 is double the autosome number."
+            },
+            {
+              "label": "C",
+              "text": "22",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "44",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Gametes are produced by meiosis and contain half the diploid number — one set of 23 chromosomes — so that the diploid number of 46 is restored at fertilisation. 46 is the number in a body cell, 22 counts only the autosomes and omits the sex chromosome, and 44 is double the autosome number. Therefore the correct answer is B: 23.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_genetics_s2_003",
+          "original": true,
+          "topicCode": "0610-GEN",
+          "type": "multiple_choice",
+          "prompt": "Two heterozygous tall pea plants (Tt) are crossed. What is the expected ratio of tall to short plants in the offspring?",
+          "options": [
+            {
+              "label": "A",
+              "text": "1 tall : 1 short",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "All tall",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "3 tall : 1 short",
+              "rationale": "This is the supported answer. The cross Tt × Tt gives genotypes 1 TT : 2 Tt : 1 tt, and the TT and Tt plants are all tall because T is dominant, so the phenotype ratio is 3 tall to 1 short. The 1 : 1 ratio comes from a Tt × tt test cross, all tall offspring would require at least one TT parent, and 1 : 2 : 1 is the genotype ratio rather than the phenotype ratio."
+            },
+            {
+              "label": "D",
+              "text": "1 tall : 2 heterozygous : 1 short",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The cross Tt × Tt gives genotypes 1 TT : 2 Tt : 1 tt, and the TT and Tt plants are all tall because T is dominant, so the phenotype ratio is 3 tall to 1 short. The 1 : 1 ratio comes from a Tt × tt test cross, all tall offspring would require at least one TT parent, and 1 : 2 : 1 is the genotype ratio rather than the phenotype ratio. Therefore the correct answer is C: 3 tall : 1 short.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_genetics_s2_004",
+          "original": true,
+          "topicCode": "0610-GEN",
+          "type": "multiple_choice",
+          "prompt": "Which factors are known to increase the rate of mutation?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Antibiotics and vaccines",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A balanced diet and regular exercise",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "High altitude and low humidity",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Ionising radiation and certain chemicals",
+              "rationale": "This is the supported answer. Ionising radiation such as X-rays and ultraviolet light, together with certain chemicals called mutagens, damage DNA and increase the rate of mutation. Antibiotics and vaccines act on pathogens and the immune system rather than on DNA, diet and exercise affect the phenotype without altering base sequences, and altitude and humidity have no known mutagenic effect."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Ionising radiation such as X-rays and ultraviolet light, together with certain chemicals called mutagens, damage DNA and increase the rate of mutation. Antibiotics and vaccines act on pathogens and the immune system rather than on DNA, diet and exercise affect the phenotype without altering base sequences, and altitude and humidity have no known mutagenic effect. Therefore the correct answer is D: Ionising radiation and certain chemicals.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_genetics_s2_005",
+          "original": true,
+          "topicCode": "0610-GEN",
+          "type": "multiple_choice",
+          "prompt": "Which statement about a dominant allele is correct?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It is expressed in the phenotype when only one copy is present",
+              "rationale": "This is the supported answer. A dominant allele shows its effect in a heterozygote, so only one copy is needed for the trait to appear in the phenotype. Dominance concerns expression rather than frequency, so a dominant allele can be rare, one copy is sufficient rather than two, and dominant alleles occur on every chromosome, not only the X chromosome."
+            },
+            {
+              "label": "B",
+              "text": "It is always the most common allele in a population",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It must be inherited from both parents to have an effect",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It is carried only on the X chromosome",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A dominant allele shows its effect in a heterozygote, so only one copy is needed for the trait to appear in the phenotype. Dominance concerns expression rather than frequency, so a dominant allele can be rare, one copy is sufficient rather than two, and dominant alleles occur on every chromosome, not only the X chromosome. Therefore the correct answer is A: It is expressed in the phenotype when only one copy is present.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_genetics_s2_006",
+          "original": true,
+          "topicCode": "0610-GEN",
+          "type": "multiple_choice",
+          "prompt": "Which human characteristic shows continuous variation?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Blood group",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Height",
+              "rationale": "This is the supported answer. Height can take any value within a range and is influenced by many genes together with environmental factors such as diet, so it shows continuous variation. Blood group, tongue-rolling ability and sex each fall into distinct categories with no intermediates, which is discontinuous variation."
+            },
+            {
+              "label": "C",
+              "text": "Ability to roll the tongue",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Sex",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Height can take any value within a range and is influenced by many genes together with environmental factors such as diet, so it shows continuous variation. Blood group, tongue-rolling ability and sex each fall into distinct categories with no intermediates, which is discontinuous variation. Therefore the correct answer is B: Height.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_ecology_s2_001",
+          "original": true,
+          "topicCode": "0610-ECOL",
+          "type": "multiple_choice",
+          "prompt": "Which organisms feed on dead organic material and release nutrients back into the soil?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Producers such as green plants",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Herbivores such as caterpillars",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Decomposers such as bacteria and fungi",
+              "rationale": "This is the supported answer. Decomposers — mainly bacteria and fungi — secrete enzymes onto dead matter, digest it and release mineral ions such as nitrates back into the soil for plants to reuse. Producers make their own food by photosynthesis, while herbivores and carnivores eat living or freshly killed organisms rather than decomposing dead material."
+            },
+            {
+              "label": "D",
+              "text": "Carnivores such as hawks",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Decomposers — mainly bacteria and fungi — secrete enzymes onto dead matter, digest it and release mineral ions such as nitrates back into the soil for plants to reuse. Producers make their own food by photosynthesis, while herbivores and carnivores eat living or freshly killed organisms rather than decomposing dead material. Therefore the correct answer is C: Decomposers such as bacteria and fungi.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_ecology_s2_002",
+          "original": true,
+          "topicCode": "0610-ECOL",
+          "type": "multiple_choice",
+          "prompt": "Which process removes carbon dioxide from the atmosphere in the carbon cycle?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Respiration",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Combustion of fossil fuels",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Decomposition",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Photosynthesis",
+              "rationale": "This is the supported answer. Green plants, algae and phytoplankton take in carbon dioxide for photosynthesis and lock the carbon into organic molecules such as glucose. Respiration, combustion and decomposition all release carbon dioxide back into the atmosphere rather than removing it."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Green plants, algae and phytoplankton take in carbon dioxide for photosynthesis and lock the carbon into organic molecules such as glucose. Respiration, combustion and decomposition all release carbon dioxide back into the atmosphere rather than removing it. Therefore the correct answer is D: Photosynthesis.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 2,
+          "timeLimit": 60,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_ecology_s2_003",
+          "original": true,
+          "topicCode": "0610-ECOL",
+          "type": "multiple_choice",
+          "prompt": "In the food chain grass → grasshopper → frog → hawk, what happens to the amount of energy available at each successive trophic level?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It decreases because energy is lost in respiration, movement and waste",
+              "rationale": "This is the supported answer. At each transfer much of the energy is used for respiration and movement or lost in waste and uneaten material, so only a small fraction passes on and the available energy decreases at every level. Energy cannot increase along a food chain, transfer is never completely efficient, and the losses happen at every step rather than only at the last."
+            },
+            {
+              "label": "B",
+              "text": "It increases because each animal eats more than the last",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It stays exactly the same at every level",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It decreases only at the final trophic level",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "At each transfer much of the energy is used for respiration and movement or lost in waste and uneaten material, so only a small fraction passes on and the available energy decreases at every level. Energy cannot increase along a food chain, transfer is never completely efficient, and the losses happen at every step rather than only at the last. Therefore the correct answer is A: It decreases because energy is lost in respiration, movement and waste.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_ecology_s2_004",
+          "original": true,
+          "topicCode": "0610-ECOL",
+          "type": "multiple_choice",
+          "prompt": "Nitrate fertiliser is washed from a field into a lake. Which sequence of events is most likely to follow?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Clearer water → more underwater plants → more fish",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Algal bloom → death of algae → bacterial decomposition → oxygen depletion in the water",
+              "rationale": "This is the supported answer. The extra nitrate triggers rapid algal growth (an algal bloom); when the algae die, decomposer bacteria multiply and respire, using up the dissolved oxygen so fish and other aquatic animals suffocate. Nitrates are nutrients rather than fast-acting poisons, they promote rather than prevent algal growth, and the outcome is oxygen loss rather than clearer water."
+            },
+            {
+              "label": "C",
+              "text": "Immediate death of all fish from nitrate poisoning",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Less plant growth because nitrates are toxic to algae",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The extra nitrate triggers rapid algal growth (an algal bloom); when the algae die, decomposer bacteria multiply and respire, using up the dissolved oxygen so fish and other aquatic animals suffocate. Nitrates are nutrients rather than fast-acting poisons, they promote rather than prevent algal growth, and the outcome is oxygen loss rather than clearer water. Therefore the correct answer is B: Algal bloom → death of algae → bacterial decomposition → oxygen depletion in the water.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_ecology_s2_005",
+          "original": true,
+          "topicCode": "0610-ECOL",
+          "type": "multiple_choice",
+          "prompt": "Which process in the nitrogen cycle returns nitrogen gas to the atmosphere?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Nitrogen fixation by lightning",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Nitrification by nitrifying bacteria",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Denitrification by bacteria that convert nitrates to nitrogen gas",
+              "rationale": "This is the supported answer. Denitrifying bacteria in waterlogged soils convert nitrates back into nitrogen gas, which escapes into the atmosphere. Nitrogen fixation and nitrification move nitrogen in the opposite direction — from nitrogen gas or ammonium compounds towards nitrates — and the absorption of nitrates by roots removes nitrate from the soil rather than returning nitrogen to the atmosphere."
+            },
+            {
+              "label": "D",
+              "text": "Absorption of nitrates by plant roots",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Denitrifying bacteria in waterlogged soils convert nitrates back into nitrogen gas, which escapes into the atmosphere. Nitrogen fixation and nitrification move nitrogen in the opposite direction — from nitrogen gas or ammonium compounds towards nitrates — and the absorption of nitrates by roots removes nitrate from the soil rather than returning nitrogen to the atmosphere. Therefore the correct answer is C: Denitrification by bacteria that convert nitrates to nitrogen gas.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_igbio_ecology_s2_006",
+          "original": true,
+          "topicCode": "0610-ECOL",
+          "type": "multiple_choice",
+          "prompt": "A lake contains pike, perch, water fleas and algae, together with the water, dissolved minerals and sunlight. Which term describes this whole system?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A population",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A community, with no abiotic factors",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "A single food chain",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "An ecosystem",
+              "rationale": "This is the supported answer. The system includes all the living organisms interacting with one another and with the non-living factors such as water, minerals and light, which together make up an ecosystem. A population is the members of one species only, a community is all the living organisms without the non-living environment, and a food chain describes just one feeding relationship."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The system includes all the living organisms interacting with one another and with the non-living factors such as water, minerals and light, which together make up an ecosystem. A population is the members of one species only, a community is all the living organisms without the non-living environment, and a food chain describes just one feeding relationship. Therefore the correct answer is D: An ecosystem.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 90,
+          "commandWord": "Recall",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Biology (0610) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-biology-0610/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
