@@ -1,0 +1,1892 @@
+{
+  "batchId": "bece-int-science-sprint3-001",
+  "status": "approved_for_beta",
+  "examTypeId": "exam_bece",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment, Ghana",
+      "title": "Common Core Programme curricula for Junior High School",
+      "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T14:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep curriculum-aligned BECE Integrated Science practice questions; not official WAEC (West African Examinations Council) examination material. Use the enabled feedback channel to report corrections.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_bece_science",
+      "specificationCode": "BRILLA-BECE-INTSCI-S3-001",
+      "sources": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Common Core Programme curricula for Junior High School",
+          "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "BECE-CELLS",
+          "title": "Cells and Living Organisms",
+          "objective": "Describe cell structure, classification of living things and the movement of substances in and out of cells."
+        },
+        {
+          "code": "BECE-BODY",
+          "title": "Human Body Systems",
+          "objective": "Explain how the digestive, circulatory, respiratory and skeletal systems keep the body working."
+        },
+        {
+          "code": "BECE-MATTER",
+          "title": "Matter and Its States",
+          "objective": "Apply the particle theory of matter and separate mixtures using suitable physical methods."
+        },
+        {
+          "code": "BECE-ENERGY",
+          "title": "Energy and Its Forms",
+          "objective": "Identify energy forms and transformations and apply the principle of conservation of energy."
+        },
+        {
+          "code": "BECE-ELEC",
+          "title": "Electricity and Magnetism",
+          "objective": "Connect simple series and parallel circuits, use electrical safety rules and describe magnets and electromagnets."
+        },
+        {
+          "code": "BECE-MACH",
+          "title": "Force, Work and Machines",
+          "objective": "Describe forces and friction, calculate work done and explain how levers and inclined planes make work easier."
+        },
+        {
+          "code": "BECE-AGRIC",
+          "title": "Agriculture and Food Production",
+          "objective": "Apply good practice in crop production, food processing and farm record keeping."
+        },
+        {
+          "code": "BECE-HEALTH",
+          "title": "Health, Sanitation and Environment",
+          "objective": "Explain how communicable diseases spread and how clean water, sanitation and immunisation protect health."
+        },
+        {
+          "code": "BECE-METHODS",
+          "title": "Scientific Inquiry and Technology",
+          "objective": "Use the scientific method, read laboratory instruments accurately and apply technology safely."
+        },
+        {
+          "code": "BECE-EARTH",
+          "title": "Earth and Space Science",
+          "objective": "Describe rocks, the water cycle, weather measurement and the Earth-Moon-Sun system."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_bece_intsci_s3_001",
+          "original": true,
+          "topicCode": "BECE-CELLS",
+          "type": "multiple_choice",
+          "prompt": "A red blood cell bursts when placed in pure water, but a plant cell kept in pure water does not. Which structure explains the difference?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The cellulose cell wall, which resists the extra water pressure",
+              "rationale": "This is the supported answer. Water enters both cells by osmosis. The plant cell has a tough cellulose cell wall outside its membrane; as water enters, the wall resists the pressure, so the cell becomes firm (turgid) but does not burst. The red blood cell has no wall, so it swells and bursts. (The nucleus controls cell activities but cannot pump out water; chloroplasts make food and do not absorb the inflow; plant and animal cell membranes are similarly thin.)"
+            },
+            {
+              "label": "B",
+              "text": "The nucleus, which pumps water out of the plant cell",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The chloroplasts, which absorb the extra water",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The cell membrane, which is thicker in plant cells",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Water enters both cells by osmosis. The plant cell has a tough cellulose cell wall outside its membrane; as water enters, the wall resists the pressure, so the cell becomes firm (turgid) but does not burst. The red blood cell has no wall, so it swells and bursts. (The nucleus controls cell activities but cannot pump out water; chloroplasts make food and do not absorb the inflow; plant and animal cell membranes are similarly thin.) Therefore the correct answer is A: The cellulose cell wall, which resists the extra water pressure.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_002",
+          "original": true,
+          "topicCode": "BECE-CELLS",
+          "type": "multiple_choice",
+          "prompt": "Pieces of peeled cassava are placed in a concentrated salt solution. After one hour the pieces have become soft and have shrunk slightly. Which statement explains this?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Water moved by osmosis from the salt solution into the cassava cells",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Water moved by osmosis from the cassava cells into the stronger salt solution",
+              "rationale": "This is the supported answer. Osmosis moves water across a partially permeable membrane from the weaker (more dilute) solution to the stronger (more concentrated) one. The concentrated salt solution draws water out of the cassava cells, so they lose turgor and the pieces go soft. (Water moving in would make the pieces firm, not soft; salt does not dissolve the cell contents.)"
+            },
+            {
+              "label": "C",
+              "text": "Salt moved into the cells and dissolved their contents",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The cassava absorbed salt, which made the cells firm",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Osmosis moves water across a partially permeable membrane from the weaker (more dilute) solution to the stronger (more concentrated) one. The concentrated salt solution draws water out of the cassava cells, so they lose turgor and the pieces go soft. (Water moving in would make the pieces firm, not soft; salt does not dissolve the cell contents.) Therefore the correct answer is B: Water moved by osmosis from the cassava cells into the stronger salt solution.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_003",
+          "original": true,
+          "topicCode": "BECE-CELLS",
+          "type": "short_answer",
+          "prompt": "State two structural differences between a typical plant cell and a typical animal cell.",
+          "correctAnswer": "A plant cell has a cellulose cell wall and chloroplasts (and usually a large central vacuole); an animal cell has none of these structures.",
+          "workedSolution": "A typical plant cell is surrounded by a cellulose cell wall, contains chloroplasts for photosynthesis and usually has one large central vacuole. An animal cell has only a cell membrane, no chloroplasts and only small temporary vacuoles. Any two of these differences earn the marks. Answer: plant cells have a cell wall and chloroplasts (and a large central vacuole); animal cells do not.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 2,
+          "timeLimit": 90,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_004",
+          "original": true,
+          "topicCode": "BECE-CELLS",
+          "type": "calculation",
+          "prompt": "A diagram of a cell measures 45 mm across. The real cell is 0.15 mm across. Calculate the magnification of the diagram.",
+          "correctAnswer": "×300",
+          "workedSolution": "Magnification = size of image ÷ real size of object = 45 mm ÷ 0.15 mm = 300. The diagram is 300 times larger than the real cell. Answer: ×300.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_005",
+          "original": true,
+          "topicCode": "BECE-CELLS",
+          "type": "structured",
+          "prompt": "Ama is studying how substances move into and out of cells.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Define the term diffusion.",
+              "marks": 1,
+              "correctAnswer": "Diffusion is the movement of particles from a region of higher concentration to a region of lower concentration until they are evenly spread (1)."
+            },
+            {
+              "label": "b",
+              "text": "State two factors that affect the rate of diffusion.",
+              "marks": 2,
+              "correctAnswer": "Any two of: temperature — a higher temperature gives faster diffusion (1); the concentration difference (gradient) between the two regions (1); the distance over which diffusion must occur; the size of the particles (1)."
+            },
+            {
+              "label": "c",
+              "text": "Explain why a tiny organism such as Amoeba does not need a special transport system, but a human being does.",
+              "marks": 2,
+              "correctAnswer": "Amoeba is microscopic, so oxygen and nutrients reach every part of its single cell by diffusion over a very short distance (1). A human is large and made of many cells, so diffusion alone would be far too slow; a blood circulatory system is needed to carry materials quickly to all cells (1)."
+            }
+          ],
+          "correctAnswer": "(a) Diffusion is the movement of particles from a region of higher concentration to a region of lower concentration until they are evenly spread (1). (b) Any two of: temperature — a higher temperature gives faster diffusion (1); the concentration difference (gradient) between the two regions (1); the distance over which diffusion must occur; the size of the particles (1). (c) Amoeba is microscopic, so oxygen and nutrients reach every part of its single cell by diffusion over a very short distance (1). A human is large and made of many cells, so diffusion alone would be far too slow; a blood circulatory system is needed to carry materials quickly to all cells (1).",
+          "workedSolution": "(a) Diffusion is the movement of particles from a region of higher concentration to a region of lower concentration until they are evenly spread (1). (b) Any two of: temperature — a higher temperature gives faster diffusion (1); the concentration difference (gradient) between the two regions (1); the distance over which diffusion must occur; the size of the particles (1). (c) Amoeba is microscopic, so oxygen and nutrients reach every part of its single cell by diffusion over a very short distance (1). A human is large and made of many cells, so diffusion alone would be far too slow; a blood circulatory system is needed to carry materials quickly to all cells (1).",
+          "difficulty": "medium",
+          "marks": 5,
+          "points": 5,
+          "timeLimit": null,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned BECE Integrated Science practice content; not official WAEC examination material.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_006",
+          "original": true,
+          "topicCode": "BECE-BODY",
+          "type": "multiple_choice",
+          "prompt": "Why does the wall of the left ventricle of the heart have thicker muscle than the wall of the right ventricle?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It receives blood from both lungs at once",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It pumps blood a shorter distance to the lungs",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It must pump blood at higher pressure round the whole body",
+              "rationale": "This is the supported answer. The left ventricle pumps oxygenated blood through the aorta to the entire body, a long distance that needs high pressure, so its muscular wall is the thickest. The right ventricle pumps blood only to the nearby lungs at lower pressure. (Pumping to the lungs is the right side’s job; valves are thin flaps that prevent backflow and do not need thick muscle to support them.)"
+            },
+            {
+              "label": "D",
+              "text": "It contains more valves that need support",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The left ventricle pumps oxygenated blood through the aorta to the entire body, a long distance that needs high pressure, so its muscular wall is the thickest. The right ventricle pumps blood only to the nearby lungs at lower pressure. (Pumping to the lungs is the right side’s job; valves are thin flaps that prevent backflow and do not need thick muscle to support them.) Therefore the correct answer is C: It must pump blood at higher pressure round the whole body.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_007",
+          "original": true,
+          "topicCode": "BECE-BODY",
+          "type": "multiple_choice",
+          "prompt": "During a game of football, Kofi’s breathing becomes faster and deeper. What is the main reason for this change?",
+          "options": [
+            {
+              "label": "A",
+              "text": "His lungs are resting, so they work more slowly",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "His body temperature falls and the lungs keep him warm",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "His heart stops, so the lungs take over its work",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "His muscles need more oxygen and produce more carbon dioxide that must be removed",
+              "rationale": "This is the supported answer. Exercise raises the rate of respiration in the muscle cells, using up more oxygen and releasing more carbon dioxide. Faster, deeper breathing supplies the extra oxygen and expels the extra carbon dioxide. (The lungs do not rest during exercise; breathing is not controlled by body temperature falling, and the heart beats faster rather than stopping.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Exercise raises the rate of respiration in the muscle cells, using up more oxygen and releasing more carbon dioxide. Faster, deeper breathing supplies the extra oxygen and expels the extra carbon dioxide. (The lungs do not rest during exercise; breathing is not controlled by body temperature falling, and the heart beats faster rather than stopping.) Therefore the correct answer is D: His muscles need more oxygen and produce more carbon dioxide that must be removed.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_008",
+          "original": true,
+          "topicCode": "BECE-BODY",
+          "type": "short_answer",
+          "prompt": "State two functions of the human skeleton other than giving the body its shape.",
+          "correctAnswer": "Any two of: it protects delicate organs such as the brain, heart and lungs; it allows movement by providing attachment for muscles; it makes blood cells in the bone marrow; it stores minerals such as calcium.",
+          "workedSolution": "Besides supporting and shaping the body, the skeleton protects delicate organs (the skull guards the brain and the ribs guard the heart and lungs), provides firm attachment points for muscles so that movement is possible, manufactures red and white blood cells in the bone marrow, and stores minerals such as calcium and phosphorus. Any two of these functions earn the marks.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 2,
+          "timeLimit": 90,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_009",
+          "original": true,
+          "topicCode": "BECE-BODY",
+          "type": "calculation",
+          "prompt": "After exercising, Esi counts her pulse 21 times in 15 seconds. Calculate her heart rate in beats per minute.",
+          "correctAnswer": "84 beats per minute",
+          "workedSolution": "There are 4 × 15 = 60 seconds in one minute, so multiply the 15-second count by 4: 21 × 4 = 84. Answer: her heart rate is 84 beats per minute.",
+          "difficulty": "easy",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_010",
+          "original": true,
+          "topicCode": "BECE-BODY",
+          "type": "structured",
+          "prompt": "Yaw is learning about how the human digestive system deals with a meal of kenkey and fish.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Define digestion.",
+              "marks": 1,
+              "correctAnswer": "Digestion is the breakdown of large, insoluble food molecules into small, soluble molecules that can be absorbed into the blood (1)."
+            },
+            {
+              "label": "b",
+              "text": "State the part of the digestive system where (i) digestion of starch begins and (ii) most absorption of digested food takes place.",
+              "marks": 2,
+              "correctAnswer": "(i) The mouth, where the enzyme amylase in saliva starts to break down starch (1). (ii) The small intestine (ileum) (1)."
+            },
+            {
+              "label": "c",
+              "text": "Explain how the small intestine is adapted for absorbing digested food.",
+              "marks": 2,
+              "correctAnswer": "Its inner surface is folded into many tiny finger-like villi, which give a very large surface area for absorption (1); each villus has thin walls and a rich blood supply, so digested food passes quickly into the blood (1)."
+            }
+          ],
+          "correctAnswer": "(a) Digestion is the breakdown of large, insoluble food molecules into small, soluble molecules that can be absorbed into the blood (1). (b) (i) The mouth, where the enzyme amylase in saliva starts to break down starch (1). (ii) The small intestine (ileum) (1). (c) Its inner surface is folded into many tiny finger-like villi, which give a very large surface area for absorption (1); each villus has thin walls and a rich blood supply, so digested food passes quickly into the blood (1).",
+          "workedSolution": "(a) Digestion is the breakdown of large, insoluble food molecules into small, soluble molecules that can be absorbed into the blood (1). (b) (i) The mouth, where the enzyme amylase in saliva starts to break down starch (1). (ii) The small intestine (ileum) (1). (c) Its inner surface is folded into many tiny finger-like villi, which give a very large surface area for absorption (1); each villus has thin walls and a rich blood supply, so digested food passes quickly into the blood (1).",
+          "difficulty": "medium",
+          "marks": 5,
+          "points": 5,
+          "timeLimit": null,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned BECE Integrated Science practice content; not official WAEC examination material.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_011",
+          "original": true,
+          "topicCode": "BECE-MATTER",
+          "type": "multiple_choice",
+          "prompt": "When 50 cm³ of water is mixed with 50 cm³ of ethanol, the final volume is slightly less than 100 cm³. What does this show about matter?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Particles of matter have spaces between them, so smaller particles fill gaps between larger ones",
+              "rationale": "This is the supported answer. The particle theory says matter is made of tiny particles with spaces between them. When water and ethanol mix, some of the smaller particles occupy spaces between the larger ones, so the total volume shrinks slightly. (No measurable evaporation or chemical reaction takes place during the mixing, and matter cannot be destroyed by simply mixing liquids.)"
+            },
+            {
+              "label": "B",
+              "text": "Some of the liquid always evaporates during mixing",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The two liquids react to form a solid",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Matter is destroyed when liquids are mixed",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The particle theory says matter is made of tiny particles with spaces between them. When water and ethanol mix, some of the smaller particles occupy spaces between the larger ones, so the total volume shrinks slightly. (No measurable evaporation or chemical reaction takes place during the mixing, and matter cannot be destroyed by simply mixing liquids.) Therefore the correct answer is A: Particles of matter have spaces between them, so smaller particles fill gaps between larger ones.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_012",
+          "original": true,
+          "topicCode": "BECE-MATTER",
+          "type": "multiple_choice",
+          "prompt": "A mixture contains iron filings, sand and common salt. A learner wants a sample of pure salt. Which sequence of separation methods is correct?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Evaporate first, then filter, then use a magnet",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Use a magnet, dissolve the rest in water and filter, then evaporate the filtrate",
+              "rationale": "This is the supported answer. A magnet first pulls out the magnetic iron filings. Adding water then dissolves only the salt; filtering removes the insoluble sand as the residue. Evaporating (or crystallising) the filtrate finally recovers the dissolved salt. (A dry mixture of solids cannot be filtered, and the magnet must be used before dissolving or the filings end up in the filter paper.)"
+            },
+            {
+              "label": "C",
+              "text": "Filter the dry mixture, then dissolve and evaporate",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Dissolve everything, filter, then use a magnet on the solution",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A magnet first pulls out the magnetic iron filings. Adding water then dissolves only the salt; filtering removes the insoluble sand as the residue. Evaporating (or crystallising) the filtrate finally recovers the dissolved salt. (A dry mixture of solids cannot be filtered, and the magnet must be used before dissolving or the filings end up in the filter paper.) Therefore the correct answer is B: Use a magnet, dissolve the rest in water and filter, then evaporate the filtrate.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Sequence",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_013",
+          "original": true,
+          "topicCode": "BECE-MATTER",
+          "type": "short_answer",
+          "prompt": "State two differences between a mixture and a compound.",
+          "correctAnswer": "In a mixture the substances keep their own properties and can be separated by physical methods; in a compound the elements are chemically combined in a fixed ratio and can be separated only by chemical means.",
+          "workedSolution": "A mixture contains two or more substances that are not chemically joined: each keeps its own properties, the amounts can vary, and the substances can be separated by physical methods such as filtering or evaporation. A compound forms when elements chemically combine in a fixed ratio; it has completely new properties and can be split up only by chemical means. Any two of these differences earn the marks.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 2,
+          "timeLimit": 90,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_014",
+          "original": true,
+          "topicCode": "BECE-MATTER",
+          "type": "calculation",
+          "prompt": "A stone has a mass of 54 g. When it is fully immersed, it raises the level of water in a measuring cylinder from 50 cm³ to 70 cm³. Calculate the density of the stone.",
+          "correctAnswer": "2.7 g/cm³",
+          "workedSolution": "Volume of the stone = 70 cm³ − 50 cm³ = 20 cm³. Density = mass ÷ volume = 54 g ÷ 20 cm³ = 2.7 g/cm³. Answer: the density of the stone is 2.7 g/cm³.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_015",
+          "original": true,
+          "topicCode": "BECE-MATTER",
+          "type": "structured",
+          "prompt": "A teacher gives a class a mixture of salt and sand and asks them to obtain pure dry salt from it.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Explain why the mixture is first stirred with warm water.",
+              "marks": 1,
+              "correctAnswer": "Warm water dissolves the salt quickly, but sand does not dissolve in water at all (1)."
+            },
+            {
+              "label": "b",
+              "text": "Describe how the sand is then separated from the salt solution.",
+              "marks": 2,
+              "correctAnswer": "The mixture is poured through filter paper held in a funnel — this is filtration (1); the insoluble sand stays on the paper as the residue while the salt solution passes through as the filtrate (1)."
+            },
+            {
+              "label": "c",
+              "text": "Describe how pure dry salt is obtained from the filtrate.",
+              "marks": 2,
+              "correctAnswer": "The filtrate is heated so that the water evaporates (1); the salt is left behind as solid crystals, which are then dried (1)."
+            }
+          ],
+          "correctAnswer": "(a) Warm water dissolves the salt quickly, but sand does not dissolve in water at all (1). (b) The mixture is poured through filter paper held in a funnel — this is filtration (1); the insoluble sand stays on the paper as the residue while the salt solution passes through as the filtrate (1). (c) The filtrate is heated so that the water evaporates (1); the salt is left behind as solid crystals, which are then dried (1).",
+          "workedSolution": "(a) Warm water dissolves the salt quickly, but sand does not dissolve in water at all (1). (b) The mixture is poured through filter paper held in a funnel — this is filtration (1); the insoluble sand stays on the paper as the residue while the salt solution passes through as the filtrate (1). (c) The filtrate is heated so that the water evaporates (1); the salt is left behind as solid crystals, which are then dried (1).",
+          "difficulty": "medium",
+          "marks": 5,
+          "points": 5,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned BECE Integrated Science practice content; not official WAEC examination material.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_016",
+          "original": true,
+          "topicCode": "BECE-ENERGY",
+          "type": "multiple_choice",
+          "prompt": "Which sequence correctly shows the energy transformations in a hydroelectric power station such as Akosombo?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Electrical energy → kinetic energy → potential energy",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Chemical energy of coal → heat energy → electrical energy",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Potential energy of stored water → kinetic energy of moving water → kinetic energy of turbines → electrical energy",
+              "rationale": "This is the supported answer. Water held behind the dam has gravitational potential energy; as it falls through the penstock it gains kinetic energy, which spins the turbines, and the generators convert that movement into electrical energy. (A hydroelectric station burns no coal, and the chain cannot begin with electrical energy, which is the output, not the input.)"
+            },
+            {
+              "label": "D",
+              "text": "Light energy → sound energy → electrical energy",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Water held behind the dam has gravitational potential energy; as it falls through the penstock it gains kinetic energy, which spins the turbines, and the generators convert that movement into electrical energy. (A hydroelectric station burns no coal, and the chain cannot begin with electrical energy, which is the output, not the input.) Therefore the correct answer is C: Potential energy of stored water → kinetic energy of moving water → kinetic energy of turbines → electrical energy.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Sequence",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_017",
+          "original": true,
+          "topicCode": "BECE-ENERGY",
+          "type": "multiple_choice",
+          "prompt": "No machine is 100% efficient. What happens to the input energy that is not converted into useful work?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It is destroyed by the machine",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It is stored inside the machine forever",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It changes back into the original fuel",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It is changed into other forms, such as heat and sound, that are not useful",
+              "rationale": "This is the supported answer. By the law of conservation of energy, energy cannot be created or destroyed. Friction between moving parts converts some of the input energy into heat and sound, which do no useful work, so the useful output is always less than the input. (Energy is never destroyed, and the wasted heat does not turn back into fuel.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "By the law of conservation of energy, energy cannot be created or destroyed. Friction between moving parts converts some of the input energy into heat and sound, which do no useful work, so the useful output is always less than the input. (Energy is never destroyed, and the wasted heat does not turn back into fuel.) Therefore the correct answer is D: It is changed into other forms, such as heat and sound, that are not useful.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_018",
+          "original": true,
+          "topicCode": "BECE-ENERGY",
+          "type": "short_answer",
+          "prompt": "State the law of conservation of energy, and name the energy transformation that takes place when a torch is switched on.",
+          "correctAnswer": "Energy cannot be created or destroyed; it can only be changed from one form to another. In a torch, chemical energy in the battery changes into electrical energy and then into light (and a little heat).",
+          "workedSolution": "The law of conservation of energy states that energy cannot be created or destroyed but can only be transformed from one form to another. When a torch is switched on, the chemical energy stored in the battery becomes electrical energy in the circuit, and the bulb converts this into light energy with a small amount of heat.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 2,
+          "timeLimit": 90,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_019",
+          "original": true,
+          "topicCode": "BECE-ENERGY",
+          "type": "calculation",
+          "prompt": "A 2 kg bag of rice is lifted from the floor onto a shelf 3 m high. Taking g = 10 m/s², calculate the potential energy gained by the bag.",
+          "correctAnswer": "60 J",
+          "workedSolution": "Potential energy gained = m × g × h = 2 kg × 10 m/s² × 3 m = 60 J. Answer: the bag gains 60 J of potential energy.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_020",
+          "original": true,
+          "topicCode": "BECE-ENERGY",
+          "type": "structured",
+          "prompt": "Ghana needs more sources of electricity for homes and schools.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Explain what is meant by a renewable energy source.",
+              "marks": 1,
+              "correctAnswer": "A renewable energy source is one that is naturally replaced and will not run out, such as sunlight, wind or flowing water (1)."
+            },
+            {
+              "label": "b",
+              "text": "Name two renewable energy sources that can be used in Ghana.",
+              "marks": 2,
+              "correctAnswer": "Any two of: solar energy (sunlight), wind energy, hydroelectric power (flowing water), biomass (1 each)."
+            },
+            {
+              "label": "c",
+              "text": "State one advantage and one disadvantage of using solar energy.",
+              "marks": 2,
+              "correctAnswer": "Advantage: sunlight is free and clean and produces no smoke or greenhouse gases (1). Disadvantage: it works only when the sun shines, so batteries or another source are needed at night or on cloudy days (1)."
+            }
+          ],
+          "correctAnswer": "(a) A renewable energy source is one that is naturally replaced and will not run out, such as sunlight, wind or flowing water (1). (b) Any two of: solar energy (sunlight), wind energy, hydroelectric power (flowing water), biomass (1 each). (c) Advantage: sunlight is free and clean and produces no smoke or greenhouse gases (1). Disadvantage: it works only when the sun shines, so batteries or another source are needed at night or on cloudy days (1).",
+          "workedSolution": "(a) A renewable energy source is one that is naturally replaced and will not run out, such as sunlight, wind or flowing water (1). (b) Any two of: solar energy (sunlight), wind energy, hydroelectric power (flowing water), biomass (1 each). (c) Advantage: sunlight is free and clean and produces no smoke or greenhouse gases (1). Disadvantage: it works only when the sun shines, so batteries or another source are needed at night or on cloudy days (1).",
+          "difficulty": "medium",
+          "marks": 5,
+          "points": 5,
+          "timeLimit": null,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned BECE Integrated Science practice content; not official WAEC examination material.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_021",
+          "original": true,
+          "topicCode": "BECE-ELEC",
+          "type": "multiple_choice",
+          "prompt": "Two lamps are connected in series in a circuit. One lamp blows (its filament breaks). What happens to the other lamp?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It goes out because the circuit is now incomplete",
+              "rationale": "This is the supported answer. In a series circuit there is only one path for the current. A broken filament breaks that single path, so no current flows and the second lamp goes out. (In a parallel circuit the second lamp would stay on; a lamp cannot become brighter when the current has stopped completely.)"
+            },
+            {
+              "label": "B",
+              "text": "It becomes brighter because it gets all the current",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It keeps shining normally",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It becomes dimmer but stays on",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "In a series circuit there is only one path for the current. A broken filament breaks that single path, so no current flows and the second lamp goes out. (In a parallel circuit the second lamp would stay on; a lamp cannot become brighter when the current has stopped completely.) Therefore the correct answer is A: It goes out because the circuit is now incomplete.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Predict",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_022",
+          "original": true,
+          "topicCode": "BECE-ELEC",
+          "type": "multiple_choice",
+          "prompt": "Which instrument is used to measure the current flowing through a lamp, and how is it connected?",
+          "options": [
+            {
+              "label": "A",
+              "text": "A voltmeter, connected in series with the lamp",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "An ammeter, connected in series with the lamp",
+              "rationale": "This is the supported answer. Current is measured with an ammeter, and because the same current must pass through it, the ammeter is connected in series with the lamp. A voltmeter measures potential difference and is connected in parallel across a component. (An ammeter connected in parallel would create a short circuit across the lamp.)"
+            },
+            {
+              "label": "C",
+              "text": "An ammeter, connected in parallel with the lamp",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "A voltmeter, connected across the battery only",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Current is measured with an ammeter, and because the same current must pass through it, the ammeter is connected in series with the lamp. A voltmeter measures potential difference and is connected in parallel across a component. (An ammeter connected in parallel would create a short circuit across the lamp.) Therefore the correct answer is B: An ammeter, connected in series with the lamp.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_023",
+          "original": true,
+          "topicCode": "BECE-ELEC",
+          "type": "multiple_choice",
+          "prompt": "Why are the lamps and sockets in a house wired in parallel rather than in series?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Parallel wiring always uses thinner cables and less copper",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "In series the lamps would burn out immediately",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Each appliance then receives the full mains voltage and can be switched on or off independently",
+              "rationale": "This is the supported answer. In parallel, each branch is connected directly across the supply, so every appliance receives the full mains voltage, and a fault or switch in one branch does not affect the others. In series the voltage would be shared between the appliances and one fault would switch everything off. (Cable thickness depends on current rating, not on the circuit layout.)"
+            },
+            {
+              "label": "D",
+              "text": "Parallel circuits prevent any current from flowing when one lamp fails",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "In parallel, each branch is connected directly across the supply, so every appliance receives the full mains voltage, and a fault or switch in one branch does not affect the others. In series the voltage would be shared between the appliances and one fault would switch everything off. (Cable thickness depends on current rating, not on the circuit layout.) Therefore the correct answer is C: Each appliance then receives the full mains voltage and can be switched on or off independently.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_024",
+          "original": true,
+          "topicCode": "BECE-ELEC",
+          "type": "multiple_choice",
+          "prompt": "An electromagnet made from a coil of wire around an iron nail picks up only a few paper clips. Which change will make it stronger?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Use a wooden core instead of the iron nail",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Reduce the current flowing through the coil",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Spread the turns of the coil farther apart",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Increase the number of turns of wire on the coil",
+              "rationale": "This is the supported answer. The strength of an electromagnet increases with more turns of wire, a larger current and a soft-iron core. Adding turns concentrates the magnetic field around the core. (Wood is not magnetic, reducing the current weakens the field, and spreading the turns out weakens it as well.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The strength of an electromagnet increases with more turns of wire, a larger current and a soft-iron core. Adding turns concentrates the magnetic field around the core. (Wood is not magnetic, reducing the current weakens the field, and spreading the turns out weakens it as well.) Therefore the correct answer is D: Increase the number of turns of wire on the coil.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Apply",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_025",
+          "original": true,
+          "topicCode": "BECE-ELEC",
+          "type": "short_answer",
+          "prompt": "Explain the difference between an electrical conductor and an insulator, giving one example of each.",
+          "correctAnswer": "A conductor allows electric current to pass through it easily, for example copper wire; an insulator does not allow current to pass through it, for example rubber or plastic.",
+          "workedSolution": "An electrical conductor is a material that lets charge flow through it easily because it has many free electrons — metals such as copper and aluminium are good conductors, which is why cables have a copper core. An insulator does not allow current to pass through it — rubber, plastic and dry wood are examples, which is why cables are covered with plastic.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 2,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_026",
+          "original": true,
+          "topicCode": "BECE-ELEC",
+          "type": "calculation",
+          "prompt": "A resistor of 4 Ω is connected to a battery and a current of 0.5 A flows through it. Calculate the voltage across the resistor.",
+          "correctAnswer": "2 V",
+          "workedSolution": "Using Ohm’s law, V = I × R = 0.5 A × 4 Ω = 2 V. Answer: the voltage across the resistor is 2 V.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_027",
+          "original": true,
+          "topicCode": "BECE-ELEC",
+          "type": "structured",
+          "prompt": "Kofi wants to connect a simple circuit to light a bulb for his study table.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State the function of each of the following in the circuit: (i) the battery, (ii) the switch.",
+              "marks": 2,
+              "correctAnswer": "(i) The battery provides the electrical energy (voltage) that pushes current round the circuit (1). (ii) The switch opens or closes the circuit to turn the current off or on (1)."
+            },
+            {
+              "label": "b",
+              "text": "Name the material used to join the components, and state the property that makes it suitable.",
+              "marks": 1,
+              "correctAnswer": "Copper wire; copper is a very good conductor of electricity (1)."
+            },
+            {
+              "label": "c",
+              "text": "Explain why a fuse is included in the plug of the table lamp.",
+              "marks": 2,
+              "correctAnswer": "If a fault makes the current too large, the thin fuse wire melts and breaks the circuit (1); this protects the lamp and prevents the cable from overheating and causing a fire (1)."
+            }
+          ],
+          "correctAnswer": "(a) (i) The battery provides the electrical energy (voltage) that pushes current round the circuit (1). (ii) The switch opens or closes the circuit to turn the current off or on (1). (b) Copper wire; copper is a very good conductor of electricity (1). (c) If a fault makes the current too large, the thin fuse wire melts and breaks the circuit (1); this protects the lamp and prevents the cable from overheating and causing a fire (1).",
+          "workedSolution": "(a) (i) The battery provides the electrical energy (voltage) that pushes current round the circuit (1). (ii) The switch opens or closes the circuit to turn the current off or on (1). (b) Copper wire; copper is a very good conductor of electricity (1). (c) If a fault makes the current too large, the thin fuse wire melts and breaks the circuit (1); this protects the lamp and prevents the cable from overheating and causing a fire (1).",
+          "difficulty": "medium",
+          "marks": 5,
+          "points": 5,
+          "timeLimit": null,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned BECE Integrated Science practice content; not official WAEC examination material.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_028",
+          "original": true,
+          "topicCode": "BECE-MACH",
+          "type": "multiple_choice",
+          "prompt": "A wheelbarrow carries a load of sand placed between the wheel (the pivot) and the gardener’s hands (the effort). Which class of lever is the wheelbarrow?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Second-class lever, because the load is between the pivot and the effort",
+              "rationale": "This is the supported answer. In a second-class lever the load lies between the fulcrum and the effort, which gives a large mechanical advantage — a small effort lifts a heavy load. The wheel is the fulcrum, the sand is the load and the hands supply the effort. (First class has the pivot in the middle, like a see-saw; third class has the effort in the middle, like tongs or a fishing rod.)"
+            },
+            {
+              "label": "B",
+              "text": "First-class lever, because the pivot is between the load and the effort",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Third-class lever, because the effort is between the pivot and the load",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It is not a lever at all but a pulley",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "In a second-class lever the load lies between the fulcrum and the effort, which gives a large mechanical advantage — a small effort lifts a heavy load. The wheel is the fulcrum, the sand is the load and the hands supply the effort. (First class has the pivot in the middle, like a see-saw; third class has the effort in the middle, like tongs or a fishing rod.) Therefore the correct answer is A: Second-class lever, because the load is between the pivot and the effort.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Classify",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_029",
+          "original": true,
+          "topicCode": "BECE-MACH",
+          "type": "multiple_choice",
+          "prompt": "Porters push a heavy drum up a long plank onto a lorry instead of lifting it vertically. Which statement correctly explains why the plank (an inclined plane) helps?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The plank reduces the weight of the drum",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "A smaller effort is needed because the load moves over a longer distance",
+              "rationale": "This is the supported answer. An inclined plane lets the porters use a smaller force spread over a longer distance. The work done against gravity (weight × vertical height) is the same either way; only the effort needed at each moment is smaller. (The drum’s weight is unchanged, and a rough plank can even add friction — it is never removed completely.)"
+            },
+            {
+              "label": "C",
+              "text": "The total work done against gravity is reduced",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The plank removes friction completely",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "An inclined plane lets the porters use a smaller force spread over a longer distance. The work done against gravity (weight × vertical height) is the same either way; only the effort needed at each moment is smaller. (The drum’s weight is unchanged, and a rough plank can even add friction — it is never removed completely.) Therefore the correct answer is B: A smaller effort is needed because the load moves over a longer distance.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_030",
+          "original": true,
+          "topicCode": "BECE-MACH",
+          "type": "short_answer",
+          "prompt": "State two ways of reducing friction between the moving parts of a machine.",
+          "correctAnswer": "Any two of: lubricating the parts with oil or grease; using ball bearings or rollers; polishing or smoothing the rubbing surfaces; separating the surfaces with a cushion of air.",
+          "workedSolution": "Friction between moving parts wastes energy and wears the parts out. It can be reduced by lubricating with oil or grease, which keeps the surfaces slightly apart; by fitting ball bearings or rollers so the parts roll instead of slide; by polishing the surfaces to make them smoother; or by separating them with a cushion of air. Any two of these methods earn the marks.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 2,
+          "timeLimit": 90,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_031",
+          "original": true,
+          "topicCode": "BECE-MACH",
+          "type": "calculation",
+          "prompt": "A pupil pushes a box along the floor with a steady force of 50 N and moves it 4 m in the direction of the force. Calculate the work done on the box.",
+          "correctAnswer": "200 J",
+          "workedSolution": "Work done = force × distance moved in the direction of the force = 50 N × 4 m = 200 J. Answer: the work done on the box is 200 J.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_032",
+          "original": true,
+          "topicCode": "BECE-MACH",
+          "type": "structured",
+          "prompt": "Abena uses a long spanner to loosen a tight nut on her bicycle.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Name the three main parts of any lever.",
+              "marks": 1,
+              "correctAnswer": "The pivot (fulcrum), the effort and the load (all three needed for the mark)."
+            },
+            {
+              "label": "b",
+              "text": "Give one example each of a first-class and a third-class lever used at home.",
+              "marks": 2,
+              "correctAnswer": "First class: a pair of scissors, pliers or a see-saw — the pivot is between the load and the effort (1). Third class: tongs, a fishing rod or a broom — the effort is between the pivot and the load (1)."
+            },
+            {
+              "label": "c",
+              "text": "Explain why the long spanner loosens the nut more easily than a short one.",
+              "marks": 2,
+              "correctAnswer": "The turning effect (moment) of a force equals the force × the perpendicular distance from the pivot (1); a longer spanner gives a greater distance, so the same effort produces a larger turning effect on the nut (1)."
+            }
+          ],
+          "correctAnswer": "(a) The pivot (fulcrum), the effort and the load (all three needed for the mark). (b) First class: a pair of scissors, pliers or a see-saw — the pivot is between the load and the effort (1). Third class: tongs, a fishing rod or a broom — the effort is between the pivot and the load (1). (c) The turning effect (moment) of a force equals the force × the perpendicular distance from the pivot (1); a longer spanner gives a greater distance, so the same effort produces a larger turning effect on the nut (1).",
+          "workedSolution": "(a) The pivot (fulcrum), the effort and the load (all three needed for the mark). (b) First class: a pair of scissors, pliers or a see-saw — the pivot is between the load and the effort (1). Third class: tongs, a fishing rod or a broom — the effort is between the pivot and the load (1). (c) The turning effect (moment) of a force equals the force × the perpendicular distance from the pivot (1); a longer spanner gives a greater distance, so the same effort produces a larger turning effect on the nut (1).",
+          "difficulty": "medium",
+          "marks": 5,
+          "points": 5,
+          "timeLimit": null,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned BECE Integrated Science practice content; not official WAEC examination material.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_033",
+          "original": true,
+          "topicCode": "BECE-AGRIC",
+          "type": "short_answer",
+          "prompt": "State two benefits a farmer gets by processing fresh cassava into gari before storage.",
+          "correctAnswer": "Any two of: drying and roasting remove moisture, so the gari keeps much longer without rotting; gari is lighter and easier to transport; processing adds value, so it sells at a higher price; proper processing reduces harmful compounds in fresh cassava.",
+          "workedSolution": "Fresh cassava roots contain a lot of water and start to rot within a few days. Processing them into gari removes most of the moisture through pressing, fermentation and roasting, so the product stores for months; the dried gari is lighter and cheaper to transport to market; processing adds value and raises the selling price; and proper roasting reduces the harmful cyanide compounds in fresh cassava. Any two of these benefits earn the marks.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 2,
+          "timeLimit": 90,
+          "commandWord": "State",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_034",
+          "original": true,
+          "topicCode": "BECE-AGRIC",
+          "type": "calculation",
+          "prompt": "A farmer sows 200 maize seeds and 170 of them germinate. Calculate the germination percentage.",
+          "correctAnswer": "85%",
+          "workedSolution": "Germination percentage = (number of seeds germinated ÷ number of seeds sown) × 100 = (170 ÷ 200) × 100 = 0.85 × 100 = 85%. Answer: the germination percentage is 85%.",
+          "difficulty": "easy",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_035",
+          "original": true,
+          "topicCode": "BECE-AGRIC",
+          "type": "structured",
+          "prompt": "A JHS class wants to start a small vegetable garden behind the school block.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State two factors the class should consider when choosing the site for the garden.",
+              "marks": 2,
+              "correctAnswer": "Any two of: fertile, well-drained soil; a reliable source of water for irrigation; enough sunlight; closeness to the school so the crops are easy to tend and safe from thieves and animals (1 each)."
+            },
+            {
+              "label": "b",
+              "text": "Give one reason why the land is cleared and dug before planting.",
+              "marks": 1,
+              "correctAnswer": "Clearing removes weeds that would compete with the vegetables for nutrients, water and light, and digging loosens the soil so that roots, air and water can enter easily (1)."
+            },
+            {
+              "label": "c",
+              "text": "State two reasons for keeping records of the garden activities.",
+              "marks": 2,
+              "correctAnswer": "Records of costs and sales show whether the garden is making a profit or a loss (1); records of what was planted and how each crop performed help the class plan better for the next season (1)."
+            }
+          ],
+          "correctAnswer": "(a) Any two of: fertile, well-drained soil; a reliable source of water for irrigation; enough sunlight; closeness to the school so the crops are easy to tend and safe from thieves and animals (1 each). (b) Clearing removes weeds that would compete with the vegetables for nutrients, water and light, and digging loosens the soil so that roots, air and water can enter easily (1). (c) Records of costs and sales show whether the garden is making a profit or a loss (1); records of what was planted and how each crop performed help the class plan better for the next season (1).",
+          "workedSolution": "(a) Any two of: fertile, well-drained soil; a reliable source of water for irrigation; enough sunlight; closeness to the school so the crops are easy to tend and safe from thieves and animals (1 each). (b) Clearing removes weeds that would compete with the vegetables for nutrients, water and light, and digging loosens the soil so that roots, air and water can enter easily (1). (c) Records of costs and sales show whether the garden is making a profit or a loss (1); records of what was planted and how each crop performed help the class plan better for the next season (1).",
+          "difficulty": "medium",
+          "marks": 5,
+          "points": 5,
+          "timeLimit": null,
+          "commandWord": "State",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned BECE Integrated Science practice content; not official WAEC examination material.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_036",
+          "original": true,
+          "topicCode": "BECE-HEALTH",
+          "type": "multiple_choice",
+          "prompt": "Health workers advise that pit latrines and refuse dumps should be sited far away from wells and streams. Why is this important?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Waste near water attracts snakes that bite people",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The smell of the waste makes the water too salty to drink",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Germs from the waste can seep into or be washed into the water and cause diseases such as cholera",
+              "rationale": "This is the supported answer. Faeces and refuse contain disease-causing micro-organisms. Rain can wash these germs into streams, and they can seep through the soil into wells; people who drink the contaminated water may suffer from cholera, typhoid or dysentery. (Snakes and smell are not the main health reason for the rule, and the advice concerns contamination, not collapsing pits.)"
+            },
+            {
+              "label": "D",
+              "text": "Pit latrines dug near wells always collapse into the water",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Faeces and refuse contain disease-causing micro-organisms. Rain can wash these germs into streams, and they can seep through the soil into wells; people who drink the contaminated water may suffer from cholera, typhoid or dysentery. (Snakes and smell are not the main health reason for the rule, and the advice concerns contamination, not collapsing pits.) Therefore the correct answer is C: Germs from the waste can seep into or be washed into the water and cause diseases such as cholera.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_037",
+          "original": true,
+          "topicCode": "BECE-HEALTH",
+          "type": "multiple_choice",
+          "prompt": "Covering water storage containers and draining standing water around the home helps to control malaria mainly because it...",
+          "options": [
+            {
+              "label": "A",
+              "text": "kills the malaria parasites already inside the mosquitoes",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "stops mosquitoes from flying at night",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "makes the stored water too cold for drinking",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "removes the places where mosquitoes lay their eggs and breed",
+              "rationale": "This is the supported answer. Mosquitoes lay their eggs in stagnant water, where the larvae develop into adults. Removing or covering such water breaks the mosquito life cycle, so fewer adult mosquitoes survive to bite people and spread the malaria parasite. (It does not kill parasites already inside mosquitoes, and adult mosquitoes can still fly at night.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Mosquitoes lay their eggs in stagnant water, where the larvae develop into adults. Removing or covering such water breaks the mosquito life cycle, so fewer adult mosquitoes survive to bite people and spread the malaria parasite. (It does not kill parasites already inside mosquitoes, and adult mosquitoes can still fly at night.) Therefore the correct answer is D: removes the places where mosquitoes lay their eggs and breed.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_038",
+          "original": true,
+          "topicCode": "BECE-HEALTH",
+          "type": "short_answer",
+          "prompt": "State two methods a family can use to make unsafe drinking water safe at home.",
+          "correctAnswer": "Any two of: boiling the water; filtering it and then treating it with the recommended amount of chlorine; using solar disinfection in clear bottles left in the sun.",
+          "workedSolution": "Boiling water for a few minutes kills the germs that cause diseases such as cholera and typhoid. Filtering removes particles, and adding the recommended small amount of chlorine then kills the remaining germs. Solar disinfection — leaving clear bottles of water in bright sunshine for several hours — also kills many germs. Any two of these methods earn the marks.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 2,
+          "timeLimit": 90,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_039",
+          "original": true,
+          "topicCode": "BECE-HEALTH",
+          "type": "calculation",
+          "prompt": "In a village, 200 out of 250 children have been immunised against measles. Calculate the percentage of children immunised.",
+          "correctAnswer": "80%",
+          "workedSolution": "Percentage immunised = (number immunised ÷ total number of children) × 100 = (200 ÷ 250) × 100 = 0.8 × 100 = 80%. Answer: 80% of the children have been immunised.",
+          "difficulty": "easy",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_040",
+          "original": true,
+          "topicCode": "BECE-HEALTH",
+          "type": "structured",
+          "prompt": "There has been an outbreak of cholera in a nearby town, and the school health club is preparing a talk on it.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Explain what is meant by a communicable disease.",
+              "marks": 1,
+              "correctAnswer": "A communicable disease is one that can be passed from one person (or animal) to another, for example through water, food, air or body contact (1)."
+            },
+            {
+              "label": "b",
+              "text": "State two ways in which cholera is spread.",
+              "marks": 2,
+              "correctAnswer": "Drinking water contaminated with the cholera germs (1); eating food contaminated by dirty hands, flies or contaminated water (1)."
+            },
+            {
+              "label": "c",
+              "text": "State two measures the community can take to control the outbreak.",
+              "marks": 2,
+              "correctAnswer": "Any two of: boil or chlorinate drinking water; wash hands with soap after using the toilet and before handling food; dispose of refuse and faeces safely; cover food and keep it away from flies; report cases quickly and treat patients with oral rehydration (1 each)."
+            }
+          ],
+          "correctAnswer": "(a) A communicable disease is one that can be passed from one person (or animal) to another, for example through water, food, air or body contact (1). (b) Drinking water contaminated with the cholera germs (1); eating food contaminated by dirty hands, flies or contaminated water (1). (c) Any two of: boil or chlorinate drinking water; wash hands with soap after using the toilet and before handling food; dispose of refuse and faeces safely; cover food and keep it away from flies; report cases quickly and treat patients with oral rehydration (1 each).",
+          "workedSolution": "(a) A communicable disease is one that can be passed from one person (or animal) to another, for example through water, food, air or body contact (1). (b) Drinking water contaminated with the cholera germs (1); eating food contaminated by dirty hands, flies or contaminated water (1). (c) Any two of: boil or chlorinate drinking water; wash hands with soap after using the toilet and before handling food; dispose of refuse and faeces safely; cover food and keep it away from flies; report cases quickly and treat patients with oral rehydration (1 each).",
+          "difficulty": "medium",
+          "marks": 5,
+          "points": 5,
+          "timeLimit": null,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned BECE Integrated Science practice content; not official WAEC examination material.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_041",
+          "original": true,
+          "topicCode": "BECE-METHODS",
+          "type": "multiple_choice",
+          "prompt": "When reading the volume of water in a measuring cylinder, the eye must be level with the bottom of the meniscus. What error does this prevent?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Parallax error, which gives a reading that is too high or too low",
+              "rationale": "This is the supported answer. If the eye is above or below the meniscus, the line of sight makes the water level appear higher or lower than it really is — a parallax error. Reading with the eye level with the bottom of the meniscus gives the true volume. (Zero error is a fault of the instrument itself, and evaporation is far too slow to affect a single reading.)"
+            },
+            {
+              "label": "B",
+              "text": "Zero error, which comes from a faulty scale",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Expansion of the water as it warms up",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Evaporation of the water during the reading",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "If the eye is above or below the meniscus, the line of sight makes the water level appear higher or lower than it really is — a parallax error. Reading with the eye level with the bottom of the meniscus gives the true volume. (Zero error is a fault of the instrument itself, and evaporation is far too slow to affect a single reading.) Therefore the correct answer is A: Parallax error, which gives a reading that is too high or too low.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_042",
+          "original": true,
+          "topicCode": "BECE-METHODS",
+          "type": "multiple_choice",
+          "prompt": "A class investigates whether seedlings grow taller with more water. They give one group 50 cm³ of water a day and another group 100 cm³ a day. Which variable must be kept the same for a fair test?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The amount of water given to each pot",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The type and amount of soil in each pot",
+              "rationale": "This is the supported answer. In a fair test only the variable being investigated — the amount of water — is changed; every other factor that could affect growth, such as the soil, the pot size, the type of seed and the sunlight, must be kept constant. Otherwise no one can tell whether the water or some other difference caused the result. (The final height is the variable being measured, so it is expected to differ, and cylinder colour cannot affect growth.)"
+            },
+            {
+              "label": "C",
+              "text": "The height the seedlings finally reach",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The colour of the measuring cylinder",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "In a fair test only the variable being investigated — the amount of water — is changed; every other factor that could affect growth, such as the soil, the pot size, the type of seed and the sunlight, must be kept constant. Otherwise no one can tell whether the water or some other difference caused the result. (The final height is the variable being measured, so it is expected to differ, and cylinder colour cannot affect growth.) Therefore the correct answer is B: The type and amount of soil in each pot.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Evaluate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_043",
+          "original": true,
+          "topicCode": "BECE-METHODS",
+          "type": "short_answer",
+          "prompt": "List the first four stages of the scientific method, in the correct order.",
+          "correctAnswer": "Observation of a problem; asking a question and forming a hypothesis; experimenting to test the hypothesis; recording the results and drawing a conclusion.",
+          "workedSolution": "Scientific investigation begins with careful observation, which raises a question; the investigator then forms a hypothesis — a testable suggested answer; next an experiment is designed and carried out to test the hypothesis; finally the results are recorded and analysed so that a conclusion can be drawn about whether the hypothesis was supported. Answer: observation → hypothesis → experiment → results and conclusion.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 2,
+          "timeLimit": 90,
+          "commandWord": "Sequence",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_044",
+          "original": true,
+          "topicCode": "BECE-METHODS",
+          "type": "calculation",
+          "prompt": "A learner measures the length of a leaf three times and gets 5.2 cm, 5.4 cm and 5.3 cm. Calculate the average (mean) length of the leaf.",
+          "correctAnswer": "5.3 cm",
+          "workedSolution": "Mean = (5.2 + 5.4 + 5.3) cm ÷ 3 = 15.9 cm ÷ 3 = 5.3 cm. Answer: the average length of the leaf is 5.3 cm.",
+          "difficulty": "easy",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_045",
+          "original": true,
+          "topicCode": "BECE-METHODS",
+          "type": "structured",
+          "prompt": "A school is setting up a small science corner with basic instruments and safety rules.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State two safety rules learners must follow when doing experiments.",
+              "marks": 2,
+              "correctAnswer": "Any two of: wear eye protection and tie back long hair; never taste chemicals; wash hands after practical work; report any breakage, spill or injury to the teacher at once; handle hot equipment with care (1 each)."
+            },
+            {
+              "label": "b",
+              "text": "Name the instrument used to measure the mass of a stone.",
+              "marks": 1,
+              "correctAnswer": "A (beam or electronic) balance (1)."
+            },
+            {
+              "label": "c",
+              "text": "State two ways in which technology helps farmers in Ghana.",
+              "marks": 2,
+              "correctAnswer": "Any two of: tractors and other machines prepare land faster than hand tools; mobile phones give weather forecasts and market prices; irrigation pumps water crops in the dry season; improved storage and processing equipment reduce post-harvest losses (1 each)."
+            }
+          ],
+          "correctAnswer": "(a) Any two of: wear eye protection and tie back long hair; never taste chemicals; wash hands after practical work; report any breakage, spill or injury to the teacher at once; handle hot equipment with care (1 each). (b) A (beam or electronic) balance (1). (c) Any two of: tractors and other machines prepare land faster than hand tools; mobile phones give weather forecasts and market prices; irrigation pumps water crops in the dry season; improved storage and processing equipment reduce post-harvest losses (1 each).",
+          "workedSolution": "(a) Any two of: wear eye protection and tie back long hair; never taste chemicals; wash hands after practical work; report any breakage, spill or injury to the teacher at once; handle hot equipment with care (1 each). (b) A (beam or electronic) balance (1). (c) Any two of: tractors and other machines prepare land faster than hand tools; mobile phones give weather forecasts and market prices; irrigation pumps water crops in the dry season; improved storage and processing equipment reduce post-harvest losses (1 each).",
+          "difficulty": "medium",
+          "marks": 5,
+          "points": 5,
+          "timeLimit": null,
+          "commandWord": "State",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned BECE Integrated Science practice content; not official WAEC examination material.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_046",
+          "original": true,
+          "topicCode": "BECE-EARTH",
+          "type": "multiple_choice",
+          "prompt": "The Moon shines brightly at night, yet it produces no light of its own. Why can we see the Moon, and why does its shape appear to change through the month?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The Earth’s shadow covers the Moon a little more every night",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The Moon burns its fuel slowly, so it dims each month",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "We see sunlight reflected from the Moon, and the changing amount of its lit half that faces us causes the phases",
+              "rationale": "This is the supported answer. The Moon is visible because it reflects sunlight. As it orbits the Earth we see different amounts of its sunlit half, producing the phases from new moon to full moon and back. (The Earth’s shadow causes a lunar eclipse, which is rare — not the monthly phases; the Moon has no fuel to burn, and clouds can hide the Moon but do not cause its phases.)"
+            },
+            {
+              "label": "D",
+              "text": "Clouds covering the Moon make it appear to change shape",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The Moon is visible because it reflects sunlight. As it orbits the Earth we see different amounts of its sunlit half, producing the phases from new moon to full moon and back. (The Earth’s shadow causes a lunar eclipse, which is rare — not the monthly phases; the Moon has no fuel to burn, and clouds can hide the Moon but do not cause its phases.) Therefore the correct answer is C: We see sunlight reflected from the Moon, and the changing amount of its lit half that faces us causes the phases.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_047",
+          "original": true,
+          "topicCode": "BECE-EARTH",
+          "type": "multiple_choice",
+          "prompt": "Places near the equator are generally hotter than places near the poles. Which statement best explains this?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The equator is much closer to the Sun than the poles",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The poles reflect all sunlight back into space",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The Earth stops rotating at the poles, so they receive no heat",
+              "rationale": "This option is a plausible misconception, but it conflicts with the principle established in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "At the equator the Sun’s rays strike the ground almost directly, concentrating their energy on a smaller area",
+              "rationale": "This is the supported answer. At the equator the Sun’s rays hit the surface nearly at right angles, so their energy is concentrated over a small area and heating is strong. Near the poles the same rays arrive at a slant and spread over a larger area, giving less heating per unit area. (The difference in distance to the Sun is negligible compared with the Earth-Sun distance, and the Earth rotates on its axis everywhere.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "At the equator the Sun’s rays hit the surface nearly at right angles, so their energy is concentrated over a small area and heating is strong. Near the poles the same rays arrive at a slant and spread over a larger area, giving less heating per unit area. (The difference in distance to the Sun is negligible compared with the Earth-Sun distance, and the Earth rotates on its axis everywhere.) Therefore the correct answer is D: At the equator the Sun’s rays strike the ground almost directly, concentrating their energy on a smaller area.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_048",
+          "original": true,
+          "topicCode": "BECE-EARTH",
+          "type": "short_answer",
+          "prompt": "State two differences between igneous rocks and sedimentary rocks.",
+          "correctAnswer": "Igneous rocks form when molten magma or lava cools and solidifies; sedimentary rocks form from layers of deposited sediment that are compacted and cemented. Sedimentary rocks often show layers and may contain fossils; igneous rocks do not.",
+          "workedSolution": "Igneous rocks, such as granite and basalt, form when hot molten rock (magma or lava) cools and hardens. Sedimentary rocks, such as sandstone and limestone, form when layers of sediment are pressed and cemented together over a long time, so they usually show visible layers and may contain fossils; igneous rocks have neither layers nor fossils. Any two of these differences earn the marks.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 2,
+          "timeLimit": 90,
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_049",
+          "original": true,
+          "topicCode": "BECE-EARTH",
+          "type": "calculation",
+          "prompt": "A rain gauge at a school weather station recorded 12 mm, 18 mm and 15 mm of rain on three days. Calculate the total rainfall and the average daily rainfall.",
+          "correctAnswer": "Total 45 mm; average 15 mm per day",
+          "workedSolution": "Total rainfall = 12 + 18 + 15 = 45 mm. Average daily rainfall = 45 mm ÷ 3 days = 15 mm per day. Answer: total 45 mm and average 15 mm per day.",
+          "difficulty": "easy",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_bece_intsci_s3_050",
+          "original": true,
+          "topicCode": "BECE-EARTH",
+          "type": "structured",
+          "prompt": "A class is studying how water moves between the Earth and the atmosphere.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Define evaporation as it occurs in the water cycle.",
+              "marks": 1,
+              "correctAnswer": "Evaporation is the process by which the Sun’s heat turns liquid water from rivers, lakes and the sea into water vapour (1)."
+            },
+            {
+              "label": "b",
+              "text": "State the two processes by which water vapour in the atmosphere returns to the Earth.",
+              "marks": 2,
+              "correctAnswer": "Condensation, in which the water vapour cools and forms tiny droplets in clouds (1); precipitation, in which the water falls back to the Earth as rain (or other forms) (1)."
+            },
+            {
+              "label": "c",
+              "text": "Explain two reasons why the water cycle is important to people in Ghana.",
+              "marks": 2,
+              "correctAnswer": "It supplies fresh water for drinking, farming and fishing by refilling rivers, streams and wells (1); it supports the rainfall patterns on which food crops and livestock depend (1)."
+            }
+          ],
+          "correctAnswer": "(a) Evaporation is the process by which the Sun’s heat turns liquid water from rivers, lakes and the sea into water vapour (1). (b) Condensation, in which the water vapour cools and forms tiny droplets in clouds (1); precipitation, in which the water falls back to the Earth as rain (or other forms) (1). (c) It supplies fresh water for drinking, farming and fishing by refilling rivers, streams and wells (1); it supports the rainfall patterns on which food crops and livestock depend (1).",
+          "workedSolution": "(a) Evaporation is the process by which the Sun’s heat turns liquid water from rivers, lakes and the sea into water vapour (1). (b) Condensation, in which the water vapour cools and forms tiny droplets in clouds (1); precipitation, in which the water falls back to the Earth as rain (or other forms) (1). (c) It supplies fresh water for drinking, farming and fishing by refilling rivers, streams and wells (1); it supports the rainfall patterns on which food crops and livestock depend (1).",
+          "difficulty": "medium",
+          "marks": 5,
+          "points": 5,
+          "timeLimit": null,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned BECE Integrated Science practice content; not official WAEC examination material.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Common Core Programme curricula for Junior High School",
+              "url": "https://nacca.gov.gh/common-core-programme-ccp/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
