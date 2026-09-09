@@ -3443,14 +3443,14 @@ revisionClassroomApp.get('/whiteboard-types', async (c) => {
 // =============================================
 
 const TTS_MAX_CHARS = 1500;
-const TTS_SPEAKER = 'luna';
+export const TTS_SPEAKER = 'luna';
 
 // Cache key: sha-256 hex of `${model}|${speaker}|${text}` — global across
 // users (voiceOver text is generated content, identical for everyone).
-async function ttsCacheKey(model: string, text: string): Promise<string> {
+export async function ttsCacheKey(model: string, text: string, speaker: string = TTS_SPEAKER): Promise<string> {
   const digest = await crypto.subtle.digest(
     'SHA-256',
-    new TextEncoder().encode(`${model}|${TTS_SPEAKER}|${text}`)
+    new TextEncoder().encode(`${model}|${speaker}|${text}`)
   );
   const hex = Array.from(new Uint8Array(digest))
     .map((b) => b.toString(16).padStart(2, '0'))
@@ -3461,7 +3461,7 @@ async function ttsCacheKey(model: string, text: string): Promise<string> {
 // Aura 2 (verified via /api/admin/tts-spike) returns a ReadableStream of raw
 // MP3 bytes. The other shapes are handled defensively so a model swap via
 // AI_MODEL_TTS doesn't silently break the endpoint.
-async function extractTtsAudio(result: unknown): Promise<Uint8Array> {
+export async function extractTtsAudio(result: unknown): Promise<Uint8Array> {
   if (result instanceof ReadableStream) {
     const reader = result.getReader();
     const chunks: Uint8Array[] = [];

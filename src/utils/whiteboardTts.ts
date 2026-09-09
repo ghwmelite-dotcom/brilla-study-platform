@@ -7,17 +7,20 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 const cache = new Map<string, Promise<string | null>>();
 
-async function fetchAudioUrl(text: string): Promise<string | null> {
+// Shared fetch helper: POST text to a server TTS endpoint and return an
+// object URL for the audio, or null on any failure (no token, non-200,
+// network error) so callers can fall back to browser speechSynthesis.
+export async function fetchServerTtsAudioUrl(path: string, text: string, voice?: string): Promise<string | null> {
   try {
     const token = localStorage.getItem('brilla_token');
     if (!token) return null;
-    const res = await fetch(`${API_BASE_URL}/revision-classroom/tts`, {
+    const res = await fetch(`${API_BASE_URL}${path}`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify(voice ? { text, voice } : { text }),
     });
     if (!res.ok) return null;
     const blob = await res.blob();
@@ -26,6 +29,10 @@ async function fetchAudioUrl(text: string): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+function fetchAudioUrl(text: string): Promise<string | null> {
+  return fetchServerTtsAudioUrl('/revision-classroom/tts', text);
 }
 
 // Fire-and-forget warm of the client cache (and, on a miss, the server-side

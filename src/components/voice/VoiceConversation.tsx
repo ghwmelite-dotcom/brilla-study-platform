@@ -11,6 +11,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { cn } from '@/utils';
+import { playVoiceTtsAudio, releaseVoiceTtsAudioCache } from '@/utils/voiceTts';
 
 // Types for Web Speech API
 interface CustomSpeechRecognitionEvent {
@@ -97,6 +98,7 @@ export function VoiceConversation({
   // Refs
   const recognitionRef = useRef<CustomSpeechRecognition | null>(null);
   const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -198,6 +200,17 @@ export function VoiceConversation({
     };
   }, []);
 
+  // Release server-TTS object URLs on unmount
+  useEffect(() => {
+    return () => {
+      if (ttsAudioRef.current) {
+        ttsAudioRef.current.pause();
+        ttsAudioRef.current = null;
+      }
+      releaseVoiceTtsAudioCache();
+    };
+  }, []);
+
   // Audio level visualization
   const startAudioVisualization = useCallback(async () => {
     try {
@@ -265,31 +278,18 @@ export function VoiceConversation({
     stopAudioVisualization();
   }, [stopAudioVisualization]);
 
-  // Speak text using TTS
+  // Speak text using neural TTS (endpoint-first, speechSynthesis fallback)
   const speak = useCallback((text: string) => {
-    if (isMuted || !text || typeof window === 'undefined' || !window.speechSynthesis) return;
+    if (isMuted || !text || typeof window === 'undefined') return;
 
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = rate;
-    utterance.pitch = pitch;
-    utterance.volume = volume;
-
-    if (selectedVoice) {
-      utterance.voice = selectedVoice;
-    }
-
-    utterance.onstart = () => {
-      setIsSpeaking(true);
+    const pauseListening = () => {
       // Pause listening while speaking to avoid feedback
       if (recognitionRef.current && isListening) {
         recognitionRef.current.stop();
       }
     };
 
-    utterance.onend = () => {
+    const resumeListening = () => {
       setIsSpeaking(false);
       // Resume listening if in voice mode
       if (isVoiceMode && recognitionRef.current) {
@@ -302,20 +302,78 @@ export function VoiceConversation({
       }
     };
 
-    utterance.onerror = () => {
-      setIsSpeaking(false);
+    const speakWithBrowser = () => {
+      if (!window.speechSynthesis) return;
+
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = rate;
+      utterance.pitch = pitch;
+      utterance.volume = volume;
+
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+
+      utterance.onstart = () => {
+        setIsSpeaking(true);
+        pauseListening();
+      };
+
+      utterance.onend = resumeListening;
+
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+      };
+
+      synthRef.current = utterance;
+      window.speechSynthesis.speak(utterance);
     };
 
-    synthRef.current = utterance;
-    window.speechSynthesis.speak(utterance);
+    // Cancel any ongoing speech (browser synth + server audio element)
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    if (ttsAudioRef.current) {
+      ttsAudioRef.current.pause();
+      ttsAudioRef.current = null;
+    }
+
+    // Neural voice first (premium-only server endpoint); any failure —
+    // 403 free tier, 502 ttsUnavailable, network error, play() rejection —
+    // falls back to browser speechSynthesis exactly as before.
+    void (async () => {
+      const audio = await playVoiceTtsAudio(text);
+      if (!audio) {
+        speakWithBrowser();
+        return;
+      }
+      ttsAudioRef.current = audio;
+      setIsSpeaking(true);
+      pauseListening();
+      audio.onended = () => {
+        ttsAudioRef.current = null;
+        resumeListening();
+      };
+      audio.onerror = () => {
+        ttsAudioRef.current = null;
+        setIsSpeaking(false);
+      };
+    })();
   }, [isMuted, rate, pitch, volume, selectedVoice, isListening, isVoiceMode]);
 
   // Stop speaking
   const stopSpeaking = useCallback(() => {
     if (typeof window !== 'undefined' && window.speechSynthesis) {
       window.speechSynthesis.cancel();
-      setIsSpeaking(false);
     }
+    if (ttsAudioRef.current) {
+      ttsAudioRef.current.pause();
+      ttsAudioRef.current = null;
+    }
+    setIsSpeaking(false);
   }, []);
 
   // Toggle voice mode (continuous conversation)
