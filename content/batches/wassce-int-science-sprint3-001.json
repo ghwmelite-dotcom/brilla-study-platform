@@ -1,0 +1,1868 @@
+{
+  "batchId": "wassce-int-science-sprint3-001",
+  "status": "approved_for_beta",
+  "examTypeId": "exam_wassce",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+      "title": "Secondary Education Curriculum — Integrated Science",
+      "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T14:30:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science practice questions; not official WAEC (West African Examinations Council) examination material. Use the enabled feedback channel to report corrections.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_wassce_int_science",
+      "specificationCode": "BRILLA-WASSCE-ISC-S3-001",
+      "sources": [
+        {
+          "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+          "title": "Secondary Education Curriculum — Integrated Science",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "WASSCE-ISC-AGRIC",
+          "title": "Agriculture and Ecosystems",
+          "objective": "Apply soil-, crop- and ecosystem-science principles to Ghanaian farming and natural habitats."
+        },
+        {
+          "code": "WASSCE-ISC-HLTH",
+          "title": "Environmental Health",
+          "objective": "Evaluate community water, sanitation and pollution-control practices that protect public health."
+        },
+        {
+          "code": "WASSCE-ISC-CELL",
+          "title": "Cells and Living Things",
+          "objective": "Relate cell structure to function and classify organisms by their cellular organisation."
+        },
+        {
+          "code": "WASSCE-ISC-BODY",
+          "title": "Human Body Systems",
+          "objective": "Explain how the circulatory, nervous, skeletal and other body systems sustain the human body."
+        },
+        {
+          "code": "WASSCE-ISC-REP",
+          "title": "Reproduction and Heredity",
+          "objective": "Compare modes of reproduction and predict inheritance patterns using simple genetic crosses."
+        },
+        {
+          "code": "WASSCE-ISC-MTR",
+          "title": "Matter and Materials",
+          "objective": "Distinguish physical from chemical change and relate particle behaviour to the states of matter."
+        },
+        {
+          "code": "WASSCE-ISC-ENGY",
+          "title": "Energy and Electricity",
+          "objective": "Analyse series circuits and apply the relationships between energy, power, current, voltage and resistance."
+        },
+        {
+          "code": "WASSCE-ISC-WAV",
+          "title": "Waves, Light and Sound",
+          "objective": "Apply the properties and wave equation of light and sound to reflection and wave-motion problems."
+        },
+        {
+          "code": "WASSCE-ISC-ACD",
+          "title": "Acids, Bases and Salts",
+          "objective": "Use indicators and neutralisation reactions to relate acids, bases and salts to everyday life."
+        },
+        {
+          "code": "WASSCE-ISC-ECO",
+          "title": "Ecosystems",
+          "objective": "Estimate population sizes from quadrat samples and interpret energy flow in ecosystems."
+        },
+        {
+          "code": "WASSCE-ISC-MAT",
+          "title": "Matter and mixtures",
+          "objective": "Calculate the composition of solutions and justify separation techniques for common mixtures."
+        },
+        {
+          "code": "WASSCE-ISC-BIO",
+          "title": "Human digestion",
+          "objective": "Relate the products of digestion to the energy the body obtains from food."
+        },
+        {
+          "code": "WASSCE-ISC-HLT",
+          "title": "Disease and health",
+          "objective": "Quantify the spread of communicable diseases and evaluate control measures."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_wisc_agric_b003_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Which of the following farming practices best conserves soil moisture during the dry season?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Mulching the soil with plant residues",
+              "rationale": "This is the supported answer. Mulching covers the soil with dry grass or crop residues, reducing direct evaporation and keeping the soil moist for longer. Burning stubble destroys organic matter and exposes the soil, ploughing along the slope encourages erosion, and removing vegetation leaves the soil bare to the sun."
+            },
+            {
+              "label": "B",
+              "text": "Burning the stubble after harvest",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Ploughing the field along the slope",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Removing all vegetation between crops",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Mulching covers the soil with dry grass or crop residues, reducing direct evaporation and keeping the soil moist for longer. Burning stubble destroys organic matter and exposes the soil, ploughing along the slope encourages erosion, and removing vegetation leaves the soil bare to the sun. Therefore the correct answer is A: Mulching the soil with plant residues.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agric_b003_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Which organism lives in the root nodules of legumes and improves soil fertility by fixing atmospheric nitrogen?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Earthworm",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Rhizobium bacterium",
+              "rationale": "This is the supported answer. Rhizobium bacteria live symbiotically in the root nodules of legumes such as cowpea and groundnut, converting atmospheric nitrogen into nitrates the plant can use. Earthworms only improve soil aeration and drainage, while mushrooms and termites are decomposers that do not fix nitrogen."
+            },
+            {
+              "label": "C",
+              "text": "Mushroom fungus",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Termite",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Rhizobium bacteria live symbiotically in the root nodules of legumes such as cowpea and groundnut, converting atmospheric nitrogen into nitrates the plant can use. Earthworms only improve soil aeration and drainage, while mushrooms and termites are decomposers that do not fix nitrogen. Therefore the correct answer is B: Rhizobium bacterium.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agric_b003_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "In the food chain grass → grasshopper → lizard → hawk, the hawk is a",
+          "options": [
+            {
+              "label": "A",
+              "text": "producer",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "primary consumer",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "tertiary consumer",
+              "rationale": "This is the supported answer. Grass is the producer, the grasshopper that eats it is the primary consumer, the lizard that eats the grasshopper is the secondary consumer, and the hawk that eats the lizard is the tertiary consumer — the fourth trophic level."
+            },
+            {
+              "label": "D",
+              "text": "secondary consumer",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Grass is the producer, the grasshopper that eats it is the primary consumer, the lizard that eats the grasshopper is the secondary consumer, and the hawk that eats the lizard is the tertiary consumer — the fourth trophic level. Therefore the correct answer is C: tertiary consumer.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agric_b003_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "A maize farmer observes that the older leaves of his plants are turning yellow and growth is stunted. Which soil nutrient is most likely deficient?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Phosphorus",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Potassium",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Calcium",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Nitrogen",
+              "rationale": "This is the supported answer. Nitrogen is needed for proteins and chlorophyll, and because it is mobile in the plant, deficiency shows first as yellowing (chlorosis) of the older leaves with stunted growth. Phosphorus deficiency gives poor root development and purplish leaves, while potassium deficiency scorches leaf edges."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Nitrogen is needed for proteins and chlorophyll, and because it is mobile in the plant, deficiency shows first as yellowing (chlorosis) of the older leaves with stunted growth. Phosphorus deficiency gives poor root development and purplish leaves, while potassium deficiency scorches leaf edges. Therefore the correct answer is D: Nitrogen.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agric_b003_005",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is an important advantage of including a legume in a crop rotation programme?",
+          "options": [
+            {
+              "label": "A",
+              "text": "It restores nitrogen to the soil for the following crop",
+              "rationale": "This is the supported answer. Legumes such as cowpea and groundnut host Rhizobium bacteria that fix atmospheric nitrogen into the soil, reducing the fertilizer needs of the next crop. Rotation cannot remove all weeds or prevent all erosion, and it does not increase soil salinity."
+            },
+            {
+              "label": "B",
+              "text": "It removes all weeds from the field",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "It increases the salinity of the soil",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "It prevents all soil erosion",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Legumes such as cowpea and groundnut host Rhizobium bacteria that fix atmospheric nitrogen into the soil, reducing the fertilizer needs of the next crop. Rotation cannot remove all weeds or prevent all erosion, and it does not increase soil salinity. Therefore the correct answer is A: It restores nitrogen to the soil for the following crop.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agric_b003_006",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "The process by which plants lose water vapour through their leaves to the atmosphere is called",
+          "options": [
+            {
+              "label": "A",
+              "text": "guttation",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "transpiration",
+              "rationale": "This is the supported answer. Transpiration is the loss of water vapour mainly through the stomata of leaves, and it drives the upward movement of water from the roots. Guttation is the loss of liquid water droplets at leaf edges, while photosynthesis makes food and respiration releases energy."
+            },
+            {
+              "label": "C",
+              "text": "photosynthesis",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "respiration",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Transpiration is the loss of water vapour mainly through the stomata of leaves, and it drives the upward movement of water from the roots. Guttation is the loss of liquid water droplets at leaf edges, while photosynthesis makes food and respiration releases energy. Therefore the correct answer is B: transpiration.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agric_b003_007",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "In any ecosystem, the largest amount of energy is available to the",
+          "options": [
+            {
+              "label": "A",
+              "text": "primary consumers",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "secondary consumers",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "producers",
+              "rationale": "This is the supported answer. Energy enters the ecosystem through producers (green plants) by photosynthesis, and only about 10% of the energy at each trophic level is transferred to the next — the rest is lost as heat and in life processes — so energy decreases up the food chain and producers hold the largest share."
+            },
+            {
+              "label": "D",
+              "text": "decomposers",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Energy enters the ecosystem through producers (green plants) by photosynthesis, and only about 10% of the energy at each trophic level is transferred to the next — the rest is lost as heat and in life processes — so energy decreases up the food chain and producers hold the largest share. Therefore the correct answer is C: producers.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agric_b003_008",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGRIC",
+          "type": "multiple_choice",
+          "prompt": "Bush burning is discouraged as a land-clearing method mainly because it",
+          "options": [
+            {
+              "label": "A",
+              "text": "adds excess nitrogen to the soil",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "makes the soil too fertile for crops",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "increases the humus content of the soil",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "destroys soil organic matter and kills beneficial soil organisms",
+              "rationale": "This is the supported answer. Bush burning destroys humus and kills earthworms, microbes and other beneficial organisms, lowering soil fertility and structure; the ash gives only a short-lived mineral boost. It removes rather than adds nitrogen, since nitrogen compounds escape into the air as gases during burning."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Bush burning destroys humus and kills earthworms, microbes and other beneficial organisms, lowering soil fertility and structure; the ash gives only a short-lived mineral boost. It removes rather than adds nitrogen, since nitrogen compounds escape into the air as gases during burning. Therefore the correct answer is D: destroys soil organic matter and kills beneficial soil organisms.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agric_b003_009",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGRIC",
+          "type": "calculation",
+          "prompt": "A rectangular maize farm measures 120 m by 80 m. Calculate the area of the farm in hectares. (1 hectare = 10,000 m²)",
+          "correctAnswer": "0.96 hectares",
+          "workedSolution": "Area = length × width = 120 m × 80 m = 9,600 m². Converting to hectares: 9,600 ÷ 10,000 = 0.96. Answer: the farm covers 0.96 hectares.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_agric_b003_010",
+          "original": true,
+          "topicCode": "WASSCE-ISC-AGRIC",
+          "type": "structured",
+          "prompt": "A school farm keeps a small grassland plot as a study site.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Define the term ecosystem.",
+              "marks": 2,
+              "correctAnswer": "An ecosystem is a community of living organisms interacting with one another and with their non-living physical environment, such as soil, water and air."
+            },
+            {
+              "label": "b",
+              "text": "Construct a food chain with three trophic levels using organisms found in the grassland.",
+              "marks": 2,
+              "correctAnswer": "For example, grass → grasshopper → lizard (or grass → grasscutter → hawk); the arrows point from the organism being eaten to the eater, showing the direction of energy flow."
+            },
+            {
+              "label": "c",
+              "text": "State the role of decomposers in the ecosystem.",
+              "marks": 2,
+              "correctAnswer": "Decomposers such as bacteria and fungi break down dead organisms and waste products, releasing nutrients back into the soil for producers to reuse."
+            }
+          ],
+          "correctAnswer": "(a) An ecosystem is a community of living organisms interacting with one another and with their non-living physical environment, such as soil, water and air. (b) For example, grass → grasshopper → lizard (or grass → grasscutter → hawk); the arrows point from the organism being eaten to the eater, showing the direction of energy flow. (c) Decomposers such as bacteria and fungi break down dead organisms and waste products, releasing nutrients back into the soil for producers to reuse.",
+          "workedSolution": "(a) An ecosystem is a community of living organisms interacting with one another and with their non-living physical environment, such as soil, water and air. (b) For example, grass → grasshopper → lizard (or grass → grasscutter → hawk); the arrows point from the organism being eaten to the eater, showing the direction of energy flow. (c) Decomposers such as bacteria and fungi break down dead organisms and waste products, releasing nutrients back into the soil for producers to reuse.",
+          "difficulty": "medium",
+          "marks": 6,
+          "points": 6,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science practice content; not official WAEC (West African Examinations Council) examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_health_b003_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLTH",
+          "type": "multiple_choice",
+          "prompt": "Which of the following methods is most reliable for killing disease-causing micro-organisms in drinking water at home?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Boiling the water",
+              "rationale": "This is the supported answer. Boiling kills the bacteria, viruses and other pathogens in water. Decanting, sieving and settling only remove suspended particles; they do not kill the micro-organisms that cause diseases such as cholera and typhoid."
+            },
+            {
+              "label": "B",
+              "text": "Decanting the water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Sieving the water through cloth",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Leaving the water to settle",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Boiling kills the bacteria, viruses and other pathogens in water. Decanting, sieving and settling only remove suspended particles; they do not kill the micro-organisms that cause diseases such as cholera and typhoid. Therefore the correct answer is A: Boiling the water.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_health_b003_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLTH",
+          "type": "multiple_choice",
+          "prompt": "Which of the following diseases is commonly spread by houseflies?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Malaria",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Cholera",
+              "rationale": "This is the supported answer. Houseflies carry germs from faeces and refuse onto food, spreading intestinal diseases such as cholera, typhoid and dysentery. Malaria is spread by mosquitoes, tuberculosis by air-borne droplets, and measles by coughing and sneezing."
+            },
+            {
+              "label": "C",
+              "text": "Tuberculosis",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Measles",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Houseflies carry germs from faeces and refuse onto food, spreading intestinal diseases such as cholera, typhoid and dysentery. Malaria is spread by mosquitoes, tuberculosis by air-borne droplets, and measles by coughing and sneezing. Therefore the correct answer is B: Cholera.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_health_b003_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLTH",
+          "type": "multiple_choice",
+          "prompt": "The most effective way to control the breeding of mosquitoes in a community is to",
+          "options": [
+            {
+              "label": "A",
+              "text": "plant more flowers around houses",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "burn firewood every evening",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "drain or cover all stagnant water around homes",
+              "rationale": "This is the supported answer. Mosquitoes lay their eggs in stagnant water, so draining puddles and covering water-storage containers removes their breeding sites. Flowers do not affect breeding, smoke from firewood gives only temporary relief, and uncovered containers create even more breeding sites."
+            },
+            {
+              "label": "D",
+              "text": "keep water containers uncovered",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Mosquitoes lay their eggs in stagnant water, so draining puddles and covering water-storage containers removes their breeding sites. Flowers do not affect breeding, smoke from firewood gives only temporary relief, and uncovered containers create even more breeding sites. Therefore the correct answer is C: drain or cover all stagnant water around homes.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_health_b003_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLTH",
+          "type": "multiple_choice",
+          "prompt": "Chlorine is added to public water supplies mainly because it",
+          "options": [
+            {
+              "label": "A",
+              "text": "removes suspended solids from the water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "softens the hard water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "improves the colour of the water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "kills disease-causing micro-organisms in the water",
+              "rationale": "This is the supported answer. Chlorination disinfects water: chlorine destroys bacteria and viruses, making the treated water safe to drink. Suspended solids are removed earlier by coagulation, sedimentation and filtration, and chlorine neither softens hard water nor changes its colour."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Chlorination disinfects water: chlorine destroys bacteria and viruses, making the treated water safe to drink. Suspended solids are removed earlier by coagulation, sedimentation and filtration, and chlorine neither softens hard water nor changes its colour. Therefore the correct answer is D: kills disease-causing micro-organisms in the water.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_health_b003_005",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLTH",
+          "type": "multiple_choice",
+          "prompt": "Depletion of the ozone layer is caused mainly by the release of",
+          "options": [
+            {
+              "label": "A",
+              "text": "chlorofluorocarbons from old refrigerants and aerosols",
+              "rationale": "This is the supported answer. Chlorofluorocarbons (CFCs) rise into the stratosphere, where ultraviolet radiation breaks them down and the chlorine released destroys ozone molecules. Carbon dioxide drives global warming rather than ozone depletion, and sulphur dioxide causes acid rain — common confusions."
+            },
+            {
+              "label": "B",
+              "text": "carbon dioxide from burning fossil fuels",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "sulphur dioxide from factories",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "smoke from bushfires",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Chlorofluorocarbons (CFCs) rise into the stratosphere, where ultraviolet radiation breaks them down and the chlorine released destroys ozone molecules. Carbon dioxide drives global warming rather than ozone depletion, and sulphur dioxide causes acid rain — common confusions. Therefore the correct answer is A: chlorofluorocarbons from old refrigerants and aerosols.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_health_b003_006",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLTH",
+          "type": "calculation",
+          "prompt": "A water treatment plant adds 0.5 g of chlorine for every 100 litres of water. Calculate the mass of chlorine needed to treat 4,000 litres of water.",
+          "correctAnswer": "20 g",
+          "workedSolution": "Each 100 litres needs 0.5 g, and 4,000 litres contains 4,000 ÷ 100 = 40 units of 100 litres. Mass of chlorine = 40 × 0.5 g = 20 g. Answer: 20 g of chlorine is needed.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_health_b003_007",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLTH",
+          "type": "structured",
+          "prompt": "Water for a rural community comes from a shallow well.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State two ways in which the well water may become contaminated.",
+              "marks": 2,
+              "correctAnswer": "Any two of: runoff carrying refuse or faeces into the well; animals drinking directly from the well; buckets and ropes handled with dirty hands; pit latrines sited too close to the well."
+            },
+            {
+              "label": "b",
+              "text": "Describe two methods of purifying the water for drinking.",
+              "marks": 2,
+              "correctAnswer": "Any two of: boiling the water to kill germs; adding chlorine (for example WaterGuard) at the correct dose; filtering and then disinfecting; solar disinfection in clear bottles exposed to sunlight."
+            },
+            {
+              "label": "c",
+              "text": "State one reason why water must be purified before drinking.",
+              "marks": 1,
+              "correctAnswer": "To kill or remove germs that cause water-borne diseases such as cholera, typhoid and dysentery."
+            }
+          ],
+          "correctAnswer": "(a) Any two of: runoff carrying refuse or faeces into the well; animals drinking directly from the well; buckets and ropes handled with dirty hands; pit latrines sited too close to the well. (b) Any two of: boiling the water to kill germs; adding chlorine (for example WaterGuard) at the correct dose; filtering and then disinfecting; solar disinfection in clear bottles exposed to sunlight. (c) To kill or remove germs that cause water-borne diseases such as cholera, typhoid and dysentery.",
+          "workedSolution": "(a) Any two of: runoff carrying refuse or faeces into the well; animals drinking directly from the well; buckets and ropes handled with dirty hands; pit latrines sited too close to the well. (b) Any two of: boiling the water to kill germs; adding chlorine (for example WaterGuard) at the correct dose; filtering and then disinfecting; solar disinfection in clear bottles exposed to sunlight. (c) To kill or remove germs that cause water-borne diseases such as cholera, typhoid and dysentery.",
+          "difficulty": "medium",
+          "marks": 5,
+          "points": 5,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science practice content; not official WAEC (West African Examinations Council) examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_cells_b003_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-CELL",
+          "type": "multiple_choice",
+          "prompt": "Which part of a living cell regulates the passage of substances across its boundary?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Cell wall",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Cell membrane",
+              "rationale": "This is the supported answer. The cell membrane is partially permeable, allowing some substances to pass while blocking others. The cell wall is fully permeable and only gives support, the nucleus controls the activities of the cell, and the cytoplasm is the site of chemical reactions."
+            },
+            {
+              "label": "C",
+              "text": "Nucleus",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Cytoplasm",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The cell membrane is partially permeable, allowing some substances to pass while blocking others. The cell wall is fully permeable and only gives support, the nucleus controls the activities of the cell, and the cytoplasm is the site of chemical reactions. Therefore the correct answer is B: Cell membrane.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_cells_b003_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-CELL",
+          "type": "multiple_choice",
+          "prompt": "Which of the following organisms is made up of only one cell?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Hydra",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Earthworm",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Amoeba",
+              "rationale": "This is the supported answer. Amoeba is a unicellular organism that carries out all life processes within a single cell. Hydra, the earthworm and Spirogyra are multicellular organisms made of many specialised cells."
+            },
+            {
+              "label": "D",
+              "text": "Spirogyra",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Amoeba is a unicellular organism that carries out all life processes within a single cell. Hydra, the earthworm and Spirogyra are multicellular organisms made of many specialised cells. Therefore the correct answer is C: Amoeba.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_cells_b003_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-CELL",
+          "type": "multiple_choice",
+          "prompt": "Which of the following correctly distinguishes a plant cell from an animal cell?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The animal cell has a cell wall; the plant cell does not",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "The plant cell has no nucleus; the animal cell has one",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Both cells contain chloroplasts for making food",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "The plant cell has a cellulose cell wall and chloroplasts; the animal cell has neither",
+              "rationale": "This is the supported answer. Plant cells are surrounded by a cellulose cell wall and contain chloroplasts with chlorophyll for photosynthesis; animal cells lack both. All plant and animal cells have a nucleus, and only plant cells can photosynthesise."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Plant cells are surrounded by a cellulose cell wall and contain chloroplasts with chlorophyll for photosynthesis; animal cells lack both. All plant and animal cells have a nucleus, and only plant cells can photosynthesise. Therefore the correct answer is D: The plant cell has a cellulose cell wall and chloroplasts; the animal cell has neither.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Distinguish",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_cells_b003_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-CELL",
+          "type": "multiple_choice",
+          "prompt": "A plant cell placed in a concentrated salt solution loses water. The process by which the water leaves the cell is",
+          "options": [
+            {
+              "label": "A",
+              "text": "osmosis",
+              "rationale": "This is the supported answer. Water moves from the dilute cell sap through the partially permeable membrane into the concentrated external solution by osmosis, so the cell shrinks (plasmolysis). Active transport moves substances against a gradient using energy, transpiration is water loss from leaves, and imbibition is water uptake by dry materials."
+            },
+            {
+              "label": "B",
+              "text": "active transport",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "transpiration",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "imbibition",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Water moves from the dilute cell sap through the partially permeable membrane into the concentrated external solution by osmosis, so the cell shrinks (plasmolysis). Active transport moves substances against a gradient using energy, transpiration is water loss from leaves, and imbibition is water uptake by dry materials. Therefore the correct answer is A: osmosis.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_cells_b003_005",
+          "original": true,
+          "topicCode": "WASSCE-ISC-CELL",
+          "type": "calculation",
+          "prompt": "A microscope has an eyepiece lens of magnification ×10 and an objective lens of magnification ×40. Calculate the total magnification of the microscope.",
+          "correctAnswer": "×400",
+          "workedSolution": "Total magnification = eyepiece magnification × objective magnification = 10 × 40 = 400. Answer: the total magnification of the microscope is ×400.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_cells_b003_006",
+          "original": true,
+          "topicCode": "WASSCE-ISC-CELL",
+          "type": "structured",
+          "prompt": "A student observes plant cells and animal cells under a light microscope.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State two differences between the plant cells and the animal cells the student observes.",
+              "marks": 2,
+              "correctAnswer": "Any two of: plant cells have a cellulose cell wall, animal cells do not; plant cells contain chloroplasts, animal cells do not; plant cells have a large central vacuole, animal cells have small temporary vacuoles; plant cells have a regular shape, animal cells are irregular."
+            },
+            {
+              "label": "b",
+              "text": "Name two organelles found in both types of cell and state the function of each.",
+              "marks": 4,
+              "correctAnswer": "Any two of: nucleus — controls the activities of the cell and carries the genetic material; mitochondrion — releases energy from food during respiration; cell membrane — controls the movement of substances into and out of the cell; cytoplasm — site of most chemical reactions of the cell."
+            }
+          ],
+          "correctAnswer": "(a) Any two of: plant cells have a cellulose cell wall, animal cells do not; plant cells contain chloroplasts, animal cells do not; plant cells have a large central vacuole, animal cells have small temporary vacuoles; plant cells have a regular shape, animal cells are irregular. (b) Any two of: nucleus — controls the activities of the cell and carries the genetic material; mitochondrion — releases energy from food during respiration; cell membrane — controls the movement of substances into and out of the cell; cytoplasm — site of most chemical reactions of the cell.",
+          "workedSolution": "(a) Any two of: plant cells have a cellulose cell wall, animal cells do not; plant cells contain chloroplasts, animal cells do not; plant cells have a large central vacuole, animal cells have small temporary vacuoles; plant cells have a regular shape, animal cells are irregular. (b) Any two of: nucleus — controls the activities of the cell and carries the genetic material; mitochondrion — releases energy from food during respiration; cell membrane — controls the movement of substances into and out of the cell; cytoplasm — site of most chemical reactions of the cell.",
+          "difficulty": "medium",
+          "marks": 6,
+          "points": 6,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science practice content; not official WAEC (West African Examinations Council) examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_body_b003_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BODY",
+          "type": "multiple_choice",
+          "prompt": "Oxygenated blood returns from the lungs to the left atrium of the heart through the",
+          "options": [
+            {
+              "label": "A",
+              "text": "Pulmonary artery",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Pulmonary vein",
+              "rationale": "This is the supported answer. The pulmonary vein returns oxygenated blood from the lungs to the left atrium of the heart. The pulmonary artery carries deoxygenated blood from the heart to the lungs, the vena cava brings deoxygenated blood from the body to the heart, and the aorta distributes oxygenated blood from the heart to the body."
+            },
+            {
+              "label": "C",
+              "text": "Vena cava",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Aorta",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The pulmonary vein returns oxygenated blood from the lungs to the left atrium of the heart. The pulmonary artery carries deoxygenated blood from the heart to the lungs, the vena cava brings deoxygenated blood from the body to the heart, and the aorta distributes oxygenated blood from the heart to the body. Therefore the correct answer is B: Pulmonary vein.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_body_b003_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BODY",
+          "type": "multiple_choice",
+          "prompt": "The part of the brain responsible for balance and the coordination of body movement is the",
+          "options": [
+            {
+              "label": "A",
+              "text": "cerebrum",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "medulla oblongata",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "cerebellum",
+              "rationale": "This is the supported answer. The cerebellum, at the back of the brain, coordinates muscular movement and maintains balance and posture. The cerebrum handles thought and voluntary actions, the medulla oblongata controls involuntary actions such as heartbeat and breathing, and the spinal cord is not part of the brain."
+            },
+            {
+              "label": "D",
+              "text": "spinal cord",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The cerebellum, at the back of the brain, coordinates muscular movement and maintains balance and posture. The cerebrum handles thought and voluntary actions, the medulla oblongata controls involuntary actions such as heartbeat and breathing, and the spinal cord is not part of the brain. Therefore the correct answer is C: cerebellum.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_body_b003_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BODY",
+          "type": "calculation",
+          "prompt": "A student's heart beats 72 times per minute. Calculate the total number of heartbeats during a 2-hour examination.",
+          "correctAnswer": "8,640 beats",
+          "workedSolution": "Two hours is 2 × 60 = 120 minutes. Number of beats = 72 × 120 = 8,640. Answer: the heart beats 8,640 times during the examination.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_body_b003_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BODY",
+          "type": "structured",
+          "prompt": "The human skeleton and circulatory system work together to support and sustain the body.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State two functions of the human skeleton.",
+              "marks": 2,
+              "correctAnswer": "Any two of: supports the body and gives it shape; protects delicate organs such as the brain, heart and lungs; provides surfaces for muscle attachment to allow movement; produces blood cells in the bone marrow."
+            },
+            {
+              "label": "b",
+              "text": "Describe the path taken by oxygenated blood from the lungs to the rest of the body.",
+              "marks": 3,
+              "correctAnswer": "Oxygenated blood flows from the lungs through the pulmonary vein into the left atrium, passes into the left ventricle, and is then pumped out through the aorta to all parts of the body."
+            }
+          ],
+          "correctAnswer": "(a) Any two of: supports the body and gives it shape; protects delicate organs such as the brain, heart and lungs; provides surfaces for muscle attachment to allow movement; produces blood cells in the bone marrow. (b) Oxygenated blood flows from the lungs through the pulmonary vein into the left atrium, passes into the left ventricle, and is then pumped out through the aorta to all parts of the body.",
+          "workedSolution": "(a) Any two of: supports the body and gives it shape; protects delicate organs such as the brain, heart and lungs; provides surfaces for muscle attachment to allow movement; produces blood cells in the bone marrow. (b) Oxygenated blood flows from the lungs through the pulmonary vein into the left atrium, passes into the left ventricle, and is then pumped out through the aorta to all parts of the body.",
+          "difficulty": "medium",
+          "marks": 5,
+          "points": 5,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science practice content; not official WAEC (West African Examinations Council) examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_reproduction_b003_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-REP",
+          "type": "calculation",
+          "prompt": "In guinea pigs, black fur (B) is dominant over white fur (b). Two heterozygous guinea pigs (Bb) are crossed. What fraction of the offspring is expected to have white fur?",
+          "correctAnswer": "1/4 (25%)",
+          "workedSolution": "The cross Bb × Bb gives the genotypes BB, Bb, Bb and bb in equal proportions. Since black is dominant, the BB and Bb offspring are black and only the bb offspring are white — 1 out of 4. Answer: 1/4, or 25%, of the offspring are expected to have white fur.",
+          "difficulty": "hard",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_reproduction_b003_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-REP",
+          "type": "structured",
+          "prompt": "Living things increase their numbers by reproduction.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Distinguish between asexual reproduction and sexual reproduction.",
+              "marks": 2,
+              "correctAnswer": "Asexual reproduction involves one parent and produces offspring that are genetically identical to that parent, while sexual reproduction involves the fusion of male and female gametes, usually from two parents, and produces offspring that show variation."
+            },
+            {
+              "label": "b",
+              "text": "State one advantage of each type of reproduction.",
+              "marks": 2,
+              "correctAnswer": "Asexual reproduction allows rapid multiplication when conditions are favourable; sexual reproduction produces variation, which helps the species adapt to changing conditions and resist disease."
+            }
+          ],
+          "correctAnswer": "(a) Asexual reproduction involves one parent and produces offspring that are genetically identical to that parent, while sexual reproduction involves the fusion of male and female gametes, usually from two parents, and produces offspring that show variation. (b) Asexual reproduction allows rapid multiplication when conditions are favourable; sexual reproduction produces variation, which helps the species adapt to changing conditions and resist disease.",
+          "workedSolution": "(a) Asexual reproduction involves one parent and produces offspring that are genetically identical to that parent, while sexual reproduction involves the fusion of male and female gametes, usually from two parents, and produces offspring that show variation. (b) Asexual reproduction allows rapid multiplication when conditions are favourable; sexual reproduction produces variation, which helps the species adapt to changing conditions and resist disease.",
+          "difficulty": "medium",
+          "marks": 4,
+          "points": 4,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science practice content; not official WAEC (West African Examinations Council) examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_matter_b003_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-MTR",
+          "type": "multiple_choice",
+          "prompt": "Which of the following is an example of a chemical change?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Melting of candle wax",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "Dissolving salt in water",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "Magnetising a steel needle",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "Rusting of an iron roofing sheet",
+              "rationale": "This is the supported answer. Rusting forms a new substance, hydrated iron(III) oxide, and cannot easily be reversed, so it is a chemical change. Melting wax, dissolving salt and magnetising steel produce no new substance and are reversible physical changes."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Rusting forms a new substance, hydrated iron(III) oxide, and cannot easily be reversed, so it is a chemical change. Melting wax, dissolving salt and magnetising steel produce no new substance and are reversible physical changes. Therefore the correct answer is D: Rusting of an iron roofing sheet.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_matter_b003_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-MTR",
+          "type": "calculation",
+          "prompt": "A metal block has a mass of 270 g and a volume of 100 cm³. Calculate the density of the metal.",
+          "correctAnswer": "2.7 g/cm³",
+          "workedSolution": "Density = mass ÷ volume = 270 g ÷ 100 cm³ = 2.7 g/cm³. Answer: the density of the metal is 2.7 g/cm³.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_matter_b003_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-MTR",
+          "type": "structured",
+          "prompt": "A student is given samples of candle wax, water and air to investigate.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State the three states of matter.",
+              "marks": 3,
+              "correctAnswer": "Solid, liquid and gas."
+            },
+            {
+              "label": "b",
+              "text": "Describe how the arrangement and movement of particles differ between a solid and a gas.",
+              "marks": 2,
+              "correctAnswer": "In a solid the particles are closely packed in fixed positions and can only vibrate, while in a gas the particles are far apart and move freely and rapidly in all directions."
+            }
+          ],
+          "correctAnswer": "(a) Solid, liquid and gas. (b) In a solid the particles are closely packed in fixed positions and can only vibrate, while in a gas the particles are far apart and move freely and rapidly in all directions.",
+          "workedSolution": "(a) Solid, liquid and gas. (b) In a solid the particles are closely packed in fixed positions and can only vibrate, while in a gas the particles are far apart and move freely and rapidly in all directions.",
+          "difficulty": "medium",
+          "marks": 5,
+          "points": 5,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science practice content; not official WAEC (West African Examinations Council) examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_energy_b003_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENGY",
+          "type": "multiple_choice",
+          "prompt": "Three resistors of 2 Ω, 3 Ω and 5 Ω are connected in series in a circuit. What is their total resistance?",
+          "options": [
+            {
+              "label": "A",
+              "text": "10 Ω",
+              "rationale": "This is the supported answer. Resistors in series simply add: R = 2 + 3 + 5 = 10 Ω. (30 Ω comes from multiplying the values, and 0.97 Ω is the parallel combination 1 ÷ (½ + ⅓ + ⅕) — a common confusion between series and parallel rules.)"
+            },
+            {
+              "label": "B",
+              "text": "30 Ω",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "5 Ω",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "0.97 Ω",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Resistors in series simply add: R = 2 + 3 + 5 = 10 Ω. (30 Ω comes from multiplying the values, and 0.97 Ω is the parallel combination 1 ÷ (½ + ⅓ + ⅕) — a common confusion between series and parallel rules.) Therefore the correct answer is A: 10 Ω.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_energy_b003_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENGY",
+          "type": "multiple_choice",
+          "prompt": "Two identical lamps are connected in series in a circuit. If one lamp blows, the other lamp will",
+          "options": [
+            {
+              "label": "A",
+              "text": "shine brighter than before",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "go out because the circuit is now broken",
+              "rationale": "This is the supported answer. In a series circuit there is only one path for the current. A blown lamp creates a gap, so the current stops completely and the second lamp goes out. Only lamps in parallel are unaffected when one branch fails — a common misconception."
+            },
+            {
+              "label": "C",
+              "text": "stay on with the same brightness",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "become dimmer but remain lit",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "In a series circuit there is only one path for the current. A blown lamp creates a gap, so the current stops completely and the second lamp goes out. Only lamps in parallel are unaffected when one branch fails — a common misconception. Therefore the correct answer is B: go out because the circuit is now broken.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_energy_b003_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENGY",
+          "type": "calculation",
+          "prompt": "An electric iron is rated at 1,000 W. Calculate the energy it consumes when used for 30 minutes, giving your answer in joules.",
+          "correctAnswer": "1,800,000 J (1.8 × 10⁶ J)",
+          "workedSolution": "Energy = power × time, with time in seconds: 30 minutes = 30 × 60 = 1,800 s. Energy = 1,000 W × 1,800 s = 1,800,000 J = 1.8 × 10⁶ J. Answer: the iron consumes 1.8 × 10⁶ J of energy.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_energy_b003_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ENGY",
+          "type": "structured",
+          "prompt": "A student sets up a simple circuit containing a battery, an ammeter and a resistor.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State Ohm's law.",
+              "marks": 2,
+              "correctAnswer": "The current flowing through a metallic conductor is directly proportional to the potential difference across its ends, provided temperature and other physical conditions remain constant (V = IR)."
+            },
+            {
+              "label": "b",
+              "text": "The ammeter reads 2 A and the resistor has a resistance of 6 Ω. Calculate the potential difference across the resistor.",
+              "marks": 2,
+              "correctAnswer": "V = I × R = 2 A × 6 Ω = 12 V."
+            }
+          ],
+          "correctAnswer": "(a) The current flowing through a metallic conductor is directly proportional to the potential difference across its ends, provided temperature and other physical conditions remain constant (V = IR). (b) V = I × R = 2 A × 6 Ω = 12 V.",
+          "workedSolution": "(a) The current flowing through a metallic conductor is directly proportional to the potential difference across its ends, provided temperature and other physical conditions remain constant (V = IR). (b) V = I × R = 2 A × 6 Ω = 12 V.",
+          "difficulty": "medium",
+          "marks": 4,
+          "points": 4,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science practice content; not official WAEC (West African Examinations Council) examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_waves_b003_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WAV",
+          "type": "multiple_choice",
+          "prompt": "The image formed by a plane mirror is always",
+          "options": [
+            {
+              "label": "A",
+              "text": "real, inverted and diminished",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "virtual, inverted and magnified",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "virtual, upright and the same size as the object",
+              "rationale": "This is the supported answer. A plane mirror forms an image that is virtual (the rays only appear to come from behind the mirror), upright, the same size as the object and laterally inverted. It is never real or upside down."
+            },
+            {
+              "label": "D",
+              "text": "real, upright and the same size as the object",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A plane mirror forms an image that is virtual (the rays only appear to come from behind the mirror), upright, the same size as the object and laterally inverted. It is never real or upside down. Therefore the correct answer is C: virtual, upright and the same size as the object.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_waves_b003_002",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WAV",
+          "type": "multiple_choice",
+          "prompt": "Sound waves cannot travel through a vacuum because sound",
+          "options": [
+            {
+              "label": "A",
+              "text": "travels too fast to pass through empty space",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "B",
+              "text": "is an electromagnetic wave",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "is completely absorbed by any empty space",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "requires a material medium to transmit its vibrations",
+              "rationale": "This is the supported answer. Sound is a mechanical wave: it travels by vibrating the particles of a medium such as air, water or metal, so in a vacuum there is nothing to carry the vibration. Light is electromagnetic and does travel through a vacuum — confusing the two kinds of wave is a common error."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Sound is a mechanical wave: it travels by vibrating the particles of a medium such as air, water or metal, so in a vacuum there is nothing to carry the vibration. Light is electromagnetic and does travel through a vacuum — confusing the two kinds of wave is a common error. Therefore the correct answer is D: requires a material medium to transmit its vibrations.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_waves_b003_003",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WAV",
+          "type": "multiple_choice",
+          "prompt": "A light ray strikes a plane mirror at an angle of incidence of 35°. What is the angle between the incident ray and the reflected ray?",
+          "options": [
+            {
+              "label": "A",
+              "text": "70°",
+              "rationale": "This is the supported answer. By the law of reflection the angle of reflection equals the angle of incidence, so both are 35° measured from the normal. The angle between the two rays is 35° + 35° = 70°. (55° is the angle between a ray and the mirror surface — measuring from the surface instead of the normal is the common slip.)"
+            },
+            {
+              "label": "B",
+              "text": "35°",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "C",
+              "text": "55°",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            },
+            {
+              "label": "D",
+              "text": "90°",
+              "rationale": "This option reflects a common misconception; the worked explanation shows why it does not apply here."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "By the law of reflection the angle of reflection equals the angle of incidence, so both are 35° measured from the normal. The angle between the two rays is 35° + 35° = 70°. (55° is the angle between a ray and the mirror surface — measuring from the surface instead of the normal is the common slip.) Therefore the correct answer is A: 70°.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_waves_b003_004",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WAV",
+          "type": "calculation",
+          "prompt": "A wave on water has a frequency of 50 Hz and a wavelength of 4 m. Calculate the speed of the wave.",
+          "correctAnswer": "200 m/s",
+          "workedSolution": "Wave speed = frequency × wavelength: v = fλ = 50 Hz × 4 m = 200 m/s. Answer: the wave travels at 200 m/s.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_waves_b003_005",
+          "original": true,
+          "topicCode": "WASSCE-ISC-WAV",
+          "type": "structured",
+          "prompt": "Light and sound are both forms of wave motion.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State two differences between light waves and sound waves.",
+              "marks": 2,
+              "correctAnswer": "Any two of: light travels through a vacuum but sound cannot; light travels much faster than sound (about 3 × 10⁸ m/s versus about 340 m/s in air); light is a transverse electromagnetic wave while sound is a longitudinal mechanical wave."
+            },
+            {
+              "label": "b",
+              "text": "A sound wave travels 1,700 m through air in 5 s. Calculate the speed of sound in air.",
+              "marks": 2,
+              "correctAnswer": "Speed = distance ÷ time = 1,700 m ÷ 5 s = 340 m/s."
+            }
+          ],
+          "correctAnswer": "(a) Any two of: light travels through a vacuum but sound cannot; light travels much faster than sound (about 3 × 10⁸ m/s versus about 340 m/s in air); light is a transverse electromagnetic wave while sound is a longitudinal mechanical wave. (b) Speed = distance ÷ time = 1,700 m ÷ 5 s = 340 m/s.",
+          "workedSolution": "(a) Any two of: light travels through a vacuum but sound cannot; light travels much faster than sound (about 3 × 10⁸ m/s versus about 340 m/s in air); light is a transverse electromagnetic wave while sound is a longitudinal mechanical wave. (b) Speed = distance ÷ time = 1,700 m ÷ 5 s = 340 m/s.",
+          "difficulty": "medium",
+          "marks": 4,
+          "points": 4,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science practice content; not official WAEC (West African Examinations Council) examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_acids_b003_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ACD",
+          "type": "structured",
+          "prompt": "A student tests lemon juice and a dilute sodium hydroxide solution in the laboratory.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State the colour change observed when blue litmus paper is dipped into the lemon juice.",
+              "marks": 1,
+              "correctAnswer": "The blue litmus paper turns red, showing that lemon juice is acidic."
+            },
+            {
+              "label": "b",
+              "text": "Name the salt formed when hydrochloric acid reacts completely with sodium hydroxide, and name the other product of the reaction.",
+              "marks": 2,
+              "correctAnswer": "Sodium chloride (common salt) and water: HCl + NaOH → NaCl + H₂O."
+            },
+            {
+              "label": "c",
+              "text": "State one everyday application of neutralisation.",
+              "marks": 1,
+              "correctAnswer": "Any one of: treating acid indigestion with an antacid; adding lime to acidic soil; using toothpaste to neutralise acid produced on teeth."
+            }
+          ],
+          "correctAnswer": "(a) The blue litmus paper turns red, showing that lemon juice is acidic. (b) Sodium chloride (common salt) and water: HCl + NaOH → NaCl + H₂O. (c) Any one of: treating acid indigestion with an antacid; adding lime to acidic soil; using toothpaste to neutralise acid produced on teeth.",
+          "workedSolution": "(a) The blue litmus paper turns red, showing that lemon juice is acidic. (b) Sodium chloride (common salt) and water: HCl + NaOH → NaCl + H₂O. (c) Any one of: treating acid indigestion with an antacid; adding lime to acidic soil; using toothpaste to neutralise acid produced on teeth.",
+          "difficulty": "medium",
+          "marks": 4,
+          "points": 4,
+          "timeLimit": null,
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Integrated Science practice content; not official WAEC (West African Examinations Council) examination material. Use the enabled feedback channel to report corrections.",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_eco_b003_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-ECO",
+          "type": "calculation",
+          "prompt": "In an ecological survey, a 1 m² quadrat thrown at random on a school field contained an average of 12 grass plants per throw. Estimate the total number of grass plants in the 500 m² field.",
+          "correctAnswer": "6,000 plants",
+          "workedSolution": "Estimated density = 12 plants per m². Total population = density × total area = 12 × 500 = 6,000. Answer: the field contains about 6,000 grass plants.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_mat_b003_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-MAT",
+          "type": "calculation",
+          "prompt": "A student dissolves 25 g of salt in 100 g of water. Calculate the percentage by mass of salt in the resulting solution.",
+          "correctAnswer": "20%",
+          "workedSolution": "Total mass of solution = 25 g + 100 g = 125 g. Percentage by mass of salt = (25 ÷ 125) × 100 = 20%. Answer: the solution is 20% salt by mass. (Using 25/100 = 25% wrongly divides by the mass of water instead of the mass of the whole solution.)",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_bio_b003_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-BIO",
+          "type": "calculation",
+          "prompt": "A serving of boiled yam contains 40 g of carbohydrate. If 1 g of carbohydrate releases 17 kJ of energy when fully digested, calculate the energy the body obtains from the serving.",
+          "correctAnswer": "680 kJ",
+          "workedSolution": "Energy = mass of carbohydrate × energy released per gram = 40 g × 17 kJ/g = 680 kJ. Answer: the body obtains 680 kJ of energy from the serving.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_wisc_hlt_b003_001",
+          "original": true,
+          "topicCode": "WASSCE-ISC-HLT",
+          "type": "calculation",
+          "prompt": "During a cholera outbreak in a village of 2,000 people, 150 people were infected. Calculate the percentage of the population that was infected.",
+          "correctAnswer": "7.5%",
+          "workedSolution": "Percentage infected = (number infected ÷ total population) × 100 = (150 ÷ 2,000) × 100 = 0.075 × 100 = 7.5%. Answer: 7.5% of the population was infected.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120,
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment (NaCCA), Ghana",
+              "title": "Secondary Education Curriculum — Integrated Science",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
