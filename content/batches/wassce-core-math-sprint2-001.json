@@ -1,0 +1,1983 @@
+{
+  "batchId": "wassce-core-math-sprint2-001",
+  "status": "approved_for_beta",
+  "examTypeId": "exam_wassce",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment, Ghana",
+      "title": "Secondary Education Curriculum — Core Mathematics",
+      "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T13:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep curriculum-aligned WASSCE Core Mathematics practice questions; not official WAEC (West African Examinations Council) examination material. Use the enabled feedback channel to report corrections.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_wassce_core_math",
+      "specificationCode": "BRILLA-WASSCE-COREMATH-S2-001",
+      "sources": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum — Core Mathematics",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "WCM-ALG",
+          "title": "Algebra",
+          "objective": "Simplify expressions, solve linear and simultaneous equations and rearrange formulae accurately."
+        },
+        {
+          "code": "WCM-QDR",
+          "title": "Quadratic Equations",
+          "objective": "Factorise and solve quadratic equations and analyse their roots using the discriminant."
+        },
+        {
+          "code": "WCM-GEO",
+          "title": "Geometry",
+          "objective": "Apply angle, triangle, polygon and circle properties to calculate unknown measures."
+        },
+        {
+          "code": "WCM-TRG",
+          "title": "Trigonometry",
+          "objective": "Use trigonometric ratios and Pythagoras to solve right-angled triangle problems."
+        },
+        {
+          "code": "WCM-STA",
+          "title": "Statistics & Probability",
+          "objective": "Compute measures of central tendency and the probabilities of simple events."
+        },
+        {
+          "code": "WCM-NUM",
+          "title": "Number and numeration",
+          "objective": "Apply fractions, percentages, ratio, approximation and commercial arithmetic to everyday problems."
+        },
+        {
+          "code": "WCM-MEN",
+          "title": "Mensuration",
+          "objective": "Calculate perimeters, areas, surface areas and volumes of plane figures and solids."
+        },
+        {
+          "code": "WCM-RAT",
+          "title": "Ratio and proportion",
+          "objective": "Simplify ratios, share quantities in a given ratio and solve direct and inverse proportion problems."
+        },
+        {
+          "code": "WCM-PRB",
+          "title": "Probability",
+          "objective": "Compute probabilities of single and compound events with and without replacement."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_was_coremath_s2_001",
+          "original": true,
+          "topicCode": "WCM-ALG",
+          "type": "multiple_choice",
+          "prompt": "Solve the equation 2x + 3 = x + 9.",
+          "difficulty": "medium",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "x = 6",
+              "rationale": "This is the supported answer. Subtract x from both sides: x + 3 = 9. Then subtract 3 from both sides: x = 6. Check: 2(6) + 3 = 15 and 6 + 9 = 15, as required."
+            },
+            {
+              "label": "B",
+              "text": "x = 3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "x = 4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "x = 12",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Subtract x from both sides: x + 3 = 9. Then subtract 3 from both sides: x = 6. Check: 2(6) + 3 = 15 and 6 + 9 = 15, as required. Therefore the correct answer is A: x = 6.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_002",
+          "original": true,
+          "topicCode": "WCM-ALG",
+          "type": "multiple_choice",
+          "prompt": "Solve the equation (2x − 1)/3 + (x + 4)/2 = 4.",
+          "difficulty": "hard",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "x = 4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "x = 2",
+              "rationale": "This is the supported answer. Multiply every term by 6, the LCM of 3 and 2: 2(2x − 1) + 3(x + 4) = 24, so 4x − 2 + 3x + 12 = 24. Hence 7x + 10 = 24, giving 7x = 14 and x = 2."
+            },
+            {
+              "label": "C",
+              "text": "x = 14",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "x = 3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Multiply every term by 6, the LCM of 3 and 2: 2(2x − 1) + 3(x + 4) = 24, so 4x − 2 + 3x + 12 = 24. Hence 7x + 10 = 24, giving 7x = 14 and x = 2. Therefore the correct answer is B: x = 2.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_003",
+          "original": true,
+          "topicCode": "WCM-ALG",
+          "type": "calculation",
+          "prompt": "Solve the simultaneous equations 2x + 3y = 12 and x + y = 5.",
+          "difficulty": "medium",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "x = 3 and y = 2",
+          "workedSolution": "From the second equation, x = 5 − y. Substituting into the first: 2(5 − y) + 3y = 12, so 10 − 2y + 3y = 12, giving y = 2. Then x = 5 − 2 = 3. Check: 2(3) + 3(2) = 6 + 6 = 12, as required. Answer: x = 3 and y = 2.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_was_coremath_s2_004",
+          "original": true,
+          "topicCode": "WCM-ALG",
+          "type": "calculation",
+          "prompt": "Make x the subject of the formula y = (3x − 2)/(x + 5).",
+          "difficulty": "hard",
+          "commandWord": "Rearrange",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "x = (5y + 2)/(3 − y)",
+          "workedSolution": "Multiply both sides by (x + 5): y(x + 5) = 3x − 2, so xy + 5y = 3x − 2. Collect the terms in x: xy − 3x = −2 − 5y, so x(y − 3) = −(5y + 2). Dividing both sides by (y − 3) gives x = −(5y + 2)/(y − 3), which simplifies to x = (5y + 2)/(3 − y). Answer: x = (5y + 2)/(3 − y).",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_was_coremath_s2_005",
+          "original": true,
+          "topicCode": "WCM-QDR",
+          "type": "multiple_choice",
+          "prompt": "Find the product of the roots of the equation x² + 2x − 15 = 0.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "15",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "−2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "−15",
+              "rationale": "This is the supported answer. For ax² + bx + c = 0 the product of the roots is c/a. Here c = −15 and a = 1, so the product is −15. (−2 is the sum of the roots, −b/a = −2 — a common confusion.)"
+            },
+            {
+              "label": "D",
+              "text": "2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "For ax² + bx + c = 0 the product of the roots is c/a. Here c = −15 and a = 1, so the product is −15. (−2 is the sum of the roots, −b/a = −2 — a common confusion.) Therefore the correct answer is C: −15.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_006",
+          "original": true,
+          "topicCode": "WCM-QDR",
+          "type": "multiple_choice",
+          "prompt": "The roots of 2x² − 3x − 5 = 0 are α and β. Find the value of 1/α + 1/β.",
+          "difficulty": "hard",
+          "commandWord": "Find",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "3/5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "−5/3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "−3/10",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "−3/5",
+              "rationale": "This is the supported answer. The sum of the roots is α + β = −(−3)/2 = 3/2 and the product is αβ = −5/2. Then 1/α + 1/β = (α + β)/(αβ) = (3/2) ÷ (−5/2) = (3/2) × (−2/5) = −3/5."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The sum of the roots is α + β = −(−3)/2 = 3/2 and the product is αβ = −5/2. Then 1/α + 1/β = (α + β)/(αβ) = (3/2) ÷ (−5/2) = (3/2) × (−2/5) = −3/5. Therefore the correct answer is D: −3/5.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_007",
+          "original": true,
+          "topicCode": "WCM-QDR",
+          "type": "calculation",
+          "prompt": "Solve the equation x² + 4x − 5 = 0 by completing the square.",
+          "difficulty": "medium",
+          "commandWord": "Solve",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "x = 1 or x = −5",
+          "workedSolution": "Complete the square: x² + 4x − 5 = (x + 2)² − 4 − 5 = (x + 2)² − 9 = 0. So (x + 2)² = 9, giving x + 2 = ±3. Hence x = 3 − 2 = 1 or x = −3 − 2 = −5. Check by factorising: (x − 1)(x + 5) = 0 gives the same roots. Answer: x = 1 or x = −5.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_was_coremath_s2_008",
+          "original": true,
+          "topicCode": "WCM-QDR",
+          "type": "calculation",
+          "prompt": "Find the set of values of k for which the equation x² + 4x + k = 0 has real roots.",
+          "difficulty": "hard",
+          "commandWord": "Find",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "k ≤ 4",
+          "workedSolution": "Real roots require the discriminant to be non-negative: b² − 4ac ≥ 0. Here a = 1 and b = 4, so 4² − 4(1)(k) ≥ 0, giving 16 − 4k ≥ 0, hence 4k ≤ 16 and k ≤ 4. Answer: k ≤ 4.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_was_coremath_s2_009",
+          "original": true,
+          "topicCode": "WCM-GEO",
+          "type": "multiple_choice",
+          "prompt": "The angles of a triangle are x°, 2x° and 3x°. Find the size of the largest angle.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "90°",
+              "rationale": "This is the supported answer. The angles of a triangle sum to 180°: x + 2x + 3x = 6x = 180, so x = 30. The largest angle is 3x = 3 × 30 = 90°. (30° is only the smallest angle.)"
+            },
+            {
+              "label": "B",
+              "text": "30°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "60°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "120°",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The angles of a triangle sum to 180°: x + 2x + 3x = 6x = 180, so x = 30. The largest angle is 3x = 3 × 30 = 90°. (30° is only the smallest angle.) Therefore the correct answer is A: 90°.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_010",
+          "original": true,
+          "topicCode": "WCM-GEO",
+          "type": "multiple_choice",
+          "prompt": "Each interior angle of a regular polygon is 156°. How many sides does the polygon have?",
+          "difficulty": "hard",
+          "commandWord": "Find",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "12",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "15",
+              "rationale": "This is the supported answer. Each exterior angle is 180° − 156° = 24°. The exterior angles of any polygon sum to 360°, so the number of sides is 360 ÷ 24 = 15."
+            },
+            {
+              "label": "C",
+              "text": "18",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "20",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Each exterior angle is 180° − 156° = 24°. The exterior angles of any polygon sum to 360°, so the number of sides is 360 ÷ 24 = 15. Therefore the correct answer is B: 15.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_011",
+          "original": true,
+          "topicCode": "WCM-GEO",
+          "type": "calculation",
+          "prompt": "O is the centre of a circle; A, B and C are points on its circumference with C on the major arc AB. If angle AOB = 130°, calculate angle ACB.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "65°",
+          "workedSolution": "The angle subtended at the centre of a circle is twice the angle subtended at the circumference by the same arc. Since C lies on the major arc, angle ACB = 130° ÷ 2 = 65°. Answer: 65°.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_was_coremath_s2_012",
+          "original": true,
+          "topicCode": "WCM-GEO",
+          "type": "calculation",
+          "prompt": "The sum of the interior angles of a polygon is 1,260°. Calculate the number of sides of the polygon.",
+          "difficulty": "hard",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "9 sides",
+          "workedSolution": "A polygon with n sides has interior-angle sum (n − 2) × 180°. Setting (n − 2) × 180 = 1,260 gives n − 2 = 1,260 ÷ 180 = 7, so n = 9. Check: (9 − 2) × 180 = 7 × 180 = 1,260°, as required. Answer: the polygon has 9 sides.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_was_coremath_s2_013",
+          "original": true,
+          "topicCode": "WCM-TRG",
+          "type": "multiple_choice",
+          "prompt": "A right-angled triangle has a hypotenuse of 13 cm and one side of 5 cm. Find the length of the third side.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "8 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "18 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "12 cm",
+              "rationale": "This is the supported answer. By the theorem of Pythagoras, the third side is √(13² − 5²) = √(169 − 25) = √144 = 12 cm. (√194 cm comes from adding the squares, which applies only when both given sides are the shorter ones.)"
+            },
+            {
+              "label": "D",
+              "text": "√194 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "By the theorem of Pythagoras, the third side is √(13² − 5²) = √(169 − 25) = √144 = 12 cm. (√194 cm comes from adding the squares, which applies only when both given sides are the shorter ones.) Therefore the correct answer is C: 12 cm.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_014",
+          "original": true,
+          "topicCode": "WCM-TRG",
+          "type": "multiple_choice",
+          "prompt": "A ladder 10 m long leans against a vertical wall, making an angle of 60° with the horizontal ground. How far is the foot of the ladder from the wall?",
+          "difficulty": "hard",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "8.7 m",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "10 m",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "5√3 m",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "5 m",
+              "rationale": "This is the supported answer. The distance from the wall is the side adjacent to the 60° angle, with the ladder as hypotenuse: 10 × cos 60° = 10 × 0.5 = 5 m. (10 sin 60° ≈ 8.7 m is the height reached up the wall, not the distance asked for.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The distance from the wall is the side adjacent to the 60° angle, with the ladder as hypotenuse: 10 × cos 60° = 10 × 0.5 = 5 m. (10 sin 60° ≈ 8.7 m is the height reached up the wall, not the distance asked for.) Therefore the correct answer is D: 5 m.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_015",
+          "original": true,
+          "topicCode": "WCM-TRG",
+          "type": "calculation",
+          "prompt": "A kite is at the end of a taut string 50 m long that makes an angle of 30° with the horizontal. Calculate the height of the kite above the ground.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "25 m",
+          "workedSolution": "The height is the side opposite the 30° angle in the right-angled triangle, with the string as hypotenuse: h = 50 × sin 30° = 50 × 0.5 = 25 m. Answer: the kite is 25 m above the ground.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_was_coremath_s2_016",
+          "original": true,
+          "topicCode": "WCM-TRG",
+          "type": "calculation",
+          "prompt": "From the top of a cliff 40 m high, the angle of depression of a boat at sea is 30°. Calculate the distance of the boat from the foot of the cliff, leaving your answer in surd form.",
+          "difficulty": "hard",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "40√3 m",
+          "workedSolution": "The angle of depression from the top equals the angle of elevation from the boat (alternate angles). In the right-angled triangle, tan 30° = 40/d, so d = 40 ÷ tan 30° = 40 ÷ (1/√3) = 40√3 m. Answer: the boat is 40√3 m from the foot of the cliff.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_was_coremath_s2_017",
+          "original": true,
+          "topicCode": "WCM-STA",
+          "type": "multiple_choice",
+          "prompt": "The mean of five numbers is 8. Four of the numbers are 6, 9, 7 and 12. Find the fifth number.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "6",
+              "rationale": "This is the supported answer. The five numbers total 5 × 8 = 40. The four known numbers total 6 + 9 + 7 + 12 = 34, so the fifth number is 40 − 34 = 6. (8.5 is the mean of the four given numbers only.)"
+            },
+            {
+              "label": "B",
+              "text": "8",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "8.5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The five numbers total 5 × 8 = 40. The four known numbers total 6 + 9 + 7 + 12 = 34, so the fifth number is 40 − 34 = 6. (8.5 is the mean of the four given numbers only.) Therefore the correct answer is A: 6.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_018",
+          "original": true,
+          "topicCode": "WCM-STA",
+          "type": "multiple_choice",
+          "prompt": "A fair die is thrown twice. What is the probability that the two scores add up to 9?",
+          "difficulty": "hard",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "1/6",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "1/9",
+              "rationale": "This is the supported answer. There are 6 × 6 = 36 equally likely outcomes. The outcomes totalling 9 are (3, 6), (4, 5), (5, 4) and (6, 3) — four of them — so the probability is 4/36 = 1/9."
+            },
+            {
+              "label": "C",
+              "text": "1/12",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "5/36",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "There are 6 × 6 = 36 equally likely outcomes. The outcomes totalling 9 are (3, 6), (4, 5), (5, 4) and (6, 3) — four of them — so the probability is 4/36 = 1/9. Therefore the correct answer is B: 1/9.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_019",
+          "original": true,
+          "topicCode": "WCM-STA",
+          "type": "calculation",
+          "prompt": "The marks of eight students in a test are 5, 6, 8, 8, 9, 10, 12 and 14. Calculate the mean mark.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "9",
+          "workedSolution": "The sum of the marks is 5 + 6 + 8 + 8 + 9 + 10 + 12 + 14 = 72. Dividing the total by the number of students gives the mean: 72 ÷ 8 = 9. Answer: the mean mark is 9.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_was_coremath_s2_020",
+          "original": true,
+          "topicCode": "WCM-STA",
+          "type": "calculation",
+          "prompt": "A box contains 3 green balls and 5 yellow balls. Two balls are picked at random, one after the other, without replacement. Find the probability that they are of different colours.",
+          "difficulty": "hard",
+          "commandWord": "Find",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "15/28",
+          "workedSolution": "P(green then yellow) = (3/8) × (5/7) = 15/56, and P(yellow then green) = (5/8) × (3/7) = 15/56. The two cases are mutually exclusive, so add them: 15/56 + 15/56 = 30/56 = 15/28. Answer: 15/28.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_was_coremath_s2_021",
+          "original": true,
+          "topicCode": "WCM-NUM",
+          "type": "multiple_choice",
+          "prompt": "Express 2.5% as a fraction in its lowest terms.",
+          "difficulty": "medium",
+          "commandWord": "Express",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "1/4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "1/25",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "1/40",
+              "rationale": "This is the supported answer. 2.5% = 2.5/100 = 25/1000. Dividing the numerator and denominator by 25 gives 1/40. (1/400 would be 0.25%, ten times smaller.)"
+            },
+            {
+              "label": "D",
+              "text": "1/400",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "2.5% = 2.5/100 = 25/1000. Dividing the numerator and denominator by 25 gives 1/40. (1/400 would be 0.25%, ten times smaller.) Therefore the correct answer is C: 1/40.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_022",
+          "original": true,
+          "topicCode": "WCM-NUM",
+          "type": "multiple_choice",
+          "prompt": "A trader buys a bicycle for GH₵400.00 and sells it at a loss of 15%. Find the selling price.",
+          "difficulty": "hard",
+          "commandWord": "Find",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "GH₵60.00",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "GH₵385.00",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "GH₵460.00",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "GH₵340.00",
+              "rationale": "This is the supported answer. The loss is 15% of 400 = (15/100) × 400 = GH₵60.00, so the selling price is 400 − 60 = GH₵340.00. (GH₵60.00 is the loss itself, not the selling price.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The loss is 15% of 400 = (15/100) × 400 = GH₵60.00, so the selling price is 400 − 60 = GH₵340.00. (GH₵60.00 is the loss itself, not the selling price.) Therefore the correct answer is D: GH₵340.00.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_023",
+          "original": true,
+          "topicCode": "WCM-NUM",
+          "type": "calculation",
+          "prompt": "Calculate the compound interest on GH₵5,000.00 invested at 10% per annum for 2 years.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "GH₵1,050.00",
+          "workedSolution": "After the first year the amount is 5,000 × 1.10 = GH₵5,500.00. After the second year it is 5,500 × 1.10 = GH₵6,050.00. The compound interest is 6,050 − 5,000 = GH₵1,050.00. Answer: GH₵1,050.00.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_was_coremath_s2_024",
+          "original": true,
+          "topicCode": "WCM-NUM",
+          "type": "calculation",
+          "prompt": "A machine valued at GH₵8,000.00 depreciates by 25% each year. Calculate its value after 2 years.",
+          "difficulty": "hard",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "GH₵4,500.00",
+          "workedSolution": "Each year the value is multiplied by (100 − 25)/100 = 0.75. After the first year: 8,000 × 0.75 = GH₵6,000.00. After the second year: 6,000 × 0.75 = GH₵4,500.00. Equivalently, 8,000 × 0.75² = 8,000 × 0.5625 = GH₵4,500.00. Answer: GH₵4,500.00.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_was_coremath_s2_025",
+          "original": true,
+          "topicCode": "WCM-MEN",
+          "type": "multiple_choice",
+          "prompt": "Calculate the area of a rectangle with length 14 cm and width 6 cm.",
+          "difficulty": "easy",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "84 cm²",
+              "rationale": "This is the supported answer. Area of a rectangle = length × width = 14 × 6 = 84 cm². (40 cm is the perimeter 2(14 + 6), a common mix-up.)"
+            },
+            {
+              "label": "B",
+              "text": "20 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "40 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "168 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Area of a rectangle = length × width = 14 × 6 = 84 cm². (40 cm is the perimeter 2(14 + 6), a common mix-up.) Therefore the correct answer is A: 84 cm².",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_026",
+          "original": true,
+          "topicCode": "WCM-MEN",
+          "type": "multiple_choice",
+          "prompt": "Taking π = 22/7, calculate the circumference of a circle of radius 7 cm.",
+          "difficulty": "easy",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "22 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "44 cm",
+              "rationale": "This is the supported answer. Circumference = 2πr = 2 × (22/7) × 7 = 2 × 22 = 44 cm. (154 cm² is πr², the area, not the circumference.)"
+            },
+            {
+              "label": "C",
+              "text": "154 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "88 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Circumference = 2πr = 2 × (22/7) × 7 = 2 × 22 = 44 cm. (154 cm² is πr², the area, not the circumference.) Therefore the correct answer is B: 44 cm.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_027",
+          "original": true,
+          "topicCode": "WCM-MEN",
+          "type": "multiple_choice",
+          "prompt": "Find the area of a triangle with base 8 cm and height 9 cm.",
+          "difficulty": "easy",
+          "commandWord": "Find",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "72 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "17 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "36 cm²",
+              "rationale": "This is the supported answer. Area of a triangle = ½ × base × height = ½ × 8 × 9 = 36 cm². (72 cm² forgets the ½, treating the triangle as a rectangle.)"
+            },
+            {
+              "label": "D",
+              "text": "40 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Area of a triangle = ½ × base × height = ½ × 8 × 9 = 36 cm². (72 cm² forgets the ½, treating the triangle as a rectangle.) Therefore the correct answer is C: 36 cm².",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_028",
+          "original": true,
+          "topicCode": "WCM-MEN",
+          "type": "multiple_choice",
+          "prompt": "A cuboid has length 10 cm, width 6 cm and volume 240 cm³. Find its height.",
+          "difficulty": "easy",
+          "commandWord": "Find",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "24 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "40 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "16 cm",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "4 cm",
+              "rationale": "This is the supported answer. Volume = length × width × height, so height = volume ÷ (length × width) = 240 ÷ (10 × 6) = 240 ÷ 60 = 4 cm."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Volume = length × width × height, so height = volume ÷ (length × width) = 240 ÷ (10 × 6) = 240 ÷ 60 = 4 cm. Therefore the correct answer is D: 4 cm.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_029",
+          "original": true,
+          "topicCode": "WCM-MEN",
+          "type": "multiple_choice",
+          "prompt": "Taking π = 22/7, calculate the area of a circle of radius 14 cm.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "616 cm²",
+              "rationale": "This is the supported answer. Area = πr² = (22/7) × 14² = (22/7) × 196 = 22 × 28 = 616 cm². (88 cm is the circumference 2πr, and 308 cm² uses r = 7 instead of r² = 14².)"
+            },
+            {
+              "label": "B",
+              "text": "88 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "308 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "1,232 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Area = πr² = (22/7) × 14² = (22/7) × 196 = 22 × 28 = 616 cm². (88 cm is the circumference 2πr, and 308 cm² uses r = 7 instead of r² = 14².) Therefore the correct answer is A: 616 cm².",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_030",
+          "original": true,
+          "topicCode": "WCM-MEN",
+          "type": "multiple_choice",
+          "prompt": "A cylinder has radius 7 cm and height 5 cm. Taking π = 22/7, calculate its volume.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "110 cm³",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "770 cm³",
+              "rationale": "This is the supported answer. Volume = πr²h = (22/7) × 7² × 5 = 22 × 7 × 5 = 770 cm³. (220 cm² is 2πrh, the curved surface area, not the volume.)"
+            },
+            {
+              "label": "C",
+              "text": "220 cm³",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "1,540 cm³",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Volume = πr²h = (22/7) × 7² × 5 = 22 × 7 × 5 = 770 cm³. (220 cm² is 2πrh, the curved surface area, not the volume.) Therefore the correct answer is B: 770 cm³.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_031",
+          "original": true,
+          "topicCode": "WCM-MEN",
+          "type": "multiple_choice",
+          "prompt": "Calculate the total surface area of a cube of edge 3 cm.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "27 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "9 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "54 cm²",
+              "rationale": "This is the supported answer. Each face of the cube has area 3 × 3 = 9 cm², and a cube has 6 identical faces, so the total surface area is 6 × 9 = 54 cm². (27 is the volume 3³ in cm³, the wrong measure.)"
+            },
+            {
+              "label": "D",
+              "text": "36 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Each face of the cube has area 3 × 3 = 9 cm², and a cube has 6 identical faces, so the total surface area is 6 × 9 = 54 cm². (27 is the volume 3³ in cm³, the wrong measure.) Therefore the correct answer is C: 54 cm².",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_032",
+          "original": true,
+          "topicCode": "WCM-MEN",
+          "type": "multiple_choice",
+          "prompt": "A trapezium has parallel sides of lengths 8 cm and 12 cm, and the perpendicular distance between them is 5 cm. Calculate its area.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "100 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "40 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "60 cm²",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "50 cm²",
+              "rationale": "This is the supported answer. Area = ½ × (sum of parallel sides) × height = ½ × (8 + 12) × 5 = ½ × 20 × 5 = 50 cm². (100 cm² omits the ½.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Area = ½ × (sum of parallel sides) × height = ½ × (8 + 12) × 5 = ½ × 20 × 5 = 50 cm². (100 cm² omits the ½.) Therefore the correct answer is D: 50 cm².",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_033",
+          "original": true,
+          "topicCode": "WCM-RAT",
+          "type": "multiple_choice",
+          "prompt": "Express the ratio 15 : 25 in its simplest form.",
+          "difficulty": "easy",
+          "commandWord": "Express",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "3 : 5",
+              "rationale": "This is the supported answer. Divide both parts by their highest common factor, 5: 15 ÷ 5 = 3 and 25 ÷ 5 = 5, giving 3 : 5."
+            },
+            {
+              "label": "B",
+              "text": "5 : 3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "1 : 2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "3 : 4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Divide both parts by their highest common factor, 5: 15 ÷ 5 = 3 and 25 ÷ 5 = 5, giving 3 : 5. Therefore the correct answer is A: 3 : 5.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_034",
+          "original": true,
+          "topicCode": "WCM-RAT",
+          "type": "multiple_choice",
+          "prompt": "GH₵60.00 is shared between two people in the ratio 1 : 2. How much is the smaller share?",
+          "difficulty": "easy",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "GH₵40.00",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "GH₵20.00",
+              "rationale": "This is the supported answer. Total parts = 1 + 2 = 3, so one part is 60 ÷ 3 = GH₵20.00. The smaller share is one part: GH₵20.00. (GH₵40.00 is the larger share.)"
+            },
+            {
+              "label": "C",
+              "text": "GH₵30.00",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "GH₵12.00",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Total parts = 1 + 2 = 3, so one part is 60 ÷ 3 = GH₵20.00. The smaller share is one part: GH₵20.00. (GH₵40.00 is the larger share.) Therefore the correct answer is B: GH₵20.00.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_035",
+          "original": true,
+          "topicCode": "WCM-RAT",
+          "type": "multiple_choice",
+          "prompt": "Three identical pencils cost GH₵4.50 altogether. What is the cost of one pencil?",
+          "difficulty": "easy",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "GH₵13.50",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "GH₵1.25",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "GH₵1.50",
+              "rationale": "This is the supported answer. Unit cost = total cost ÷ quantity = 4.50 ÷ 3 = GH₵1.50. (GH₵13.50 multiplies by 3 instead of dividing.)"
+            },
+            {
+              "label": "D",
+              "text": "GH₵7.50",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Unit cost = total cost ÷ quantity = 4.50 ÷ 3 = GH₵1.50. (GH₵13.50 multiplies by 3 instead of dividing.) Therefore the correct answer is C: GH₵1.50.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_036",
+          "original": true,
+          "topicCode": "WCM-RAT",
+          "type": "multiple_choice",
+          "prompt": "On a map of scale 1 : 50,000, two towns are 4 cm apart. Find the actual distance between the towns in kilometres.",
+          "difficulty": "easy",
+          "commandWord": "Find",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "20 km",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "200 km",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "0.2 km",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "2 km",
+              "rationale": "This is the supported answer. Actual distance = 4 × 50,000 = 200,000 cm. Converting: 200,000 cm ÷ 100 = 2,000 m, and 2,000 m ÷ 1,000 = 2 km."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Actual distance = 4 × 50,000 = 200,000 cm. Converting: 200,000 cm ÷ 100 = 2,000 m, and 2,000 m ÷ 1,000 = 2 km. Therefore the correct answer is D: 2 km.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_037",
+          "original": true,
+          "topicCode": "WCM-RAT",
+          "type": "multiple_choice",
+          "prompt": "The ratio of boys to girls in a class is 4 : 5. If there are 36 students in the class, how many are girls?",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "20",
+              "rationale": "This is the supported answer. Total parts = 4 + 5 = 9, so one part represents 36 ÷ 9 = 4 students. Girls take 5 parts: 5 × 4 = 20. (16 is the number of boys.)"
+            },
+            {
+              "label": "B",
+              "text": "16",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "18",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "24",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Total parts = 4 + 5 = 9, so one part represents 36 ÷ 9 = 4 students. Girls take 5 parts: 5 × 4 = 20. (16 is the number of boys.) Therefore the correct answer is A: 20.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_038",
+          "original": true,
+          "topicCode": "WCM-RAT",
+          "type": "multiple_choice",
+          "prompt": "Three friends share GH₵540.00 in the ratio 2 : 3 : 4. Find the largest share.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "GH₵180.00",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "GH₵240.00",
+              "rationale": "This is the supported answer. Total parts = 2 + 3 + 4 = 9, so one part is 540 ÷ 9 = GH₵60.00. The largest share is 4 × 60 = GH₵240.00. (GH₵60.00 is only the value of one part.)"
+            },
+            {
+              "label": "C",
+              "text": "GH₵120.00",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "GH₵60.00",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Total parts = 2 + 3 + 4 = 9, so one part is 540 ÷ 9 = GH₵60.00. The largest share is 4 × 60 = GH₵240.00. (GH₵60.00 is only the value of one part.) Therefore the correct answer is B: GH₵240.00.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_039",
+          "original": true,
+          "topicCode": "WCM-RAT",
+          "type": "multiple_choice",
+          "prompt": "Eight workers can build a wall in 15 days. Working at the same rate, how many days will it take 12 workers to build the same wall?",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "22.5 days",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "20 days",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "10 days",
+              "rationale": "This is the supported answer. The job needs 8 × 15 = 120 worker-days. With 12 workers the time is 120 ÷ 12 = 10 days. (22.5 days wrongly uses direct proportion; more workers means fewer days.)"
+            },
+            {
+              "label": "D",
+              "text": "8 days",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The job needs 8 × 15 = 120 worker-days. With 12 workers the time is 120 ÷ 12 = 10 days. (22.5 days wrongly uses direct proportion; more workers means fewer days.) Therefore the correct answer is C: 10 days.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_040",
+          "original": true,
+          "topicCode": "WCM-RAT",
+          "type": "multiple_choice",
+          "prompt": "A car uses 12 litres of petrol to travel 150 km. At the same rate, how many litres are needed to travel 400 km?",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "36 litres",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "28 litres",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "40 litres",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "32 litres",
+              "rationale": "This is the supported answer. Petrol per kilometre = 12 ÷ 150 = 0.08 litres, so for 400 km the car needs 0.08 × 400 = 32 litres. Equivalently, 12 × (400/150) = 32 litres."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Petrol per kilometre = 12 ÷ 150 = 0.08 litres, so for 400 km the car needs 0.08 × 400 = 32 litres. Equivalently, 12 × (400/150) = 32 litres. Therefore the correct answer is D: 32 litres.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_041",
+          "original": true,
+          "topicCode": "WCM-PRB",
+          "type": "multiple_choice",
+          "prompt": "A fair coin is tossed once. What is the probability of obtaining a tail?",
+          "difficulty": "easy",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "1/2",
+              "rationale": "This is the supported answer. A fair coin has two equally likely outcomes, head and tail, so P(tail) = 1/2."
+            },
+            {
+              "label": "B",
+              "text": "1",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "1/3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "1/4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A fair coin has two equally likely outcomes, head and tail, so P(tail) = 1/2. Therefore the correct answer is A: 1/2.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_042",
+          "original": true,
+          "topicCode": "WCM-PRB",
+          "type": "multiple_choice",
+          "prompt": "A bag contains 3 red balls and 7 blue balls. One ball is picked at random. What is the probability that it is red?",
+          "difficulty": "easy",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "3/7",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "3/10",
+              "rationale": "This is the supported answer. There are 3 red balls out of 3 + 7 = 10 equally likely balls, so P(red) = 3/10. (3/7 wrongly compares red to blue instead of red to the total; 7/10 is the probability of blue.)"
+            },
+            {
+              "label": "C",
+              "text": "7/10",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "1/3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "There are 3 red balls out of 3 + 7 = 10 equally likely balls, so P(red) = 3/10. (3/7 wrongly compares red to blue instead of red to the total; 7/10 is the probability of blue.) Therefore the correct answer is B: 3/10.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_043",
+          "original": true,
+          "topicCode": "WCM-PRB",
+          "type": "multiple_choice",
+          "prompt": "A letter is chosen at random from the word MATHS. What is the probability that it is a vowel?",
+          "difficulty": "easy",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "2/5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "1/2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "1/5",
+              "rationale": "This is the supported answer. The word MATHS has 5 letters and only one vowel (A), so P(vowel) = 1/5. (2/5 wrongly counts two vowels; only A qualifies.)"
+            },
+            {
+              "label": "D",
+              "text": "4/5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The word MATHS has 5 letters and only one vowel (A), so P(vowel) = 1/5. (2/5 wrongly counts two vowels; only A qualifies.) Therefore the correct answer is C: 1/5.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_044",
+          "original": true,
+          "topicCode": "WCM-PRB",
+          "type": "multiple_choice",
+          "prompt": "A fair die is thrown once. Find the probability of obtaining a number greater than 4.",
+          "difficulty": "easy",
+          "commandWord": "Find",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "1/2",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "2/3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "1/6",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "1/3",
+              "rationale": "This is the supported answer. The outcomes greater than 4 are 5 and 6 — two of the six equally likely outcomes — so the probability is 2/6 = 1/3. (1/6 is the probability of one specific number.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The outcomes greater than 4 are 5 and 6 — two of the six equally likely outcomes — so the probability is 2/6 = 1/3. (1/6 is the probability of one specific number.) Therefore the correct answer is D: 1/3.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_045",
+          "original": true,
+          "topicCode": "WCM-PRB",
+          "type": "multiple_choice",
+          "prompt": "Two fair dice are thrown together. What is the probability of obtaining a double (both dice showing the same number)?",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "1/6",
+              "rationale": "This is the supported answer. Of the 6 × 6 = 36 equally likely outcomes, six are doubles: (1,1), (2,2), …, (6,6). Hence P(double) = 6/36 = 1/6. (1/36 is the probability of one specific double, such as (3,3).)"
+            },
+            {
+              "label": "B",
+              "text": "1/36",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "1/12",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "1/3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Of the 6 × 6 = 36 equally likely outcomes, six are doubles: (1,1), (2,2), …, (6,6). Hence P(double) = 6/36 = 1/6. (1/36 is the probability of one specific double, such as (3,3).) Therefore the correct answer is A: 1/6.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_046",
+          "original": true,
+          "topicCode": "WCM-PRB",
+          "type": "multiple_choice",
+          "prompt": "A bag contains 4 white balls and 6 black balls. A ball is picked at random and replaced, then a second ball is picked. Find the probability that both balls are black.",
+          "difficulty": "medium",
+          "commandWord": "Find",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "1/3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "9/25",
+              "rationale": "This is the supported answer. Because the first ball is replaced, the draws are independent and P(black) = 6/10 = 3/5 each time. Hence P(both black) = (3/5) × (3/5) = 9/25. (1/3 is close to 30/90, the without-replacement value.)"
+            },
+            {
+              "label": "C",
+              "text": "3/5",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "9/20",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Because the first ball is replaced, the draws are independent and P(black) = 6/10 = 3/5 each time. Hence P(both black) = (3/5) × (3/5) = 9/25. (1/3 is close to 30/90, the without-replacement value.) Therefore the correct answer is B: 9/25.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_047",
+          "original": true,
+          "topicCode": "WCM-PRB",
+          "type": "multiple_choice",
+          "prompt": "The probability that it rains on a given day is 0.3. What is the probability that it does not rain on that day?",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "0.3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "0.6",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "0.7",
+              "rationale": "This is the supported answer. Raining and not raining are complementary events whose probabilities sum to 1, so P(no rain) = 1 − 0.3 = 0.7. (1.3 is impossible: no probability can exceed 1.)"
+            },
+            {
+              "label": "D",
+              "text": "1.3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Raining and not raining are complementary events whose probabilities sum to 1, so P(no rain) = 1 − 0.3 = 0.7. (1.3 is impossible: no probability can exceed 1.) Therefore the correct answer is C: 0.7.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_was_coremath_s2_048",
+          "original": true,
+          "topicCode": "WCM-PRB",
+          "type": "multiple_choice",
+          "prompt": "A number is chosen at random from the integers 1 to 20 inclusive. What is the probability that it is a multiple of 3?",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — Core Mathematics",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "7/20",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "1/3",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "1/4",
+              "rationale": "This is a plausible misconception, but it does not follow from the calculation in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "3/10",
+              "rationale": "This is the supported answer. The multiples of 3 from 1 to 20 are 3, 6, 9, 12, 15 and 18 — six numbers — so the probability is 6/20 = 3/10. (7/20 wrongly counts 21, which is outside the range.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The multiples of 3 from 1 to 20 are 3, 6, 9, 12, 15 and 18 — six numbers — so the probability is 6/20 = 3/10. (7/20 wrongly counts 21, which is outside the range.) Therefore the correct answer is D: 3/10.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        }
+      ]
+    }
+  ]
+}
