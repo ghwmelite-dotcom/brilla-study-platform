@@ -1,0 +1,2419 @@
+{
+  "batchId": "wassce-english-sprint1-001",
+  "status": "approved_for_beta",
+  "examTypeId": "exam_wassce",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment, Ghana",
+      "title": "Secondary Education Curriculum — English Language",
+      "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "West African Examinations Council",
+      "title": "WASSCE English Language syllabus blueprint",
+      "url": "https://waecgh.org/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T00:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep WASSCE English practice content; not official WAEC material.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_wassce_english",
+      "specificationCode": "BRILLA-WASSCE-ENG-SPRINT1-001",
+      "sources": [
+        {
+          "publisher": "National Council for Curriculum and Assessment, Ghana",
+          "title": "Secondary Education Curriculum — English Language",
+          "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+          "use": "curriculum_blueprint_only"
+        },
+        {
+          "publisher": "West African Examinations Council",
+          "title": "WASSCE English Language syllabus blueprint",
+          "url": "https://waecgh.org/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "ENG-CMP",
+          "title": "Comprehension",
+          "objective": "Read short passages and answer literal, inferential and vocabulary-in-context questions."
+        },
+        {
+          "code": "ENG-SUM",
+          "title": "Summary Writing",
+          "objective": "Identify main points and condense passages into concise sentences in the candidate's own words."
+        },
+        {
+          "code": "ENG-ESS",
+          "title": "Essay Writing",
+          "objective": "Plan and compose narrative, descriptive, expository and argumentative essays."
+        },
+        {
+          "code": "ENG-LET",
+          "title": "Letter and Report Writing",
+          "objective": "Apply the formats and registers of formal and informal letters, speeches, articles and reports."
+        },
+        {
+          "code": "ENG-LIT",
+          "title": "Literary Devices",
+          "objective": "Identify and interpret figurative language such as simile, metaphor, personification and hyperbole."
+        },
+        {
+          "code": "ENG-GRAM",
+          "title": "Grammar and Usage",
+          "objective": "Apply the rules of concord, tense, voice and sentence transformation."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_eng_s1_cmp_mcq_001",
+          "original": true,
+          "topicCode": "ENG-CMP",
+          "type": "multiple_choice",
+          "prompt": "Read the passage, then answer. — \"When the harmattan came, Kofi's grandfather was ready. He had sealed the windows with old newspapers and moved his seedlings into the shade of the mango tree. \"The wind respects the prepared,\" he said. When the haze lifted, his was the only garden on the street still green.\" According to the passage, Kofi's grandfather sealed the windows with what material?",
+          "options": [
+            {
+              "label": "A",
+              "text": "old newspapers",
+              "rationale": "This is the supported answer. The passage states directly that he \"had sealed the windows with old newspapers\". The other materials are not mentioned anywhere in the passage."
+            },
+            {
+              "label": "B",
+              "text": "wet towels",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "wooden boards",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "plastic sheets",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The passage states directly that he \"had sealed the windows with old newspapers\". The other materials are not mentioned anywhere in the passage.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_cmp_mcq_002",
+          "original": true,
+          "topicCode": "ENG-CMP",
+          "type": "multiple_choice",
+          "prompt": "Read the passage, then answer. — \"When the harmattan came, Kofi's grandfather was ready. He had sealed the windows with old newspapers and moved his seedlings into the shade of the mango tree. \"The wind respects the prepared,\" he said. When the haze lifted, his was the only garden on the street still green.\" Where did the grandfather move his seedlings?",
+          "options": [
+            {
+              "label": "A",
+              "text": "behind the house",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "into the shade of the mango tree",
+              "rationale": "This is the supported answer. The passage says he \"moved his seedlings into the shade of the mango tree\". None of the other locations is mentioned."
+            },
+            {
+              "label": "C",
+              "text": "onto the street",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "into the kitchen",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The passage says he \"moved his seedlings into the shade of the mango tree\". None of the other locations is mentioned.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_cmp_mcq_003",
+          "original": true,
+          "topicCode": "ENG-CMP",
+          "type": "multiple_choice",
+          "prompt": "Read the passage, then answer. — \"When the harmattan came, Kofi's grandfather was ready. He had sealed the windows with old newspapers and moved his seedlings into the shade of the mango tree. \"The wind respects the prepared,\" he said. When the haze lifted, his was the only garden on the street still green.\" The saying \"The wind respects the prepared\" suggests that",
+          "options": [
+            {
+              "label": "A",
+              "text": "the wind avoids only wealthy households",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "preparation can stop the harmattan from blowing",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "hardship has less power over people who make ready for it",
+              "rationale": "This is the supported answer. The saying is figurative: the prepared suffer less from hardship, as the grandfather's intact garden shows. It does not claim the wind is literally a person."
+            },
+            {
+              "label": "D",
+              "text": "the wind is a person who greets the elders",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The saying is figurative: the prepared suffer less from hardship, as the grandfather's intact garden shows. It does not claim the wind is literally a person.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 60,
+          "commandWord": "Interpret",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_cmp_mcq_004",
+          "original": true,
+          "topicCode": "ENG-CMP",
+          "type": "multiple_choice",
+          "prompt": "Read the passage, then answer. — \"When the harmattan came, Kofi's grandfather was ready. He had sealed the windows with old newspapers and moved his seedlings into the shade of the mango tree. \"The wind respects the prepared,\" he said. When the haze lifted, his was the only garden on the street still green.\" The grandfather's actions show that he was",
+          "options": [
+            {
+              "label": "A",
+              "text": "afraid of his neighbours",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "wasteful with his property",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "indifferent to the weather",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "foresighted and careful",
+              "rationale": "This is the supported answer. Sealing windows and sheltering seedlings before the wind arrived show planning and care; nothing suggests fear of neighbours, waste, or indifference."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Sealing windows and sheltering seedlings before the wind arrived show planning and care; nothing suggests fear of neighbours, waste, or indifference.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 60,
+          "commandWord": "Interpret",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_cmp_mcq_005",
+          "original": true,
+          "topicCode": "ENG-CMP",
+          "type": "multiple_choice",
+          "prompt": "Read the passage, then answer. — \"When the harmattan came, Kofi's grandfather was ready. He had sealed the windows with old newspapers and moved his seedlings into the shade of the mango tree. \"The wind respects the prepared,\" he said. When the haze lifted, his was the only garden on the street still green.\" The last sentence implies that the other people on the street",
+          "options": [
+            {
+              "label": "A",
+              "text": "had not prepared for the harmattan as well as the grandfather",
+              "rationale": "This is the supported answer. His garden was the only one still green, and the passage ties his success to preparation; the implied contrast is that the others had not prepared as well."
+            },
+            {
+              "label": "B",
+              "text": "had planted no gardens at all",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "envied the grandfather's mango tree",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "had left the street before the harmattan",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "His garden was the only one still green, and the passage ties his success to preparation; the implied contrast is that the others had not prepared as well.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 60,
+          "commandWord": "Infer",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_cmp_mcq_006",
+          "original": true,
+          "topicCode": "ENG-CMP",
+          "type": "multiple_choice",
+          "prompt": "Read the passage, then answer. — \"Mansa's school began a silent reading period every morning. At first the students grumbled, but within a term the library's borrowing records had doubled and essays had grown longer and richer. \"You cannot hear a book,\" the headmistress said, \"until the noise stops.\" Soon parents asked how to start the habit at home.\" How often was the silent reading period held?",
+          "options": [
+            {
+              "label": "A",
+              "text": "once a week",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "every morning",
+              "rationale": "This is the supported answer. The opening sentence says the school \"began a silent reading period every morning\". Weekly, evening and termly periods are not mentioned."
+            },
+            {
+              "label": "C",
+              "text": "every evening",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "once a term",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The opening sentence says the school \"began a silent reading period every morning\". Weekly, evening and termly periods are not mentioned.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_cmp_mcq_007",
+          "original": true,
+          "topicCode": "ENG-CMP",
+          "type": "multiple_choice",
+          "prompt": "Read the passage, then answer. — \"Mansa's school began a silent reading period every morning. At first the students grumbled, but within a term the library's borrowing records had doubled and essays had grown longer and richer. \"You cannot hear a book,\" the headmistress said, \"until the noise stops.\" Soon parents asked how to start the habit at home.\" At first, the students",
+          "options": [
+            {
+              "label": "A",
+              "text": "borrowed twice as many books",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "wrote longer and richer essays",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "grumbled about the reading period",
+              "rationale": "This is the supported answer. \"At first the students grumbled.\" The doubled borrowing and richer essays came later, so they describe the result, not the first reaction."
+            },
+            {
+              "label": "D",
+              "text": "asked their parents for help",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "\"At first the students grumbled.\" The doubled borrowing and richer essays came later, so they describe the result, not the first reaction.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_cmp_mcq_008",
+          "original": true,
+          "topicCode": "ENG-CMP",
+          "type": "multiple_choice",
+          "prompt": "Read the passage, then answer. — \"Mansa's school began a silent reading period every morning. At first the students grumbled, but within a term the library's borrowing records had doubled and essays had grown longer and richer. \"You cannot hear a book,\" the headmistress said, \"until the noise stops.\" Soon parents asked how to start the habit at home.\" Which of the following does the passage give as evidence that the reading period succeeded?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The students stopped grumbling at home",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "The headmistress closed the library",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "The parents bought new books for the school",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "The library's borrowing records had doubled",
+              "rationale": "This is the supported answer. The passage names two pieces of evidence: doubled borrowing records and richer essays. Only the first appears among the options."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The passage names two pieces of evidence: doubled borrowing records and richer essays. Only the first appears among the options.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 60,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_cmp_mcq_009",
+          "original": true,
+          "topicCode": "ENG-CMP",
+          "type": "multiple_choice",
+          "prompt": "Read the passage, then answer. — \"Mansa's school began a silent reading period every morning. At first the students grumbled, but within a term the library's borrowing records had doubled and essays had grown longer and richer. \"You cannot hear a book,\" the headmistress said, \"until the noise stops.\" Soon parents asked how to start the habit at home.\" The headmistress's words \"You cannot hear a book until the noise stops\" mean that",
+          "options": [
+            {
+              "label": "A",
+              "text": "reading requires quiet and full attention",
+              "rationale": "This is the supported answer. The saying is figurative: \"hearing\" a book means absorbing it and \"noise\" means distraction, so reading needs quiet attention."
+            },
+            {
+              "label": "B",
+              "text": "books make a noise when they are read aloud",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "students should stop reading noisy books",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "the library should be soundproofed",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The saying is figurative: \"hearing\" a book means absorbing it and \"noise\" means distraction, so reading needs quiet attention.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 60,
+          "commandWord": "Interpret",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_cmp_mcq_010",
+          "original": true,
+          "topicCode": "ENG-CMP",
+          "type": "multiple_choice",
+          "prompt": "Read the passage, then answer. — \"Mansa's school began a silent reading period every morning. At first the students grumbled, but within a term the library's borrowing records had doubled and essays had grown longer and richer. \"You cannot hear a book,\" the headmistress said, \"until the noise stops.\" Soon parents asked how to start the habit at home.\" The word \"grumbled\" as used in the passage means",
+          "options": [
+            {
+              "label": "A",
+              "text": "rejoiced openly",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "complained in a quiet, discontented way",
+              "rationale": "This is the supported answer. Their later benefit shows the first reaction was muted discontent, not refusal: \"grumbled\" means complained in a low, discontented way."
+            },
+            {
+              "label": "C",
+              "text": "refused to obey",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "read aloud",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Their later benefit shows the first reaction was muted discontent, not refusal: \"grumbled\" means complained in a low, discontented way.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 60,
+          "commandWord": "Interpret",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_cmp_st_001",
+          "original": true,
+          "topicCode": "ENG-CMP",
+          "type": "structured",
+          "prompt": "Read the passage, then answer all the questions. — \"Every evening Adjoa sells roasted plantain by the junction. She notes every sale in a small book and sets aside a fifth of her profit for new stock. Customers say her plantain is dearer than her neighbour's, yet her tray empties first, because she greets every buyer by name and never serves a burnt piece.\"",
+          "correctAnswer": "(a) She sells roasted plantain by the junction. (b) She notes every sale in a small book, and she sets aside a fifth of her profit for new stock. (c) She greets every buyer by name, and she never serves a burnt piece.",
+          "workedSolution": "All answers must come straight from the passage: (a) names the goods and the place; (b) wants the record book and the saved fifth of the profit; (c) wants the personal greeting and the unburnt pieces.",
+          "difficulty": "medium",
+          "marks": 10,
+          "points": 10,
+          "timeLimit": 300,
+          "commandWord": "Read",
+          "contentLabel": "Original BrillaPrep WASSCE English practice; not official WAEC examination material.",
+          "markingScheme": null,
+          "parts": [
+            {
+              "label": "a",
+              "text": "What does Adjoa sell, and where does she sell it?",
+              "marks": 2,
+              "correctAnswer": "She sells roasted plantain by the junction."
+            },
+            {
+              "label": "b",
+              "text": "State two things Adjoa does to manage her money.",
+              "marks": 4,
+              "correctAnswer": "She notes every sale in a small book, and she sets aside a fifth of her profit for new stock."
+            },
+            {
+              "label": "c",
+              "text": "Give two reasons why Adjoa's tray empties first although her plantain is dearer.",
+              "marks": 4,
+              "correctAnswer": "She greets every buyer by name, and she never serves a burnt piece."
+            }
+          ],
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_sum_mcq_001",
+          "original": true,
+          "topicCode": "ENG-SUM",
+          "type": "multiple_choice",
+          "prompt": "A good summary of a passage should",
+          "options": [
+            {
+              "label": "A",
+              "text": "state the main points briefly in your own words",
+              "rationale": "This is the supported answer. A summary condenses the passage to its main points in the candidate's own words; copying sentences or adding opinions defeats the purpose."
+            },
+            {
+              "label": "B",
+              "text": "reproduce every sentence of the passage",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "add your own opinions to the writer's ideas",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "copy the longest sentences word for word",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A summary condenses the passage to its main points in the candidate's own words; copying sentences or adding opinions defeats the purpose.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_sum_mcq_002",
+          "original": true,
+          "topicCode": "ENG-SUM",
+          "type": "multiple_choice",
+          "prompt": "Which of the following should normally be left out of a summary?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The main idea of each paragraph",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "Repetitions and illustrative examples",
+              "rationale": "This is the supported answer. Summaries keep main ideas and conclusions but drop repetitions, examples and other illustrative detail that merely supports the main points."
+            },
+            {
+              "label": "C",
+              "text": "The writer's overall conclusion",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "Important supporting arguments",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Summaries keep main ideas and conclusions but drop repetitions, examples and other illustrative detail that merely supports the main points.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_sum_mcq_003",
+          "original": true,
+          "topicCode": "ENG-SUM",
+          "type": "multiple_choice",
+          "prompt": "The topic sentence of a paragraph usually",
+          "options": [
+            {
+              "label": "A",
+              "text": "gives the writer's biography",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "is always the longest sentence of the paragraph",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "states the main idea of the paragraph",
+              "rationale": "This is the supported answer. The topic sentence expresses the paragraph's controlling idea, which the other sentences develop. It need not be the longest sentence or a question."
+            },
+            {
+              "label": "D",
+              "text": "asks the reader a direct question",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The topic sentence expresses the paragraph's controlling idea, which the other sentences develop. It need not be the longest sentence or a question.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_sum_mcq_004",
+          "original": true,
+          "topicCode": "ENG-SUM",
+          "type": "multiple_choice",
+          "prompt": "When a summary question says \"in one sentence\", the candidate must",
+          "options": [
+            {
+              "label": "A",
+              "text": "write only one word as the answer",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "use exactly one line of the answer sheet",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "quote one sentence from the passage",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "combine the required points into a single grammatical sentence",
+              "rationale": "This is the supported answer. The instruction limits the form: the points must be joined into one grammatical sentence, often with conjunctions. Quoting the passage does not satisfy it."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The instruction limits the form: the points must be joined into one grammatical sentence, often with conjunctions. Quoting the passage does not satisfy it.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_sum_mcq_005",
+          "original": true,
+          "topicCode": "ENG-SUM",
+          "type": "multiple_choice",
+          "prompt": "Choose the best summary of the following. — \"The factory closed in June. More than two hundred workers lost their jobs, and many shops in the town lost their customers.\"",
+          "options": [
+            {
+              "label": "A",
+              "text": "The factory's closure cost many workers their jobs and the shops their customers.",
+              "rationale": "This is the supported answer. A correct summary keeps both effects: job losses and lost customers. Each wrong option reverses the cause or confuses who closed and who lost customers."
+            },
+            {
+              "label": "B",
+              "text": "The factory closed because two hundred workers lost their jobs in June.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "Two hundred shops closed when the factory lost its customers.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "The town's shops closed in June, throwing factory workers out of work.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A correct summary keeps both effects: job losses and lost customers. Each wrong option reverses the cause or confuses who closed and who lost customers.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Summarize",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_sum_mcq_006",
+          "original": true,
+          "topicCode": "ENG-SUM",
+          "type": "multiple_choice",
+          "prompt": "Examiners penalise \"lifting\" whole phrases from the passage in a summary because",
+          "options": [
+            {
+              "label": "A",
+              "text": "summaries must always be written in pencil",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "it shows the candidate cannot express the ideas in their own words",
+              "rationale": "This is the supported answer. Summary questions test comprehension and expression, so copied phrases — even correct ones — do not prove the candidate can restate the ideas."
+            },
+            {
+              "label": "C",
+              "text": "the passage is the examiner's property",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "lifted phrases always contain wrong ideas",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Summary questions test comprehension and expression, so copied phrases — even correct ones — do not prove the candidate can restate the ideas.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_sum_mcq_007",
+          "original": true,
+          "topicCode": "ENG-SUM",
+          "type": "multiple_choice",
+          "prompt": "Choose the best summary of the following. — \"Kofi woke before dawn, swept the store, counted the stock and opened the doors before the first customers arrived.\"",
+          "options": [
+            {
+              "label": "A",
+              "text": "Kofi woke before dawn and the customers arrived.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "Kofi swept the store because he woke before dawn.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "Kofi completed all his opening duties before the customers arrived.",
+              "rationale": "This is the supported answer. The best option condenses the three duties into \"all his opening duties\" and keeps the point that they were finished before customers came; the others lose or distort content."
+            },
+            {
+              "label": "D",
+              "text": "Kofi counts the stock whenever customers arrive early.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The best option condenses the three duties into \"all his opening duties\" and keeps the point that they were finished before customers came; the others lose or distort content.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Summarize",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_sum_mcq_008",
+          "original": true,
+          "topicCode": "ENG-SUM",
+          "type": "multiple_choice",
+          "prompt": "A passage argues that deforestation causes soil erosion and flooding, and that tree planting is the remedy. Which sentence should NOT appear in its summary?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Deforestation strips the land of its tree cover.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "The loss of tree cover causes soil erosion and flooding.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "The tree-planting scheme is intended to reverse the damage.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "In 1994, one northern village lost its only bridge to a flood.",
+              "rationale": "This is the supported answer. The bridge incident is a specific illustration, not a main point. The other sentences capture the argument: the problem, its effects and the remedy."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The bridge incident is a specific illustration, not a main point. The other sentences capture the argument: the problem, its effects and the remedy.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Evaluate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_sum_mcq_009",
+          "original": true,
+          "topicCode": "ENG-SUM",
+          "type": "multiple_choice",
+          "prompt": "A summary requires two points: \"The new market has improved trading conditions\" and \"The new market has created jobs for the youth\". Which single sentence combines them best?",
+          "options": [
+            {
+              "label": "A",
+              "text": "The new market has improved trading conditions and created jobs for the youth.",
+              "rationale": "This is the supported answer. The correct option joins both points in one sentence without distortion; the first wrong option uses two sentences and the others tangle the relationships."
+            },
+            {
+              "label": "B",
+              "text": "The new market has improved trading conditions. It has also created jobs for the youth.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "Trading conditions have created a new market with jobs for the youth.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "The new market improved conditions for the trading jobs of the youth.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The correct option joins both points in one sentence without distortion; the first wrong option uses two sentences and the others tangle the relationships.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Summarize",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_sum_sa_001",
+          "original": true,
+          "topicCode": "ENG-SUM",
+          "type": "short_answer",
+          "prompt": "Combine the following into one summary sentence without losing the essential meaning: \"The rains failed. The crops withered. The farmers travelled to the city in search of work.\"",
+          "correctAnswer": "Because the rains failed and the crops withered, the farmers travelled to the city in search of work.",
+          "workedSolution": "The statements form a cause chain: failed rains withered the crops, so the farmers migrated to the city. Link all three with \"because\" and add nothing.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 90,
+          "commandWord": "Summarize",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_ess_mcq_001",
+          "original": true,
+          "topicCode": "ENG-ESS",
+          "type": "multiple_choice",
+          "prompt": "An essay that tells a story is called",
+          "options": [
+            {
+              "label": "A",
+              "text": "a narrative essay",
+              "rationale": "This is the supported answer. Narrative essays recount events; expository essays explain, argumentative essays persuade and descriptive essays paint pictures with words."
+            },
+            {
+              "label": "B",
+              "text": "an expository essay",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "an argumentative essay",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "a descriptive essay",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Narrative essays recount events; expository essays explain, argumentative essays persuade and descriptive essays paint pictures with words.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_ess_mcq_002",
+          "original": true,
+          "topicCode": "ENG-ESS",
+          "type": "multiple_choice",
+          "prompt": "The introduction of an essay is expected to",
+          "options": [
+            {
+              "label": "A",
+              "text": "list all the writer's sources of information",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "present the topic and indicate the direction the essay will take",
+              "rationale": "This is the supported answer. A good introduction presents the topic and shows the line the essay will follow; sources, full conclusions and personal detail do not belong there."
+            },
+            {
+              "label": "C",
+              "text": "state the conclusion of the essay in full",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "describe the writer's school in detail",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A good introduction presents the topic and shows the line the essay will follow; sources, full conclusions and personal detail do not belong there.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_ess_mcq_003",
+          "original": true,
+          "topicCode": "ENG-ESS",
+          "type": "multiple_choice",
+          "prompt": "A well-developed paragraph normally discusses",
+          "options": [
+            {
+              "label": "A",
+              "text": "as many ideas as possible",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "only direct quotations",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "one main idea",
+              "rationale": "This is the supported answer. Unity is the rule of paragraphing: one main idea, stated in a topic sentence, is developed by the other sentences."
+            },
+            {
+              "label": "D",
+              "text": "the opposite of its topic sentence",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Unity is the rule of paragraphing: one main idea, stated in a topic sentence, is developed by the other sentences.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_ess_mcq_004",
+          "original": true,
+          "topicCode": "ENG-ESS",
+          "type": "multiple_choice",
+          "prompt": "Which of the following topics calls for a descriptive essay?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Should corporal punishment be abolished in schools?",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "Write a story that ends with the words: it was all a dream.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "Explain how to prepare for an examination.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "My hometown on the morning of the annual festival",
+              "rationale": "This is the supported answer. The festival scene asks the writer to paint a picture of a place and moment — descriptive writing. The others are argumentative, narrative and expository."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The festival scene asks the writer to paint a picture of a place and moment — descriptive writing. The others are argumentative, narrative and expository.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Classify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_ess_mcq_005",
+          "original": true,
+          "topicCode": "ENG-ESS",
+          "type": "multiple_choice",
+          "prompt": "In an argumentative essay, the writer acknowledges the opposing view in order to",
+          "options": [
+            {
+              "label": "A",
+              "text": "answer it and so strengthen the writer's own position",
+              "rationale": "This is the supported answer. Anticipating and answering the strongest counter-argument shows the question has been considered fully and makes the chosen position more convincing."
+            },
+            {
+              "label": "B",
+              "text": "confuse the reader deliberately",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "show that both sides are equally right",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "fill up the required number of words",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Anticipating and answering the strongest counter-argument shows the question has been considered fully and makes the chosen position more convincing.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_ess_mcq_006",
+          "original": true,
+          "topicCode": "ENG-ESS",
+          "type": "multiple_choice",
+          "prompt": "Coherence in an essay is achieved mainly through",
+          "options": [
+            {
+              "label": "A",
+              "text": "long and difficult sentences",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "a logical order of ideas and appropriate linking words",
+              "rationale": "This is the supported answer. Coherence means ideas connect smoothly: a logical plan plus transitions such as \"however\" and \"consequently\". Length, repetition and proverbs do not create it."
+            },
+            {
+              "label": "C",
+              "text": "frequent repetition of the same point",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "the use of as many proverbs as possible",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Coherence means ideas connect smoothly: a logical plan plus transitions such as \"however\" and \"consequently\". Length, repetition and proverbs do not create it.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_ess_mcq_007",
+          "original": true,
+          "topicCode": "ENG-ESS",
+          "type": "multiple_choice",
+          "prompt": "Which is the most effective opening thesis statement for an essay on \"The importance of discipline in schools\"?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Discipline is very important.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "This essay is about discipline in schools.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "Discipline is essential in schools because it creates order, promotes learning and prepares students for adult responsibility.",
+              "rationale": "This is the supported answer. A strong thesis states the position and previews the reasons; the others are vague, merely announce the topic, or make an empty observation."
+            },
+            {
+              "label": "D",
+              "text": "Many people talk about discipline these days.",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A strong thesis states the position and previews the reasons; the others are vague, merely announce the topic, or make an empty observation.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Evaluate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_ess_mcq_008",
+          "original": true,
+          "topicCode": "ENG-ESS",
+          "type": "multiple_choice",
+          "prompt": "Which opening is most appropriate for a speech supporting a motion in a school debate?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Once upon a time, there lived a great hunter...",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "Dear Sir, I write to inform you that...",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "It was a dark and stormy night when...",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "Mr Chairman, Panel of Judges, fellow students, I rise to support the motion that...",
+              "rationale": "This is the supported answer. A debate speech opens with the vocative address and a declaration of the speaker's side; the other openings belong to tales, letters and narratives."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A debate speech opens with the vocative address and a declaration of the speaker's side; the other openings belong to tales, letters and narratives.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Evaluate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_ess_mcq_009",
+          "original": true,
+          "topicCode": "ENG-ESS",
+          "type": "multiple_choice",
+          "prompt": "A paragraph loses its unity when",
+          "options": [
+            {
+              "label": "A",
+              "text": "a sentence introduces an idea that does not support the topic sentence",
+              "rationale": "This is the supported answer. Unity requires every sentence to develop the one idea in the topic sentence; only an unrelated idea destroys it."
+            },
+            {
+              "label": "B",
+              "text": "it begins with a clear topic sentence",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "its sentences are linked by connectives",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "it ends with a summarising sentence",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Unity requires every sentence to develop the one idea in the topic sentence; only an unrelated idea destroys it.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Evaluate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_ess_st_001",
+          "original": true,
+          "topicCode": "ENG-ESS",
+          "type": "structured",
+          "prompt": "You are to write an article for the school magazine on the topic: \"Keeping Our School Compound Clean\". Answer these planning questions.",
+          "correctAnswer": "(a) An expository article for the school magazine, addressed to students and staff. (b) A catchy title, a byline with the writer's name, and organised paragraphs from introduction to conclusion. (c) Students can keep the compound clean by using the litter bins and joining the weekly clean-up exercise.",
+          "workedSolution": "Match the task: (a) an expository article for the school community; (b) title, byline and organised paragraphs; (c) one clear sentence on how students can help.",
+          "difficulty": "medium",
+          "marks": 10,
+          "points": 10,
+          "timeLimit": 300,
+          "commandWord": "Plan",
+          "contentLabel": "Original BrillaPrep WASSCE English practice; not official WAEC examination material.",
+          "markingScheme": null,
+          "parts": [
+            {
+              "label": "a",
+              "text": "State the type of composition required and its intended audience.",
+              "marks": 3,
+              "correctAnswer": "An expository article for the school magazine, addressed to students and staff."
+            },
+            {
+              "label": "b",
+              "text": "State three features of the format of a magazine article.",
+              "marks": 4,
+              "correctAnswer": "A catchy title, a byline with the writer's name, and organised paragraphs from introduction to conclusion."
+            },
+            {
+              "label": "c",
+              "text": "Write one suitable topic sentence for a paragraph on how students can help.",
+              "marks": 3,
+              "correctAnswer": "Students can keep the compound clean by using the litter bins and joining the weekly clean-up exercise."
+            }
+          ],
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_let_mcq_001",
+          "original": true,
+          "topicCode": "ENG-LET",
+          "type": "multiple_choice",
+          "prompt": "A formal letter to a public officer must contain",
+          "options": [
+            {
+              "label": "A",
+              "text": "the writer's address and the recipient's address",
+              "rationale": "This is the supported answer. Formal letters carry two addresses — the writer's and the recipient's — plus the date; informal letters carry only the writer's address."
+            },
+            {
+              "label": "B",
+              "text": "only the recipient's address",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "no address at all",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "only a telephone number",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Formal letters carry two addresses — the writer's and the recipient's — plus the date; informal letters carry only the writer's address.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_let_mcq_002",
+          "original": true,
+          "topicCode": "ENG-LET",
+          "type": "multiple_choice",
+          "prompt": "The most suitable salutation for a formal letter written to a stranger is",
+          "options": [
+            {
+              "label": "A",
+              "text": "My dear Kofi,",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "Dear Sir,",
+              "rationale": "This is the supported answer. A stranger in an official position is addressed \"Dear Sir\" or \"Dear Madam\"; the other salutations are informal or too casual."
+            },
+            {
+              "label": "C",
+              "text": "Hello Sir,",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "Dearest friend,",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "A stranger in an official position is addressed \"Dear Sir\" or \"Dear Madam\"; the other salutations are informal or too casual.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Choose",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_let_mcq_003",
+          "original": true,
+          "topicCode": "ENG-LET",
+          "type": "multiple_choice",
+          "prompt": "Which subscription is appropriate for a letter to a close friend?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Yours faithfully,",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "Yours sincerely,",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "Yours ever,",
+              "rationale": "This is the supported answer. Letters to friends close warmly with subscriptions such as \"Yours ever\"; \"faithfully\" and \"sincerely\" belong to formal letters, and \"obediently\" is servile."
+            },
+            {
+              "label": "D",
+              "text": "Yours obediently,",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Letters to friends close warmly with subscriptions such as \"Yours ever\"; \"faithfully\" and \"sincerely\" belong to formal letters, and \"obediently\" is servile.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Choose",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_let_mcq_004",
+          "original": true,
+          "topicCode": "ENG-LET",
+          "type": "multiple_choice",
+          "prompt": "A report is usually written in order to",
+          "options": [
+            {
+              "label": "A",
+              "text": "entertain readers with an exciting story",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "describe the writer's personal feelings",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "advertise a new product to the public",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "present facts and findings to the person or body that asked for them",
+              "rationale": "This is the supported answer. A report is commissioned: someone in authority asks for facts, findings and often recommendations on a specific matter."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A report is commissioned: someone in authority asks for facts, findings and often recommendations on a specific matter.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_let_mcq_005",
+          "original": true,
+          "topicCode": "ENG-LET",
+          "type": "multiple_choice",
+          "prompt": "In a formal letter, the heading is normally written",
+          "options": [
+            {
+              "label": "A",
+              "text": "in capital letters, and it may be underlined",
+              "rationale": "This is the supported answer. The heading announces the subject and is conventionally written in capital letters, sometimes underlined, and placed after the salutation."
+            },
+            {
+              "label": "B",
+              "text": "in small letters only",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "in red ink without exception",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "after the subscription at the end",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The heading announces the subject and is conventionally written in capital letters, sometimes underlined, and placed after the salutation.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_let_mcq_006",
+          "original": true,
+          "topicCode": "ENG-LET",
+          "type": "multiple_choice",
+          "prompt": "The subscription \"Yours faithfully\" is correctly paired with the salutation",
+          "options": [
+            {
+              "label": "A",
+              "text": "Dear Mr Mensah,",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "Dear Sir,",
+              "rationale": "This is the supported answer. An unnamed recipient (\"Dear Sir\") takes \"Yours faithfully\"; a named recipient (\"Dear Mr Mensah\") takes \"Yours sincerely\"."
+            },
+            {
+              "label": "C",
+              "text": "Dear Akosua,",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "My dear Father,",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "An unnamed recipient (\"Dear Sir\") takes \"Yours faithfully\"; a named recipient (\"Dear Mr Mensah\") takes \"Yours sincerely\".",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Choose",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_let_mcq_007",
+          "original": true,
+          "topicCode": "ENG-LET",
+          "type": "multiple_choice",
+          "prompt": "Which list gives the correct order of the opening parts of a formal letter?",
+          "options": [
+            {
+              "label": "A",
+              "text": "Date, salutation, writer's address, recipient's address",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "Recipient's address, writer's address, salutation, date",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "Writer's address, date, recipient's address, salutation",
+              "rationale": "This is the supported answer. The conventional layout is writer's address, date, recipient's address on the left, then the salutation; every other sequence misplaces a part."
+            },
+            {
+              "label": "D",
+              "text": "Salutation, writer's address, date, recipient's address",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The conventional layout is writer's address, date, recipient's address on the left, then the salutation; every other sequence misplaces a part.",
+          "difficulty": "medium",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Order",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_let_mcq_008",
+          "original": true,
+          "topicCode": "ENG-LET",
+          "type": "multiple_choice",
+          "prompt": "A letter to the editor of a newspaper differs from a letter to a friend chiefly because it",
+          "options": [
+            {
+              "label": "A",
+              "text": "is always written entirely in capital letters",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "needs no address or date at all",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "must be written by a professional journalist",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "uses a formal register and the full formal-letter format for a public audience",
+              "rationale": "This is the supported answer. A letter to the editor is a formal public document, so it keeps the full formal format and a restrained register even when the subject is a personal grievance."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A letter to the editor is a formal public document, so it keeps the full formal format and a restrained register even when the subject is a personal grievance.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Evaluate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_let_mcq_009",
+          "original": true,
+          "topicCode": "ENG-LET",
+          "type": "multiple_choice",
+          "prompt": "In an official report, the section headed \"terms of reference\" states",
+          "options": [
+            {
+              "label": "A",
+              "text": "what the writer was instructed to investigate and report on",
+              "rationale": "This is the supported answer. The terms of reference record the mandate: who asked for the report and exactly what it was to cover."
+            },
+            {
+              "label": "B",
+              "text": "the names of all the members of the committee",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "the recommendations of the report",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "the cost of writing the report",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The terms of reference record the mandate: who asked for the report and exactly what it was to cover.",
+          "difficulty": "hard",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Explain",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_let_st_001",
+          "original": true,
+          "topicCode": "ENG-LET",
+          "type": "structured",
+          "prompt": "The headmistress has asked you, as senior prefect, to write a report on the damage done to classroom furniture during the term. Answer the following questions about the report you would write.",
+          "correctAnswer": "(a) A title or heading, and clearly labelled sections such as the introduction, findings and recommendations. (b) Report on the Damage Done to Classroom Furniture During the Term. (c) A description of the furniture that was damaged, and the extent and possible causes of the damage.",
+          "workedSolution": "The report must suit its official purpose: (a) a title and labelled sections; (b) a title naming the subject of the report; (c) findings describing what was damaged and how badly or why.",
+          "difficulty": "medium",
+          "marks": 10,
+          "points": 10,
+          "timeLimit": 300,
+          "commandWord": "Plan",
+          "contentLabel": "Original BrillaPrep WASSCE English practice; not official WAEC examination material.",
+          "markingScheme": null,
+          "parts": [
+            {
+              "label": "a",
+              "text": "State two features of the format of an official report.",
+              "marks": 3,
+              "correctAnswer": "A title or heading, and clearly labelled sections such as the introduction, findings and recommendations."
+            },
+            {
+              "label": "b",
+              "text": "Write a suitable title for this report.",
+              "marks": 3,
+              "correctAnswer": "Report on the Damage Done to Classroom Furniture During the Term."
+            },
+            {
+              "label": "c",
+              "text": "State two kinds of information the findings section of the report should contain.",
+              "marks": 4,
+              "correctAnswer": "A description of the furniture that was damaged, and the extent and possible causes of the damage."
+            }
+          ],
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_lit_mcq_001",
+          "original": true,
+          "topicCode": "ENG-LIT",
+          "type": "multiple_choice",
+          "prompt": "\"The wind whispered through the trees\" is an example of",
+          "options": [
+            {
+              "label": "A",
+              "text": "personification",
+              "rationale": "This is the supported answer. The wind is given the human ability to whisper — personification. There is no \"like/as\" for a simile, no exaggeration for hyperbole, no irony."
+            },
+            {
+              "label": "B",
+              "text": "simile",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "hyperbole",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "irony",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "The wind is given the human ability to whisper — personification. There is no \"like/as\" for a simile, no exaggeration for hyperbole, no irony.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_lit_mcq_002",
+          "original": true,
+          "topicCode": "ENG-LIT",
+          "type": "multiple_choice",
+          "prompt": "\"The soldier fought like a lion\" is an example of",
+          "options": [
+            {
+              "label": "A",
+              "text": "metaphor",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "simile",
+              "rationale": "This is the supported answer. The comparison is made explicitly with \"like\", which makes it a simile; a metaphor would state the soldier was a lion."
+            },
+            {
+              "label": "C",
+              "text": "personification",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "D",
+              "text": "alliteration",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The comparison is made explicitly with \"like\", which makes it a simile; a metaphor would state the soldier was a lion.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_lit_mcq_003",
+          "original": true,
+          "topicCode": "ENG-LIT",
+          "type": "multiple_choice",
+          "prompt": "\"The examination hall was a furnace that afternoon\" is an example of",
+          "options": [
+            {
+              "label": "A",
+              "text": "simile",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "B",
+              "text": "onomatopoeia",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            },
+            {
+              "label": "C",
+              "text": "metaphor",
+              "rationale": "This is the supported answer. The hall is said to be a furnace without \"like\" or \"as\" — a metaphor. It is not a sound-imitating word or a mild substitute."
+            },
+            {
+              "label": "D",
+              "text": "euphemism",
+              "rationale": "This option is a plausible distractor, but the worked solution shows it does not state what the passage says or what the rule requires."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The hall is said to be a furnace without \"like\" or \"as\" — a metaphor. It is not a sound-imitating word or a mild substitute.",
+          "difficulty": "easy",
+          "marks": 1,
+          "points": 3,
+          "timeLimit": 45,
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_lit_sa_001",
+          "original": true,
+          "topicCode": "ENG-LIT",
+          "type": "short_answer",
+          "prompt": "Name the literary device used in this sentence: \"I have warned you a thousand times about that dog.\"",
+          "correctAnswer": "Hyperbole",
+          "workedSolution": "No speaker literally issues the same warning a thousand times; the number is a deliberate exaggeration used for emphasis. Exaggeration of this kind is the device called hyperbole or overstatement.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 90,
+          "commandWord": "Name",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_lit_sa_002",
+          "original": true,
+          "topicCode": "ENG-LIT",
+          "type": "short_answer",
+          "prompt": "Name the literary device used in this sentence: \"The cool, clear current curled round the canoe.\"",
+          "correctAnswer": "Alliteration",
+          "workedSolution": "The initial \"c\" sound is repeated in cool, clear, current, curled and canoe. The repetition of the same consonant sound at the beginning of nearby words is alliteration.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 90,
+          "commandWord": "Name",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_gram_sa_001",
+          "original": true,
+          "topicCode": "ENG-GRAM",
+          "type": "short_answer",
+          "prompt": "Correct the concord error in this sentence: \"Neither of the two boys have paid his fees.\"",
+          "correctAnswer": "Neither of the two boys has paid his fees.",
+          "workedSolution": "The subject is \"neither\", which is singular and takes \"has\"; \"of the two boys\" only modifies the subject and does not change its number.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 90,
+          "commandWord": "Correct",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        },
+        {
+          "id": "q_eng_s1_gram_sa_002",
+          "original": true,
+          "topicCode": "ENG-GRAM",
+          "type": "short_answer",
+          "prompt": "Correct the concord error in this sentence: \"The quality of the mangoes were poor.\"",
+          "correctAnswer": "The quality of the mangoes was poor.",
+          "workedSolution": "The headword of the subject is \"quality\", which is singular, so the verb must be \"was\"; \"of the mangoes\" only qualifies the subject and does not control the verb.",
+          "difficulty": "medium",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 90,
+          "commandWord": "Correct",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "National Council for Curriculum and Assessment, Ghana",
+              "title": "Secondary Education Curriculum — English Language",
+              "url": "https://nacca.gov.gh/secondary-education-curriculum/",
+              "use": "curriculum_blueprint_only"
+            },
+            {
+              "publisher": "West African Examinations Council",
+              "title": "WASSCE English Language syllabus blueprint",
+              "url": "https://waecgh.org/",
+              "use": "curriculum_blueprint_only"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
