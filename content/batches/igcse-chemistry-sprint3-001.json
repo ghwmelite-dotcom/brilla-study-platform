@@ -1,0 +1,2293 @@
+{
+  "batchId": "igcse-chemistry-sprint3-001",
+  "status": "approved_for_beta",
+  "examTypeId": "igcse",
+  "provenance": [
+    {
+      "publisher": "Cambridge International Education",
+      "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+      "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-10T09:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep practice content aligned to the published Cambridge IGCSE Chemistry (0620) syllabus; not official Cambridge International, WAEC or NSMQ examination material. Use the enabled feedback channel to report corrections.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "subjects": [
+    {
+      "subjectId": "subj_igcse_chemistry",
+      "specificationCode": "BRILLA-IGCSE-CHEM0620-S3-001",
+      "sources": [
+        {
+          "publisher": "Cambridge International Education",
+          "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+          "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+          "use": "curriculum_blueprint_only"
+        }
+      ],
+      "topics": [
+        {
+          "code": "IGC-ATO",
+          "title": "Matter and Atomic Structure",
+          "objective": "Describe particles, atomic structure, isotopes and electron arrangements for the first twenty elements."
+        },
+        {
+          "code": "IGC-PER",
+          "title": "The Periodic Table",
+          "objective": "Relate group and period position to electron arrangement and describe trends in Groups I and VII and the noble gases."
+        },
+        {
+          "code": "IGC-BON",
+          "title": "Chemical Bonding",
+          "objective": "Distinguish ionic, covalent and metallic bonding and link structure to physical properties."
+        },
+        {
+          "code": "IGC-STO",
+          "title": "Stoichiometry",
+          "objective": "Use the mole concept, relative formula mass and balanced equations to calculate reacting masses and concentrations."
+        },
+        {
+          "code": "IGC-REA",
+          "title": "Reactions, Rates and Energetics",
+          "objective": "Explain rates of reaction using collision theory, interpret reversible reactions and calculate enthalpy changes."
+        },
+        {
+          "code": "IGC-ACI",
+          "title": "Acids, Bases and Salts",
+          "objective": "Describe acid and alkali properties, neutralisation reactions and the preparation of pure salts."
+        },
+        {
+          "code": "IGC-MET",
+          "title": "Metals and Reactivity",
+          "objective": "Use the reactivity series to predict reactions of metals, their extraction methods and corrosion."
+        },
+        {
+          "code": "IGC-ORG",
+          "title": "Organic Chemistry",
+          "objective": "Identify homologous series, functional groups and reactions of alkanes, alkenes, alcohols, acids and polymers."
+        },
+        {
+          "code": "IGC-ELE",
+          "title": "Electrolysis",
+          "objective": "Predict the products of electrolysing molten and aqueous ionic compounds using inert electrodes."
+        },
+        {
+          "code": "IGC-ANA",
+          "title": "Experimental Techniques and Chemical Analysis",
+          "objective": "Select tests to identify gases, cations and anions and interpret chromatography results."
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_igcse_chem_s3_001",
+          "original": true,
+          "topicCode": "IGC-ATO",
+          "type": "multiple_choice",
+          "prompt": "An atom of carbon-14 has proton number 6 and nucleon number 14. How many neutrons does the atom contain?",
+          "difficulty": "medium",
+          "commandWord": "Determine",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "8",
+              "rationale": "This is the supported answer. Number of neutrons = nucleon number − proton number = 14 − 6 = 8. (6 is the number of protons; 14 is the nucleon number; 20 adds the numbers instead of subtracting.)"
+            },
+            {
+              "label": "B",
+              "text": "6",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "14",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "20",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Number of neutrons = nucleon number − proton number = 14 − 6 = 8. (6 is the number of protons; 14 is the nucleon number; 20 adds the numbers instead of subtracting.) Therefore the correct answer is A: 8.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_002",
+          "original": true,
+          "topicCode": "IGC-ATO",
+          "type": "multiple_choice",
+          "prompt": "An element X has atomic number 12. What is the electronic configuration of an atom of X?",
+          "difficulty": "medium",
+          "commandWord": "Determine",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "2,8,8",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "2,8,2",
+              "rationale": "This is the supported answer. An atom of X has 12 electrons. The first shell holds 2 electrons and the second holds 8, leaving 2 in the third shell: 2,8,2. (2,8,8 is argon with 18 electrons; 8,2,2 fills the shells in the wrong order.)"
+            },
+            {
+              "label": "C",
+              "text": "8,2,2",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "2,10",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "An atom of X has 12 electrons. The first shell holds 2 electrons and the second holds 8, leaving 2 in the third shell: 2,8,2. (2,8,8 is argon with 18 electrons; 8,2,2 fills the shells in the wrong order.) Therefore the correct answer is B: 2,8,2.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_003",
+          "original": true,
+          "topicCode": "IGC-ATO",
+          "type": "multiple_choice",
+          "prompt": "Which sub-atomic particle has a charge of −1 and a negligible mass?",
+          "difficulty": "medium",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Proton",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Neutron",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Electron",
+              "rationale": "This is the supported answer. The electron has a relative charge of −1 and a relative mass of about 1/1840, which is negligible. (A proton has charge +1 and relative mass 1; a neutron is neutral with relative mass 1; an alpha particle is a helium nucleus of charge +2.)"
+            },
+            {
+              "label": "D",
+              "text": "Alpha particle",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The electron has a relative charge of −1 and a relative mass of about 1/1840, which is negligible. (A proton has charge +1 and relative mass 1; a neutron is neutral with relative mass 1; an alpha particle is a helium nucleus of charge +2.) Therefore the correct answer is C: Electron.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_004",
+          "original": true,
+          "topicCode": "IGC-ATO",
+          "type": "multiple_choice",
+          "prompt": "Magnesium has atomic number 12. How many electrons are there in one Mg²⁺ ion?",
+          "difficulty": "medium",
+          "commandWord": "Determine",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "12",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "14",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "8",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "10",
+              "rationale": "This is the supported answer. A neutral magnesium atom has 12 electrons. The Mg²⁺ ion forms when the atom loses its two outer-shell electrons, leaving 12 − 2 = 10 electrons. (14 wrongly adds the charge; 12 ignores it; 8 is only the second-shell population.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A neutral magnesium atom has 12 electrons. The Mg²⁺ ion forms when the atom loses its two outer-shell electrons, leaving 12 − 2 = 10 electrons. (14 wrongly adds the charge; 12 ignores it; 8 is only the second-shell population.) Therefore the correct answer is D: 10.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_005",
+          "original": true,
+          "topicCode": "IGC-ATO",
+          "type": "structured",
+          "prompt": "Chlorine exists naturally as two isotopes, ³⁵Cl and ³⁷Cl. Answer the following questions about these isotopes.",
+          "difficulty": "medium",
+          "commandWord": "Define",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "contentLabel": "Original BrillaPrep practice material aligned to the published Cambridge IGCSE Chemistry (0620) syllabus; not official Cambridge International material and not official WAEC material. Use the enabled feedback channel to report corrections.",
+          "parts": [
+            {
+              "label": "(a)",
+              "text": "Define the term isotope.",
+              "correctAnswer": "Atoms of the same element that have the same number of protons but different numbers of neutrons.",
+              "marks": 1
+            },
+            {
+              "label": "(b)",
+              "text": "State the numbers of protons, neutrons and electrons in one atom of ³⁷Cl.",
+              "correctAnswer": "17 protons, 20 neutrons and 17 electrons.",
+              "marks": 2
+            },
+            {
+              "label": "(c)",
+              "text": "Explain why ³⁵Cl and ³⁷Cl have identical chemical properties.",
+              "correctAnswer": "Chemical properties depend on the electron arrangement; both isotopes have 17 electrons and the same arrangement, so they react identically.",
+              "marks": 1
+            }
+          ],
+          "correctAnswer": "(a) atoms of the same element with different numbers of neutrons; (b) 17 protons, 20 neutrons, 17 electrons; (c) identical electron arrangements give identical chemical properties.",
+          "workedSolution": "(a) Isotopes are atoms of the same element (same proton number) with different nucleon numbers because they contain different numbers of neutrons. (b) Chlorine has proton number 17, so every chlorine atom has 17 protons and, being neutral, 17 electrons; neutrons = 37 − 17 = 20. (c) Chemical reactions involve only the outer electrons; both isotopes have the configuration 2,8,7, so they behave identically. The extra neutrons change only the mass.",
+          "marks": 4,
+          "points": 4,
+          "timeLimit": 300
+        },
+        {
+          "id": "q_igcse_chem_s3_006",
+          "original": true,
+          "topicCode": "IGC-PER",
+          "type": "multiple_choice",
+          "prompt": "Which statement about the elements in Group I of the Periodic Table is correct?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "They are soft metals whose reactivity increases down the group.",
+              "rationale": "This is the supported answer. Group I elements are the alkali metals: soft, with one outer electron. Down the group the outer electron is lost more easily, so reactivity increases from lithium to potassium. (Full outer shells describe Group 0 noble gases; Group I atoms form 1+ ions, not 2−.)"
+            },
+            {
+              "label": "B",
+              "text": "They are unreactive gases with full outer shells.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Their reactivity decreases down the group.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "They form ions with a 2− charge.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Group I elements are the alkali metals: soft, with one outer electron. Down the group the outer electron is lost more easily, so reactivity increases from lithium to potassium. (Full outer shells describe Group 0 noble gases; Group I atoms form 1+ ions, not 2−.) Therefore the correct answer is A: They are soft metals whose reactivity increases down the group..",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_007",
+          "original": true,
+          "topicCode": "IGC-PER",
+          "type": "multiple_choice",
+          "prompt": "Which halogen is a green gas at room temperature?",
+          "difficulty": "easy",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Bromine",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Chlorine",
+              "rationale": "This is the supported answer. Chlorine is a green gas at room temperature. (Bromine is a red-brown liquid and iodine a grey-black solid; astatine is a dark solid at the bottom of Group VII.)"
+            },
+            {
+              "label": "C",
+              "text": "Iodine",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Astatine",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Chlorine is a green gas at room temperature. (Bromine is a red-brown liquid and iodine a grey-black solid; astatine is a dark solid at the bottom of Group VII.) Therefore the correct answer is B: Chlorine.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_008",
+          "original": true,
+          "topicCode": "IGC-PER",
+          "type": "multiple_choice",
+          "prompt": "Elements in the same group of the Periodic Table have similar chemical properties. This is because the atoms have the same number of…",
+          "difficulty": "easy",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "electron shells.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "protons in the nucleus.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "electrons in their outer shell.",
+              "rationale": "This is the supported answer. Chemical behaviour is governed by the outer-shell electrons, and a group collects elements with the same number of outer electrons. (Atoms in the same period share the number of shells; the proton number is unique to each element; neutron number varies even between isotopes.)"
+            },
+            {
+              "label": "D",
+              "text": "neutrons in the nucleus.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Chemical behaviour is governed by the outer-shell electrons, and a group collects elements with the same number of outer electrons. (Atoms in the same period share the number of shells; the proton number is unique to each element; neutron number varies even between isotopes.) Therefore the correct answer is C: electrons in their outer shell..",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_009",
+          "original": true,
+          "topicCode": "IGC-PER",
+          "type": "multiple_choice",
+          "prompt": "Which of the following elements is a noble gas?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Nitrogen",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Chlorine",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Sodium",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Argon",
+              "rationale": "This is the supported answer. Argon is in Group 0 (Group 18), the noble gases, with a full outer shell of electrons. (Nitrogen and chlorine are reactive non-metals; sodium is an alkali metal.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Argon is in Group 0 (Group 18), the noble gases, with a full outer shell of electrons. (Nitrogen and chlorine are reactive non-metals; sodium is an alkali metal.) Therefore the correct answer is D: Argon.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_010",
+          "original": true,
+          "topicCode": "IGC-PER",
+          "type": "calculation",
+          "prompt": "A sample of chlorine contains 75% of the isotope ³⁵Cl and 25% of the isotope ³⁷Cl. Calculate the relative atomic mass of the chlorine in the sample.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "35.5",
+          "workedSolution": "Relative atomic mass = (percentage × mass number) for each isotope, summed, divided by 100: (75 × 35 + 25 × 37) ÷ 100 = (2,625 + 925) ÷ 100 = 3,550 ÷ 100 = 35.5. Answer: the relative atomic mass is 35.5.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_igcse_chem_s3_011",
+          "original": true,
+          "topicCode": "IGC-BON",
+          "type": "multiple_choice",
+          "prompt": "Which substance contains only covalent bonds?",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Methane, CH₄",
+              "rationale": "This is the supported answer. Methane contains a non-metal bonded to a non-metal, so its atoms share electrons covalently. (NaCl, MgO and CaF₂ are metal–non-metal compounds with ionic bonding.)"
+            },
+            {
+              "label": "B",
+              "text": "Sodium chloride, NaCl",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Magnesium oxide, MgO",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Calcium fluoride, CaF₂",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Methane contains a non-metal bonded to a non-metal, so its atoms share electrons covalently. (NaCl, MgO and CaF₂ are metal–non-metal compounds with ionic bonding.) Therefore the correct answer is A: Methane, CH₄.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_012",
+          "original": true,
+          "topicCode": "IGC-BON",
+          "type": "multiple_choice",
+          "prompt": "Solid sodium chloride does not conduct electricity, but molten sodium chloride does. Which statement explains this?",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Electrons flow through the molten lattice.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The ions are free to move in the molten state.",
+              "rationale": "This is the supported answer. Ionic solids conduct only when their charged ions can move. Melting breaks up the lattice so the ions become mobile and carry the current. (Ionic compounds conduct by moving ions, not electrons; melting supplies energy, not electrons.)"
+            },
+            {
+              "label": "C",
+              "text": "The ions gain extra electrons when the solid melts.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Sodium chloride becomes a metal when it melts.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Ionic solids conduct only when their charged ions can move. Melting breaks up the lattice so the ions become mobile and carry the current. (Ionic compounds conduct by moving ions, not electrons; melting supplies energy, not electrons.) Therefore the correct answer is B: The ions are free to move in the molten state..",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_013",
+          "original": true,
+          "topicCode": "IGC-BON",
+          "type": "multiple_choice",
+          "prompt": "Graphite conducts electricity. Which feature of its structure explains this?",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "It contains freely moving ions.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Its layers are held together by strong covalent bonds.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It contains delocalised electrons that can move between the layers.",
+              "rationale": "This is the supported answer. In graphite each carbon atom bonds to three others, leaving one delocalised electron per atom that can move along the layers and carry a current. (Graphite has no ions; the bonds within layers are covalent but the layers themselves attract weakly; each carbon forms three bonds, not two.)"
+            },
+            {
+              "label": "D",
+              "text": "Each carbon atom forms only two covalent bonds.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "In graphite each carbon atom bonds to three others, leaving one delocalised electron per atom that can move along the layers and carry a current. (Graphite has no ions; the bonds within layers are covalent but the layers themselves attract weakly; each carbon forms three bonds, not two.) Therefore the correct answer is C: It contains delocalised electrons that can move between the layers..",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_014",
+          "original": true,
+          "topicCode": "IGC-BON",
+          "type": "multiple_choice",
+          "prompt": "How many shared pairs of electrons are there in one molecule of methane, CH₄?",
+          "difficulty": "medium",
+          "commandWord": "Determine",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "1",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "2",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "8",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "4",
+              "rationale": "This is the supported answer. The carbon atom shares one pair of electrons with each of the four hydrogen atoms, giving 4 shared pairs. (8 counts the individual shared electrons rather than the pairs; 2 would satisfy only two hydrogen atoms.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The carbon atom shares one pair of electrons with each of the four hydrogen atoms, giving 4 shared pairs. (8 counts the individual shared electrons rather than the pairs; 2 would satisfy only two hydrogen atoms.) Therefore the correct answer is D: 4.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_015",
+          "original": true,
+          "topicCode": "IGC-BON",
+          "type": "structured",
+          "prompt": "Sodium reacts with chlorine to form sodium chloride, NaCl. Answer the following questions about the bonding and properties of sodium chloride.",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "contentLabel": "Original BrillaPrep practice material aligned to the published Cambridge IGCSE Chemistry (0620) syllabus; not official Cambridge International material and not official WAEC material. Use the enabled feedback channel to report corrections.",
+          "parts": [
+            {
+              "label": "(a)",
+              "text": "Describe, in terms of electrons, how a sodium atom becomes a sodium ion.",
+              "correctAnswer": "A sodium atom (2,8,1) loses its one outer-shell electron to form a Na⁺ ion with the full outer shell 2,8.",
+              "marks": 1
+            },
+            {
+              "label": "(b)",
+              "text": "State the type of bonding present in sodium chloride.",
+              "correctAnswer": "Ionic bonding — the electrostatic attraction between oppositely charged Na⁺ and Cl⁻ ions.",
+              "marks": 1
+            },
+            {
+              "label": "(c)",
+              "text": "Explain why sodium chloride has a high melting point.",
+              "correctAnswer": "It forms a giant ionic lattice with strong electrostatic attractions between ions in all directions; a large amount of energy is needed to overcome these attractions.",
+              "marks": 2
+            }
+          ],
+          "correctAnswer": "(a) the sodium atom loses its outer electron to form Na⁺; (b) ionic bonding; (c) strong electrostatic attractions throughout the giant lattice need much energy to overcome.",
+          "workedSolution": "(a) Sodium has the electron arrangement 2,8,1; losing the single outer electron leaves the stable arrangement 2,8 and the ion Na⁺. (b) The transfer of electrons from sodium to chlorine produces oppositely charged ions, so the bonding is ionic. (c) In the solid lattice every ion is surrounded by oppositely charged ions; the strong attractions extend in all directions, so a lot of heat energy is required to separate the ions, giving a high melting point.",
+          "marks": 4,
+          "points": 4,
+          "timeLimit": 300
+        },
+        {
+          "id": "q_igcse_chem_s3_016",
+          "original": true,
+          "topicCode": "IGC-STO",
+          "type": "multiple_choice",
+          "prompt": "What is the relative formula mass, Mr, of calcium carbonate, CaCO₃? (Ar: Ca = 40, C = 12, O = 16)",
+          "difficulty": "easy",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "100",
+              "rationale": "This is the supported answer. Mr = 40 + 12 + (3 × 16) = 40 + 12 + 48 = 100. (68 uses only one oxygen atom; 56 is the Mr of CaO; 96 doubles the oxygen contribution incorrectly.)"
+            },
+            {
+              "label": "B",
+              "text": "68",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "56",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "96",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Mr = 40 + 12 + (3 × 16) = 40 + 12 + 48 = 100. (68 uses only one oxygen atom; 56 is the Mr of CaO; 96 doubles the oxygen contribution incorrectly.) Therefore the correct answer is A: 100.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_017",
+          "original": true,
+          "topicCode": "IGC-STO",
+          "type": "multiple_choice",
+          "prompt": "How many moles are there in 8 g of methane, CH₄? (Ar: C = 12, H = 1)",
+          "difficulty": "easy",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "2 mol",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "0.5 mol",
+              "rationale": "This is the supported answer. Mr of CH₄ = 12 + (4 × 1) = 16, so moles = mass ÷ Mr = 8 ÷ 16 = 0.5 mol. (2 mol inverts the division; 16 g, not 8 g, would be 1 mole.)"
+            },
+            {
+              "label": "C",
+              "text": "8 mol",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "16 mol",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Mr of CH₄ = 12 + (4 × 1) = 16, so moles = mass ÷ Mr = 8 ÷ 16 = 0.5 mol. (2 mol inverts the division; 16 g, not 8 g, would be 1 mole.) Therefore the correct answer is B: 0.5 mol.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_018",
+          "original": true,
+          "topicCode": "IGC-STO",
+          "type": "multiple_choice",
+          "prompt": "How many particles are there in one mole of any substance?",
+          "difficulty": "easy",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "6.02 × 10²²",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "1.60 × 10⁻¹⁹",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "6.02 × 10²³",
+              "rationale": "This is the supported answer. One mole contains the Avogadro constant of particles: 6.02 × 10²³. (6.02 × 10²² is a tenth of a mole; 1.60 × 10⁻¹⁹ is the charge on an electron in coulombs; 12 g is the mass of one mole of carbon-12, not a particle count.)"
+            },
+            {
+              "label": "D",
+              "text": "12",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "One mole contains the Avogadro constant of particles: 6.02 × 10²³. (6.02 × 10²² is a tenth of a mole; 1.60 × 10⁻¹⁹ is the charge on an electron in coulombs; 12 g is the mass of one mole of carbon-12, not a particle count.) Therefore the correct answer is C: 6.02 × 10²³.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_019",
+          "original": true,
+          "topicCode": "IGC-STO",
+          "type": "multiple_choice",
+          "prompt": "When the equation CH₄ + O₂ → CO₂ + H₂O is correctly balanced, what is the coefficient of O₂?",
+          "difficulty": "easy",
+          "commandWord": "Determine",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "1",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "3",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "4",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "2",
+              "rationale": "This is the supported answer. Balancing gives CH₄ + 2O₂ → CO₂ + 2H₂O: one carbon and four hydrogens on each side, and 2 × 2 = 4 oxygens on the left matching 2 + 2 = 4 on the right. The coefficient of O₂ is therefore 2."
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Balancing gives CH₄ + 2O₂ → CO₂ + 2H₂O: one carbon and four hydrogens on each side, and 2 × 2 = 4 oxygens on the left matching 2 + 2 = 4 on the right. The coefficient of O₂ is therefore 2. Therefore the correct answer is D: 2.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_020",
+          "original": true,
+          "topicCode": "IGC-STO",
+          "type": "multiple_choice",
+          "prompt": "Calcium carbonate decomposes on heating: CaCO₃ → CaO + CO₂. What mass of calcium oxide is formed when 50 g of calcium carbonate is completely decomposed? (Ar: Ca = 40, C = 12, O = 16)",
+          "difficulty": "hard",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "28 g",
+              "rationale": "This is the supported answer. Mr(CaCO₃) = 100, so 50 g is 50 ÷ 100 = 0.5 mol. The equation shows a 1 : 1 mole ratio, so 0.5 mol of CaO forms. Mr(CaO) = 40 + 16 = 56, giving a mass of 0.5 × 56 = 28 g. (22 g is the mass of the CO₂ released, 0.5 × 44; 56 g assumes 1 mol of CaO; 25 g simply halves the starting mass.)"
+            },
+            {
+              "label": "B",
+              "text": "22 g",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "56 g",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "25 g",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Mr(CaCO₃) = 100, so 50 g is 50 ÷ 100 = 0.5 mol. The equation shows a 1 : 1 mole ratio, so 0.5 mol of CaO forms. Mr(CaO) = 40 + 16 = 56, giving a mass of 0.5 × 56 = 28 g. (22 g is the mass of the CO₂ released, 0.5 × 44; 56 g assumes 1 mol of CaO; 25 g simply halves the starting mass.) Therefore the correct answer is A: 28 g.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_021",
+          "original": true,
+          "topicCode": "IGC-ACI",
+          "type": "multiple_choice",
+          "prompt": "Which ion is responsible for the acidic properties of aqueous solutions of acids?",
+          "difficulty": "medium",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "The hydroxide ion, OH⁻(aq)",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The hydrogen ion, H⁺(aq)",
+              "rationale": "This is the supported answer. Acids produce hydrogen ions, H⁺(aq), in aqueous solution, and it is these ions that give acids their characteristic reactions. (OH⁻ is responsible for alkaline behaviour; oxide ions act as bases.)"
+            },
+            {
+              "label": "C",
+              "text": "The oxide ion, O²⁻",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The hydronium-free metal cation",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Acids produce hydrogen ions, H⁺(aq), in aqueous solution, and it is these ions that give acids their characteristic reactions. (OH⁻ is responsible for alkaline behaviour; oxide ions act as bases.) Therefore the correct answer is B: The hydrogen ion, H⁺(aq).",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_022",
+          "original": true,
+          "topicCode": "IGC-ACI",
+          "type": "multiple_choice",
+          "prompt": "What colour is universal indicator in a solution of pH 2?",
+          "difficulty": "medium",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Green",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Purple",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Red",
+              "rationale": "This is the supported answer. Universal indicator is red in strongly acidic solutions (pH 1–2). (Green indicates a neutral solution of pH 7; blue and purple indicate increasingly alkaline solutions.)"
+            },
+            {
+              "label": "D",
+              "text": "Blue",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Universal indicator is red in strongly acidic solutions (pH 1–2). (Green indicates a neutral solution of pH 7; blue and purple indicate increasingly alkaline solutions.) Therefore the correct answer is C: Red.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_023",
+          "original": true,
+          "topicCode": "IGC-ACI",
+          "type": "multiple_choice",
+          "prompt": "Which type of reaction takes place when dilute hydrochloric acid reacts with aqueous sodium hydroxide?",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Oxidation",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Thermal decomposition",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Displacement",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Neutralisation",
+              "rationale": "This is the supported answer. An acid reacting with an alkali (a soluble base) to form a salt and water is a neutralisation: HCl + NaOH → NaCl + H₂O. (No element changes oxidation state, nothing is broken down by heat, and no element displaces another.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "An acid reacting with an alkali (a soluble base) to form a salt and water is a neutralisation: HCl + NaOH → NaCl + H₂O. (No element changes oxidation state, nothing is broken down by heat, and no element displaces another.) Therefore the correct answer is D: Neutralisation.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_024",
+          "original": true,
+          "topicCode": "IGC-ACI",
+          "type": "multiple_choice",
+          "prompt": "Pure copper(II) sulfate crystals are prepared by adding excess copper(II) oxide to warm dilute sulfuric acid, filtering and crystallising the filtrate. Why is the copper(II) oxide added in excess?",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "To make sure that all of the sulfuric acid has reacted.",
+              "rationale": "This is the supported answer. Copper(II) oxide is insoluble, so any unreacted excess is simply removed by filtration; using an excess guarantees that no acid remains to contaminate the salt solution. (The oxide is a reactant, not a catalyst, and it cannot create more acid.)"
+            },
+            {
+              "label": "B",
+              "text": "To make the reaction go faster.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "To act as a catalyst for the reaction.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "To increase the amount of sulfuric acid available.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Copper(II) oxide is insoluble, so any unreacted excess is simply removed by filtration; using an excess guarantees that no acid remains to contaminate the salt solution. (The oxide is a reactant, not a catalyst, and it cannot create more acid.) Therefore the correct answer is A: To make sure that all of the sulfuric acid has reacted..",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_025",
+          "original": true,
+          "topicCode": "IGC-ACI",
+          "type": "calculation",
+          "prompt": "25.0 cm³ of 0.100 mol/dm³ sodium hydroxide solution exactly neutralises 20.0 cm³ of hydrochloric acid. NaOH + HCl → NaCl + H₂O. Calculate the concentration of the hydrochloric acid in mol/dm³.",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "correctAnswer": "0.125 mol/dm³",
+          "workedSolution": "Moles of NaOH = 0.100 × (25.0 ÷ 1,000) = 0.00250 mol. The equation shows a 1 : 1 ratio, so moles of HCl = 0.00250 mol in 20.0 cm³. Concentration = 0.00250 ÷ (20.0 ÷ 1,000) = 0.00250 ÷ 0.0200 = 0.125 mol/dm³. Answer: 0.125 mol/dm³.",
+          "marks": 2,
+          "points": 4,
+          "timeLimit": 120
+        },
+        {
+          "id": "q_igcse_chem_s3_026",
+          "original": true,
+          "topicCode": "IGC-MET",
+          "type": "multiple_choice",
+          "prompt": "Which metal reacts steadily with cold water, producing hydrogen gas?",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Copper",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Calcium",
+              "rationale": "This is the supported answer. Calcium reacts with cold water to give calcium hydroxide and hydrogen. (Zinc and iron react only with steam when red-hot; copper does not react with water at all.)"
+            },
+            {
+              "label": "C",
+              "text": "Zinc",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Iron",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Calcium reacts with cold water to give calcium hydroxide and hydrogen. (Zinc and iron react only with steam when red-hot; copper does not react with water at all.) Therefore the correct answer is B: Calcium.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_027",
+          "original": true,
+          "topicCode": "IGC-MET",
+          "type": "multiple_choice",
+          "prompt": "An iron nail is placed in blue copper(II) sulfate solution and a brown-pink solid forms on the nail. What is the correct explanation?",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Copper is more reactive than iron and dissolves the nail.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The nail has begun to rust.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Iron is more reactive than copper and displaces copper from the solution.",
+              "rationale": "This is the supported answer. A more reactive metal displaces a less reactive one from its salt solution: Fe + CuSO₄ → FeSO₄ + Cu, and the brown-pink solid is copper. (The reactivity series puts iron above copper; rusting needs oxygen and water, not copper sulfate.)"
+            },
+            {
+              "label": "D",
+              "text": "Copper(II) sulfate decomposes iron on contact.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "A more reactive metal displaces a less reactive one from its salt solution: Fe + CuSO₄ → FeSO₄ + Cu, and the brown-pink solid is copper. (The reactivity series puts iron above copper; rusting needs oxygen and water, not copper sulfate.) Therefore the correct answer is C: Iron is more reactive than copper and displaces copper from the solution..",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_028",
+          "original": true,
+          "topicCode": "IGC-MET",
+          "type": "multiple_choice",
+          "prompt": "Which two substances are both needed for iron to rust?",
+          "difficulty": "medium",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Oxygen and carbon dioxide",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Water and salt",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Nitrogen and water",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Oxygen and water",
+              "rationale": "This is the supported answer. Rusting requires both oxygen and water. (Carbon dioxide and nitrogen are not involved; salt only speeds rusting up — it is not essential.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Rusting requires both oxygen and water. (Carbon dioxide and nitrogen are not involved; salt only speeds rusting up — it is not essential.) Therefore the correct answer is D: Oxygen and water.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_029",
+          "original": true,
+          "topicCode": "IGC-MET",
+          "type": "multiple_choice",
+          "prompt": "In the blast furnace, iron is extracted from iron(III) oxide. Which substance reduces the iron(III) oxide to iron?",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Carbon monoxide",
+              "rationale": "This is the supported answer. Carbon monoxide, formed from the burning coke, is the reducing agent: Fe₂O₃ + 3CO → 2Fe + 3CO₂. (Oxygen would oxidise, not reduce; nitrogen is inert here; calcium carbonate removes sandy impurities as slag but does not reduce the ore.)"
+            },
+            {
+              "label": "B",
+              "text": "Oxygen",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Nitrogen",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Calcium carbonate",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Carbon monoxide, formed from the burning coke, is the reducing agent: Fe₂O₃ + 3CO → 2Fe + 3CO₂. (Oxygen would oxidise, not reduce; nitrogen is inert here; calcium carbonate removes sandy impurities as slag but does not reduce the ore.) Therefore the correct answer is A: Carbon monoxide.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_030",
+          "original": true,
+          "topicCode": "IGC-MET",
+          "type": "structured",
+          "prompt": "A student investigates the reactivity of magnesium, zinc, iron and copper by adding a small piece of each metal to separate samples of dilute hydrochloric acid.",
+          "difficulty": "medium",
+          "commandWord": "Describe",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "contentLabel": "Original BrillaPrep practice material aligned to the published Cambridge IGCSE Chemistry (0620) syllabus; not official Cambridge International material and not official WAEC material. Use the enabled feedback channel to report corrections.",
+          "parts": [
+            {
+              "label": "(a)",
+              "text": "State what is observed when magnesium is added to dilute hydrochloric acid.",
+              "correctAnswer": "Rapid effervescence (bubbles of hydrogen gas); the magnesium dissolves and the test-tube gets warm.",
+              "marks": 1
+            },
+            {
+              "label": "(b)",
+              "text": "Write the balanced symbol equation, with state symbols, for the reaction of zinc with dilute hydrochloric acid.",
+              "correctAnswer": "Zn(s) + 2HCl(aq) → ZnCl₂(aq) + H₂(g)",
+              "marks": 2
+            },
+            {
+              "label": "(c)",
+              "text": "The student observes no reaction with copper. Place all four metals in order of reactivity, most reactive first.",
+              "correctAnswer": "Magnesium > zinc > iron > copper.",
+              "marks": 1
+            }
+          ],
+          "correctAnswer": "(a) rapid effervescence as the magnesium dissolves; (b) Zn + 2HCl → ZnCl₂ + H₂; (c) magnesium, zinc, iron, copper.",
+          "workedSolution": "(a) Magnesium is high in the reactivity series, so it reacts vigorously with the acid, giving bubbles of hydrogen and heat. (b) Zinc forms zinc chloride and hydrogen: Zn(s) + 2HCl(aq) → ZnCl₂(aq) + H₂(g); the 2 balances the chlorine and hydrogen atoms. (c) Vigour of reaction gives magnesium > zinc > iron, and copper, which shows no reaction, is the least reactive of the four.",
+          "marks": 4,
+          "points": 4,
+          "timeLimit": 300
+        },
+        {
+          "id": "q_igcse_chem_s3_031",
+          "original": true,
+          "topicCode": "IGC-ORG",
+          "type": "multiple_choice",
+          "prompt": "What is the general formula of the alkenes?",
+          "difficulty": "medium",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "CₙH₂ₙ₊₂",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "CₙH₂ₙ",
+              "rationale": "This is the supported answer. Alkenes contain one C=C double bond, so they have two fewer hydrogen atoms than the corresponding alkane: CₙH₂ₙ. (CₙH₂ₙ₊₂ is the alkane series; CₙH₂ₙ₋₂ would have two degrees of unsaturation; CₙH₂ₙ₊₁OH describes an alcohol.)"
+            },
+            {
+              "label": "C",
+              "text": "CₙH₂ₙ₋₂",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "CₙH₂ₙ₊₁OH",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Alkenes contain one C=C double bond, so they have two fewer hydrogen atoms than the corresponding alkane: CₙH₂ₙ. (CₙH₂ₙ₊₂ is the alkane series; CₙH₂ₙ₋₂ would have two degrees of unsaturation; CₙH₂ₙ₊₁OH describes an alcohol.) Therefore the correct answer is B: CₙH₂ₙ.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_032",
+          "original": true,
+          "topicCode": "IGC-ORG",
+          "type": "multiple_choice",
+          "prompt": "Which functional group is present in every molecule of ethanol?",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "The carboxyl group, –COOH",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The carbon-to-carbon double bond, C=C",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The hydroxyl group, –OH",
+              "rationale": "This is the supported answer. Ethanol, C₂H₅OH, is an alcohol, and the alcohol functional group is the hydroxyl group –OH. (–COOH is found in carboxylic acids such as ethanoic acid; C=C is found in alkenes; –COO– is found in esters.)"
+            },
+            {
+              "label": "D",
+              "text": "The ester linkage, –COO–",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Ethanol, C₂H₅OH, is an alcohol, and the alcohol functional group is the hydroxyl group –OH. (–COOH is found in carboxylic acids such as ethanoic acid; C=C is found in alkenes; –COO– is found in esters.) Therefore the correct answer is C: The hydroxyl group, –OH.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_033",
+          "original": true,
+          "topicCode": "IGC-ORG",
+          "type": "multiple_choice",
+          "prompt": "Which monomer is used to manufacture poly(ethene)?",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Ethane",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Ethyne",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Chloroethene",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Ethene",
+              "rationale": "This is the supported answer. Poly(ethene) forms by the addition polymerisation of ethene monomers, whose C=C double bonds open up and link together. (Ethane is saturated and cannot polymerise by addition; chloroethene gives poly(chloroethene), PVC.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Poly(ethene) forms by the addition polymerisation of ethene monomers, whose C=C double bonds open up and link together. (Ethane is saturated and cannot polymerise by addition; chloroethene gives poly(chloroethene), PVC.) Therefore the correct answer is D: Ethene.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_034",
+          "original": true,
+          "topicCode": "IGC-ORG",
+          "type": "multiple_choice",
+          "prompt": "Ethanol reacts with ethanoic acid in the presence of a few drops of concentrated sulfuric acid as a catalyst. What are the products of this esterification reaction?",
+          "difficulty": "hard",
+          "commandWord": "Deduce",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Ethyl ethanoate and water",
+              "rationale": "This is the supported answer. An alcohol and a carboxylic acid react to form an ester and water: C₂H₅OH + CH₃COOH → CH₃COOC₂H₅ + H₂O. The ester from ethanol and ethanoic acid is ethyl ethanoate. (Ethyl methanoate would need methanoic acid; ethene and water come from dehydrating ethanol; hydrogen is not a product of condensation.)"
+            },
+            {
+              "label": "B",
+              "text": "Ethyl methanoate and water",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Ethene and water",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Ethyl ethanoate and hydrogen",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "An alcohol and a carboxylic acid react to form an ester and water: C₂H₅OH + CH₃COOH → CH₃COOC₂H₅ + H₂O. The ester from ethanol and ethanoic acid is ethyl ethanoate. (Ethyl methanoate would need methanoic acid; ethene and water come from dehydrating ethanol; hydrogen is not a product of condensation.) Therefore the correct answer is A: Ethyl ethanoate and water.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_035",
+          "original": true,
+          "topicCode": "IGC-ORG",
+          "type": "multiple_choice",
+          "prompt": "During cracking, one molecule of decane, C₁₀H₂₂, produces one molecule of octane, C₈H₁₈, and one molecule of X. What is X?",
+          "difficulty": "hard",
+          "commandWord": "Deduce",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Ethane, C₂H₆",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Ethene, C₂H₄",
+              "rationale": "This is the supported answer. The atoms must balance: C₁₀H₂₂ − C₈H₁₈ leaves C₂H₄, which is ethene. Cracking always produces at least one alkene. (C₂H₆ would make the hydrogen count 24, not 22; CH₄ would leave only 9 carbons accounted for; C₃H₆ would need 11 carbons in total.)"
+            },
+            {
+              "label": "C",
+              "text": "Methane, CH₄",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Propene, C₃H₆",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "The atoms must balance: C₁₀H₂₂ − C₈H₁₈ leaves C₂H₄, which is ethene. Cracking always produces at least one alkene. (C₂H₆ would make the hydrogen count 24, not 22; CH₄ would leave only 9 carbons accounted for; C₃H₆ would need 11 carbons in total.) Therefore the correct answer is B: Ethene, C₂H₄.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_036",
+          "original": true,
+          "topicCode": "IGC-ELE",
+          "type": "multiple_choice",
+          "prompt": "Molten lead(II) bromide is electrolysed using inert electrodes. What is formed at the cathode?",
+          "difficulty": "easy",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Bromine",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Oxygen",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Lead",
+              "rationale": "This is the supported answer. The cathode is the negative electrode, attracting the positive Pb²⁺ ions, which gain electrons and are discharged as molten lead: Pb²⁺ + 2e⁻ → Pb. (Bromine forms at the anode; there is no oxygen or hydrogen in the melt.)"
+            },
+            {
+              "label": "D",
+              "text": "Hydrogen",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "The cathode is the negative electrode, attracting the positive Pb²⁺ ions, which gain electrons and are discharged as molten lead: Pb²⁺ + 2e⁻ → Pb. (Bromine forms at the anode; there is no oxygen or hydrogen in the melt.) Therefore the correct answer is C: Lead.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_037",
+          "original": true,
+          "topicCode": "IGC-ELE",
+          "type": "multiple_choice",
+          "prompt": "During electrolysis, which electrode is the anode?",
+          "difficulty": "easy",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "The negative electrode",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "The electrode where reduction occurs",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "The electrode at which metals are always deposited",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "The positive electrode",
+              "rationale": "This is the supported answer. The anode is defined as the positive electrode, where anions are attracted and oxidation takes place. (The negative electrode is the cathode; reduction occurs at the cathode; metals deposit at the cathode, not the anode.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "The anode is defined as the positive electrode, where anions are attracted and oxidation takes place. (The negative electrode is the cathode; reduction occurs at the cathode; metals deposit at the cathode, not the anode.) Therefore the correct answer is D: The positive electrode.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_038",
+          "original": true,
+          "topicCode": "IGC-ELE",
+          "type": "multiple_choice",
+          "prompt": "Why must an ionic compound be molten, or dissolved in water, before it can be electrolysed?",
+          "difficulty": "easy",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "So that its ions are free to move and carry the electric current.",
+              "rationale": "This is the supported answer. In the solid lattice the ions are locked in fixed positions. Melting or dissolving frees the ions to move to the electrodes, which is how the current is carried through the electrolyte. (Electrolytes conduct by moving ions, not electrons; the voltage comes from the supply.)"
+            },
+            {
+              "label": "B",
+              "text": "So that electrons can flow through the liquid.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "To increase the voltage of the power supply.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "To prevent the compound reacting with the electrodes.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "In the solid lattice the ions are locked in fixed positions. Melting or dissolving frees the ions to move to the electrodes, which is how the current is carried through the electrolyte. (Electrolytes conduct by moving ions, not electrons; the voltage comes from the supply.) Therefore the correct answer is A: So that its ions are free to move and carry the electric current..",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_039",
+          "original": true,
+          "topicCode": "IGC-ELE",
+          "type": "multiple_choice",
+          "prompt": "Which material is commonly used to make inert electrodes for electrolysis?",
+          "difficulty": "easy",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Copper",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Graphite",
+              "rationale": "This is the supported answer. Graphite (and platinum) conduct electricity yet are unreactive, so they do not take part in the electrolysis — they are inert. (Copper, iron and aluminium are active electrodes that can themselves oxidise and dissolve at the anode.)"
+            },
+            {
+              "label": "C",
+              "text": "Iron",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Aluminium",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Graphite (and platinum) conduct electricity yet are unreactive, so they do not take part in the electrolysis — they are inert. (Copper, iron and aluminium are active electrodes that can themselves oxidise and dissolve at the anode.) Therefore the correct answer is B: Graphite.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_040",
+          "original": true,
+          "topicCode": "IGC-ELE",
+          "type": "multiple_choice",
+          "prompt": "Concentrated aqueous sodium chloride is electrolysed using inert electrodes. What are the products at the cathode and at the anode?",
+          "difficulty": "hard",
+          "commandWord": "Predict",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Sodium at the cathode and chlorine at the anode.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Hydrogen at the cathode and oxygen at the anode.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Hydrogen at the cathode and chlorine at the anode.",
+              "rationale": "This is the supported answer. At the cathode hydrogen is discharged because hydrogen is less reactive than sodium: 2H⁺ + 2e⁻ → H₂. At the anode, the high chloride concentration means Cl⁻ is discharged rather than OH⁻: 2Cl⁻ → Cl₂ + 2e⁻. (Sodium is never discharged from aqueous solution; oxygen forms at the anode only when the chloride is dilute; the products are never swapped between electrodes.)"
+            },
+            {
+              "label": "D",
+              "text": "Chlorine at the cathode and hydrogen at the anode.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "At the cathode hydrogen is discharged because hydrogen is less reactive than sodium: 2H⁺ + 2e⁻ → H₂. At the anode, the high chloride concentration means Cl⁻ is discharged rather than OH⁻: 2Cl⁻ → Cl₂ + 2e⁻. (Sodium is never discharged from aqueous solution; oxygen forms at the anode only when the chloride is dilute; the products are never swapped between electrodes.) Therefore the correct answer is C: Hydrogen at the cathode and chlorine at the anode..",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_041",
+          "original": true,
+          "topicCode": "IGC-ANA",
+          "type": "multiple_choice",
+          "prompt": "A solution is acidified with dilute nitric acid, then aqueous silver nitrate is added. A white precipitate forms. Which ion is present in the solution?",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Sulfate, SO₄²⁻",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Nitrate, NO₃⁻",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Carbonate, CO₃²⁻",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Chloride, Cl⁻",
+              "rationale": "This is the supported answer. A white precipitate of silver chloride after acidifying with dilute nitric acid confirms chloride ions. (Sulfate is tested with barium nitrate solution; the nitric acid destroys any carbonate, which would otherwise give a precipitate that dissolves in acid; nitrate gives no precipitate.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "A white precipitate of silver chloride after acidifying with dilute nitric acid confirms chloride ions. (Sulfate is tested with barium nitrate solution; the nitric acid destroys any carbonate, which would otherwise give a precipitate that dissolves in acid; nitrate gives no precipitate.) Therefore the correct answer is D: Chloride, Cl⁻.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_042",
+          "original": true,
+          "topicCode": "IGC-ANA",
+          "type": "multiple_choice",
+          "prompt": "What colour does a sodium compound produce in a flame test?",
+          "difficulty": "medium",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Yellow",
+              "rationale": "This is the supported answer. Sodium compounds give a bright yellow flame. (Lilac is potassium; brick-red is calcium; green is copper(II) or barium.)"
+            },
+            {
+              "label": "B",
+              "text": "Lilac",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Brick-red",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Green",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "Sodium compounds give a bright yellow flame. (Lilac is potassium; brick-red is calcium; green is copper(II) or barium.) Therefore the correct answer is A: Yellow.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_043",
+          "original": true,
+          "topicCode": "IGC-ANA",
+          "type": "multiple_choice",
+          "prompt": "Which statement correctly describes the test for ammonia gas?",
+          "difficulty": "medium",
+          "commandWord": "State",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "It relights a glowing splint.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "It turns damp red litmus paper blue.",
+              "rationale": "This is the supported answer. Ammonia is the only common alkaline gas, so it turns damp red litmus paper blue. (Relighting a glowing splint is the oxygen test; a squeaky pop indicates hydrogen; milky limewater indicates carbon dioxide.)"
+            },
+            {
+              "label": "C",
+              "text": "It gives a squeaky pop with a lighted splint.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It turns limewater milky.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Ammonia is the only common alkaline gas, so it turns damp red litmus paper blue. (Relighting a glowing splint is the oxygen test; a squeaky pop indicates hydrogen; milky limewater indicates carbon dioxide.) Therefore the correct answer is B: It turns damp red litmus paper blue..",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_044",
+          "original": true,
+          "topicCode": "IGC-ANA",
+          "type": "multiple_choice",
+          "prompt": "In paper chromatography, a spot travels 6.0 cm while the solvent front travels 8.0 cm. What is the Rf value of the spot?",
+          "difficulty": "medium",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "1.33",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "0.60",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "0.75",
+              "rationale": "This is the supported answer. Rf = distance travelled by the substance ÷ distance travelled by the solvent = 6.0 ÷ 8.0 = 0.75. (1.33 inverts the ratio, and Rf values can never exceed 1; 0.60 and 0.80 come from misreading the two distances.)"
+            },
+            {
+              "label": "D",
+              "text": "0.80",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "Rf = distance travelled by the substance ÷ distance travelled by the solvent = 6.0 ÷ 8.0 = 0.75. (1.33 inverts the ratio, and Rf values can never exceed 1; 0.60 and 0.80 come from misreading the two distances.) Therefore the correct answer is C: 0.75.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_045",
+          "original": true,
+          "topicCode": "IGC-ANA",
+          "type": "structured",
+          "prompt": "X is a white solid compound containing one cation and one anion. Answer the following questions about identifying X.",
+          "difficulty": "medium",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "contentLabel": "Original BrillaPrep practice material aligned to the published Cambridge IGCSE Chemistry (0620) syllabus; not official Cambridge International material and not official WAEC material. Use the enabled feedback channel to report corrections.",
+          "parts": [
+            {
+              "label": "(a)",
+              "text": "A flame test on X gives a lilac flame. Identify the cation present in X.",
+              "correctAnswer": "The potassium ion, K⁺.",
+              "marks": 1
+            },
+            {
+              "label": "(b)",
+              "text": "Describe a chemical test to show that X contains carbonate ions, and state the observation that confirms a positive result.",
+              "correctAnswer": "Add dilute hydrochloric acid to X; effervescence occurs and the gas evolved turns limewater milky, confirming carbon dioxide and therefore carbonate ions.",
+              "marks": 2
+            },
+            {
+              "label": "(c)",
+              "text": "Use your answers to (a) and (b) to suggest the identity of X.",
+              "correctAnswer": "Potassium carbonate, K₂CO₃.",
+              "marks": 1
+            }
+          ],
+          "correctAnswer": "(a) potassium ions, K⁺; (b) add dilute acid — the gas evolved turns limewater milky; (c) potassium carbonate, K₂CO₃.",
+          "workedSolution": "(a) A lilac flame is characteristic of potassium compounds. (b) Carbonates react with dilute acids to release carbon dioxide: CO₃²⁻ + 2H⁺ → H₂O + CO₂; bubbling the gas through limewater turns it milky as insoluble calcium carbonate forms. (c) Combining a potassium cation with a carbonate anion gives potassium carbonate, K₂CO₃.",
+          "marks": 4,
+          "points": 4,
+          "timeLimit": 300
+        },
+        {
+          "id": "q_igcse_chem_s3_046",
+          "original": true,
+          "topicCode": "IGC-REA",
+          "type": "multiple_choice",
+          "prompt": "Which change increases the rate of the reaction between marble chips and dilute hydrochloric acid?",
+          "difficulty": "easy",
+          "commandWord": "Identify",
+          "assessmentObjective": "AO1",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Using larger marble chips.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Cooling the acid before use.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Diluting the acid with more water.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "Using powdered marble chips instead of large lumps.",
+              "rationale": "This is the supported answer. Powdering the marble increases its surface area, so more particles are exposed to the acid and collisions are more frequent. (Larger chips reduce the surface area; cooling and diluting both slow the reaction.)"
+            }
+          ],
+          "correctAnswer": "D",
+          "workedSolution": "Powdering the marble increases its surface area, so more particles are exposed to the acid and collisions are more frequent. (Larger chips reduce the surface area; cooling and diluting both slow the reaction.) Therefore the correct answer is D: Using powdered marble chips instead of large lumps..",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_047",
+          "original": true,
+          "topicCode": "IGC-REA",
+          "type": "multiple_choice",
+          "prompt": "How does a catalyst increase the rate of a chemical reaction?",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "It provides an alternative reaction pathway with a lower activation energy.",
+              "rationale": "This is the supported answer. A catalyst works by offering a route of lower activation energy, so a greater proportion of collisions are successful. It is chemically unchanged at the end and does not alter temperature or concentration. (A catalyst that was used up could not, by definition, be a catalyst.)"
+            },
+            {
+              "label": "B",
+              "text": "It increases the temperature of the reactants.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "It is used up during the reaction.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "It increases the concentration of the reactants.",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "A",
+          "workedSolution": "A catalyst works by offering a route of lower activation energy, so a greater proportion of collisions are successful. It is chemically unchanged at the end and does not alter temperature or concentration. (A catalyst that was used up could not, by definition, be a catalyst.) Therefore the correct answer is A: It provides an alternative reaction pathway with a lower activation energy..",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_048",
+          "original": true,
+          "topicCode": "IGC-REA",
+          "type": "multiple_choice",
+          "prompt": "For the reaction H₂ + Cl₂ → 2HCl the bond energies are H–H = 436 kJ/mol, Cl–Cl = 243 kJ/mol and H–Cl = 432 kJ/mol. What is the enthalpy change, ΔH, of the reaction?",
+          "difficulty": "hard",
+          "commandWord": "Calculate",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "+185 kJ/mol",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "−185 kJ/mol",
+              "rationale": "This is the supported answer. Energy taken in to break bonds = 436 + 243 = 679 kJ. Energy released forming two H–Cl bonds = 2 × 432 = 864 kJ. ΔH = 679 − 864 = −185 kJ/mol, so the reaction is exothermic. (+185 reverses the sign; −247 forms only one H–Cl bond; +1,111 adds the two energies instead of subtracting.)"
+            },
+            {
+              "label": "C",
+              "text": "−247 kJ/mol",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "D",
+              "text": "+1,111 kJ/mol",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "B",
+          "workedSolution": "Energy taken in to break bonds = 436 + 243 = 679 kJ. Energy released forming two H–Cl bonds = 2 × 432 = 864 kJ. ΔH = 679 − 864 = −185 kJ/mol, so the reaction is exothermic. (+185 reverses the sign; −247 forms only one H–Cl bond; +1,111 adds the two energies instead of subtracting.) Therefore the correct answer is B: −185 kJ/mol.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_049",
+          "original": true,
+          "topicCode": "IGC-REA",
+          "type": "multiple_choice",
+          "prompt": "In the Haber process, N₂(g) + 3H₂(g) ⇌ 2NH₃(g), the forward reaction is exothermic. Which change increases the yield of ammonia at equilibrium?",
+          "difficulty": "hard",
+          "commandWord": "Deduce",
+          "assessmentObjective": "AO3",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "options": [
+            {
+              "label": "A",
+              "text": "Increasing the temperature",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "B",
+              "text": "Adding more iron catalyst",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            },
+            {
+              "label": "C",
+              "text": "Increasing the pressure",
+              "rationale": "This is the supported answer. There are 4 moles of gas on the left and 2 on the right, so increasing the pressure shifts the equilibrium towards the fewer moles — the ammonia side. (The forward reaction is exothermic, so raising the temperature lowers the yield; a catalyst speeds up attainment of equilibrium but does not change the yield; decreasing the pressure favours the reactant side.)"
+            },
+            {
+              "label": "D",
+              "text": "Decreasing the pressure",
+              "rationale": "This is a plausible misconception, but it does not follow from the chemistry in the worked solution."
+            }
+          ],
+          "correctAnswer": "C",
+          "workedSolution": "There are 4 moles of gas on the left and 2 on the right, so increasing the pressure shifts the equilibrium towards the fewer moles — the ammonia side. (The forward reaction is exothermic, so raising the temperature lowers the yield; a catalyst speeds up attainment of equilibrium but does not change the yield; decreasing the pressure favours the reactant side.) Therefore the correct answer is C: Increasing the pressure.",
+          "marks": 1,
+          "points": 1,
+          "timeLimit": 90
+        },
+        {
+          "id": "q_igcse_chem_s3_050",
+          "original": true,
+          "topicCode": "IGC-REA",
+          "type": "structured",
+          "prompt": "A student adds 2 g of marble chips (calcium carbonate) to 50 cm³ of dilute hydrochloric acid and measures the volume of carbon dioxide produced every 30 seconds.",
+          "difficulty": "medium",
+          "commandWord": "Explain",
+          "assessmentObjective": "AO2",
+          "provenance": [
+            {
+              "publisher": "Cambridge International Education",
+              "title": "Cambridge IGCSE Chemistry (0620) syllabus",
+              "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-chemistry-0620/",
+              "use": "curriculum_blueprint_only"
+            }
+          ],
+          "contentLabel": "Original BrillaPrep practice material aligned to the published Cambridge IGCSE Chemistry (0620) syllabus; not official Cambridge International material and not official WAEC material. Use the enabled feedback channel to report corrections.",
+          "parts": [
+            {
+              "label": "(a)",
+              "text": "Write the balanced symbol equation for the reaction between calcium carbonate and hydrochloric acid.",
+              "correctAnswer": "CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂",
+              "marks": 2
+            },
+            {
+              "label": "(b)",
+              "text": "State two changes the student could make to increase the rate of this reaction.",
+              "correctAnswer": "Use powdered marble chips (greater surface area) and use a more concentrated (or warmer) acid.",
+              "marks": 1
+            },
+            {
+              "label": "(c)",
+              "text": "Explain, in terms of particles, why increasing the temperature increases the rate of reaction.",
+              "correctAnswer": "The particles have more kinetic energy, so they collide more frequently and a greater proportion of collisions have energy at least equal to the activation energy.",
+              "marks": 1
+            }
+          ],
+          "correctAnswer": "(a) CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂; (b) powder the marble chips and use more concentrated or warmer acid; (c) particles move faster and collide more often with enough energy to react.",
+          "workedSolution": "(a) Calcium carbonate neutralises hydrochloric acid to give calcium chloride, water and carbon dioxide; the 2 in front of HCl balances the chlorine and hydrogen atoms. (b) Crushing the chips raises the surface area exposed to the acid, and a more concentrated or warmer acid gives more frequent, more energetic collisions. (c) At higher temperature the particles move faster, so collisions are both more frequent and more often energetic enough to break bonds and react.",
+          "marks": 4,
+          "points": 4,
+          "timeLimit": 300
+        }
+      ]
+    }
+  ]
+}
