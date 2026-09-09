@@ -1,0 +1,798 @@
+{
+  "batchId": "flashcards-beta-002",
+  "status": "automated_beta",
+  "generatedAt": "2026-09-09T00:00:00Z",
+  "provenance": [
+    {
+      "publisher": "National Council for Curriculum and Assessment, Ghana",
+      "title": "Secondary Education Curriculum (Common Core Programme and SHS subject curricula)",
+      "url": "https://nacca.gov.gh/",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "West African Examinations Council, Ghana",
+      "title": "WASSCE for School Candidates subject catalogue and syllabus scope",
+      "url": "https://waecgh.org/home/wassce-school/",
+      "use": "curriculum_blueprint_only"
+    },
+    {
+      "publisher": "Primetime Limited",
+      "title": "National Science & Maths Quiz (scope: Ghana SHS science and mathematics syllabi)",
+      "url": "https://nsmq.com.gh/",
+      "use": "curriculum_blueprint_only"
+    }
+  ],
+  "review": {
+    "authoringMethod": "original_curriculum_aligned",
+    "qualityAssurance": "automated_beta",
+    "automatedChecksAt": "2026-09-09T00:00:00Z"
+  },
+  "release": {
+    "channel": "beta",
+    "contentLabel": "Original BrillaPrep revision flashcards aligned to Ghana’s published NaCCA curriculum and the WAEC/NSMQ syllabus scope; not official WAEC, NaCCA or NSMQ material.",
+    "officialExamBoardContent": false,
+    "feedbackEnabled": true
+  },
+  "decks": [
+    {
+      "deckId": "deck_sys_topic_geometry",
+      "isNewDeck": false,
+      "cards": [
+        {
+          "id": "fc_b002_geometry_01",
+          "front": "State the angle in a semicircle theorem.",
+          "back": "The angle subtended at the circumference by a diameter is a right angle: any angle inscribed in a semicircle equals 90°.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_geometry_02",
+          "front": "What is the relationship between a tangent to a circle and the radius drawn to the point of contact?",
+          "back": "They are perpendicular: the tangent meets the radius at exactly 90° at the point of contact.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_geometry_03",
+          "front": "State the alternate segment theorem.",
+          "back": "The angle between a tangent and a chord drawn through the point of contact equals the angle subtended by that chord in the alternate segment of the circle.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_geometry_04",
+          "front": "What do the opposite angles of a cyclic quadrilateral add up to?",
+          "back": "180° — opposite angles of a cyclic quadrilateral are supplementary, since each pair subtends arcs that together make the whole circle.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_geometry_05",
+          "front": "State the angle at the centre theorem.",
+          "back": "The angle subtended by an arc at the centre of a circle is twice the angle subtended by the same arc at the circumference.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_geometry_06",
+          "front": "Write the formula for the circumference of a circle of radius r.",
+          "back": "C = 2πr (equivalently C = πd, where d = 2r is the diameter).",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_geometry_07",
+          "front": "Write the formula for the volume of a cylinder of radius r and height h.",
+          "back": "V = πr²h — the base area (πr²) multiplied by the height.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_geometry_08",
+          "front": "Write the formula for the volume of a cone of base radius r and perpendicular height h.",
+          "back": "V = ⅓πr²h — one third of the volume of the cylinder with the same base and height.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_geometry_09",
+          "front": "What is the sum of the interior angles of an n-sided polygon?",
+          "back": "(n − 2) × 180°. Each exterior angle of a regular n-gon is 360°/n, and the interior angle is 180° − 360°/n.",
+          "hint": "Split the polygon into triangles from one vertex.",
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_geometry_10",
+          "front": "What can be said about angles in the same segment of a circle?",
+          "back": "They are equal: angles subtended by the same arc (or chord) in the same segment of a circle are identical.",
+          "hint": null,
+          "difficulty": 2
+        }
+      ]
+    },
+    {
+      "deckId": "deck_sys_topic_quadratic",
+      "isNewDeck": false,
+      "cards": [
+        {
+          "id": "fc_b002_quadratic_01",
+          "front": "Write the standard form of a quadratic equation.",
+          "back": "ax² + bx + c = 0, where a, b and c are constants and a ≠ 0 (if a = 0 the equation is linear, not quadratic).",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_quadratic_02",
+          "front": "For ax² + bx + c = 0 with a ≠ 0, write the formula that gives the roots in terms of a, b and c.",
+          "back": "x = (−b ± √(b² − 4ac)) / 2a — obtained by completing the square on the standard form.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_quadratic_03",
+          "front": "What is the discriminant of a quadratic, and what does each sign of it tell you?",
+          "back": "Δ = b² − 4ac. If Δ > 0 there are two distinct real roots; if Δ = 0 there is one repeated real root; if Δ < 0 there are no real roots (a complex conjugate pair).",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_quadratic_04",
+          "front": "What is the sum of the roots of ax² + bx + c = 0?",
+          "back": "−b/a. This follows from writing the equation as a(x − α)(x − β) = 0 and comparing coefficients of x.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_quadratic_05",
+          "front": "What is the product of the roots of ax² + bx + c = 0?",
+          "back": "c/a, from the constant term of a(x − α)(x − β) = a[x² − (α + β)x + αβ].",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_quadratic_06",
+          "front": "Solve x² − 5x + 6 = 0 by factorising.",
+          "back": "x² − 5x + 6 = (x − 2)(x − 3) = 0, so x = 2 or x = 3. The factors come from the pair of numbers with sum −5 and product +6.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_quadratic_07",
+          "front": "What is the axis of symmetry of the parabola y = ax² + bx + c?",
+          "back": "The vertical line x = −b/2a. The vertex (turning point) of the parabola lies on this line.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_quadratic_08",
+          "front": "Complete the square for x² + 6x + 5.",
+          "back": "x² + 6x + 5 = (x + 3)² − 9 + 5 = (x + 3)² − 4. Hence the minimum value is −4 at x = −3, and the roots are x = −1 and x = −5.",
+          "hint": "Halve the coefficient of x to build the bracket.",
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_quadratic_09",
+          "front": "How does the sign of a affect the graph of y = ax² + bx + c?",
+          "back": "If a > 0 the parabola opens upward and has a minimum point; if a < 0 it opens downward and has a maximum point.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_quadratic_10",
+          "front": "Form a quadratic equation with integer coefficients whose roots are 3 and −4.",
+          "back": "Sum of roots = −1 and product = −12, so the equation is x² − (sum)x + product = 0, i.e. x² + x − 12 = 0.",
+          "hint": "Use x² − (α + β)x + αβ = 0.",
+          "difficulty": 3
+        }
+      ]
+    },
+    {
+      "deckId": "deck_sys_topic_statistics",
+      "isNewDeck": false,
+      "cards": [
+        {
+          "id": "fc_b002_statistics_01",
+          "front": "Define the mean of a set of n observations.",
+          "back": "The arithmetic average: mean = Σx/n, the sum of all values divided by the number of values.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_statistics_02",
+          "front": "Define the median of a data set.",
+          "back": "The middle value when the data are arranged in order of size; for an even number of observations it is the average of the two middle values.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_statistics_03",
+          "front": "Define the mode of a data set.",
+          "back": "The value that occurs most frequently. A data set may have one mode, more than one mode (bimodal), or no mode at all.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_statistics_04",
+          "front": "What is the range of a data set?",
+          "back": "The difference between the largest and smallest values: range = maximum − minimum. It is the simplest measure of spread.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_statistics_05",
+          "front": "Write the formula for the variance of a population, and define standard deviation.",
+          "back": "Variance σ² = Σ(x − μ)²/n, the mean of the squared deviations from the mean μ. The standard deviation σ is the positive square root of the variance.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_statistics_06",
+          "front": "State the addition rule of probability for two events A and B.",
+          "back": "P(A ∪ B) = P(A) + P(B) − P(A ∩ B). If A and B are mutually exclusive, P(A ∩ B) = 0 and the rule reduces to P(A) + P(B).",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_statistics_07",
+          "front": "State the multiplication rule for two independent events.",
+          "back": "If A and B are independent, P(A ∩ B) = P(A) × P(B) — the probability of both occurring is the product of their separate probabilities.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_statistics_08",
+          "front": "Define the conditional probability P(A|B).",
+          "back": "P(A|B) = P(A ∩ B)/P(B), provided P(B) > 0: the probability of A given that B has already occurred.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_statistics_09",
+          "front": "Within what range must every probability lie, and what do the endpoints mean?",
+          "back": "0 ≤ P(E) ≤ 1 for every event E. P(E) = 0 means the event is impossible; P(E) = 1 means it is certain.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_statistics_10",
+          "front": "A fair die is thrown once. What is the probability of obtaining a score greater than 4?",
+          "back": "The favourable outcomes are 5 and 6, so P = 2/6 = 1/3.",
+          "hint": "Count the favourable faces out of six equally likely faces.",
+          "difficulty": 2
+        }
+      ]
+    },
+    {
+      "deckId": "deck_sys_topic_kinematics",
+      "isNewDeck": false,
+      "cards": [
+        {
+          "id": "fc_b002_kinematics_01",
+          "front": "Distinguish between distance and displacement.",
+          "back": "Distance is the total length of the path travelled (a scalar); displacement is the straight-line change in position from start to finish, with direction (a vector).",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_kinematics_02",
+          "front": "Define acceleration and state its SI unit.",
+          "back": "Acceleration is the rate of change of velocity, a = Δv/Δt; its SI unit is the metre per second squared (m/s²).",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_kinematics_03",
+          "front": "What does the area under a velocity–time graph represent?",
+          "back": "The displacement of the body over the time interval considered (area above the time axis is positive displacement, below it negative).",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_kinematics_04",
+          "front": "What does the gradient of a displacement–time graph give?",
+          "back": "The velocity of the body; the gradient at a point gives the instantaneous velocity, ds/dt.",
+          "hint": "Gradient = rate of change.",
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_kinematics_05",
+          "front": "What is free fall?",
+          "back": "Motion under the influence of gravity alone, with negligible air resistance; near the Earth’s surface the acceleration is g ≈ 9.81 m/s² directed downwards.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_kinematics_06",
+          "front": "Write the kinematic equation that gives displacement from the average of the initial and final velocities.",
+          "back": "s = ½(u + v)t, valid for uniform (constant) acceleration: displacement equals average velocity multiplied by time.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_kinematics_07",
+          "front": "What is the acceleration of a body moving with constant velocity?",
+          "back": "Zero — acceleration is the rate of change of velocity, and a constant velocity (including rest) does not change.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_kinematics_08",
+          "front": "Write the formula for the horizontal range of a projectile launched with speed u at angle θ to the horizontal.",
+          "back": "R = u² sin 2θ / g. For a given launch speed the range is greatest when θ = 45°, since sin 2θ is then 1.",
+          "hint": null,
+          "difficulty": 4
+        },
+        {
+          "id": "fc_b002_kinematics_09",
+          "front": "A car starts from rest and accelerates uniformly at 2 m/s² for 5 s. What is its final velocity?",
+          "back": "v = u + at = 0 + (2)(5) = 10 m/s.",
+          "hint": "“Starts from rest” means u = 0.",
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_kinematics_10",
+          "front": "Define instantaneous velocity.",
+          "back": "The velocity of a body at a particular instant: the limiting value of the average velocity as the time interval shrinks to zero, v = ds/dt.",
+          "hint": null,
+          "difficulty": 3
+        }
+      ]
+    },
+    {
+      "deckId": "deck_sys_topic_waves",
+      "isNewDeck": false,
+      "cards": [
+        {
+          "id": "fc_b002_waves_01",
+          "front": "What is a wave?",
+          "back": "A disturbance that transfers energy from one point to another without any net transfer of matter.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_waves_02",
+          "front": "Distinguish between transverse and longitudinal waves, giving one example of each.",
+          "back": "In transverse waves the oscillations are perpendicular to the direction of travel (e.g. light, water ripples); in longitudinal waves they are parallel to it (e.g. sound in air).",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_waves_03",
+          "front": "How are the period T and the frequency f of a wave related?",
+          "back": "T = 1/f: the period is the reciprocal of the frequency. T is measured in seconds and f in hertz (Hz).",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_waves_04",
+          "front": "State the law of reflection.",
+          "back": "The angle of incidence equals the angle of reflection, both measured from the normal at the point of incidence, with the incident ray, reflected ray and normal all in one plane.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_waves_05",
+          "front": "Define the refractive index of a medium.",
+          "back": "n = c/v: the ratio of the speed of light in a vacuum to its speed in the medium. Equivalently, n = sin i / sin r for light entering the medium from air.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_waves_06",
+          "front": "State Snell’s law of refraction.",
+          "back": "n₁ sin θ₁ = n₂ sin θ₂, where θ₁ and θ₂ are the angles the ray makes with the normal in media of refractive indices n₁ and n₂.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_waves_07",
+          "front": "What is diffraction, and when is it most noticeable?",
+          "back": "The spreading of waves as they pass through a gap or around an obstacle; it is greatest when the gap or obstacle is comparable in size to the wavelength.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_waves_08",
+          "front": "What is total internal reflection, and under what conditions does it occur?",
+          "back": "The complete reflection of light back into a denser medium at a boundary with a less dense medium; it occurs only when light travels from the optically denser medium and the angle of incidence exceeds the critical angle.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_waves_09",
+          "front": "Define the critical angle and give its relation to refractive index.",
+          "back": "The critical angle θc is the angle of incidence in the denser medium for which the angle of refraction is 90°; sin θc = n₂/n₁ where n₁ > n₂ (for a medium into air, sin θc = 1/n).",
+          "hint": null,
+          "difficulty": 4
+        },
+        {
+          "id": "fc_b002_waves_10",
+          "front": "State the thin lens formula.",
+          "back": "1/f = 1/u + 1/v, where f is the focal length, u the object distance and v the image distance, using a consistent sign convention.",
+          "hint": null,
+          "difficulty": 3
+        }
+      ]
+    },
+    {
+      "deckId": "deck_sys_topic_modern_physics",
+      "isNewDeck": false,
+      "cards": [
+        {
+          "id": "fc_b002_modern_physics_01",
+          "front": "What is the energy of a photon of frequency f?",
+          "back": "E = hf, where h is Planck’s constant, 6.63 × 10⁻³⁴ J·s. Higher-frequency radiation (e.g. ultraviolet) carries more energy per photon than lower-frequency radiation (e.g. red light).",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_modern_physics_02",
+          "front": "What is the photoelectric effect?",
+          "back": "The emission of electrons from a metal surface when electromagnetic radiation of sufficiently high frequency falls on it; no electrons are emitted below the threshold frequency, however intense the light.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_modern_physics_03",
+          "front": "Write Einstein’s photoelectric equation.",
+          "back": "hf = φ + ½mv²max: the photon energy hf equals the work function φ plus the maximum kinetic energy of the emitted photoelectrons.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_modern_physics_04",
+          "front": "Define the work function of a metal.",
+          "back": "The minimum energy needed to liberate an electron from the metal surface: φ = hf₀, where f₀ is the threshold frequency.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_modern_physics_05",
+          "front": "State the mass–energy equivalence relation.",
+          "back": "E = mc²: a mass m is equivalent to energy E, with c the speed of light; because c² is huge, a small mass converts into an enormous amount of energy (as in nuclear reactions).",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_modern_physics_06",
+          "front": "Define the half-life of a radioactive isotope.",
+          "back": "The time taken for half of the radioactive nuclei in a sample to decay — equivalently, for the activity (count rate) to fall to half its initial value.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_modern_physics_07",
+          "front": "State the Heisenberg uncertainty principle.",
+          "back": "The position and momentum of a particle cannot both be known exactly at the same time: Δx·Δp ≥ ℏ/2, where ℏ = h/2π. The more precisely one is measured, the less precisely the other is known.",
+          "hint": null,
+          "difficulty": 4
+        },
+        {
+          "id": "fc_b002_modern_physics_08",
+          "front": "What is meant by wave–particle duality?",
+          "back": "Matter and radiation exhibit both wave-like behaviour (interference, diffraction) and particle-like behaviour (photoelectric effect, electron diffraction showing the wave nature of particles).",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_modern_physics_09",
+          "front": "Name the three common types of radioactive emission and identify each.",
+          "back": "Alpha particles — helium nuclei (⁴₂He), strongly ionising, easily stopped; beta particles — fast electrons, moderately penetrating; gamma rays — high-energy electromagnetic radiation, very penetrating.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_modern_physics_10",
+          "front": "What happens to the nucleus of an atom when it undergoes alpha decay?",
+          "back": "It emits an alpha particle (⁴₂He), so its atomic number decreases by 2 and its mass number decreases by 4, producing a nucleus of a different element.",
+          "hint": null,
+          "difficulty": 2
+        }
+      ]
+    },
+    {
+      "deckId": "deck_sys_topic_bonding",
+      "isNewDeck": false,
+      "cards": [
+        {
+          "id": "fc_b002_bonding_01",
+          "front": "What is an ionic bond?",
+          "back": "The strong electrostatic attraction between oppositely charged ions, formed when one atom transfers electron(s) to another — typically metal to non-metal, as in NaCl.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_bonding_02",
+          "front": "What is a covalent bond?",
+          "back": "A shared pair of electrons between two atoms, each atom (usually) contributing one electron — typical between non-metal atoms, as in H₂, Cl₂ and CH₄.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_bonding_03",
+          "front": "What is a metallic bond?",
+          "back": "The attraction between a lattice of positive metal ions and the sea of delocalised electrons surrounding them; it holds metal atoms together and explains metallic properties.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_bonding_04",
+          "front": "How does the electronegativity difference between two atoms predict the bond type?",
+          "back": "A large difference (roughly above 1.7) gives an ionic bond; a small or zero difference gives a non-polar covalent bond; an intermediate difference gives a polar covalent bond.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_bonding_05",
+          "front": "Give three characteristic properties of ionic compounds.",
+          "back": "High melting and boiling points; conduct electricity when molten or in aqueous solution but not when solid; usually soluble in water and brittle as solids.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_bonding_06",
+          "front": "Give two characteristic properties of simple molecular covalent substances.",
+          "back": "Low melting and boiling points (weak intermolecular forces only), and they do not conduct electricity because they contain no free ions or electrons.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_bonding_07",
+          "front": "What is a coordinate (dative covalent) bond? Give one example.",
+          "back": "A covalent bond in which both shared electrons are donated by the same atom — for example, the N→H bond in the ammonium ion NH₄⁺ or the O→H bond in H₃O⁺.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_bonding_08",
+          "front": "What is hydrogen bonding, and which elements must be involved?",
+          "back": "A strong dipole–dipole attraction between a hydrogen atom covalently bonded to nitrogen, oxygen or fluorine and a lone pair on N, O or F of a neighbouring molecule; it explains the unusually high boiling point of water.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_bonding_09",
+          "front": "Why do metals conduct electricity?",
+          "back": "Their delocalised electrons are free to move through the lattice of positive ions, carrying charge when a potential difference is applied.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_bonding_10",
+          "front": "What are van der Waals forces?",
+          "back": "Weak, short-range intermolecular attractions arising from temporary, fluctuating dipoles; present between all molecules and growing stronger as molecular size (number of electrons) increases.",
+          "hint": null,
+          "difficulty": 3
+        }
+      ]
+    },
+    {
+      "deckId": "deck_sys_topic_organic",
+      "isNewDeck": false,
+      "cards": [
+        {
+          "id": "fc_b002_organic_01",
+          "front": "Write the general formula of the alkanes and name the simplest member.",
+          "back": "CₙH₂ₙ₊₂; the simplest member is methane, CH₄ (n = 1). Alkanes are saturated hydrocarbons containing only single bonds.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_organic_02",
+          "front": "Write the general formula of the alkenes.",
+          "back": "CₙH₂ₙ; alkenes are unsaturated hydrocarbons containing one carbon–carbon double bond, e.g. ethene C₂H₄.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_organic_03",
+          "front": "What is a homologous series?",
+          "back": "A family of organic compounds with the same functional group and general formula, in which successive members differ by CH₂ and show a gradual trend in physical properties and similar chemical behaviour.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_organic_04",
+          "front": "What is a functional group? Give two examples.",
+          "back": "The atom or group of atoms responsible for the characteristic chemical reactions of a compound — for example, the hydroxyl group −OH in alcohols, the carboxyl group −COOH in carboxylic acids, or the C=C double bond in alkenes.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_organic_05",
+          "front": "What are structural isomers?",
+          "back": "Compounds that have the same molecular formula but different structural arrangements of atoms — for example, butane and 2-methylpropane are both C₄H₁₀.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_organic_06",
+          "front": "Name the compound CH₃CH₂CH₂OH.",
+          "back": "Propan-1-ol: a three-carbon chain (propan-) with the hydroxyl group on carbon 1, making it a primary alcohol.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_organic_07",
+          "front": "Describe the chemical test for carbon–carbon unsaturation.",
+          "back": "Add bromine water: alkenes and alkynes decolourise it (orange-brown to colourless) as Br₂ adds across the multiple bond; saturated compounds give no change.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_organic_08",
+          "front": "What is esterification?",
+          "back": "The reaction of a carboxylic acid with an alcohol in the presence of an acid catalyst to form an ester and water — for example, ethanoic acid + ethanol → ethyl ethanoate + water.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_organic_09",
+          "front": "What is addition polymerisation? Give one example.",
+          "back": "The joining of many unsaturated monomer molecules to form a long-chain polymer with no small molecule eliminated — for example, ethene polymerising to poly(ethene).",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_organic_10",
+          "front": "What is cracking in petroleum chemistry?",
+          "back": "The thermal or catalytic breaking of long-chain alkanes into shorter, more useful alkanes and alkenes; it converts heavy fractions into petrol-range fuels and feedstock alkenes.",
+          "hint": null,
+          "difficulty": 3
+        }
+      ]
+    },
+    {
+      "deckId": "deck_sys_topic_ecology",
+      "isNewDeck": false,
+      "cards": [
+        {
+          "id": "fc_b002_ecology_01",
+          "front": "Define an ecosystem.",
+          "back": "A community of living organisms together with the non-living (abiotic) components of their environment, interacting as a functional unit — for example, a pond or a savanna.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_ecology_02",
+          "front": "What is a food chain?",
+          "back": "A linear sequence of organisms through which energy is transferred by feeding, starting with a producer (green plant) and passing through primary, secondary and tertiary consumers.",
+          "hint": null,
+          "difficulty": 1
+        },
+        {
+          "id": "fc_b002_ecology_03",
+          "front": "What is a trophic level?",
+          "back": "A feeding level in a food chain or web: producers occupy the first trophic level, herbivores the second, and successive carnivores the higher levels.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_ecology_04",
+          "front": "State the 10% rule of energy transfer in ecosystems.",
+          "back": "Only about 10% of the energy at one trophic level is passed on to the next; the rest is lost as heat from respiration, in waste and in uneaten remains — which is why food chains are short.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_ecology_05",
+          "front": "Distinguish between a population and a community.",
+          "back": "A population is all the individuals of one species living in an area; a community is all the populations of different species living and interacting in that area.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_ecology_06",
+          "front": "What is an ecological niche?",
+          "back": "The role and position of a species within its ecosystem — its habitat, what it eats, how it obtains energy and how it interacts with other organisms.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_ecology_07",
+          "front": "Define the carrying capacity of an environment.",
+          "back": "The maximum population size of a species that the environment can sustain indefinitely, given the available food, water, space and other resources.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_ecology_08",
+          "front": "What is the role of decomposers in nutrient cycling?",
+          "back": "Bacteria and fungi break down dead organisms and waste, releasing mineral nutrients (such as nitrates and phosphates) back into the soil for producers to reuse.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_ecology_09",
+          "front": "What is ecological succession?",
+          "back": "The orderly, directional change in the species composition of a community over time, from pioneer species through intermediate stages to a stable climax community.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_ecology_10",
+          "front": "Name the three main types of symbiosis and describe each briefly.",
+          "back": "Mutualism — both species benefit (e.g. bees and flowering plants); commensalism — one benefits and the other is unaffected; parasitism — one benefits at the expense of the host (e.g. tapeworm in the gut).",
+          "hint": null,
+          "difficulty": 3
+        }
+      ]
+    },
+    {
+      "deckId": "deck_sys_topic_physiology",
+      "isNewDeck": false,
+      "cards": [
+        {
+          "id": "fc_b002_physiology_01",
+          "front": "What is the cardiac cycle?",
+          "back": "The sequence of events making up one heartbeat: atrial systole (atria contract, filling the ventricles), ventricular systole (ventricles contract, pumping blood to lungs and body) and diastole (the heart relaxes and refills); it lasts about 0.8 s at rest.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_physiology_02",
+          "front": "Describe how a nerve impulse crosses a synapse.",
+          "back": "The arriving impulse causes vesicles to release neurotransmitter into the synaptic cleft; the transmitter diffuses across, binds to receptors on the post-synaptic membrane and triggers a new impulse there.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_physiology_03",
+          "front": "Outline the pathway of a reflex arc.",
+          "back": "Receptor → sensory neurone → relay neurone in the spinal cord → motor neurone → effector (muscle or gland). The response is fast and involuntary because it does not involve the conscious brain.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_physiology_04",
+          "front": "What is the functional unit of the kidney, and what two processes occur in it?",
+          "back": "The nephron. Ultrafiltration of blood occurs at the glomerulus into the Bowman’s capsule, then selective reabsorption of useful substances (glucose, some water and salts) occurs along the tubule.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_physiology_05",
+          "front": "Distinguish between nervous and hormonal control.",
+          "back": "Nervous control uses electrical impulses along neurones and is fast, short-lived and targeted; hormonal control uses chemical messengers carried in the blood and is slower, longer-lasting and more widespread.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_physiology_06",
+          "front": "Which hormone lowers blood glucose, and which organ secretes it?",
+          "back": "Insulin, secreted by the islets of Langerhans in the pancreas; it stimulates liver and muscle cells to take up glucose and store it as glycogen. (Glucagon, from the same organ, raises blood glucose.)",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_physiology_07",
+          "front": "State three functions of the liver.",
+          "back": "Any three of: production of bile for fat emulsification; deamination of excess amino acids (forming urea); detoxification of drugs and alcohol; storage of glucose as glycogen; breakdown of worn-out red blood cells; heat production.",
+          "hint": null,
+          "difficulty": 2
+        },
+        {
+          "id": "fc_b002_physiology_08",
+          "front": "How does the body respond when the core temperature falls?",
+          "back": "Arterioles near the skin constrict (vasoconstriction) to reduce heat loss, shivering generates heat through rapid muscle contraction, sweating stops, and hairs are raised to trap an insulating layer of air.",
+          "hint": null,
+          "difficulty": 3
+        },
+        {
+          "id": "fc_b002_physiology_09",
+          "front": "Summarise the sliding filament theory of muscle contraction.",
+          "back": "Using energy from ATP, myosin heads attach to actin filaments and pull them towards the centre of the sarcomere, so the actin and myosin filaments slide past each other and the muscle fibre shortens.",
+          "hint": null,
+          "difficulty": 4
+        },
+        {
+          "id": "fc_b002_physiology_10",
+          "front": "Compare inhalation with exhalation in humans.",
+          "back": "Inhalation: the diaphragm contracts and flattens and the external intercostal muscles raise the ribs, increasing thoracic volume and lowering pressure so air flows in. Exhalation is largely passive: the muscles relax, volume falls, pressure rises and air flows out.",
+          "hint": null,
+          "difficulty": 3
+        }
+      ]
+    }
+  ]
+}
