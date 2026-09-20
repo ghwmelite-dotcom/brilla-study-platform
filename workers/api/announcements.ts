@@ -6,6 +6,10 @@ const MAX_BODY_BYTES = 24_576;
 const MAX_AUDIENCE_IDS = 50;
 const MAX_EMAIL_BATCH_SIZE = 100;
 const MAX_EMAIL_RECIPIENTS_PER_DISPATCH = 5_000;
+const MAX_D1_BIND_PARAMETERS = 100;
+const EMAIL_STATUS_FIXED_BIND_PARAMETERS = 3;
+const MAX_EMAIL_STATUS_USER_IDS_PER_STATEMENT =
+  MAX_D1_BIND_PARAMETERS - EMAIL_STATUS_FIXED_BIND_PARAMETERS;
 const RESEND_BATCH_URL = 'https://api.resend.com/emails/batch';
 const RESEND_USER_AGENT = 'BrillaPrep-Worker/1.0 (+https://brillaprep.org)';
 
@@ -381,7 +385,7 @@ async function deliverChatrooms(db: D1Database, announcement: AnnouncementRow): 
   }
 }
 
-async function setRecipientEmailStatus(
+export async function setRecipientEmailStatus(
   db: D1Database,
   announcementId: string,
   userIds: string[],
@@ -389,11 +393,20 @@ async function setRecipientEmailStatus(
   reason: string | null,
 ): Promise<void> {
   if (userIds.length === 0) return;
-  await db.prepare(`
-    UPDATE admin_announcement_recipients
-    SET email_status = ?, email_reason = ?, updated_at = datetime('now')
-    WHERE announcement_id = ? AND user_id IN (${placeholders(userIds.length)})
-  `).bind(status, reason, announcementId, ...userIds).run();
+  const statements: D1PreparedStatement[] = [];
+  for (
+    let offset = 0;
+    offset < userIds.length;
+    offset += MAX_EMAIL_STATUS_USER_IDS_PER_STATEMENT
+  ) {
+    const chunk = userIds.slice(offset, offset + MAX_EMAIL_STATUS_USER_IDS_PER_STATEMENT);
+    statements.push(db.prepare(`
+      UPDATE admin_announcement_recipients
+      SET email_status = ?, email_reason = ?, updated_at = datetime('now')
+      WHERE announcement_id = ? AND user_id IN (${placeholders(chunk.length)})
+    `).bind(status, reason, announcementId, ...chunk));
+  }
+  await db.batch(statements);
 }
 
 async function deliverEmail(env: AnnouncementEnv, announcement: AnnouncementRow): Promise<void> {

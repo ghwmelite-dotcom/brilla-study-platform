@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { sign } from 'hono/jwt';
 import worker from '../index';
-import { buildAudienceFilter } from '../announcements';
+import { buildAudienceFilter, setRecipientEmailStatus } from '../announcements';
 
 const JWT_SECRET = 'announcement-test-secret';
 
@@ -61,6 +61,30 @@ describe('admin announcements', () => {
     const filter = buildAudienceFilter('school', ['school-1', 'school-2']);
     expect(filter.sql).toContain('u.school_id IN (?,?)');
     expect(filter.params).toEqual(['school-1', 'school-2']);
+  });
+
+  it('chunks email status updates below the D1 bind-variable ceiling', async () => {
+    const boundParameterCounts: number[] = [];
+    const batchSizes: number[] = [];
+    const db = {
+      prepare: () => ({
+        bind: (...params: unknown[]) => {
+          boundParameterCounts.push(params.length);
+          return { run: async () => ({ success: true }) };
+        },
+      }),
+      batch: async (statements: unknown[]) => {
+        batchSizes.push(statements.length);
+        return statements.map(() => ({ success: true }));
+      },
+    } as unknown as D1Database;
+    const userIds = Array.from({ length: 215 }, (_, index) => `user-${index}`);
+
+    await setRecipientEmailStatus(db, 'announcement-1', userIds, 'queued', null);
+
+    expect(batchSizes).toEqual([3]);
+    expect(boundParameterCounts).toEqual([100, 100, 24]);
+    expect(Math.max(...boundParameterCounts)).toBeLessThanOrEqual(100);
   });
 
   it('requires admin authorization to create a draft', async () => {
