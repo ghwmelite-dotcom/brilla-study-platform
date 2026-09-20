@@ -18,6 +18,7 @@ import {
   GraduationCap,
   Gift,
   Mail,
+  Megaphone,
   School,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -93,7 +94,7 @@ export function AdminSidebar() {
   // Determine which group should be open based on current path
   const isDashboardSection = location.pathname === '/admin' || location.pathname.startsWith('/admin/analytics');
   const isUsersSection = location.pathname.startsWith('/admin/users') || location.pathname.startsWith('/admin/approvals') || location.pathname.startsWith('/admin/schools');
-  const isContentSection = location.pathname.startsWith('/admin/content') || location.pathname.startsWith('/admin/moderation');
+  const isContentSection = location.pathname.startsWith('/admin/content') || location.pathname.startsWith('/admin/moderation') || location.pathname.startsWith('/admin/announcements');
   const isSystemSection = location.pathname.startsWith('/admin/audit') || location.pathname.startsWith('/admin/settings');
   const isRevenueSection = location.pathname.startsWith('/admin/subscriptions') || location.pathname.startsWith('/admin/affiliates') || location.pathname.startsWith('/admin/campaigns');
   const isTutoringSection = location.pathname.startsWith('/admin/tutoring') || location.pathname.startsWith('/admin/teacher-bonuses');
@@ -133,6 +134,7 @@ export function AdminSidebar() {
           {/* Content Management hidden until backend is implemented */}
           {/* <NavItem to="/admin/content" icon={<ScrollText className="w-4 h-4" />} label="Questions" /> */}
           <NavItem to="/admin/moderation" icon={<MessageSquareWarning className="w-4 h-4" />} label="Moderation" />
+          <NavItem to="/admin/announcements" icon={<Megaphone className="w-4 h-4" />} label="Announcements" />
         </NavGroup>
 
         {/* System */}

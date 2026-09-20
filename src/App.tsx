@@ -47,6 +47,7 @@ const AdminAnalytics = lazyWithRetry(() => import('@/pages/AdminAnalytics'));
 const AdminSubscriptions = lazyWithRetry(() => import('@/pages/AdminSubscriptions'));
 const AdminAffiliates = lazyWithRetry(() => import('@/pages/AdminAffiliates'));
 const AdminCampaigns = lazyWithRetry(() => import('@/pages/AdminCampaigns'));
+const AdminAnnouncements = lazyWithRetry(() => import('@/pages/AdminAnnouncements'));
 const AdminTutoringDirectory = lazyWithRetry(() => import('@/pages/admin/AdminTutoringDirectory'));
 const AdminTeacherBonuses = lazyWithRetry(() => import('@/pages/admin/AdminTeacherBonuses'));
 const AdminSchools = lazyWithRetry(() => import('@/pages/admin/AdminSchools'));
@@ -936,6 +937,7 @@ function App() {
           <Route path="subscriptions" element={<LazyPage><AdminSubscriptions /></LazyPage>} />
           <Route path="affiliates" element={<LazyPage><AdminAffiliates /></LazyPage>} />
           <Route path="campaigns" element={<LazyPage><AdminCampaigns /></LazyPage>} />
+          <Route path="announcements" element={<LazyPage><AdminAnnouncements /></LazyPage>} />
           <Route path="tutoring" element={<LazyPage><AdminTutoringDirectory /></LazyPage>} />
           <Route path="teacher-bonuses" element={<LazyPage><AdminTeacherBonuses /></LazyPage>} />
           <Route path="schools" element={<LazyPage><AdminSchools /></LazyPage>} />

@@ -84,6 +84,7 @@ import {
 } from './usage-limits';
 import { mapSubjectCatalogRow } from './subject-catalog';
 import { marketingCampaignsApp } from './marketing-campaigns';
+import { announcementsApp } from './announcements';
 
 // Types for Cloudflare bindings
 export interface Env {
@@ -13315,6 +13316,9 @@ app.route('/api/auth/oauth', oauthApp);
 // Consent-gated referral marketing preferences, provider webhooks, and
 // admin-only draft preparation. This router deliberately has no send endpoint.
 app.route('/api/marketing', marketingCampaignsApp);
+
+// Admin announcement broadcasts and signed-in user communication preferences.
+app.route('/api/announcements', announcementsApp);
 
 // Mount protected routes (must be after all protectedApp routes are defined)
 app.route('/api', protectedApp);

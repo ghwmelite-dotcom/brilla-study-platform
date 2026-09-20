@@ -154,9 +154,16 @@ describe('Settings exam mode tab', () => {
           data: { referralRewardsOptIn: false, emailVerified: true, providerSyncStatus: 'not_synced' },
         });
       }
+      if (url.includes('announcements')) {
+        return Promise.resolve({ success: true, data: { emailEnabled: true } });
+      }
       return Promise.resolve({ success: true, data: {} });
     });
-    mocks.apiPut.mockResolvedValue({ success: true, data: {} });
+    mocks.apiPut.mockImplementation((url: string, body: { emailEnabled?: boolean }) => (
+      url.includes('announcements')
+        ? Promise.resolve({ success: true, data: { emailEnabled: body.emailEnabled } })
+        : Promise.resolve({ success: true, data: {} })
+    ));
     mocks.getLinkedProviders.mockResolvedValue({ providers: [], hasPassword: true });
   });
 
@@ -346,9 +353,16 @@ describe('Settings other tabs', () => {
           data: { referralRewardsOptIn: false, emailVerified: true, providerSyncStatus: 'not_synced' },
         });
       }
+      if (url.includes('announcements')) {
+        return Promise.resolve({ success: true, data: { emailEnabled: true } });
+      }
       return Promise.resolve({ success: true, data: {} });
     });
-    mocks.apiPut.mockResolvedValue({ success: true, data: {} });
+    mocks.apiPut.mockImplementation((url: string, body: { emailEnabled?: boolean }) => (
+      url.includes('announcements')
+        ? Promise.resolve({ success: true, data: { emailEnabled: body.emailEnabled } })
+        : Promise.resolve({ success: true, data: {} })
+    ));
     mocks.getLinkedProviders.mockResolvedValue({ providers: [], hasPassword: true });
   });
 
@@ -391,9 +405,12 @@ describe('Settings other tabs', () => {
 
     expect(mocks.apiGet).toHaveBeenCalledWith('/notifications/telegram/status');
     expect(mocks.apiGet).toHaveBeenCalledWith('/marketing/preferences');
+    expect(mocks.apiGet).toHaveBeenCalledWith('/announcements/preferences');
     expect(rendered.textContent).toContain('Connect Telegram');
 
-    const toggle = rendered.querySelector('input[type="checkbox"]');
+    const toggle = rendered.querySelector(
+      'input[aria-label="Receive platform announcement emails"]',
+    );
     await act(async () => {
       toggle?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
@@ -401,5 +418,8 @@ describe('Settings other tabs', () => {
     await wait(600);
 
     expect(rendered.textContent).toContain('Preferences saved!');
+    expect(mocks.apiPut).toHaveBeenCalledWith('/announcements/preferences', {
+      emailEnabled: false,
+    });
   });
 });

@@ -52,7 +52,12 @@ interface MySchoolSeat {
 export default function Settings() {
   const navigate = useNavigate();
   const { user, updateProfile } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
+  const [activeTab, setActiveTab] = useState<SettingsTab>(() => {
+    const requested = new URLSearchParams(window.location.search).get('tab');
+    return ['profile', 'school', 'exams', 'password', 'notifications', 'appearance'].includes(requested || '')
+      ? requested as SettingsTab
+      : 'profile';
+  });
   const passwordTurnstile = useTurnstile();
 
   // Profile form state
@@ -129,6 +134,7 @@ export default function Settings() {
   });
   const [notificationsSaving, setNotificationsSaving] = useState(false);
   const [notificationsSuccess, setNotificationsSuccess] = useState(false);
+  const [notificationsError, setNotificationsError] = useState<string | null>(null);
 
   const [marketingPreference, setMarketingPreference] = useState({
     referralRewardsOptIn: false,
@@ -208,6 +214,23 @@ export default function Settings() {
   useEffect(() => {
     if (activeTab === 'notifications') {
       loadTelegramStatus();
+      void (async () => {
+        try {
+          const response = await api.get<{ emailEnabled: boolean }>('/announcements/preferences');
+          if (!response.success || !response.data ||
+              typeof response.data.emailEnabled !== 'boolean') {
+            throw new Error(response.error || 'Failed to load platform email preference');
+          }
+          setNotifications((current) => ({
+            ...current,
+            emailUpdates: response.data!.emailEnabled,
+          }));
+        } catch (error) {
+          setNotificationsError(
+            error instanceof Error ? error.message : 'Failed to load platform email preference',
+          );
+        }
+      })();
     }
   }, [activeTab]);
 
@@ -605,12 +628,26 @@ export default function Settings() {
   const handleNotificationsSave = async () => {
     setNotificationsSaving(true);
     setNotificationsSuccess(false);
+    setNotificationsError(null);
 
     try {
-      // In production, this would save to API
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const response = await api.put<{ emailEnabled: boolean }>('/announcements/preferences', {
+        emailEnabled: notifications.emailUpdates,
+      });
+      if (!response.success || !response.data ||
+          typeof response.data.emailEnabled !== 'boolean') {
+        throw new Error(response.error || 'Failed to save platform email preference');
+      }
+      setNotifications((current) => ({
+        ...current,
+        emailUpdates: response.data!.emailEnabled,
+      }));
       setNotificationsSuccess(true);
       setTimeout(() => setNotificationsSuccess(false), 3000);
+    } catch (error) {
+      setNotificationsError(
+        error instanceof Error ? error.message : 'Failed to save platform email preference',
+      );
     } finally {
       setNotificationsSaving(false);
     }
@@ -1481,6 +1518,13 @@ export default function Settings() {
                     <p className="text-sm text-neutral-500">Choose what notifications you receive</p>
                   </div>
 
+                  {notificationsError && (
+                    <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center gap-2" role="alert">
+                      <AlertTriangle className="w-4 h-4" />
+                      {notificationsError}
+                    </div>
+                  )}
+
                   {notificationsSuccess && (
                     <div className="p-3 bg-green-50 text-green-700 rounded-lg text-sm flex items-center gap-2">
                       <Check className="w-4 h-4" />
@@ -1492,10 +1536,13 @@ export default function Settings() {
                     <label className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg cursor-pointer hover:bg-neutral-100 transition-colors">
                       <div>
                         <p className="font-medium text-neutral-900">Email Updates</p>
-                        <p className="text-sm text-neutral-500">Get notified about platform updates</p>
+                        <p className="text-sm text-neutral-500">
+                          Receive non-promotional platform announcements and feedback invitations
+                        </p>
                       </div>
                       <input
                         type="checkbox"
+                        aria-label="Receive platform announcement emails"
                         checked={notifications.emailUpdates}
                         onChange={(e) => setNotifications({ ...notifications, emailUpdates: e.target.checked })}
                         className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
