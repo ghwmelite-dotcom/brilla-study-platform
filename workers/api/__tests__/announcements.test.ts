@@ -18,6 +18,7 @@ async function authHeader(role: 'student' | 'admin' = 'admin') {
 function mockDb(options: {
   role?: 'student' | 'admin';
   announcement?: Record<string, unknown>;
+  preparedSql?: string[];
 } = {}) {
   const role = options.role || 'admin';
   const statement = (sql: string) => ({
@@ -36,7 +37,10 @@ function mockDb(options: {
     run: async () => ({ success: true, meta: { changes: 1 } }),
   });
   return {
-    prepare: (sql: string) => statement(sql),
+    prepare: (sql: string) => {
+      options.preparedSql?.push(sql);
+      return statement(sql);
+    },
     batch: async (statements: unknown[]) => statements.map(() => ({
       success: true,
       meta: { changes: 1 },
@@ -157,5 +161,45 @@ describe('admin announcements', () => {
       success: false,
       error: 'Resend email delivery is not configured',
     });
+  });
+
+  it('stores announcements as a supported system notification type', async () => {
+    const preparedSql: string[] = [];
+    const announcement = {
+      id: 'announcement-1',
+      title: 'Feedback',
+      message: 'Tell us about your experience.',
+      link: '/community',
+      audience_type: 'all',
+      audience_ids: '[]',
+      send_in_app: 1,
+      send_email: 0,
+      post_to_chatrooms: 0,
+      status: 'failed',
+      matched_users: 0,
+      in_app_sent: 0,
+      email_queued: 0,
+      email_skipped: 0,
+      email_failed: 0,
+      chatrooms_posted: 0,
+      created_by: 'admin-1',
+      created_at: '2026-09-20T00:00:00.000Z',
+      dispatched_at: null,
+      updated_at: '2026-09-20T00:00:00.000Z',
+    };
+
+    const response = await worker.fetch(
+      new Request('http://x/api/announcements/admin/announcements/announcement-1/send', {
+        method: 'POST',
+        headers: await authHeader('admin'),
+        body: JSON.stringify({ confirmation: 'SEND announcement-1' }),
+      }),
+      { DB: mockDb({ announcement, preparedSql }), JWT_SECRET },
+    );
+
+    expect(response.status).toBe(200);
+    const notificationInsert = preparedSql.find((sql) => sql.includes('INSERT INTO notifications'));
+    expect(notificationInsert).toContain("'system'");
+    expect(notificationInsert).not.toContain("'announcement'");
   });
 });

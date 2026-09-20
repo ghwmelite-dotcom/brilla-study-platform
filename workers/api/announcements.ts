@@ -326,7 +326,7 @@ async function deliverInApp(db: D1Database, announcement: AnnouncementRow): Prom
       SELECT
         'notif_' || lower(hex(randomblob(16))),
         recipients.user_id,
-        'announcement',
+        'system',
         ?, ?, 'megaphone', ?, ?
       FROM admin_announcement_recipients recipients
       WHERE recipients.announcement_id = ? AND recipients.in_app_status = 'pending'
